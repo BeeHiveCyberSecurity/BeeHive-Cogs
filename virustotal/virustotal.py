@@ -2,7 +2,7 @@ import requests
 import asyncio
 import discord
 from redbot.core import commands
-import time
+import time, json
 
 
 class VirusTotal(commands.Cog):
@@ -49,11 +49,9 @@ class VirusTotal(commands.Cog):
             if "data" in data:
                 attributes = data["data"].get("attributes")
                 if attributes and attributes.get("status") == "completed":
-                    results = attributes.get("results", {})
-                    if "malicious" in results:
-                        malicious_count = len([engine for engine in results["malicious"] if results["malicious"][engine]["category"] == "malicious"])
-                        await ctx.send(f"The file has been detected as malicious by {malicious_count} scanners.")
-                    else:
-                        await ctx.send("The file is not detected as malicious by any scanner.")
+                    json_data = json.dumps(data, indent=4)
+                    with open("analysis_result.json", "w") as json_file:
+                        json_file.write(json_data)
+                    await ctx.send(file=discord.File("analysis_result.json"))
                     break
             await asyncio.sleep(3)
