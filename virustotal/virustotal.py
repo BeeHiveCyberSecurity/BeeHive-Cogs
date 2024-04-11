@@ -2,6 +2,8 @@ import requests
 import asyncio
 import discord
 from redbot.core import commands
+import time
+
 
 class VirusTotal(commands.Cog):
     """Virus Total Inspection"""
@@ -43,15 +45,16 @@ class VirusTotal(commands.Cog):
         while True:
             response = requests.get(f'https://www.virustotal.com/api/v3/analyses/{analysis_id}', headers=headers)
             data = response.json()
-            if "data" in data:
-                attributes = data["data"].get("attributes")
-                if attributes and attributes.get("status") == "completed":
-                    results = attributes.get("results", {})
-                    malicious_count = results.get("malicious", 0)
-                    total_scanners = results.get("malicious", 0) + results.get("suspicious", 0) + results.get("type-unsupported", 0)
-                    if malicious_count > 0:
-                        await ctx.send(f"The file has been detected as malicious by {malicious_count}/{total_scanners} scanners.")
-                    else:
-                        await ctx.send("The file is not detected as malicious by any scanner.")
+            if "attributes" in data and "results" in data["attributes"]:
+                results = data["attributes"]["results"]
+                malicious_results = [result for result in results.values() if result["category"] == "malicious"]
+                if malicious_results:
+                    await ctx.send(f"The file has been detected as malicious by the following engines:")
+                    for result in malicious_results:
+                        await ctx.send(f"{result['engine_name']}: {result['result']}")
                     break
-            await asyncio.sleep(3)
+                else:
+                    await ctx.send("The file is not detected as malicious by any scanner.")
+                    break
+            else:
+                await asyncio.sleep(3)
