@@ -17,12 +17,12 @@ class VirusTotal(commands.Cog):
                 return await ctx.send("The Virus Total API key has not been set.")
             else:
                 if file_url:
-                    response = requests.post("https://www.virustotal.com/vtapi/v2/url/scan", params={"apikey": vt_key["api_key"]}, data={"url": file_url})
+                    response = requests.post("https://www.virustotal.com/api/v3/urls", headers={"x-apikey": vt_key["api_key"]}, data={"url": file_url})
                     data = response.json()
                     if "permalink" in data:
                         permalink = data["permalink"]
                         await ctx.send(f"Permalink: {permalink.split('-')[1]}")
-                        await self.check_results(ctx, permalink)
+                        await self.check_results(ctx, permalink.split('-')[1])
                     else:
                         await ctx.send("Failed to submit the file for analysis.")
                 elif ctx.message.attachments:
@@ -31,29 +31,27 @@ class VirusTotal(commands.Cog):
                     if response.status_code != 200:
                         return await ctx.send("Failed to download the attached file.")
                     file_content = response.content
-                    response = requests.post("https://www.virustotal.com/vtapi/v2/file/scan", params={"apikey": vt_key["api_key"]}, files={"file": file_content})
+                    response = requests.post("https://www.virustotal.com/api/v3/files", headers={"x-apikey": vt_key["api_key"]}, files={"file": file_content})
                     data = response.json()
-                    if "permalink" in data:
-                        permalink = data["permalink"]
-                        await ctx.send(f"Permalink: https://www.virustotal.com/gui/file/{permalink.split('-')[1]}?nocache=1")
-                        await self.check_results(ctx, permalink)
-                    else:
-                        await ctx.send("Failed to submit the file for analysis.")
+                    analysis = data['data']['id']
+                    await self.check_results(ctx, analysis)
                 else:
                     await ctx.send("No file URL or attachment provided.")
-
-    async def check_results(self, ctx, permalink):
+    async def check_results(self, ctx, analysis_id):
         vt_key = await self.bot.get_shared_api_tokens("virustotal")
+        headers = {"x-apikey": vt_key["api_key"]}
         while True:
-            response = requests.get(f"https://www.virustotal.com/gui/file/{permalink.split('-')[1]}", params={"apikey": vt_key["api_key"]})
+            response = requests.get(f'https://www.virustotal.com/api/v3/analyses/{analysis_id}', headers=headers)
             data = response.json()
-            if "positives" in data:
-                positives = data["positives"]
-                total = data["total"]
-                if positives > 0:
-                    await ctx.send(f"The file has been detected as malicious by {positives}/{total} scanners.")
-                else:
-                    await ctx.send("The file is not detected as malicious by any scanner.")
-                break
-            else:
-                await asyncio.sleep(3)
+            if "data" in data:
+                attributes = data["data"].get("attributes")
+                if attributes and attributes.get("status") == "completed":
+                    results = attributes.get("results", {})
+                    malicious_count = results.get("malicious", 0)
+                    total_scanners = results.get("malicious", 0) + results.get("suspicious", 0) + results.get("type-unsupported", 0)
+                    if malicious_count > 0:
+                        await ctx.send(f"The file has been detected as malicious by {malicious_count}/{total_scanners} scanners.")
+                    else:
+                        await ctx.send("The file is not detected as malicious by any scanner.")
+                    break
+            await asyncio.sleep(3)
