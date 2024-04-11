@@ -39,7 +39,7 @@ class VirusTotal(commands.Cog):
                         await ctx.send(f"Analysis ID: {analysis_id}")
                         await self.process_analysis(ctx, analysis_id)
                     else:
-                        await ctx.send("Failed to submit the file for analysis.")
+                        await ctx.send("Failed to submit the file for analysis. [fileupload]")
                         return
                 else:
                     await ctx.send("No file URL or attachment provided.")
@@ -59,7 +59,7 @@ class VirusTotal(commands.Cog):
                 await ctx.send(embed=embed_response)
                 break
             elif "errors" in analysis_data:
-                await ctx.send("Failed to submit the file for analysis.")
+                await ctx.send("Failed to submit the file for analysis. [process_analysis]")
                 break
             else:
                 await asyncio.sleep(3)
