@@ -9,12 +9,6 @@ class VirusTotal(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-class VirusTotal(commands.Cog):
-    """Virus Total Inspection"""
-
-    def __init__(self, bot):
-        self.bot = bot
-
     @commands.command()
     async def virustotal(self, ctx, file_url: str = None):
         async with ctx.typing():
