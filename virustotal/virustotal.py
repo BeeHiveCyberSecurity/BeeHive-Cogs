@@ -9,7 +9,7 @@ class VirusTotal(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    async def virustotal(self, ctx, file_url: str):
+    async def virustotal(self, ctx, file_url: str = None):
         await ctx.message.delete()
         vt_key = await self.bot.get_shared_api_tokens("virustotal")
         if vt_key.get("api_key") is None:
