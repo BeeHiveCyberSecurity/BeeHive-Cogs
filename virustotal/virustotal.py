@@ -15,7 +15,13 @@ class VirusTotal(commands.Cog):
                 res = response.json()
                 if res["response_code"] == 1:
                     return res
-                await asyncio.sleep(3)  # Wait for 3 seconds before checking again
+                await asyncio.sleep(3)
+
+class VirusTotal(commands.Cog):
+    """Virus Total Inspection"""
+
+    def __init__(self, bot):
+        self.bot = bot
 
     @commands.command()
     async def virustotal(self, ctx, file_url: str = None):
@@ -26,44 +32,43 @@ class VirusTotal(commands.Cog):
                 return await ctx.send("The Virus Total API key has not been set.")
             else:
                 if file_url:
-                    response = requests.get(file_url)
-                    if response.status_code != 200:
-                        embed_error = discord.Embed(title="**[** ``Error`` **]**", color=0x7F00FF)
-                        embed_error.add_field(name="", value="\u200a", inline=False)
-                        embed_error.add_field(name="Download Error:", value=f"Failed to download the file!", inline=False)
-                        await ctx.message.delete()
-                        original_message_error = await ctx.send(embed=embed_error)
-                        await original_message_error.delete(delay=10)
-                        return
-                    file_url = file_url.split("?")[0]
-                    response = requests.get(file_url)
-                    file_content = response.content
-                    file_name = file_url.split("/")[-1]
-                else:
-                    if not ctx.message.attachments:
-                        await ctx.send("No file provided or attached.")
-                        return
+                    response = requests.post("https://www.virustotal.com/api/v3/files", headers={"x-apikey": vt_key["api_key"]}, json={"url": file_url})
+                    data = response.json()
+                    if "data" in data and "id" in data["data"]:
+                        analysis_id = data["data"]["id"]
+                        await ctx.send(f"Analysis ID: {analysis_id}")
+                        await self.process_analysis(ctx, analysis_id)
+                    else:
+                        await ctx.send("Failed to submit the file for analysis.")
+                elif ctx.message.attachments:
                     attachment = ctx.message.attachments[0]
-                    file_content = await attachment.read()
-                    file_name = attachment.filename
-
-                vt_params = {"apikey": vt_key["api_key"]}
-                files = {"file": (file_name, file_content)}
-                response = requests.post("https://www.virustotal.com/vtapi/v2/file/scan", files=files, params=vt_params)
-                res = response.json()
-                if res["response_code"] == 1:
-                    embed_response = discord.Embed(title="**[** ``VirusTotal`` **]**", color=0x00FF00)
-                    embed_response.add_field(name="", value="\u200a", inline=False)
-                    embed_response.add_field(name="Scan Result:", value=res["verbose_msg"], inline=False)
-                    permalink = res["permalink"]
-                    embed_response.add_field(name="Permalink:", value=permalink, inline=False)
-                    await ctx.send(embed=embed_response)
+                    response = requests.get(attachment.url)
+                    if response.status_code != 200:
+                        return await ctx.send("Failed to download the attached file.")
+                    file_content = response.content
+                    response = requests.post("https://www.virustotal.com/api/v3/files", headers={"x-apikey": vt_key["api_key"]}, data=file_content)
+                    data = response.json()
+                    if "data" in data and "id" in data["data"]:
+                        analysis_id = data["data"]["id"]
+                        await ctx.send(f"Analysis ID: {analysis_id}")
+                        await self.process_analysis(ctx, analysis_id)
+                    else:
+                        await ctx.send("Failed to submit the file for analysis.")
                 else:
-                    scan_id = res["scan_id"]
-                    scan_status = await self.check_scan_status(ctx, scan_id, vt_key["api_key"])
-                    embed_response = discord.Embed(title="**[** ``VirusTotal`` **]**", color=0x00FF00)
-                    embed_response.add_field(name="", value="\u200a", inline=False)
-                    embed_response.add_field(name="Scan Result:", value=scan_status["verbose_msg"], inline=False)
-                    permalink = scan_status["permalink"]
-                    embed_response.add_field(name="Permalink:", value=permalink, inline=False)
-                    await ctx.send(embed=embed_response)
+                    await ctx.send("No file URL or attachment provided.")
+
+    async def process_analysis(self, ctx, analysis_id):
+        vt_key = await self.bot.get_shared_api_tokens("virustotal")
+        while True:
+            response = requests.get(f"https://www.virustotal.com/api/v3/analyses/{analysis_id}", headers={"x-apikey": vt_key["api_key"]})
+            analysis_data = response.json()
+            if analysis_data["data"]["attributes"]["status"] == "completed":
+                results = analysis_data["data"]["attributes"]["results"]
+                embed_response = discord.Embed(title="VirusTotal Results", color=0x00FF00)
+                for engine, result_data in results.items():
+                    if result_data["result"]:
+                        embed_response.add_field(name=engine, value=result_data["result"], inline=False)
+                await ctx.send(embed=embed_response)
+                break
+            else:
+                await asyncio.sleep(3)
