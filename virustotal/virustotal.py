@@ -37,7 +37,6 @@ class VirusTotal(commands.Cog):
                     if "data" in data and "id" in data["data"]:
                         analysis_id = data["data"]["id"]
                         await ctx.send(f"Analysis ID: {analysis_id}")
-                        await self.process_analysis(ctx, analysis_id)
                     else:
                         await ctx.send("Failed to submit the file for analysis. [fileupload]")
                         return
