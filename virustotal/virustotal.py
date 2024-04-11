@@ -3,7 +3,7 @@ import asyncio
 import discord
 from redbot.core import commands
 import time
-
+import json
 
 class VirusTotal(commands.Cog):
     """Virus Total Inspection"""
@@ -44,17 +44,21 @@ class VirusTotal(commands.Cog):
         headers = {"x-apikey": vt_key["api_key"]}
         while True:
             response = requests.get(f'https://www.virustotal.com/api/v3/analyses/{analysis_id}', headers=headers)
-            data = response.json()
-            if "attributes" in data and "results" in data["attributes"]:
-                results = data["attributes"]["results"]
-                malicious_results = [result for result in results.values() if result["category"] == "malicious"]
-                if malicious_results:
-                    await ctx.send(f"The file has been detected as malicious by the following engines:")
-                    for result in malicious_results:
-                        await ctx.send(f"{result['engine_name']}: {result['result']}")
-                    break
+            try:
+                data = response.json()
+                if "attributes" in data and "results" in data["attributes"]:
+                    results = data["attributes"]["results"]
+                    malicious_results = [result for result in results.values() if result["category"] == "malicious"]
+                    if malicious_results:
+                        await ctx.send(f"The file has been detected as malicious by the following engines:")
+                        for result in malicious_results:
+                            await ctx.send(f"{result['engine_name']}: {result['result']}")
+                        break
+                    else:
+                        await ctx.send("The file is not detected as malicious by any scanner.")
+                        break
                 else:
-                    await ctx.send("The file is not detected as malicious by any scanner.")
-                    break
-            else:
-                await asyncio.sleep(3)
+                    await asyncio.sleep(3)
+            except json.decoder.JSONDecodeError:
+                await ctx.send("Error decoding JSON response from VirusTotal API.")
+                break
