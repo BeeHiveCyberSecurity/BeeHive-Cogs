@@ -35,7 +35,7 @@ class VirusTotal(commands.Cog):
                     data = response.json()
                     if "permalink" in data:
                         permalink = data["permalink"]
-                        await ctx.send(f"Permalink: {permalink.split('-')[1]}")
+                        await ctx.send(f"Permalink: https://www.virustotal.com/gui/file/{permalink.split('-')[1]}?nocache=1")
                         await self.check_results(ctx, permalink)
                     else:
                         await ctx.send("Failed to submit the file for analysis.")
@@ -45,7 +45,7 @@ class VirusTotal(commands.Cog):
     async def check_results(self, ctx, permalink):
         vt_key = await self.bot.get_shared_api_tokens("virustotal")
         while True:
-            response = requests.get(permalink, params={"apikey": vt_key["api_key"]})
+            response = requests.get(f"https://www.virustotal.com/gui/file/{permalink.split('-')[1]}", params={"apikey": vt_key["api_key"]})
             data = response.json()
             if "positives" in data:
                 positives = data["positives"]
