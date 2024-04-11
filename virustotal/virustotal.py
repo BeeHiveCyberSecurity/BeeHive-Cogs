@@ -40,6 +40,7 @@ class VirusTotal(commands.Cog):
                 else:
                     await ctx.send("No file URL or attachment provided.")
     async def check_results(self, ctx, analysis_id):
+        time.sleep(5)
         vt_key = await self.bot.get_shared_api_tokens("virustotal")
         headers = {"x-apikey": vt_key["api_key"]}
         while True:
