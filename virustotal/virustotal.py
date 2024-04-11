@@ -21,7 +21,7 @@ class VirusTotal(commands.Cog):
                     data = response.json()
                     if "permalink" in data:
                         permalink = data["permalink"]
-                        await ctx.send(f"Permalink: {permalink}")
+                        await ctx.send(f"Permalink: {permalink.split('-')[1]}")
                         await self.check_results(ctx, permalink)
                     else:
                         await ctx.send("Failed to submit the file for analysis.")
@@ -35,7 +35,7 @@ class VirusTotal(commands.Cog):
                     data = response.json()
                     if "permalink" in data:
                         permalink = data["permalink"]
-                        await ctx.send(f"Permalink: {permalink}")
+                        await ctx.send(f"Permalink: {permalink.split('-')[1]}")
                         await self.check_results(ctx, permalink)
                     else:
                         await ctx.send("Failed to submit the file for analysis.")
