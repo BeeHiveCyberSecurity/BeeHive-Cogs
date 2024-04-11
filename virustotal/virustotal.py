@@ -23,6 +23,12 @@ class VirusTotal(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+class VirusTotal(commands.Cog):
+    """Virus Total Inspection"""
+
+    def __init__(self, bot):
+        self.bot = bot
+
     @commands.command()
     async def virustotal(self, ctx, file_url: str = None):
         async with ctx.typing():
@@ -40,6 +46,7 @@ class VirusTotal(commands.Cog):
                         await self.process_analysis(ctx, analysis_id)
                     else:
                         await ctx.send("Failed to submit the file for analysis.")
+                        return  # Stop execution here if failed to submit file
                 elif ctx.message.attachments:
                     attachment = ctx.message.attachments[0]
                     response = requests.get(attachment.url)
@@ -53,15 +60,16 @@ class VirusTotal(commands.Cog):
                         await ctx.send(f"Analysis ID: {analysis_id}")
                         await self.process_analysis(ctx, analysis_id)
                     else:
-                        await ctx.send("Failed to submit the file for analysis.")
+                        await ctx.send(data)
+                        return 
                 else:
                     await ctx.send("No file URL or attachment provided.")
 
     async def process_analysis(self, ctx, analysis_id):
-        vt_key = await self.bot.get_shared_api_tokens("virustotal")
         while True:
             response = requests.get(f"https://www.virustotal.com/api/v3/analyses/{analysis_id}", headers={"x-apikey": vt_key["api_key"]})
             analysis_data = response.json()
+            # Check if analysis is completed
             if analysis_data["data"]["attributes"]["status"] == "completed":
                 results = analysis_data["data"]["attributes"]["results"]
                 embed_response = discord.Embed(title="VirusTotal Results", color=0x00FF00)
@@ -70,5 +78,9 @@ class VirusTotal(commands.Cog):
                         embed_response.add_field(name=engine, value=result_data["result"], inline=False)
                 await ctx.send(embed=embed_response)
                 break
+            elif "errors" in analysis_data:
+                await ctx.send("Failed to submit the file for analysis.")
+                break  # Stop loop if failed to submit file
             else:
-                await asyncio.sleep(3)
+                await asyncio.sleep(3)  # Check again after 3 seconds
+
