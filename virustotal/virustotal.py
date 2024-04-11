@@ -50,8 +50,7 @@ class VirusTotal(commands.Cog):
                 attributes = data["data"].get("attributes")
                 if attributes and attributes.get("status") == "completed":
                     json_data = json.dumps(data, indent=4)
-                    with open("analysis_result.json", "w") as json_file:
-                        json_file.write(json_data)
-                    await ctx.send(file=discord.File("analysis_result.json"))
+                    json_bytes = json_data.encode("utf-8")
+                    await ctx.send(file=discord.File(io.BytesIO(json_bytes), filename="analysis_result.json"))
                     break
             await asyncio.sleep(3)
