@@ -10,6 +10,6 @@ class VirusTotal(commands.Cog):
     async def virustotal(self, ctx):
         vt_key = await self.bot.get_shared_api_tokens("virustotal")
         if vt_key.get("api_key") is None:
-            return await ctx.send("The YouTube API key has not been set.")
+            return await ctx.send("The Virus Total API key has not been set.")
         else:
-            return await ctx.send(f"The Virus Key Registerd Is: {vt_key.get("api_key")}")
+            return await ctx.send("Virus Total Key Found")
