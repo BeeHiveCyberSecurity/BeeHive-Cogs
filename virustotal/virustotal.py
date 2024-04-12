@@ -3,7 +3,7 @@ import asyncio
 import discord
 from redbot.core import commands
 import time, json
-
+import io
 
 class VirusTotal(commands.Cog):
     """Virus Total Inspection"""
