@@ -1,7 +1,14 @@
-Red is a free, self-hostable, open-source Discord bot that can be used in growing communities to help personalize and modularize server management, moderation, games, and more. 
+# About this repo
+Red is a free, self-hostable, open-source Discord bot that can be used in growing Discord communities to help personalize and modularize server management, moderation, games, and more. 
 
-This repo contains cogs built for Red that can help keep your community safer. 
+This repo contains cogs built for Red that can help keep your community safer, in many cases for free. 
 
-## Getting started
+## Adding the repo
 To add this repo to your Red bot, use the command
+
 ```[p]repo add RedDiscordBot-Cogs https://github.com/BeeHiveCyberSecurity/RedDiscordBot-Cogs```
+
+## Adding cogs to your bot
+To install cogs from this repo to your Red instance, use the command
+
+```[p]cog install RedDiscordBot-Cogs (cogname)```
