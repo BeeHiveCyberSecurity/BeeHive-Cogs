@@ -36,11 +36,11 @@ class VirusTotal(commands.Cog):
                     response = requests.post("https://www.virustotal.com/api/v3/files", headers={"x-apikey": vt_key["api_key"]}, files={"file": file_content})
                     data = response.json()
                     analysis = data['data']['id']
-                    await self.check_results(ctx, analysis)
+                    await self.check_results(ctx, analysis, ctx.author.id)
                 else:
                     await ctx.send("No file URL or attachment provided.")
 
-    async def check_results(self, ctx, analysis_id):
+    async def check_results(self, ctx, analysis_id, presid):
         vt_key = await self.bot.get_shared_api_tokens("virustotal")
         headers = {"x-apikey": vt_key["api_key"]}
         
@@ -62,14 +62,14 @@ class VirusTotal(commands.Cog):
                     
                     if meta:
                         embed = discord.Embed(title="File Analysis Completed", url=f"https://www.virustotal.com/gui/file/{meta}")
-                        author_mention = ctx.author.mention
+                        author_mention = presid
                         if malicious_count > 0:
-                            embed.description = f"{author_mention}, VirusTotal analysis indicates this file could be malicious!"
+                            embed.description = f"<@{presid}>, VirusTotal analysis indicates this file could be malicious!"
                             embed.color = 0xFF4545  # Red color
                             embed.set_thumbnail(url="https://images-ext-1.discordapp.net/external/SPQpi1FTkADM8XzV0UQQ1eHe_EShYovjwHzX8YnjNkI/https/www.beehive.systems/hubfs/Icon%2520Packs/Red/warning-outline.png?format=webp&quality=lossless&width=910&height=910")
                         else:
                             embed.color = 0x2BBD8E  # Green color
-                            embed.description(f"{author_mention}, VirusTotal analysis indicates this file is safe to use!")
+                            embed.description(f"<@{presid}>, VirusTotal analysis indicates this file is safe to use!")
                             embed.add_field(name="Status", value="Safe", inline=False)
                             embed.set_thumbnail(url="https://images-ext-1.discordapp.net/external/emlj4WYJyGGJaChkQdaMHt5bdsnE9pJUF5Qqgml4T5g/%3Fformat%3Dwebp%26quality%3Dlossless%26width%3D910%26height%3D910/https/images-ext-1.discordapp.net/external/OmwDVUJYkMMUoU_0CFX9rI2qpJ-mg_oMDpVkrrym0HY/https/www.beehive.systems/hubfs/Icon%252520Packs/Green/checkmark-circle-outline.png?format=webp&quality=lossless")
                         
