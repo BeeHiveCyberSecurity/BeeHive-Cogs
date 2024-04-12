@@ -49,11 +49,26 @@ class VirusTotal(commands.Cog):
             if "data" in data:
                 attributes = data["data"].get("attributes")
                 if attributes and attributes.get("status") == "completed":
-                    stats = data["data"]["attributes"]["stats"]
+                    stats = attributes.get("stats", {})
                     malicious_count = stats.get("malicious", 0)
-                    embed = discord.Embed(title="File Analysis Completed", url="https://www.virustotal.com")
-                    embed.add_field(name="Status", value="completed")
-                    embed.add_field(name="Malicious Count", value=malicious_count)
+                    suspicious_count = stats.get("suspicious", 0)
+                    undetected_count = stats.get("undetected", 0)
+                    harmless_count = stats.get("harmless", 0)
+                    timeout_count = stats.get("timeout", 0)
+                    confirmed_timeout_count = stats.get("confirmed-timeout", 0)
+                    failure_count = stats.get("failure", 0)
+                    unsupported_count = stats.get("type-unsupported", 0)
+                    
+                    embed = discord.Embed(title="File Analysis Completed", url="https://www.virustotal.com", color=0x00ff00)
+                    embed.add_field(name="Status", value="Completed", inline=False)
+                    embed.add_field(name="Malicious Count", value=malicious_count, inline=False)
+                    embed.add_field(name="Suspicious Count", value=suspicious_count, inline=False)
+                    embed.add_field(name="Undetected Count", value=undetected_count, inline=False)
+                    embed.add_field(name="Harmless Count", value=harmless_count, inline=False)
+                    embed.add_field(name="Timeout Count", value=timeout_count, inline=False)
+                    embed.add_field(name="Confirmed Timeout Count", value=confirmed_timeout_count, inline=False)
+                    embed.add_field(name="Failure Count", value=failure_count, inline=False)
+                    embed.add_field(name="Unsupported Count", value=unsupported_count, inline=False)
                     await ctx.send(embed=embed)
                     break
             await asyncio.sleep(3)
