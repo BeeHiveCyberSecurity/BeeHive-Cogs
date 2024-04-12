@@ -69,6 +69,7 @@ class VirusTotal(commands.Cog):
                             embed.set_thumbnail(url="https://images-ext-1.discordapp.net/external/SPQpi1FTkADM8XzV0UQQ1eHe_EShYovjwHzX8YnjNkI/https/www.beehive.systems/hubfs/Icon%2520Packs/Red/warning-outline.png?format=webp&quality=lossless&width=910&height=910")
                         else:
                             embed.color = 0x2BBD8E  # Green color
+                            embed.description(f"{author_mention}, VirusTotal analysis indicates this file is safe to use!")
                             embed.add_field(name="Status", value="Safe", inline=False)
                             embed.set_thumbnail(url="https://images-ext-1.discordapp.net/external/emlj4WYJyGGJaChkQdaMHt5bdsnE9pJUF5Qqgml4T5g/%3Fformat%3Dwebp%26quality%3Dlossless%26width%3D910%26height%3D910/https/images-ext-1.discordapp.net/external/OmwDVUJYkMMUoU_0CFX9rI2qpJ-mg_oMDpVkrrym0HY/https/www.beehive.systems/hubfs/Icon%252520Packs/Green/checkmark-circle-outline.png?format=webp&quality=lossless")
                         
