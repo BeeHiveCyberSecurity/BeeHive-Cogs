@@ -14,6 +14,7 @@ class VirusTotal(commands.Cog):
     @commands.command()
     async def virustotal(self, ctx, file_url: str = None):
         async with ctx.typing():
+            await ctx.message.delete()
             vt_key = await self.bot.get_shared_api_tokens("virustotal")
             if vt_key.get("api_key") is None:
                 return await ctx.send("The Virus Total API key has not been set.")
@@ -58,10 +59,18 @@ class VirusTotal(commands.Cog):
                     confirmed_timeout_count = stats.get("confirmed-timeout", 0)
                     failure_count = stats.get("failure", 0)
                     unsupported_count = stats.get("type-unsupported", 0)
-                    
-                    embed = discord.Embed(title="File Analysis Completed", url="https://www.virustotal.com", color=0x00ff00)
+                    if malicious_count > 0:
+                        embed = discord.Embed(title="File Analysis Completed", url="https://www.virustotal.com", color=15158332)
+                    else:
+                        embed = discord.Embed(title="File Analysis Completed", url="https://www.virustotal.com", color=0x00ff00)
                     embed.add_field(name="Status", value="Completed", inline=False)
                     embed.add_field(name="Malicious Count", value=malicious_count, inline=False)
+                    if malicious_count > 0:
+                        malicious_engines = []
+                        for engine, result in attributes["results"].items():
+                            if result.get("category") == "malicious":
+                                malicious_engines.append(engine)
+                        embed.add_field(name="Malicious Engines", value=", ".join(malicious_engines), inline=False)
                     embed.add_field(name="Suspicious Count", value=suspicious_count, inline=False)
                     embed.add_field(name="Undetected Count", value=undetected_count, inline=False)
                     embed.add_field(name="Harmless Count", value=harmless_count, inline=False)
