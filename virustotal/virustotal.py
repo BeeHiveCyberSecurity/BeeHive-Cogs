@@ -50,7 +50,7 @@ class VirusTotal(commands.Cog):
                 attributes = data["data"].get("attributes")
                 if attributes and attributes.get("status") == "completed":
                     embed = discord.Embed(title="File Analysis Completed", url="https://www.virustotal.com")
-                    malicious = data["attributes"]["results"]["stats"]["malicious"]
+                    malicious = data["data"]["attributes"]["results"]["stats"]["malicious"]
                     embed.add_field(name="Status", value="completed")
                     embed.add_field(name="Malicious Count", value=malicious)
                     await ctx.send(embed=embed)
