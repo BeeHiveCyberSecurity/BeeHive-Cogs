@@ -133,13 +133,14 @@ class AntiPhishing(commands.Cog):
                 with contextlib.suppress(discord.NotFound):
                     embed = discord.Embed(
                         title="Dangerous link detected!",
-                        description=f"One or more security vendors have marked this website as dangerous.\n\nThis could be anything from a fraudulent online seller, to an IP logger, to a page delivering malware intended to target your Discord account.\n\nYou should avoid clicking this link for your own security.",
+                        description=f"A potentially dangerous website was detected in chat.\n\nThis link could have been anything from a fraudulent online seller, to an IP logger, to a page delivering malware intended to target members Discord accounts.\n\n",
                         color=16729413,
                     )
                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/warning-outline.png")
                     embed.timestamp = datetime.datetime.utcnow()
                     embed.set_footer(text="Link scanning powered by BeeHive",icon_url="")
-                    await message.reply(embed=embed)
+                    await message.send(embed=embed)
+                    
                 await modlog.create_case(
                     guild=message.guild,
                     bot=self.bot,
@@ -282,9 +283,9 @@ class AntiPhishing(commands.Cog):
         Choose the action that occurs when a user sends a phishing scam.
 
         Options:
-        `ignore` - Disables the anti-phishing integration (default)
-        `notify` - Sends a message to the channel and says it's a phishing scam
-        `delete` - Deletes the message
+        `ignore` - Disables phishing protection
+        `delete` - Silently deletes detected dangerous links
+        `notify` - Deletes and notifies in chat that a dangerous link was blocked (default)
         `kick` - Kicks the author (also deletes the message)
         `ban` - Bans the author (also deletes the message)
         """
