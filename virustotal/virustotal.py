@@ -62,7 +62,6 @@ class VirusTotal(commands.Cog):
                     
                     if meta:
                         embed = discord.Embed(title="File Analysis Completed", url=f"https://www.virustotal.com/gui/file/{meta}")
-                        author_mention = presid
                         if malicious_count > 0:
                             content = f"||<@{presid}>||"
                             embed.description = f"VirusTotal analysis indicates this file could be malicious!"
