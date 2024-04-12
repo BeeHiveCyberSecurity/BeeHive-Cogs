@@ -133,7 +133,7 @@ class AntiPhishing(commands.Cog):
                 with contextlib.suppress(discord.NotFound):
                     embed = discord.Embed(
                         title="This is a malicious link!",
-                        description=f"{message.author.mention} has sent a malicious link.\n\nThis link is known malicious by one or more security vendors, and might be intended to deliver malicious software, or trick you into handing over sensitive information. A server moderator should delete this link, and ban the user immediately.",
+                        description=f"{message.author.mention} has sent a malicious link.\n\nThis link is known malicious by one or more security vendors, and might be intended to deliver malicious software, or trick you into handing over sensitive information.\n\nA server moderator should delete this link, and ban the user immediately.",
                         color=16729413,
                     )
                     embed.set_author(
