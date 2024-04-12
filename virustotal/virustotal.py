@@ -54,33 +54,31 @@ class VirusTotal(commands.Cog):
                     suspicious_count = stats.get("suspicious", 0)
                     undetected_count = stats.get("undetected", 0)
                     harmless_count = stats.get("harmless", 0)
-                    timeout_count = stats.get("timeout", 0)
-                    confirmed_timeout_count = stats.get("confirmed-timeout", 0)
                     failure_count = stats.get("failure", 0)
                     unsupported_count = stats.get("type-unsupported", 0)
                     meta = data.get("meta", {}).get("file_info", {}).get("sha256")
                     if meta:
                         if malicious_count > 0:
-                            embed = discord.Embed(title="File Analysis Completed", url=f"https://www.virustotal.com/gui/file/{meta}", color=0xFF4545) # Detected
+                            embed = discord.Embed(title="File Analysis Completed", url=f"https://www.virustotal.com/gui/file/{meta}", description="VirusTotal analysis indicates this file could be malicious!", color=0xFF4545) # Detected
                             embed.set_thumbnail(url="https://images-ext-1.discordapp.net/external/SPQpi1FTkADM8XzV0UQQ1eHe_EShYovjwHzX8YnjNkI/https/www.beehive.systems/hubfs/Icon%2520Packs/Red/warning-outline.png?format=webp&quality=lossless&width=910&height=910")
+                            embed.add_field(name="Status", value="Malicious", inline=False)
                         else:
                             embed = discord.Embed(title="File Analysis Completed", url=f"https://www.virustotal.com/gui/file/{meta}", color=0x2BBD8E) # Safe File
                             embed.set_thumbnail(url="https://images-ext-1.discordapp.net/external/OmwDVUJYkMMUoU_0CFX9rI2qpJ-mg_oMDpVkrrym0HY/https/www.beehive.systems/hubfs/Icon%2520Packs/Green/checkmark-circle-outline.png?format=webp&quality=lossless&width=910&height=910")
-                        embed.add_field(name="Status", value="Completed", inline=False)
-                        embed.add_field(name="Malicious Count", value=malicious_count, inline=False)
+                            embed.add_field(name="Status", value="Safe", inline=False)
+                        
                         if malicious_count > 0:
                             malicious_engines = []
                             for engine, result in attributes["results"].items():
                                 if result.get("category") == "malicious":
                                     malicious_engines.append(engine)
                             embed.add_field(name="Malicious Engines", value=", ".join(malicious_engines), inline=False)
-                        embed.add_field(name="Suspicious Count", value=suspicious_count, inline=False)
-                        embed.add_field(name="Undetected Count", value=undetected_count, inline=False)
-                        embed.add_field(name="Harmless Count", value=harmless_count, inline=False)
-                        embed.add_field(name="Timeout Count", value=timeout_count, inline=False)
-                        embed.add_field(name="Confirmed Timeout Count", value=confirmed_timeout_count, inline=False)
-                        embed.add_field(name="Failure Count", value=failure_count, inline=False)
-                        embed.add_field(name="Unsupported Count", value=unsupported_count, inline=False)
+                        embed.add_field(name="Malicious Count", value=malicious_count, inline=True)
+                        embed.add_field(name="Suspicious Count", value=suspicious_count, inline=True)
+                        embed.add_field(name="Undetected Count", value=undetected_count, inline=True)
+                        embed.add_field(name="Harmless Count", value=harmless_count, inline=True)
+                        embed.add_field(name="Failure Count", value=failure_count, inline=True)
+                        embed.add_field(name="Unsupported Count", value=unsupported_count, inline=True)
                         await ctx.send(embed=embed)
                         break
                     else:
