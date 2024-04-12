@@ -132,14 +132,15 @@ class AntiPhishing(commands.Cog):
             if message.channel.permissions_for(message.guild.me).send_messages:
                 with contextlib.suppress(discord.NotFound):
                     embed = discord.Embed(
-                        title="Dangerous link detected",
-                        description=f"{message.author.mention} has sent a dangerous link.\n\nThis link is known malicious by one or more security vendors, and might be intended to deliver malicious software, or trick you into handing over sensitive information. A server moderator should delete this link, and ban the user immediately.",
+                        title="This is a malicious link!",
+                        description=f"{message.author.mention} has sent a malicious link.\n\nThis link is known malicious by one or more security vendors, and might be intended to deliver malicious software, or trick you into handing over sensitive information. A server moderator should delete this link, and ban the user immediately.",
                         color=16729413,
                     )
                     embed.set_author(
                         name=message.author.display_name,
                         icon_url=message.author.display_avatar.url,
                     )
+                    embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/warning-outline.png")
                     await message.reply(embed=embed)
                 await modlog.create_case(
                     guild=message.guild,
