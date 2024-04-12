@@ -14,7 +14,6 @@ class VirusTotal(commands.Cog):
     @commands.command()
     async def virustotal(self, ctx, file_url: str = None):
         async with ctx.typing():
-            await ctx.message.delete()
             vt_key = await self.bot.get_shared_api_tokens("virustotal")
             if vt_key.get("api_key") is None:
                 return await ctx.send("The Virus Total API key has not been set.")
@@ -26,6 +25,7 @@ class VirusTotal(commands.Cog):
                         permalink = data["permalink"]
                         await ctx.send(f"Permalink: {permalink.split('-')[1]}")
                         await self.check_results(ctx, permalink.split('-')[1])
+                        await ctx.message.delete()
                     else:
                         await ctx.send("Failed to submit the file for analysis.")
                 elif ctx.message.attachments:
@@ -38,6 +38,7 @@ class VirusTotal(commands.Cog):
                     data = response.json()
                     analysis = data['data']['id']
                     await self.check_results(ctx, analysis)
+                    await ctx.message.delete()
                 else:
                     await ctx.send("No file URL or attachment provided.")
 
