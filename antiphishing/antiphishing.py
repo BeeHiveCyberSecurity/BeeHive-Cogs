@@ -94,6 +94,13 @@ class AntiPhishing(commands.Cog):
             if request.status == 200:
                 data = await request.json()
                 domains.extend(data)
+                
+        async with self.session.get(
+            "https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/blob/main/antiphishing/blocklist.json"
+        ) as request:
+            if request.status == 200:
+                data = await request.json()
+                domains.extend(data)
 
         deduped = list(set(domains))
         self.domains = deduped
