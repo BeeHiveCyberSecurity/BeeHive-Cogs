@@ -72,7 +72,7 @@ class VirusTotal(commands.Cog):
                             for engine, result in attributes["results"].items():
                                 if result.get("category") == "malicious":
                                     malicious_engines.append(engine)
-                            embed.add_field(name="Malicious Engines", value=", ".join(malicious_engines), inline=False)
+                            embed.add_field(name="Malicious Engines", value="```" + ", ".join(malicious_engines) + "```", inline=False)
                         embed.add_field(name="Malicious Count", value=malicious_count, inline=True)
                         embed.add_field(name="Suspicious Count", value=suspicious_count, inline=True)
                         embed.add_field(name="Undetected Count", value=undetected_count, inline=True)
