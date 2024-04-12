@@ -73,14 +73,14 @@ class VirusTotal(commands.Cog):
                         total_count = malicious_count + suspicious_count + undetected_count + harmless_count + failure_count + unsupported_count
                         percentpre = malicious_count / total_count
                         percent = round(percentpre * 100, 2)
-                        embed.add_field(name="Analysis Results", value=f"**{percent}%** of security vendors rated this file dangerous!\n*{malicious_count} Malicious, {undetected_count} undetected*", inline=False)
+                        embed.add_field(name="Analysis Results", value=f"**{percent}% of security vendors rated this file dangerous!**\n`({malicious_count} malicious, {undetected_count} undetected)`", inline=False)
                         
-                        embed.add_field(name="Malicious Count", value=malicious_count, inline=True)
-                        embed.add_field(name="Suspicious Count", value=suspicious_count, inline=True)
-                        embed.add_field(name="Undetected Count", value=undetected_count, inline=True)
-                        embed.add_field(name="Harmless Count", value=harmless_count, inline=True)
-                        embed.add_field(name="Failure Count", value=failure_count, inline=True)
-                        embed.add_field(name="Unsupported Count", value=unsupported_count, inline=True)
+                        # embed.add_field(name="Malicious Count", value=malicious_count, inline=True)
+                        # embed.add_field(name="Suspicious Count", value=suspicious_count, inline=True)
+                        # embed.add_field(name="Undetected Count", value=undetected_count, inline=True)
+                        # embed.add_field(name="Harmless Count", value=harmless_count, inline=True)
+                        # embed.add_field(name="Failure Count", value=failure_count, inline=True)
+                        # embed.add_field(name="Unsupported Count", value=unsupported_count, inline=True)
                         
                         await ctx.send(embed=embed)
                         break
