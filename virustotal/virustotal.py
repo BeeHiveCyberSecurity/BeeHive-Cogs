@@ -65,7 +65,7 @@ class VirusTotal(commands.Cog):
                         author_mention = presid
                         if malicious_count > 0:
                             content = f"||<@{presid}>||"
-                            embed.description = f"<@{presid}>, VirusTotal analysis indicates this file could be malicious!"
+                            embed.description = f"VirusTotal analysis indicates this file could be malicious!"
                             embed.color = 0xFF4545  # Red color
                             embed.set_thumbnail(url="https://images-ext-1.discordapp.net/external/SPQpi1FTkADM8XzV0UQQ1eHe_EShYovjwHzX8YnjNkI/https/www.beehive.systems/hubfs/Icon%2520Packs/Red/warning-outline.png?format=webp&quality=lossless&width=910&height=910")
                         else:
