@@ -6,7 +6,7 @@ import time, json
 import io
 
 class VirusTotal(commands.Cog):
-    """Virus Total Inspection"""
+    """VirusTotal file upload and analysis via Discord"""
 
     def __init__(self, bot):
         self.bot = bot
@@ -16,7 +16,11 @@ class VirusTotal(commands.Cog):
         async with ctx.typing():
             vt_key = await self.bot.get_shared_api_tokens("virustotal")
             if vt_key.get("api_key") is None:
-                return await ctx.send("The Virus Total API key has not been set.")
+                vtkeyerror = discord.Embed(title='VirusTotal API Key not set', description="While VirusTotal offers users a free form of API access to the platform, you'll need to sign up for their platform first, then generate yourself an API Key for use with your Discord bot.\n\n### Getting started with VirusTotal API\nSign up for/sign into VirusTotal in your browser, then visit [this link](<https://www.virustotal.com/gui/my-apikey>) to locate your API key.\n\n### Setting your API key on your RedBot\nRun the command `[p]set api`, then complete the modal according to the image below. Once you save, your VirusTotal key will be ready for use!", colour=16729413,)
+                vtkeyerror.set_image(url='https://i.imgur.com/Df2O98t.png')
+                vtkeyerror.set_thumbnail(url='https://www.beehive.systems/hubfs/Icon%20Packs/Red/alert-circle-outline.png')
+                vtkeyerror.set_author(name='Error')
+                return await ctx.send(embed=vtkeyerror)
             else:
                 if file_url:
                     response = requests.post("https://www.virustotal.com/api/v3/urls", headers={"x-apikey": vt_key["api_key"]}, data={"url": file_url})
