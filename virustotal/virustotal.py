@@ -60,12 +60,12 @@ class VirusTotal(commands.Cog):
                     confirmed_timeout_count = stats.get("confirmed-timeout", 0)
                     failure_count = stats.get("failure", 0)
                     unsupported_count = stats.get("type-unsupported", 0)
-                    meta = data.get("meta", {}).get("file_info", {})
-                    fulllink = meta.get("sha256")
+                    meta = data["data"]["meta"]["file_info"]
+                    fulllink = meta["sha256"]
                     if malicious_count > 0:
-                        embed = discord.Embed(title="File Analysis Completed", url=f"https://www.virustotal.com/gui/file/{fulllink}", color=15158332)
+                        embed = discord.Embed(title="File Analysis Completed", url=f"https://www.virustotal.com/gui/file/{fulllink}", color=0xFF4545)
                     else:
-                        embed = discord.Embed(title="File Analysis Completed", url=f"https://www.virustotal.com/gui/file/{fulllink}", color=0x00ff00)
+                        embed = discord.Embed(title="File Analysis Completed", url=f"https://www.virustotal.com/gui/file/{fulllink}", color=0x2BBD8E)
                     embed.add_field(name="Status", value="Completed", inline=False)
                     embed.add_field(name="Malicious Count", value=malicious_count, inline=False)
                     if malicious_count > 0:
