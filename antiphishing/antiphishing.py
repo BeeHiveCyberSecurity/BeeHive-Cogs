@@ -132,8 +132,8 @@ class AntiPhishing(commands.Cog):
             if message.channel.permissions_for(message.guild.me).send_messages:
                 with contextlib.suppress(discord.NotFound):
                     embed = discord.Embed(
-                        title="Warning",
-                        description=f"{message.author.mention} has sent a phishing link.\n\nDo not click on the link.",
+                        title="Link Warning",
+                        description=f"{message.author.mention} has sent a dangerous link.\n\nThis link is known malicious by one or more security vendors, and might be intended to deliver malicious software, or trick you into handing over sensitive information.",
                         color=await self.bot.get_embed_color(message.guild),
                     )
                     embed.set_author(
