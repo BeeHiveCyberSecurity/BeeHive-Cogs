@@ -66,7 +66,6 @@ class VirusTotal(commands.Cog):
                             embed.description = "VirusTotal analysis indicates this file could be malicious!"
                             embed.color = 0xFF4545  # Red color
                             embed.set_thumbnail(url="https://images-ext-1.discordapp.net/external/SPQpi1FTkADM8XzV0UQQ1eHe_EShYovjwHzX8YnjNkI/https/www.beehive.systems/hubfs/Icon%2520Packs/Red/warning-outline.png?format=webp&quality=lossless&width=910&height=910")
-                            embed.add_field(name="Status", value="Malicious", inline=False)
                         else:
                             embed.color = 0x2BBD8E  # Green color
                             embed.add_field(name="Status", value="Safe", inline=False)
