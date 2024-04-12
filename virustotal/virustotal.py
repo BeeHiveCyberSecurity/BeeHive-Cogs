@@ -61,9 +61,11 @@ class VirusTotal(commands.Cog):
                     meta = data.get("meta", {}).get("file_info", {}).get("sha256")
                     if meta:
                         if malicious_count > 0:
-                            embed = discord.Embed(title="File Analysis Completed", url=f"https://www.virustotal.com/gui/file/{meta}", color=0xFF4545)
+                            embed = discord.Embed(title="File Analysis Completed", url=f"https://www.virustotal.com/gui/file/{meta}", color=0xFF4545) # Detected
+                            embed.set_thumbnail(url="https://images-ext-1.discordapp.net/external/SPQpi1FTkADM8XzV0UQQ1eHe_EShYovjwHzX8YnjNkI/https/www.beehive.systems/hubfs/Icon%2520Packs/Red/warning-outline.png?format=webp&quality=lossless&width=910&height=910")
                         else:
-                            embed = discord.Embed(title="File Analysis Completed", url=f"https://www.virustotal.com/gui/file/{meta}", color=0x2BBD8E)
+                            embed = discord.Embed(title="File Analysis Completed", url=f"https://www.virustotal.com/gui/file/{meta}", color=0x2BBD8E) # Safe File
+                            embed.set_thumbnail(url="https://images-ext-1.discordapp.net/external/OmwDVUJYkMMUoU_0CFX9rI2qpJ-mg_oMDpVkrrym0HY/https/www.beehive.systems/hubfs/Icon%2520Packs/Green/checkmark-circle-outline.png?format=webp&quality=lossless&width=910&height=910")
                         embed.add_field(name="Status", value="Completed", inline=False)
                         embed.add_field(name="Malicious Count", value=malicious_count, inline=False)
                         if malicious_count > 0:
