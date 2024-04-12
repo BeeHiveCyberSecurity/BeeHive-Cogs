@@ -43,11 +43,9 @@ class VirusTotal(commands.Cog):
     async def check_results(self, ctx, analysis_id):
         vt_key = await self.bot.get_shared_api_tokens("virustotal")
         headers = {"x-apikey": vt_key["api_key"]}
-        
         while True:
             response = requests.get(f'https://www.virustotal.com/api/v3/analyses/{analysis_id}', headers=headers)
             data = response.json()
-            
             if "data" in data:
                 attributes = data["data"].get("attributes")
                 if attributes and attributes.get("status") == "completed":
@@ -59,44 +57,35 @@ class VirusTotal(commands.Cog):
                     failure_count = stats.get("failure", 0)
                     unsupported_count = stats.get("type-unsupported", 0)
                     meta = data.get("meta", {}).get("file_info", {}).get("sha256")
-                    
                     if meta:
-                        embed = discord.Embed(title="File Analysis Completed", url=f"https://www.virustotal.com/gui/file/{meta}")
-                        if malicious_count > 0:
-                            embed.description = "VirusTotal analysis indicates this file could be malicious!"
-                            embed.color = 0xFF4545
-                            embed.set_thumbnail(url="https://images-ext-1.discordapp.net/external/SPQpi1FTkADM8XzV0UQQ1eHe_EShYovjwHzX8YnjNkI/https/www.beehive.systems/hubfs/Icon%2520Packs/Red/warning-outline.png?format=webp&quality=lossless&width=910&height=910")
-                            embed.add_field(name="Status", value="Malicious", inline=False)
-                        else:
-                            embed.color = 0x2BBD8E
-                            embed.add_field(name="Status", value="Safe", inline=False)
-                        
-                        engines_info = []
-                        for engine, result_info in attributes["results"].items():
-                            result = result_info.get("result")
-                            if result is not None:
-                                engines_info.append(f"{engine}: {result}")
-                        embed.add_field(name="Engine Results", value="```" + "\n".join(engines_info) + "```", inline=False)
-                        
-                        embed.add_field(name="Malicious Count", value=malicious_count, inline=True)
-                        embed.add_field(name="Suspicious Count", value=suspicious_count, inline=True)
-                        embed.add_field(name="Undetected Count", value=undetected_count, inline=True)
-                        embed.add_field(name="Harmless Count", value=harmless_count, inline=True)
-                        embed.add_field(name="Failure Count", value=failure_count, inline=True)
-                        embed.add_field(name="Unsupported Count", value=unsupported_count, inline=True)
-                        
-                        await ctx.send(embed=embed)
-                        break
-                    else:
-                        await ctx.send("Error: SHA256 value not found in the analysis response.")
-                        break
+                            embed = discord.Embed(title="File Analysis Completed", url=f"https://www.virustotal.com/gui/file/{meta}", color=0xFF4545 if malicious_count > 0 else 0x2BBD8E)
+                            if malicious_count > 0:
+                                embed.description = "VirusTotal analysis indicates this file could be malicious!"
+                                embed.set_thumbnail(url="https://images-ext-1.discordapp.net/external/SPQpi1FTkADM8XzV0UQQ1eHe_EShYovjwHzX8YnjNkI/https/www.beehive.systems/hubfs/Icon%2520Packs/Red/warning-outline.png?format=webp&quality=lossless&width=910&height=910")
+                                embed.add_field(name="Status", value="Malicious", inline=False)
+                            else:
+                                embed.set_thumbnail(url="https://images-ext-1.discordapp.net/external/OmwDVUJYkMMUoU_0CFX9rI2qpJ-mg_oMDpVkrrym0HY/https/www.beehive.systems/hubfs/Icon%2520Packs/Green/checkmark-circle-outline.png?format=webp&quality=lossless&width=910&height=910")
+                                embed.add_field(name="Status", value="Safe", inline=False)
+                            total_count = malicious_count + suspicious_count + undetected_count + harmless_count + failure_count + unsupported_count
+                            percent = malicious_count / total_count
+                            
+                            embed.add_field(name="Analysis Results", value=f"**{percent}%** of security vendors rated this file dangerous!\n*{malicious_count} Malicious, {undetected_count} undetected")
+                            embed.add_field(name="Malicious Count", value=malicious_count, inline=True)
+                            embed.add_field(name="Suspicious Count", value=suspicious_count, inline=True)
+                            embed.add_field(name="Undetected Count", value=undetected_count, inline=True)
+                            embed.add_field(name="Harmless Count", value=harmless_count, inline=True)
+                            embed.add_field(name="Failure Count", value=failure_count, inline=True)
+                            embed.add_field(name="Unsupported Count", value=unsupported_count, inline=True)
+                            await ctx.send(embed=embed)
+                            break
+                else:
+                    await ctx.send("Error: SHA256 value not found in the analysis response.")
+                    break
             else:
                 await ctx.send("Error: Analysis ID not found or analysis not completed yet.")
                 break
-            
             try:
                 await ctx.message.delete()
             except discord.errors.NotFound:
                 pass
-            
             await asyncio.sleep(3)
