@@ -139,8 +139,8 @@ class AntiPhishing(commands.Cog):
                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/warning-outline.png")
                     embed.timestamp = datetime.datetime.utcnow()
                     embed.set_footer(text="Link scanning powered by BeeHive",icon_url="")
-                    await message.send(embed=embed)
-                    
+                    await ctx.send(embed=embed)
+
                 await modlog.create_case(
                     guild=message.guild,
                     bot=self.bot,
