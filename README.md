@@ -18,4 +18,4 @@ then load the newly installed cog with
 ```[p]load (cogname)```
 
 # About these cogs
-- [virustotal](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/virustotal) - Utilize the VirusTotal API and a (free) VirusTotal account to analyze files for malware and get back multiple vendor verdicts at once
+- [virustotal](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/virustotal) - Utilize the VirusTotal API and a (free) VirusTotal account to analyze files for malware and get back multiple vendor verdicts at once. Very useful in communities where people are naturally irresponsible and will run nearly anything sent to them without a second thought.
