@@ -134,7 +134,7 @@ class AntiPhishing(commands.Cog):
                     embed = discord.Embed(
                         title="Dangerous link detected",
                         description=f"{message.author.mention} has sent a dangerous link.\n\nThis link is known malicious by one or more security vendors, and might be intended to deliver malicious software, or trick you into handing over sensitive information. A server moderator should delete this link, and ban the user immediately.",
-                        color="#FF4545",
+                        color="FF4545",
                     )
                     embed.set_author(
                         name=message.author.display_name,
