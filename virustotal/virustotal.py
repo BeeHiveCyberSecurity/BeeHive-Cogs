@@ -59,26 +59,36 @@ class VirusTotal(commands.Cog):
                     failure_count = stats.get("failure", 0)
                     unsupported_count = stats.get("type-unsupported", 0)
                     meta = data.get("meta", {}).get("file_info", {}).get("sha256")
-                    if malicious_count > 0:
-                        embed = discord.Embed(title="File Analysis Completed", url=f"https://www.virustotal.com/gui/file/{meta}", color=0xFF4545)
+                    if meta:
+                        if malicious_count > 0:
+                            embed = discord.Embed(title="File Analysis Completed", url=f"https://www.virustotal.com/gui/file/{meta}", color=0xFF4545)
+                        else:
+                            embed = discord.Embed(title="File Analysis Completed", url=f"https://www.virustotal.com/gui/file/{meta}", color=0x2BBD8E)
+                        embed.add_field(name="Status", value="Completed", inline=False)
+                        embed.add_field(name="Malicious Count", value=malicious_count, inline=False)
+                        if malicious_count > 0:
+                            malicious_engines = []
+                            for engine, result in attributes["results"].items():
+                                if result.get("category") == "malicious":
+                                    malicious_engines.append(engine)
+                            embed.add_field(name="Malicious Engines", value=", ".join(malicious_engines), inline=False)
+                        embed.add_field(name="Suspicious Count", value=suspicious_count, inline=False)
+                        embed.add_field(name="Undetected Count", value=undetected_count, inline=False)
+                        embed.add_field(name="Harmless Count", value=harmless_count, inline=False)
+                        embed.add_field(name="Timeout Count", value=timeout_count, inline=False)
+                        embed.add_field(name="Confirmed Timeout Count", value=confirmed_timeout_count, inline=False)
+                        embed.add_field(name="Failure Count", value=failure_count, inline=False)
+                        embed.add_field(name="Unsupported Count", value=unsupported_count, inline=False)
+                        await ctx.send(embed=embed)
+                        break
                     else:
-                        embed = discord.Embed(title="File Analysis Completed", url=f"https://www.virustotal.com/gui/file/{meta}", color=0x2BBD8E)
-                    embed.add_field(name="Status", value="Completed", inline=False)
-                    embed.add_field(name="Malicious Count", value=malicious_count, inline=False)
-                    if malicious_count > 0:
-                        malicious_engines = []
-                        for engine, result in attributes["results"].items():
-                            if result.get("category") == "malicious":
-                                malicious_engines.append(engine)
-                        embed.add_field(name="Malicious Engines", value=", ".join(malicious_engines), inline=False)
-                    embed.add_field(name="Suspicious Count", value=suspicious_count, inline=False)
-                    embed.add_field(name="Undetected Count", value=undetected_count, inline=False)
-                    embed.add_field(name="Harmless Count", value=harmless_count, inline=False)
-                    embed.add_field(name="Timeout Count", value=timeout_count, inline=False)
-                    embed.add_field(name="Confirmed Timeout Count", value=confirmed_timeout_count, inline=False)
-                    embed.add_field(name="Failure Count", value=failure_count, inline=False)
-                    embed.add_field(name="Unsupported Count", value=unsupported_count, inline=False)
-                    await ctx.send(embed=embed)
-                    break
-            await ctx.message.delete()
+                        await ctx.send("Error: SHA256 value not found in the analysis response.")
+                        break
+            else:
+                await ctx.send("Error: Analysis ID not found or analysis not completed yet.")
+                break
+            try:
+                await ctx.message.delete()
+            except discord.errors.NotFound:
+                pass
             await asyncio.sleep(3)
