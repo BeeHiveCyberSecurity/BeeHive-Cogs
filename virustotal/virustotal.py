@@ -61,18 +61,18 @@ class VirusTotal(commands.Cog):
                     meta = data.get("meta", {}).get("file_info", {}).get("sha256")
                     
                     if meta:
-                        embed = discord.Embed(title="File Analysis Completed", url=f"https://www.virustotal.com/gui/file/{meta}")
+                        embed = discord.Embed(title="File appears clean!", url=f"https://www.virustotal.com/gui/file/{meta}")
                         if malicious_count > 0:
                             content = f"||<@{presid}>||"
-                            embed.description = f"VirusTotal analysis indicates this file could be malicious!"
+                            embed.description = f"One or more security vendors have marked this file as potentially dangerous"
                             embed.color = 0xFF4545  # Red color
-                            embed.set_thumbnail(url="https://images-ext-1.discordapp.net/external/SPQpi1FTkADM8XzV0UQQ1eHe_EShYovjwHzX8YnjNkI/https/www.beehive.systems/hubfs/Icon%2520Packs/Red/warning-outline.png?format=webp&quality=lossless&width=910&height=910")
+                            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/warning-outline.png")
                         else:
                             content = f"||<@{presid}>||"
                             embed.color = 0x2BBD8E  # Green color
-                            embed.description = f"VirusTotal analysis indicates this file is safe to use!"
-                            embed.add_field(name="Status", value="Safe", inline=False)
-                            embed.set_thumbnail(url="https://images-ext-1.discordapp.net/external/emlj4WYJyGGJaChkQdaMHt5bdsnE9pJUF5Qqgml4T5g/%3Fformat%3Dwebp%26quality%3Dlossless%26width%3D910%26height%3D910/https/images-ext-1.discordapp.net/external/OmwDVUJYkMMUoU_0CFX9rI2qpJ-mg_oMDpVkrrym0HY/https/www.beehive.systems/hubfs/Icon%252520Packs/Green/checkmark-circle-outline.png?format=webp&quality=lossless")
+                            embed.description = f"No vendors are alarming to this file, it seems safe to use"
+                            embed.add_field(name="Status", value="Clean", inline=False)
+                            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/checkmark-circle-outline.png")
                         
                         total_count = malicious_count + suspicious_count + undetected_count + harmless_count + failure_count + unsupported_count
                         percentpre = malicious_count / total_count if total_count > 0 else 0
