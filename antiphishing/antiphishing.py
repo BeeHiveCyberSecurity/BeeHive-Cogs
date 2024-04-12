@@ -133,14 +133,14 @@ class AntiPhishing(commands.Cog):
                 with contextlib.suppress(discord.NotFound):
                     embed = discord.Embed(
                         title="Dangerous link detected!",
-                        description=f"A potentially dangerous website was detected in chat.\n\nThis link could have been anything from a fraudulent online seller, to an IP logger, to a page delivering malware intended to target members Discord accounts.\n\n",
+                        description=f"A potentially dangerous website was detected.\n\nThis link could have been anything from a fraudulent online seller, to an IP logger, to a page delivering malware intended to target members Discord accounts.\n\n",
                         color=16729413,
                     )
                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/warning-outline.png")
                     embed.timestamp = datetime.datetime.utcnow()
                     embed.set_footer(text="Link scanning powered by BeeHive",icon_url="")
-                    await ctx.send(embed=embed)
-
+                    await message.send(embed=embed)
+                    await message.delete()
                 await modlog.create_case(
                     guild=message.guild,
                     bot=self.bot,
