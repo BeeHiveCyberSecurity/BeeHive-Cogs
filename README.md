@@ -12,3 +12,7 @@ To add this repo to your Red bot, use the command
 To install cogs from this repo to your Red instance, use the command
 
 ```[p]cog install RedDiscordBot-Cogs (cogname)```
+
+then load the newly installed cog with
+
+```[p]load (cogname)```
