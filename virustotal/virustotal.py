@@ -62,27 +62,21 @@ class VirusTotal(commands.Cog):
                     
                     if meta:
                         embed = discord.Embed(title="File Analysis Completed", url=f"https://www.virustotal.com/gui/file/{meta}")
+                        author_mention = ctx.author.mention
                         if malicious_count > 0:
-                            embed.description = "VirusTotal analysis indicates this file could be malicious!"
+                            embed.description = f"{author_mention}, VirusTotal analysis indicates this file could be malicious!"
                             embed.color = 0xFF4545  # Red color
                             embed.set_thumbnail(url="https://images-ext-1.discordapp.net/external/SPQpi1FTkADM8XzV0UQQ1eHe_EShYovjwHzX8YnjNkI/https/www.beehive.systems/hubfs/Icon%2520Packs/Red/warning-outline.png?format=webp&quality=lossless&width=910&height=910")
                         else:
                             embed.color = 0x2BBD8E  # Green color
                             embed.add_field(name="Status", value="Safe", inline=False)
                             embed.set_thumbnail(url="https://images-ext-1.discordapp.net/external/emlj4WYJyGGJaChkQdaMHt5bdsnE9pJUF5Qqgml4T5g/%3Fformat%3Dwebp%26quality%3Dlossless%26width%3D910%26height%3D910/https/images-ext-1.discordapp.net/external/OmwDVUJYkMMUoU_0CFX9rI2qpJ-mg_oMDpVkrrym0HY/https/www.beehive.systems/hubfs/Icon%252520Packs/Green/checkmark-circle-outline.png?format=webp&quality=lossless")
+                        
                         total_count = malicious_count + suspicious_count + undetected_count + harmless_count + failure_count + unsupported_count
-                        percentpre = malicious_count / total_count
+                        percentpre = malicious_count / total_count if total_count > 0 else 0
                         percent = round(percentpre * 100, 2)
                         embed.add_field(name="Analysis Results", value=f"**{percent}% of security vendors rated this file dangerous!**\n({malicious_count} malicious, {undetected_count} undetected)", inline=False)
-    
-                        
-                        # embed.add_field(name="Malicious Count", value=malicious_count, inline=True)
-                        # embed.add_field(name="Suspicious Count", value=suspicious_count, inline=True)
-                        # embed.add_field(name="Undetected Count", value=undetected_count, inline=True)
-                        # embed.add_field(name="Harmless Count", value=harmless_count, inline=True)
-                        # embed.add_field(name="Failure Count", value=failure_count, inline=True)
-                        # embed.add_field(name="Unsupported Count", value=unsupported_count, inline=True)
-                        
+
                         await ctx.send(embed=embed)
                         break
                     else:
