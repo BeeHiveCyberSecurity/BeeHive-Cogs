@@ -133,14 +133,16 @@ class AntiPhishing(commands.Cog):
                 with contextlib.suppress(discord.NotFound):
                     embed = discord.Embed(
                         title="Dangerous link detected!",
-                        description=f"A potentially dangerous website was detected.\n\nThis link could have been anything from a fraudulent online seller, to an IP logger, to a page delivering malware intended to target members Discord accounts.\n\n",
+                        description=f"A potentially website was sent in chat and automatically deleted to protect server members.\n\nThis link could have been anything from a fraudulent online seller, to an IP logger, to a page delivering malware intended to target members Discord accounts.\n\nYou should avoid clicking this link for your own security, and report to a server moderator that this message appeared in chat!",
                         color=16729413,
                     )
                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/warning-outline.png")
                     embed.timestamp = datetime.datetime.utcnow()
-                    embed.set_footer(text="Link scanning powered by BeeHive",icon_url="")
-                    await message.send(embed=embed)
-                    await message.delete()
+                    embed.set_footer(text="Domain scanning powered by BeeHive",icon_url="")
+                    await message.reply(embed=embed)
+                        if message.channel.permissions_for(message.guild.me).manage_messages:
+                        with contextlib.suppress(discord.NotFound):
+                        await message.delete()
                 await modlog.create_case(
                     guild=message.guild,
                     bot=self.bot,
@@ -283,9 +285,9 @@ class AntiPhishing(commands.Cog):
         Choose the action that occurs when a user sends a phishing scam.
 
         Options:
-        `ignore` - Disables phishing protection
-        `delete` - Silently deletes detected dangerous links
-        `notify` - Deletes and notifies in chat that a dangerous link was blocked (default)
+        `ignore` - Disables the anti-phishing integration (default)
+        `notify` - Sends a message to the channel and says it's a phishing scam
+        `delete` - Deletes the message
         `kick` - Kicks the author (also deletes the message)
         `ban` - Bans the author (also deletes the message)
         """
