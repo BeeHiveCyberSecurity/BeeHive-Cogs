@@ -64,8 +64,14 @@ class VirusTotal(commands.Cog):
                         embed = discord.Embed(url=f"https://www.virustotal.com/gui/file/{meta}")
                         if malicious_count > 0:
                             content = f"||<@{presid}>||"
+                            embed.title = f"This file is suspicious..."
+                            embed.description = f"This file has a few security vendors rating it negatively, it could be dangerous..."
+                            embed.color = 0xFF4545  # Red color
+                            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/warning-outline.png")
+                        if malicious_count > 10:
+                            content = f"||<@{presid}>||"
                             embed.title = f"That file looks malicious!"
-                            embed.description = f"One or more security vendors have marked this file as potentially dangerous.\nFor your own safety, you should not open, launch, or interact with it."
+                            embed.description = f"This is more than likely a dangerous file\n\nFor your own safety, you should not open, launch, or interact with it."
                             embed.color = 0xFF4545  # Red color
                             embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/warning-outline.png")
                         else:
