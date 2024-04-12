@@ -64,12 +64,14 @@ class VirusTotal(commands.Cog):
                         embed = discord.Embed(title="File Analysis Completed", url=f"https://www.virustotal.com/gui/file/{meta}")
                         author_mention = presid
                         if malicious_count > 0:
+                            content = f"||<@{presid}>||"
                             embed.description = f"<@{presid}>, VirusTotal analysis indicates this file could be malicious!"
                             embed.color = 0xFF4545  # Red color
                             embed.set_thumbnail(url="https://images-ext-1.discordapp.net/external/SPQpi1FTkADM8XzV0UQQ1eHe_EShYovjwHzX8YnjNkI/https/www.beehive.systems/hubfs/Icon%2520Packs/Red/warning-outline.png?format=webp&quality=lossless&width=910&height=910")
                         else:
+                            content = f"||<@{presid}>||"
                             embed.color = 0x2BBD8E  # Green color
-                            embed.description = f"<@{presid}>, VirusTotal analysis indicates this file is safe to use!"
+                            embed.description = f"VirusTotal analysis indicates this file is safe to use!"
                             embed.add_field(name="Status", value="Safe", inline=False)
                             embed.set_thumbnail(url="https://images-ext-1.discordapp.net/external/emlj4WYJyGGJaChkQdaMHt5bdsnE9pJUF5Qqgml4T5g/%3Fformat%3Dwebp%26quality%3Dlossless%26width%3D910%26height%3D910/https/images-ext-1.discordapp.net/external/OmwDVUJYkMMUoU_0CFX9rI2qpJ-mg_oMDpVkrrym0HY/https/www.beehive.systems/hubfs/Icon%252520Packs/Green/checkmark-circle-outline.png?format=webp&quality=lossless")
                         
@@ -78,7 +80,7 @@ class VirusTotal(commands.Cog):
                         percent = round(percentpre * 100, 2)
                         embed.add_field(name="Analysis Results", value=f"**{percent}% of security vendors rated this file dangerous!**\n({malicious_count} malicious, {undetected_count} undetected)", inline=False)
 
-                        await ctx.send(embed=embed)
+                        await ctx.send(content, embed=embed)
                         break
                     else:
                         await ctx.send("Error: SHA256 value not found in the analysis response.")
