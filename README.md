@@ -16,3 +16,6 @@ To install cogs from this repo to your Red instance, use the command
 then load the newly installed cog with
 
 ```[p]load (cogname)```
+
+# About these cogs
+- [virustotal](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/virustotal) - Utilize the VirusTotal API and a (free) VirusTotal account to analyze files for malware and get back multiple vendor verdicts at once
