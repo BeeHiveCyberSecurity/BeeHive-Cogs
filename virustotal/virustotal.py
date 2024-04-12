@@ -39,8 +39,8 @@ class VirusTotal(commands.Cog):
                     await self.check_results(ctx, analysis)
                 else:
                     await ctx.send("No file URL or attachment provided.")
+
     async def check_results(self, ctx, analysis_id):
-        time.sleep(5)
         vt_key = await self.bot.get_shared_api_tokens("virustotal")
         headers = {"x-apikey": vt_key["api_key"]}
         while True:
@@ -49,8 +49,10 @@ class VirusTotal(commands.Cog):
             if "data" in data:
                 attributes = data["data"].get("attributes")
                 if attributes and attributes.get("status") == "completed":
-                    json_data = json.dumps(data, indent=4)
-                    json_bytes = json_data.encode("utf-8")
-                    await ctx.send(file=discord.File(io.BytesIO(json_bytes), filename="analysis_result.json"))
+                    embed = discord.Embed(title="File Analysis Completed", url="https://www.virustotal.com")
+                    malicious = data["attributes"]["results"]["stats"]["malicious"]
+                    embed.add_field(name="Status", value="completed")
+                    embed.add_field(name="Malicious Count", value=malicious)
+                    await ctx.send(embed=embed)
                     break
             await asyncio.sleep(3)
