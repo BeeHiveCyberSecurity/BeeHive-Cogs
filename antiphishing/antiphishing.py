@@ -21,12 +21,12 @@ class AntiPhishing(commands.Cog):
     Guard users from malicious links and phishing attempts with customizable protection options.
     """
 
-    __version__ = "2.0.0"
+    __version__ = "1.0.0"
 
     def __init__(self, bot: Red):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=73835)
-        self.config.register_guild(action="ignore", caught=0)
+        self.config.register_guild(action="notify", caught=0)
         self.session = aiohttp.ClientSession()
         self.bot.loop.create_task(self.register_casetypes())
         self.bot.loop.create_task(self.get_phishing_domains())
@@ -132,9 +132,9 @@ class AntiPhishing(commands.Cog):
             if message.channel.permissions_for(message.guild.me).send_messages:
                 with contextlib.suppress(discord.NotFound):
                     embed = discord.Embed(
-                        title="Link Warning",
-                        description=f"{message.author.mention} has sent a dangerous link.\n\nThis link is known malicious by one or more security vendors, and might be intended to deliver malicious software, or trick you into handing over sensitive information.",
-                        color=await self.bot.get_embed_color(message.guild),
+                        title="Dangerous link detected",
+                        description=f"{message.author.mention} has sent a dangerous link.\n\nThis link is known malicious by one or more security vendors, and might be intended to deliver malicious software, or trick you into handing over sensitive information. A server moderator should delete this link, and ban the user immediately.",
+                        color="#FF4545",
                     )
                     embed.set_author(
                         name=message.author.display_name,
