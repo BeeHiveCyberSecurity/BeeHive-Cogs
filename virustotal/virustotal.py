@@ -68,6 +68,7 @@ class VirusTotal(commands.Cog):
                             embed.description = f"This file has a few security vendors rating it negatively, it could be dangerous..."
                             embed.color = 0xFF4545  # Red color
                             embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/warning-outline.png")
+                        else:
                         if malicious_count > 10:
                             content = f"||<@{presid}>||"
                             embed.title = f"That file looks malicious!"
