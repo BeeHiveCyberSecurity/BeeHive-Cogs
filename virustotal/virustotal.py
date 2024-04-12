@@ -25,7 +25,6 @@ class VirusTotal(commands.Cog):
                         permalink = data["permalink"]
                         await ctx.send(f"Permalink: {permalink.split('-')[1]}")
                         await self.check_results(ctx, permalink.split('-')[1])
-                        await ctx.message.delete()
                     else:
                         await ctx.send("Failed to submit the file for analysis.")
                 elif ctx.message.attachments:
@@ -38,7 +37,6 @@ class VirusTotal(commands.Cog):
                     data = response.json()
                     analysis = data['data']['id']
                     await self.check_results(ctx, analysis)
-                    await ctx.message.delete()
                 else:
                     await ctx.send("No file URL or attachment provided.")
 
@@ -82,4 +80,5 @@ class VirusTotal(commands.Cog):
                     embed.add_field(name="Unsupported Count", value=unsupported_count, inline=False)
                     await ctx.send(embed=embed)
                     break
+            await ctx.message.delete()
             await asyncio.sleep(3)
