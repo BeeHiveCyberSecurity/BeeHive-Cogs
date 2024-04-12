@@ -133,7 +133,7 @@ class AntiPhishing(commands.Cog):
                 with contextlib.suppress(discord.NotFound):
                     embed = discord.Embed(
                         title="Dangerous link detected!",
-                        description=f"One or more security vendors have marked this website as dangerous.\nThis could be anything from a scam, to a phishing page, to an IP logger.\nYou should avoid clicking this link for your own security.",
+                        description=f"One or more security vendors have marked this website as dangerous.\n\nThis could be anything from a fraudulent online seller, to an IP logger, to a page delivering malware intended to target your Discord account.\n\nYou should avoid clicking this link for your own security.",
                         color=16729413,
                     )
                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/warning-outline.png")
