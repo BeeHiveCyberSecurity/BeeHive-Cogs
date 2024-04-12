@@ -72,8 +72,8 @@ class VirusTotal(commands.Cog):
                             embed.add_field(name="Status", value="Safe", inline=False)
                         total_count = malicious_count + suspicious_count + undetected_count + harmless_count + failure_count + unsupported_count
                         percentpre = malicious_count / total_count
-                        percent = percentpre * 100
-                        embed.add_field(name="Analysis Results", value=f"**{percent}%** of security vendors rated this file dangerous!\n*{malicious_count} Malicious, {undetected_count} undetected", inline=False)
+                        percent = round(percentpre * 100, 2)
+                        embed.add_field(name="Analysis Results", value=f"**{percent}%** of security vendors rated this file dangerous!\n*{malicious_count} Malicious, {undetected_count} undetected*", inline=False)
                         
                         embed.add_field(name="Malicious Count", value=malicious_count, inline=True)
                         embed.add_field(name="Suspicious Count", value=suspicious_count, inline=True)
