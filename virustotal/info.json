@@ -8,8 +8,16 @@
     "requirements": [
         "requests",
         "asyncio",
-        "json"
+        "json",
         "io"
+    ],
+    "tags": [
+        "file scanning",
+        "antivirus",
+        "virustotal",
+        "file analysis",
+        "security",
+        "safety"
     ],
     "short": "Analyze files via Discord for malicious content",
     "min_bot_version": "3.5.0"
