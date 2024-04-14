@@ -10,12 +10,14 @@ class Malcore(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    async def malcore(self, ctx, file_url: str = None):
+    async def malcore(self, ctx, file_url: str):
         async with ctx.typing():
             await ctx.message.delete()
             mcore_key = await self.bot.get_shared_api_tokens("malcore")
             if mcore_key.get("api_key") is None:
                 return await ctx.send("The Malcore API key has not been set.")
+            if file_url == "":
+                await ctx.send("Please Define A URL!")
             if file_url:
                 
                 headers = {
