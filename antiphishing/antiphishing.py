@@ -265,7 +265,7 @@ class AntiPhishing(commands.Cog):
         domain = urlparse(real_url).netloc
 
         if domain in self.domains:
-            await ctx.send("That URL is likely a phishing scam.")
+            await ctx.send("That URL is on our blocklist as known malicious! It is dangerous!")
         else:
             await ctx.send("That URL is likely not a phishing scam.")
 
