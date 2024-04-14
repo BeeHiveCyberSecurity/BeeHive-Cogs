@@ -35,7 +35,7 @@ class Malcore(commands.Cog):
                 else:
                     await ctx.send("The URL might be unsafe.")
             except json.JSONDecodeError:
-                await ctx.send(f"Invalid JSON response from Malcore API.\nDEBUG: ```{json_data}```")
+                await ctx.send(f"Invalid JSON response from Malcore API.\nDEBUG: ```{res}```")
         else:
             await ctx.send("No URL provided.")
 
