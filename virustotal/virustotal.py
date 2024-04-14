@@ -5,6 +5,7 @@ import requests
 import asyncio
 import discord
 from redbot.core import commands
+from redbot.core import app_commands
 
 class VirusTotal(commands.Cog):
     """VirusTotal file upload and analysis via Discord"""
