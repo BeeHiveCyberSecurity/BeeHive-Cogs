@@ -51,5 +51,5 @@ class Malcore(commands.Cog):
     @commands.command()
     async def malcore(self, ctx, url: str):
         async with ctx.typing():
-            await ctx.message.delete()
             await self.checkurl(url, ctx)
+            await ctx.message.delete()
