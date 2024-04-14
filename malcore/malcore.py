@@ -23,7 +23,7 @@ class Malcore(commands.Cog):
                 }
                 
                 r = requests.post('https://api.malcore.io/api/urlcheck', headers=headers, data=f"url={file_url}")
-                res = r.json()
+                res = r.text
                 print(res)
                 await ctx.send(f"{res}")
             else:
