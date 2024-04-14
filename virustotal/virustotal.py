@@ -41,7 +41,9 @@ class VirusTotal(commands.Cog):
                     analysis = data['data']['id']
                     await self.check_results(ctx, analysis, ctx.author.id)
                 else:
-                    await ctx.send("No file URL or attachment provided.")
+                    embed = discord.Embed(title='Error: No file provided', description=f"The bot was unable to find content to submit for analysis!\nPlease provide one of the following when using this command\n- URL file can be downloaded from\n- Drag-and-drop a file less than 25mb in size", colour=16729413,)
+                    embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle-outline.png")
+                    await ctx.send(embed=embed)
 
     async def check_results(self, ctx, analysis_id, presid):
         vt_key = await self.bot.get_shared_api_tokens("virustotal")
