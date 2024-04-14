@@ -296,7 +296,9 @@ class AntiPhishing(commands.Cog):
             return
 
         await self.config.guild(ctx.guild).action.set(action)
-        await ctx.send(f"Set the action to `{action}`.")
+        embed = discord.Embed(title='Settings changed', description=f"Malicious links will now trigger an **`{action}`** event when detected in chat.\nYou can make changes to this setting at any time.", colour=2866574,)
+        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/checkmark-circle-outline.png")
+        await ctx.send(embed=embed)
 
     @antiphishing.command()
     async def stats(self, ctx: Context):
