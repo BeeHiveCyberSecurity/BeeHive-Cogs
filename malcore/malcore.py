@@ -1,5 +1,5 @@
 import requests
-import asyncio
+import re
 import discord
 from redbot.core import commands
 
@@ -35,8 +35,12 @@ class Malcore(commands.Cog):
                 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
-        if message.content.lower() == "ping":
-            await message.channel.send("pong")
+        url_pattern = re.compile(r"^(?:http[s]?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$")
+
+        if url_pattern.search(message.content):
+            await message.delete()
+            # Optionally, you can notify the user about the deletion
+            await message.author.send("Please do not send URLs or domains in this server.")
                 
     # async def check_results(self, ctx, analysis_id, presid):
     #     vt_key = await self.bot.get_shared_api_tokens("virustotal")

@@ -10,7 +10,7 @@
     "disabled": false,
     "requirements": [
         "requests",
-        "asyncio"
+        "re"
     ],
     "tags": [
         "file scanning",
