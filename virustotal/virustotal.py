@@ -14,7 +14,7 @@ class VirusTotal(commands.Cog):
         self.bot = bot
 
     @commands.bot_has_permissions(embed_links=True)
-    @commands.hybrid_command(aliases=["vt"])
+    @commands.hybrid_command(name="virustotal", description="Submit a file for analysis via VirusTotal", aliases=["vt"])
     async def virustotal(self, ctx, file_url: str = None):
         async with ctx.typing():
             vt_key = await self.bot.get_shared_api_tokens("virustotal")
