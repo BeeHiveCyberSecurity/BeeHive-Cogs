@@ -39,8 +39,7 @@ class Malcore(commands.Cog):
 
         if url_pattern.search(message.content):
             await message.delete()
-            # Optionally, you can notify the user about the deletion
-            await message.author.send("Please do not send URLs or domains in this server.")
+            await message.author.send("Ay Fuck You Were Testing Here!")
                 
     # async def check_results(self, ctx, analysis_id, presid):
     #     vt_key = await self.bot.get_shared_api_tokens("virustotal")
