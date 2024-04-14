@@ -10,7 +10,8 @@
     "disabled": false,
     "requirements": [
         "requests",
-        "re"
+        "re",
+        "json"
     ],
     "tags": [
         "file scanning",

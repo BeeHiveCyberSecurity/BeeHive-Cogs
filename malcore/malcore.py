@@ -1,5 +1,5 @@
 import requests
-import re
+import re, json
 import discord
 from redbot.core import commands
 
@@ -30,11 +30,19 @@ class Malcore(commands.Cog):
                 
                 r = requests.post('https://api.malcore.io/api/urlcheck', headers=headers, data=data)
                 res = r.text
-                print(res)
-                await ctx.send(f"{res}")
+                
+                try:
+                    json_data = json.loads(res)
+                    threat_level = json_data.get("data", {}).get("data", {}).get("threat_level")
+                    if threat_level and "SAFE" in threat_level:
+                        await ctx.send("The URL is SAFE.")
+                    else:
+                        await ctx.send("The URL might be unsafe.")
+                except json.JSONDecodeError:
+                    await ctx.send("Invalid JSON response from Malcore API.")
             else:
                 await ctx.send("No URL provided.")
-                
+            
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
         url_pattern = re.compile(r"^(?:http[s]?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$")
