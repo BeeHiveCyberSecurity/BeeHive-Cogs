@@ -2,8 +2,6 @@ import requests
 import asyncio
 import discord
 from redbot.core import commands
-import time, json
-import io
 
 class Malcore(commands.Cog):
     """malcore file upload and analysis via Discord"""
@@ -14,11 +12,23 @@ class Malcore(commands.Cog):
     @commands.command()
     async def malcore(self, ctx, file_url: str = None):
         async with ctx.typing():
+            await ctx.message.delete()
+            mcore_key = await self.bot.get_shared_api_tokens("malcore")
+            if mcore_key.get("api_key") is None:
+                return await ctx.send("The Malcore API key has not been set.")
             if file_url:
-                await ctx.send(f"Looking At {file_url}")
+                
+                headers = {
+                    "apiKey" : mcore_key["api_key"]
+                }
+                
+                r = requests.post('https://api.malcore.io/api/urlcheck', headers=headers, data=f"url={file_url}")
+                res = r.json()
+                print(res)
+                await ctx.send(f"{res}")
             else:
                 await ctx.send("No URL provided.")
-
+                
     # async def check_results(self, ctx, analysis_id, presid):
     #     vt_key = await self.bot.get_shared_api_tokens("virustotal")
     #     headers = {"x-apikey": vt_key["api_key"]}
