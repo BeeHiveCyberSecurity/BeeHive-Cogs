@@ -78,7 +78,7 @@ class AntiPhishing(commands.Cog):
         domains = []
 
         headers = {
-            "X-Identity": f"Sentri, AntiPhishing v{self.__version__} (https://www.beehive.systems)",
+            "X-Identity": f"Sentri, AntiPhishing v{self.__version__} (https://www.beehive.systems/sentri)",
         }
 
         async with self.session.get(
@@ -133,12 +133,12 @@ class AntiPhishing(commands.Cog):
                 with contextlib.suppress(discord.NotFound):
                     embed = discord.Embed(
                         title="Dangerous link detected!",
-                        description=f"The message I am replying to contains a dangerous website.\n\nThis link could be anything from a fraudulent online seller, to an IP logger, to a page delivering malware intended to target members Discord accounts.\n\nYou should avoid clicking this link for your own security, and report to a server moderator that this message appeared in chat!",
+                        description=f"This message contains a malicious website or URL.\n\nThis URL could be anything from a fraudulent online seller, to an IP logger, to a page delivering malware intended to steal Discord accounts.\n\n**Don't click any links in this message, and notify server moderators ASAP**",
                         color=16729413,
                     )
                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/warning-outline.png")
                     embed.timestamp = datetime.datetime.utcnow()
-                    embed.set_footer(text="Domain scanning powered by BeeHive",icon_url="")
+                    embed.set_footer(text="Link scanning powered by BeeHive",icon_url="")
                     await message.reply(embed=embed)
                     
                 await modlog.create_case(
@@ -274,7 +274,7 @@ class AntiPhishing(commands.Cog):
     @commands.admin_or_permissions(manage_guild=True)
     async def antiphishing(self, ctx: Context):
         """
-        Settings to set up the anti-phishing integration.
+        Settings to configure link safety in this server.
         """
 
     @antiphishing.command()
