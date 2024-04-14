@@ -12,6 +12,7 @@ class VirusTotal(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    @commands.bot_has_permissions(embed_links=True)
     @commands.hybrid_command()
     async def virustotal(self, ctx, file_url: str = None):
         async with ctx.typing():
