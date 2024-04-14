@@ -18,6 +18,8 @@ class Malcore(commands.Cog):
                 return await ctx.send("The Malcore API key has not been set.")
             if file_url == "":
                 await ctx.send("Please Define A URL!")
+            if "http" or "https" not in file_url:
+                await ctx.send("Please Provide A Valid URL!")
             if file_url:
                 
                 headers = {
@@ -48,8 +50,7 @@ class Malcore(commands.Cog):
         url_pattern = re.compile(r"^(?:http[s]?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$")
 
         if url_pattern.search(message.content):
-            await message.delete()
-            await message.author.send("Ay Fuck You Were Testing Here!")
+            pass
                 
     # async def check_results(self, ctx, analysis_id, presid):
     #     vt_key = await self.bot.get_shared_api_tokens("virustotal")
