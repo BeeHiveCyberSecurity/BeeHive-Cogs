@@ -54,17 +54,3 @@ class Malcore(commands.Cog):
         async with ctx.typing():
             await ctx.message.delete()
             await self.checkurl(url, ctx)
-                    
-    @commands.Cog.listener()
-    async def on_message(self, message: discord.Message):
-        url_pattern = re.compile(
-            r"(?:(?:https?|ftp):\/\/)?[\w/\-?=%.]+\.[\w/\-?=%.]+")
-
-        urls = url_pattern.findall(message.content)
-        for url in urls:
-            await self.url_queue.put(url)
-            
-    async def process_urls(self):
-            while True:
-                url = await self.url_queue.get()
-                await self.checkurl(url, ctx=None)
