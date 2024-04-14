@@ -34,7 +34,9 @@ class VirusTotal(commands.Cog):
                     attachment = ctx.message.attachments[0]
                     response = requests.get(attachment.url)
                     if response.status_code != 200:
-                        return await ctx.send("Failed to download the attached file.")
+                        embed = discord.Embed(title='Error: Failed to save file to memory', description=f"The bot was unable to submit that file to VirusTotal for analysis because the file download failed.", colour=16729413,)
+                        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle-outline.png")
+                        return await ctx.send(embed=embed)
                     file_content = response.content
                     response = requests.post("https://www.virustotal.com/api/v3/files", headers={"x-apikey": vt_key["api_key"]}, files={"file": file_content})
                     data = response.json()
