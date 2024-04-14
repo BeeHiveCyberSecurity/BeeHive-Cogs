@@ -1,5 +1,6 @@
 import requests
-import re, json
+import re
+import json
 import discord
 from redbot.core import commands
 
