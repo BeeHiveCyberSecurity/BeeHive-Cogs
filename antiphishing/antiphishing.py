@@ -267,11 +267,13 @@ class AntiPhishing(commands.Cog):
         domain = urlparse(real_url).netloc
 
         if domain in self.domains:
-            embed = discord.Embed(title="We've seen this before - it's dangerous...", description=f"Good catch! You found a **known malicious link**!\n\nYou should let a server moderator know about this.", colour=16729413,)
+            embed = discord.Embed(title="Link query: Dangerous", description=f"You found a **known malicious link**!\n\nYou should let a server moderator know about this.", colour=16729413,)
             embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle-outline.png")
             await ctx.send(embed=embed)
         else:
-            await ctx.send("That URL is likely not a phishing scam.")
+            embed = discord.Embed(title="Link query: No detections", description=f"This link looks clean. You should be able to proceed with caution safely. Rely on your best judgement while browsing this site, and leave the site if at any time your sense of trust is impaired.", colour=2866574,)
+            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/checkmark-circle-outline.png")
+            await ctx.send(embed=embed)
 
     @commands.group(aliases=["antiphish"])
     @commands.guild_only()
