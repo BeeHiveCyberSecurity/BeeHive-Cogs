@@ -29,6 +29,11 @@ class Malcore(commands.Cog):
             else:
                 await ctx.send("No URL provided.")
                 
+    @commands.Cog.listener()
+    async def on_message(self, message: discord.Message):
+        if message.content.lower() == "ping":
+            await message.channel.send("pong")
+                
     # async def check_results(self, ctx, analysis_id, presid):
     #     vt_key = await self.bot.get_shared_api_tokens("virustotal")
     #     headers = {"x-apikey": vt_key["api_key"]}
