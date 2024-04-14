@@ -1,10 +1,10 @@
 from redbot.core.bot import Red
 
-from .linkguard import LinkGuard
+from .antiphishing import AntiPhishing
 
 
 async def setup(bot: Red):
-    cog = LinkGuard(bot)
+    cog = AntiPhishing(bot)
     await bot.add_cog(cog)
 
 
