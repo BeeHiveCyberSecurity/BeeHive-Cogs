@@ -4,7 +4,7 @@
         "Sorted"
     ],
     "description": "Analyze urls via Malcore thru Red-DiscordBot using the Malcore API",
-    "install_msg": "## :white_check_mark: Successfully installed Malcore.\n**Questions?** [We're listening](<https://www.beehive.systems/contact-us>)\n**Interested in CyberSecurity and CyberSafety?** [Join our Discord](https://discord.gg/ckdzsm7mTs).\n\n**IMPORTANT** - Before you can use this cog, you'll need to sign up for a Malcore account, then add your API Key to your Red instance.",
+    "install_msg": "## :white_check_mark: Successfully installed Malcore.\n**Questions?** [We're listening](<https://www.beehive.systems/contact-us>)\n**Interested in CyberSecurity and CyberSafety?** Join our Discord! https://discord.gg/ckdzsm7mTs\n\n**IMPORTANT** - Before you can use this cog, you'll need to sign up for a Malcore account, then add your API Key to your Red instance.\nLearn more and sign up for Malcore [**here**](<https://go.beehive.systems/malcore>)",
     "name": "Malcore",
     "hidden": false,
     "disabled": false,
