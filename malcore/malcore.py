@@ -30,10 +30,19 @@ class Malcore(commands.Cog):
             try:
                 json_data = json.loads(res)
                 threat_level = json_data.get("data", {}).get("data", {}).get("threat_level")
+                embed = discord.Embed(url=f"{file_url}")
                 if threat_level and "SAFE" in threat_level:
-                    await ctx.send(f"The URL is SAFE.\nDEBUG: ```{json_data}```")
+                    embed.title = f"That file looks safe!"
+                    embed.color = 0x2BBD8E  # Green color
+                    embed.description = f"There's nothing obviously malicious about this url - it should be safe."
+                    embed.add_field(name="Overall verdict", value="Scanned and found safe", inline=False)
+                    embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/checkmark-circle-outline.png")
                 else:
-                    await ctx.send("The URL might be unsafe.")
+                    embed.title = f"{file_url} looks malicious!"
+                    embed.description = f"One or more security vendors have marked this url as potentially dangerous.\n\nFor your own safety, you should not open, launch, or interact with it."
+                    embed.color = 0xFF4545  # Red color
+                    embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/warning-outline.png")
+                    await ctx.send(embed=embed)
             except json.JSONDecodeError:
                 await ctx.send(f"Invalid JSON response from Malcore API.\nDEBUG: ```{res}```")
         else:
