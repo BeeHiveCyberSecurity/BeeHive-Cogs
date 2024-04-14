@@ -43,7 +43,7 @@ class Malcore(commands.Cog):
                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/warning-outline.png")
                     await ctx.send(embed=embed)
             except json.JSONDecodeError:
-                await ctx.send(f"Invalid JSON response from Malcore API.\nDEBUG: ```{res}```")
+                await ctx.send(f"Invalid JSON response from Malcore API.")
         else:
             await ctx.send("No URL provided.")
 
