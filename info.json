@@ -1,6 +1,6 @@
 {
     "author" : ["movelaterally"],
-    "install_msg" : "## Successfully installed repo.\n**Questions?** [We're listening](<https://www.beehive.systems/contact-us>)\n**Interested in CyberSecurity and CyberSafety?** [Join our Discord](https://discord.gg/ckdzsm7mTs)",
+    "install_msg" : "## Successfully installed repo.\n**Questions?** [We're listening](<https://www.beehive.systems/contact-us>)\n**Interested in CyberSecurity and CyberSafety?** Join our Discord - https://discord.gg/ckdzsm7mTs",
     "name" : "BeeHive-Cogs",
     "short" : "Security, safety, and server management cogs",
     "description" : "Cogs made to help better protect and serve Discord communities that use Red for server management and operations."
