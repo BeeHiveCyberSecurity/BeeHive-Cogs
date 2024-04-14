@@ -27,7 +27,9 @@ class VirusTotal(commands.Cog):
                         await ctx.send(f"Permalink: {permalink.split('-')[1]}")
                         await self.check_results(ctx, permalink.split('-')[1])
                     else:
-                        await ctx.send("Failed to submit the file for analysis.")
+                        embed = discord.Embed(title='Error: Failed to submit file', description=f"The bot was unable to submit that file to VirusTotal for analysis.", colour=16729413,)
+                        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle-outline.png")
+                        await ctx.send(embed=embed)
                 elif ctx.message.attachments:
                     attachment = ctx.message.attachments[0]
                     response = requests.get(attachment.url)
