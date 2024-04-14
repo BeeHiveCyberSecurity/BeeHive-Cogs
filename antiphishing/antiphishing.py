@@ -305,6 +305,6 @@ class AntiPhishing(commands.Cog):
         """
         caught = await self.config.guild(ctx.guild).caught()
         s = "s" if caught != 1 else ""
-        embed = discord.Embed(title='Protection statistics', description=f"I've caught and alerted to **`{caught}`** malicious link{s} in your server", colour=16767334,)
+        embed = discord.Embed(title='Link protection statistics', description=f"I've caught and alerted to **`{caught}`** malicious link{s} in your server", colour=16767334,)
+        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/shield-checkmark-outline.png")
         await ctx.send(embed=embed)
-        await ctx.send(f"I've caught `{caught}` phishing scam{s} in this server!")
