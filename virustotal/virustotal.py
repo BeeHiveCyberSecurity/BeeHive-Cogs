@@ -91,7 +91,9 @@ class VirusTotal(commands.Cog):
                         await ctx.send(content, embed=embed)
                         break
                     else:
-                        await ctx.send("Error: SHA256 value not found in the analysis response.")
+                        embed = discord.Embed(title='Error: SHA256 value not found in the analysis response', description=f"VirusTotal did not correctly match an Analysis ID with a file hash in the API response - try again, this is an odd error.", colour=16729413,)
+                        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle-outline.png")
+                        await ctx.send(embed=embed)
                         break
             else:
                 await ctx.send("Error: Analysis ID not found or analysis not completed yet.")
