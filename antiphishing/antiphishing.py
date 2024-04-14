@@ -258,7 +258,9 @@ class AntiPhishing(commands.Cog):
         url = url.strip("<>")
         urls = self.extract_urls(url)
         if not urls:
-            await ctx.send("That's not a valid URL.")
+            embed = discord.Embed(title='Error: Invalid URL', description=f"You provided an invalid URL.\n\nCheck the formatting of any links and try again...", colour=16729413,)
+            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle-outline.png")
+            await ctx.send(embed=embed)
             return
 
         real_url = urls[0]
