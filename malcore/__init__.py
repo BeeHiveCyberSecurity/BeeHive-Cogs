@@ -8,4 +8,4 @@ async def setup(bot: Red):
     await bot.add_cog(cog)
 
 
-__red_end_user_data_statement__ = "The Malcore cog by BeeHive does not store any user data. Samples shared with Malcore are kept public unless the user participating, and their API Key, are enrolled in the Malcore Signature Research Program."
+__red_end_user_data_statement__ = "This cog does not store any user data. Samples shared with Malcore are kept public unless the user participating, and their API Key, are enrolled in the Malcore Signature Research Program."
