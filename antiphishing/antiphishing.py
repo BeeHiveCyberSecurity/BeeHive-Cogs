@@ -283,11 +283,11 @@ class AntiPhishing(commands.Cog):
         Choose the action that occurs when a user sends a phishing scam.
 
         Options:
-        `ignore` - Disables the anti-phishing integration (default)
-        `notify` - Sends a message to the channel and says it's a phishing scam
+        `ignore` - Disables phishing protection
+        `notify` - Alerts in channel when malicious links detected (default)
         `delete` - Deletes the message
-        `kick` - Kicks the author (also deletes the message)
-        `ban` - Bans the author (also deletes the message)
+        `kick` - Delete message and kick sender
+        `ban` - Delete message and ban sender (recommended)
         """
         if action not in ["ignore", "notify", "delete", "kick", "ban"]:
             await ctx.send(
@@ -305,4 +305,6 @@ class AntiPhishing(commands.Cog):
         """
         caught = await self.config.guild(ctx.guild).caught()
         s = "s" if caught != 1 else ""
+        embed = discord.Embed(title='Protection statistics', description=f"I've caught and alerted to **`{caught}`** malicious link{s} in your server", colour=16767334,)
+        await ctx.send(embed=embed)
         await ctx.send(f"I've caught `{caught}` phishing scam{s} in this server!")
