@@ -22,7 +22,11 @@ class Malcore(commands.Cog):
                     "apiKey" : mcore_key["api_key"]
                 }
                 
-                r = requests.post('https://api.malcore.io/api/urlcheck', headers=headers, data=f"url={file_url}")
+                data = {
+                    "url": file_url
+                }
+                
+                r = requests.post('https://api.malcore.io/api/urlcheck', headers=headers, data=data)
                 res = r.text
                 print(res)
                 await ctx.send(f"{res}")
