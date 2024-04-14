@@ -8,4 +8,4 @@ async def setup(bot: Red):
     await bot.add_cog(cog)
 
 
-__red_end_user_data_statement__ = "The VirusTotal cog by BeeHive does not store any user data. VirusTotal stores submitted file information subject to their own Terms of Service and Privacy Policy."
+__red_end_user_data_statement__ = "The Malcore cog by BeeHive does not store any user data. Samples shared with Malcore are kept public unless the user participating, and their API Key, are enrolled in the Malcore Signature Research Program."
