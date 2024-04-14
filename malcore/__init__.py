@@ -1,6 +1,6 @@
 from redbot.core.bot import Red
 
-from .virustotal import VirusTotal
+from .malcore import Malcore
 
 
 async def setup(bot: Red):
