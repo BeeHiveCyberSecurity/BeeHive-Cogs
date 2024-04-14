@@ -9,9 +9,7 @@
     "hidden": false,
     "disabled": false,
     "requirements": [
-        "requests",
-        "re",
-        "json"
+        "requests"
     ],
     "tags": [
         "file scanning",
