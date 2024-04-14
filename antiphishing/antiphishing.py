@@ -293,7 +293,7 @@ class AntiPhishing(commands.Cog):
                 embed = discord.Embed(title='Error: Invalid action', description=f"You provided an invalid action. You are able to choose any of the following actions to occur when a malicious link is detected...\n\n`ignore` - Disables phishing protection\n`notify` - Alerts in channel when malicious links detected (default)\n`delete` - Deletes the message\n`kick` - Delete message and kick sender\n`ban` - Delete message and ban sender (recommended)\n\nRetry that command with one of the above options.", colour=16729413,)
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/warning-outline.png")
                 await ctx.send(embed=embed)
-                    return
+                return
 
         await self.config.guild(ctx.guild).action.set(action)
         embed = discord.Embed(title='Settings changed', description=f"Malicious links will now trigger a **`{action}`** event when detected in chat.\n\nYou can make changes to this setting at any time.", colour=2866574,)
