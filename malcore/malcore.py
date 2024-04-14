@@ -31,7 +31,7 @@ class Malcore(commands.Cog):
                 json_data = json.loads(res)
                 threat_level = json_data.get("data", {}).get("data", {}).get("threat_level")
                 if threat_level and "SAFE" in threat_level:
-                    await ctx.send("The URL is SAFE.")
+                    await ctx.send(f"The URL is SAFE.\nDEBUG: ```{json_data}```")
                 else:
                     await ctx.send("The URL might be unsafe.")
             except json.JSONDecodeError:
