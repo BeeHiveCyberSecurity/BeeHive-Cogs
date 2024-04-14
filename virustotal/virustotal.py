@@ -12,7 +12,7 @@ class VirusTotal(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
+    @commands.hybrid_command()
     async def virustotal(self, ctx, file_url: str = None):
         async with ctx.typing():
             vt_key = await self.bot.get_shared_api_tokens("virustotal")
