@@ -267,7 +267,9 @@ class AntiPhishing(commands.Cog):
         domain = urlparse(real_url).netloc
 
         if domain in self.domains:
-            await ctx.send("That URL is on our blocklist as known malicious! It is dangerous!")
+            embed = discord.Embed(title="We've seen this before - it's dangerous...", description=f"Good catch! You found a **known malicious link**!\n\nYou should let a server moderator know about this.", colour=16729413,)
+            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle-outline.png")
+            await ctx.send(embed=embed)
         else:
             await ctx.send("That URL is likely not a phishing scam.")
 
