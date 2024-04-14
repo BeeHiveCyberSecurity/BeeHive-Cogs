@@ -1,9 +1,9 @@
+import time, json
+import io
 import requests
 import asyncio
 import discord
 from redbot.core import commands
-import time, json
-import io
 
 class VirusTotal(commands.Cog):
     """VirusTotal file upload and analysis via Discord"""
