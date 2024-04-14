@@ -2,7 +2,7 @@
     "author": ["movelaterally"],
     "description": "Scan for malicious links and punish those who send them",
     "install_msg": "Thanks for installing! This is a private cog co-engineered between the BeeHive team and community members.\n\nIf you have any issues, please reach out at https://www.beehive.systems/support",
-    "name": "LinkGuard",
+    "name": "antiphishing",
     "short": "Defend from malicious links",
     "min_bot_version": "3.5.0"
 }
