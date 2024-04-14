@@ -8,7 +8,6 @@ class Malcore(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.bot.loop.create_task(self.process_urls())
 
     async def checkurl(self, file_url, ctx):
         mcore_key = await self.bot.get_shared_api_tokens("malcore")
