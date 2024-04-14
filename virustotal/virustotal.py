@@ -19,7 +19,9 @@ class VirusTotal(commands.Cog):
         async with ctx.typing():
             vt_key = await self.bot.get_shared_api_tokens("virustotal")
             if vt_key.get("api_key") is None:
-                return await ctx.send("The VirusTotal API key has not been set.")
+                embed = discord.Embed(title='Error: No VirusTotal API Key set', description=f"Your Red instance doesn't have an API key set for VirusTotal.\n\nUntil you add an API key using `[p]set api`, the VirusTotal cog may not function properly.", colour=16729413,)
+                embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle-outline.png")
+                return await ctx.send(embed=embed)
             else:
                 if file_url:
                     response = requests.post("https://www.virustotal.com/api/v3/urls", headers={"x-apikey": vt_key["api_key"]}, data={"url": file_url})

@@ -78,7 +78,7 @@ class AntiPhishing(commands.Cog):
         domains = []
 
         headers = {
-            "X-Identity": f"Sentri, AntiPhishing v{self.__version__} (https://www.beehive.systems/sentri)",
+            "X-Identity": f"BeeHive AntiPhishing v{self.__version__} (https://www.beehive.systems/sentri)",
         }
 
         async with self.session.get(
