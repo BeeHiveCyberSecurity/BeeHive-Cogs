@@ -76,15 +76,15 @@ class VirusTotal(commands.Cog):
                         if malicious_count > 0:
                             content = f"||<@{presid}>||"
                             embed.title = f"That file looks malicious!"
-                            embed.description = f"One or more security vendors have marked this file as potentially dangerous.\n\nFor your own safety, you should not open, launch, or interact with it."
+                            embed.description = f"You should avoid running, using, or handling the file"
                             embed.color = 0xFF4545  # Red color
                             embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/warning-outline.png")
                         else:
                             content = f"||<@{presid}>||"
                             embed.title = f"That file looks safe!"
                             embed.color = 0x2BBD8E  # Green color
-                            embed.description = f"There's nothing obviously malicious about this file - it should be safe."
-                            embed.add_field(name="Overall verdict", value="Scanned and found safe", inline=False)
+                            embed.description = f"You should be safe to use this file"
+                            embed.add_field(name="Overall verdict", value="Clean", inline=False)
                             embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/checkmark-circle-outline.png")
                         
                         total_count = malicious_count + suspicious_count + undetected_count + harmless_count + failure_count + unsupported_count
