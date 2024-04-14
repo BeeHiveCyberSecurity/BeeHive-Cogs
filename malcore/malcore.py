@@ -16,7 +16,8 @@ class Malcore(commands.Cog):
         async with ctx.typing():
             if file_url:
                 await ctx.send(f"Looking At {file_url}")
-            await ctx.send("No URL provided.")
+            else:
+                await ctx.send("No URL provided.")
 
     # async def check_results(self, ctx, analysis_id, presid):
     #     vt_key = await self.bot.get_shared_api_tokens("virustotal")
