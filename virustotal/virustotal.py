@@ -19,7 +19,7 @@ class VirusTotal(commands.Cog):
         async with ctx.typing():
             vt_key = await self.bot.get_shared_api_tokens("virustotal")
             if vt_key.get("api_key") is None:
-                embed = discord.Embed(title='Error: No VirusTotal API Key set', description=f"Your Red instance doesn't have an API key set for VirusTotal.\n\nUntil you add an API key using `[p]set api`, the VirusTotal cog may not function properly.", colour=16729413,)
+                embed = discord.Embed(title='Error: No VirusTotal API Key set', description=f"Your Red instance doesn't have an API key set for VirusTotal.\n\nUntil you add an API key using `[p]set api`, the VirusTotal API will refuse your requests and this cog won't work.", colour=16729413,)
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle-outline.png")
                 return await ctx.send(embed=embed)
             else:
@@ -88,9 +88,10 @@ class VirusTotal(commands.Cog):
                             embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/checkmark-circle-outline.png")
                         
                         total_count = malicious_count + suspicious_count + undetected_count + harmless_count + failure_count + unsupported_count
+                        noanswer_count = failure_count + unsupported_count
                         percentpre = malicious_count / total_count if total_count > 0 else 0
                         percent = round(percentpre * 100, 2)
-                        embed.add_field(name="Analysis results", value=f"**{percent}% of security vendors rated this file dangerous!**\n({malicious_count} malicious, {undetected_count} clean)", inline=False)
+                        embed.add_field(name="Analysis results", value=f"**{percent}% of security vendors rated this file dangerous!**\n{malicious_count} malicious, {undetected_count} clean\n{noanswer_count} engines couldn't check this file.", inline=False)
 
                         await ctx.send(content, embed=embed)
                         break
