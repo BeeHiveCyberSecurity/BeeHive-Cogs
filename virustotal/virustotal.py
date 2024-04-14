@@ -92,7 +92,7 @@ class VirusTotal(commands.Cog):
                         safe_count = harmless_count + undetected_count
                         percentpre = malicious_count / total_count if total_count > 0 else 0
                         percent = round(percentpre * 100, 2)
-                        embed.add_field(name="Analysis results", value=f"**{percent}%** of security vendors rated this file dangerous!\n**{malicious_count}** malicious\n**{suspicious_count}** suspicious\n**{safe_count}** clean\n**{noanswer_count}** engines couldn't check this file.", inline=False)
+                        embed.add_field(name="Analysis results", value=f"**{percent}%** of security vendors rated this file dangerous!\n- **{malicious_count}** malicious\n- **{suspicious_count}** suspicious\n- **{safe_count}** detected no threats\n- **{noanswer_count}** engines couldn't check this file.", inline=False)
 
                         await ctx.send(content, embed=embed)
                         break
