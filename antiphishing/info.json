@@ -1,8 +1,8 @@
 {
     "author": ["movelaterally"],
-    "description": "Scan for malicious links and punish those who send them",
-    "install_msg": "Thanks for installing! This is a private cog co-engineered between the BeeHive team and community members.\n\nIf you have any issues, please reach out at https://www.beehive.systems/support",
+    "description": "Screen for malicious links in your server",
+    "install_msg": "## :white_check_mark: Successfully installed Malcore.\n**Questions?** [We're listening](<https://www.beehive.systems/contact-us>)\n**Interested in CyberSecurity and CyberSafety?** Join our Discord! https://discord.gg/ckdzsm7mTs",
     "name": "antiphishing",
-    "short": "Defend from malicious links",
+    "short": "Screen for malicious links in your server",
     "min_bot_version": "3.5.0"
 }
