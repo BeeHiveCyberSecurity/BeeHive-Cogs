@@ -11,7 +11,7 @@ class Malcore(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         
-    @commands.hybrid_command(name="urlcheck", description="Submit content to Malcore for deep analysis")
+    @commands.hybrid_command(name="urlcheck", description="Utilize Malcore's /urlcheck endpoint to scan a URL")
     async def urlcheck(self, ctx, url: str):
         mcore_key = await self.bot.get_shared_api_tokens("malcore")
         if mcore_key.get("api_key") is None:
@@ -34,14 +34,14 @@ class Malcore(commands.Cog):
                 threat_level = json_data.get("data", {}).get("data", {}).get("threat_level")
                 embed = discord.Embed(url=f"{url}")
                 if threat_level and "SAFE" in threat_level:
-                    embed.title = f"{url} looks safe"
+                    embed.title = f"That URL looks safe"
                     embed.color = 0x2BBD8E  # Green color
-                    embed.description = f"Malcore did not detect any threats associated with this URL"
+                    embed.description = f"Malcore did not detect any threats associated with {url}"
                     embed.add_field(name="Overall verdict", value="Scanned and found safe", inline=False)
                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/checkmark-circle-outline.png")
                 else:
-                    embed.title = f"{url} looks malicious!"
-                    embed.description = f"One or more security vendors have marked this URL as potentially dangerous.\n\nFor your own safety, you should not open, launch, or interact with it."
+                    embed.title = f"This URL looks malicious!"
+                    embed.description = f"Malcore says {url} is malicious!\n\nFor your own safety, please don't click it."
                     embed.color = 0xFF4545  # Red color
                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/warning-outline.png")
                 await ctx.send(embed=embed)
