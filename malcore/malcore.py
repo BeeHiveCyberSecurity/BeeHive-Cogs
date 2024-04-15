@@ -47,3 +47,38 @@ class Malcore(commands.Cog):
                 await ctx.send(embed=embed)
         except json.JSONDecodeError:
             await ctx.send(f"Invalid JSON response from Malcore API.")
+
+
+    @commands.hybrid_command(name="filecheck", description="Submit File to Malcore for deep analysis")
+    async def filecheck(self, ctx):
+        mcore_key = await self.bot.get_shared_api_tokens("malcore")
+        if mcore_key.get("api_key") is None:
+            await ctx.send("The Malcore API key has not been set.")
+        if ctx.message.attachments == "":
+            await ctx.send("Please attach a file!")
+
+        if ctx.message.attachments:
+            attachment = ctx.message.attachments[0]
+            response = requests.get(attachment.url)
+            headers = {
+                "apiKey": mcore_key["api_key"],
+                "X-No-Poll": False
+            }
+            if response.status_code != 200:
+                        embed = discord.Embed(title='Error: Failed to save file to memory', description=f"The bot was unable to submit that file to VirusTotal for analysis because the file download failed.", colour=16729413,)
+                        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle-outline.png")
+                        return await ctx.send(embed=embed)
+            file_content = response.content
+            try:
+                async with ctx.typing():
+                    r = requests.post('https://api.malcore.io/api/upload', headers=headers, files={'filename': ('1', file_content)})
+                    res = r.text
+                    json_data = json.loads(res)
+                    r2 = requests.post('https://paste.org/', data={'text': json_data})
+                    paste_url = r2.url
+                    await ctx.send(f"Uploaded to Paste.org: {paste_url}")
+
+            except json.JSONDecodeError:
+                await ctx.send(f"Invalid JSON response from Malcore API.")
+        else:
+            await ctx.send("Please attach a file!")
