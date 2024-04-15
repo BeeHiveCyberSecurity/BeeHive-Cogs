@@ -21,14 +21,13 @@ class URLScan(commands.Cog):
         if "http" not in url and "https" not in url:
             await ctx.send("Please provide a valid URL!")
         headers = {
-            "apiKey": urlscan_key["api_key"]
+            "Content-Type: application/json"
+            "API-Key": urlscan_key["api_key"]
         }
-        data = {
-            "url": url
-        }
+        data = {"url": f"{url}", "visibility": "public"}
         try:
             async with ctx.typing():
-                r = requests.post('', headers=headers, data=data)
+                r = requests.post('https://urlscan.io/api/v1/scan/', headers=headers, data=data)
                 res = r.text
                 json_data = json.loads(res)
                 threat_level = json_data.get("data", {}).get("data", {}).get("threat_level")
