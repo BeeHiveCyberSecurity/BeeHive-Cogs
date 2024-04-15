@@ -15,17 +15,18 @@ class Malcore(commands.Cog):
     async def urlcheck(self, ctx, url: str):
         mcore_key = await self.bot.get_shared_api_tokens("malcore")
         if mcore_key.get("api_key") is None:
-            return await ctx.send("The Malcore API key has not been set.")
+            await ctx.send("The Malcore API key has not been set.")
         if url == "":
-            return await ctx.send("Please define a URL!")
+            await ctx.send("Please define a URL!")
         if "http" not in url and "https" not in url:
-            return await ctx.send("Please provide a valid URL!")
+            await ctx.send("Please provide a valid URL!")
         headers = {
             "apiKey": mcore_key["api_key"]
         }
         data = {
             "url": url
         }
+        await ctx.message.delete()
         try:
             async with ctx.typing():
                 r = requests.post('https://api.malcore.io/api/urlcheck', headers=headers, data=data)
@@ -47,4 +48,3 @@ class Malcore(commands.Cog):
                 await ctx.send(embed=embed)
         except json.JSONDecodeError:
             await ctx.send(f"Invalid JSON response from Malcore API.")
-        await ctx.message.delete()
