@@ -26,7 +26,6 @@ class Malcore(commands.Cog):
         data = {
             "url": url
         }
-        await ctx.message.delete()
         try:
             async with ctx.typing():
                 r = requests.post('https://api.malcore.io/api/urlcheck', headers=headers, data=data)
