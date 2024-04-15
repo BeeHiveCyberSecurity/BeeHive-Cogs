@@ -18,7 +18,7 @@ then load the newly installed cog with
 ```[p]load (cogname)```
 
 # About these cogs
-- [virustotal](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/virustotal) - Utilize the VirusTotal API and a (free) VirusTotal API Key to analyze files and URLs for malicious content and get back multiple vendor verdicts at once.
-- [malcore](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/malcore) - Utilize the Malcore API and a (free) Malcore account to perform deep file analysis via Discord, utilizing one of the fastest reverse engineering platforms available. Learn more about the platform, and sign up for Malcore [here](<https://go.beehive.systems/malcore>)
+- [virustotal](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/virustotal) - Utilize the VirusTotal API and a (free) VirusTotal API Key to analyze files and URLs for malicious content `(recommended)`.
+- [malcore](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/malcore) - Utilize the Malcore API and a (free) Malcore account to perform deep file analysis via Discord
 - [urlscan](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/urlscan) - Utilize the URLScan.io API and a (free) URLScan API Key to analyze URL's for safety and/or security.
 - [antiphishing](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/antiphishing) - Passively detect and remove malicious website links sent in your server's chats.
