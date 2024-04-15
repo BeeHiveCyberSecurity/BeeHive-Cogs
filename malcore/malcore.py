@@ -49,7 +49,7 @@ class Malcore(commands.Cog):
             await ctx.send(f"Invalid JSON response from Malcore API.")
 
 
-    @commands.hybrid_command(name="filecheck", description="Submit File to Malcore for deep analysis")
+    @commands.command()
     async def filecheck(self, ctx):
         mcore_key = await self.bot.get_shared_api_tokens("malcore")
         if mcore_key.get("api_key") is None:
