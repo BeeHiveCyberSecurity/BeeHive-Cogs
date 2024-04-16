@@ -9,5 +9,5 @@ class Products(commands.Cog):
         await ctx.send("What would you like to learn more about?")
 
     @product.command(name="antivirus")
-    async def bark(self, ctx: commands.Context):
-        await ctx.send("antivirus test message lol", ephemeral=false)
+    async def antivirus(self, ctx: commands.Context):
+        await ctx.send("antivirus test message lol")
