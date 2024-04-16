@@ -11,7 +11,7 @@ class Products(commands.Cog):
     @commands.hybrid_command(name="antivirus", description="Learn more about BeeHive's AntiVirus", aliases=["av"])
     async def antivirus(self, ctx: commands.Context):
 
-    embed = discord.Embed(
+        embed = discord.Embed(
     title='AntiVirus & AntiMalware',
     description='Description text field',
     colour=16767334,
