@@ -32,7 +32,7 @@ class Products(commands.Cog):
         embed.add_field(name="Automated Remediation", value="No-touch, no-interaction, 100% hands free threat remediation across 7 layers of powerful protection", inline=False)
         embed.add_field(name="Start a 15 day free trial", value="Get 15 days of complete protection from malware, spyware, password stealers and more - no committment required. Subscribe today and cancel anytime from your billing dashboard.", inline=False)
         view = discord.ui.View()
-        view.add_item(discord.ui.Button(label="Start a 15 day free trial", url="https://buy.stripe.com/5kA8y62kIg06dLqdRc", style=discord.ButtonStyle.link, emoji="<:shield:1194906995036262420>"))
+        view.add_item(discord.ui.Button(label="Start a 15 day free trial", url="https://buy.stripe.com/5kA8y62kIg06dLqdRc", style=discord.ButtonStyle.green, emoji="<:shield:1194906995036262420>"))
         view.add_item(discord.ui.Button(label="Learn more on our website", url="https://www.beehive.systems/antivirus", style=discord.ButtonStyle.link, emoji="<:info:1199305085738553385>"))
         await ctx.send(embed=embed, view=view)
     
