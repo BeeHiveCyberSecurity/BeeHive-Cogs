@@ -26,7 +26,7 @@ class Products(commands.Cog):
         embed.add_field(name="Real-Time Cloud Analysis", value="Ongoing static and dynamic analysis of unknown objects within your filesystem for unidentified malware", inline=True)
         embed.add_field(name="Automated Threat Containment", value="Kernel-level API virtualization to monitor and contain unknowns during analysis and verdicting", inline=True)
         embed.add_field(name="Automated Remediation", value="No-touch, no-interaction, 100% hands free threat remediation across 7 layers of powerful protection", inline=True)
-        embed.add_field(name="৿", value="৿", inline=False)
+        embed.add_field(name="​", value="​", inline=False)
         embed.add_field(name="Start a 14 day free trial", value="CTA", inline=True)
         await ctx.send(embed=embed)
     
