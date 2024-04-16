@@ -14,8 +14,10 @@ class Products(commands.Cog):
     @commands.bot_has_permissions(embed_links=True)
     @commands.hybrid_command(name="antivirus", description="Learn more about BeeHive's AntiVirus", aliases=["av"])
     async def antivirus(self, ctx: commands.Context):
-    """Learn more about BeeHive's AntiVirus"""
-    
+    """
+    Learn more about BeeHive's AntiVirus
+    """
+
         embed = discord.Embed(
     title=f"Award-winning protection against advanced online threats",
     description=f"# Protect your PC from malware and spyware in just a few clicks\n\nBeeHive's security client is a security software application designed to protect users from malware or viruses while working, shopping, or playing games on their computers. It works by isolating unknown files in a safe virtual environment before performing real-time analysis to determine whether they pose any threat - all done without risk or alert fatigue for normal computer usage.",
