@@ -8,6 +8,14 @@ class Products(commands.Cog):
     @commands.bot_has_permissions(embed_links=True)
     @commands.hybrid_command(name="antivirus", description="Learn more about BeeHive's AntiVirus", aliases=["av"])
     async def antivirus(self, ctx: commands.Context):
+        embed = discord.Embed(
+    title='AntiVirus & AntiMalware',
+    description='Description text field',
+    colour=16767334,
+    url='https://www.beehive.systems/antivirus',
+)
+
+        await ctx.send(embed=embed)
         await ctx.send("antivirus test message lol")
     
     @commands.bot_has_permissions(embed_links=True)
