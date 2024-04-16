@@ -1,0 +1,20 @@
+{
+    "author": [
+        "movelaterally"
+    ],
+    "description": "Get product details thru Discord commands",
+    "install_msg": "## :white_check_mark: Successfully installed Products.\n**Questions?** [We're listening](<https://www.beehive.systems/contact-us>)\n**Interested in CyberSecurity and CyberSafety?** Join our Discord! https://discord.gg/ckdzsm7mTs",
+    "name": "Products",
+    "hidden": false,
+    "disabled": false,
+    "requirements": [
+        "requests"
+    ],
+    "tags": [
+        "sales",
+        "products",
+        "URLScan"
+    ],
+    "short": "View information about company products",
+    "min_bot_version": "3.5.0"
+}
