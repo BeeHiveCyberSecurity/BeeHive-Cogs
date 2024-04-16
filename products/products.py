@@ -17,7 +17,7 @@ class Products(commands.Cog):
     colour=16767334,
     url='https://www.beehive.systems/antivirus',
 )
-    await ctx.send(embed=embed)
+        await ctx.send(embed=embed)
     
     @commands.bot_has_permissions(embed_links=True)
     @commands.hybrid_command(name="vulnerabilityscanning", description="Learn more about Vulnerability Scanning", aliases=[""])
