@@ -21,7 +21,7 @@ class Products(commands.Cog):
         Learn more [here](<https://www.beehive.systems/antivirus>)
         """
 
-        embed = discord.Embed(title=f"Award-winning protection against advanced online threats", description=f"# Protect your PC from malware and spyware in just a few clicks\n\n**BeeHive's security client is a security software application designed to protect users from malware or viruses while working, shopping, or playing games on their computers. It works by isolating unknown files in a safe virtual environment before performing real-time analysis to determine whether they pose any threat - all done without risk or alert fatigue for normal computer usage.**", colour=16767334, url='https://www.beehive.systems/antivirus')
+        embed = discord.Embed(title=f"Award-winning protection against advanced online threats", description=f"# Protect your PC from malware and spyware in just a few clicks\n\n### BeeHive's security client is a security software application designed to protect users from malware or viruses while working, shopping, or playing games on their computers. It works by isolating unknown files in a safe virtual environment before performing real-time analysis to determine whether they pose any threat - all done without risk or alert fatigue for normal computer usage.", colour=16767334, url='https://www.beehive.systems/antivirus')
         embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/shield-checkmark.png")
         embed.set_image(url="https://i.imgur.com/NvGx5WK.png")
         embed.add_field(name="​", value="​", inline=False)
