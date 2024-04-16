@@ -27,7 +27,7 @@ class Products(commands.Cog):
         embed.add_field(name="Automated Threat Containment", value="Kernel-level API virtualization to monitor and contain unknowns during analysis and verdicting", inline=True)
         embed.add_field(name="Automated Remediation", value="No-touch, no-interaction, 100% hands free threat remediation across 7 layers of powerful protection", inline=True)
         embed.add_field(name="​", value="​", inline=False)
-        embed.add_field(name="Start a 14 day free trial", value="CTA", inline=True)
+        embed.add_field(name="Start a 15 day free trial", value="Get 15 days of complete protection from malware, spyware, password stealers and more - no committment required. [**Subscribe today**](<https://buy.stripe.com/8wM9Ca1gE4hocHmaEL>), and cancel anytime from your billing portal.", inline=True)
         await ctx.send(embed=embed)
     
     @commands.bot_has_permissions(embed_links=True)
