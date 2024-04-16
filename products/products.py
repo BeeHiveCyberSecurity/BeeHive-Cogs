@@ -34,6 +34,7 @@ class Products(commands.Cog):
         embed.add_field(name="Start a 15 day free trial", value="Get 15 days of complete protection from malware, spyware, password stealers and more - no committment required. Subscribe today and cancel anytime from your billing dashboard.", inline=True)
         view = discord.ui.View()
         view.add_item(discord.ui.Button(label="Start a 15 day free trial", url="https://buy.stripe.com/5kA8y62kIg06dLqdRc", style=discord.ButtonStyle.link))
+        view.add_item(discord.ui.Button(label="Learn more on our website", url="https://www.beehive.systems/antivirus", style=discord.ButtonStyle.link))
         await ctx.send(embed=embed, view=view)
     
     @commands.bot_has_permissions(embed_links=True)
