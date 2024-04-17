@@ -75,3 +75,22 @@ class Products(commands.Cog):
         view = discord.ui.View()
         view.add_item(discord.ui.Button(label="Learn more on our website", url="https://www.beehive.systems/brand-protection", style=discord.ButtonStyle.link, emoji="<:info:1199305085738553385>"))
         await ctx.send(embed=embed, view=view)
+
+    @commands.bot_has_permissions(embed_links=True)
+    @commands.hybrid_command(name="incidentresponse", description="Learn more about Incident Response", aliases=["ir"])
+    async def incidentresponse(self, ctx: commands.Context):
+        """
+        Show an embed containing product details about BeeHive's Incident Response services
+
+        Prefer a website?
+        Learn more [here](<https://www.beehive.systems/incident-response>)
+        """
+        embed = discord.Embed(title=f"Incident Response", description=f"# When all else fails, you can count on us.\n\n### Investigate and disrupt attacker persistance to ensure business continuity", colour=16767334, url='https://www.beehive.systems/incident-response')
+        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/shield-checkmark.png")
+        embed.set_image(url="")
+        embed.add_field(name="Get help from the experts", value="Collaborate with our team of security experts and tap into the wealth of knowledge gained from hundreds of previous engagements", inline=False)
+        embed.add_field(name="Gain clarity of your security event", value="Utilize threat intelligence to effectively allocate resources and make informed decisions based on the risks posed to your business", inline=False)
+        embed.add_field(name="Get back to business faster", value="Get back on track quickly by taking immediate action to address the situation, minimize financial repercussions, and expedite the return to your core business operations", inline=False)
+        view = discord.ui.View()
+        view.add_item(discord.ui.Button(label="Learn more on our website", url="https://www.beehive.systems/incident-response", style=discord.ButtonStyle.link, emoji="<:info:1199305085738553385>"))
+        await ctx.send(embed=embed, view=view)
