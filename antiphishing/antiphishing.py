@@ -3,7 +3,6 @@ import datetime
 import re
 from typing import List
 from urllib.parse import urlparse
-
 import aiohttp
 import discord
 from discord.ext import tasks
