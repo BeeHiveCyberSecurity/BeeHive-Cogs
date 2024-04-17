@@ -39,4 +39,10 @@ class Products(commands.Cog):
     @commands.bot_has_permissions(embed_links=True)
     @commands.hybrid_command(name="vulnerabilityscanning", description="Learn more about Vulnerability Scanning", aliases=[""])
     async def vulnerabilityscanning(self, ctx: commands.Context):
+        """
+        Show an embed containing product details about BeeHive's Vulnerability Scanning and Monitoring services
+
+        Prefer a website?
+        Learn more [here](<https://www.beehive.systems/vulnerabilityscanning>)
+        """
         await ctx.send("vuln scanning test message")
