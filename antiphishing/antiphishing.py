@@ -88,7 +88,7 @@ class AntiPhishing(commands.Cog):
                 domains.extend(data)
 
         async with self.session.get(
-            "https://www.beehive.systems/hubfs/blocklist.json", headers=headers
+            "https://www.beehive.systems/hubfs/blocklist/blocklist.json", headers=headers
         ) as request:
             if request.status == 200:
                 data = await request.json()
