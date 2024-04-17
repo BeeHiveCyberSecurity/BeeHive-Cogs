@@ -45,4 +45,17 @@ class Products(commands.Cog):
         Prefer a website?
         Learn more [here](<https://www.beehive.systems/vulnerabilityscanning>)
         """
-        await ctx.send("vuln scanning test message")
+        embed = discord.Embed(title=f"Web vulnerability scanning and monitoring", description=f"# Scan and monitor for website and web application vulnerabilities\n\n### Hosting a website or web-app can cost a part-time job's worth of time to properly secure. Our Vulnerability Scanning and Vulnerability Monitoring makes it easier to know whether your changes and security mitigations are effective and help guide you on how to assume a better security posture over time.", colour=16767334, url='https://www.beehive.systems/antivirus')
+        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/shield-checkmark.png")
+        embed.set_image(url="")
+        embed.add_field(name="Know what's public", value="Discover and explore the full scope of visibility and vulnerabilities in your network, domain, or project with our detailed and carefully documented analysis. Our expert insights offer a comprehensive understanding of your system, enabling you to proactively address any potential weaknesses and bolster your defenses.", inline=False)
+        embed.add_field(name="Find what's not supposed to be", value="Explore your platform's vulnerabilities, uncover hidden misconfigurations, identify vulnerable ports, and detect unpatched exploits. Our analysis equips you with the knowledge to fortify your platform's security and protect against potential threats.", inline=False)
+        embed.add_field(name="Fix what's dangerous", value="Discover detailed, step-by-step instructions for effectively patching vulnerabilities and safeguarding your valuable information. Our comprehensive guides not only address weaknesses but also mitigate risks and bolster network security.", inline=False)
+        embed.add_field(name="Verify it stays that way", value="Discover the power of observing the effects caused by modifications in your codebase and dependencies. Unleash the ability to effortlessly analyze and contrast different configurations spanning various domains or endpoints.", inline=False)
+        embed.add_field(name="", value="", inline=False)
+        embed.add_field(name="", value="", inline=False)
+        embed.add_field(name="", value="", inline=False)
+        view = discord.ui.View()
+        view.add_item(discord.ui.Button(label="Purchase a scan today", url="https://buy.stripe.com/14k8y64sQ15c4aQ4gg", style=discord.ButtonStyle.green, emoji="<:shield:1194906995036262420>"))
+        view.add_item(discord.ui.Button(label="Learn more on our website", url="https://www.beehive.systems/vulnerability-scanning", style=discord.ButtonStyle.link, emoji="<:info:1199305085738553385>"))
+        await ctx.send(embed=embed, view=view)
