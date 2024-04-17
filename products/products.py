@@ -37,7 +37,7 @@ class Products(commands.Cog):
         await ctx.send(embed=embed, view=view)
     
     @commands.bot_has_permissions(embed_links=True)
-    @commands.hybrid_command(name="vulnerabilityscanning", description="Learn more about Vulnerability Scanning", aliases=[""])
+    @commands.hybrid_command(name="vulnerabilityscanning", description="Learn more about Vulnerability Scanning")
     async def vulnerabilityscanning(self, ctx: commands.Context):
         """
         Show an embed containing product details about BeeHive's Vulnerability Scanning and Monitoring services
@@ -58,7 +58,7 @@ class Products(commands.Cog):
         await ctx.send(embed=embed, view=view)
 
     @commands.bot_has_permissions(embed_links=True)
-    @commands.hybrid_command(name="brandprotection", description="Learn more about Brand Protection", aliases=[""])
+    @commands.hybrid_command(name="brandprotection", description="Learn more about Brand Protection")
     async def brandprotection(self, ctx: commands.Context):
         """
         Show an embed containing product details about BeeHive's Brand Protection services
