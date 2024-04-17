@@ -43,7 +43,7 @@ class Products(commands.Cog):
         Show an embed containing product details about BeeHive's Vulnerability Scanning and Monitoring services
 
         Prefer a website?
-        Learn more [here](<https://www.beehive.systems/vulnerabilityscanning>)
+        Learn more [here](<https://www.beehive.systems/vulnerability-scanning>)
         """
         embed = discord.Embed(title=f"Web vulnerability scanning and monitoring", description=f"# Scan and monitor for website and web application vulnerabilities\n\n### Hosting a website or web-app can cost a part-time job's worth of time to properly secure. Our Vulnerability Scanning and Vulnerability Monitoring makes it easier to know whether your changes and security mitigations are effective and help guide you on how to assume a better security posture over time.", colour=16767334, url='https://www.beehive.systems/antivirus')
         embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/shield-checkmark.png")
