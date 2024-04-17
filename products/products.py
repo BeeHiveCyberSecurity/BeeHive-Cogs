@@ -3,8 +3,8 @@ import time
 import json
 import io
 import discord # type: ignore
-from redbot.core import commands
-from redbot.core import app_commands
+from redbot.core import commands # type: ignore
+from redbot.core import app_commands # type: ignore
 
 
 class Products(commands.Cog):

@@ -3,7 +3,7 @@ import json
 import io
 import requests
 import asyncio
-import discord
+import discord # type: ignore
 from redbot.core import commands
 from redbot.core import app_commands # type: ignore
 

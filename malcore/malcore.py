@@ -1,7 +1,7 @@
 import requests
 import re
 import json
-import discord
+import discord # type: ignore
 from redbot.core import commands
 from redbot.core import app_commands
 
