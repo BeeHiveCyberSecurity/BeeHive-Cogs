@@ -2,7 +2,7 @@ import asyncio
 import time
 import json
 import io
-import discord
+import discord # type: ignore
 from redbot.core import commands
 from redbot.core import app_commands
 

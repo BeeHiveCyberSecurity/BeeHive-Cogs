@@ -4,7 +4,7 @@ import re
 from typing import List
 from urllib.parse import urlparse
 import aiohttp
-import discord
+import discord # type: ignore
 from discord.ext import tasks
 from redbot.core import Config, commands, modlog
 from redbot.core.bot import Red
