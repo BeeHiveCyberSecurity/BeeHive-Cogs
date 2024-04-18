@@ -51,7 +51,7 @@ class Products(commands.Cog):
         if discount_link:
             await asyncio.sleep(3)
             await ctx.typing()
-            embed2 = discord.Embed(title=f"Partner Perk Unlocked!", description=f"**{server_name}** is a Discord partner of BeeHive, and this grants this community exclusive perks! Get an exclusive offer as thanks for your support of this server [here]({discount_link})", colour=16767334, url='https://www.beehive.systems/antivirus')
+            embed2 = discord.Embed(title=f"Partner Perk Available", description=f"**{server_name}** is a Discord partner of BeeHive, and this grants this community exclusive perks! Get an exclusive offer as thanks for your support of this server [here]({discount_link})", colour=16767334, url='https://www.beehive.systems/antivirus')
             embed2.add_field(name="Offer Details", value=f"", inline=False)
             await ctx.send(embed=embed2)
     
