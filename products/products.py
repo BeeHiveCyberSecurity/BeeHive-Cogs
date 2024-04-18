@@ -83,8 +83,8 @@ class Products(commands.Cog):
         await ctx.send(embed=embed, view=view)
 
     @commands.bot_has_permissions(embed_links=True)
-    @commands.hybrid_command(name="incidentresponse", description="Learn more about Incident Response", aliases=["ir"])
-    async def incidentresponse(self, ctx: commands.Context):
+    @product.command(name="incidentresponse", description="Learn more about Incident Response", aliases=["ir"])
+    async def product_incidentresponse(self, ctx: commands.Context):
         """
         Show an embed containing product details about BeeHive's Incident Response services
 
@@ -102,8 +102,8 @@ class Products(commands.Cog):
         await ctx.send(embed=embed, view=view)
 
     @commands.bot_has_permissions(embed_links=True)
-    @commands.hybrid_command(name="pcoptimization", description="Learn more about PC Optimization", aliases=["opti"])
-    async def pcoptimization(self, ctx: commands.Context):
+    @product.command(name="pcoptimization", description="Learn more about PC Optimization", aliases=["opti"])
+    async def product_pcoptimization(self, ctx: commands.Context):
         """
         Show an embed containing product details about BeeHive's PC Optimization services
 
