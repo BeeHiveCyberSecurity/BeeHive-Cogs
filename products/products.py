@@ -11,8 +11,8 @@ class Products(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.antivirus_links = {
-            1147002526156206170: "https://link.for.server.1",  # Example server ID and link
-            1081164568669200384: "https://link.for.server.2",  # Another example server ID and link
+            1147002526156206170: "https://buy.stripe.com/5kA8y62kIg06dLqdRc?prefilled_promo_code=DIRTYTHR33&utm_source=discord&utm_medium=partnerperk",  # Example server ID and link
+            1081164568669200384: "https://buy.stripe.com/5kA8y62kIg06dLqdRc?prefilled_promo_code=DIRTYTHR33&utm_source=discord&utm_medium=partnerperk",  # Another example server ID and link
             # Add more server IDs and their links as needed
         }
 
