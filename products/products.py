@@ -11,7 +11,7 @@ class Products(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.antivirus_links = {
-            123456789012345678: "https://link.for.server.1",  # Example server ID and link
+            1147002526156206170: "https://link.for.server.1",  # Example server ID and link
             876543210987654321: "https://link.for.server.2",  # Another example server ID and link
             # Add more server IDs and their links as needed
         }
