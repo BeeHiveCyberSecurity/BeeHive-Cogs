@@ -55,7 +55,7 @@ class Products(commands.Cog):
             view2.add_item(discord.ui.Button(label="Save 30% on your first 3 months of protection", url=f"{discount_link}", style=discord.ButtonStyle.link, emoji="<:shield:1194906995036262420>"))
             embed2 = discord.Embed(title=f"Partner Perk Available", description=f"**{server_name}** is a Discord partner of BeeHive, and this grants this community exclusive discounts and credits", colour=16767334, url='')
             embed2.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/bag-add.png")
-            embed2.add_field(name="Offer Details", value=f"Trial our Security Client for 15 days free, then pay only $7.00 per month until coupon expires. Offer valid for first-time customers only, billing continues automatically unless cancelled.", inline=False)
+            embed2.add_field(name="Offer Details", value=f"Trial our Security Client for **15 days free**, then pay **only** **`$7.00`** per month until coupon expires.\n`Offer valid for first-time customers only, billing continues automatically unless cancelled.`", inline=False)
             await ctx.send(embed=embed2, view=view2)
     
     @commands.bot_has_permissions(embed_links=True)
