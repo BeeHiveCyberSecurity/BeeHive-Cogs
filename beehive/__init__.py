@@ -1,10 +1,10 @@
 from redbot.core.bot import Red
 
-from .products import Products
+from .beehive import BeeHive
 
 
 async def setup(bot: Red):
-    cog = Products(bot)
+    cog = BeeHive(bot)
     await bot.add_cog(cog)
 
 
