@@ -11,14 +11,14 @@ class Products(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-codes = {
+ codes = {
         '1110666799298662410': 'LODGE'
         # Add more server IDs and their corresponding codes here
     }
 
-async def get_discount_code(self, server_id):
-    # Return the discount code for the server, or None if not found
-    return self.discount_codes.get(str(server_id))
+    async def get_discount_code(self, server_id):
+        # Return the discount code for the server, or None if not found
+        return self.discount_codes.get(str(server_id))
 
     @commands.guild_only()
     @commands.hybrid_group()
