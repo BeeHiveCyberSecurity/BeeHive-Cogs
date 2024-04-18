@@ -48,10 +48,11 @@ class Products(commands.Cog):
         view.add_item(discord.ui.Button(label="Start a 15 day free trial", url="https://buy.stripe.com/5kA8y62kIg06dLqdRc", style=discord.ButtonStyle.link, emoji="<:shield:1194906995036262420>"))
         view.add_item(discord.ui.Button(label="Learn more on our website", url="https://www.beehive.systems/antivirus", style=discord.ButtonStyle.link, emoji="<:info:1199305085738553385>"))
         await ctx.send(embed=embed, view=view)
-        await asyncio.sleep(2)
+        asyncio.sleep(2)
         if discount_link:
             embed2 = discord.Embed(title=f"Partner Perk Unlocked!", description=f"**{server_name}** is a Discord partner of BeeHive, and this grants this community exclusive perks! Get an exclusive offer as thanks for your support of this server [here]({discount_link})", colour=16767334, url='https://www.beehive.systems/antivirus')
             embed2.add_field(name="Offer Details", value=f"", inline=False)
+            await ctx.send(embed=embed2)
     
     @commands.bot_has_permissions(embed_links=True)
     @product.command(name="vulnerabilityscanning", description="Learn more about Vulnerability Scanning")
