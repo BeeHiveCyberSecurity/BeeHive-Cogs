@@ -10,7 +10,6 @@ from redbot.core import app_commands # type: ignore
 class Products(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        # Hardcoded dictionary of server-specific discount links
         self.antivirus_links = {
             123456789012345678: "https://link.for.server.1",  # Example server ID and link
             876543210987654321: "https://link.for.server.2",  # Another example server ID and link
@@ -33,6 +32,7 @@ class Products(commands.Cog):
         Learn more [here](<https://www.beehive.systems/antivirus>)
         """
         server_id = ctx.guild.id
+        server_name = ctx.guild.name
         discount_link = self.antivirus_links.get(server_id)
 
         embed = discord.Embed(title=f"AntiVirus / AntiMalware Security Kit", description=f"# Protect your PC from malware and spyware in just a few clicks\n\nBeeHive's security client is a security software application designed to protect users from malware or viruses while working, shopping, or playing games on their computers. It works by isolating unknown files in a safe virtual environment before performing real-time analysis to determine whether they pose any threat - all done without risk or alert fatigue for normal computer usage.", colour=16767334, url='https://www.beehive.systems/antivirus')
@@ -44,13 +44,14 @@ class Products(commands.Cog):
         embed.add_field(name="Real-Time Cloud Analysis", value="Ongoing static and dynamic analysis of unknown objects within your filesystem for unidentified malware", inline=False)
         embed.add_field(name="Automated Threat Containment", value="Kernel-level API virtualization to monitor and contain unknowns during analysis and verdicting", inline=False)
         embed.add_field(name="Automated Remediation", value="No-touch, no-interaction, 100% hands free threat remediation across 7 layers of powerful protection", inline=False)
-        embed.add_field(name="Start a 15 day free trial", value="Get 15 days of complete protection from malware, spyware, password stealers and more - no committment required. Subscribe today and cancel anytime from your billing dashboard.", inline=False)
-        if discount_link:
-            embed.add_field(name="Exclusive Server Discount", value=f"Get an exclusive discount for your server [here]({discount_link})", inline=False)
         view = discord.ui.View()
-        view.add_item(discord.ui.Button(label="Start a 15 day free trial", url="https://buy.stripe.com/5kA8y62kIg06dLqdRc", style=discord.ButtonStyle.green, emoji="<:shield:1194906995036262420>"))
+        view.add_item(discord.ui.Button(label="Start a 15 day free trial", url="https://buy.stripe.com/5kA8y62kIg06dLqdRc", style=discord.ButtonStyle.link, emoji="<:shield:1194906995036262420>"))
         view.add_item(discord.ui.Button(label="Learn more on our website", url="https://www.beehive.systems/antivirus", style=discord.ButtonStyle.link, emoji="<:info:1199305085738553385>"))
         await ctx.send(embed=embed, view=view)
+        await asyncio.sleep(2)
+        if discount_link:
+            embed2 = discord.Embed(title=f"Partner Perk Unlocked!", description=f"**{server_name}** is a Discord partner of BeeHive, and this grants this community exclusive perks! Get an exclusive offer as thanks for your support of this server [here]({discount_link})", colour=16767334, url='https://www.beehive.systems/antivirus')
+            embed2.add_field(name="Offer Details", value=f"", inline=False)
     
     @commands.bot_has_permissions(embed_links=True)
     @product.command(name="vulnerabilityscanning", description="Learn more about Vulnerability Scanning")
