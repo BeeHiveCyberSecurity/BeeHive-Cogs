@@ -51,10 +51,12 @@ class Products(commands.Cog):
         if discount_link:
             await ctx.typing()
             await asyncio.sleep(3)
+            view2 = discord.ui.View()
+            view2.add_item(discord.ui.Button(label="Save 30% on your first 3 months of protection", url=f"{discount_link}", style=discord.ButtonStyle.link, emoji="<:shield:1194906995036262420>"))
             embed2 = discord.Embed(title=f"Partner Perk Available", description=f"**{server_name}** is a Discord partner of BeeHive, and this grants this community exclusive perks! Get an exclusive offer as thanks for your support of this server [here]({discount_link})", colour=16767334, url='https://www.beehive.systems/antivirus')
             embed2.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/bag-add.png")
             embed2.add_field(name="Offer Details", value=f"", inline=False)
-            await ctx.send(embed=embed2)
+            await ctx.send(embed=embed2, view=view2)
     
     @commands.bot_has_permissions(embed_links=True)
     @product.command(name="vulnerabilityscanning", description="Learn more about Vulnerability Scanning")
