@@ -3,11 +3,11 @@ import datetime
 import re
 from typing import List
 from urllib.parse import urlparse
-import aiohttp
+import aiohttp # type: ignore
 import discord # type: ignore
-from discord.ext import tasks
-from redbot.core import Config, commands, modlog
-from redbot.core.bot import Red
+from discord.ext import tasks # type: ignore
+from redbot.core import Config, commands, modlog # type: ignore
+from redbot.core.bot import Red # type: ignore
 from redbot.core.commands import Context # type: ignore
 
 URL_REGEX_PATTERN = re.compile(
