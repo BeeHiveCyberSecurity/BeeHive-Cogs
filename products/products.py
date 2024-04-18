@@ -85,7 +85,7 @@ class Products(commands.Cog):
         Prefer a website?
         Learn more [here](<https://www.beehive.systems/incident-response>)
         """
-        embed = discord.Embed(title=f"Incident Response", description=f"# When all else fails, you can count on us.\n\n### Investigate and disrupt attacker persistance to ensure business continuity", colour=16767334, url='https://www.beehive.systems/incident-response')
+        embed = discord.Embed(title=f"Incident Response", description=f"# Respond to potential cybersecurity incidents effectively\n\n### Detect and stop breaches, empower investigation, deploy defenses, and protect business continuity", colour=16767334, url='https://www.beehive.systems/incident-response')
         embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/shield-checkmark.png")
         embed.set_image(url="")
         embed.add_field(name="Get help from the experts", value="Collaborate with our team of security experts and tap into the wealth of knowledge gained from hundreds of previous engagements", inline=False)
