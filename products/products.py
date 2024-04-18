@@ -18,7 +18,7 @@ class Products(commands.Cog):
         pass
 
     @commands.bot_has_permissions(embed_links=True)
-    @product.hybrid_command(name="antivirus", description="Learn more about BeeHive's AntiVirus", aliases=["av"])
+    @product.command(name="antivirus", description="Learn more about BeeHive's AntiVirus", aliases=["av"])
     async def product_antivirus(self, ctx: commands.Context):
         """
         Show an embed containing product details about BeeHive's AntiViral/AntiMalware software
