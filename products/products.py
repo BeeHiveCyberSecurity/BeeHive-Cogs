@@ -17,14 +17,10 @@ class Products(commands.Cog):
             # Add more server IDs and their links as needed
         }
 
-    @commands.hybrid_group()
-    async def product(self, ctx: commands.Context) -> None:
-        """Product information related commands"""
-        pass
 
     @commands.bot_has_permissions(embed_links=True)
-    @product.command(name="antivirus", description="Learn more about BeeHive's AntiVirus", aliases=["av"])
-    async def product_antivirus(self, ctx: commands.Context):
+    @commands.hybrid_command(name="antivirus", description="Learn more about BeeHive's AntiVirus", aliases=["av"])
+    async def _antivirus(self, ctx: commands.Context):
         """
         Show an embed containing product details about BeeHive's AntiViral/AntiMalware software
 
@@ -52,7 +48,7 @@ class Products(commands.Cog):
             await ctx.typing()
             view2 = discord.ui.View()
             view2.add_item(discord.ui.Button(label="Save 30% on your first 3 months of protection", url=f"{discount_link}", style=discord.ButtonStyle.link, emoji="<:shield:1194906995036262420>"))
-            embed2 = discord.Embed(title=f"Partner Perk Available", description=f"**{server_name}** is a Discord partner of BeeHive, and this grants this community exclusive discounts and credits", colour=16767334, url='')
+            embed2 = discord.Embed(title=f"Partner Perk Available", description=f"**{server_name}** is a Discord partner of BeeHive, which automatically grants this community exclusive discounts and credits", colour=16767334, url='')
             embed2.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/bag-add.png")
             embed2.add_field(name="Offer Details", value=f"Trial our Security Client for **15 days free**, then pay **only** **`$7.00`** per month until coupon expires.\n\n`Offer valid for first-time customers only, billing continues automatically unless cancelled.`", inline=False)
             await ctx.send(embed=embed2, view=view2)
