@@ -17,7 +17,6 @@ class Products(commands.Cog):
             # Add more server IDs and their links as needed
         }
 
-    @commands.guild_only()
     @commands.hybrid_group()
     async def product(self, ctx: commands.Context) -> None:
         """Product information related commands"""
@@ -51,7 +50,6 @@ class Products(commands.Cog):
         await ctx.send(embed=embed, view=view)
         if discount_link:
             await ctx.typing()
-            await asyncio.sleep(3)
             view2 = discord.ui.View()
             view2.add_item(discord.ui.Button(label="Save 30% on your first 3 months of protection", url=f"{discount_link}", style=discord.ButtonStyle.link, emoji="<:shield:1194906995036262420>"))
             embed2 = discord.Embed(title=f"Partner Perk Available", description=f"**{server_name}** is a Discord partner of BeeHive, and this grants this community exclusive discounts and credits", colour=16767334, url='')
