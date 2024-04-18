@@ -20,7 +20,7 @@ class Products(commands.Cog):
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.hybrid_command(name="antivirus", description="Learn more about BeeHive's AntiVirus", aliases=["av"])
-    async def _antivirus(self, ctx: commands.Context):
+    async def antivirus(self, ctx: commands.Context):
         """
         Show an embed containing product details about BeeHive's AntiViral/AntiMalware software
 
@@ -54,8 +54,8 @@ class Products(commands.Cog):
             await ctx.send(embed=embed2, view=view2)
     
     @commands.bot_has_permissions(embed_links=True)
-    @product.command(name="vulnerabilityscanning", description="Learn more about Vulnerability Scanning")
-    async def product_vulnerabilityscanning(self, ctx: commands.Context):
+    @commands.hybrid_command(name="vulnerabilityscanning", description="Learn more about Vulnerability Scanning")
+    async def vulnerabilityscanning(self, ctx: commands.Context):
         """
         Show an embed containing product details about BeeHive's Vulnerability Scanning and Monitoring services
 
@@ -75,8 +75,8 @@ class Products(commands.Cog):
         await ctx.send(embed=embed, view=view)
 
     @commands.bot_has_permissions(embed_links=True)
-    @product.command(name="brandprotection", description="Learn more about Brand Protection")
-    async def product_brandprotection(self, ctx: commands.Context):
+    @commands.hybrid_command(name="brandprotection", description="Learn more about Brand Protection")
+    async def brandprotection(self, ctx: commands.Context):
         """
         Show an embed containing product details about BeeHive's Brand Protection services
 
@@ -94,8 +94,8 @@ class Products(commands.Cog):
         await ctx.send(embed=embed, view=view)
 
     @commands.bot_has_permissions(embed_links=True)
-    @product.command(name="incidentresponse", description="Learn more about Incident Response", aliases=["ir"])
-    async def product_incidentresponse(self, ctx: commands.Context):
+    @commands.hybrid_command(name="incidentresponse", description="Learn more about Incident Response", aliases=["ir"])
+    async def incidentresponse(self, ctx: commands.Context):
         """
         Show an embed containing product details about BeeHive's Incident Response services
 
@@ -113,8 +113,8 @@ class Products(commands.Cog):
         await ctx.send(embed=embed, view=view)
 
     @commands.bot_has_permissions(embed_links=True)
-    @product.command(name="pcoptimization", description="Learn more about PC Optimization", aliases=["opti"])
-    async def product_pcoptimization(self, ctx: commands.Context):
+    @commands.hybrid_command(name="pcoptimization", description="Learn more about PC Optimization", aliases=["opti"])
+    async def pcoptimization(self, ctx: commands.Context):
         """
         Show an embed containing product details about BeeHive's PC Optimization services
 
