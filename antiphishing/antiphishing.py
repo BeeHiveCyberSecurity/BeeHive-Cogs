@@ -8,7 +8,7 @@ import discord # type: ignore
 from discord.ext import tasks
 from redbot.core import Config, commands, modlog
 from redbot.core.bot import Red
-from redbot.core.commands import Context
+from redbot.core.commands import Context # type: ignore
 
 URL_REGEX_PATTERN = re.compile(
     r"^(?:http[s]?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$"

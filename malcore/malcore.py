@@ -2,8 +2,8 @@ import requests
 import re
 import json
 import discord # type: ignore
-from redbot.core import commands
-from redbot.core import app_commands
+from redbot.core import commands # type: ignore
+from redbot.core import app_commands # type: ignore
 
 class Malcore(commands.Cog):
     """Malcore file upload and analysis via Discord"""
