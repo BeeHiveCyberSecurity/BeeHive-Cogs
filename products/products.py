@@ -7,7 +7,7 @@ from redbot.core import commands # type: ignore
 from redbot.core import app_commands # type: ignore
 
 
-class BeeHive(commands.Cog):
+class Products(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
