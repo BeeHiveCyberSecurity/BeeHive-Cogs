@@ -94,3 +94,23 @@ class Products(commands.Cog):
         view = discord.ui.View()
         view.add_item(discord.ui.Button(label="Learn more on our website", url="https://www.beehive.systems/incident-response", style=discord.ButtonStyle.link, emoji="<:info:1199305085738553385>"))
         await ctx.send(embed=embed, view=view)
+
+    @commands.bot_has_permissions(embed_links=True)
+    @commands.hybrid_command(name="pcoptimization", description="Learn more about PC Optimization", aliases=["opti"])
+    async def pcoptimization(self, ctx: commands.Context):
+        """
+        Show an embed containing product details about BeeHive's PC Optimization services
+
+        Prefer a website?
+        Learn more [here](<https://www.beehive.systems/pc-optimization>)
+        """
+        embed = discord.Embed(title=f"PC Optimization", description=f"# Optimize system stability and performance\n\nRemove malware and stealers, update outdated system software and driver components, and know the condition of your hardware and expected repairs so you can get back to gaming faster", colour=16767334, url='https://www.beehive.systems/pc-optimization')
+        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/shield-checkmark.png")
+        embed.set_image(url="https://asset.brandfetch.io/idGpYEfxfH/id0xj4J1xg.png")
+        embed.add_field(name="Remove malware and potentially unwanted applications", value="Removing unused software and terminating threats can improve system resource accessibility", inline=False)
+        embed.add_field(name="Know when hardware maintenance is required", value="Taking care of your PC and its operating conditions can improve hardware lifespan and operating performance", inline=False)
+        embed.add_field(name="Increase gaming and streaming performance", value="A well-maintained PC will perform at its best capability for the longest, letting you do the most possible with it", inline=False)
+        embed.add_field(name="Improve battery life and efficiency", value="A well optimized PC will leave more resources for you to utilize while playing, streaming, or working", inline=False)
+        view = discord.ui.View()
+        view.add_item(discord.ui.Button(label="Learn more on our website", url="https://www.beehive.systems/pc-optimization", style=discord.ButtonStyle.link, emoji="<:info:1199305085738553385>"))
+        await ctx.send(embed=embed, view=view)
