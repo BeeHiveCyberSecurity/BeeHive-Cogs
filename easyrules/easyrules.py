@@ -24,9 +24,11 @@ class EasyRules(commands.Cog):
         """Send selected pre-written rules to a specific channel using a dropdown interaction."""
 
         def generate_select_options(channels: list[discord.TextChannel]) -> list[discord.SelectOption]:
+            # Ensure that the number of options does not exceed 25, which is the maximum allowed by Discord
+            limited_channels = channels[:25]
             return [
                 discord.SelectOption(label=channel.name, value=str(channel.id))
-                for channel in channels
+                for channel in limited_channels
             ]
 
         async def rules_dropdown(interaction: discord.Interaction, select: discord.ui.Select):
