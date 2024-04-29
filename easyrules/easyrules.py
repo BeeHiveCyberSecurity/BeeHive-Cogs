@@ -17,9 +17,14 @@ class EasyRules(commands.Cog):
         }
         self.config.register_guild(**default_guild)
 
+    @commands.group(name="rules")
     @commands.guild_only()
     @commands.admin_or_permissions(manage_guild=True)
-    @commands.command(name="sendrules")
+    async def _rules(self, ctx: commands.Context):
+        """Commands for rule management."""
+        pass
+
+    @_rules.command(name="send")
     async def _send_rules(self, ctx: commands.Context, channel: discord.TextChannel):
         """Send selected pre-written rules to a specific channel."""
         rules = await self.config.guild(ctx.guild).rules()
@@ -30,7 +35,7 @@ class EasyRules(commands.Cog):
         await channel.send(embed=embed)
         await ctx.send(f"Rules have been sent to {channel.mention}")
 
-    @commands.command(name="addrule")
+    @_rules.command(name="add")
     async def _add_rule(self, ctx: commands.Context, *, rule: str):
         """Add a new rule to the list of pre-written rules."""
         async with self.config.guild(ctx.guild).rules() as rules:
@@ -38,7 +43,7 @@ class EasyRules(commands.Cog):
             rules[rule_number] = {"text": rule, "enabled": True}
         await ctx.send("New rule added.")
 
-    @commands.command(name="editrule")
+    @_rules.command(name="edit")
     async def _edit_rule(self, ctx: commands.Context, rule_number: int, *, new_text: str):
         """Edit an existing rule."""
         async with self.config.guild(ctx.guild).rules() as rules:
@@ -49,7 +54,7 @@ class EasyRules(commands.Cog):
             else:
                 await ctx.send("Rule number does not exist.")
 
-    @commands.command(name="toggle")
+    @_rules.command(name="toggle")
     async def _set_rules_toggle(self, ctx: commands.Context, rule_number: int):
         """Toggle a rule's enabled state."""
         async with self.config.guild(ctx.guild).rules() as rules:
@@ -61,7 +66,7 @@ class EasyRules(commands.Cog):
             else:
                 await ctx.send("Rule number does not exist.")
 
-    @commands.command(name="remove")
+    @_rules.command(name="remove")
     async def _remove_rule(self, ctx: commands.Context, rule_number: int):
         """Remove a rule from the list of pre-written rules."""
         async with self.config.guild(ctx.guild).rules() as rules:
@@ -72,7 +77,7 @@ class EasyRules(commands.Cog):
             else:
                 await ctx.send("Invalid rule number.")
 
-    @commands.command(name="list")
+    @_rules.command(name="list")
     async def _set_rules_list(self, ctx: commands.Context):
         """List all rules with their number and state."""
         rules = await self.config.guild(ctx.guild).rules()
