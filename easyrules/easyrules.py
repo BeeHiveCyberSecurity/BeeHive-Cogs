@@ -19,8 +19,8 @@ class EasyRules(commands.Cog):
 
     @commands.guild_only()
     @commands.admin_or_permissions(manage_guild=True)
-    @commands.command(name="setrules")
-    async def _set_rules(self, ctx: commands.Context, channel: discord.TextChannel):
+    @commands.command(name="sendrules")
+    async def _send_rules(self, ctx: commands.Context, channel: discord.TextChannel):
         """Send selected pre-written rules to a specific channel."""
         rules = await self.config.guild(ctx.guild).rules()
         embed = discord.Embed(title="Server Rules", color=discord.Color.blue())
