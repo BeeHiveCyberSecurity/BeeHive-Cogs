@@ -19,16 +19,42 @@ class EasyRules(commands.Cog):
 
     @commands.guild_only()
     @commands.admin_or_permissions(manage_guild=True)
-    @commands.group(name="setrules", invoke_without_command=True)
-    async def _set_rules(self, ctx: commands.Context, channel: discord.TextChannel):
-        """Send selected pre-written rules to a specific channel."""
-        rules = await self.config.guild(ctx.guild).rules()
-        embed = discord.Embed(title="Server Rules", color=discord.Color.blue())
-        for rule_number, rule_data in rules.items():
-            if rule_data["enabled"]:
-                embed.add_field(name=f"Rule {rule_number}", value=rule_data["text"], inline=False)
-        await channel.send(embed=embed)
-        await ctx.send(f"Rules have been sent to {channel.mention}")
+    @commands.command(name="setrules")
+    async def _set_rules(self, ctx: commands.Context):
+        """Send selected pre-written rules to a specific channel using a dropdown interaction."""
+
+        def generate_select_options(channels: List[discord.TextChannel]) -> List[discord.SelectOption]:
+            return [
+                discord.SelectOption(label=channel.name, value=str(channel.id))
+                for channel in channels
+            ]
+
+        async def rules_dropdown(interaction: discord.Interaction, select: discord.ui.Select):
+            channel_id = int(select.values[0])
+            channel = ctx.guild.get_channel(channel_id)
+            if channel:
+                rules = await self.config.guild(ctx.guild).rules()
+                embed = discord.Embed(title="Server Rules", color=discord.Color.blue())
+                for rule_number, rule_data in rules.items():
+                    if rule_data["enabled"]:
+                        embed.add_field(name=f"Rule {rule_number}", value=rule_data["text"], inline=False)
+                await channel.send(embed=embed)
+                await interaction.response.send_message(f"Rules have been sent to {channel.mention}", ephemeral=True)
+            else:
+                await interaction.response.send_message("The selected channel was not found.", ephemeral=True)
+
+        channels = ctx.guild.text_channels
+        select = discord.ui.Select(
+            placeholder="Choose a channel to send the rules to",
+            min_values=1,
+            max_values=1,
+            options=generate_select_options(channels),
+        )
+        select.callback = rules_dropdown
+
+        view = discord.ui.View()
+        view.add_item(select)
+        await ctx.send("Please select the channel to send the rules to:", view=view)
 
     @_set_rules.command(name="add")
     async def _set_rules_add(self, ctx: commands.Context, *, rule: str):
