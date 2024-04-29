@@ -32,6 +32,7 @@ class EasyRules(commands.Cog):
             ]
 
         async def rules_dropdown(interaction: discord.Interaction, select: discord.ui.Select):
+            await interaction.response.defer()  # Defer the interaction to prevent "This interaction failed" error
             channel_id = int(select.values[0])
             channel = ctx.guild.get_channel(channel_id)
             if channel:
@@ -41,9 +42,9 @@ class EasyRules(commands.Cog):
                     if rule_data["enabled"]:
                         embed.add_field(name=f"Rule {rule_number}", value=rule_data["text"], inline=False)
                 await channel.send(embed=embed)
-                await interaction.response.send_message(f"Rules have been sent to {channel.mention}", ephemeral=True)
+                await interaction.followup.send(f"Rules have been sent to {channel.mention}", ephemeral=True)
             else:
-                await interaction.response.send_message("The selected channel was not found.", ephemeral=True)
+                await interaction.followup.send("The selected channel was not found.", ephemeral=True)
 
         channels = ctx.guild.text_channels
         select = discord.ui.Select(
