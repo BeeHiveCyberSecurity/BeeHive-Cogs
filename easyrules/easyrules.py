@@ -71,6 +71,19 @@ class EasyRules(commands.Cog):
                 await ctx.send("Rule removed.")
             else:
                 await ctx.send("Invalid rule number.")
+                
+    @_set_rules.command(name="list")
+    async def _set_rules_list(self, ctx: commands.Context):
+        """List all rules with their number and state."""
+        rules = await self.config.guild(ctx.guild).rules()
+        if rules:
+            embed = discord.Embed(title="List of Server Rules", color=discord.Color.green())
+            for rule_number, rule_data in rules.items():
+                state = "Enforced" if rule_data["enabled"] else "Unenforced"
+                embed.add_field(name=f"Rule {rule_number}", value=f"{rule_data['text']} - {state}", inline=False)
+            await ctx.send(embed=embed)
+        else:
+            await ctx.send("No rules have been set.")
 
 def setup(bot: Red):
     cog = EasyRules(bot)
