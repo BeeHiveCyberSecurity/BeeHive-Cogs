@@ -3,7 +3,7 @@ from redbot.core.bot import Red
 import discord
 
 class EasyRules(commands.Cog):
-    """A cog for easy rule management using Discord interactions."""
+    """A cog for easy rule management."""
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -20,44 +20,15 @@ class EasyRules(commands.Cog):
     @commands.guild_only()
     @commands.admin_or_permissions(manage_guild=True)
     @commands.command(name="setrules")
-    async def _set_rules(self, ctx: commands.Context):
-        """Send selected pre-written rules to a specific channel using a dropdown interaction."""
-
-        def generate_select_options(channels: list[discord.TextChannel]) -> list[discord.SelectOption]:
-            # Ensure that the number of options does not exceed 25, which is the maximum allowed by Discord
-            limited_channels = channels[:25]
-            return [
-                discord.SelectOption(label=channel.name, value=str(channel.id))
-                for channel in limited_channels
-            ]
-
-        async def rules_dropdown(interaction: discord.Interaction, select: discord.ui.Select):
-            await interaction.response.defer()  # Defer the interaction to prevent "This interaction failed" error
-            channel_id = int(select.values[0])
-            channel = ctx.guild.get_channel(channel_id)
-            if channel:
-                rules = await self.config.guild(ctx.guild).rules()
-                embed = discord.Embed(title="Server Rules", color=discord.Color.blue())
-                for rule_number, rule_data in rules.items():
-                    if rule_data["enabled"]:
-                        embed.add_field(name=f"Rule {rule_number}", value=rule_data["text"], inline=False)
-                await channel.send(embed=embed)
-                await interaction.followup.send(f"Rules have been sent to {channel.mention}", ephemeral=True)
-            else:
-                await interaction.followup.send("The selected channel was not found.", ephemeral=True)
-
-        channels = ctx.guild.text_channels
-        select = discord.ui.Select(
-            placeholder="Choose a channel to send the rules to",
-            min_values=1,
-            max_values=1,
-            options=generate_select_options(channels),
-        )
-        select.callback = rules_dropdown
-
-        view = discord.ui.View()
-        view.add_item(select)
-        await ctx.send("Please select the channel to send the rules to:", view=view)
+    async def _set_rules(self, ctx: commands.Context, channel: discord.TextChannel):
+        """Send selected pre-written rules to a specific channel."""
+        rules = await self.config.guild(ctx.guild).rules()
+        embed = discord.Embed(title="Server Rules", color=discord.Color.blue())
+        for rule_number, rule_data in rules.items():
+            if rule_data["enabled"]:
+                embed.add_field(name=f"Rule {rule_number}", value=rule_data["text"], inline=False)
+        await channel.send(embed=embed)
+        await ctx.send(f"Rules have been sent to {channel.mention}")
 
     @commands.command(name="addrule")
     async def _add_rule(self, ctx: commands.Context, *, rule: str):
@@ -117,5 +88,3 @@ class EasyRules(commands.Cog):
 def setup(bot: Red):
     cog = EasyRules(bot)
     bot.add_cog(cog)
-
-
