@@ -23,7 +23,7 @@ class EasyRules(commands.Cog):
     async def _set_rules(self, ctx: commands.Context):
         """Send selected pre-written rules to a specific channel using a dropdown interaction."""
 
-        def generate_select_options(channels: List[discord.TextChannel]) -> List[discord.SelectOption]:
+        def generate_select_options(channels: list[discord.TextChannel]) -> list[discord.SelectOption]:
             return [
                 discord.SelectOption(label=channel.name, value=str(channel.id))
                 for channel in channels
