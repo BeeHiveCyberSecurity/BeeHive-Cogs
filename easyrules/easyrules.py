@@ -56,8 +56,8 @@ class EasyRules(commands.Cog):
         view.add_item(select)
         await ctx.send("Please select the channel to send the rules to:", view=view)
 
-    @_set_rules.command(name="add")
-    async def _set_rules_add(self, ctx: commands.Context, *, rule: str):
+    @commands.command(name="addrule")
+    async def _add_rule(self, ctx: commands.Context, *, rule: str):
         """Add a new rule to the list of pre-written rules."""
         async with self.config.guild(ctx.guild).rules() as rules:
             rule_number = str(len(rules) + 1)
