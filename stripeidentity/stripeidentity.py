@@ -63,9 +63,13 @@ class StripeIdentity(commands.Cog):
         session_id = await self.config.pending_verification_sessions.get_raw(str(user.id), default=None)
         if session_id:
             try:
-                stripe.identity.VerificationSession.cancel(session_id)
-                await self.config.pending_verification_sessions.clear_raw(str(user.id))
-                embed = discord.Embed(description=f"Verification session for {user.display_name} has been canceled and removed.", color=discord.Color.green())
+                verification_session = stripe.identity.VerificationSession.retrieve(session_id)
+                if verification_session.status in ["requires_action", "processing"]:
+                    stripe.identity.VerificationSession.cancel(session_id)
+                    await self.config.pending_verification_sessions.clear_raw(str(user.id))
+                    embed = discord.Embed(description=f"Verification session for {user.display_name} has been canceled and removed.", color=discord.Color.green())
+                else:
+                    embed = discord.Embed(description=f"Verification session for {user.display_name} cannot be canceled as it is already {verification_session.status}.", color=discord.Color.orange())
                 await ctx.send(embed=embed)
             except stripe.error.StripeError as e:
                 embed = discord.Embed(description=f"Failed to cancel the verification session: {e.user_message}", color=discord.Color.red())
