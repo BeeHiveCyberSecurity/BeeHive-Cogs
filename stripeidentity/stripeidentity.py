@@ -77,6 +77,29 @@ class StripeIdentity(commands.Cog):
         else:
             embed = discord.Embed(description=f"No pending verification session found for {user.display_name}.", color=discord.Color.orange())
             await ctx.send(embed=embed)
+            
+    @commands.is_owner()
+    @commands.command(name="bypassverification")
+    async def bypass_verification(self, ctx: commands.Context, user: discord.Member):
+        """
+        Bypass the verification process for a user.
+        """
+        # Remove any pending verification session for the user
+        await self.config.pending_verification_sessions.clear_raw(str(user.id))
+        
+        # Optionally, you can set the user's roles to verified roles here
+        # age_verified_role_id = await self.config.age_verified_role()
+        # id_verified_role_id = await self.config.id_verified_role()
+        # age_verified_role = ctx.guild.get_role(age_verified_role_id)
+        # id_verified_role = ctx.guild.get_role(id_verified_role_id)
+        # if age_verified_role:
+        #     await user.add_roles(age_verified_role)
+        # if id_verified_role:
+        #     await user.add_roles(id_verified_role)
+
+        # Send confirmation message
+        embed = discord.Embed(description=f"{user.display_name}'s verification has been bypassed.", color=discord.Color.green())
+        await ctx.send(embed=embed)
 
     @commands.command(name="agecheck")
     @commands.guild_only()
