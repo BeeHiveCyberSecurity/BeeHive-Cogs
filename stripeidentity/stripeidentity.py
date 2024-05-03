@@ -60,17 +60,16 @@ class StripeIdentity(commands.Cog):
         """
         Cancel a pending verification session for a user and remove it from the list of sessions.
         """
-        session_id = await self.config.pending_verification_sessions.get_raw(user.id, default=None)
+        session_id = await self.config.pending_verification_sessions.get_raw(str(user.id), default=None)
         if session_id:
             try:
                 stripe.identity.VerificationSession.cancel(session_id)
+                await self.config.pending_verification_sessions.clear_raw(str(user.id))
                 embed = discord.Embed(description=f"Verification session for {user.display_name} has been canceled and removed.", color=discord.Color.green())
                 await ctx.send(embed=embed)
             except stripe.error.StripeError as e:
                 embed = discord.Embed(description=f"Failed to cancel the verification session: {e.user_message}", color=discord.Color.red())
                 await ctx.send(embed=embed)
-            finally:
-                await self.config.pending_verification_sessions.clear_raw(user.id)
         else:
             embed = discord.Embed(description=f"No pending verification session found for {user.display_name}.", color=discord.Color.orange())
             await ctx.send(embed=embed)
