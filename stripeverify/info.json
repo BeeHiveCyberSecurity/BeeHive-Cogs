@@ -1,0 +1,22 @@
+{
+    "author": [
+        "movelaterally"
+    ],
+    "description": "Verify ages and identities using Stripe Identity",
+    "install_msg": "## :white_check_mark: Successfully installed Stripe Identity.\n**Questions?** [We're listening](<https://www.beehive.systems/contact-us>)\n**Interested in CyberSecurity and CyberSafety?** Join our Discord! https://discord.gg/ckdzsm7mTs",
+    "name": "StripeVerify",
+    "hidden": false,
+    "disabled": false,
+    "requirements": [
+        "requests",
+        "discord-py-interactions",
+        "stripe"
+    ],
+    "tags": [
+        "stripe",
+        "identity",
+        "age-gate"
+    ],
+    "short": "Verify ages and identities via Discord",
+    "min_bot_version": "3.5.0"
+}
