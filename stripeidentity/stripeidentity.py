@@ -112,9 +112,9 @@ class StripeIdentity(commands.Cog):
                     "\n\n"
                     "You have 15 minutes to complete this process. If you do not complete verification, you will be removed from the server for safety."
                 ),
-                color=discord.Color(0xff4545),
-                thumbnail="https://www.beehive.systems/hubfs/Icon%20Packs/Red/id-card-sharp.png"
+                color=discord.Color(0xff4545)
             )
+            dm_embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/id-card-sharp.png")
             view = discord.ui.View()
             view.add_item(discord.ui.Button(label="Start verification", url=f"{verification_session.url}", style=discord.ButtonStyle.link, emoji="<:shield:1194906995036262420>"))
             dm_message = await user.send(embed=dm_embed, view=view)
