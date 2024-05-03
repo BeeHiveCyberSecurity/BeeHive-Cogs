@@ -224,9 +224,13 @@ class StripeIdentity(commands.Cog):
         for user_id, session_info in pending_sessions.items():
             member = ctx.guild.get_member(int(user_id))
             if member:
-                start_time = discord.utils.snowflake_time(int(session_info))
-                time_remaining = discord.utils.format_dt(start_time + datetime.timedelta(minutes=15), style='R')
-                embed.add_field(name=f"User: {member.display_name} (ID: {user_id})", value=f"Time remaining: {time_remaining}", inline=False)
+                # Check if session_info is not None before converting to int
+                if session_info is not None:
+                    start_time = discord.utils.snowflake_time(int(session_info))
+                    time_remaining = discord.utils.format_dt(start_time + datetime.timedelta(minutes=15), style='R')
+                    embed.add_field(name=f"User: {member.display_name} (ID: {user_id})", value=f"Time remaining: {time_remaining}", inline=False)
+                else:
+                    embed.add_field(name=f"User: {member.display_name} (ID: {user_id})", value="Session info not available.", inline=False)
             else:
                 embed.add_field(name=f"User ID: {user_id}", value="Member not found in this guild.", inline=False)
         await ctx.send(embed=embed)
