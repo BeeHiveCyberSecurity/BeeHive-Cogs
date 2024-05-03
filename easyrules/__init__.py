@@ -1,5 +1,4 @@
 from redbot.core.bot import Red
-
 from .easyrules import EasyRules
 
 

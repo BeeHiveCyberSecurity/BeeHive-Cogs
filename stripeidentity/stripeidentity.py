@@ -1,7 +1,7 @@
-import stripe
-from redbot.core import Config, commands, checks
-from redbot.core.bot import Red
-import discord
+import stripe #type: ignore
+from redbot.core import Config, commands, checks #type: ignore
+from redbot.core.bot import Red #type: ignore
+import discord #type: ignore
 import asyncio
 from datetime import datetime
 
@@ -211,23 +211,22 @@ class StripeIdentity(commands.Cog):
         except discord.HTTPException as e:
             await ctx.send(f"Failed to send DM to {user.display_name}: {e.text}")
 
-            @commands.command(name="pendingverifications")
-            async def pending_verifications(self, ctx):
-                """Show all pending verifications and their details."""
-                pending_sessions = await self.config.pending_verification_sessions.all()
-                if not pending_sessions:
-                    await ctx.send("There are no pending verification sessions.")
-                    return
+    @commands.command(name="pendingverifications")
+    async def pending_verifications(self, ctx):
+        """Show all pending verifications and their details."""
+        pending_sessions = await self.config.pending_verification_sessions.all()
+        if not pending_sessions:
+            await ctx.send("There are no pending verification sessions.")
+            return
 
-                embed = discord.Embed(title="Pending Verification Sessions", color=discord.Color.blue())
-                current_time = discord.utils.utcnow()
-                for user_id, session_info in pending_sessions.items():
-                    member = ctx.guild.get_member(int(user_id))
-                    if member:
-                        start_time = discord.utils.snowflake_time(int(session_info))
-                        time_remaining = discord.utils.format_dt(start_time + datetime.timedelta(minutes=15), style='R')
-                        embed.add_field(name=f"User: {member.display_name} (ID: {user_id})", value=f"Time remaining: {time_remaining}", inline=False)
-                    else:
-                        embed.add_field(name=f"User ID: {user_id}", value="Member not found in this guild.", inline=False)
-
-                await ctx.send(embed=embed)
+        embed = discord.Embed(title="Pending Verification Sessions", color=discord.Color.blue())
+        current_time = discord.utils.utcnow()
+        for user_id, session_info in pending_sessions.items():
+            member = ctx.guild.get_member(int(user_id))
+            if member:
+                start_time = discord.utils.snowflake_time(int(session_info))
+                time_remaining = discord.utils.format_dt(start_time + datetime.timedelta(minutes=15), style='R')
+                embed.add_field(name=f"User: {member.display_name} (ID: {user_id})", value=f"Time remaining: {time_remaining}", inline=False)
+            else:
+                embed.add_field(name=f"User ID: {user_id}", value="Member not found in this guild.", inline=False)
+        await ctx.send(embed=embed)
