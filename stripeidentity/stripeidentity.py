@@ -104,16 +104,18 @@ class StripeIdentity(commands.Cog):
             )
             await self.config.pending_verification_sessions.set_raw(user.id, value=verification_session.id)
             dm_embed = discord.Embed(
-                title="Age Verification Required",
+                title="Age verification requested",
                 description=(
-                    f"Hello {user.mention},\n"
-                    "To remain in the server, you need to prove you are **18+**. "
-                    "Please complete the verification using the following link: "
-                    f"[Click here to verify your age securely]({verification_session.url})\n"
+                    f"Hello {user.mention},\n\n"
+                    "Enhancing user safety bilaterally on Discord is a priority within our services and communities."
+                    "As part of our ongoing safety and security operations, your account has been selected to verify your age due to recent activity in one or more servers."
+                    "\n"
                     "You have 15 minutes to complete this process. If you do not complete verification, you will be removed from the server for safety."
                 ),
-                color=discord.Color.blue()
+                color=discord.Color(0xff4545)
             )
+            view = discord.ui.View()
+            view.add_item(discord.ui.Button(label="Start verification", url=f"{verification_session.url}", style=discord.ButtonStyle.link, emoji="<:shield:1194906995036262420>"))
             dm_message = await user.send(embed=dm_embed)
             embed = discord.Embed(description=f"Verification session created for {user.display_name}. Instructions have been sent via DM.", color=discord.Color.green())
             await ctx.send(embed=embed)
