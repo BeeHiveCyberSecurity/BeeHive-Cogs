@@ -79,6 +79,7 @@ class StripeIdentity(commands.Cog):
         try:
             verification_session = stripe.identity.VerificationSession.create(
                 type='document',
+                metadata={'discord_user_id': str(user.id)},  # Added metadata key with the user's Discord ID
                 options={
                     'document': {
                         'allowed_types': ['driving_license', 'passport', 'id_card'],
@@ -137,17 +138,14 @@ class StripeIdentity(commands.Cog):
         Perform a full identity check on a user using Stripe Identity.
         """
         try:
-            verification_session = stripe.post(
-                "/v1/identity/verification_sessions",
-                params={
-                    'type': 'identity',
-                    'options': {
-                        'document': {
-                            'allowed_types': ['driving_license', 'passport', 'id_card'],
-                            'require_id_number': True,
-                            'require_live_capture': True,
-                            'require_matching_selfie': True,
-                        },
+            verification_session = stripe.identity.create_verification_session(
+                type='document',
+                options={
+                    'document': {
+                        'allowed_types': ['driving_license', 'passport', 'id_card'],
+                        'require_id_number': True,
+                        'require_live_capture': True,
+                        'require_matching_selfie': True,
                     },
                 }
             )
@@ -162,7 +160,7 @@ class StripeIdentity(commands.Cog):
             await ctx.send(f"Identity verification session created for {user.display_name}. Instructions have been sent via DM.")
 
             async def check_verification_status(session_id):
-                session = stripe.get(f"/v1/identity/verification_sessions/{session_id}")
+                session = stripe.identity.retrieve_verification_session(session_id)
                 return session.status == 'verified', session
 
             await asyncio.sleep(900)  # Wait for 15 minutes
