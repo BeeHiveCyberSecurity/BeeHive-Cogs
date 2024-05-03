@@ -101,11 +101,17 @@ class StripeIdentity(commands.Cog):
 
             async def check_verification_status(session_id):
                 session = stripe.identity.VerificationSession.retrieve(session_id)
+                if session.status == 'requires_input':
+                    for event in session.last_error:
+                        if event.code in ['consent_declined', 'device_unsupported', 'under_supported_age', 'phone_otp_declined', 'email_verification_declined']:
+                            return event.code, session
                 return session.status == 'verified', session
 
             await asyncio.sleep(900)  # Wait for 15 minutes
-            verified, session = await check_verification_status(verification_session.id)
-            if not verified:
+            status, session = await check_verification_status(verification_session.id)
+            if status in ['consent_declined', 'device_unsupported', 'under_supported_age', 'phone_otp_declined', 'email_verification_declined']:
+                await ctx.send(f"Verification failed due to {status.replace('_', ' ')}.")
+            elif not status:
                 await ctx.guild.kick(user, reason="Did not verify age")
                 await dm_message.edit(content=f"Verification was not completed in time. You have been removed from the server {ctx.guild.name}.")
             else:
@@ -160,12 +166,23 @@ class StripeIdentity(commands.Cog):
             await ctx.send(f"Identity verification session created for {user.display_name}. Instructions have been sent via DM.")
 
             async def check_verification_status(session_id):
+                # Check if the session has been cancelled before proceeding
+                if await self.config.pending_verification_sessions.get_raw(user.id, default=None) != session_id:
+                    return 'cancelled', None
                 session = stripe.identity.VerificationSession.retrieve(session_id)
-                return session.status == 'verified', session
+                if session.status == 'requires_input':
+                    for event in session.last_error:
+                        if event.code in ['consent_declined', 'device_unsupported', 'under_supported_age', 'phone_otp_declined', 'email_verification_declined']:
+                            return event.code, session
+                return session.status, session
 
             await asyncio.sleep(900)  # Wait for 15 minutes
-            verified, session = await check_verification_status(verification_session.id)
-            if not verified:
+            status, session = await check_verification_status(verification_session.id)
+            if status == 'cancelled':
+                await ctx.send(f"Identity verification for {user.display_name} has been cancelled.")
+            elif status in ['consent_declined', 'device_unsupported', 'under_supported_age', 'phone_otp_declined', 'email_verification_declined']:
+                await ctx.send(f"Identity verification failed due to {status.replace('_', ' ')}.")
+            elif status != 'verified':
                 await ctx.guild.kick(user, reason="Did not verify identity")
                 await dm_message.edit(content=f"Identity verification was not completed in time. You have been removed from the server {ctx.guild.name}.")
             else:
