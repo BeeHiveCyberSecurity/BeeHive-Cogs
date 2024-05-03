@@ -60,7 +60,7 @@ class StripeIdentity(commands.Cog):
         session_id = await self.config.pending_verification_sessions.get_raw(user.id)
         if session_id:
             try:
-                stripe.post(f"/v1/identity/verification_sessions/{session_id}/cancel")
+                stripe.identity.VerificationSession.cancel(session_id)
                 await ctx.send(f"Verification session for {user.display_name} has been canceled.")
             except stripe.error.StripeError as e:
                 await ctx.send(f"Failed to cancel the verification session: {e.user_message}")
