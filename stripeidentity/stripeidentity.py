@@ -148,17 +148,17 @@ class StripeIdentity(commands.Cog):
                     dob = datetime.fromisoformat(session.last_verification_report.document.dob)
                     age = (datetime.now() - dob).days // 365
                     if age < 18:
-                        await ctx.guild.ban(user, reason="User is underage - ID Validated by BeeHive")
                         dm_embed = discord.Embed(
                             title="Underage - Banned",
                             description=(
                                 "You have been banned from the server because you are under 18.\n"
                                 "You may return once you are 18 years of age or older...\n\n"
-                                "Please don't take this ban personally - we're sure you're a great person to meet and interact with, but...the internet can be a dangerous place sometimes, and this is as much to keep us safe as it is to keep you safe."
+                                ""
                             ),
                             color=discord.Color.red()
                         )
                         await dm_message.edit(embed=dm_embed)
+                        await ctx.guild.ban(user, reason="User is underage - ID Validated by BeeHive")
                     else:
                         age_verified_role = ctx.guild.get_role(self.age_verified_role_id)
                         if age_verified_role:
