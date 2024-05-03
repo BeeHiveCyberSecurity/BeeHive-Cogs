@@ -55,17 +55,17 @@ class StripeIdentity(commands.Cog):
     @checks.admin_or_permissions(manage_guild=True)
     async def cancel_verification(self, ctx: commands.Context, user: discord.Member):
         """
-        Cancel a pending verification session for a user.
+        Cancel a pending verification session for a user and remove it from the list of sessions.
         """
-        session_id = await self.config.pending_verification_sessions.get_raw(user.id)
+        session_id = await self.config.pending_verification_sessions.get_raw(user.id, default=None)
         if session_id:
             try:
                 stripe.identity.VerificationSession.cancel(session_id)
-                await ctx.send(f"Verification session for {user.display_name} has been canceled.")
+                await ctx.send(f"Verification session for {user.display_name} has been canceled and removed.")
             except stripe.error.StripeError as e:
                 await ctx.send(f"Failed to cancel the verification session: {e.user_message}")
             finally:
-                await self.config.pending_verification_sessions.set_raw(user.id, value=None)
+                await self.config.pending_verification_sessions.clear_raw(user.id)
         else:
             await ctx.send(f"No pending verification session found for {user.display_name}.")
 
