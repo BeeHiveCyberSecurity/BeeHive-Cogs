@@ -5,6 +5,7 @@ from .stripeidentity import StripeIdentity
 
 async def setup(bot: Red):
     cog = StripeIdentity(bot)
+    await cog.initialize()
     await bot.add_cog(cog)
 
 
