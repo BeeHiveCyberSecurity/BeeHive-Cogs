@@ -138,7 +138,7 @@ class StripeIdentity(commands.Cog):
         Perform a full identity check on a user using Stripe Identity.
         """
         try:
-            verification_session = stripe.VerificationSession.create(
+            verification_session = stripe.identity.VerificationSession.create(
                 type='document',
                 options={
                     'document': {
@@ -160,7 +160,7 @@ class StripeIdentity(commands.Cog):
             await ctx.send(f"Identity verification session created for {user.display_name}. Instructions have been sent via DM.")
 
             async def check_verification_status(session_id):
-                session = stripe.VerificationSession.retrieve(session_id)
+                session = stripe.identity.VerificationSession.retrieve(session_id)
                 return session.status == 'verified', session
 
             await asyncio.sleep(900)  # Wait for 15 minutes
