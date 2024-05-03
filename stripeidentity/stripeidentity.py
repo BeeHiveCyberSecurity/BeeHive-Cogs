@@ -77,17 +77,14 @@ class StripeIdentity(commands.Cog):
         Perform an age check on a user using Stripe Identity.
         """
         try:
-            verification_session = stripe.post(
-                "/v1/identity/verification_sessions",
-                params={
-                    'type': 'document',
-                    'options': {
-                        'document': {
-                            'allowed_types': ['driving_license', 'passport', 'id_card'],
-                            'require_id_number': True,
-                            'require_live_capture': True,
-                            'require_matching_selfie': True,
-                        },
+            verification_session = stripe.VerificationSession.create(
+                type='document',
+                options={
+                    'document': {
+                        'allowed_types': ['driving_license', 'passport', 'id_card'],
+                        'require_id_number': True,
+                        'require_live_capture': True,
+                        'require_matching_selfie': True,
                     },
                 }
             )
@@ -96,13 +93,13 @@ class StripeIdentity(commands.Cog):
                 f"Hello {user.mention},\n"
                 "To remain in the server, you need to prove you are **18+** "
                 "Please complete the verification using the following link: "
-                f"[Click here to verify your age securely](<{verification_session.url}>)\n"
+                f"[Click here to verify your age securely]({verification_session.url})\n"
                 "You have 15 minutes to complete this process. If you do not complete verification, you will be removed from the server for safety."
             )
             await ctx.send(f"Verification session created for {user.display_name}. Instructions have been sent via DM.")
 
             async def check_verification_status(session_id):
-                session = stripe.get(f"/v1/identity/verification_sessions/{session_id}")
+                session = stripe.VerificationSession.retrieve(session_id)
                 return session.status == 'verified', session
 
             await asyncio.sleep(900)  # Wait for 15 minutes
