@@ -156,13 +156,18 @@ class StripeIdentity(commands.Cog):
                 }
             )
             await self.config.pending_verification_sessions.set_raw(user.id, value=verification_session.id)
-            dm_message = await user.send(
-                f"Hello {user.mention},\n"
-                "To access certain features of the server, we require a full identity verification process. "
-                "Please complete the verification using the following link: "
-                f"{verification_session.url}\n"
-                "You have 15 minutes to complete this process."
+            embed = discord.Embed(
+                title="Identity Verification Required",
+                description=(
+                    f"Hello {user.mention},\n"
+                    "To access certain features of the server, we require a full identity verification process. "
+                    "Please complete the verification using the following link: "
+                    f"{verification_session.url}\n"
+                    "You have 15 minutes to complete this process."
+                ),
+                color=discord.Color.blue()
             )
+            dm_message = await user.send(embed=embed)
             await ctx.send(f"Identity verification session created for {user.display_name}. Instructions have been sent via DM.")
 
             async def check_verification_status(session_id):
