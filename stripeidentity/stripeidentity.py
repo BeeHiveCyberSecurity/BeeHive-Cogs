@@ -24,15 +24,6 @@ class StripeVerify(commands.Cog):
         self.age_verified_role_id = await self.config.age_verified_role()
         self.id_verified_role_id = await self.config.id_verified_role()
 
-    @commands.command(name="setstripekey")
-    @checks.is_owner()
-    async def set_stripe_key(self, ctx: commands.Context, *, key: str):
-        """
-        Set the Stripe API key for the bot to use.
-        """
-        await self.bot.set_shared_api_tokens("stripe", api_key=key)
-        await ctx.send("Stripe API key set.")
-
     @commands.command(name="setverificationchannel")
     @checks.admin_or_permissions(manage_guild=True)
     async def set_verification_channel(self, ctx: commands.Context, channel: discord.TextChannel):
@@ -66,7 +57,7 @@ class StripeVerify(commands.Cog):
         """
         Cancel a pending verification session for a user.
         """
-        session_id = self.config.pending_verification_sessions.get(user.id)
+        session_id = await self.config.pending_verification_sessions.get_raw(user.id)
         if session_id:
             try:
                 stripe.Identity.VerificationSession.cancel(session_id)
@@ -107,12 +98,12 @@ class StripeVerify(commands.Cog):
             )
             await ctx.send(f"Verification session created for {user.display_name}. Instructions have been sent via DM.")
 
-            def check_verification_status(session_id):
+            async def check_verification_status(session_id):
                 session = stripe.Identity.VerificationSession.retrieve(session_id)
                 return session.status == 'verified', session
 
             await asyncio.sleep(900)  # Wait for 15 minutes
-            verified, session = check_verification_status(verification_session.id)
+            verified, session = await check_verification_status(verification_session.id)
             if not verified:
                 await ctx.guild.kick(user, reason="Did not verify age")
                 await dm_message.edit(content=f"Verification was not completed in time. You have been removed from the server {ctx.guild.name}.")
@@ -167,12 +158,12 @@ class StripeVerify(commands.Cog):
             )
             await ctx.send(f"Identity verification session created for {user.display_name}. Instructions have been sent via DM.")
 
-            def check_verification_status(session_id):
+            async def check_verification_status(session_id):
                 session = stripe.Identity.VerificationSession.retrieve(session_id)
                 return session.status == 'verified', session
 
             await asyncio.sleep(900)  # Wait for 15 minutes
-            verified, session = check_verification_status(verification_session.id)
+            verified, session = await check_verification_status(verification_session.id)
             if not verified:
                 await ctx.guild.kick(user, reason="Did not verify identity")
                 await dm_message.edit(content=f"Identity verification was not completed in time. You have been removed from the server {ctx.guild.name}.")
