@@ -85,7 +85,11 @@ class StripeIdentity(commands.Cog):
         try:
             verification_session = stripe.identity.VerificationSession.create(
                 type='document',
-                metadata={'discord_user_id': str(user.id)},  # Added metadata key with the user's Discord ID
+                metadata={
+                    'discord_user_id': str(user.id),
+                    'discord_server_id': str(ctx.guild.id),
+                    'verification_command': 'agecheck'
+                },
                 options={
                     'document': {
                         'allowed_types': ['driving_license', 'passport', 'id_card'],
@@ -175,6 +179,11 @@ class StripeIdentity(commands.Cog):
         try:
             verification_session = stripe.identity.VerificationSession.create(
                 type='document',
+                metadata={
+                    'discord_user_id': str(user.id),
+                    'discord_server_id': str(ctx.guild.id),
+                    'verification_command': 'identitycheck'
+                },
                 options={
                     'document': {
                         'allowed_types': ['driving_license', 'passport', 'id_card'],
