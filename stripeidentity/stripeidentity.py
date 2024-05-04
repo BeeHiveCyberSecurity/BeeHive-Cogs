@@ -108,7 +108,7 @@ class StripeIdentity(commands.Cog):
 
     @commands.command(name="agecheck")
     @commands.guild_only()
-    @checks.admin_or_permissions(manage_guild=True)
+    @checks.mod_or_permissions(manage_guild=True)
     async def age_check(self, ctx: commands.Context, user: discord.Member):
         """
         Perform an age check on a user using Stripe Identity.
