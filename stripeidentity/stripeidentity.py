@@ -138,13 +138,24 @@ class StripeIdentity(commands.Cog):
                     "Enhancing user safety bilaterally on Discord is a priority within our services and communities. "
                     "As part of our ongoing safety and security operations, your account has been selected to verify your age due to recent activity in one or more servers. "
                     "\n\n"
-                    "You have 15 minutes to complete this process. If you do not complete verification, you will be removed from the server for safety."
+                    "You have 15 minutes to complete this process. If you do not complete verification, you will be removed from the server for safety. "
+                    "If you choose to decline the verification, you will be accepting a ban from the server."
                 ),
                 color=discord.Color(0xff4545)
             )
             dm_embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/id-card-sharp.png")
             view = discord.ui.View()
             view.add_item(discord.ui.Button(label="Start verification", url=f"{verification_session.url}", style=discord.ButtonStyle.link, emoji="<:shield:1194906995036262420>"))
+            
+            # Decline button with action to ban the user and clear the verification request
+            decline_button = discord.ui.Button(label="Decline verification", style=discord.ButtonStyle.danger)
+            async def decline_verification(interaction: discord.Interaction):
+                if interaction.user.id == user.id:
+                    await interaction.response.send_message(f"You have declined the verification and have been banned from {ctx.guild.name}.", ephemeral=True)
+                    await ctx.guild.ban(user, reason="User declined age verification")
+                    await self.config.pending_verification_sessions.clear_raw(str(user.id))
+            decline_button.callback = decline_verification
+            view.add_item(decline_button)
             dm_message = await user.send(embed=dm_embed, view=view)
             embed = discord.Embed(description=f"Verification session created for {user.display_name}. Instructions have been sent via DM.", color=discord.Color(0x2BBD8E))
             await ctx.send(embed=embed)
