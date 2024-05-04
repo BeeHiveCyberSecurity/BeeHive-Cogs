@@ -263,9 +263,11 @@ class StripeIdentity(commands.Cog):
                     return 'cancelled', None
                 session = stripe.identity.VerificationSession.retrieve(session_id)
                 if session.status == 'requires_input':
-                    for event in session.last_error:
-                        if event.code in ['consent_declined', 'device_unsupported', 'under_supported_age', 'phone_otp_declined', 'email_verification_declined']:
-                            return event.code, session
+                    # Check if last_error is not None before iterating
+                    if session.last_error is not None:
+                        for event in session.last_error:
+                            if event.code in ['consent_declined', 'device_unsupported', 'under_supported_age', 'phone_otp_declined', 'email_verification_declined']:
+                                return event.code, session
                 return session.status, session
 
             await asyncio.sleep(900)  # Wait for 15 minutes
@@ -336,3 +338,4 @@ class StripeIdentity(commands.Cog):
             else:
                 embed.add_field(name=f"User ID: {user_id}", value="Member not found in this guild.", inline=False)
         await ctx.send(embed=embed)
+
