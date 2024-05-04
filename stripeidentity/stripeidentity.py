@@ -25,6 +25,7 @@ class StripeIdentity(commands.Cog):
         self.id_verified_role_id = await self.config.id_verified_role()
 
     @commands.command(name="setverificationchannel")
+    @commands.guild_only()
     @checks.admin_or_permissions(manage_guild=True)
     async def set_verification_channel(self, ctx: commands.Context, channel: discord.TextChannel):
         """
@@ -35,6 +36,7 @@ class StripeIdentity(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command(name="setageverifiedrole")
+    @commands.guild_only()
     @checks.admin_or_permissions(manage_roles=True)
     async def set_age_verified_role(self, ctx: commands.Context, role: discord.Role):
         """
@@ -45,6 +47,7 @@ class StripeIdentity(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command(name="setidverifiedrole")
+    @commands.guild_only()
     @checks.admin_or_permissions(manage_roles=True)
     async def set_id_verified_role(self, ctx: commands.Context, role: discord.Role):
         """
@@ -55,6 +58,7 @@ class StripeIdentity(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command(name="cancelverification")
+    @commands.guild_only()
     @checks.admin_or_permissions(manage_guild=True)
     async def cancel_verification(self, ctx: commands.Context, user: discord.Member):
         """
@@ -79,6 +83,7 @@ class StripeIdentity(commands.Cog):
             await ctx.send(embed=embed)
             
     @commands.is_owner()
+    @commands.guild_only()
     @commands.command(name="bypassverification")
     async def bypass_verification(self, ctx: commands.Context, user: discord.Member):
         """
@@ -169,7 +174,7 @@ class StripeIdentity(commands.Cog):
                 verification_channel = self.bot.get_channel(self.verification_channel_id)
                 if verification_channel:
                     dob = datetime.fromisoformat(session.last_verification_report.document.dob)
-                    age = (datetime.now() - dob).days // 365
+                    age = (datetime.utcnow() - dob).days // 365
                     if age < 18:
                         dm_embed = discord.Embed(
                             title="Underage - Banned",
@@ -291,7 +296,9 @@ class StripeIdentity(commands.Cog):
             embed = discord.Embed(description=f"Failed to send DM to {user.display_name}: {e.text}", color=discord.Color(0xff4545))
             await ctx.send(embed=embed)
 
+    @commands.guild_only()
     @commands.command(name="pendingverifications")
+    @checks.admin_or_permissions(manage_guild=True)
     async def pending_verifications(self, ctx):
         """Show all pending verifications and their details."""
         pending_sessions = await self.config.pending_verification_sessions.all()
