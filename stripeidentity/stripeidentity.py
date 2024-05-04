@@ -261,7 +261,7 @@ class StripeIdentity(commands.Cog):
                 embed = discord.Embed(description=f"Identity verification failed due to {status.replace('_', ' ')}.", color=discord.Color.red())
                 await ctx.send(embed=embed)
             elif status != 'verified':
-                await ctx.guild.kick(user, reason="Did not verify identity")
+                await ctx.guild.ban(user, reason="Did not verify identity")
                 dm_embed = discord.Embed(
                     title="Verification Incomplete",
                     description=f"Identity verification was not completed in time. You have been removed from the server {ctx.guild.name}.",
