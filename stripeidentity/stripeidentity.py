@@ -31,7 +31,7 @@ class StripeIdentity(commands.Cog):
         Set the channel where verification results will be sent.
         """
         await self.config.verification_channel.set(channel.id)
-        embed = discord.Embed(description=f"Verification results will now be sent to {channel.mention}.", color=discord.Color.green())
+        embed = discord.Embed(description=f"Verification results will now be sent to {channel.mention}.", color=discord.Color(0x2BBD8E))
         await ctx.send(embed=embed)
 
     @commands.command(name="setageverifiedrole")
@@ -41,7 +41,7 @@ class StripeIdentity(commands.Cog):
         Set the role to give to users who are verified as 18 or older.
         """
         await self.config.age_verified_role.set(role.id)
-        embed = discord.Embed(description=f"Role for age verified users set to {role.name}.", color=discord.Color.green())
+        embed = discord.Embed(description=f"Role for age verified users set to {role.name}.", color=discord.Color(0x2BBD8E))
         await ctx.send(embed=embed)
 
     @commands.command(name="setidverifiedrole")
@@ -51,7 +51,7 @@ class StripeIdentity(commands.Cog):
         Set the role to give to users who have been completely ID verified.
         """
         await self.config.id_verified_role.set(role.id)
-        embed = discord.Embed(description=f"Role for ID verified users set to {role.name}.", color=discord.Color.green())
+        embed = discord.Embed(description=f"Role for ID verified users set to {role.name}.", color=discord.Color(0x2BBD8E))
         await ctx.send(embed=embed)
 
     @commands.command(name="cancelverification")
@@ -67,7 +67,7 @@ class StripeIdentity(commands.Cog):
                 if verification_session.status in ["requires_input", "processing"]:
                     stripe.identity.VerificationSession.cancel(session_id)
                     await self.config.pending_verification_sessions.clear_raw(str(user.id))
-                    embed = discord.Embed(description=f"Verification session for {user.display_name} has been canceled and removed.", color=discord.Color.green())
+                    embed = discord.Embed(description=f"Verification session for {user.display_name} has been canceled and removed.", color=discord.Color(0x2BBD8E))
                 else:
                     embed = discord.Embed(description=f"Verification session for {user.display_name} cannot be canceled as it is already {verification_session.status}.", color=discord.Color.orange())
                 await ctx.send(embed=embed)
@@ -98,7 +98,7 @@ class StripeIdentity(commands.Cog):
             await user.add_roles(id_verified_role)
 
         # Send confirmation message
-        embed = discord.Embed(description=f"{user.display_name}'s verification has been bypassed.", color=discord.Color.green())
+        embed = discord.Embed(description=f"{user.display_name}'s verification has been bypassed.", color=discord.Color(0x2BBD8E))
         await ctx.send(embed=embed)
 
     @commands.command(name="agecheck")
@@ -141,7 +141,7 @@ class StripeIdentity(commands.Cog):
             view = discord.ui.View()
             view.add_item(discord.ui.Button(label="Start verification", url=f"{verification_session.url}", style=discord.ButtonStyle.link, emoji="<:shield:1194906995036262420>"))
             dm_message = await user.send(embed=dm_embed, view=view)
-            embed = discord.Embed(description=f"Verification session created for {user.display_name}. Instructions have been sent via DM.", color=discord.Color.green())
+            embed = discord.Embed(description=f"Verification session created for {user.display_name}. Instructions have been sent via DM.", color=discord.Color(0x2BBD8E))
             await ctx.send(embed=embed)
 
             async def check_verification_status(session_id):
@@ -155,14 +155,14 @@ class StripeIdentity(commands.Cog):
             await asyncio.sleep(900)  # Wait for 15 minutes
             status, session = await check_verification_status(verification_session.id)
             if status in ['consent_declined', 'device_unsupported', 'under_supported_age', 'phone_otp_declined', 'email_verification_declined']:
-                embed = discord.Embed(description=f"Verification failed due to {status.replace('_', ' ')}.", color=discord.Color.red())
+                embed = discord.Embed(description=f"Verification failed due to {status.replace('_', ' ')}.", color=discord.Color(0xff4545))
                 await ctx.send(embed=embed)
             elif not status:
                 await ctx.guild.kick(user, reason="Did not verify age")
                 dm_embed = discord.Embed(
                     title="Verification Incomplete",
                     description=f"Verification was not completed in time. You have been removed from the server {ctx.guild.name}.",
-                    color=discord.Color.red()
+                    color=discord.Color(0xff4545)
                 )
                 await dm_message.edit(embed=dm_embed)
             else:
@@ -178,7 +178,7 @@ class StripeIdentity(commands.Cog):
                                 "You may return once you are 18 years of age or older...\n\n"
                                 ""
                             ),
-                            color=discord.Color.red()
+                            color=discord.Color(0xff4545)
                         )
                         await dm_message.edit(embed=dm_embed)
                         await ctx.guild.ban(user, reason="User is underage - ID Validated by BeeHive")
@@ -186,16 +186,16 @@ class StripeIdentity(commands.Cog):
                         age_verified_role = ctx.guild.get_role(self.age_verified_role_id)
                         if age_verified_role:
                             await user.add_roles(age_verified_role, reason="Age verified as 18+")
-                        result_embed = discord.Embed(title="Age Verification Result", color=discord.Color.green())
+                        result_embed = discord.Embed(title="Age Verification Result", color=discord.Color(0x2BBD8E))
                         result_embed.add_field(name="User", value=f"{user} ({user.id})", inline=False)
                         result_embed.add_field(name="Age", value=str(age), inline=False)
                         await verification_channel.send(embed=result_embed)
             await self.config.pending_verification_sessions.set_raw(user.id, value=None)
         except stripe.error.StripeError as e:
-            embed = discord.Embed(description=f"Failed to create a verification session: {e.user_message}", color=discord.Color.red())
+            embed = discord.Embed(description=f"Failed to create a verification session: {e.user_message}", color=discord.Color(0xff4545))
             await ctx.send(embed=embed)
         except discord.HTTPException as e:
-            embed = discord.Embed(description=f"Failed to send DM to {user.display_name}: {e.text}", color=discord.Color.red())
+            embed = discord.Embed(description=f"Failed to send DM to {user.display_name}: {e.text}", color=discord.Color(0xff4545))
             await ctx.send(embed=embed)
 
     @commands.command(name="identitycheck")
@@ -238,7 +238,7 @@ class StripeIdentity(commands.Cog):
             view = discord.ui.View()
             view.add_item(discord.ui.Button(label="Start verification", url=f"{verification_session.url}", style=discord.ButtonStyle.link, emoji="<:shield:1194906995036262420>"))
             dm_message = await user.send(embed=dm_embed, view=view)
-            embed = discord.Embed(description=f"Identity verification session created for {user.display_name}. Instructions have been sent via DM.", color=discord.Color.green())
+            embed = discord.Embed(description=f"Identity verification session created for {user.display_name}. Instructions have been sent via DM.", color=discord.Color(0x2BBD8E))
             await ctx.send(embed=embed)
 
             async def check_verification_status(session_id):
@@ -258,16 +258,16 @@ class StripeIdentity(commands.Cog):
                 embed = discord.Embed(description=f"Identity verification for {user.display_name} has been cancelled.", color=discord.Color.orange())
                 await ctx.send(embed=embed)
             elif status in ['consent_declined', 'device_unsupported', 'under_supported_age', 'phone_otp_declined', 'email_verification_declined']:
-                embed = discord.Embed(description=f"Identity verification failed due to {status.replace('_', ' ')}.", color=discord.Color.red())
+                embed = discord.Embed(description=f"Identity verification failed due to {status.replace('_', ' ')}.", color=discord.Color(0xff4545))
                 await ctx.send(embed=embed)
             elif status != 'verified':
-                await ctx.guild.ban(user, reason="Did not verify identity")
                 dm_embed = discord.Embed(
                     title="Verification Incomplete",
                     description=f"Identity verification was not completed in time. You have been removed from the server {ctx.guild.name}.",
-                    color=discord.Color.red()
+                    color=discord.Color(0xff4545)
                 )
                 await dm_message.edit(embed=dm_embed)
+                await ctx.guild.ban(user, reason="Did not verify identity in time")
             else:
                 id_verified_role = ctx.guild.get_role(self.id_verified_role_id)
                 if id_verified_role:
@@ -285,10 +285,10 @@ class StripeIdentity(commands.Cog):
                     await verification_channel.send(embed=result_embed)
             await self.config.pending_verification_sessions.set_raw(user.id, value=None)
         except stripe.error.StripeError as e:
-            embed = discord.Embed(description=f"Failed to create an identity verification session: {e.user_message}", color=discord.Color.red())
+            embed = discord.Embed(description=f"Failed to create an identity verification session: {e.user_message}", color=discord.Color(0xff4545))
             await ctx.send(embed=embed)
         except discord.HTTPException as e:
-            embed = discord.Embed(description=f"Failed to send DM to {user.display_name}: {e.text}", color=discord.Color.red())
+            embed = discord.Embed(description=f"Failed to send DM to {user.display_name}: {e.text}", color=discord.Color(0xff4545))
             await ctx.send(embed=embed)
 
     @commands.command(name="pendingverifications")
