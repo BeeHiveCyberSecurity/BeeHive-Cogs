@@ -88,14 +88,14 @@ class StripeIdentity(commands.Cog):
         await self.config.pending_verification_sessions.clear_raw(str(user.id))
         
         # Optionally, you can set the user's roles to verified roles here
-        # age_verified_role_id = await self.config.age_verified_role()
-        # id_verified_role_id = await self.config.id_verified_role()
-        # age_verified_role = ctx.guild.get_role(age_verified_role_id)
-        # id_verified_role = ctx.guild.get_role(id_verified_role_id)
-        # if age_verified_role:
-        #     await user.add_roles(age_verified_role)
-        # if id_verified_role:
-        #     await user.add_roles(id_verified_role)
+        age_verified_role_id = await self.config.age_verified_role()
+        id_verified_role_id = await self.config.id_verified_role()
+        age_verified_role = ctx.guild.get_role(age_verified_role_id)
+        id_verified_role = ctx.guild.get_role(id_verified_role_id)
+        if age_verified_role:
+            await user.add_roles(age_verified_role)
+        if id_verified_role:
+            await user.add_roles(id_verified_role)
 
         # Send confirmation message
         embed = discord.Embed(description=f"{user.display_name}'s verification has been bypassed.", color=discord.Color.green())
@@ -226,15 +226,18 @@ class StripeIdentity(commands.Cog):
             dm_embed = discord.Embed(
                 title="Identity verification required",
                 description=(
-                    f"Hello {user.mention},\n"
-                    "To access certain features of the server, we require a full identity verification process. "
-                    "Please complete the verification using the following link: "
-                    f"{verification_session.url}\n"
-                    "You have 15 minutes to complete this process."
+                    f"Hello {user.mention},\n\n"
+                    "Enhancing user safety bilaterally on Discord is a priority within our services and communities. "
+                    "As part of our ongoing safety and security operations, your account has been selected to verify your human identity due to recent activity in one or more servers. "
+                    "\n\n"
+                    "You have 15 minutes to complete this process. If you do not complete verification, you will be removed from the server for safety."
                 ),
                 color=discord.Color(0xff4545)
             )
-            dm_message = await user.send(embed=dm_embed)
+            dm_embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/id-card-sharp.png")
+            view = discord.ui.View()
+            view.add_item(discord.ui.Button(label="Start verification", url=f"{verification_session.url}", style=discord.ButtonStyle.link, emoji="<:shield:1194906995036262420>"))
+            dm_message = await user.send(embed=dm_embed, view=view)
             embed = discord.Embed(description=f"Identity verification session created for {user.display_name}. Instructions have been sent via DM.", color=discord.Color.green())
             await ctx.send(embed=embed)
 
