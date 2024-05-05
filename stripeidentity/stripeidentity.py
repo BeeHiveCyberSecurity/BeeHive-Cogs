@@ -114,7 +114,7 @@ class StripeIdentity(commands.Cog):
         Perform an age check on a user using Stripe Identity.
         """
         await ctx.message.delete()
-        embed = discord.Embed(description="### Attempting to create verification session, please wait...", color=discord.Color(0x2BBD8E))
+        embed = discord.Embed(description="**Attempting to create verification session, please wait...**", color=discord.Color(0x2BBD8E))
         await ctx.send(embed=embed)
         try:
             verification_session = stripe.identity.VerificationSession.create(
@@ -160,7 +160,7 @@ class StripeIdentity(commands.Cog):
             decline_button.callback = decline_verification
             view.add_item(decline_button)
             dm_message = await user.send(embed=dm_embed, view=view)
-            embed = discord.Embed(description=f"Verification session created for {user.display_name}. Instructions have been sent via DM.", color=discord.Color(0x2BBD8E))
+            embed = discord.Embed(description=f":white_check_mark: **Verification session created for {user.mention}. They've been sent instructions on how to continue.**", color=discord.Color(0x2BBD8E))
             await ctx.send(embed=embed)
 
             async def check_verification_status(session_id):
@@ -174,16 +174,16 @@ class StripeIdentity(commands.Cog):
             await asyncio.sleep(900)  # Wait for 15 minutes
             status, session = await check_verification_status(verification_session.id)
             if isinstance(status, str) and status in ['consent_declined', 'device_unsupported', 'under_supported_age', 'phone_otp_declined', 'email_verification_declined']:
-                embed = discord.Embed(description=f"Verification failed due to {status.replace('_', ' ')}.", color=discord.Color(0xff4545))
+                embed = discord.Embed(description=f":x: **Verification failed due to `{status.replace('_', ' ')}`**", color=discord.Color(0xff4545))
                 await ctx.send(embed=embed)
             elif not status:
-                await ctx.guild.kick(user, reason="Did not verify age")
                 dm_embed = discord.Embed(
-                    title="Verification Incomplete",
+                    title="Verification failure",
                     description=f"Verification was not completed in time. You have been removed from the server {ctx.guild.name}.",
                     color=discord.Color(0xff4545)
                 )
                 await dm_message.edit(embed=dm_embed)
+                await ctx.guild.kick(user, reason="Did not verify age")
             else:
                 verification_channel = self.bot.get_channel(self.verification_channel_id)
                 if verification_channel:
