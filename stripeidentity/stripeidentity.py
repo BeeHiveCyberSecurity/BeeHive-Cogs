@@ -3,6 +3,7 @@ from redbot.core import Config, commands, checks #type: ignore
 from redbot.core.bot import Red #type: ignore
 import discord #type: ignore
 import asyncio
+import time
 from datetime import datetime
 
 class StripeIdentity(commands.Cog):
