@@ -149,7 +149,7 @@ class StripeIdentity(commands.Cog):
             )
             dm_embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/id-card-sharp.png")
             view = discord.ui.View()
-            view.add_item(discord.ui.Button(label="Start verification", url=f"{verification_session.url}", style=discord.ButtonStyle.link, emoji="<:shield:1194906995036262420>"))
+            view.add_item(discord.ui.Button(label="Start verification", url=f"{verification_session.url}", style=discord.ButtonStyle.link, emoji="<:globe:1196807971674533968>"))
             
             # Decline button with action to ban the user and clear the verification request
             decline_button = discord.ui.Button(label="Decline verification", style=discord.ButtonStyle.danger)
