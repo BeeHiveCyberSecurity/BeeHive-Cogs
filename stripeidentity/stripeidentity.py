@@ -225,6 +225,9 @@ class StripeIdentity(commands.Cog):
         """
         Perform a full identity check on a user using Stripe Identity.
         """
+        await ctx.message.delete()
+        embed = discord.Embed(description="**Attempting to create verification session, please wait...**", color=discord.Color(0x2BBD8E))
+        await ctx.send(embed=embed)
         try:
             verification_session = stripe.identity.VerificationSession.create(
                 type='document',
