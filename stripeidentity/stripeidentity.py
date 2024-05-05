@@ -131,7 +131,8 @@ class StripeIdentity(commands.Cog):
                         'require_live_capture': True,
                         'require_matching_selfie': True,
                     },
-                }
+                },
+                expires_at=int(time.time()) + 900  # Set the expiration time to 15 minutes from now
             )
             await self.config.pending_verification_sessions.set_raw(user.id, value=verification_session.id)
             dm_embed = discord.Embed(
@@ -191,11 +192,11 @@ class StripeIdentity(commands.Cog):
                     age = (datetime.utcnow() - dob).days // 365
                     if age < 18:
                         dm_embed = discord.Embed(
-                            title="Underage - Banned",
+                            title="Underage user detected",
                             description=(
-                                "You have been banned from the server because you are under 18.\n"
+                                "You have been banned from the server because you are under 18.\n\n"
                                 "You may return once you are 18 years of age or older...\n\n"
-                                ""
+                                "**If you have any questions, please contact a staff member.**"
                             ),
                             color=discord.Color(0xff4545)
                         )
@@ -211,10 +212,10 @@ class StripeIdentity(commands.Cog):
                         await verification_channel.send(embed=result_embed)
             await self.config.pending_verification_sessions.set_raw(user.id, value=None)
         except stripe.error.StripeError as e:
-            embed = discord.Embed(description=f"Failed to create a verification session: {e.user_message}", color=discord.Color(0xff4545))
+            embed = discord.Embed(description=f":x: **Failed to create a verification session**\n`{e.user_message}`", color=discord.Color(0xff4545))
             await ctx.send(embed=embed)
         except discord.HTTPException as e:
-            embed = discord.Embed(description=f"Failed to send DM to {user.display_name}: {e.text}", color=discord.Color(0xff4545))
+            embed = discord.Embed(description=f":x: **Failed to send DM to {user.display_name}**\n`{e.text}`", color=discord.Color(0xff4545))
             await ctx.send(embed=embed)
 
     @commands.command(name="identitycheck")
