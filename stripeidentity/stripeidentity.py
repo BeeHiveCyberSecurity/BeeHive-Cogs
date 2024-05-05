@@ -113,6 +113,9 @@ class StripeIdentity(commands.Cog):
         """
         Perform an age check on a user using Stripe Identity.
         """
+        await ctx.message.delete()
+        embed = discord.Embed(description="### Attempting to create verification session, please wait...", color=discord.Color(0x2BBD8E))
+        await ctx.send(embed=embed)
         try:
             verification_session = stripe.identity.VerificationSession.create(
                 type='document',
@@ -135,7 +138,7 @@ class StripeIdentity(commands.Cog):
                 title="Age verification requested",
                 description=(
                     f"Hello {user.mention},\n\n"
-                    "Enhancing user safety bilaterally on Discord is a priority within our services and communities. "
+                    "**Enhancing user safety bilaterally on Discord is a priority within our services and communities.**\n\n"
                     "As part of our ongoing safety and security operations, your account has been selected to verify your age due to recent activity in one or more servers. "
                     "\n\n"
                     "You have 15 minutes to complete this process. If you do not complete verification, you will be removed from the server for safety. "
@@ -162,7 +165,7 @@ class StripeIdentity(commands.Cog):
 
             async def check_verification_status(session_id):
                 session = stripe.identity.VerificationSession.retrieve(session_id)
-                if session.status == 'requires_input':
+                if session.status == 'requires_input' and session.last_error:
                     for event in session.last_error:
                         if event.code in ['consent_declined', 'device_unsupported', 'under_supported_age', 'phone_otp_declined', 'email_verification_declined']:
                             return event.code, session
@@ -170,7 +173,7 @@ class StripeIdentity(commands.Cog):
 
             await asyncio.sleep(900)  # Wait for 15 minutes
             status, session = await check_verification_status(verification_session.id)
-            if status in ['consent_declined', 'device_unsupported', 'under_supported_age', 'phone_otp_declined', 'email_verification_declined']:
+            if isinstance(status, str) and status in ['consent_declined', 'device_unsupported', 'under_supported_age', 'phone_otp_declined', 'email_verification_declined']:
                 embed = discord.Embed(description=f"Verification failed due to {status.replace('_', ' ')}.", color=discord.Color(0xff4545))
                 await ctx.send(embed=embed)
             elif not status:
