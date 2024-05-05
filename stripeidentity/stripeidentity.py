@@ -3,7 +3,6 @@ from redbot.core import Config, commands, checks #type: ignore
 from redbot.core.bot import Red #type: ignore
 import discord #type: ignore
 import asyncio
-import time
 from datetime import datetime
 
 class StripeIdentity(commands.Cog):
@@ -132,8 +131,7 @@ class StripeIdentity(commands.Cog):
                         'require_live_capture': True,
                         'require_matching_selfie': True,
                     },
-                },
-                expires_at=int(time.time()) + 900  # Set the expiration time to 15 minutes from now
+                }
             )
             await self.config.pending_verification_sessions.set_raw(user.id, value=verification_session.id)
             dm_embed = discord.Embed(
