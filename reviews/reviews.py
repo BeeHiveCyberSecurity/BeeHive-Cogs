@@ -74,6 +74,7 @@ class ReviewsCog(commands.Cog):
         for i in range(1, 6):
             button = ReviewButton(label=f"{i} Star", review_id=review_id)
             view.add_item(button)
+        view.cog = self  # Assign the cog reference to the view for callback access
 
         embed = discord.Embed(description="Please rate your review from 1 to 5 stars:", color=discord.Color.blue())
         message = await ctx.send(embed=embed, view=view)
