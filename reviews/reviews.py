@@ -114,8 +114,9 @@ class ReviewsCog(commands.Cog):
         await self.config.guild(ctx.guild).next_id.set(review_id + 1)
 
         view = View(timeout=None)
+        colors = [discord.ButtonStyle.danger, discord.ButtonStyle.gray, discord.ButtonStyle.gray, discord.ButtonStyle.gray, discord.ButtonStyle.success]
         for i in range(1, 6):
-            button = ReviewButton(label=f"{i} Star", review_id=review_id)
+            button = ReviewButton(label=f"{i} Star", review_id=review_id, style=colors[i-1])
             view.add_item(button)
         view.cog = self  # Assign the cog reference to the view for callback access
 
