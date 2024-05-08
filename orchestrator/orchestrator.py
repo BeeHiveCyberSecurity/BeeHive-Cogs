@@ -34,54 +34,58 @@ class Orchestrator(commands.Cog):
         embeds = []
         guild_ids = []
         for guild in guilds_sorted:
-            full_guild = await self.bot.fetch_guild(guild.id)
-            guild_owner = await self.bot.fetch_user(full_guild.owner_id) if full_guild.owner_id else 'Unknown'
-            # Calculate activity score based on message count in the past week
-            one_week_ago = datetime.utcnow() - timedelta(days=7)
-            messages_past_week = 0  # Initialize message count
-            for channel in full_guild.text_channels:
-                try:
-                    messages_past_week += sum(1 async for _ in channel.history(after=one_week_ago))
-                except discord.Forbidden:
-                    # Bot does not have permissions to read message history in this channel
-                    pass
-            # Check if there are members in the guild to avoid division by zero
-            member_count = full_guild.member_count if full_guild.member_count else 1
-            activity_score = messages_past_week / member_count  # Messages per member
+            try:
+                full_guild = await self.bot.fetch_guild(guild.id)
+                guild_owner = await self.bot.fetch_user(full_guild.owner_id) if full_guild.owner_id else 'Unknown'
+                # Calculate activity score based on message count in the past week
+                one_week_ago = datetime.utcnow() - timedelta(days=7)
+                messages_past_week = 0  # Initialize message count
+                for channel in full_guild.text_channels:
+                    try:
+                        messages_past_week += sum(1 async for _ in channel.history(after=one_week_ago))
+                    except discord.Forbidden:
+                        # Bot does not have permissions to read message history in this channel
+                        pass
+                # Check if there are members in the guild to avoid division by zero
+                member_count = full_guild.member_count if full_guild.member_count else 1
+                activity_score = messages_past_week / member_count  # Messages per member
 
-            # Determine activity level based on the score
-            if activity_score > 1:
-                activity_level = "High"
-            elif activity_score > 0.1:
-                activity_level = "Medium"
-            else:
-                activity_level = "Low"
+                # Determine activity level based on the score
+                if activity_score > 1:
+                    activity_level = "High"
+                elif activity_score > 0.1:
+                    activity_level = "Medium"
+                else:
+                    activity_level = "Low"
 
-            embed_color = discord.Color.from_rgb(255, 255, 254)
-            # Fetch the full member list to get an accurate count
-            full_member_list = await full_guild.query_members(limit=None)
-            accurate_member_count = len(full_member_list)
-            embed_description = (
-                f"**Members:** `{accurate_member_count}`\n"
-                f"**Owner:** `{guild_owner}`\n"
-                f"**Created At:** `{full_guild.created_at.strftime('%Y-%m-%d %H:%M:%S')}`\n"
-                f"**Boost Level:** `{full_guild.premium_tier}`\n"
-                f"**Boosts:** `{full_guild.premium_subscription_count}`\n"
-                f"**Features:** `{', '.join(full_guild.features) if full_guild.features else 'None'}`\n"
-                f"**Activity Level (Past Week):** `{activity_level}`"
-            )
-            embed = discord.Embed(title=full_guild.name, description=embed_description, color=embed_color)
-            embed.set_thumbnail(url=full_guild.icon.url if full_guild.icon else None)
-            embed.add_field(name="Guild ID", value=str(full_guild.id))
-            embed.add_field(name="Verification Level", value=str(full_guild.verification_level) if full_guild.verification_level else "None")
-            embed.add_field(name="Explicit Content Filter", value=str(full_guild.explicit_content_filter))
-            embed.add_field(name="Number of Roles", value=str(len(full_guild.roles)))
-            embed.add_field(name="Number of Emojis", value=str(len(full_guild.emojis)))
-            embed.add_field(name="Number of Text Channels", value=str(len(full_guild.text_channels)))
-            embed.add_field(name="Number of Voice Channels", value=str(len(full_guild.voice_channels)))
-            embeds.append(embed)
-            guild_ids.append(full_guild.id)
-        
+                embed_color = discord.Color.from_rgb(255, 255, 254)
+                # Fetch the full member list to get an accurate count
+                full_member_list = await full_guild.query_members(limit=None)
+                accurate_member_count = len(full_member_list)
+                embed_description = (
+                    f"**Members:** `{accurate_member_count}`\n"
+                    f"**Owner:** `{guild_owner}`\n"
+                    f"**Created At:** `{full_guild.created_at.strftime('%Y-%m-%d %H:%M:%S')}`\n"
+                    f"**Boost Level:** `{full_guild.premium_tier}`\n"
+                    f"**Boosts:** `{full_guild.premium_subscription_count}`\n"
+                    f"**Features:** `{', '.join(full_guild.features) if full_guild.features else 'None'}`\n"
+                    f"**Activity Level (Past Week):** `{activity_level}`"
+                )
+                embed = discord.Embed(title=full_guild.name, description=embed_description, color=embed_color)
+                embed.set_thumbnail(url=full_guild.icon.url if full_guild.icon else None)
+                embed.add_field(name="Guild ID", value=str(full_guild.id))
+                embed.add_field(name="Verification Level", value=str(full_guild.verification_level) if full_guild.verification_level else "None")
+                embed.add_field(name="Explicit Content Filter", value=str(full_guild.explicit_content_filter))
+                embed.add_field(name="Number of Roles", value=str(len(full_guild.roles)))
+                embed.add_field(name="Number of Emojis", value=str(len(full_guild.emojis)))
+                embed.add_field(name="Number of Text Channels", value=str(len(full_guild.text_channels)))
+                embed.add_field(name="Number of Voice Channels", value=str(len(full_guild.voice_channels)))
+                embeds.append(embed)
+                guild_ids.append(full_guild.id)
+            except Exception as e:
+                print(f"Failed to fetch guild {guild.id} due to {str(e)}")
+                continue
+
         # Paginator view with buttons
         class PaginatorView(View):
             def __init__(self, embeds, guild_ids):
