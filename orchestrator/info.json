@@ -1,0 +1,13 @@
+{
+  "author": ["movelaterally"],
+  "description": "See basic server info. Show bot info about the Discord servers your bot is in, including approximate total user count/member count and server count. Guild info, such as guild ID and guild names are also shown.",
+  "install_msg": "## :white_check_mark: Successfully installed Orchestrator.\n**Stay updated with changes and get support:** [Join our Support Discord](<https://discord.gg/ckdzsm7mTs>)",
+  "name": "Orchestrator",
+  "short": "Server Information Viewer",
+  "min_bot_version": "3.5.0",
+  "requirements": [],
+  "permissions": [],
+  "end_user_data_statement": "This cog does not store any End User Data.",
+  "tags": ["servers", "member", "members", "information"]
+}
+
