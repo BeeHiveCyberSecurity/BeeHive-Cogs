@@ -26,7 +26,7 @@ class Orchestrator(commands.Cog):
         await ctx.defer()
         guilds = [guild async for guild in self.bot.fetch_guilds(limit=None)]
         # No need to filter out guilds as we want to list all guilds the bot is in
-        guilds_sorted = sorted(guilds, key=lambda x: x.member_count if x.member_count is not None else 0, reverse=True)
+        guilds_sorted = sorted(guilds, key=lambda x: x.member_count, reverse=True)
         if not guilds_sorted:
             return await ctx.send("No guilds available.")
 
@@ -34,7 +34,7 @@ class Orchestrator(commands.Cog):
         guild_ids = []
         for guild in guilds_sorted:
             full_guild = await self.bot.fetch_guild(guild.id)
-            guild_owner = await self.bot.fetch_user(guild.owner_id) if guild.owner_id else 'Unknown'
+            guild_owner = await self.bot.fetch_user(full_guild.owner_id) if full_guild.owner_id else 'Unknown'
             # Calculate activity score based on message count in the past week
             one_week_ago = datetime.utcnow() - timedelta(days=7)
             messages_past_week = 0  # Initialize message count
@@ -45,7 +45,7 @@ class Orchestrator(commands.Cog):
                     # Bot does not have permissions to read message history in this channel
                     pass
             # Check if there are members in the guild to avoid division by zero
-            member_count = len(full_guild.members) if full_guild.members else 1
+            member_count = full_guild.member_count if full_guild.member_count else 1
             activity_score = messages_past_week / member_count  # Messages per member
 
             # Determine activity level based on the score
@@ -66,17 +66,17 @@ class Orchestrator(commands.Cog):
                 f"**Features:** `{', '.join(full_guild.features) if full_guild.features else 'None'}`\n"
                 f"**Activity Level (Past Week):** `{activity_level}`"
             )
-            embed = discord.Embed(title=guild.name, description=embed_description, color=embed_color)
-            embed.set_thumbnail(url=guild.icon.url if guild.icon else None)
-            embed.add_field(name="Guild ID", value=str(guild.id))
-            embed.add_field(name="Verification Level", value=str(guild.verification_level) if guild.verification_level else "None")
-            embed.add_field(name="Explicit Content Filter", value=str(guild.explicit_content_filter))
-            embed.add_field(name="Number of Roles", value=str(len(guild.roles)))
-            embed.add_field(name="Number of Emojis", value=str(len(guild.emojis)))
-            embed.add_field(name="Number of Text Channels", value=str(len(guild.text_channels)))
-            embed.add_field(name="Number of Voice Channels", value=str(len(guild.voice_channels)))
+            embed = discord.Embed(title=full_guild.name, description=embed_description, color=embed_color)
+            embed.set_thumbnail(url=full_guild.icon.url if full_guild.icon else None)
+            embed.add_field(name="Guild ID", value=str(full_guild.id))
+            embed.add_field(name="Verification Level", value=str(full_guild.verification_level) if full_guild.verification_level else "None")
+            embed.add_field(name="Explicit Content Filter", value=str(full_guild.explicit_content_filter))
+            embed.add_field(name="Number of Roles", value=str(len(full_guild.roles)))
+            embed.add_field(name="Number of Emojis", value=str(len(full_guild.emojis)))
+            embed.add_field(name="Number of Text Channels", value=str(len(full_guild.text_channels)))
+            embed.add_field(name="Number of Voice Channels", value=str(len(full_guild.voice_channels)))
             embeds.append(embed)
-            guild_ids.append(guild.id)
+            guild_ids.append(full_guild.id)
         
         # Paginator view with buttons
         class PaginatorView(View):
