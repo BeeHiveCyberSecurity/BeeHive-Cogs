@@ -95,7 +95,7 @@ class ReviewsCog(commands.Cog):
         def check(m):
             return m.author == ctx.author and m.channel == ctx.channel
 
-        embed = discord.Embed(description=f"### Leave a new review for {ctx.guild.name}\nReply in chat with your review message or type **`cancel`** to abandon the process.", color=discord.Color.from_str("#fffffe"))
+        embed = discord.Embed(title=f"Leave a new review for {ctx.guild.name}", description=f"Thanks for wanting to submit feedback about your experience here! This should only take a couple seconds...\n\nReply in chat with your review message or type **`cancel`** to abandon the process.", color=discord.Color.from_str("#fffffe"))
         await ctx.send(embed=embed)
         try:
             msg = await self.bot.wait_for('message', check=check, timeout=120.0)
