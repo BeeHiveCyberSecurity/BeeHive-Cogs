@@ -67,15 +67,15 @@ class ReviewsCog(commands.Cog):
                 if interaction.user != ctx.author:
                     await interaction.response.send_message("You are not allowed to interact with this button.", ephemeral=True)
                     return
-                await self.review_submit.callback(self, ctx)
                 await interaction.response.defer()
+                await self.review_submit.callback(self, ctx)
 
             async def help_button_callback(interaction):
                 if interaction.user != ctx.author:
                     await interaction.response.send_message("You are not allowed to interact with this button.", ephemeral=True)
                     return
-                await ctx.send_help(str(ctx.command))
                 await interaction.response.defer()
+                await ctx.send_help(str(ctx.command))
 
             submit_button.callback = submit_button_callback
             help_button.callback = help_button_callback
