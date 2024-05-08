@@ -38,7 +38,7 @@ class Orchestrator(commands.Cog):
             full_guild = await self.bot.fetch_guild(guild.id)
             embed_description = (
                 f"**Members:** `{full_guild.member_count}`\n"
-                f"**Active:** `{full_guild.presence_count}`\n"
+                # Removed the line that caused the AttributeError as 'presence_count' is not an attribute of 'Guild'
                 f"**Owner:** `{guild_owner}`\n"
                 f"**Created At:** `{full_guild.created_at.strftime('%Y-%m-%d %H:%M:%S')}`\n"
                 f"**Boost Level:** `{full_guild.premium_tier}`\n"
