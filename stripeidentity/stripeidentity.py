@@ -159,6 +159,14 @@ class StripeIdentity(commands.Cog):
                     await self.config.pending_verification_sessions.clear_raw(str(user.id))
                     await interaction.response.send_message(f"You have declined the verification and have been banned from {ctx.guild.name}.", ephemeral=True)
                     await ctx.guild.ban(user, reason="User declined age verification")
+            modlog_channel = self.bot.get_channel(self.modlog_channel_id)
+            if modlog_channel:
+                modlog_embed = discord.Embed(
+                    title="Modlog: User Ban",
+                    description=f"**User:** {user} ({user.id})\n**Action:** Ban\n**Reason:** User declined age verification",
+                    color=discord.Color.red()
+                )
+                await modlog_channel.send(embed=modlog_embed)
             decline_button.callback = decline_verification
             view.add_item(decline_button)
             dm_message = await user.send(embed=dm_embed, view=view)
