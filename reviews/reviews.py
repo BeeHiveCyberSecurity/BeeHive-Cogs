@@ -95,10 +95,14 @@ class ReviewsCog(commands.Cog):
         def check(m):
             return m.author == ctx.author and m.channel == ctx.channel
 
-        embed = discord.Embed(description="Start by letting us know how your experience was...\n`Reply in chat with your review message`", color=discord.Color.from_str("#fffffe"))
+        embed = discord.Embed(description=f"### Leave a new review for {ctx.guild.name}\nReply in chat with your review message or type **`cancel`** to abandon the process.", color=discord.Color.from_str("#fffffe"))
         await ctx.send(embed=embed)
         try:
             msg = await self.bot.wait_for('message', check=check, timeout=120.0)
+            if msg.content.lower() == 'cancel':
+                embed = discord.Embed(description="Review process has been canceled.", color=discord.Color(0xff4545))
+                await ctx.send(embed=embed)
+                return
         except asyncio.TimeoutError:
             embed = discord.Embed(description="You didn't describe an experience, timed out. Please try again.", color=discord.Color(0xff4545))
             await ctx.send(embed=embed)
