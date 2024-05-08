@@ -47,10 +47,10 @@ class Orchestrator(commands.Cog):
                 self.embeds = embeds
                 self.guild_ids = guild_ids
                 self.current_page = 0
+                self.invite_button = Button(emoji="🔗", label="Generate invite", style=discord.ButtonStyle.secondary, row=1, custom_id="invite_btn")
                 self.leave_button = Button(emoji="🗑️", label="Leave server", style=discord.ButtonStyle.danger, row=1, custom_id="leave_btn")
                 self.previous_button = Button(label="Previous", style=discord.ButtonStyle.primary, row=2, custom_id="previous_btn")
                 self.next_button = Button(label="Next", style=discord.ButtonStyle.primary, row=2, custom_id="next_btn")
-                self.invite_button = Button(label="Generate Invite", style=discord.ButtonStyle.secondary, row=1, custom_id="invite_btn")
                 self.add_item(self.previous_button)
                 self.add_item(self.next_button)
                 self.add_item(self.invite_button)
@@ -114,9 +114,9 @@ class Orchestrator(commands.Cog):
                     await interaction.response.send_message(f"Could not leave guild with ID: {guild_id}", ephemeral=True)
         
         paginator_view = PaginatorView(embeds, guild_ids)
-        paginator_view.previous_button.callback = paginator_view.previous_button_callback
-        paginator_view.next_button.callback = paginator_view.next_button_callback
         paginator_view.invite_button.callback = paginator_view.invite_button_callback
         paginator_view.leave_button.callback = paginator_view.leave_button_callback
+        paginator_view.previous_button.callback = paginator_view.previous_button_callback
+        paginator_view.next_button.callback = paginator_view.next_button_callback
         
         await ctx.send(embed=embeds[0], view=paginator_view)
