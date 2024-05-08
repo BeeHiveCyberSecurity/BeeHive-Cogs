@@ -148,11 +148,9 @@ class ReviewsCog(commands.Cog):
         try:
             with open(csv_file_path, "w", newline='', encoding='utf-8') as file:
                 writer = csv.writer(file)
-                writer.writerow(["ID", "Author", "Content", "Status", "Rating"])
+                writer.writerow(["ID", "Author ID", "Content", "Status", "Rating"])
                 for review_id, review in reviews.items():
-                    author_member = ctx.guild.get_member(review["author"])
-                    author_name = author_member.display_name if author_member else "Unknown"
-                    writer.writerow([review_id, author_name, review["content"], review["status"], review.get("rating", "Not rated")])
+                    writer.writerow([review_id, review["author"], review["content"], review["status"], review.get("rating", "Not rated")])
             await ctx.send(file=discord.File(csv_file_path))
         except PermissionError as e:
             await ctx.send("I do not have permission to write to the file system.")
