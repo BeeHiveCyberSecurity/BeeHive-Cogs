@@ -19,7 +19,7 @@ class Orchestrator(commands.Cog):
         pass
 
     @commands.hybrid_command(name="orchestrator", aliases=["botservers"])
-    @commands.is_owner()
+    @commands.is_bot_owner()
     async def orchestrator(self, ctx):
         """See and manage the servers that your bot instance is in."""
         await ctx.defer()
