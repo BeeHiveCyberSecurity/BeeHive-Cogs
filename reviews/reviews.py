@@ -150,7 +150,6 @@ class ReviewsCog(commands.Cog):
                             description=f"**Review by:** <@{review['author']}>\n\n**Rating:** {star_rating}\n\n**Review Content:**\n{review['content']}",
                             color=discord.Color.gold()
                         )
-                        )
                         embed.set_author(name=str(ctx.author), icon_url=ctx.author.display_avatar.url)
                         embed.set_footer(text=f"User ID: {ctx.author.id}")
                         embed.set_thumbnail(url=ctx.guild.icon.url if ctx.guild.icon else discord.Embed.Empty)
