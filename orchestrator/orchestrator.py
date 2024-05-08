@@ -56,7 +56,7 @@ class Orchestrator(commands.Cog):
             embeds.append(embed)
             guild_ids.append(guild.id)
         
-        if not embeds:
+        if not guilds_sorted:
             return await ctx.send("No guilds available.")
         
         # Paginator view with buttons
