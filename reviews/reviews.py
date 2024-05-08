@@ -162,7 +162,12 @@ class ReviewsCog(commands.Cog):
 
         for review_id, review in reviews.items():
             status = "Approved" if review["status"] == "approved" else "Pending"
-            embed = discord.Embed(description=f"ID: {review_id} - Status: {status}\nContent: {review['content'][:100]}... Rating: {review.get('rating', 'Not rated')}", color=discord.Color.blue())
+            embed = discord.Embed(title=f"Review ID: {review_id}", color=discord.Color.blue())
+            embed.add_field(name="Status", value=status, inline=False)
+            content_preview = review['content'][:100] + "..." if len(review['content']) > 100 else review['content']
+            embed.add_field(name="Content", value=content_preview, inline=False)
+            rating = review.get('rating', 'Not rated')
+            embed.add_field(name="Rating", value=rating, inline=False)
             await ctx.send(embed=embed)
 
 def setup(bot):
