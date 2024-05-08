@@ -31,7 +31,7 @@ class Orchestrator(commands.Cog):
         for guild in guilds_sorted:
             # Set the embed color to #fffffe as instructed
             embed_color = discord.Color.from_rgb(255, 255, 254)
-            embed = discord.Embed(title=guild.name, description=f"Members: {guild.approximate_member_count}\nActive: {guild.approximate_presence_count}", color=embed_color)
+            embed = discord.Embed(title=guild.name, description=f"**Members** `{guild.approximate_member_count}`\n**Active** `{guild.approximate_presence_count}`", color=embed_color)
             embed.set_thumbnail(url=guild.icon.url if guild.icon else None)
             embed.add_field(name="Guild ID", value=guild.id)
             embeds.append(embed)
