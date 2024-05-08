@@ -147,8 +147,9 @@ class ReviewsCog(commands.Cog):
                         star_rating = "⭐" * review['rating'] if review['rating'] else "No rating"
                         embed = discord.Embed(
                             title="Member Review",
-                            description=f"**Review by:** {ctx.author.mention}\n\n**Rating:** {star_rating}\n\n**Review Content:**\n{review['content']}",
+                            description=f"**Review by:** <@{review['author']}>\n\n**Rating:** {star_rating}\n\n**Review Content:**\n{review['content']}",
                             color=discord.Color.gold()
+                        )
                         )
                         embed.set_author(name=str(ctx.author), icon_url=ctx.author.display_avatar.url)
                         embed.set_footer(text=f"User ID: {ctx.author.id}")
