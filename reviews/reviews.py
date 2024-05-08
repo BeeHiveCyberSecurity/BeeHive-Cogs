@@ -30,9 +30,11 @@ class ReviewsCog(commands.Cog):
             review = reviews.get(str(review_id))
             if review:
                 review['rating'] = rating
-                await interaction.response.send_message(f"Thank you for rating the review {rating} stars!", ephemeral=True)
+                embed = discord.Embed(description=f"Thank you for rating the review {rating} stars!", color=discord.Color.green())
+                await interaction.response.send_message(embed=embed, ephemeral=True)
             else:
-                await interaction.response.send_message("Review not found.", ephemeral=True)
+                embed = discord.Embed(description="Review not found.", color=discord.Color.red())
+                await interaction.response.send_message(embed=embed, ephemeral=True)
 
     @commands.guild_only()
     @commands.group(invoke_without_command=True)
@@ -47,11 +49,13 @@ class ReviewsCog(commands.Cog):
         def check(m):
             return m.author == ctx.author and m.channel == ctx.channel
 
-        await ctx.send("Please enter your review text:")
+        embed = discord.Embed(description="Please enter your review text:", color=discord.Color.blue())
+        await ctx.send(embed=embed)
         try:
             msg = await self.bot.wait_for('message', check=check, timeout=120.0)
         except asyncio.TimeoutError:
-            await ctx.send("You didn't enter any review. Please try again.")
+            embed = discord.Embed(description="You didn't enter any review. Please try again.", color=discord.Color.red())
+            await ctx.send(embed=embed)
             return
 
         content = msg.content
@@ -67,7 +71,8 @@ class ReviewsCog(commands.Cog):
                 item.review_id = review_id  # Assign the review ID to each button
 
         await self.config.guild(ctx.guild).next_id.set(review_id + 1)
-        await ctx.send("Please rate your review from 1 to 5 stars:", view=view)
+        embed = discord.Embed(description="Please rate your review from 1 to 5 stars:", color=discord.Color.blue())
+        await ctx.send(embed=embed, view=view)
 
     @review.command(name="approve")
     @commands.has_permissions(manage_guild=True)
@@ -77,20 +82,24 @@ class ReviewsCog(commands.Cog):
             review = reviews.get(str(review_id))
             if review and review["status"] == "pending":
                 review["status"] = "approved"
-                await ctx.send("The review has been approved.")
+                embed = discord.Embed(description="The review has been approved.", color=discord.Color.green())
+                await ctx.send(embed=embed)
                 review_channel_id = await self.config.guild(ctx.guild).review_channel()
                 if review_channel_id:
                     review_channel = self.bot.get_channel(review_channel_id)
                     if review_channel:
-                        embed = discord.Embed(description=f"{review['content']}\nRating: {review['rating']} stars")
+                        embed = discord.Embed(description=f"{review['content']}\nRating: {review['rating']} stars", color=discord.Color.blue())
                         embed.set_author(name=ctx.guild.get_member(review["author"]), icon_url=ctx.guild.get_member(review["author"]).avatar_url)
                         await review_channel.send(embed=embed)
                     else:
-                        await ctx.send("Review channel not found.")
+                        embed = discord.Embed(description="Review channel not found.", color=discord.Color.red())
+                        await ctx.send(embed=embed)
                 else:
-                    await ctx.send("Review channel not set.")
+                    embed = discord.Embed(description="Review channel not set.", color=discord.Color.red())
+                    await ctx.send(embed=embed)
             else:
-                await ctx.send("This review has already been handled or does not exist.")
+                embed = discord.Embed(description="This review has already been handled or does not exist.", color=discord.Color.red())
+                await ctx.send(embed=embed)
 
     @review.command(name="remove")
     @commands.has_permissions(manage_guild=True)
@@ -99,9 +108,11 @@ class ReviewsCog(commands.Cog):
         async with self.config.guild(ctx.guild).reviews() as reviews:
             if str(review_id) in reviews:
                 del reviews[str(review_id)]
-                await ctx.send("The review has been removed.")
+                embed = discord.Embed(description="The review has been removed.", color=discord.Color.green())
+                await ctx.send(embed=embed)
             else:
-                await ctx.send("Review not found.")
+                embed = discord.Embed(description="Review not found.", color=discord.Color.red())
+                await ctx.send(embed=embed)
 
     @review.command(name="export")
     @commands.has_permissions(manage_guild=True)
@@ -120,7 +131,8 @@ class ReviewsCog(commands.Cog):
     async def review_setchannel(self, ctx, channel: discord.TextChannel):
         """Set the channel where approved reviews will be posted."""
         await self.config.guild(ctx.guild).review_channel.set(channel.id)
-        await ctx.send(f"Review channel has been set to {channel.mention}.")
+        embed = discord.Embed(description=f"Review channel has been set to {channel.mention}.", color=discord.Color.green())
+        await ctx.send(embed=embed)
 
     @review.command(name="list")
     @commands.has_permissions(manage_guild=True)
@@ -128,12 +140,14 @@ class ReviewsCog(commands.Cog):
         """List all reviews."""
         reviews = await self.config.guild(ctx.guild).reviews()
         if not reviews:
-            await ctx.send("There are no reviews to list.")
+            embed = discord.Embed(description="There are no reviews to list.", color=discord.Color.red())
+            await ctx.send(embed=embed)
             return
 
         for review_id, review in reviews.items():
             status = "Approved" if review["status"] == "approved" else "Pending"
-            await ctx.send(f"ID: {review_id} - Status: {status}\nContent: {review['content'][:100]}... Rating: {review.get('rating', 'Not rated')}")
+            embed = discord.Embed(description=f"ID: {review_id} - Status: {status}\nContent: {review['content'][:100]}... Rating: {review.get('rating', 'Not rated')}", color=discord.Color.blue())
+            await ctx.send(embed=embed)
 
 def setup(bot):
     bot.add_cog(ReviewsCog(bot))
