@@ -2,6 +2,7 @@ import csv
 import os
 import discord
 import asyncio  # Added to handle the asyncio.TimeoutError
+import tempfile
 from redbot.core import commands, Config
 from discord.ui import Button, View
 
