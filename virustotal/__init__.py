@@ -1,4 +1,4 @@
-from redbot.core.bot import Red
+from redbot.core.bot import Red #type: ignore
 
 from .virustotal import VirusTotal
 

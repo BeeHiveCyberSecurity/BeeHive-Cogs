@@ -1,16 +1,16 @@
 import csv
 import os
-import discord
-import asyncio  # Added to handle the asyncio.TimeoutError
+import discord  #type: ignore
+import asyncio  #type: ignore
 import tempfile
 import datetime
-from reportlab.lib.pagesizes import letter
-from reportlab.pdfgen import canvas
-from reportlab.lib import colors
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak, Table, TableStyle
-from redbot.core import commands, Config
-from discord.ui import Button, View
+from reportlab.lib.pagesizes import letter #type: ignore
+from reportlab.pdfgen import canvas #type: ignore 
+from reportlab.lib import colors#type: ignore
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle #type: ignore
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak, Table, TableStyle #type: ignore
+from redbot.core import commands, Config #type: ignore
+from discord.ui import Button, View #type: ignore
 
 class ReviewButton(discord.ui.Button):
     def __init__(self, label, review_id, style=discord.ButtonStyle.primary):
