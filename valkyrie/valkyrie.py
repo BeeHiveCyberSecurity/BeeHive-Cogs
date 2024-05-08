@@ -1,13 +1,12 @@
 import discord
 from discord.ext import commands
 import aiohttp
-import asyncio
 
 class ValkyrieCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.valkyrie_url = "https://valkyrie.comodo.com/api/"
-        self.api_key = self.bot.get_shared_api_tokens("valkyrie")
+        self.api_key = self.bot.get_shared_api_tokens("valkyrie")["api_key"]
 
     @commands.command(name="checkfile")
     async def check_file(self, ctx, *, message: discord.Message = None):
@@ -47,4 +46,3 @@ class ValkyrieCog(commands.Cog):
 
 def setup(bot):
     bot.add_cog(ValkyrieCog(bot))
-
