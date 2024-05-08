@@ -56,7 +56,7 @@ class ReviewsCog(commands.Cog):
             embed = discord.Embed(
                 title="Review Options",
                 description="Would you like to submit a review or get help with the review commands?",
-                color=discord.Color.blue()
+                color=discord.Color.from_str("#fffffe")
             )
             view = View(timeout=180)  # Set a timeout for the view
 
@@ -96,7 +96,7 @@ class ReviewsCog(commands.Cog):
         def check(m):
             return m.author == ctx.author and m.channel == ctx.channel
 
-        embed = discord.Embed(description="Start by letting us know how your experience was...\n`Reply in chat with your review message`", color=discord.Color.blue())
+        embed = discord.Embed(description="Start by letting us know how your experience was...\n`Reply in chat with your review message`", color=discord.Color.from_str("#fffffe"))
         await ctx.send(embed=embed)
         try:
             msg = await self.bot.wait_for('message', check=check, timeout=120.0)
@@ -120,7 +120,7 @@ class ReviewsCog(commands.Cog):
             view.add_item(button)
         view.cog = self  # Assign the cog reference to the view for callback access
 
-        embed = discord.Embed(description="Please rate your experience from 1 to 5 stars:", color=discord.Color.blue())
+        embed = discord.Embed(description="Please rate your experience from 1 to 5 stars:", color=discord.Color.from_str("#fffffe"))
         message = await ctx.send(embed=embed, view=view)
         await view.wait()  # Wait for the interaction to be completed
 
@@ -254,7 +254,7 @@ class ReviewsCog(commands.Cog):
 
         for review_id, review in reviews.items():
             status = "Approved" if review["status"] == "approved" else "Pending"
-            embed = discord.Embed(title=f"Review ID: {review_id}", color=discord.Color.blue())
+            embed = discord.Embed(title=f"Review ID: {review_id}", color=discord.Color.from_str("#fffffe"))
             embed.add_field(name="Status", value=status, inline=False)
             content_preview = review['content'][:100] + "..." if len(review['content']) > 100 else review['content']
             embed.add_field(name="Content", value=content_preview, inline=False)
