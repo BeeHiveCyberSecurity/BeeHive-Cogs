@@ -38,7 +38,8 @@ class ReviewsCog(commands.Cog):
     @commands.group()
     async def review(self, ctx):
         """Review commands."""
-        pass
+        if ctx.invoked_subcommand is None:
+            await ctx.send_help(str(ctx.command))
 
     @review.command(name="submit")
     async def review_submit(self, ctx):
@@ -47,7 +48,12 @@ class ReviewsCog(commands.Cog):
             return m.author == ctx.author and m.channel == ctx.channel
 
         await ctx.send("Please enter your review text:")
-        msg = await self.bot.wait_for('message', check=check)
+        try:
+            msg = await self.bot.wait_for('message', check=check, timeout=120.0)
+        except asyncio.TimeoutError:
+            await ctx.send("You didn't enter any review. Please try again.")
+            return
+
         content = msg.content
 
         view = View(timeout=None)
@@ -121,6 +127,10 @@ class ReviewsCog(commands.Cog):
     async def review_list(self, ctx):
         """List all reviews."""
         reviews = await self.config.guild(ctx.guild).reviews()
+        if not reviews:
+            await ctx.send("There are no reviews to list.")
+            return
+
         for review_id, review in reviews.items():
             status = "Approved" if review["status"] == "approved" else "Pending"
             await ctx.send(f"ID: {review_id} - Status: {status}\nContent: {review['content'][:100]}... Rating: {review.get('rating', 'Not rated')}")
