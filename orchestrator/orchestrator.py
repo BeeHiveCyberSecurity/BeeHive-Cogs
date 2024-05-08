@@ -161,5 +161,7 @@ class Orchestrator(commands.Cog):
         paginator_view.previous_button.callback = paginator_view.previous_button_callback
         paginator_view.next_button.callback = paginator_view.next_button_callback
         
-        await ctx.send(embed=embeds[0], view=paginator_view)
-
+        if embeds:
+            await ctx.send(embed=embeds[0], view=paginator_view)
+        else:
+            await ctx.send("No embeds available.", view=paginator_view)
