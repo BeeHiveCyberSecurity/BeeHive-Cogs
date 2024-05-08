@@ -44,7 +44,9 @@ class Orchestrator(commands.Cog):
                 except discord.Forbidden:
                     # Bot does not have permissions to read message history in this channel
                     pass
-            activity_score = messages_past_week / len(full_guild.members) if full_guild.members else 0  # Messages per member
+            # Check if there are members in the guild to avoid division by zero
+            member_count = len(full_guild.members) if full_guild.members else 1
+            activity_score = messages_past_week / member_count  # Messages per member
 
             # Determine activity level based on the score
             if activity_score > 1:
