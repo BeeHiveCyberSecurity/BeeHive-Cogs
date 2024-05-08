@@ -58,8 +58,11 @@ class Orchestrator(commands.Cog):
                 activity_level = "Low"
 
             embed_color = discord.Color.from_rgb(255, 255, 254)
+            # Fetch the full member list to get an accurate count
+            full_member_list = await full_guild.query_members(limit=None)
+            accurate_member_count = len(full_member_list)
             embed_description = (
-                f"**Members:** `{full_guild.member_count}`\n"
+                f"**Members:** `{accurate_member_count}`\n"
                 f"**Owner:** `{guild_owner}`\n"
                 f"**Created At:** `{full_guild.created_at.strftime('%Y-%m-%d %H:%M:%S')}`\n"
                 f"**Boost Level:** `{full_guild.premium_tier}`\n"
