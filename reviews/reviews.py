@@ -123,7 +123,7 @@ class ReviewsCog(commands.Cog):
             view.add_item(button)
         view.cog = self  # Assign the cog reference to the view for callback access
 
-        embed = discord.Embed(description="Please rate your experience from 1 to 5 stars:", color=discord.Color.from_str("#fffffe"))
+        embed = discord.Embed(description="Please rate your experience from 1 to 5 stars, where...\n\n**1 star** indicates **poor* customer service, product quality, or overall experience\nand\n**5 stars** indicates an **excellent** experience, **high** product quality, or **extremely helpful** customer service.", color=discord.Color.from_str("#fffffe"))
         message = await ctx.send(embed=embed, view=view)
         await view.wait()  # Wait for the interaction to be completed
 
