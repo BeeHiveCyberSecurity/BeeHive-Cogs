@@ -19,17 +19,17 @@ class Orchestrator(commands.Cog):
     async def red_delete_data_for_user(self, *, requester, user_id: int) -> None:
         pass
 
-    @commands.hybrid_command(name="orchestrator", aliases=["botservers"])
+    @commands.hybrid_command(name="orchestrator")
     @commands.is_owner()
     async def orchestrator(self, ctx):
         """See and manage the servers that your bot instance is in."""
         await ctx.defer()
         guilds = [guild async for guild in self.bot.fetch_guilds(limit=None)]
-        # No need to filter out guilds as we want to list all guilds the bot is in
+        if not guilds:
+            return await ctx.send("No guilds available.")
+
         # Ensure that member_count is not None before sorting
         guilds_sorted = sorted((guild for guild in guilds if guild.member_count is not None), key=lambda x: x.member_count, reverse=True)
-        if not guilds_sorted:
-            return await ctx.send("No guilds available.")
 
         embeds = []
         guild_ids = []
@@ -162,3 +162,4 @@ class Orchestrator(commands.Cog):
         paginator_view.next_button.callback = paginator_view.next_button_callback
         
         await ctx.send(embed=embeds[0], view=paginator_view)
+
