@@ -53,7 +53,7 @@ class ReviewsCog(commands.Cog):
         def check(m):
             return m.author == ctx.author and m.channel == ctx.channel
 
-        embed = discord.Embed(description="Please enter your review text:", color=discord.Color.blue())
+        embed = discord.Embed(description="Provide me your review or experience first:", color=discord.Color.blue())
         await ctx.send(embed=embed)
         try:
             msg = await self.bot.wait_for('message', check=check, timeout=120.0)
@@ -76,7 +76,7 @@ class ReviewsCog(commands.Cog):
             view.add_item(button)
         view.cog = self  # Assign the cog reference to the view for callback access
 
-        embed = discord.Embed(description="Please rate your review from 1 to 5 stars:", color=discord.Color.blue())
+        embed = discord.Embed(description="Please rate your experience from 1 to 5 stars:", color=discord.Color.blue())
         message = await ctx.send(embed=embed, view=view)
         await view.wait()  # Wait for the interaction to be completed
 
@@ -104,7 +104,7 @@ class ReviewsCog(commands.Cog):
                         embed = discord.Embed(description=f"{review['content']}\nRating: {review['rating']} stars", color=discord.Color.blue())
                         author_member = ctx.guild.get_member(review["author"])
                         if author_member:
-                            embed.set_author(name=author_member, icon_url=author_member.avatar_url)
+                            embed.set_author(name=str(author_member), icon_url=author_member.display_avatar.url)
                         await review_channel.send(embed=embed)
                     else:
                         embed = discord.Embed(description="Review channel not found.", color=discord.Color.red())
