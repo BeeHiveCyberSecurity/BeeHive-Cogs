@@ -37,8 +37,14 @@ class Orchestrator(commands.Cog):
             guild_owner = await self.bot.fetch_user(guild.owner_id) if guild.owner_id else 'Unknown'
             # Calculate activity score based on message count in the past week
             one_week_ago = datetime.utcnow() - timedelta(days=7)
-            messages_past_week = sum(1 for message in await full_guild.history(after=one_week_ago).flatten())
-            activity_score = messages_past_week / len(full_guild.members)  # Messages per member
+            messages_past_week = 0  # Initialize message count
+            for channel in full_guild.text_channels:
+                try:
+                    messages_past_week += sum(1 async for _ in channel.history(after=one_week_ago))
+                except discord.Forbidden:
+                    # Bot does not have permissions to read message history in this channel
+                    pass
+            activity_score = messages_past_week / len(full_guild.members) if full_guild.members else 0  # Messages per member
 
             # Determine activity level based on the score
             if activity_score > 1:
