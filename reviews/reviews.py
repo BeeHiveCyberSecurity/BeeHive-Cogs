@@ -218,7 +218,7 @@ class ReviewsCog(commands.Cog):
                 t.setStyle(TableStyle([
                     ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
                     ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-                    ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                    ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
                     # Use the standard font name here as well
                     ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
                     ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
