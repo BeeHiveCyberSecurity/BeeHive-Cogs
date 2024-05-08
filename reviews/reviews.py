@@ -53,12 +53,12 @@ class ReviewsCog(commands.Cog):
         def check(m):
             return m.author == ctx.author and m.channel == ctx.channel
 
-        embed = discord.Embed(description="Provide me your review or experience first:", color=discord.Color.blue())
+        embed = discord.Embed(description="Start by letting us know how your experience was...\n`Reply in chat with your review message`", color=discord.Color.blue())
         await ctx.send(embed=embed)
         try:
             msg = await self.bot.wait_for('message', check=check, timeout=120.0)
         except asyncio.TimeoutError:
-            embed = discord.Embed(description="You didn't enter any review. Please try again.", color=discord.Color.red())
+            embed = discord.Embed(description="You didn't describe an experience, timed out. Please try again.", color=discord.Color.red())
             await ctx.send(embed=embed)
             return
 
