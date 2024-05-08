@@ -4,6 +4,11 @@ import discord
 import asyncio  # Added to handle the asyncio.TimeoutError
 import tempfile
 import datetime
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak, Table, TableStyle
 from redbot.core import commands, Config
 from discord.ui import Button, View
 
@@ -116,13 +121,13 @@ class ReviewsCog(commands.Cog):
                         embed.timestamp = datetime.datetime.utcnow()
                         await review_channel.send(embed=embed)
                     else:
-                        embed = discord.Embed(description="Review channel not found.", color=discord.Color.red())
+                        embed = discord.Embed(description=":x: **Review channel not found.**", color=discord.Color.red())
                         await ctx.send(embed=embed)
                 else:
-                    embed = discord.Embed(description="Review channel not set.", color=discord.Color.red())
+                    embed = discord.Embed(description=":x: **Review channel not set.**", color=discord.Color.red())
                     await ctx.send(embed=embed)
             else:
-                embed = discord.Embed(description="This review has already been handled or does not exist.", color=discord.Color.red())
+                embed = discord.Embed(description=":x: **This review has already been handled or does not exist.**", color=discord.Color.red())
                 await ctx.send(embed=embed)
 
     @review.command(name="remove")
@@ -140,23 +145,56 @@ class ReviewsCog(commands.Cog):
 
     @review.command(name="export")
     @commands.has_permissions(manage_guild=True)
-    async def review_export(self, ctx):
-        """Export reviews to a CSV file."""
+    async def review_export(self, ctx, file_format: str):
+        """Export reviews to a CSV or PDF file."""
+        if file_format.lower() not in ["csv", "pdf"]:
+            await ctx.send("Please specify the file format as either 'csv' or 'pdf'.")
+            return
+
         reviews = await self.config.guild(ctx.guild).reviews()
-        csv_filename = f"reviews_{ctx.guild.id}.csv"
-        csv_file_path = os.path.join(tempfile.gettempdir(), csv_filename)
+        file_name = f"reviews_{ctx.guild.id}.{file_format.lower()}"
+        file_path = os.path.join(tempfile.gettempdir(), file_name)
+
         try:
-            with open(csv_file_path, "w", newline='', encoding='utf-8') as file:
-                writer = csv.writer(file)
-                writer.writerow(["ID", "Author ID", "Content", "Status", "Rating"])
+            if file_format.lower() == "csv":
+                with open(file_path, "w", newline='', encoding='utf-8') as file:
+                    writer = csv.writer(file)
+                    writer.writerow(["ID", "Author ID", "Content", "Status", "Rating"])
+                    for review_id, review in reviews.items():
+                        writer.writerow([review_id, review["author"], review["content"], review["status"], review.get("rating", "Not rated")])
+                await ctx.send(file=discord.File(file_path))
+            elif file_format.lower() == "pdf":
+
+                doc = SimpleDocTemplate(file_path, pagesize=letter)
+                styles = getSampleStyleSheet()
+                styles.add(ParagraphStyle(name='InterTight', fontName='Inter-Tight', fontSize=12, leading=14))
+                flowables = []
+
+                flowables.append(Paragraph("Guild Reviews", styles['InterTight']))
+                flowables.append(Spacer(1, 12))
+
+                data = [["ID", "Author ID", "Content", "Status", "Rating"]]
                 for review_id, review in reviews.items():
-                    writer.writerow([review_id, review["author"], review["content"], review["status"], review.get("rating", "Not rated")])
-            await ctx.send(file=discord.File(csv_file_path))
+                    data.append([review_id, review["author"], review["content"], review["status"], review.get("rating", "Not rated")])
+
+                t = Table(data)
+                t.setStyle(TableStyle([
+                    ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                    ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                    ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                    ('FONTNAME', (0, 0), (-1, -1), 'Inter-Tight'),
+                    ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                    ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                ]))
+                flowables.append(t)
+
+                doc.build(flowables)
+                await ctx.send(file=discord.File(file_path))
         except PermissionError as e:
             await ctx.send("I do not have permission to write to the file system.")
         finally:
-            if os.path.exists(csv_file_path):
-                os.remove(csv_file_path)
+            if os.path.exists(file_path):
+                os.remove(file_path)
 
     @review.command(name="setchannel")
     @commands.has_permissions(manage_guild=True)
