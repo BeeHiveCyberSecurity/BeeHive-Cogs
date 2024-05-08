@@ -36,15 +36,19 @@ class Orchestrator(commands.Cog):
                 f"**Owner:** <@{guild.owner_id}>\n"
                 f"**Created At:** `{guild.created_at.strftime('%Y-%m-%d %H:%M:%S')}`\n"
                 f"**Boost Level:** `{guild.premium_tier}`\n"
-                f"**Boosts:** `{guild.premium_subscription_count}`"
+                f"**Boosts:** `{guild.premium_subscription_count}`\n"
+                f"**Features:** `{', '.join(guild.features) if guild.features else 'None'}`"
             )
             embed = discord.Embed(title=guild.name, description=embed_description, color=embed_color)
             embed.set_thumbnail(url=guild.icon.url if guild.icon else None)
-            embed.add_field(name="Guild ID", value=guild.id)
-            embed.add_field(name="Region", value=str(guild.region))
+            embed.add_field(name="Guild ID", value=str(guild.id))
             embed.add_field(name="Verification Level", value=str(guild.verification_level))
             embed.add_field(name="Explicit Content Filter", value=str(guild.explicit_content_filter))
             embed.add_field(name="Default Notifications", value=str(guild.default_notifications))
+            embed.add_field(name="Number of Roles", value=str(len(guild.roles)))
+            embed.add_field(name="Number of Emojis", value=str(len(guild.emojis)))
+            embed.add_field(name="Number of Text Channels", value=str(len(guild.text_channels)))
+            embed.add_field(name="Number of Voice Channels", value=str(len(guild.voice_channels)))
             embeds.append(embed)
             guild_ids.append(guild.id)
         
