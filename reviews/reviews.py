@@ -53,7 +53,33 @@ class ReviewsCog(commands.Cog):
     async def review(self, ctx):
         """Review commands."""
         if ctx.invoked_subcommand is None:
-            await ctx.send_help(str(ctx.command))
+            embed = discord.Embed(
+                title="Review Options",
+                description="Would you like to submit a review or get help with the review commands?",
+                color=discord.Color.blue()
+            )
+            view = View()
+
+            submit_button = Button(label="Submit Review", style=discord.ButtonStyle.primary)
+            help_button = Button(label="Get Help", style=discord.ButtonStyle.secondary)
+
+            async def submit_button_callback(interaction):
+                if interaction.user != ctx.author:
+                    return
+                await self.review_submit.callback(self, ctx)
+
+            async def help_button_callback(interaction):
+                if interaction.user != ctx.author:
+                    return
+                await ctx.send_help(str(ctx.command))
+
+            submit_button.callback = submit_button_callback
+            help_button.callback = help_button_callback
+
+            view.add_item(submit_button)
+            view.add_item(help_button)
+
+            await ctx.send(embed=embed, view=view)
 
     @review.command(name="submit")
     async def review_submit(self, ctx):
