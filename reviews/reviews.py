@@ -58,20 +58,24 @@ class ReviewsCog(commands.Cog):
                 description="Would you like to submit a review or get help with the review commands?",
                 color=discord.Color.blue()
             )
-            view = View()
+            view = View(timeout=180)  # Set a timeout for the view
 
             submit_button = Button(label="Submit Review", style=discord.ButtonStyle.primary)
             help_button = Button(label="Get Help", style=discord.ButtonStyle.secondary)
 
             async def submit_button_callback(interaction):
                 if interaction.user != ctx.author:
+                    await interaction.response.send_message("You are not allowed to interact with this button.", ephemeral=True)
                     return
                 await self.review_submit.callback(self, ctx)
+                await interaction.response.defer()
 
             async def help_button_callback(interaction):
                 if interaction.user != ctx.author:
+                    await interaction.response.send_message("You are not allowed to interact with this button.", ephemeral=True)
                     return
                 await ctx.send_help(str(ctx.command))
+                await interaction.response.defer()
 
             submit_button.callback = submit_button_callback
             help_button.callback = help_button_callback
@@ -79,7 +83,12 @@ class ReviewsCog(commands.Cog):
             view.add_item(submit_button)
             view.add_item(help_button)
 
-            await ctx.send(embed=embed, view=view)
+            message = await ctx.send(embed=embed, view=view)
+
+            await view.wait()  # Wait for the interaction to be completed
+
+            if view.is_finished():
+                await message.edit(view=None)  # Remove the buttons after the interaction is done
 
     @review.command(name="submit")
     async def review_submit(self, ctx):
