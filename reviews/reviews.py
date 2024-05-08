@@ -1,5 +1,6 @@
 import csv
 import discord
+import asyncio  # Added to handle the asyncio.TimeoutError
 from redbot.core import commands, Config
 from discord.ui import Button, View
 
@@ -10,7 +11,10 @@ class ReviewButton(discord.ui.Button):
 
     async def callback(self, interaction):
         cog = self.view.cog
-        await cog.rate_review(interaction, self.review_id, int(self.label[0]))
+        try:
+            await cog.rate_review(interaction, self.review_id, int(self.label[0]))
+        except Exception as e:
+            await interaction.response.send_message(f"An error occurred: {e}", ephemeral=True)
 
 class ReviewsCog(commands.Cog):
     """A cog for managing product or service reviews."""
@@ -89,7 +93,9 @@ class ReviewsCog(commands.Cog):
                     review_channel = self.bot.get_channel(review_channel_id)
                     if review_channel:
                         embed = discord.Embed(description=f"{review['content']}\nRating: {review['rating']} stars", color=discord.Color.blue())
-                        embed.set_author(name=ctx.guild.get_member(review["author"]), icon_url=ctx.guild.get_member(review["author"]).avatar_url)
+                        author_member = ctx.guild.get_member(review["author"])
+                        if author_member:
+                            embed.set_author(name=author_member, icon_url=author_member.avatar_url)
                         await review_channel.send(embed=embed)
                     else:
                         embed = discord.Embed(description="Review channel not found.", color=discord.Color.red())
@@ -123,7 +129,8 @@ class ReviewsCog(commands.Cog):
             writer = csv.writer(file)
             writer.writerow(["ID", "Author", "Content", "Status", "Rating"])
             for review_id, review in reviews.items():
-                writer.writerow([review_id, ctx.guild.get_member(review["author"]), review["content"], review["status"], review.get("rating", "Not rated")])
+                author_member = ctx.guild.get_member(review["author"])
+                writer.writerow([review_id, author_member, review["content"], review["status"], review.get("rating", "Not rated")])
         await ctx.send(file=discord.File(f"reviews_{ctx.guild.id}.csv"))
 
     @review.command(name="setchannel")
