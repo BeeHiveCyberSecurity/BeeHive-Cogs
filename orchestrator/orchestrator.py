@@ -42,22 +42,31 @@ class Orchestrator(commands.Cog):
                 super().__init__()
                 self.embeds = embeds
                 self.current_page = 0
-                self.add_item(Button(label="Previous", style=discord.ButtonStyle.primary, custom_id="previous_btn"))
-                self.add_item(Button(label="Next", style=discord.ButtonStyle.primary, custom_id="next_btn"))
+                self.previous_button = Button(label="Previous", style=discord.ButtonStyle.primary, custom_id="previous_btn")
+                self.next_button = Button(label="Next", style=discord.ButtonStyle.primary, custom_id="next_btn")
+                self.add_item(self.previous_button)
+                self.add_item(self.next_button)
             
             async def interaction_check(self, interaction):
                 return interaction.user == ctx.author
             
-            @discord.ui.button(label="Previous", style=discord.ButtonStyle.primary, custom_id="previous_btn")
-            async def previous_button_callback(self, button, interaction):
+            async def on_timeout(self):
+                self.previous_button.disabled = True
+                self.next_button.disabled = True
+                self.stop()
+
+            async def previous_button_callback(self, interaction):
                 if self.current_page > 0:
                     self.current_page -= 1
                     await interaction.response.edit_message(embed=self.embeds[self.current_page], view=self)
             
-            @discord.ui.button(label="Next", style=discord.ButtonStyle.primary, custom_id="next_btn")
-            async def next_button_callback(self, button, interaction):
+            async def next_button_callback(self, interaction):
                 if self.current_page < len(self.embeds) - 1:
                     self.current_page += 1
                     await interaction.response.edit_message(embed=self.embeds[self.current_page], view=self)
         
-        await ctx.send(embed=embeds[0], view=PaginatorView(embeds))
+        paginator_view = PaginatorView(embeds)
+        paginator_view.previous_button.callback = paginator_view.previous_button_callback
+        paginator_view.next_button.callback = paginator_view.next_button_callback
+        
+        await ctx.send(embed=embeds[0], view=paginator_view)
