@@ -28,6 +28,9 @@ class Orchestrator(commands.Cog):
         guilds_filtered = [guild for guild in guilds if guild.member_count is not None]
         guilds_sorted = sorted(guilds_filtered, key=lambda x: x.member_count, reverse=True)
         
+        if not guilds_sorted:
+            return await ctx.send("No guilds available.")
+
         embeds = []
         guild_ids = []
         for guild in guilds_sorted:
@@ -55,9 +58,6 @@ class Orchestrator(commands.Cog):
             embed.add_field(name="Number of Voice Channels", value=str(len(guild.voice_channels)))
             embeds.append(embed)
             guild_ids.append(guild.id)
-        
-        if not guilds_sorted:
-            return await ctx.send("No guilds available.")
         
         # Paginator view with buttons
         class PaginatorView(View):
