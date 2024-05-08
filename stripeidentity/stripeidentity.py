@@ -249,13 +249,14 @@ class StripeIdentity(commands.Cog):
             )
             await self.config.pending_verification_sessions.set_raw(user.id, value=verification_session.id)
             dm_embed = discord.Embed(
-                title="Identity verification required",
+                title="Identity Verification Required",
                 description=(
                     f"Hello {user.mention},\n\n"
-                    "Enhancing user safety bilaterally on Discord is a priority within our services and communities. "
-                    "As part of our ongoing safety and security operations, your account has been selected to verify your human identity due to recent activity in one or more servers. "
-                    "\n\n"
-                    "You have 15 minutes to complete this process. If you do not complete verification, you will be removed from the server for safety."
+                    "To enhance safety within our Discord communities, we require a one-time verification of your identity. "
+                    "This process involves confirming your identity with a government-issued ID and biometric verification. "
+                    "**Please have one of the following documents ready**\n- State ID\n- Driver's License\n - Driver's Permit\n - Passport"
+                    "**Additionally**, be prepared to...\n- Provide a valid email address\n- Take a series of selfies in a well-lit space\n\n"
+                    "We allow 15 minutes to pass before this verification request times out. Failure to verify will result in removal from the server for safety reasons."
                 ),
                 color=discord.Color(0xff4545)
             )
