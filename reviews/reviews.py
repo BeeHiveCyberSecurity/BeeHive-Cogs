@@ -141,13 +141,22 @@ class ReviewsCog(commands.Cog):
     async def review_export(self, ctx):
         """Export reviews to a CSV file."""
         reviews = await self.config.guild(ctx.guild).reviews()
-        with open(f"reviews_{ctx.guild.id}.csv", "w", newline='', encoding='utf-8') as file:
-            writer = csv.writer(file)
-            writer.writerow(["ID", "Author", "Content", "Status", "Rating"])
-            for review_id, review in reviews.items():
-                author_member = ctx.guild.get_member(review["author"])
-                writer.writerow([review_id, author_member, review["content"], review["status"], review.get("rating", "Not rated")])
-        await ctx.send(file=discord.File(f"reviews_{ctx.guild.id}.csv"))
+        csv_filename = f"reviews_{ctx.guild.id}.csv"
+        csv_file_path = os.path.join(tempfile.gettempdir(), csv_filename)
+        try:
+            with open(csv_file_path, "w", newline='', encoding='utf-8') as file:
+                writer = csv.writer(file)
+                writer.writerow(["ID", "Author", "Content", "Status", "Rating"])
+                for review_id, review in reviews.items():
+                    author_member = ctx.guild.get_member(review["author"])
+                    author_name = author_member.display_name if author_member else "Unknown"
+                    writer.writerow([review_id, author_name, review["content"], review["status"], review.get("rating", "Not rated")])
+            await ctx.send(file=discord.File(csv_file_path))
+        except PermissionError as e:
+            await ctx.send("I do not have permission to write to the file system.")
+        finally:
+            if os.path.exists(csv_file_path):
+                os.remove(csv_file_path)
 
     @review.command(name="setchannel")
     @commands.has_permissions(manage_guild=True)
