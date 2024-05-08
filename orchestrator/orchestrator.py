@@ -33,7 +33,7 @@ class Orchestrator(commands.Cog):
             embed_description = (
                 f"**Members:** `{guild.approximate_member_count}`\n"
                 f"**Active:** `{guild.approximate_presence_count}`\n"
-                f"**Owner:** <@{guild.owner_id}>\n"
+                f"**Owner:** `{guild.owner_id if guild.owner_id else 'Unknown'}`\n"
                 f"**Created At:** `{guild.created_at.strftime('%Y-%m-%d %H:%M:%S')}`\n"
                 f"**Boost Level:** `{guild.premium_tier}`\n"
                 f"**Boosts:** `{guild.premium_subscription_count}`\n"
