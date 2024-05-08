@@ -30,10 +30,11 @@ class Orchestrator(commands.Cog):
         guild_ids = []
         for guild in guilds_sorted:
             embed_color = discord.Color.from_rgb(255, 255, 254)
+            guild_owner = await self.bot.fetch_user(guild.owner_id) if guild.owner_id else 'Unknown'
             embed_description = (
                 f"**Members:** `{guild.approximate_member_count}`\n"
                 f"**Active:** `{guild.approximate_presence_count}`\n"
-                f"**Owner:** `{guild.owner_id if guild.owner_id else 'Unknown'}`\n"
+                f"**Owner:** `{guild_owner}`\n"
                 f"**Created At:** `{guild.created_at.strftime('%Y-%m-%d %H:%M:%S')}`\n"
                 f"**Boost Level:** `{guild.premium_tier}`\n"
                 f"**Boosts:** `{guild.premium_subscription_count}`\n"
