@@ -1,4 +1,5 @@
 import csv
+import os
 import discord
 import asyncio  # Added to handle the asyncio.TimeoutError
 from redbot.core import commands, Config
