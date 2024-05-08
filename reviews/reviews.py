@@ -100,11 +100,11 @@ class ReviewsCog(commands.Cog):
         try:
             msg = await self.bot.wait_for('message', check=check, timeout=120.0)
             if msg.content.lower() == 'cancel':
-                embed = discord.Embed(description="Review process has been canceled.", color=discord.Color(0xff4545))
+                embed = discord.Embed(description=":x: **Review process has been canceled**", color=discord.Color(0xff4545))
                 await ctx.send(embed=embed)
                 return
         except asyncio.TimeoutError:
-            embed = discord.Embed(description="You didn't describe an experience, timed out. Please try again.", color=discord.Color(0xff4545))
+            embed = discord.Embed(description=":x: **Timed out, you took too long to reply**", color=discord.Color(0xff4545))
             await ctx.send(embed=embed)
             return
 
