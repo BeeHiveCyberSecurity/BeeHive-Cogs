@@ -60,7 +60,7 @@ class ReviewsCog(commands.Cog):
             )
             view = View(timeout=180)  # Set a timeout for the view
 
-            submit_button = Button(label=f"Add a review for {server.name}", style=discord.ButtonStyle.green)
+            submit_button = Button(label=f"Add a review for {ctx.guild.name}", style=discord.ButtonStyle.green)
             help_button = Button(label="Show available commands", style=discord.ButtonStyle.grey)
 
             async def submit_button_callback(interaction):
@@ -84,7 +84,6 @@ class ReviewsCog(commands.Cog):
             view.add_item(help_button)
 
             message = await ctx.send(embed=embed, view=view)
-
             await view.wait()  # Wait for the interaction to be completed
 
             if view.is_finished():
