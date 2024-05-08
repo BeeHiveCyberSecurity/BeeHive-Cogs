@@ -1,4 +1,5 @@
 from redbot.core import Config, app_commands, commands, checks
+from redbot.core.utils.menus import menu, DEFAULT_CONTROLS
 import discord
 
 class Orchestrator(commands.Cog):
@@ -40,6 +41,5 @@ class Orchestrator(commands.Cog):
         if not embeds:
             return await ctx.send("No guilds available.")
         
-        # Paginator class to be implemented or imported
-        paginator = Paginator(pages=embeds, timeout=60.0)
-        await paginator.start(ctx)
+        # Using menu from redbot.core.utils.menus to create a paginator
+        await menu(ctx, embeds, DEFAULT_CONTROLS, timeout=60.0)
