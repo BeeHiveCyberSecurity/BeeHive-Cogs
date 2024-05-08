@@ -249,7 +249,7 @@ class StripeIdentity(commands.Cog):
             )
             await self.config.pending_verification_sessions.set_raw(user.id, value=verification_session.id)
             dm_embed = discord.Embed(
-                title="Identity Verification Required",
+                title="Identity verification required",
                 description=(
                     f"Hello {user.mention},\n\n"
                     "To enhance safety within our Discord communities, we require a one-time verification of your identity. "
