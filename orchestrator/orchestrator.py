@@ -1,6 +1,7 @@
 from redbot.core import Config, commands
 import discord
 from discord.ui import Button, View
+from datetime import datetime
 
 class Orchestrator(commands.Cog):
     """See info about the servers your bot is in.
@@ -26,24 +27,36 @@ class Orchestrator(commands.Cog):
         guilds = [guild async for guild in self.bot.fetch_guilds(limit=None)]
         # No need to filter out guilds as we want to list all guilds the bot is in
         guilds_sorted = sorted(guilds, key=lambda x: x.member_count if x.member_count is not None else 0, reverse=True)
-        full_guild = await self.bot.fetch_guild(guild.id)
         if not guilds_sorted:
             return await ctx.send("No guilds available.")
 
         embeds = []
         guild_ids = []
         for guild in guilds_sorted:
-            embed_color = discord.Color.from_rgb(255, 255, 254)
-            guild_owner = await self.bot.fetch_user(guild.owner_id) if guild.owner_id else 'Unknown'
             full_guild = await self.bot.fetch_guild(guild.id)
+            guild_owner = await self.bot.fetch_user(guild.owner_id) if guild.owner_id else 'Unknown'
+            # Calculate activity score based on message count in the past week
+            one_week_ago = datetime.utcnow() - timedelta(days=7)
+            messages_past_week = sum(1 for message in await full_guild.history(after=one_week_ago).flatten())
+            activity_score = messages_past_week / len(full_guild.members)  # Messages per member
+
+            # Determine activity level based on the score
+            if activity_score > 1:
+                activity_level = "High"
+            elif activity_score > 0.1:
+                activity_level = "Medium"
+            else:
+                activity_level = "Low"
+
+            embed_color = discord.Color.from_rgb(255, 255, 254)
             embed_description = (
                 f"**Members:** `{full_guild.member_count}`\n"
-                # Removed the line that caused the AttributeError as 'presence_count' is not an attribute of 'Guild'
                 f"**Owner:** `{guild_owner}`\n"
                 f"**Created At:** `{full_guild.created_at.strftime('%Y-%m-%d %H:%M:%S')}`\n"
                 f"**Boost Level:** `{full_guild.premium_tier}`\n"
                 f"**Boosts:** `{full_guild.premium_subscription_count}`\n"
-                f"**Features:** `{', '.join(full_guild.features) if full_guild.features else 'None'}`"
+                f"**Features:** `{', '.join(full_guild.features) if full_guild.features else 'None'}`\n"
+                f"**Activity Level (Past Week):** `{activity_level}`"
             )
             embed = discord.Embed(title=guild.name, description=embed_description, color=embed_color)
             embed.set_thumbnail(url=guild.icon.url if guild.icon else None)
