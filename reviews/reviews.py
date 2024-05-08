@@ -35,7 +35,7 @@ class ReviewsCog(commands.Cog):
                 await interaction.response.send_message("Review not found.", ephemeral=True)
 
     @commands.guild_only()
-    @commands.group()
+    @commands.group(invoke_without_command=True)
     async def review(self, ctx):
         """Review commands."""
         if ctx.invoked_subcommand is None:
