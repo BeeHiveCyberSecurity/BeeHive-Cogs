@@ -60,8 +60,8 @@ class ReviewsCog(commands.Cog):
             )
             view = View(timeout=180)  # Set a timeout for the view
 
-            submit_button = Button(label="Submit Review", style=discord.ButtonStyle.primary)
-            help_button = Button(label="Get Help", style=discord.ButtonStyle.secondary)
+            submit_button = Button(label=f"Add a review for {server.name}", style=discord.ButtonStyle.green)
+            help_button = Button(label="Show available commands", style=discord.ButtonStyle.grey)
 
             async def submit_button_callback(interaction):
                 if interaction.user != ctx.author:
