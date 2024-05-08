@@ -29,11 +29,22 @@ class Orchestrator(commands.Cog):
         embeds = []
         guild_ids = []
         for guild in guilds_sorted:
-            # Set the embed color to #fffffe as instructed
             embed_color = discord.Color.from_rgb(255, 255, 254)
-            embed = discord.Embed(title=guild.name, description=f"**Members** `{guild.approximate_member_count}`\n**Active** `{guild.approximate_presence_count}`", color=embed_color)
+            embed_description = (
+                f"**Members:** `{guild.approximate_member_count}`\n"
+                f"**Active:** `{guild.approximate_presence_count}`\n"
+                f"**Owner:** <@{guild.owner_id}>\n"
+                f"**Created At:** `{guild.created_at.strftime('%Y-%m-%d %H:%M:%S')}`\n"
+                f"**Boost Level:** `{guild.premium_tier}`\n"
+                f"**Boosts:** `{guild.premium_subscription_count}`"
+            )
+            embed = discord.Embed(title=guild.name, description=embed_description, color=embed_color)
             embed.set_thumbnail(url=guild.icon.url if guild.icon else None)
             embed.add_field(name="Guild ID", value=guild.id)
+            embed.add_field(name="Region", value=str(guild.region))
+            embed.add_field(name="Verification Level", value=str(guild.verification_level))
+            embed.add_field(name="Explicit Content Filter", value=str(guild.explicit_content_filter))
+            embed.add_field(name="Default Notifications", value=str(guild.default_notifications))
             embeds.append(embed)
             guild_ids.append(guild.id)
         
