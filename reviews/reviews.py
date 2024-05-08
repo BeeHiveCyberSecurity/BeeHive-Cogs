@@ -146,11 +146,15 @@ class ReviewsCog(commands.Cog):
                     if review_channel:
                         star_rating = "⭐" * review['rating'] if review['rating'] else "No rating"
                         embed = discord.Embed(
-                            title="Member Review",
-                            description=f"**Review by:** <@{review['author']}>\n\n**Rating:** {star_rating}\n\n**Review Content:**\n{review['content']}",
-                            color=discord.Color.gold()
+                            title="New Review",
+                            description=f"**Customer:** <@{review['author']}>\n**Rating:** {star_rating}\n\n**Testimonial:**\n{review['content']}",
+                            color=discord.Color.from_str("#fffffe")
                         )
-                        embed.set_author(name=str(ctx.author), icon_url=ctx.author.display_avatar.url)
+                        user = ctx.guild.get_member(review['author'])
+                        if user:
+                            embed.set_author(name=str(user), icon_url=user.display_avatar.url)
+                        else:
+                            embed.set_author(name="User not found")
                         embed.set_footer(text=f"User ID: {ctx.author.id}")
                         embed.set_thumbnail(url=ctx.guild.icon.url if ctx.guild.icon else discord.Embed.Empty)
                         embed.timestamp = datetime.datetime.utcnow()

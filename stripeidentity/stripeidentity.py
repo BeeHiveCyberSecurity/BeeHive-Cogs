@@ -333,29 +333,28 @@ class StripeIdentity(commands.Cog):
     @commands.command(name="pendingverifications")
     @checks.admin_or_permissions(manage_guild=True)
     async def pending_verifications(self, ctx):
-        """Show all pending verifications and their details."""
+        """Show all pending verifications for users in the guild."""
         pending_sessions = await self.config.pending_verification_sessions.all()
-        if not pending_sessions:
-            embed = discord.Embed(description="There are no pending verification sessions.", color=discord.Color.orange())
+        guild_member_ids = {member.id for member in ctx.guild.members}
+        pending_guild_sessions = {user_id: session_info for user_id, session_info in pending_sessions.items() if int(user_id) in guild_member_ids}
+
+        if not pending_guild_sessions:
+            embed = discord.Embed(description="There are no pending verification sessions for users in this guild.", color=discord.Color.orange())
             await ctx.send(embed=embed)
             return
 
         embed = discord.Embed(title="Pending Verification Sessions", color=discord.Color.blue())
-        current_time = discord.utils.utcnow()
-        for user_id, session_info in pending_sessions.items():
+        for user_id, session_info in pending_guild_sessions.items():
             member = ctx.guild.get_member(int(user_id))
-            if member:
-                if session_info is not None:
-                    # Assuming session_info is a timestamp string, parse it into a datetime object
-                    try:
-                        start_time = datetime.fromisoformat(session_info)
-                        time_remaining = discord.utils.format_dt(start_time + datetime.timedelta(minutes=15), style='R')
-                        embed.add_field(name=f"User: {member.display_name} (ID: {user_id})", value=f"Time remaining: {time_remaining}", inline=False)
-                    except ValueError:
-                        embed.add_field(name=f"User: {member.display_name} (ID: {user_id})", value="Invalid session start time.", inline=False)
-                else:
-                    embed.add_field(name=f"User: {member.display_name} (ID: {user_id})", value="Session info not available.", inline=False)
+            if session_info is not None:
+                # Assuming session_info is a timestamp string, parse it into a datetime object
+                try:
+                    start_time = datetime.fromisoformat(session_info)
+                    time_remaining = discord.utils.format_dt(start_time + datetime.timedelta(minutes=15), style='R')
+                    embed.add_field(name=f"User: {member.display_name} (ID: {user_id})", value=f"Time remaining: {time_remaining}", inline=False)
+                except ValueError:
+                    embed.add_field(name=f"User: {member.display_name} (ID: {user_id})", value="Invalid session start time.", inline=False)
             else:
-                embed.add_field(name=f"User ID: {user_id}", value="Member not found in this guild.", inline=False)
+                embed.add_field(name=f"User: {member.display_name} (ID: {user_id})", value="Session info not available.", inline=False)
         await ctx.send(embed=embed)
 
