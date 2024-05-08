@@ -26,7 +26,8 @@ class Orchestrator(commands.Cog):
         await ctx.defer()
         guilds = [guild async for guild in self.bot.fetch_guilds(limit=None)]
         # No need to filter out guilds as we want to list all guilds the bot is in
-        guilds_sorted = sorted(guilds, key=lambda x: x.member_count, reverse=True)
+        # Ensure that member_count is not None before sorting
+        guilds_sorted = sorted((guild for guild in guilds if guild.member_count is not None), key=lambda x: x.member_count, reverse=True)
         if not guilds_sorted:
             return await ctx.send("No guilds available.")
 
