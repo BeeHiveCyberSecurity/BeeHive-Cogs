@@ -7,7 +7,7 @@ class ValkyrieCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.valkyrie_url = "https://valkyrie.comodo.com/api/"
-        self.api_key = await self.bot.get_shared_api_tokens("valkyrie")
+        self.api_key = self.bot.get_shared_api_tokens("valkyrie")
 
     @commands.command(name="checkfile")
     async def check_file(self, ctx, *, message: discord.Message = None):

@@ -5,5 +5,5 @@
     "name": "valkyrie",
     "short": "Valkyrie but for Discord",
     "min_bot_version": "3.5.0",
-    "requirements": [""]
+    "requirements": []
 }
