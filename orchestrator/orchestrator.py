@@ -20,7 +20,7 @@ class Orchestrator(commands.Cog):
 
     @commands.hybrid_command(name="orchestrator", aliases=["botservers"])
     @commands.is_owner()
-    async def servers(self, ctx):
+    async def orchestrator(self, ctx):
         """See and manage the servers that your bot instance is in."""
         await ctx.message.add_reaction("⏳")
         guilds = [guild async for guild in self.bot.fetch_guilds(limit=None)]
