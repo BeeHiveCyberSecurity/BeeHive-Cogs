@@ -64,20 +64,28 @@ class ReviewsCog(commands.Cog):
 
         content = msg.content
 
-        view = View(timeout=None)
-        for i in range(1, 6):
-            view.add_item(ReviewButton(label=f"{i} Star", review_id=None))
-
         review_id = await self.config.guild(ctx.guild).next_id()
         async with self.config.guild(ctx.guild).reviews() as reviews:
             reviews[str(review_id)] = {"author": ctx.author.id, "content": content, "status": "pending", "rating": None}
-            for item in view.children:
-                item.review_id = review_id  # Assign the review ID to each button
 
         await self.config.guild(ctx.guild).next_id.set(review_id + 1)
-        embed = discord.Embed(description="Please rate your review from 1 to 5 stars:", color=discord.Color.blue())
-        await ctx.send(embed=embed, view=view)
 
+        view = View(timeout=None)
+        for i in range(1, 6):
+            button = ReviewButton(label=f"{i} Star", review_id=review_id)
+            view.add_item(button)
+
+        embed = discord.Embed(description="Please rate your review from 1 to 5 stars:", color=discord.Color.blue())
+        message = await ctx.send(embed=embed, view=view)
+        await view.wait()  # Wait for the interaction to be completed
+
+        if not view.children:  # If the view has no children, the interaction was completed
+            embed = discord.Embed(description="Thank you for submitting your review!", color=discord.Color.green())
+            await message.edit(embed=embed, view=None)
+        else:
+            embed = discord.Embed(description="Review rating was not received. Please try submitting again.", color=discord.Color.red())
+            await message.edit(embed=embed, view=None)
+            
     @review.command(name="approve")
     @commands.has_permissions(manage_guild=True)
     async def review_approve(self, ctx, review_id: int):
