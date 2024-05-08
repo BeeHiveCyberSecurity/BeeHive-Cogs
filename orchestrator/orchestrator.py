@@ -28,7 +28,8 @@ class Orchestrator(commands.Cog):
         
         embeds = []
         for guild in guilds_sorted:
-            embed = discord.Embed(title=guild.name, description=f"Members: {guild.approximate_member_count}\nActive: {guild.approximate_presence_count}")
+            dominant_color = await self.get_dominant_color(guild.icon.url) if guild.icon else discord.Color.default()
+            embed = discord.Embed(title=guild.name, description=f"Members: {guild.approximate_member_count}\nActive: {guild.approximate_presence_count}", color=dominant_color)
             embed.set_thumbnail(url=guild.icon.url if guild.icon else None)
             embed.add_field(name="Guild ID", value=guild.id)
             embeds.append(embed)
