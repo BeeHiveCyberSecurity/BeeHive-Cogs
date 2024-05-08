@@ -24,21 +24,22 @@ class Orchestrator(commands.Cog):
         """See and manage the servers that your bot instance is in."""
         await ctx.defer()
         guilds = [guild async for guild in self.bot.fetch_guilds(limit=None)]
-        guilds_sorted = sorted(guilds, key=lambda x: x.approximate_member_count, reverse=True)
+        guilds_sorted = sorted(guilds, key=lambda x: x.member_count, reverse=True)
         
         embeds = []
         guild_ids = []
         for guild in guilds_sorted:
             embed_color = discord.Color.from_rgb(255, 255, 254)
             guild_owner = await self.bot.fetch_user(guild.owner_id) if guild.owner_id else 'Unknown'
+            full_guild = await self.bot.fetch_guild(guild.id)
             embed_description = (
-                f"**Members:** `{guild.approximate_member_count}`\n"
-                f"**Active:** `{guild.approximate_presence_count}`\n"
+                f"**Members:** `{full_guild.member_count}`\n"
+                f"**Active:** `{full_guild.presence_count}`\n"
                 f"**Owner:** `{guild_owner}`\n"
-                f"**Created At:** `{guild.created_at.strftime('%Y-%m-%d %H:%M:%S')}`\n"
-                f"**Boost Level:** `{guild.premium_tier}`\n"
-                f"**Boosts:** `{guild.premium_subscription_count}`\n"
-                f"**Features:** `{', '.join(guild.features) if guild.features else 'None'}`"
+                f"**Created At:** `{full_guild.created_at.strftime('%Y-%m-%d %H:%M:%S')}`\n"
+                f"**Boost Level:** `{full_guild.premium_tier}`\n"
+                f"**Boosts:** `{full_guild.premium_subscription_count}`\n"
+                f"**Features:** `{', '.join(full_guild.features) if full_guild.features else 'None'}`"
             )
             embed = discord.Embed(title=guild.name, description=embed_description, color=embed_color)
             embed.set_thumbnail(url=guild.icon.url if guild.icon else None)
