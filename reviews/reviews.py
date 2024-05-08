@@ -203,7 +203,7 @@ class ReviewsCog(commands.Cog):
                 doc = SimpleDocTemplate(file_path, pagesize=letter)
                 styles = getSampleStyleSheet()
                 # Ensure the font name is a standard font available in ReportLab, such as 'Helvetica'
-                styles.add(ParagraphStyle(name='Normal-Bold', fontName='Helvetica-Bold', fontSize=12, leading=14))
+                styles.add(ParagraphStyle(name='Normal-Bold', fontName='Helvetica-Bold', fontSize=12, leading=14, alignment=TA_LEFT))
                 flowables = []
 
                 flowables.append(Paragraph("Guild Reviews", styles['Normal-Bold']))
