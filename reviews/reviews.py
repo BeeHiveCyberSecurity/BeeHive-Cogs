@@ -101,10 +101,17 @@ class ReviewsCog(commands.Cog):
                 if review_channel_id:
                     review_channel = self.bot.get_channel(review_channel_id)
                     if review_channel:
-                        embed = discord.Embed(description=f"{review['content']}\nRating: {review['rating']} stars", color=discord.Color.blue())
+                        embed = discord.Embed(
+                            title="Member Review",
+                            description=f"**Review Content:**\n{review['content']}\n\n**Rating:** :star:" * review['rating'],
+                            color=discord.Color.gold()
+                        )
                         author_member = ctx.guild.get_member(review["author"])
                         if author_member:
-                            embed.set_author(name=str(author_member), icon_url=author_member.display_avatar.url)
+                            embed.set_author(name=f"Review by {author_member.display_name}", icon_url=author_member.display_avatar.url)
+                            embed.set_footer(text=f"User ID: {author_member.id}")
+                        embed.set_thumbnail(url=ctx.guild.icon.url if ctx.guild.icon else discord.Embed.Empty)
+                        embed.timestamp = datetime.datetime.utcnow()
                         await review_channel.send(embed=embed)
                     else:
                         embed = discord.Embed(description="Review channel not found.", color=discord.Color.red())
