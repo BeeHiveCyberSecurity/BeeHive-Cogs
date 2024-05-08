@@ -1,0 +1,9 @@
+{
+    "author": ["movelaterally"],
+    "description": "Commands to interact with the COMODO Valkyrie Verdict API",
+    "install_msg": "## :white_check_mark: Successfully installed Valkyrie.\n**Need help or have suggestions?** [Contact us](<https://www.beehive.systems/contact-us>)\n**Looking for robust moderation tools?** Join our Discord! https://discord.gg/ckdzsm7mTs",
+    "name": "valkyrie",
+    "short": "Valkyrie but for Discord",
+    "min_bot_version": "3.5.0",
+    "requirements": [""]
+}
