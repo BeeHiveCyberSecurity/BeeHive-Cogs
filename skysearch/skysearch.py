@@ -216,7 +216,6 @@ class Skysearch(commands.Cog):
         else:
             embed = discord.Embed(title="Error", description="Error retrieving aircraft information.", color=0xff4545)
             await ctx.send(embed=embed)
-
     @aircraft_group.command(name='callsign', help='Get information about an aircraft by its callsign.')
     async def aircraft_by_callsign(self, ctx, callsign: str):
         url = f"{self.api_url}/callsign/{callsign}"
@@ -242,24 +241,7 @@ class Skysearch(commands.Cog):
         url = f"{self.api_url}/type/{aircraft_type}"
         response = await self._make_request(url)
         if response:
-            if 'ac' in response and len(response['ac']) > 1:
-                embed = discord.Embed(title="Multiple Aircraft Found", description="Here are the aircraft of the type " + aircraft_type, color=0x00ff00)
-                aircraft_list = []
-                for aircraft_info in response['ac'][:10]:  # Limit to top 10 results
-                    callsign = aircraft_info.get('callsign', 'N/A')
-                    aircraft_type = aircraft_info.get('type', 'N/A')
-                    registration = aircraft_info.get('reg', 'N/A')
-                    if callsign != 'N/A' and aircraft_type != 'N/A' and registration != 'N/A':  # Only add field if all data is available
-                        aircraft_list.append((callsign, aircraft_type, registration))
-                if aircraft_list:
-                    for aircraft in aircraft_list:
-                        embed.add_field(name=aircraft[0], value=f"Type: {aircraft[1]}\nRegistration: {aircraft[2]}", inline=False)
-                    await ctx.send(embed=embed)
-                else:
-                    embed = discord.Embed(title="No Results", description="No aircraft found of the type " + aircraft_type, color=0xff4545)
-                    await ctx.send(embed=embed)
-            else:
-                await self._send_aircraft_info(ctx, response)
+            await self._send_aircraft_info(ctx, response)
         else:
             embed = discord.Embed(title="Error", description="Error retrieving aircraft information.", color=0xff4545)
             await ctx.send(embed=embed)
@@ -269,13 +251,7 @@ class Skysearch(commands.Cog):
         url = f"{self.api_url}/squawk/{squawk_value}"
         response = await self._make_request(url)
         if response:
-            if 'ac' in response and len(response['ac']) > 1:
-                embed = discord.Embed(title="Multiple Aircraft Found", description="Here are the aircraft with the squawk code " + squawk_value, color=0x00ff00)
-                for aircraft_info in response['ac']:
-                    embed.add_field(name=aircraft_info['callsign'], value=f"Type: {aircraft_info['type']}\nRegistration: {aircraft_info['reg']}", inline=False)
-                await ctx.send(embed=embed)
-            else:
-                await self._send_aircraft_info(ctx, response)
+            await self._send_aircraft_info(ctx, response)
         else:
             embed = discord.Embed(title="Error", description="Error retrieving aircraft information.", color=0xff4545)
             await ctx.send(embed=embed)
