@@ -268,13 +268,11 @@ class ServerInfoCog(commands.Cog):
                 self.add_item(Button(style=ButtonStyle.secondary, label="Previous", custom_id="previous"))
                 self.add_item(Button(style=ButtonStyle.secondary, label="Next", custom_id="next"))
 
-                @discord.ui.button(label='Previous', style=discord.ButtonStyle.secondary)
-                async def previous_button(self, button: discord.ui.Button, interaction: discord.Interaction):
-                # Logic for showing the previous page
+                    @discord.ui.button(label='Previous', style=discord.ButtonStyle.secondary)
+                    async def previous_button(self, button: discord.ui.Button, interaction: discord.Interaction):
 
-                @discord.ui.button(label='Next', style=discord.ButtonStyle.secondary)
-                async def next_button(self, button: discord.ui.Button, interaction: discord.Interaction):
-                # Logic for showing the next page
+                    @discord.ui.button(label='Next', style=discord.ButtonStyle.secondary)
+                    async def next_button(self, button: discord.ui.Button, interaction: discord.Interaction):
 
         view = NavigationView()
         await ctx.send(embed=pages[0], view=view)
