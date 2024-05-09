@@ -335,19 +335,21 @@ class Skysearch(commands.Cog):
                     flowables.append(Paragraph(f"{search_type.capitalize()} {search_value}", styles['Normal-Bold']))
                     flowables.append(Spacer(1, 12))
 
-                    data = [list(response.keys())]
-                    data.append(list(map(str, response.values())))
+                    for aircraft in response['ac']:
+                        data = [list(aircraft.keys())]
+                        data.append(list(map(str, aircraft.values())))
 
-                    t = Table(data)
-                    t.setStyle(TableStyle([
-                        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
-                        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-                        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-                        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
-                        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-                        ('BACKGROUND', (0, 1), (-1, -1), colors.blue),
-                    ]))
-                    flowables.append(t)
+                        t = Table(data)
+                        t.setStyle(TableStyle([
+                            ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+                            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                            ('BACKGROUND', (0, 1), (-1, -1), colors.blue),
+                        ]))
+                        flowables.append(t)
+                        flowables.append(PageBreak())
 
                     doc.build(flowables)
                     await ctx.send(file=discord.File(file_path))
