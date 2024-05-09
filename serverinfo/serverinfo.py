@@ -265,16 +265,20 @@ class ServerInfoCog(commands.Cog):
         class NavigationView(View):
             def __init__(self):
                 super().__init__()
-                self.add_item(Button(style=discord.ButtonStyle.secondary, label="Previous", custom_id="previous_button_id_1"))
-                self.add_item(Button(style=discord.ButtonStyle.secondary, label="Next", custom_id="next_button_id_1"))
+                self.add_item(Button(style=discord.ButtonStyle.secondary, label="Previous", custom_id="previous_button_id"))
+                self.add_item(Button(style=discord.ButtonStyle.secondary, label="Next", custom_id="next_button_id"))
 
-            @discord.ui.button(label="Previous", custom_id="previous_button_id_2")
+            @discord.ui.button(label="Previous", custom_id="previous_button_id")
             async def previous_button(self, button: discord.ui.Button, interaction: discord.Interaction):
-                pass
+                current_page = pages.index(interaction.message.embeds[0])
+                if current_page > 0:
+                    await interaction.response.edit_message(embed=pages[current_page - 1])
 
-            @discord.ui.button(label="Next", custom_id="next_button_id_2")
+            @discord.ui.button(label="Next", custom_id="next_button_id")
             async def next_button(self, button: discord.ui.Button, interaction: discord.Interaction):
-                pass
+                current_page = pages.index(interaction.message.embeds[0])
+                if current_page < len(pages) - 1:
+                    await interaction.response.edit_message(embed=pages[current_page + 1])
 
         view = NavigationView()
         await ctx.send(embed=pages[0], view=view)
