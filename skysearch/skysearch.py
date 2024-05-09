@@ -102,7 +102,7 @@ class Skysearch(commands.Cog):
             pass
         return None, None
 
-    @commands.group(name='aircraft', help='Get information about aircraft.', invoke_without_command=True)
+    @commands.group(name='skysearch', help='Get information about aircraft.', invoke_without_command=True)
     async def aircraft_group(self, ctx):
         """"""
         if ctx.invoked_subcommand is None:
