@@ -271,13 +271,13 @@ class ServerInfoCog(commands.Cog):
             async def previous_button(self, button: discord.ui.Button, interaction: discord.Interaction):
                 if self.current_page > 0:
                     self.current_page -= 1
-                    await interaction.response.edit_message(embed=pages[self.current_page])
+                    await interaction.message.edit(embed=pages[self.current_page])
 
             @discord.ui.button(label="Next", custom_id="next_button_id")
             async def next_button(self, button: discord.ui.Button, interaction: discord.Interaction):
                 if self.current_page < len(pages) - 1:
                     self.current_page += 1
-                    await interaction.response.edit_message(embed=pages[self.current_page])
+                    await interaction.message.edit(embed=pages[self.current_page])
 
         view = NavigationView()
         await ctx.send(embed=pages[0], view=view)
