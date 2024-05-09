@@ -327,9 +327,9 @@ class Skysearch(commands.Cog):
                         writer.writerow(map(str, response.values()))
                     await ctx.send(file=discord.File(file_path))
                 elif file_format.lower() == "pdf":
-                    doc = SimpleDocTemplate(file_path, pagesize=landscape(letter))
+                    doc = SimpleDocTemplate(file_path, pagesize=landscape(A4)) # Changed to A4 size
                     styles = getSampleStyleSheet()
-                    styles.add(ParagraphStyle(name='Normal-Bold', fontName='Helvetica-Bold', fontSize=12, leading=14, alignment=1))
+                    styles.add(ParagraphStyle(name='Normal-Bold', fontName='Helvetica-Bold', fontSize=10, leading=12, alignment=1)) # Reduced font size
                     flowables = []
 
                     flowables.append(Paragraph(f"{search_type.capitalize()} {search_value}", styles['Normal-Bold']))
@@ -339,12 +339,13 @@ class Skysearch(commands.Cog):
                     for aircraft in response['ac']:
                         data.append(list(map(str, aircraft.values())))
 
-                    t = Table(data)
+                    t = Table(data, repeatRows=1) # Added repeatRows to repeat the header on each page
                     t.setStyle(TableStyle([
                         ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
                         ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
                         ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
                         ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+                        ('FONTSIZE', (0, 0), (-1, -1), 10), # Reduced font size
                         ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
                         ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
                     ]))
