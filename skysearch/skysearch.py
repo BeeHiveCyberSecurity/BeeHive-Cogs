@@ -244,12 +244,15 @@ class Skysearch(commands.Cog):
         if response:
             if 'ac' in response and len(response['ac']) > 1:
                 embed = discord.Embed(title="Multiple Aircraft Found", description="Here are the aircraft of the type " + aircraft_type, color=0x00ff00)
-                for aircraft_info in response['ac']:
+                for i, aircraft_info in enumerate(response['ac']):
                     callsign = aircraft_info.get('callsign', 'N/A')
                     aircraft_type = aircraft_info.get('type', 'N/A')
                     registration = aircraft_info.get('reg', 'N/A')
                     embed.add_field(name=callsign, value=f"Type: {aircraft_type}\nRegistration: {registration}", inline=False)
-                await ctx.send(embed=embed)
+                    # Check if embed size is reaching limit and send current embed if it is
+                    if len(embed) > 5500 or i == len(response['ac']) - 1:
+                        await ctx.send(embed=embed)
+                        embed = discord.Embed(title="Multiple Aircraft Found", description="Continuing list of aircraft of the type " + aircraft_type, color=0x00ff00)
             else:
                 await self._send_aircraft_info(ctx, response)
         else:
