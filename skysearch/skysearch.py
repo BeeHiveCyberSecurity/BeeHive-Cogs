@@ -296,35 +296,46 @@ class Skysearch(commands.Cog):
             embed = discord.Embed(title="Error", description="Error retrieving aircraft information for aircraft within the specified radius.", color=0xff4545)
             await ctx.send(embed=embed)
 
-    @aircraft_group.command(name='json', help='Retrieve aircraft information in various formats based on identifier type.')
-    async def json(self, ctx, identifier: str, identifier_type: str = None):
-        # Determine the type of aircraft identifier provided if not specified
-        if identifier_type is None:
-            if re.match(r'^[0-9a-fA-F]{6}$', identifier):
-                identifier_type = "hex"
-            elif re.match(r'^[0-9]{4}$', identifier):
-                identifier_type = "squawk"
-            elif re.match(r'^[A-Z0-9]{2,7}$', identifier, re.I):
-                identifier_type = "callsign"
-            else:
-                identifier_type = "type"  # Default to type if no match found and type not specified
-        
-        if identifier_type not in ["hex", "squawk", "callsign", "type"]:
-            embed = discord.Embed(title="Error", description="Invalid identifier type specified.\n\nChoose between `hex`, `squawk`, `callsign`, or `type`.", color=0xff4545)
-            await ctx.send(embed=embed)
+    @aircraft_group.command(name='export', help='Search aircraft by ICAO, callsign, squawk, or type and export the results.')
+    async def export_aircraft(self, ctx, search_type: str, search_value: str, file_format: str):
+        if search_type not in ["icao", "callsign", "squawk", "type"]:
+            await ctx.send("Invalid search type specified. Use one of: icao, callsign, squawk, or type.")
             return
-        
-        url = f"{self.api_url}/{identifier_type}/{identifier}"
-        
-        try:
-            response = await self._make_request(url)
-            if not response or 'ac' not in response or not response['ac']:
-                raise ValueError("Failed to receive data from the API or no aircraft data found.")
-            
-            json_data = json.dumps(response, indent=4)
-            await ctx.send(f"```json\n{json_data}\n```")
-        except Exception as e:
-            embed = discord.Embed(title="Error", description=f"Failed to retrieve aircraft information: {e}", color=0xff4545)
+
+        if file_format not in ["txt", "csv", "html", "pdf"]:
+            await ctx.send("Invalid file format specified. Use one of: txt, csv, html, pdf.")
+            return
+
+        url = f"{self.api_url}/{search_type}/{search_value}"
+        response = await self._make_request(url)
+        if response:
+            if file_format == "txt":
+                file_content = json.dumps(response, indent=4)
+                file_name = f"{search_type}_{search_value}.txt"
+            elif file_format == "csv":
+                file_content = ', '.join(response.keys()) + '\n' + ', '.join(map(str, response.values()))
+                file_name = f"{search_type}_{search_value}.csv"
+            elif file_format == "html":
+                file_content = json2html.convert(json=response)
+                file_name = f"{search_type}_{search_value}.html"
+            elif file_format == "pdf":
+                file_content = json.dumps(response, indent=4)
+                file_name = f"{search_type}_{search_value}.pdf"
+                pdf = FPDF()
+                pdf.add_page()
+                pdf.set_font("Arial", size=12)
+                pdf.cell(200, 10, txt=file_content, ln=True)
+                pdf.output(file_name)
+
+            with open(file_name, 'w') as file:
+                file.write(file_content)
+
+            with open(file_name, 'rb') as file:
+                await ctx.send(file=discord.File(file, file_name))
+
+            os.remove(file_name)
+        else:
+            embed = discord.Embed(title="Error", description="Error retrieving aircraft information.", color=0xff4545)
             await ctx.send(embed=embed)
 
     @aircraft_group.command(name='stats', help='Get feeder stats for airplanes.live')
