@@ -36,7 +36,7 @@ class Airplaneslive(commands.Cog):
             link = f"https://globe.airplanes.live/?icao={hex_id}"
             emergency_squawk_codes = ['7500', '7600', '7700']
             if aircraft_data.get('squawk', 'N/A') in emergency_squawk_codes:
-                embed = discord.Embed(title='Aircraft Information', color=discord.Colour(0xff4545))
+                embed = discord.Embed(title='Aircraft Information', color=discord.Colour(0xFF9145))
                 emergency_status = ":warning: **Declared**"
             else:
                 embed = discord.Embed(title='Aircraft Information', color=discord.Colour(0xfffffe))
@@ -65,7 +65,7 @@ class Airplaneslive(commands.Cog):
             await ctx.send(embed=embed, view=view)
             squawk_code = aircraft_data.get('squawk', 'N/A')
             if squawk_code in emergency_squawk_codes:
-                emergency_embed = discord.Embed(title='Emergency declared', color=discord.Colour(0xff4545))
+                emergency_embed = discord.Embed(title='Emergency declared', color=discord.Colour(0xFF9145))
                 if squawk_code == '7500':
                     emergency_embed.add_field(name="Squawk 7500 - Hijacking", value="The pilots of this aircraft have indicated that the plane is being hijacked.", inline=False)
                 elif squawk_code == '7600':
