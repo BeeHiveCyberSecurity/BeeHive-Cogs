@@ -323,9 +323,8 @@ class Skysearch(commands.Cog):
                 if file_format.lower() == "csv":
                     with open(file_path, "w", newline='', encoding='utf-8') as file:
                         writer = csv.writer(file)
-                        writer.writerow(response[0].keys())  # Write the keys as the header
-                        for aircraft in response:  # Iterate over each aircraft in the response
-                            writer.writerow(map(str, aircraft.values()))  # Write the values of each aircraft
+                        writer.writerow(response.keys())
+                        writer.writerow(map(str, response.values()))
                     await ctx.send(file=discord.File(file_path))
                 elif file_format.lower() == "pdf":
                     doc = SimpleDocTemplate(file_path, pagesize=letter)
@@ -336,21 +335,20 @@ class Skysearch(commands.Cog):
                     flowables.append(Paragraph(f"{search_type.capitalize()} {search_value}", styles['Normal-Bold']))
                     flowables.append(Spacer(1, 12))
 
-                    for aircraft in response:  # Iterate over each aircraft in the response
-                        data = [list(aircraft.keys())]
+                    data = [list(response['ac'][0].keys())]
+                    for aircraft in response['ac']:
                         data.append(list(map(str, aircraft.values())))
 
-                        t = Table(data)
-                        t.setStyle(TableStyle([
-                            ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
-                            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-                            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-                            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
-                            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-                            ('BACKGROUND', (0, 1), (-1, -1), colors.blue),
-                        ]))
-                        flowables.append(t)
-                        flowables.append(PageBreak())
+                    t = Table(data)
+                    t.setStyle(TableStyle([
+                        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+                        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                        ('BACKGROUND', (0, 1), (-1, -1), colors.blue),
+                    ]))
+                    flowables.append(t)
 
                     doc.build(flowables)
                     await ctx.send(file=discord.File(file_path))
