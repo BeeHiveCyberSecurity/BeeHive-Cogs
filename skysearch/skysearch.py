@@ -243,14 +243,14 @@ class Skysearch(commands.Cog):
         response = await self._make_request(url)
         if response:
             if 'ac' in response and len(response['ac']) > 1:
-                for i in range(0, len(response['ac']), 25):
-                    embed = discord.Embed(title="Multiple Aircraft Found", description="Here are the aircraft of the type " + aircraft_type, color=0x00ff00)
-                    for aircraft_info in response['ac'][i:i+25]:
-                        callsign = aircraft_info.get('callsign', 'N/A')
-                        aircraft_type = aircraft_info.get('type', 'N/A')
-                        registration = aircraft_info.get('reg', 'N/A')
+                embed = discord.Embed(title="Multiple Aircraft Found", description="Here are the aircraft of the type " + aircraft_type, color=0x00ff00)
+                for aircraft_info in response['ac'][:10]:  # Limit to top 10 results
+                    callsign = aircraft_info.get('callsign', 'N/A')
+                    aircraft_type = aircraft_info.get('type', 'N/A')
+                    registration = aircraft_info.get('reg', 'N/A')
+                    if callsign != 'N/A' and aircraft_type != 'N/A' and registration != 'N/A':  # Only add field if all data is available
                         embed.add_field(name=callsign, value=f"Type: {aircraft_type}\nRegistration: {registration}", inline=False)
-                    await ctx.send(embed=embed)
+                await ctx.send(embed=embed)
             else:
                 await self._send_aircraft_info(ctx, response)
         else:
