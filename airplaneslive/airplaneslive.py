@@ -178,7 +178,8 @@ class Airplaneslive(commands.Cog):
         if response:
             await self._send_aircraft_info(ctx, response)
         else:
-            await ctx.send("No aircraft found with the specified callsign.")
+            embed = discord.Embed(title="Error", description="No aircraft found with the specified callsign.", color=0xff4545)
+            await ctx.send(embed=embed)
 
     @aircraft_group.command(name='reg', help='Get information about an aircraft by its registration.')
     async def aircraft_by_reg(self, ctx, registration: str):
@@ -187,7 +188,8 @@ class Airplaneslive(commands.Cog):
         if response:
             await self._send_aircraft_info(ctx, response)
         else:
-            await ctx.send("Error retrieving aircraft information.")
+            embed = discord.Embed(title="Error", description="Error retrieving aircraft information.", color=0xff4545)
+            await ctx.send(embed=embed)
 
     @aircraft_group.command(name='type', help='Get information about aircraft by its type.')
     async def aircraft_by_type(self, ctx, aircraft_type: str):
@@ -196,7 +198,8 @@ class Airplaneslive(commands.Cog):
         if response:
             await self._send_aircraft_info(ctx, response)
         else:
-            await ctx.send("Error retrieving aircraft information.")
+            embed = discord.Embed(title="Error", description="Error retrieving aircraft information.", color=0xff4545)
+            await ctx.send(embed=embed)
 
     @aircraft_group.command(name='squawk', help='Get information about an aircraft by its squawk code.')
     async def aircraft_by_squawk(self, ctx, squawk_value: str):
@@ -205,7 +208,8 @@ class Airplaneslive(commands.Cog):
         if response:
             await self._send_aircraft_info(ctx, response)
         else:
-            await ctx.send("Error retrieving aircraft information.")
+            embed = discord.Embed(title="Error", description="Error retrieving aircraft information.", color=0xff4545)
+            await ctx.send(embed=embed)
 
     @aircraft_group.command(name='military', help='Get information about military aircraft.')
     async def military_aircraft(self, ctx):
@@ -214,7 +218,8 @@ class Airplaneslive(commands.Cog):
         if response:
             await self._send_aircraft_info(ctx, response)
         else:
-            await ctx.send("Error retrieving military aircraft information.")
+            embed = discord.Embed(title="Error", description="Error retrieving aircraft information.", color=0xff4545)
+            await ctx.send(embed=embed)
 
     @aircraft_group.command(name='ladd', help='Limiting Aircraft Data Displayed (LADD).')
     async def ladd_aircraft(self, ctx):
@@ -223,7 +228,8 @@ class Airplaneslive(commands.Cog):
         if response:
             await self._send_aircraft_info(ctx, response)
         else:
-            await ctx.send("Error retrieving LADD aircraft information.")
+            embed = discord.Embed(title="Error", description="Error retrieving aircraft information.", color=0xff4545)
+            await ctx.send(embed=embed)
 
     @aircraft_group.command(name='pia', help='Privacy ICAO Address.')
     async def pia_aircraft(self, ctx):
@@ -232,7 +238,8 @@ class Airplaneslive(commands.Cog):
         if response:
             await self._send_aircraft_info(ctx, response)
         else:
-            await ctx.send("Error retrieving PIA aircraft information.")
+            embed = discord.Embed(title="Error", description="Error retrieving aircraft information.", color=0xff4545)
+            await ctx.send(embed=embed)
 
     @aircraft_group.command(name='radius', help='Get information about aircraft within a specified radius.')
     async def aircraft_within_radius(self, ctx, lat: str, lon: str, radius: str):
@@ -241,7 +248,8 @@ class Airplaneslive(commands.Cog):
         if response:
             await self._send_aircraft_info(ctx, response)
         else:
-            await ctx.send("Error retrieving aircraft information within the specified radius.")
+            embed = discord.Embed(title="Error", description="Error retrieving aircraft information for aircraft within the specified radius.", color=0xff4545)
+            await ctx.send(embed=embed)
 
     @aircraft_group.command(
         name='json', 
@@ -260,7 +268,8 @@ class Airplaneslive(commands.Cog):
                 identifier_type = "type"  # Default to type if no match found and type not specified
         
         if identifier_type not in ["hex", "squawk", "callsign", "type"]:
-            await ctx.send("Invalid identifier type specified. Use one of: hex, squawk, callsign, or type.")
+            embed = discord.Embed(title="Error", description="Invalid identifier type specified.\n\nChoose between `hex`, `squawk`, `callsign`, or `type`.", color=0xff4545)
+            await ctx.send(embed=embed)
             return
         
         url = f"{self.api_url}/{identifier_type}/{identifier}"
@@ -274,10 +283,10 @@ class Airplaneslive(commands.Cog):
             json_data = json.dumps(aircraft_info, indent=4)
             await ctx.send(f"```json\n{json_data}\n```")
         except Exception as e:
-            await ctx.send(f"Failed to retrieve aircraft information: {e}")
+            embed = discord.Embed(title="Error", description=f"Failed to retrieve aircraft information: {e}", color=0xff4545)
+            await ctx.send(embed=embed)
 
-
-    @aircraft_group.command(name='stats', help='Get https://airplanes.live feeder stats.')
+    @aircraft_group.command(name='stats', help='Get feeder stats for airplanes.live')
     async def stats(self, ctx):
         url = "https://api.airplanes.live/stats"
 
@@ -304,7 +313,8 @@ class Airplaneslive(commands.Cog):
             else:
                 await ctx.send("Incomplete data received from API.")
         except aiohttp.ClientError as e:
-            await ctx.send(f"Error fetching data: {e}")
+            embed = discord.Embed(title="Error", description=f"Error fetching data: {e}", color=0xff4545)
+            await ctx.send(embed=embed)
 
     @aircraft_group.command(name='alert', help='Set up configurable alerts for specific keywords.')
     async def alert(self, ctx, keyword: str, identifier_type: str, channel: discord.TextChannel, force_update: bool = False):
@@ -372,7 +382,8 @@ class Airplaneslive(commands.Cog):
             if response and 'ac' in response:
                 for index, aircraft_info in enumerate(response['ac']):
                     await self._send_aircraft_info(ctx, {'ac': [aircraft_info]})
-                    message = await ctx.send(f"Plane {index + 1}/{len(response['ac'])}. React with ➡️ to view the next plane or ⏹️ to stop.")
+                    embed = discord.Embed(description=f"Plane {index + 1}/{len(response['ac'])}. React with ➡️ to view the next plane or ⏹️ to stop.")
+                    message = await ctx.send(embed=embed)
                     await message.add_reaction("➡️")  # Adding a reaction to scroll to the next plane
                     await message.add_reaction("⏹️")  # Adding a reaction to stop scrolling
 
@@ -383,23 +394,13 @@ class Airplaneslive(commands.Cog):
                         reaction, user = await self.bot.wait_for('reaction_add', timeout=60.0, check=check)
                         await message.remove_reaction(reaction.emoji, ctx.author)  # Remove the reaction after processing
                         if str(reaction.emoji) == '⏹️':  # Check if the stop reaction was added
-                            await ctx.send("Stopping.")
+                            embed = discord.Embed(description="Stopping.")
+                            await ctx.send(embed=embed)
                             break
                     except asyncio.TimeoutError:
-                        await ctx.send("No reaction received. Stopping.")
+                        embed = discord.Embed(description="No reaction received. Stopping.")
+                        await ctx.send(embed=embed)
                         break
         except Exception as e:
-            await ctx.send(f"An error occurred during scrolling: {e}.")
-
-            @tasks.loop(minutes=15)
-            async def send_alerts(self):
-                for keyword, (identifier_type, channel) in self.alerts.items():
-                    try:
-                        url = f"{self.api_url}/{keyword}"
-                        response = await self._make_request(url)
-                        if response and 'ac' in response:
-                            for aircraft_info in response['ac']:
-                                if identifier_type in aircraft_info:
-                                    await channel.send(f"Alert for {keyword}: {aircraft_info[identifier_type]}")
-                    except Exception as e:
-                        print(f"An error occurred while sending alerts: {e}")
+            embed = discord.Embed(description=f"An error occurred during scrolling: {e}.")
+            await ctx.send(embed=embed)
