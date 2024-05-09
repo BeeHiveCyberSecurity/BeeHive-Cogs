@@ -2,6 +2,22 @@ from redbot.core import Config, commands
 import discord
 from discord.ui import Button, View
 
+class ServerInfo(commands.Cog):
+    """See info about the servers your bot is in.
+    
+    For bot owners only.
+    """
+
+    def __init__(self, bot):
+        self.config = Config.get_conf(self, identifier=989839829839293)
+        self.bot = bot
+
+    # This cog does not store any End User Data
+    async def red_get_data_for_user(self, *, user_id: int):
+        return {}
+    async def red_delete_data_for_user(self, *, requester, user_id: int) -> None:
+        pass
+
     @commands.command()
     @commands.guild_only()
     @commands.bot_has_permissions(embed_links=True)
