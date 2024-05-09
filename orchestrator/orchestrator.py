@@ -38,6 +38,8 @@ class Orchestrator(commands.Cog):
         for guild in guilds_sorted:
             try:
                 full_guild = await self.bot.fetch_guild(guild.id)
+                if not full_guild:
+                    continue
                 guild_owner = await self.bot.fetch_user(full_guild.owner_id) if full_guild.owner_id else 'Unknown'
                 # Calculate activity score based on message count in the past week
                 one_week_ago = datetime.utcnow() - timedelta(days=7)
