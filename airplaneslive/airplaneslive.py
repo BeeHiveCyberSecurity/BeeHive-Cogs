@@ -103,19 +103,6 @@ class Airplaneslive(commands.Cog):
             )
             view = discord.ui.View(timeout=180)  # Set a timeout for the view
 
-            # Define button click actions
-            async def on_search_callsign_click(interaction):
-                await self.aircraft_by_callsign(interaction)
-
-            async def on_search_icao_click(interaction):
-                await self.aircraft_by_icao(interaction)
-
-            async def on_search_registration_click(interaction):
-                await self.aircraft_by_reg(interaction)
-
-            async def on_show_the_commands_click(interaction):
-                await ctx.send_help(self.aircraft_group)
-
             # Create buttons with click actions
             search_callsign = discord.ui.Button(label=f"Search by callsign", style=discord.ButtonStyle.green, custom_id="search_callsign")
             search_icao = discord.ui.Button(label="Search by ICAO", style=discord.ButtonStyle.grey, custom_id="search_icao")
@@ -129,21 +116,16 @@ class Airplaneslive(commands.Cog):
             view.add_item(show_the_commands)
 
             # Define the interaction response
-            @search_callsign.click
-            async def on_search_callsign_click(interaction):
-                await self.aircraft_by_callsign(interaction)
-
-            @search_icao.click
-            async def on_search_icao_click(interaction):
-                await self.aircraft_by_icao(interaction)
-
-            @search_registration.click
-            async def on_search_registration_click(interaction):
-                await self.aircraft_by_reg(interaction)
-
-            @show_the_commands.click
-            async def on_show_the_commands_click(interaction):
-                await ctx.send_help(self.aircraft_group)
+            @view.listen('on_click')
+            async def on_button_click(interaction):
+                if interaction.component.custom_id == "search_callsign":
+                    await self.aircraft_by_callsign(interaction)
+                elif interaction.component.custom_id == "search_icao":
+                    await self.aircraft_by_icao(interaction)
+                elif interaction.component.custom_id == "search_registration":
+                    await self.aircraft_by_reg(interaction)
+                elif interaction.component.custom_id == "show_commands":
+                    await ctx.send_help(self.aircraft_group)
 
             # Send the embed with the view
             await ctx.send(embed=embed, view=view)
