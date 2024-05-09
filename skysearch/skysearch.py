@@ -245,7 +245,10 @@ class Skysearch(commands.Cog):
             if 'ac' in response and len(response['ac']) > 1:
                 embed = discord.Embed(title="Multiple Aircraft Found", description="Here are the aircraft of the type " + aircraft_type, color=0x00ff00)
                 for aircraft_info in response['ac']:
-                    embed.add_field(name=aircraft_info['callsign'], value=f"Type: {aircraft_info['type']}\nRegistration: {aircraft_info['reg']}", inline=False)
+                    callsign = aircraft_info.get('callsign', 'N/A')
+                    aircraft_type = aircraft_info.get('type', 'N/A')
+                    registration = aircraft_info.get('reg', 'N/A')
+                    embed.add_field(name=callsign, value=f"Type: {aircraft_type}\nRegistration: {registration}", inline=False)
                 await ctx.send(embed=embed)
             else:
                 await self._send_aircraft_info(ctx, response)
