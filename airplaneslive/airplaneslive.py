@@ -3,13 +3,9 @@ from redbot.core import commands, Config
 import json
 import aiohttp
 import re
-import asyncio  # Added asyncio import
+import asyncio
 
-
-#Pray, Mr. Babbage, if you put into the machine wrong figures, will the right answers come out?
-#I am not able rightly to apprehend the kind of confusion of ideas that could provoke such a question
-
-class Airplaneslive(commands.Cog):  # Changed class name to match import statement
+class Airplaneslive(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=492089091320446976)  
@@ -37,8 +33,8 @@ class Airplaneslive(commands.Cog):  # Changed class name to match import stateme
             formatted_response = self._format_response(response)
             hex_id = response['ac'][0].get('hex', '')                                      
             image_url, photographer = await self._get_photo_by_hex(hex_id)
-            link = f"[View on airplanes.live](https://globe.airplanes.live/?icao={hex_id})"  # Link to airplanes.live globe view
-            formatted_response += f"\n\n{link}"  # Append the link to the end of the response
+            link = f"[View on airplanes.live](https://globe.airplanes.live/?icao={hex_id})"
+            formatted_response += f"\n\n{link}"
             embed = discord.Embed(title='Aircraft Information', description=formatted_response, color=self.EMBED_COLOR)
             if image_url:
                 embed.set_image(url=image_url)
@@ -245,16 +241,16 @@ class Airplaneslive(commands.Cog):  # Changed class name to match import stateme
         try:
             if not hasattr(self, 'alerts'):
                 self.alerts = {}
-            
+
             if identifier_type not in ["hex", "squawk", "callsign", "type"]:
                 await ctx.send("Invalid identifier type specified. Use one of: hex, squawk, callsign, or type.")
                 return
-            
-            if any(keyword == alert_keyword for alert_keyword, (_, alert_channel) in self.alerts.items() if alert_channel == channel):
+
+            if keyword in self.alerts and self.alerts[keyword][1] == channel:
                 if not force_update:
                     await ctx.send(f"Alert for keyword '{keyword}' already exists in channel '{channel.name}'.")
                     return
-            
+
             self.alerts[keyword] = (identifier_type, channel)
             await ctx.send(f"Alert set up for keyword '{keyword}' with identifier type '{identifier_type}' in channel '{channel.name}'.")
         except Exception as e:
