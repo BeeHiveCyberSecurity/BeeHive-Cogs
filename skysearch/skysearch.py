@@ -296,10 +296,7 @@ class Skysearch(commands.Cog):
             embed = discord.Embed(title="Error", description="Error retrieving aircraft information for aircraft within the specified radius.", color=0xff4545)
             await ctx.send(embed=embed)
 
-    @aircraft_group.command(
-        name='json', 
-        help='Retrieve aircraft information in various formats based on identifier type.'
-    )
+    @aircraft_group.command(name='json', help='Retrieve aircraft information in various formats based on identifier type.')
     async def json(self, ctx, identifier: str, identifier_type: str = None):
         # Determine the type of aircraft identifier provided if not specified
         if identifier_type is None:
@@ -324,8 +321,8 @@ class Skysearch(commands.Cog):
             if not response:
                 raise ValueError("Failed to receive data from the API.")
             
-            aircraft_info = self._format_response(response)
-            json_data = json.dumps(aircraft_info, indent=4)
+            # Removed the line that was causing the error
+            json_data = json.dumps(response, indent=4)
             await ctx.send(f"```json\n{json_data}\n```")
         except Exception as e:
             embed = discord.Embed(title="Error", description=f"Failed to retrieve aircraft information: {e}", color=0xff4545)
