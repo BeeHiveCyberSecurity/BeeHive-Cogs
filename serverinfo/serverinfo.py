@@ -224,15 +224,11 @@ class ServerInfoCog(commands.Cog):
             page4 = discord.Embed(
                 colour=await ctx.embed_colour(),
             )
-            all_features = set(custom_feature_names.keys()).union(excluded_features)
-            feature_status = [
-                f"\N{WHITE HEAVY CHECK MARK} {custom_feature_names.get(feature, ' '.join(feature.split('_')).capitalize()}"
-                if feature in feature_names else f"\N{CROSS MARK} {custom_feature_names.get(feature, ' '.join(feature.split('_')).capitalize()}"
-                for feature in all_features
-            ]
             page4.add_field(
                 name=_("Server features"),
-                value="\n".join(feature_status),
+                value="\n".join(
+                    f"\N{WHITE HEAVY CHECK MARK} {feature}" for feature in feature_names
+                ),
             )
             pages.append(page4)
 
