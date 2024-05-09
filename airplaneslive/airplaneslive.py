@@ -63,6 +63,16 @@ class Airplaneslive(commands.Cog):
             view = discord.ui.View()
             view.add_item(discord.ui.Button(label="Track flight live", url=f"{link}", style=discord.ButtonStyle.link, emoji="<:info:1199305085738553385>"))
             await ctx.send(embed=embed, view=view)
+            squawk_code = aircraft_data.get('squawk', 'N/A')
+            if squawk_code in emergency_squawk_codes:
+                emergency_embed = discord.Embed(title='Emergency declared', color=discord.Colour(0xff4545))
+                if squawk_code == '7500':
+                    emergency_embed.add_field(name="Squawk 7500 - Hijacking", value="The pilots of this aircraft have indicated that the plane is being hijacked.", inline=False)
+                elif squawk_code == '7600':
+                    emergency_embed.add_field(name="Squawk 7600 - Radio Failure", value="This code is used to indicate a radio failure. While this code is squawked, assume an aircraft is in a location where reception and/or communication, and thus tracking, may be poor, restricted, or non-existant.", inline=False)
+                elif squawk_code == '7700':
+                    emergency_embed.add_field(name="Squawk 7700 - General Emergency", value="This code is used to indicate a general emergency. The pilot currently has ATC priority and is working on the situation.", inline=False)
+                await ctx.send(embed=emergency_embed)
         else:
             await ctx.send("No aircraft information found or the response format is incorrect.\n\nThe plane may be not currently in use or the data is not available at the moment")
 
