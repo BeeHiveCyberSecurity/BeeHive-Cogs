@@ -263,10 +263,7 @@ class ServerInfoCog(commands.Cog):
 
         # Create a View with interaction buttons for navigation
         class NavigationView(View):
-            def __init__(self):
-                super().__init__()
-                self.add_item(Button(style=discord.ButtonStyle.secondary, label="Previous", custom_id="previous_button_id"))
-                self.add_item(Button(style=discord.ButtonStyle.secondary, label="Next", custom_id="next_button_id"))
+            def __init__(self)
 
             @discord.ui.button(label="Previous", custom_id="previous_button_id")
             async def previous_button(self, button: discord.ui.Button, interaction: discord.Interaction):
