@@ -96,7 +96,7 @@ class Orchestrator(commands.Cog):
                 guild_id = self.guild_ids[self.current_page]
                 guild = self.bot.get_guild(guild_id)
                 if not guild:
-                    await interaction.response.send_message(f"Could not access guild with ID: {guild_id}", ephemeral=True)
+                    await interaction.response.send_message(f"Interaction failed: Unable to access guild with ID: {guild_id}", ephemeral=True)
                     return
 
                 invites = await guild.invites()
@@ -107,13 +107,13 @@ class Orchestrator(commands.Cog):
                     try:
                         invite = await guild.text_channels[0].create_invite(max_age=300)  # Invite expires after 5 minutes
                     except Exception as e:
-                        await interaction.response.send_message(f"Failed to create an invite: {str(e)}", ephemeral=True)
+                        await interaction.response.send_message(f"Interaction failed: Unable to create an invite: {str(e)}", ephemeral=True)
                         return
 
                 if invite:
                     await interaction.response.send_message(f"Invite for {guild.name}: {invite.url}", ephemeral=True)
                 else:
-                    await interaction.response.send_message("No available invites and cannot create one.", ephemeral=True)
+                    await interaction.response.send_message("Interaction failed: No available invites and unable to create one.", ephemeral=True)
             
             async def leave_button_callback(self, interaction):
                 guild_id = self.guild_ids[self.current_page]
