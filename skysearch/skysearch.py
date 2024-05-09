@@ -329,7 +329,7 @@ class Skysearch(commands.Cog):
                 elif file_format.lower() == "pdf":
                     doc = SimpleDocTemplate(file_path, pagesize=letter)
                     styles = getSampleStyleSheet()
-                    styles.add(ParagraphStyle(name='Normal-Bold', fontName='Helvetica-Bold', fontSize=12, leading=14, alignment=LEFT))
+                    styles.add(ParagraphStyle(name='Normal-Bold', fontName='Helvetica-Bold', fontSize=12, leading=14, alignment=1))
                     flowables = []
 
                     flowables.append(Paragraph(f"{search_type.capitalize()} {search_value}", styles['Normal-Bold']))
