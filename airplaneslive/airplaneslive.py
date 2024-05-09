@@ -38,11 +38,12 @@ class Airplaneslive(commands.Cog):
             if aircraft_data.get('squawk', 'N/A') in emergency_squawk_codes:
                 embed = discord.Embed(title='Aircraft Information', color=discord.Colour(0xFF9145))
                 emergency_status = ":warning: **Declared**"
+                embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Orange/alert-circle-outline.png")
             else:
                 embed = discord.Embed(title='Aircraft Information', color=discord.Colour(0xfffffe))
                 emergency_status = "None Declared"
+                embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/airplane.png")
             embed.set_image(url=image_url)
-            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/airplane.png")
             embed.set_footer(text="Powered by Planespotters.net and airplanes.live ✈️")
             embed.add_field(name="Flight", value=aircraft_data.get('flight', 'N/A').strip(), inline=True)
             embed.add_field(name="Registration", value=aircraft_data.get('reg', 'N/A'), inline=True)
