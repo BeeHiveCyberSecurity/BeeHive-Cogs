@@ -34,7 +34,7 @@ class Orchestrator(commands.Cog):
         for guild in guilds_sorted:
             full_guild = await self.bot.fetch_guild(guild.id)
             embed_color = discord.Color.from_rgb(255, 255, 254)
-            guild_owner = await self.bot.fetch_user(guild.owner_id) if guild.owner_id else 'Unknown'
+            guild_owner = full_guild.owner if full_guild.owner else 'Unknown'
             embed_description = (
                 f"**Members:** `{full_guild.member_count}`\n"
                 # Removed the line that caused the AttributeError as 'presence_count' is not an attribute of 'Guild'
