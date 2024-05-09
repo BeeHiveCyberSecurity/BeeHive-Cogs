@@ -129,16 +129,21 @@ class Airplaneslive(commands.Cog):
             view.add_item(show_the_commands)
 
             # Define the interaction response
-            @view.listen()
-            async def on_interaction(interaction: discord.Interaction):
-                if interaction.custom_id == "search_callsign":
-                    await on_search_callsign_click(interaction)
-                elif interaction.custom_id == "search_icao":
-                    await on_search_icao_click(interaction)
-                elif interaction.custom_id == "search_registration":
-                    await on_search_registration_click(interaction)
-                elif interaction.custom_id == "show_commands":
-                    await on_show_the_commands_click(interaction)
+            @search_callsign.click
+            async def on_search_callsign_click(interaction):
+                await self.aircraft_by_callsign(interaction)
+
+            @search_icao.click
+            async def on_search_icao_click(interaction):
+                await self.aircraft_by_icao(interaction)
+
+            @search_registration.click
+            async def on_search_registration_click(interaction):
+                await self.aircraft_by_reg(interaction)
+
+            @show_the_commands.click
+            async def on_show_the_commands_click(interaction):
+                await ctx.send_help(self.aircraft_group)
 
             # Send the embed with the view
             await ctx.send(embed=embed, view=view)
