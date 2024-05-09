@@ -35,7 +35,7 @@ class Orchestrator(commands.Cog):
             full_guild = await self.bot.fetch_guild(guild.id)
             embed_color = discord.Color.from_rgb(255, 255, 254)
             guild_owner = full_guild.owner_id if hasattr(full_guild, 'owner_id') else 'Unknown'
-            member_count = full_guild.member_count if hasattr(full_guild, 'member_count') else 'Unknown'
+            member_count = len(full_guild.members) if hasattr(full_guild, 'members') else 'Unknown'
             embed_description = (
                 f"**Members:** `{member_count}`\n"
                 f"**Owner:** <@{guild_owner}>\n"
