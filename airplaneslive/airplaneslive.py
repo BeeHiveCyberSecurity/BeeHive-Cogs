@@ -116,7 +116,7 @@ class Airplaneslive(commands.Cog):
                     await interaction.response.send_message("You are not allowed to interact with this button.", ephemeral=True)
                     return
                 await interaction.response.defer()
-                await ctx.send("Please reply with the callsign you want to search.")
+                callsign_input = discord.ui.TextInput(placeholder="Enter a callsign", title="Enter a callsign")
                 def check(m):
                     return m.author == ctx.author
                 message = await self.bot.wait_for('message', check=check)
