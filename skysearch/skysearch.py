@@ -241,29 +241,7 @@ class Skysearch(commands.Cog):
         url = f"{self.api_url}/type/{aircraft_type}"
         response = await self._make_request(url)
         if response:
-            if 'ac' in response and len(response['ac']) > 1:
-                pages = []
-                for aircraft_info in response['ac']:
-                    embed = self._send_aircraft_info(ctx, {'ac': [aircraft_info]})
-                    pages.append(embed)
-                message = await ctx.send(embed=pages[0])
-                await message.add_reaction('⬅️')
-                await message.add_reaction('➡️')
-                def check(reaction, user):
-                    return user == ctx.author and str(reaction.emoji) in ['⬅️', '➡️']
-                page = 0
-                while True:
-                    reaction, user = await self.bot.wait_for('reaction_add', timeout=60.0, check=check)
-                    if str(reaction.emoji) == '⬅️':
-                        if page > 0:
-                            page -= 1
-                            await message.edit(embed=pages[page])
-                    elif str(reaction.emoji) == '➡️':
-                        if page < len(pages) - 1:
-                            page += 1
-                            await message.edit(embed=pages[page])
-            else:
-                await self._send_aircraft_info(ctx, response)
+            await self._send_aircraft_info(ctx, response)
         else:
             embed = discord.Embed(title="Error", description="Error retrieving aircraft information.", color=0xff4545)
             await ctx.send(embed=embed)
@@ -274,25 +252,10 @@ class Skysearch(commands.Cog):
         response = await self._make_request(url)
         if response:
             if 'ac' in response and len(response['ac']) > 1:
-                pages = []
+                embed = discord.Embed(title="Multiple Aircraft Found", description="Here are the aircraft with the squawk code " + squawk_value, color=0x00ff00)
                 for aircraft_info in response['ac']:
-                    embed = self._create_embed({'ac': [aircraft_info]})
-                    pages.append(embed)
-                message = await ctx.send(embed=pages[0])
-                await message.add_reaction('⬅️')
-                await message.add_reaction('➡️')
-                def check(reaction, user):
-                    return user == ctx.author and str(reaction.emoji) in ['⬅️', '➡️']
-                while True:
-                    reaction, user = await self.bot.wait_for('reaction_add', timeout=60.0, check=check)
-                    if str(reaction.emoji) == '⬅️':
-                        if page > 0:
-                            page -= 1
-                            await message.edit(embed=pages[page])
-                    elif str(reaction.emoji) == '➡️':
-                        if page < len(pages) - 1:
-                            page += 1
-                            await message.edit(embed=pages[page])
+                    embed.add_field(name=aircraft_info['callsign'], value=f"Type: {aircraft_info['type']}\nRegistration: {aircraft_info['reg']}", inline=False)
+                await ctx.send(embed=embed)
             else:
                 await self._send_aircraft_info(ctx, response)
         else:
