@@ -324,8 +324,11 @@ class Skysearch(commands.Cog):
                 if file_format.lower() == "csv":
                     with open(file_path, "w", newline='', encoding='utf-8') as file:
                         writer = csv.writer(file)
-                        for key, value in response.items():
-                            writer.writerow([key, str(value)])
+                        aircraft_keys = list(response['ac'][0].keys())
+                        writer.writerow(aircraft_keys)
+                        for aircraft in response['ac']:
+                            aircraft_values = list(map(str, aircraft.values()))
+                            writer.writerow(aircraft_values)
                     await ctx.send(file=discord.File(file_path))
                 elif file_format.lower() == "pdf":
                     doc = SimpleDocTemplate(file_path, pagesize=landscape(A4)) 
