@@ -119,6 +119,7 @@ class Skysearch(commands.Cog):
                 description="Please select what you'd like to do with SkySearch...",
                 color=discord.Color.from_str("#fffffe")
             )
+            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/airplane.png")
             view = discord.ui.View(timeout=180)  # Set a timeout for the view
 
             # Create buttons with click actions
