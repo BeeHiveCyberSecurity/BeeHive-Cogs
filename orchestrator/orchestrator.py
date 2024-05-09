@@ -51,8 +51,8 @@ class Orchestrator(commands.Cog):
             embed.add_field(name="Explicit Content Filter", value=str(guild.explicit_content_filter.name) if guild.explicit_content_filter else "None")
             embed.add_field(name="Number of Roles", value=str(len(full_guild.roles)) if hasattr(full_guild, 'roles') else 'Unknown')
             embed.add_field(name="Number of Emojis", value=str(len(full_guild.emojis)) if hasattr(full_guild, 'emojis') else 'Unknown')
-            embed.add_field(name="Number of Text Channels", value=str(len(full_guild.text_channels)) if hasattr(full_guild, 'text_channels') else 'Unknown')
-            embed.add_field(name="Number of Voice Channels", value=str(len(full_guild.voice_channels)) if hasattr(full_guild, 'voice_channels') else 'Unknown')
+            embed.add_field(name="Number of Text Channels", value=str(len([channel for channel in full_guild.channels if isinstance(channel, discord.TextChannel)])) if hasattr(full_guild, 'channels') else 'Unknown')
+            embed.add_field(name="Number of Voice Channels", value=str(len([channel for channel in full_guild.channels if isinstance(channel, discord.VoiceChannel)])) if hasattr(full_guild, 'channels') else 'Unknown')
             embeds.append(embed)
             guild_ids.append(guild.id)
         
