@@ -311,3 +311,16 @@ class Airplaneslive(commands.Cog):
                         break
         except Exception as e:
             await ctx.send(f"An error occurred during scrolling: {e}.")
+
+            @tasks.loop(minutes=15)
+            async def send_alerts(self):
+                for keyword, (identifier_type, channel) in self.alerts.items():
+                    try:
+                        url = f"{self.api_url}/{keyword}"
+                        response = await self._make_request(url)
+                        if response and 'ac' in response:
+                            for aircraft_info in response['ac']:
+                                if identifier_type in aircraft_info:
+                                    await channel.send(f"Alert for {keyword}: {aircraft_info[identifier_type]}")
+                    except Exception as e:
+                        print(f"An error occurred while sending alerts: {e}")
