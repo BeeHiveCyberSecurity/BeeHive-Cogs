@@ -318,10 +318,9 @@ class Skysearch(commands.Cog):
         
         try:
             response = await self._make_request(url)
-            if not response:
-                raise ValueError("Failed to receive data from the API.")
+            if not response or 'ac' not in response or not response['ac']:
+                raise ValueError("Failed to receive data from the API or no aircraft data found.")
             
-            # Removed the line that was causing the error
             json_data = json.dumps(response, indent=4)
             await ctx.send(f"```json\n{json_data}\n```")
         except Exception as e:
