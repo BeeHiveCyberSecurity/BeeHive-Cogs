@@ -33,7 +33,7 @@ class Airplaneslive(commands.Cog):
             aircraft_data = response['ac'][0]
             hex_id = aircraft_data.get('hex', '')                                      
             image_url, photographer = await self._get_photo_by_hex(hex_id)
-            link = f"[View on airplanes.live](https://globe.airplanes.live/?icao={hex_id})"
+            link = f"https://globe.airplanes.live/?icao={hex_id}"
             embed = discord.Embed(title='Aircraft Information', color=self.EMBED_COLOR)
             embed.set_image(url=image_url)
             embed.set_footer(text="Powered by Planespotters.net and airplanes.live ✈️")
