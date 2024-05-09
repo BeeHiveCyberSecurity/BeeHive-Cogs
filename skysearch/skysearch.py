@@ -323,8 +323,9 @@ class Skysearch(commands.Cog):
                 if file_format.lower() == "csv":
                     with open(file_path, "w", newline='', encoding='utf-8') as file:
                         writer = csv.writer(file)
-                        writer.writerow(response.keys())
-                        writer.writerow(map(str, response.values()))
+                        writer.writerow(response[0].keys())  # Write the keys as the header
+                        for aircraft in response:  # Iterate over each aircraft in the response
+                            writer.writerow(map(str, aircraft.values()))  # Write the values of each aircraft
                     await ctx.send(file=discord.File(file_path))
                 elif file_format.lower() == "pdf":
                     doc = SimpleDocTemplate(file_path, pagesize=letter)
@@ -335,7 +336,7 @@ class Skysearch(commands.Cog):
                     flowables.append(Paragraph(f"{search_type.capitalize()} {search_value}", styles['Normal-Bold']))
                     flowables.append(Spacer(1, 12))
 
-                    for aircraft in response['ac']:
+                    for aircraft in response:  # Iterate over each aircraft in the response
                         data = [list(aircraft.keys())]
                         data.append(list(map(str, aircraft.values())))
 
