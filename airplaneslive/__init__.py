@@ -1,11 +1,8 @@
 from redbot.core.bot import Red
 
-from .airplaneslive import airplaneslive
+from .airplaneslive import Airplaneslive
 
 async def setup(bot: Red):
-    await bot.add_cog(AirplanesLive(bot))
-
-async def setup(bot: Red):
-    cog = AirplanesLive(bot)
+    cog = Airplaneslive(bot)
     await cog.initialize()
     await bot.add_cog(cog)
