@@ -4,6 +4,7 @@ import json
 import aiohttp
 import re
 import asyncio
+import typing
 
 class Airplaneslive(commands.Cog):
     def __init__(self, bot):
