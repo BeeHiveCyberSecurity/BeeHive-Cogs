@@ -104,28 +104,51 @@ class Airplaneslive(commands.Cog):
             view = discord.ui.View(timeout=180)  # Set a timeout for the view
 
             # Create buttons with click actions
-            search_callsign = discord.ui.Button(label=f"Search by callsign", style=discord.ButtonStyle.green, custom_id="search_callsign")
-            search_icao = discord.ui.Button(label="Search by ICAO", style=discord.ButtonStyle.grey, custom_id="search_icao")
-            search_registration = discord.ui.Button(label="Search by registration", style=discord.ButtonStyle.grey, custom_id="search_registration")
-            show_the_commands = discord.ui.Button(label="Show available commands", style=discord.ButtonStyle.grey, custom_id="show_commands")
+            search_callsign = discord.ui.Button(label=f"Search by callsign", style=discord.ButtonStyle.green)
+            search_icao = discord.ui.Button(label="Search by ICAO", style=discord.ButtonStyle.grey)
+            search_registration = discord.ui.Button(label="Search by registration", style=discord.ButtonStyle.grey)
+            show_the_commands = discord.ui.Button(label="Show available commands", style=discord.ButtonStyle.grey)
+
+            # Define button callbacks
+            async def search_callsign_callback(interaction):
+                if interaction.user != ctx.author:
+                    await interaction.response.send_message("You are not allowed to interact with this button.", ephemeral=True)
+                    return
+                await interaction.response.defer()
+                await self.aircraft_by_callsign(ctx)
+
+            async def search_icao_callback(interaction):
+                if interaction.user != ctx.author:
+                    await interaction.response.send_message("You are not allowed to interact with this button.", ephemeral=True)
+                    return
+                await interaction.response.defer()
+                await self.aircraft_by_icao(ctx)
+
+            async def search_registration_callback(interaction):
+                if interaction.user != ctx.author:
+                    await interaction.response.send_message("You are not allowed to interact with this button.", ephemeral=True)
+                    return
+                await interaction.response.defer()
+                await self.aircraft_by_reg(ctx)
+
+            async def show_the_commands_callback(interaction):
+                if interaction.user != ctx.author:
+                    await interaction.response.send_message("You are not allowed to interact with this button.", ephemeral=True)
+                    return
+                await interaction.response.defer()
+                await ctx.send_help(self.aircraft_group)
+
+            # Assign callbacks to buttons
+            search_callsign.callback = search_callsign_callback
+            search_icao.callback = search_icao_callback
+            search_registration.callback = search_registration_callback
+            show_the_commands.callback = show_the_commands_callback
 
             # Add buttons to the view
             view.add_item(search_callsign)
             view.add_item(search_icao)
             view.add_item(search_registration)
             view.add_item(show_the_commands)
-
-            # Define the interaction response
-            @view.listen('on_click')
-            async def on_button_click(interaction):
-                if interaction.component.custom_id == "search_callsign":
-                    await self.aircraft_by_callsign(interaction)
-                elif interaction.component.custom_id == "search_icao":
-                    await self.aircraft_by_icao(interaction)
-                elif interaction.component.custom_id == "search_registration":
-                    await self.aircraft_by_reg(interaction)
-                elif interaction.component.custom_id == "show_commands":
-                    await ctx.send_help(self.aircraft_group)
 
             # Send the embed with the view
             await ctx.send(embed=embed, view=view)
