@@ -325,7 +325,7 @@ class Skysearch(commands.Cog):
                     with open(file_path, "w", newline='', encoding='utf-8') as file:
                         writer = csv.writer(file)
                         aircraft_keys = list(response['ac'][0].keys())
-                        writer.writerow(aircraft_keys)
+                        writer.writerow([key.upper() for key in aircraft_keys])
                         for aircraft in response['ac']:
                             aircraft_values = list(map(str, aircraft.values()))
                             writer.writerow(aircraft_values)
