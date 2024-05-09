@@ -117,20 +117,28 @@ class Airplaneslive(commands.Cog):
                 await ctx.send_help(self.aircraft_group)
 
             # Create buttons with click actions
-            search_callsign = discord.ui.Button(label=f"Search by callsign", style=discord.ButtonStyle.green)
-            search_callsign.click(on_search_callsign_click)
-            search_icao = discord.ui.Button(label="Search by ICAO", style=discord.ButtonStyle.grey)
-            search_icao.click(on_search_icao_click)
-            search_registration = discord.ui.Button(label="Search by registration", style=discord.ButtonStyle.grey)
-            search_registration.click(on_search_registration_click)
-            show_the_commands = discord.ui.Button(label="Show available commands", style=discord.ButtonStyle.grey)
-            show_the_commands.click(on_show_the_commands_click)
+            search_callsign = discord.ui.Button(label=f"Search by callsign", style=discord.ButtonStyle.green, custom_id="search_callsign")
+            search_icao = discord.ui.Button(label="Search by ICAO", style=discord.ButtonStyle.grey, custom_id="search_icao")
+            search_registration = discord.ui.Button(label="Search by registration", style=discord.ButtonStyle.grey, custom_id="search_registration")
+            show_the_commands = discord.ui.Button(label="Show available commands", style=discord.ButtonStyle.grey, custom_id="show_commands")
 
             # Add buttons to the view
             view.add_item(search_callsign)
             view.add_item(search_icao)
             view.add_item(search_registration)
             view.add_item(show_the_commands)
+
+            # Define the interaction response
+            @view.listen()
+            async def on_interaction(interaction: discord.Interaction):
+                if interaction.custom_id == "search_callsign":
+                    await on_search_callsign_click(interaction)
+                elif interaction.custom_id == "search_icao":
+                    await on_search_icao_click(interaction)
+                elif interaction.custom_id == "search_registration":
+                    await on_search_registration_click(interaction)
+                elif interaction.custom_id == "show_commands":
+                    await on_show_the_commands_click(interaction)
 
             # Send the embed with the view
             await ctx.send(embed=embed, view=view)
