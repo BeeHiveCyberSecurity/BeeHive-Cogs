@@ -170,7 +170,13 @@ class Skysearch(commands.Cog):
                     await interaction.response.send_message("You are not allowed to interact with this button.", ephemeral=True)
                     return
                 await interaction.response.defer()
-                await ctx.send("Please reply with the registration you want to search.")
+                embed = discord.Embed(
+                    title="Query",
+                    description="Please reply with the registration you want to search.",
+                    color=discord.Color.from_str("#fffffe")
+                )
+                embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/search.png")
+                await ctx.send(embed=embed)
                 def check(m):
                     return m.author == ctx.author
                 message = await self.bot.wait_for('message', check=check)
@@ -181,7 +187,13 @@ class Skysearch(commands.Cog):
                     await interaction.response.send_message("You are not allowed to interact with this button.", ephemeral=True)
                     return
                 await interaction.response.defer()
-                await ctx.send("Please reply with the squawk you want to search.")
+                embed = discord.Embed(
+                    title="Query",
+                    description="Please reply with the squawk you want to search.",
+                    color=discord.Color.from_str("#fffffe")
+                )
+                embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/search.png")
+                await ctx.send(embed=embed)
                 def check(m):
                     return m.author == ctx.author
                 message = await self.bot.wait_for('message', check=check)
@@ -192,7 +204,13 @@ class Skysearch(commands.Cog):
                     await interaction.response.send_message("You are not allowed to interact with this button.", ephemeral=True)
                     return
                 await interaction.response.defer()
-                await ctx.send("Please reply with the type you want to search.")
+                embed = discord.Embed(
+                    title="Query",
+                    description="Please reply with the type you want to search.",
+                    color=discord.Color.from_str("#fffffe")
+                )
+                embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/search.png")
+                await ctx.send(embed=embed)
                 def check(m):
                     return m.author == ctx.author
                 message = await self.bot.wait_for('message', check=check)
