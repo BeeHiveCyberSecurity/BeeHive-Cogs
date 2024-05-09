@@ -251,7 +251,28 @@ class Skysearch(commands.Cog):
         url = f"{self.api_url}/squawk/{squawk_value}"
         response = await self._make_request(url)
         if response:
-            await self._send_aircraft_info(ctx, response)
+            if 'ac' in response and len(response['ac']) > 1:
+                pages = []
+                for aircraft_info in response['ac']:
+                    embed = self._create_embed({'ac': [aircraft_info]})
+                    pages.append(embed)
+                message = await ctx.send(embed=pages[0])
+                await message.add_reaction('⬅️')
+                await message.add_reaction('➡️')
+                def check(reaction, user):
+                    return user == ctx.author and str(reaction.emoji) in ['⬅️', '➡️']
+                while True:
+                    reaction, user = await self.bot.wait_for('reaction_add', timeout=60.0, check=check)
+                    if str(reaction.emoji) == '⬅️':
+                        if page > 0:
+                            page -= 1
+                            await message.edit(embed=pages[page])
+                    elif str(reaction.emoji) == '➡️':
+                        if page < len(pages) - 1:
+                            page += 1
+                            await message.edit(embed=pages[page])
+            else:
+                await self._send_aircraft_info(ctx, response)
         else:
             embed = discord.Embed(title="Error", description="Error retrieving aircraft information.", color=0xff4545)
             await ctx.send(embed=embed)
