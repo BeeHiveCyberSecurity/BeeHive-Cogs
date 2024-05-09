@@ -93,8 +93,9 @@ class Airplaneslive(commands.Cog):
             pass
         return None, None
 
-    @commands.group(name='aircraft', help='Get information about aircraft.')
+    @commands.group(name='aircraft', help='Get information about aircraft.', invoke_without_command=True)
     async def aircraft_group(self, ctx):
+        """"""
         if ctx.invoked_subcommand is None:
             embed = discord.Embed(
                 title="Air Traffic Control",
