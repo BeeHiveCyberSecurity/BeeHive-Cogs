@@ -314,6 +314,9 @@ class Skysearch(commands.Cog):
             await ctx.send("Please specify the file format as either 'csv' or 'pdf'.")
             return
 
+        if search_type == "icao":
+            search_type = "hex"
+
         url = f"{self.api_url}/{search_type}/{search_value}"
         response = await self._make_request(url)
         if response:
