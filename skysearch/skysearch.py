@@ -244,7 +244,7 @@ class Skysearch(commands.Cog):
             if 'ac' in response and len(response['ac']) > 1:
                 pages = []
                 for aircraft_info in response['ac']:
-                    embed = self._create_embed({'ac': [aircraft_info]})
+                    embed = self._send_aircraft_info(ctx, {'ac': [aircraft_info]})
                     pages.append(embed)
                 message = await ctx.send(embed=pages[0])
                 await message.add_reaction('⬅️')
