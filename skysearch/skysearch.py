@@ -118,6 +118,7 @@ class Skysearch(commands.Cog):
             search_icao = discord.ui.Button(label="Search by ICAO", style=discord.ButtonStyle.grey)
             search_registration = discord.ui.Button(label="Search by registration", style=discord.ButtonStyle.grey)
             search_squawk = discord.ui.Button(label="Search by squawk", style=discord.ButtonStyle.grey)
+            search_type = discord.ui.Button(label="Search by type", style=discord.ButtonStyle.grey)
             show_the_commands = discord.ui.Button(label="Show available commands", style=discord.ButtonStyle.grey)
 
             # Define button callbacks
@@ -165,6 +166,17 @@ class Skysearch(commands.Cog):
                 message = await self.bot.wait_for('message', check=check)
                 await self.aircraft_by_squawk(ctx, message.content)
 
+            async def search_type_callback(interaction):
+                if interaction.user != ctx.author:
+                    await interaction.response.send_message("You are not allowed to interact with this button.", ephemeral=True)
+                    return
+                await interaction.response.defer()
+                await ctx.send("Please reply with the type you want to search.")
+                def check(m):
+                    return m.author == ctx.author
+                message = await self.bot.wait_for('message', check=check)
+                await self.aircraft_by_type(ctx, message.content)
+
             async def show_the_commands_callback(interaction):
                 if interaction.user != ctx.author:
                     await interaction.response.send_message("You are not allowed to interact with this button.", ephemeral=True)
@@ -177,6 +189,7 @@ class Skysearch(commands.Cog):
             search_icao.callback = search_icao_callback
             search_registration.callback = search_registration_callback
             search_squawk.callback = search_squawk_callback
+            search_type.callback = search_type_callback
             show_the_commands.callback = show_the_commands_callback
 
             # Add buttons to the view
@@ -184,6 +197,7 @@ class Skysearch(commands.Cog):
             view.add_item(search_icao)
             view.add_item(search_registration)
             view.add_item(search_squawk)
+            view.add_item(search_type)
             view.add_item(show_the_commands)
 
             # Send the embed with the view
