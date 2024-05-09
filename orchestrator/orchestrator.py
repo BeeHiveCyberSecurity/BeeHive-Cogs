@@ -25,7 +25,7 @@ class Orchestrator(commands.Cog):
         await ctx.defer()
         guilds = [guild async for guild in self.bot.fetch_guilds(limit=None)]
         # No need to filter out guilds as we want to list all guilds the bot is in
-        guilds_sorted = sorted(guilds, key=lambda x: x.member_count if x.member_count is not None else 0, reverse=True)
+        guilds_sorted = sorted(guilds, key=lambda x: x.member_count if hasattr(x, 'member_count') else 0, reverse=True)
         if not guilds_sorted:
             return await ctx.send("No guilds available.")
 
@@ -34,10 +34,10 @@ class Orchestrator(commands.Cog):
         for guild in guilds_sorted:
             full_guild = await self.bot.fetch_guild(guild.id)
             embed_color = discord.Color.from_rgb(255, 255, 254)
-            guild_owner = full_guild.owner if full_guild.owner else 'Unknown'
+            guild_owner = full_guild.owner_id if hasattr(full_guild, 'owner_id') else 'Unknown'
+            member_count = full_guild.member_count if hasattr(full_guild, 'member_count') else 'Unknown'
             embed_description = (
-                f"**Members:** `{full_guild.member_count}`\n"
-                # Removed the line that caused the AttributeError as 'presence_count' is not an attribute of 'Guild'
+                f"**Members:** `{member_count}`\n"
                 f"**Owner:** `{guild_owner}`\n"
                 f"**Created At:** `{full_guild.created_at.strftime('%Y-%m-%d %H:%M:%S')}`\n"
                 f"**Boost Level:** `{full_guild.premium_tier}`\n"
