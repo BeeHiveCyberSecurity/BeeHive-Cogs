@@ -53,8 +53,8 @@ class Orchestrator(commands.Cog):
             embed.add_field(name="Number of Emojis", value=str(len(full_guild.emojis)) if hasattr(full_guild, 'emojis') else 'Unknown')
             text_channels = [channel for channel in full_guild.channels if isinstance(channel, discord.TextChannel)]
             voice_channels = [channel for channel in full_guild.channels if isinstance(channel, discord.VoiceChannel)]
-            embed.add_field(name="Number of Text Channels", value=str(len(text_channels)) if text_channels else 'Unknown')
-            embed.add_field(name="Number of Voice Channels", value=str(len(voice_channels)) if voice_channels else 'Unknown')
+            embed.add_field(name="Number of Text Channels", value=str(len(text_channels)) if len(text_channels) > 0 else '0')
+            embed.add_field(name="Number of Voice Channels", value=str(len(voice_channels)) if len(voice_channels) > 0 else '0')
             embeds.append(embed)
             guild_ids.append(guild.id)
         
