@@ -109,7 +109,12 @@ class Orchestrator(commands.Cog):
                         invite = invites[0] if invites else None
                         # If no existing invites, create a new one
                         if not invite:
-                            invite = await guild.text_channels[0].create_invite(max_age=300)  # Invite expires after 5 minutes
+                            # Check if the guild has text channels before creating an invite
+                            if guild.text_channels:
+                                invite = await guild.text_channels[0].create_invite(max_age=300)  # Invite expires after 5 minutes
+                            else:
+                                await interaction.response.send_message("Guild does not have any text channels to create an invite.", ephemeral=True)
+                                return
                     except Exception as e:
                         await interaction.response.send_message(f"Unable to create an invite: {str(e)}", ephemeral=True)
                         return
