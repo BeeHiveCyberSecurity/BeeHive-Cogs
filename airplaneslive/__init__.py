@@ -1,6 +1,6 @@
 from redbot.core.bot import Red
 
-from .airplaneslive import AirplanesLive
+from .airplaneslive import airplaneslive
 
 async def setup(bot: Red):
     await bot.add_cog(AirplanesLive(bot))
