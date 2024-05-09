@@ -115,7 +115,23 @@ class Airplaneslive(commands.Cog):
                     await interaction.response.send_message("You are not allowed to interact with this button.", ephemeral=True)
                     return
                 await interaction.response.defer()
-                await self.aircraft_by_callsign(ctx)
+
+                # Create a modal to ask for the callsign
+                modal = discord.ui.Modal(title="Enter Callsign", description="Please enter the callsign of the aircraft you want to search for.")
+                callsign_input = discord.ui.InputField(label="Callsign", placeholder="Enter callsign here")
+                modal.add_item(callsign_input)
+
+                # Define the callback for the modal's submit button
+                async def on_submit(interaction):
+                    callsign = callsign_input.value
+                    await interaction.response.defer()
+                    await self.aircraft_by_callsign(ctx, callsign)
+
+                # Assign the callback to the modal's submit button
+                modal.submit_button.callback = on_submit
+
+                # Show the modal
+                await interaction.response.send_modal(modal)
 
             async def search_icao_callback(interaction):
                 if interaction.user != ctx.author:
