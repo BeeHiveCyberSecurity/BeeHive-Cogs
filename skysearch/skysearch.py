@@ -141,6 +141,7 @@ class Skysearch(commands.Cog):
                     description="Please reply with the complete `callsign` you want to search the skies for.",
                     color=discord.Color.from_str("#fffffe")
                 )
+                embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/search.png")
                 await ctx.send(embed=embed)
                 def check(m):
                     return m.author == ctx.author
@@ -157,6 +158,7 @@ class Skysearch(commands.Cog):
                     description="Please reply with the ICAO you want to search.",
                     color=discord.Color.from_str("#fffffe")
                 )
+                embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/search.png")
                 await ctx.send(embed=embed)
                 def check(m):
                     return m.author == ctx.author
