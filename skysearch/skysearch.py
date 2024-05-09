@@ -7,7 +7,7 @@ import asyncio
 import typing
 import os
 import tempfile
-from reportlab.lib.pagesizes import letter #type: ignore
+from reportlab.lib.pagesizes import letter, landscape #type: ignore
 from reportlab.pdfgen import canvas #type: ignore 
 from reportlab.lib import colors#type: ignore
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle #type: ignore
