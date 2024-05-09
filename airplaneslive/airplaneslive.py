@@ -53,7 +53,7 @@ class Airplaneslive(commands.Cog):
             embed.add_field(name="Altitude Rate", value=f"{aircraft_data.get('baro_rate', 'N/A')} feet/minute", inline=True)
             embed.add_field(name="Vertical Rate", value=f"{aircraft_data.get('geom_rate', 'N/A')} feet/minute", inline=True)
             view = discord.ui.View()
-            view.add_item(discord.ui.Button(label="View more information", url=f"{link}", style=discord.ButtonStyle.link, emoji="<:info:1199305085738553385>"))
+            view.add_item(discord.ui.Button(label="Track flight live", url=f"{link}", style=discord.ButtonStyle.link, emoji="<:info:1199305085738553385>"))
             await ctx.send(embed=embed, view=view)
         else:
             await ctx.send("No aircraft information found or the response format is incorrect.\n\nThe plane may be not currently in use or the data is not available at the moment")
