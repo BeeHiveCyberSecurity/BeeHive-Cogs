@@ -347,7 +347,7 @@ class Skysearch(commands.Cog):
                 other_stats = data["other"]
                 aircraft_stats = data["aircraft"]
 
-                embed = discord.Embed(title="Aircraft Data Feeder Stats", color=0x00ff00)
+                embed = discord.Embed(title="Aircraft Data Feeder Stats", description="Data is brought to you free-of-charge by [airplanes.live](https://airplanes.live)" color=0xfffffe)
                 embed.set_image(url="https://asset.brandfetch.io/id1hdkKy3B/idqsgDGEm_.png")
                 embed.add_field(name="Beast", value="{:,} planes".format(beast_stats), inline=False)
                 embed.add_field(name="MLAT", value="{:,} planes".format(mlat_stats), inline=False)
