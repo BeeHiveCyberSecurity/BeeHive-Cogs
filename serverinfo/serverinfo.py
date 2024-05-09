@@ -1,8 +1,27 @@
 from redbot.core import Config, commands
 import discord
 from discord.ui import Button, View
+import datetime
+import time
+from enum import Enum
+from random import randint, choice
+from typing import Final
+import urllib.parse
+import aiohttp
+import discord
+from redbot.core import commands
+from redbot.core.bot import Red
+from redbot.core.i18n import Translator, cog_i18n
+from redbot.core.utils.menus import menu
+from redbot.core.utils.chat_formatting import (
+    bold,
+    escape,
+    italics,
+    humanize_number,
+    humanize_timedelta,
+)
 
-class ServerInfo(commands.Cog):
+class ServerInfoCog(commands.Cog):
     """See info about the servers your bot is in.
     
     For bot owners only.
