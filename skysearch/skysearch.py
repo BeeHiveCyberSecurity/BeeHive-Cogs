@@ -335,8 +335,8 @@ class Skysearch(commands.Cog):
                     flowables.append(Paragraph(f"{search_type.capitalize()} {search_value}", styles['Normal-Bold']))
                     flowables.append(Spacer(1, 12))
 
-                    data = [response.keys()]
-                    data.append(map(str, response.values()))
+                    data = [list(response.keys())]
+                    data.append(list(map(str, response.values())))
 
                     t = Table(data)
                     t.setStyle(TableStyle([
