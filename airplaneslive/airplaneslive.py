@@ -37,8 +37,10 @@ class Airplaneslive(commands.Cog):
             emergency_squawk_codes = ['7500', '7600', '7700']
             if aircraft_data.get('squawk', 'N/A') in emergency_squawk_codes:
                 embed = discord.Embed(title='Aircraft Information', color=discord.Colour(0xff4545))
+                emergency_status = "Declared"
             else:
                 embed = discord.Embed(title='Aircraft Information', color=discord.Colour(0xfffffe))
+                emergency_status = "None Declared"
             embed.set_image(url=image_url)
             embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/airplane.png")
             embed.set_footer(text="Powered by Planespotters.net and airplanes.live ✈️")
@@ -49,7 +51,7 @@ class Airplaneslive(commands.Cog):
             embed.add_field(name="Heading", value=f"{aircraft_data.get('true_heading', 'N/A')} degrees", inline=True)
             embed.add_field(name="Position", value=f"{aircraft_data.get('lat', 'N/A')}, {aircraft_data.get('lon', 'N/A')}", inline=True)
             embed.add_field(name="Squawk", value=aircraft_data.get('squawk', 'N/A'), inline=True)
-            embed.add_field(name="Emergency", value=aircraft_data.get('emergency', 'N/A'), inline=True)
+            embed.add_field(name="Emergency", value=emergency_status, inline=True)
             embed.add_field(name="Operator", value=aircraft_data.get('ownOp', 'N/A'), inline=True)
             embed.add_field(name="Year", value=aircraft_data.get('year', 'N/A'), inline=True)
             embed.add_field(name="Category", value=aircraft_data.get('category', 'N/A'), inline=True)
