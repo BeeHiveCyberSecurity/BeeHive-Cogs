@@ -44,7 +44,7 @@ class Airplaneslive(commands.Cog):
                 emergency_status = "None Declared"
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/airplane.png")
             embed.set_image(url=image_url)
-            embed.set_footer(text="Powered by Planespotters.net and airplanes.live ✈️")
+            embed.set_footer(text="")
             embed.add_field(name="Flight", value=aircraft_data.get('flight', 'N/A').strip(), inline=True)
             embed.add_field(name="Registration", value=aircraft_data.get('reg', 'N/A'), inline=True)
             embed.add_field(name="Type", value=f"{aircraft_data.get('desc', 'N/A')} ({aircraft_data.get('t', 'N/A')})", inline=True)
@@ -93,13 +93,50 @@ class Airplaneslive(commands.Cog):
             pass
         return None, None
 
-    @commands.hybrid_group(name='aircraft', help='Get information about aircraft.')
+    @commands.group(name='aircraft', help='Get information about aircraft.')
     async def aircraft_group(self, ctx):
         if ctx.invoked_subcommand is None:
-            await ctx.send('Invalid aircraft command passed.')
+            embed = discord.Embed(
+                title="Air Traffic Control",
+                description="Select an action to perform",
+                color=discord.Color.from_str("#fffffe")
+            )
+            view = discord.ui.View(timeout=180)  # Set a timeout for the view
 
-    @aircraft_group.command(name='hex', help='Get information about an aircraft by its hexadecimal identifier.')
-    async def aircraft_by_hex(self, ctx, hex_id: str):
+            # Define button click actions
+            async def on_search_callsign_click(interaction):
+                await self.aircraft_by_callsign(interaction)
+
+            async def on_search_icao_click(interaction):
+                await self.aircraft_by_icao(interaction)
+
+            async def on_search_registration_click(interaction):
+                await self.aircraft_by_reg(interaction)
+
+            async def on_show_the_commands_click(interaction):
+                await ctx.send_help(self.aircraft_group)
+
+            # Create buttons with click actions
+            search_callsign = discord.ui.Button(label=f"Search by callsign", style=discord.ButtonStyle.green)
+            search_callsign.click(on_search_callsign_click)
+            search_icao = discord.ui.Button(label="Search by ICAO", style=discord.ButtonStyle.grey)
+            search_icao.click(on_search_icao_click)
+            search_registration = discord.ui.Button(label="Search by registration", style=discord.ButtonStyle.grey)
+            search_registration.click(on_search_registration_click)
+            show_the_commands = discord.ui.Button(label="Show available commands", style=discord.ButtonStyle.grey)
+            show_the_commands.click(on_show_the_commands_click)
+
+            # Add buttons to the view
+            view.add_item(search_callsign)
+            view.add_item(search_icao)
+            view.add_item(search_registration)
+            view.add_item(show_the_commands)
+
+            # Send the embed with the view
+            await ctx.send(embed=embed, view=view)
+
+    @aircraft_group.command(name='icao', help='Get information about an aircraft by its 24-bit ICAO Address')
+    async def aircraft_by_icao(self, ctx, hex_id: str):
         url = f"{self.api_url}/hex/{hex_id}"
         response = await self._make_request(url)
         if response:
