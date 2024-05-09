@@ -6,6 +6,7 @@ import re
 import asyncio
 import typing
 import os
+import tempfile
 from reportlab.lib.pagesizes import letter #type: ignore
 from reportlab.pdfgen import canvas #type: ignore 
 from reportlab.lib import colors#type: ignore
