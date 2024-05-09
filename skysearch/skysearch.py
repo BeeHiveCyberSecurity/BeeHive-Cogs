@@ -309,31 +309,34 @@ class Skysearch(commands.Cog):
         url = f"{self.api_url}/{search_type}/{search_value}"
         response = await self._make_request(url)
         if response:
-            if file_format == "txt":
-                file_content = json.dumps(response, indent=4)
-                file_name = f"{search_type}_{search_value}.txt"
-            elif file_format == "csv":
-                file_content = ', '.join(response.keys()) + '\n' + ', '.join(map(str, response.values()))
-                file_name = f"{search_type}_{search_value}.csv"
-            elif file_format == "html":
-                file_content = json2html.convert(json=response)
-                file_name = f"{search_type}_{search_value}.html"
-            elif file_format == "pdf":
-                file_content = json.dumps(response, indent=4)
-                file_name = f"{search_type}_{search_value}.pdf"
-                pdf = FPDF()
-                pdf.add_page()
-                pdf.set_font("Arial", size=12)
-                pdf.cell(200, 10, txt=file_content, ln=True)
-                pdf.output(file_name)
+            try:
+                if file_format == "txt":
+                    file_content = json.dumps(response, indent=4)
+                    file_name = f"{search_type}_{search_value}.txt"
+                elif file_format == "csv":
+                    file_content = ', '.join(response.keys()) + '\n' + ', '.join(map(str, response.values()))
+                    file_name = f"{search_type}_{search_value}.csv"
+                elif file_format == "html":
+                    file_content = json2html.convert(json=response)
+                    file_name = f"{search_type}_{search_value}.html"
+                elif file_format == "pdf":
+                    file_content = json.dumps(response, indent=4)
+                    file_name = f"{search_type}_{search_value}.pdf"
+                    pdf = FPDF()
+                    pdf.add_page()
+                    pdf.set_font("Arial", size=12)
+                    pdf.cell(200, 10, txt=file_content, ln=True)
+                    pdf.output(file_name)
 
-            with open(file_name, 'w') as file:
-                file.write(file_content)
+                with open(file_name, 'w') as file:
+                    file.write(file_content)
 
-            with open(file_name, 'rb') as file:
-                await ctx.send(file=discord.File(file, file_name))
+                with open(file_name, 'rb') as file:
+                    await ctx.send(file=discord.File(file, file_name))
 
-            os.remove(file_name)
+                os.remove(file_name)
+            except PermissionError:
+                await ctx.send("Permission denied. Please check the file permissions and try again.")
         else:
             embed = discord.Embed(title="Error", description="Error retrieving aircraft information.", color=0xff4545)
             await ctx.send(embed=embed)
