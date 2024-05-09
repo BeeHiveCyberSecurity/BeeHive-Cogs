@@ -327,7 +327,7 @@ class Skysearch(commands.Cog):
                         writer.writerow(map(str, response.values()))
                     await ctx.send(file=discord.File(file_path))
                 elif file_format.lower() == "pdf":
-                    doc = SimpleDocTemplate(file_path, pagesize=letter)
+                    doc = SimpleDocTemplate(file_path, pagesize=landscape(letter))
                     styles = getSampleStyleSheet()
                     styles.add(ParagraphStyle(name='Normal-Bold', fontName='Helvetica-Bold', fontSize=12, leading=14, alignment=1))
                     flowables = []
@@ -346,7 +346,7 @@ class Skysearch(commands.Cog):
                         ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
                         ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
                         ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-                        ('BACKGROUND', (0, 1), (-1, -1), colors.blue),
+                        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
                     ]))
                     flowables.append(t)
 
