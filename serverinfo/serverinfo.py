@@ -268,11 +268,11 @@ class ServerInfoCog(commands.Cog):
                 self.add_item(Button(style=discord.ButtonStyle.secondary, label="Previous", custom_id="previous"))
                 self.add_item(Button(style=discord.ButtonStyle.secondary, label="Next", custom_id="next"))
 
-            @discord.ui.button(label='Previous', style=discord.ButtonStyle.secondary)
+            @discord.ui.button(custom_id="previous")
             async def previous_button(self, button: discord.ui.Button, interaction: discord.Interaction):
                 pass
 
-            @discord.ui.button(label='Next', style=discord.ButtonStyle.secondary)
+            @discord.ui.button(custom_id="next")
             async def next_button(self, button: discord.ui.Button, interaction: discord.Interaction):
                 pass
 
