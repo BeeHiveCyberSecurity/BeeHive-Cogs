@@ -38,7 +38,7 @@ class Orchestrator(commands.Cog):
             member_count = full_guild.member_count if hasattr(full_guild, 'member_count') else 'Unknown'
             embed_description = (
                 f"**Members:** `{member_count}`\n"
-                f"**Owner:** `<@{guild_owner}>`\n"
+                f"**Owner:** <@{guild_owner}>\n"
                 f"**Created At:** `{full_guild.created_at.strftime('%Y-%m-%d %H:%M:%S')}`\n"
                 f"**Boost Level:** `{full_guild.premium_tier}`\n"
                 f"**Boosts:** `{full_guild.premium_subscription_count}`\n"
