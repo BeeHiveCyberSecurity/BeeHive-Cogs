@@ -2,7 +2,7 @@ import discord
 import datetime
 import time
 import urllib.parse
-import airhttp
+import aiohttp
 from redbot.core import Config, commands
 from discord.ui import Button, View
 from enum import Enum
