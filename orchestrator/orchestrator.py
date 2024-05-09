@@ -95,26 +95,25 @@ class Orchestrator(commands.Cog):
             async def invite_button_callback(self, interaction):
                 guild_id = self.guild_ids[self.current_page]
                 guild = self.bot.get_guild(guild_id)
-                if guild:
-                    invites = await guild.invites()
-                    if invites:
-                        invite = invites[0]  # Use the first available invite
-                    else:
-                        # If no invites are available, try to create one if the bot has permissions
-                        if guild.me.guild_permissions.create_instant_invite:
-                            try:
-                                invite = await guild.text_channels[0].create_invite(max_age=300)  # Invite expires after 5 minutes
-                            except Exception as e:
-                                invite = None
-                                await interaction.response.send_message(f"Failed to create an invite: {str(e)}", ephemeral=True)
-                        else:
-                            invite = None
-                    if invite:
-                        await interaction.response.send_message(f"Invite for {guild.name}: {invite.url}", ephemeral=True)
-                    else:
-                        await interaction.response.send_message("No available invites and cannot create one.", ephemeral=True)
-                else:
+                if not guild:
                     await interaction.response.send_message(f"Could not access guild with ID: {guild_id}", ephemeral=True)
+                    return
+
+                invites = await guild.invites()
+                invite = invites[0] if invites else None  # Use the first available invite
+
+                # If no invites are available, try to create one if the bot has permissions
+                if not invite and guild.me.guild_permissions.create_instant_invite:
+                    try:
+                        invite = await guild.text_channels[0].create_invite(max_age=300)  # Invite expires after 5 minutes
+                    except Exception as e:
+                        await interaction.response.send_message(f"Failed to create an invite: {str(e)}", ephemeral=True)
+                        return
+
+                if invite:
+                    await interaction.response.send_message(f"Invite for {guild.name}: {invite.url}", ephemeral=True)
+                else:
+                    await interaction.response.send_message("No available invites and cannot create one.", ephemeral=True)
             
             async def leave_button_callback(self, interaction):
                 guild_id = self.guild_ids[self.current_page]
