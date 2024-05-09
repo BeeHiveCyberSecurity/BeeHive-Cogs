@@ -4,7 +4,6 @@ import time
 import urllib.parse
 import aiohttp
 from redbot.core import Config, commands
-from discord.ui import Button, View
 from enum import Enum
 from random import randint, choice
 from typing import Final
@@ -261,26 +260,26 @@ class ServerInfoCog(commands.Cog):
         for page in pages:
             page.set_footer(text=joined_on)
 
-        # Create a View with interaction buttons for navigation
-        class NavigationView(View):
-            def __init__(self):
-                super().__init__(timeout=None)
-                self.current_page = 0
+        message = await ctx.send(embed=pages[0])
+        await message.add_reaction("⬅️")
+        await message.add_reaction("➡️")
 
-            @discord.ui.button(label="Previous", custom_id="previous_button_id")
-            async def previous_button(self, button: discord.ui.Button, interaction: discord.Interaction):
-                if self.current_page > 0:
-                    self.current_page -= 1
-                    await interaction.response.edit_message(embed=pages[self.current_page])
+        def check(reaction, user):
+            return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️"]
 
-            @discord.ui.button(label="Next", custom_id="next_button_id")
-            async def next_button(self, button: discord.ui.Button, interaction: discord.Interaction):
-                if self.current_page < len(pages) - 1:
-                    self.current_page += 1
-                    await interaction.response.edit_message(embed=pages[self.current_page])
-
-        view = NavigationView()
-        message = await ctx.send(embed=pages[0], view=view)
-        await view.wait()
-        await message.edit(view=None)
+        page_number = 0
+        while True:
+            try:
+                reaction, user = await self.bot.wait_for("reaction_add", timeout=60.0, check=check)
+            except asyncio.TimeoutError:
+                return
+            else:
+                if str(reaction.emoji) == "⬅️" and page_number > 0:
+                    page_number -= 1
+                    await message.edit(embed=pages[page_number])
+                    await message.remove_reaction(reaction, user)
+                elif str(reaction.emoji) == "➡️" and page_number < len(pages) - 1:
+                    page_number += 1
+                    await message.edit(embed=pages[page_number])
+                    await message.remove_reaction(reaction, user)
 
