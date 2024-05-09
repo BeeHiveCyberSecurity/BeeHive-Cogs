@@ -307,11 +307,14 @@ class Skysearch(commands.Cog):
     @aircraft_group.command(name='export', help='Search aircraft by ICAO, callsign, squawk, or type and export the results.')
     async def export_aircraft(self, ctx, search_type: str, search_value: str, file_format: str):
         if search_type not in ["icao", "callsign", "squawk", "type"]:
-            await ctx.send("Invalid search type specified. Use one of: icao, callsign, squawk, or type.")
+            embed = discord.Embed(title="Error", description="Invalid search type specified. Use one of: icao, callsign, squawk, or type.", color=0xfa4545)
+            await ctx.send(embed=embed)
             return
 
-        if file_format.lower() not in ["csv", "pdf"]:
-            await ctx.send("Please specify the file format as either 'csv' or 'pdf'.")
+        supported_formats = ["csv", "pdf"]
+        if file_format.lower() not in supported_formats:
+            embed = discord.Embed(title="Error", description=f"Please specify the file format as either {', '.join(supported_formats[:-1])} or {supported_formats[-1]}.", color=0xff4545)
+            await ctx.send(embed=embed)
             return
 
         if search_type == "icao":
@@ -355,8 +358,8 @@ class Skysearch(commands.Cog):
                     doc.build(flowables)
                     await ctx.send(file=discord.File(file_path))
             except PermissionError as e:
-                await ctx.send("I do not have permission to write to the file system.")
-            finally:
+                embed = discord.Embed(title="Error", description="I do not have permission to write to the file system.", color=0xff4545)
+                await ctx.send(embed=embed)
                 if os.path.exists(file_path):
                     os.remove(file_path)
         else:
@@ -392,64 +395,6 @@ class Skysearch(commands.Cog):
         except aiohttp.ClientError as e:
             embed = discord.Embed(title="Error", description=f"Error fetching data: {e}", color=0xff4545)
             await ctx.send(embed=embed)
-
-    @aircraft_group.command(name='alert', help='Set up configurable alerts for specific keywords.')
-    async def alert(self, ctx, keyword: str, identifier_type: str, channel: discord.TextChannel, force_update: bool = False):
-        try:
-            if not hasattr(self, 'alerts'):
-                self.alerts = {}
-
-            if identifier_type not in ["hex", "squawk", "callsign", "type"]:
-                await ctx.send("Invalid identifier type specified. Use one of: hex, squawk, callsign, or type.")
-                return
-
-            if keyword in self.alerts and self.alerts[keyword][1] == channel:
-                if not force_update:
-                    await ctx.send(f"Alert for keyword '{keyword}' already exists in channel '{channel.name}'.")
-                    return
-
-            self.alerts[keyword] = (identifier_type, channel)
-            await ctx.send(f"Alert set up for keyword '{keyword}' with identifier type '{identifier_type}' in channel '{channel.name}'.")
-        except Exception as e:
-            await ctx.send(f"An error occurred while setting up the alert: {e}")
-    
-    @aircraft_group.command(name='force_update', help='Force an update for a specific alert.')
-    async def force_update(self, ctx, keyword: str, identifier_type: str, channel: discord.TextChannel):
-        try:
-            if not hasattr(self, 'alerts'):
-                await ctx.send("No alerts configured.")
-                return
-            
-            if (keyword, (identifier_type, channel)) not in self.alerts.items():
-                await ctx.send(f"No alert found for keyword '{keyword}' with identifier type '{identifier_type}' in channel '{channel.name}'.")
-                return
-            
-            self.alerts[keyword] = (identifier_type, channel)
-            await ctx.send(f"Forced update for alert with keyword '{keyword}' and identifier type '{identifier_type}' in channel '{channel.name}'.")
-        except Exception as e:
-            await ctx.send(f"An error occurred while forcing an update for the alert: {e}")
-
-    @aircraft_group.command(name='check_alerts', help='Check all configured alerts.')
-    async def check_alerts(self, ctx):
-        try:
-            if not hasattr(self, 'alerts') or not self.alerts:
-                await ctx.send("No alerts configured.")
-                return
-            
-            alerts_list = "\n".join([f"Keyword: {keyword}, Channel: {channel.name}, Identifier Type: {identifier_type}" for keyword, (identifier_type, channel) in self.alerts.items()])
-            await ctx.send(f"Configured Alerts:\n{alerts_list}")
-        except Exception as e:
-            await ctx.send(f"An error occurred while checking alerts: {e}")
-
-    async def _scroll_through_planes(self, ctx, response):
-        if 'ac' in response:
-            for aircraft_info in response['ac']:
-                await self._send_aircraft_info(ctx, {'ac': [aircraft_info]})
-        else:
-            await ctx.send("No aircraft information found or the response format is incorrect. The plane may not be currently in use or the data is not available at the moment.")
-
-
-            
 
     @aircraft_group.command(name='scroll', help='Scroll through available planes.')
     async def scroll_planes(self, ctx):
