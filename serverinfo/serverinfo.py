@@ -130,11 +130,13 @@ class ServerInfoCog(commands.Cog):
             since_join=humanize_number((ctx.message.created_at - guild.me.joined_at).days),
         )
 
-        data = discord.Embed(
+        pages = []
+
+        page1 = discord.Embed(
             description=(f"{guild.description}\n\n" if guild.description else "") + created_at,
             colour=await ctx.embed_colour(),
         )
-        data.set_author(
+        page1.set_author(
             name=guild.name,
             icon_url="https://cdn.discordapp.com/emojis/457879292152381443.png"
             if "VERIFIED" in guild.features
@@ -143,9 +145,14 @@ class ServerInfoCog(commands.Cog):
             else None,
         )
         if guild.icon:
-            data.set_thumbnail(url=guild.icon)
-        data.add_field(name=_("Members:"), value=member_msg)
-        data.add_field(
+            page1.set_thumbnail(url=guild.icon)
+        page1.add_field(name=_("Members:"), value=member_msg)
+        pages.append(page1)
+
+        page2 = discord.Embed(
+            colour=await ctx.embed_colour(),
+        )
+        page2.add_field(
             name=_("Channels:"),
             value=_(
                 "\N{SPEECH BALLOON} Text: {text}\n"
@@ -157,7 +164,7 @@ class ServerInfoCog(commands.Cog):
                 stage=bold(stage_channels),
             ),
         )
-        data.add_field(
+        page2.add_field(
             name=_("Utility:"),
             value=_(
                 "Owner: {owner}\nVerif. level: {verif}\nServer ID: {id}{shard_info}"
@@ -169,7 +176,12 @@ class ServerInfoCog(commands.Cog):
             ),
             inline=False,
         )
-        data.add_field(
+        pages.append(page2)
+
+        page3 = discord.Embed(
+            colour=await ctx.embed_colour(),
+        )
+        page3.add_field(
             name=_("Misc:"),
             value=_(
                 "AFK channel: {afk_chan}\nAFK timeout: {afk_timeout}\nCustom emojis: {emoji_count}\nRoles: {role_count}"
@@ -183,6 +195,7 @@ class ServerInfoCog(commands.Cog):
             ),
             inline=False,
         )
+        pages.append(page3)
 
         excluded_features = {
             # available to everyone since forum channels private beta
@@ -208,14 +221,21 @@ class ServerInfoCog(commands.Cog):
             if feature not in excluded_features
         ]
         if guild.features:
-            data.add_field(
+            page4 = discord.Embed(
+                colour=await ctx.embed_colour(),
+            )
+            page4.add_field(
                 name=_("Server features:"),
                 value="\n".join(
                     f"\N{WHITE HEAVY CHECK MARK} {feature}" for feature in feature_names
                 ),
             )
+            pages.append(page4)
 
         if guild.premium_tier != 0:
+            page5 = discord.Embed(
+                colour=await ctx.embed_colour(),
+            )
             nitro_boost = _(
                 "Tier {boostlevel} with {nitroboosters} boosts\n"
                 "File size limit: {filelimit}\n"
@@ -228,9 +248,17 @@ class ServerInfoCog(commands.Cog):
                 emojis_limit=bold(str(guild.emoji_limit)),
                 bitrate=bold(_bitsize(guild.bitrate_limit)),
             )
-            data.add_field(name=_("Nitro Boost:"), value=nitro_boost)
-        if guild.splash:
-            data.set_image(url=guild.splash.replace(format="png"))
-        data.set_footer(text=joined_on)
+            page5.add_field(name=_("Nitro Boost:"), value=nitro_boost)
+            pages.append(page5)
 
-        await ctx.send(embed=data)
+        if guild.splash:
+            page6 = discord.Embed(
+                colour=await ctx.embed_colour(),
+            )
+            page6.set_image(url=guild.splash.replace(format="png"))
+            pages.append(page6)
+
+        for page in pages:
+            page.set_footer(text=joined_on)
+
+        await menu(ctx, pages, DEFAULT_CONTROLS)
