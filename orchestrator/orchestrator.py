@@ -102,7 +102,11 @@ class Orchestrator(commands.Cog):
                     else:
                         # If no invites are available, try to create one if the bot has permissions
                         if guild.me.guild_permissions.create_instant_invite:
-                            invite = await guild.text_channels[0].create_invite(max_age=300)  # Invite expires after 5 minutes
+                            try:
+                                invite = await guild.text_channels[0].create_invite(max_age=300)  # Invite expires after 5 minutes
+                            except Exception as e:
+                                invite = None
+                                await interaction.response.send_message(f"Failed to create an invite: {str(e)}", ephemeral=True)
                         else:
                             invite = None
                     if invite:
