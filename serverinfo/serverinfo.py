@@ -3,6 +3,7 @@ import datetime
 import time
 import urllib.parse
 import aiohttp
+import asyncio
 from redbot.core import Config, commands
 from enum import Enum
 from random import randint, choice
