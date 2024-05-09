@@ -265,14 +265,14 @@ class ServerInfoCog(commands.Cog):
         class NavigationView(View):
             def __init__(self):
                 super().__init__()
-                self.add_item(Button(style=discord.ButtonStyle.secondary, label="Previous", custom_id="previous"))
-                self.add_item(Button(style=discord.ButtonStyle.secondary, label="Next", custom_id="next"))
+                self.add_item(Button(style=discord.ButtonStyle.secondary, label="Previous", custom_id="previous_button"))
+                self.add_item(Button(style=discord.ButtonStyle.secondary, label="Next", custom_id="next_button"))
 
-            @discord.ui.button(custom_id="previous")
+            @discord.ui.button(custom_id="previous_button")
             async def previous_button(self, button: discord.ui.Button, interaction: discord.Interaction):
                 pass
 
-            @discord.ui.button(custom_id="next")
+            @discord.ui.button(custom_id="next_button")
             async def next_button(self, button: discord.ui.Button, interaction: discord.Interaction):
                 pass
 
