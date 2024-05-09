@@ -24,7 +24,9 @@ class Orchestrator(commands.Cog):
     async def orchestrator(self, ctx):
         """See and manage the servers that your bot instance is in."""
         await ctx.defer()
-        guilds = [guild async for guild in self.bot.fetch_guilds(limit=None)]
+        guilds = []
+        async for guild in self.bot.fetch_guilds(limit=None):
+            guilds.append(guild)
         if not guilds:
             return await ctx.send("No guilds available.")
 
