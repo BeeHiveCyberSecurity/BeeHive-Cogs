@@ -241,7 +241,13 @@ class Skysearch(commands.Cog):
         url = f"{self.api_url}/type/{aircraft_type}"
         response = await self._make_request(url)
         if response:
-            await self._send_aircraft_info(ctx, response)
+            if 'ac' in response and len(response['ac']) > 1:
+                embed = discord.Embed(title="Multiple Aircraft Found", description="Here are the aircraft of the type " + aircraft_type, color=0x00ff00)
+                for aircraft_info in response['ac']:
+                    embed.add_field(name=aircraft_info['callsign'], value=f"Type: {aircraft_info['type']}\nRegistration: {aircraft_info['reg']}", inline=False)
+                await ctx.send(embed=embed)
+            else:
+                await self._send_aircraft_info(ctx, response)
         else:
             embed = discord.Embed(title="Error", description="Error retrieving aircraft information.", color=0xff4545)
             await ctx.send(embed=embed)
