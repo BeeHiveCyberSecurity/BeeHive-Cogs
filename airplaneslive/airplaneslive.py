@@ -116,7 +116,7 @@ class Airplaneslive(commands.Cog):
                     await interaction.response.send_message("You are not allowed to interact with this button.", ephemeral=True)
                     return
                 await interaction.response.defer()
-                callsign_input = discord.ui.TextInput(placeholder="Enter a callsign", title="Enter a callsign")
+                await ctx.send("Please reply with the callsign you want to search.")
                 def check(m):
                     return m.author == ctx.author
                 message = await self.bot.wait_for('message', check=check)
@@ -169,8 +169,8 @@ class Airplaneslive(commands.Cog):
             else:
                 await self._send_aircraft_info(ctx, response)
         else:
-            await ctx.send("Error retrieving aircraft information.")
-
+            embed = discord.Embed(title="Error", description="Error retrieving aircraft information.", color=0xff4545)
+            await ctx.send(embed=embed)
     @aircraft_group.command(name='callsign', help='Get information about an aircraft by its callsign.')
     async def aircraft_by_callsign(self, ctx, callsign: str):
         url = f"{self.api_url}/callsign/{callsign}"
