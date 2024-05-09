@@ -107,8 +107,8 @@ class Skysearch(commands.Cog):
         """"""
         if ctx.invoked_subcommand is None:
             embed = discord.Embed(
-                title="Air Traffic Control",
-                description="Select an action to perform",
+                title="SkySearch Actions",
+                description="Please select what you'd like to do with SkySearch...",
                 color=discord.Color.from_str("#fffffe")
             )
             view = discord.ui.View(timeout=180)  # Set a timeout for the view
@@ -117,6 +117,7 @@ class Skysearch(commands.Cog):
             search_callsign = discord.ui.Button(label=f"Search by callsign", style=discord.ButtonStyle.green)
             search_icao = discord.ui.Button(label="Search by ICAO", style=discord.ButtonStyle.grey)
             search_registration = discord.ui.Button(label="Search by registration", style=discord.ButtonStyle.grey)
+            search_squawk = discord.ui.Button(label="Search by squawk", style=discord.ButtonStyle.grey)
             show_the_commands = discord.ui.Button(label="Show available commands", style=discord.ButtonStyle.grey)
 
             # Define button callbacks
@@ -136,14 +137,33 @@ class Skysearch(commands.Cog):
                     await interaction.response.send_message("You are not allowed to interact with this button.", ephemeral=True)
                     return
                 await interaction.response.defer()
-                await self.aircraft_by_icao(ctx)
+                await ctx.send("Please reply with the ICAO you want to search.")
+                def check(m):
+                    return m.author == ctx.author
+                message = await self.bot.wait_for('message', check=check)
+                await self.aircraft_by_icao(ctx, message.content)
 
             async def search_registration_callback(interaction):
                 if interaction.user != ctx.author:
                     await interaction.response.send_message("You are not allowed to interact with this button.", ephemeral=True)
                     return
                 await interaction.response.defer()
-                await self.aircraft_by_reg(ctx)
+                await ctx.send("Please reply with the registration you want to search.")
+                def check(m):
+                    return m.author == ctx.author
+                message = await self.bot.wait_for('message', check=check)
+                await self.aircraft_by_reg(ctx, message.content)
+
+            async def search_squawk_callback(interaction):
+                if interaction.user != ctx.author:
+                    await interaction.response.send_message("You are not allowed to interact with this button.", ephemeral=True)
+                    return
+                await interaction.response.defer()
+                await ctx.send("Please reply with the squawk you want to search.")
+                def check(m):
+                    return m.author == ctx.author
+                message = await self.bot.wait_for('message', check=check)
+                await self.aircraft_by_squawk(ctx, message.content)
 
             async def show_the_commands_callback(interaction):
                 if interaction.user != ctx.author:
@@ -156,12 +176,14 @@ class Skysearch(commands.Cog):
             search_callsign.callback = search_callsign_callback
             search_icao.callback = search_icao_callback
             search_registration.callback = search_registration_callback
+            search_squawk.callback = search_squawk_callback
             show_the_commands.callback = show_the_commands_callback
 
             # Add buttons to the view
             view.add_item(search_callsign)
             view.add_item(search_icao)
             view.add_item(search_registration)
+            view.add_item(search_squawk)
             view.add_item(show_the_commands)
 
             # Send the embed with the view
