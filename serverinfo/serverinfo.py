@@ -261,4 +261,20 @@ class ServerInfoCog(commands.Cog):
         for page in pages:
             page.set_footer(text=joined_on)
 
-        await menu(ctx, pages, DEFAULT_CONTROLS)
+        # Create a View with interaction buttons for navigation
+        class NavigationView(View):
+            def __init__(self):
+                super().__init__()
+                self.add_item(Button(style=ButtonStyle.secondary, label="Previous", custom_id="previous"))
+                self.add_item(Button(style=ButtonStyle.secondary, label="Next", custom_id="next"))
+
+            @discord.ui.button(label='Previous', style=discord.ButtonStyle.secondary)
+            async def previous_button(self, button: discord.ui.Button, interaction: discord.Interaction):
+                # Logic for showing the previous page
+
+            @discord.ui.button(label='Next', style=discord.ButtonStyle.secondary)
+            async def next_button(self, button: discord.ui.Button, interaction: discord.Interaction):
+                # Logic for showing the next page
+
+        view = NavigationView()
+        await ctx.send(embed=pages[0], view=view)
