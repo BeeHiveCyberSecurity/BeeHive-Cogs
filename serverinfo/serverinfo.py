@@ -1,14 +1,13 @@
-from redbot.core import Config, commands
 import discord
-from discord.ui import Button, View
 import datetime
 import time
+import urllib.parse
+import airhttp
+from redbot.core import Config, commands
+from discord.ui import Button, View
 from enum import Enum
 from random import randint, choice
 from typing import Final
-import urllib.parse
-import aiohttp
-import discord
 from redbot.core import commands
 from redbot.core.bot import Red
 from redbot.core.i18n import Translator, cog_i18n
@@ -20,6 +19,8 @@ from redbot.core.utils.chat_formatting import (
     humanize_number,
     humanize_timedelta,
 )
+
+_ = T_ = Translator("ServerInfoCog", __file__)
 
 class ServerInfoCog(commands.Cog):
     """See info about the servers your bot is in.
