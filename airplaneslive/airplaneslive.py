@@ -9,7 +9,7 @@ import asyncio  # Added asyncio import
 #Pray, Mr. Babbage, if you put into the machine wrong figures, will the right answers come out?
 #I am not able rightly to apprehend the kind of confusion of ideas that could provoke such a question
 
-class AirplanesLiveCog(commands.Cog):
+class Airplaneslive(commands.Cog):  # Changed class name to match import statement
     def __init__(self, bot):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=492089091320446976)  
