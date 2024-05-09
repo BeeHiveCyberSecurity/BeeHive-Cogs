@@ -329,11 +329,11 @@ class Skysearch(commands.Cog):
                 elif file_format.lower() == "pdf":
                     doc = SimpleDocTemplate(file_path, pagesize=landscape(A4)) # Changed to A4 size
                     styles = getSampleStyleSheet()
-                    styles.add(ParagraphStyle(name='Normal-Bold', fontName='Helvetica-Bold', fontSize=10, leading=12, alignment=1)) # Reduced font size
+                    styles.add(ParagraphStyle(name='Normal-Bold', fontName='Helvetica-Bold', fontSize=14, leading=16, alignment=1)) # Increased font size
                     flowables = []
 
-                    flowables.append(Paragraph(f"{search_type.capitalize()} {search_value}", styles['Normal-Bold']))
-                    flowables.append(Spacer(1, 12))
+                    flowables.append(Paragraph(f"<u>{search_type.capitalize()} {search_value}</u>", styles['Normal-Bold'])) # Underlined the title
+                    flowables.append(Spacer(1, 24)) # Increased space
 
                     data = [list(response['ac'][0].keys())]
                     for aircraft in response['ac']:
@@ -342,12 +342,12 @@ class Skysearch(commands.Cog):
                     t = Table(data, repeatRows=1) # Added repeatRows to repeat the header on each page
                     t.setStyle(TableStyle([
                         ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
-                        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                        ('TEXTCOLOR', (0, 0), (-1, 0), colors.black), # Changed text color to black for better readability
                         ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
                         ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
-                        ('FONTSIZE', (0, 0), (-1, -1), 10), # Reduced font size
+                        ('FONTSIZE', (0, 0), (-1, -1), 12), # Increased font size
                         ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-                        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                        ('BACKGROUND', (0, 1), (-1, -1), colors.white), # Changed background color to white for better readability
                     ]))
                     flowables.append(t)
 
