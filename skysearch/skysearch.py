@@ -133,7 +133,7 @@ class Skysearch(commands.Cog):
             # Define button callbacks
             async def search_callsign_callback(interaction):
                 if interaction.user != ctx.author:
-                    await interaction.response.send_message("You are not allowed to interact with this button.", ephemeral=True)
+                    await interaction.response.send_message("This SkySearch panel doesn't belong to you. Start your own using `[p]skysearch`", ephemeral=True)
                     return
                 await interaction.response.defer()
                 embed = discord.Embed(
@@ -149,10 +149,15 @@ class Skysearch(commands.Cog):
 
             async def search_icao_callback(interaction):
                 if interaction.user != ctx.author:
-                    await interaction.response.send_message("You are not allowed to interact with this button.", ephemeral=True)
+                    await interaction.response.send_message("This SkySearch panel doesn't belong to you. Start your own using `[p]skysearch`", ephemeral=True)
                     return
                 await interaction.response.defer()
-                await ctx.send("Please reply with the ICAO you want to search.")
+                embed = discord.Embed(
+                    title="Query",
+                    description="Please reply with the ICAO you want to search.",
+                    color=discord.Color.from_str("#fffffe")
+                )
+                await ctx.send(embed=embed)
                 def check(m):
                     return m.author == ctx.author
                 message = await self.bot.wait_for('message', check=check)
