@@ -327,29 +327,23 @@ class Skysearch(commands.Cog):
                         writer.writerow(map(str, response.values()))
                     await ctx.send(file=discord.File(file_path))
                 elif file_format.lower() == "pdf":
-                    doc = SimpleDocTemplate(file_path, pagesize=landscape(A4)) # Changed to A4 size
+                    doc = SimpleDocTemplate(file_path, pagesize=landscape(A4)) 
                     styles = getSampleStyleSheet()
-                    styles.add(ParagraphStyle(name='Normal-Bold', fontName='Helvetica-Bold', fontSize=14, leading=16, alignment=1)) # Increased font size
+                    styles.add(ParagraphStyle(name='Normal-Bold', fontName='Helvetica-Bold', fontSize=14, leading=16, alignment=1)) 
                     flowables = []
 
-                    flowables.append(Paragraph(f"<u>{search_type.capitalize()} {search_value}</u>", styles['Normal-Bold'])) # Underlined the title
-                    flowables.append(Spacer(1, 24)) # Increased space
+                    flowables.append(Paragraph(f"<u>{search_type.capitalize()} {search_value}</u>", styles['Normal-Bold'])) 
+                    flowables.append(Spacer(1, 24)) 
 
-                    data = [list(response['ac'][0].keys())]
+                    aircraft_keys = list(response['ac'][0].keys())
+                    data = [Paragraph(f"<b>{key}</b>", styles['Normal-Bold']) for key in aircraft_keys]
+                    flowables.extend(data)
+
                     for aircraft in response['ac']:
-                        data.append(list(map(str, aircraft.values())))
-
-                    t = Table(data, repeatRows=1) # Added repeatRows to repeat the header on each page
-                    t.setStyle(TableStyle([
-                        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
-                        ('TEXTCOLOR', (0, 0), (-1, 0), colors.black), # Changed text color to black for better readability
-                        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-                        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
-                        ('FONTSIZE', (0, 0), (-1, -1), 12), # Increased font size
-                        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-                        ('BACKGROUND', (0, 1), (-1, -1), colors.white), # Changed background color to white for better readability
-                    ]))
-                    flowables.append(t)
+                        aircraft_values = list(map(str, aircraft.values()))
+                        data = [Paragraph(value, styles['Normal']) for value in aircraft_values]
+                        flowables.extend(data)
+                        flowables.append(PageBreak())
 
                     doc.build(flowables)
                     await ctx.send(file=discord.File(file_path))
