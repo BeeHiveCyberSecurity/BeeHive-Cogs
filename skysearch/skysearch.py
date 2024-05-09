@@ -324,8 +324,8 @@ class Skysearch(commands.Cog):
                 if file_format.lower() == "csv":
                     with open(file_path, "w", newline='', encoding='utf-8') as file:
                         writer = csv.writer(file)
-                        writer.writerow(response.keys())
-                        writer.writerow(map(str, response.values()))
+                        for key, value in response.items():
+                            writer.writerow([key, str(value)])
                     await ctx.send(file=discord.File(file_path))
                 elif file_format.lower() == "pdf":
                     doc = SimpleDocTemplate(file_path, pagesize=landscape(A4)) 
