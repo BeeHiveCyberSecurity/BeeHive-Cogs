@@ -1,7 +1,7 @@
 from redbot.core.bot import Red
 
-from .airplaneslive import Airplaneslive
+from .skysearch import Skysearch
 
 async def setup(bot: Red):
-    cog = Airplaneslive(bot)
+    cog = Skysearch(bot)
     await bot.add_cog(cog)

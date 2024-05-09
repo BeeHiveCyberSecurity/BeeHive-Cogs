@@ -1,9 +1,0 @@
-{
-    "author": ["bencos18 (492089091320446976)"],
-    "install_msg": "Yur",
-    "name": "airplaneslive",
-    "short": "some random cogs I made for my own use and decided to make public.",
-    "description": "airplanes tracking cog for the https://airplanes.live api .",
-    "tags": ["airplanes", "airplaneslive", "aircraft", "aircraft tracking"],
-    "end_user_data_statement": "This cog does not store any End User Data."
-}

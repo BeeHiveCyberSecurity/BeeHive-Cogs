@@ -6,7 +6,7 @@ import re
 import asyncio
 import typing
 
-class Airplaneslive(commands.Cog):
+class Skysearch(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=492089091320446976)  
