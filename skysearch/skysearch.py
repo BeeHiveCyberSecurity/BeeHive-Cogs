@@ -5,6 +5,11 @@ import aiohttp
 import re
 import asyncio
 import typing
+from reportlab.lib.pagesizes import letter #type: ignore
+from reportlab.pdfgen import canvas #type: ignore 
+from reportlab.lib import colors#type: ignore
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle #type: ignore
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak, Table, TableStyle #type: ignore
 
 class Skysearch(commands.Cog):
     def __init__(self, bot):
@@ -302,41 +307,53 @@ class Skysearch(commands.Cog):
             await ctx.send("Invalid search type specified. Use one of: icao, callsign, squawk, or type.")
             return
 
-        if file_format not in ["txt", "csv", "html", "pdf"]:
-            await ctx.send("Invalid file format specified. Use one of: txt, csv, html, pdf.")
+        if file_format.lower() not in ["csv", "pdf"]:
+            await ctx.send("Please specify the file format as either 'csv' or 'pdf'.")
             return
 
         url = f"{self.api_url}/{search_type}/{search_value}"
         response = await self._make_request(url)
         if response:
+            file_name = f"{search_type}_{search_value}.{file_format.lower()}"
+            file_path = os.path.join(tempfile.gettempdir(), file_name)
+
             try:
-                if file_format == "txt":
-                    file_content = json.dumps(response, indent=4)
-                    file_name = f"{search_type}_{search_value}.txt"
-                elif file_format == "csv":
-                    file_content = ', '.join(response.keys()) + '\n' + ', '.join(map(str, response.values()))
-                    file_name = f"{search_type}_{search_value}.csv"
-                elif file_format == "html":
-                    file_content = json2html.convert(json=response)
-                    file_name = f"{search_type}_{search_value}.html"
-                elif file_format == "pdf":
-                    file_content = json.dumps(response, indent=4)
-                    file_name = f"{search_type}_{search_value}.pdf"
-                    pdf = FPDF()
-                    pdf.add_page()
-                    pdf.set_font("Arial", size=12)
-                    pdf.cell(200, 10, txt=file_content, ln=True)
-                    pdf.output(file_name)
+                if file_format.lower() == "csv":
+                    with open(file_path, "w", newline='', encoding='utf-8') as file:
+                        writer = csv.writer(file)
+                        writer.writerow(response.keys())
+                        writer.writerow(map(str, response.values()))
+                    await ctx.send(file=discord.File(file_path))
+                elif file_format.lower() == "pdf":
+                    doc = SimpleDocTemplate(file_path, pagesize=letter)
+                    styles = getSampleStyleSheet()
+                    styles.add(ParagraphStyle(name='Normal-Bold', fontName='Helvetica-Bold', fontSize=12, leading=14, alignment=LEFT))
+                    flowables = []
 
-                with open(file_name, 'w') as file:
-                    file.write(file_content)
+                    flowables.append(Paragraph(f"{search_type.capitalize()} {search_value}", styles['Normal-Bold']))
+                    flowables.append(Spacer(1, 12))
 
-                with open(file_name, 'rb') as file:
-                    await ctx.send(file=discord.File(file, file_name))
+                    data = [response.keys()]
+                    data.append(map(str, response.values()))
 
-                os.remove(file_name)
-            except PermissionError:
-                await ctx.send("Permission denied. Please check the file permissions and try again.")
+                    t = Table(data)
+                    t.setStyle(TableStyle([
+                        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+                        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                        ('BACKGROUND', (0, 1), (-1, -1), colors.blue),
+                    ]))
+                    flowables.append(t)
+
+                    doc.build(flowables)
+                    await ctx.send(file=discord.File(file_path))
+            except PermissionError as e:
+                await ctx.send("I do not have permission to write to the file system.")
+            finally:
+                if os.path.exists(file_path):
+                    os.remove(file_path)
         else:
             embed = discord.Embed(title="Error", description="Error retrieving aircraft information.", color=0xff4545)
             await ctx.send(embed=embed)
