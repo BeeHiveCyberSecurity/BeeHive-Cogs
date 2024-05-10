@@ -341,7 +341,7 @@ class Skysearch(commands.Cog):
             await ctx.send(embed=embed)
 
     @aircraft_group.command(name='export', help='Search aircraft by ICAO, callsign, squawk, or type and export the results.')
-    async def export_aircraft(self, ctx, search_type: str, search_value: str):
+    async def export_aircraft(self, ctx, search_type: str, search_value: str, file_format: str):
         if search_type not in ["icao", "callsign", "squawk", "type"]:
             embed = discord.Embed(title="Error", description="Invalid search type specified. Use one of: icao, callsign, squawk, or type.", color=0xfa4545)
             await ctx.send(embed=embed)
@@ -353,59 +353,58 @@ class Skysearch(commands.Cog):
         url = f"{self.api_url}/{search_type}/{search_value}"
         response = await self._make_request(url)
         if response:
-            file_format_options = ["csv", "pdf"]
-            file_paths = []
-            for file_format in file_format_options:
-                file_name = f"{search_type}_{search_value}.{file_format.lower()}"
-                file_path = os.path.join(tempfile.gettempdir(), file_name)
-                file_paths.append(file_path)
+            if file_format not in ["csv", "pdf", "docx", "txt"]:
+                embed = discord.Embed(title="Error", description="Invalid file format specified. Use one of: csv, pdf, docx, or txt.", color=0xfa4545)
+                await ctx.send(embed=embed)
+                return
 
-                try:
-                    if file_format.lower() == "csv":
-                        with open(file_path, "w", newline='', encoding='utf-8') as file:
-                            writer = csv.writer(file)
-                            aircraft_keys = list(response['ac'][0].keys())
-                            writer.writerow([key.upper() for key in aircraft_keys])
-                            for aircraft in response['ac']:
-                                aircraft_values = list(map(str, aircraft.values()))
-                                writer.writerow(aircraft_values)
-                    elif file_format.lower() == "pdf":
-                        doc = SimpleDocTemplate(file_path, pagesize=landscape(A4)) 
-                        styles = getSampleStyleSheet()
-                        styles.add(ParagraphStyle(name='Normal-Bold', fontName='Helvetica-Bold', fontSize=14, leading=16, alignment=1)) 
-                        flowables = []
+            file_name = f"{search_type}_{search_value}.{file_format.lower()}"
+            file_path = os.path.join(tempfile.gettempdir(), file_name)
 
-                        flowables.append(Paragraph(f"<u>{search_type.capitalize()} {search_value}</u>", styles['Normal-Bold'])) 
-                        flowables.append(Spacer(1, 24)) 
-
+            try:
+                if file_format.lower() == "csv":
+                    with open(file_path, "w", newline='', encoding='utf-8') as file:
+                        writer = csv.writer(file)
                         aircraft_keys = list(response['ac'][0].keys())
-                        data = [Paragraph(f"<b>{key}</b>", styles['Normal-Bold']) for key in aircraft_keys]
-                        flowables.extend(data)
-
+                        writer.writerow([key.upper() for key in aircraft_keys])
                         for aircraft in response['ac']:
                             aircraft_values = list(map(str, aircraft.values()))
-                            data = [Paragraph(value, styles['Normal']) for value in aircraft_values]
-                            flowables.extend(data)
-                            flowables.append(PageBreak())
+                            writer.writerow(aircraft_values)
+                elif file_format.lower() == "pdf":
+                    doc = SimpleDocTemplate(file_path, pagesize=landscape(A4)) 
+                    styles = getSampleStyleSheet()
+                    styles.add(ParagraphStyle(name='Normal-Bold', fontName='Helvetica-Bold', fontSize=14, leading=16, alignment=1)) 
+                    flowables = []
 
-                        doc.build(flowables)
-                except PermissionError as e:
-                    embed = discord.Embed(title="Error", description="I do not have permission to write to the file system.", color=0xff4545)
-                    await ctx.send(embed=embed)
-                    if os.path.exists(file_path):
-                        os.remove(file_path)
+                    flowables.append(Paragraph(f"<u>{search_type.capitalize()} {search_value}</u>", styles['Normal-Bold'])) 
+                    flowables.append(Spacer(1, 24)) 
 
-            file_format_buttons = []
-            for file_path in file_paths:
-                with open(file_path, 'rb') as fp:
-                    file_url = await self._upload_file_to_server(fp, filename=os.path.basename(file_path))
-                    file_format_buttons.append(discord.ui.Button(style=discord.ButtonStyle.link, label=os.path.splitext(file_path)[1][1:], url=file_url))
+                    aircraft_keys = list(response['ac'][0].keys())
+                    data = [Paragraph(f"<b>{key}</b>", styles['Normal-Bold']) for key in aircraft_keys]
+                    flowables.extend(data)
 
-            file_format_view = discord.ui.View()
-            for button in file_format_buttons:
-                file_format_view.add_item(button)
-            
-            await ctx.send("Please select a file format:", view=file_format_view)
+                    for aircraft in response['ac']:
+                        aircraft_values = list(map(str, aircraft.values()))
+                        data = [Paragraph(value, styles['Normal']) for value in aircraft_values]
+                        flowables.extend(data)
+                        flowables.append(PageBreak())
+
+                    doc.build(flowables)
+                elif file_format.lower() in ["docx", "txt"]:
+                    with open(file_path, "w", newline='', encoding='utf-8') as file:
+                        aircraft_keys = list(response['ac'][0].keys())
+                        file.write(' '.join([key.upper() for key in aircraft_keys]) + '\n')
+                        for aircraft in response['ac']:
+                            aircraft_values = list(map(str, aircraft.values()))
+                            file.write(' '.join(aircraft_values) + '\n')
+            except PermissionError as e:
+                embed = discord.Embed(title="Error", description="I do not have permission to write to the file system.", color=0xff4545)
+                await ctx.send(embed=embed)
+                if os.path.exists(file_path):
+                    os.remove(file_path)
+
+            with open(file_path, 'rb') as fp:
+                await ctx.send(file=discord.File(fp, filename=os.path.basename(file_path)))
         else:
             embed = discord.Embed(title="Error", description="Error retrieving aircraft information.", color=0xff4545)
             await ctx.send(embed=embed)
