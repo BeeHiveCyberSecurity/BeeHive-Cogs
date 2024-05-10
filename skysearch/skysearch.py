@@ -310,7 +310,11 @@ class Skysearch(commands.Cog):
             if len(response['ac']) > 1:
                 aircraft_list = []
                 for aircraft in response['ac']:
-                    aircraft_list.append(f"Type: {aircraft['type']}, Callsign: {aircraft['callsign']}, Squawk: {aircraft['squawk']}, Speed: {aircraft['speed']}")
+                    aircraft_type = aircraft.get('type', 'N/A')
+                    aircraft_callsign = aircraft.get('callsign', 'N/A')
+                    aircraft_squawk = aircraft.get('squawk', 'N/A')
+                    aircraft_speed = aircraft.get('speed', 'N/A')
+                    aircraft_list.append(f"Type: {aircraft_type}, Callsign: {aircraft_callsign}, Squawk: {aircraft_squawk}, Speed: {aircraft_speed}")
                 embed = discord.Embed(title="Military Aircraft", description="\n".join(aircraft_list), color=0x00ff00)
                 await ctx.send(embed=embed)
             else:
