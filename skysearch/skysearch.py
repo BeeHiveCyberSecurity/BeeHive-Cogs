@@ -307,7 +307,14 @@ class Skysearch(commands.Cog):
         url = f"{self.api_url}/mil"
         response = await self._make_request(url)
         if response:
-            await self._send_aircraft_info(ctx, response)
+            if len(response['ac']) > 1:
+                aircraft_list = []
+                for aircraft in response['ac']:
+                    aircraft_list.append(f"Type: {aircraft['type']}, Callsign: {aircraft['callsign']}, Squawk: {aircraft['squawk']}, Speed: {aircraft['speed']}")
+                embed = discord.Embed(title="Military Aircraft", description="\n".join(aircraft_list), color=0x00ff00)
+                await ctx.send(embed=embed)
+            else:
+                await self._send_aircraft_info(ctx, response)
         else:
             embed = discord.Embed(title="Error", description="Error retrieving aircraft information.", color=0xff4545)
             await ctx.send(embed=embed)
