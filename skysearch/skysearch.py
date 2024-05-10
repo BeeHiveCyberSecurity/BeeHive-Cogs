@@ -395,9 +395,13 @@ class Skysearch(commands.Cog):
                     if os.path.exists(file_path):
                         os.remove(file_path)
 
-            file_format_buttons = [
-                discord.ui.Button(style=discord.ButtonStyle.link, label=format_option, url=f"https://cdn.discordapp.com/attachments/{file_path}") for format_option in file_format_options
-            ]
+            file_format_buttons = []
+            for file_path in file_paths:
+                with open(file_path, 'rb') as fp:
+                    msg = await ctx.send(file=discord.File(fp, filename=os.path.basename(file_path)))
+                    for attachment in msg.attachments:
+                        file_format_buttons.append(discord.ui.Button(style=discord.ButtonStyle.link, label=os.path.splitext(attachment.filename)[1][1:], url=attachment.url))
+
             file_format_view = discord.ui.View()
             for button in file_format_buttons:
                 file_format_view.add_item(button)
