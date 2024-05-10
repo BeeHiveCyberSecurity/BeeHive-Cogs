@@ -604,7 +604,8 @@ class Skysearch(commands.Cog):
             if alert_channel_id:
                 alert_channel = self.bot.get_channel(alert_channel_id)
                 if alert_channel:
-                    time_remaining = self.check_emergency_squawks.next_iteration - datetime.datetime.now()
+                    next_iteration = self.check_emergency_squawks.next_iteration
+                    time_remaining = next_iteration - datetime.datetime.now() if next_iteration else "Not scheduled"
                     last_check_status = "Successful, squawks found" if self.check_emergency_squawks.last_result else "Successful, no squawks"
                     embed.add_field(name=f"Guild: {guild.name}, Channel: {alert_channel.name}", value=f"Time until next check: {time_remaining}\nLast check status: {last_check_status}", inline=False)
                 else:
@@ -612,7 +613,6 @@ class Skysearch(commands.Cog):
             else:
                 embed.add_field(name=f"Guild: {guild.name}", value="No alert channel set.", inline=False)
         await ctx.send(embed=embed)
-
     @aircraft_group.command(name='alertchannel', help='Set a channel to send emergency squawk alerts to.')
     async def set_alert_channel(self, ctx, channel: discord.TextChannel):
         await self.config.guild(ctx.guild).alert_channel.set(channel.id)
