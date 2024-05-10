@@ -262,8 +262,8 @@ class StripeIdentity(commands.Cog):
                     f"Hello {user.mention},\n\n"
                     "To enhance safety within our Discord communities, we require a one-time verification of your identity. "
                     "This process involves confirming your identity with a government-issued ID and biometric verification.\n\n"
-                    "**Please have one of the following documents ready**\n- State ID\n- Driver's License\n- Driver's Permit\n- Passport\n\n"
-                    "**Additionally**, be prepared to...\n- Provide a valid email address\n- Take a series of selfies in a well-lit space\n\n"
+                    "### Please have one of the following documents ready\n- State ID\n- Driver's License\n- Driver's Permit\n- Passport\n\n"
+                    "### And prepare to...\n- Provide a valid email address\n- Take a series of selfies in a well-lit space\n- Submit an identity document that matches you\n\n"
                     "We allow 15 minutes to pass before this verification request times out. Failure to verify will result in removal from the server for safety reasons."
                 ),
                 color=discord.Color(0xff4545)
