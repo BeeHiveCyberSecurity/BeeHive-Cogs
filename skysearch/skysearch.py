@@ -50,7 +50,7 @@ class Skysearch(commands.Cog):
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Orange/alert-circle-outline.png")
             else:
                 embed = discord.Embed(title='Aircraft Information', color=discord.Colour(0xfffffe))
-                emergency_status = "None Declared"
+                emergency_status = "None Reported"
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/airplane.png")
             embed.set_image(url=image_url)
             embed.set_footer(text="")
@@ -94,7 +94,7 @@ class Skysearch(commands.Cog):
                 elif squawk_code == '7600':
                     emergency_embed.add_field(name="Squawk 7600 - Radio Failure", value="This code is used to indicate a radio failure. While this code is squawked, assume an aircraft is in a location where reception and/or communication, and thus tracking, may be poor, restricted, or non-existant.", inline=False)
                 elif squawk_code == '7700':
-                    emergency_embed.add_field(name="Squawk 7700 - General Emergency", value="This code is used to indicate a general emergency. The pilot currently has ATC priority and is working on the situation.", inline=False)
+                    emergency_embed.add_field(name="Squawk 7700 - General Emergency", value="This code is used to indicate a general emergency. The pilot currently has ATC priority and is working to resolve the situation. Check local news outlets for more information, or if this is a military flight, look into what squadron the plane belonged to, and if they posted any updates later in the day.", inline=False)
                 await ctx.send(embed=emergency_embed)
         else:
             await ctx.send("No aircraft information found or the response format is incorrect.\n\nThe plane may be not currently in use or the data is not available at the moment")
@@ -129,10 +129,10 @@ class Skysearch(commands.Cog):
 
             # Create buttons with click actions
             search_callsign = discord.ui.Button(label=f"Search by callsign", style=discord.ButtonStyle.green)
-            search_icao = discord.ui.Button(label="Search by ICAO", style=discord.ButtonStyle.grey)
-            search_registration = discord.ui.Button(label="Search by registration", style=discord.ButtonStyle.grey)
-            search_squawk = discord.ui.Button(label="Search by squawk", style=discord.ButtonStyle.grey)
-            search_type = discord.ui.Button(label="Search by type", style=discord.ButtonStyle.grey)
+            search_icao = discord.ui.Button(label="Search by ICAO", style=discord.ButtonStyle.green)
+            search_registration = discord.ui.Button(label="Search by registration", style=discord.ButtonStyle.green)
+            search_squawk = discord.ui.Button(label="Search by squawk", style=discord.ButtonStyle.green)
+            search_type = discord.ui.Button(label="Search by type", style=discord.ButtonStyle.green)
             show_the_commands = discord.ui.Button(label="Show available commands", style=discord.ButtonStyle.grey)
 
             # Define button callbacks
@@ -363,6 +363,23 @@ class Skysearch(commands.Cog):
             file_path = os.path.join(tempfile.gettempdir(), file_name)
 
             try:
+                file_format_options = ["csv", "pdf"]
+                file_format = await self._get_user_input(ctx, "Please select a file format", file_format_options)
+                
+                file_format_buttons = [
+                    discord.ui.Button(style=discord.ButtonStyle.primary, label=format_option) for format_option in file_format_options
+                ]
+                file_format_view = discord.ui.View()
+                file_format_view.add_item(*file_format_buttons)
+                
+                await ctx.send("Please select a file format:", view=file_format_view)
+                
+                def check(interaction: discord.Interaction):
+                    return interaction.user == ctx.author and interaction.message == ctx.message
+                
+                interaction = await self.bot.wait_for("interaction", check=check, timeout=60)
+                file_format = interaction.data["custom_id"]
+                
                 if file_format.lower() == "csv":
                     with open(file_path, "w", newline='', encoding='utf-8') as file:
                         writer = csv.writer(file)
