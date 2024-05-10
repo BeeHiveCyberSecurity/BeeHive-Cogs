@@ -341,15 +341,9 @@ class Skysearch(commands.Cog):
             await ctx.send(embed=embed)
 
     @aircraft_group.command(name='export', help='Search aircraft by ICAO, callsign, squawk, or type and export the results.')
-    async def export_aircraft(self, ctx, search_type: str, search_value: str, file_format: str):
+    async def export_aircraft(self, ctx, search_type: str, search_value: str):
         if search_type not in ["icao", "callsign", "squawk", "type"]:
             embed = discord.Embed(title="Error", description="Invalid search type specified. Use one of: icao, callsign, squawk, or type.", color=0xfa4545)
-            await ctx.send(embed=embed)
-            return
-
-        supported_formats = ["csv", "pdf"]
-        if file_format.lower() not in supported_formats:
-            embed = discord.Embed(title="Error", description=f"Please specify the file format as either {', '.join(supported_formats[:-1])} or {supported_formats[-1]}.", color=0xff4545)
             await ctx.send(embed=embed)
             return
 
@@ -359,27 +353,25 @@ class Skysearch(commands.Cog):
         url = f"{self.api_url}/{search_type}/{search_value}"
         response = await self._make_request(url)
         if response:
+            file_format_options = ["csv", "pdf"]
+            file_format_buttons = [
+                discord.ui.Button(style=discord.ButtonStyle.primary, label=format_option) for format_option in file_format_options
+            ]
+            file_format_view = discord.ui.View()
+            file_format_view.add_item(*file_format_buttons)
+            
+            await ctx.send("Please select a file format:", view=file_format_view)
+            
+            def check(interaction: discord.Interaction):
+                return interaction.user == ctx.author and interaction.message == ctx.message
+            
+            interaction = await self.bot.wait_for("interaction", check=check, timeout=60)
+            file_format = interaction.data["custom_id"]
+
             file_name = f"{search_type}_{search_value}.{file_format.lower()}"
             file_path = os.path.join(tempfile.gettempdir(), file_name)
 
             try:
-                file_format_options = ["csv", "pdf"]
-                file_format = await self._get_user_input(ctx, "Please select a file format", file_format_options)
-                
-                file_format_buttons = [
-                    discord.ui.Button(style=discord.ButtonStyle.primary, label=format_option) for format_option in file_format_options
-                ]
-                file_format_view = discord.ui.View()
-                file_format_view.add_item(*file_format_buttons)
-                
-                await ctx.send("Please select a file format:", view=file_format_view)
-                
-                def check(interaction: discord.Interaction):
-                    return interaction.user == ctx.author and interaction.message == ctx.message
-                
-                interaction = await self.bot.wait_for("interaction", check=check, timeout=60)
-                file_format = interaction.data["custom_id"]
-                
                 if file_format.lower() == "csv":
                     with open(file_path, "w", newline='', encoding='utf-8') as file:
                         writer = csv.writer(file)
