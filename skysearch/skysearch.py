@@ -323,38 +323,44 @@ class Skysearch(commands.Cog):
     @aircraft_group.command(name='military', help='Get information about military aircraft.')
     async def show_military_aircraft(self, ctx):
         url = f"{self.api_url}/mil"
-        try:
-            response = await self._make_request(url)
-            if response and 'ac' in response:
-                for index, aircraft_info in enumerate(response['ac']):
-                    aircraft_data = aircraft_info.get('desc', 'N/A')  # Aircraft Data
-                    aircraft_icao = aircraft_info.get('icao', 'N/A')  # ICAO
-                    aircraft_squawk = aircraft_info.get('squawk', 'N/A')  # Squawk
-                    aircraft_altitude = aircraft_info.get('alt', 'N/A')  # Altitude
-                    aircraft_type = f"{aircraft_data} ({aircraft_info.get('t', 'N/A')})"  # Aircraft Type
-                    aircraft_info_str = f"Aircraft Type: {aircraft_type}, ICAO: {aircraft_icao}, Squawk: {aircraft_squawk}, Altitude: {aircraft_altitude}"
-                    embed = discord.Embed(title="Military Aircraft", description=aircraft_info_str, color=0xfffffe)
+        response = await self._make_request(url)
+        if response:
+            if len(response['ac']) > 1:
+                pages = [response['ac'][i:i + 10] for i in range(0, len(response['ac']), 10)]  # Split aircraft list into pages of 10
+                for page_index, page in enumerate(pages):
+                    embed = discord.Embed(title=f"Military Aircraft (Page {page_index + 1}/{len(pages)})", color=0xfffffe)
                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/airplane.png")
+                    for aircraft in page:
+                        aircraft_description = aircraft.get('desc', 'N/A')  # Aircraft Description
+                        aircraft_squawk = aircraft.get('squawk', 'N/A')  # Squawk
+                        aircraft_coordinates = f"Lat: {aircraft.get('lat', 'N/A')}, Lon: {aircraft.get('lon', 'N/A')}"  # Coordinates
+                        aircraft_heading = aircraft.get('heading', 'N/A')  # Heading
+                        aircraft_speed = aircraft.get('spd', 'N/A')  # Speed
+                        aircraft_info = f"Squawk: {aircraft_squawk}, Coordinates: {aircraft_coordinates}, Heading: {aircraft_heading}, Speed: {aircraft_speed}"
+                        embed.add_field(name=aircraft_description, value=aircraft_info, inline=False)
+
                     message = await ctx.send(embed=embed)
-                    await message.add_reaction("➡️")  # Adding a reaction to scroll to the next plane
-                    await message.add_reaction("⏹️")  # Adding a reaction to stop scrolling
+                    await message.add_reaction("⬅️")  # Adding a reaction to scroll to the previous page
+                    await message.add_reaction("➡️")  # Adding a reaction to scroll to the next page
 
                     def check(reaction, user):
-                        return user == ctx.author and str(reaction.emoji) == '➡️' or str(reaction.emoji) == '⏹️'  # Updated to check for stop reaction as well
+                        return user == ctx.author and str(reaction.emoji) in ['⬅️', '➡️']
 
                     try:
                         reaction, user = await self.bot.wait_for('reaction_add', timeout=60.0, check=check)
-                        await message.remove_reaction(reaction.emoji, ctx.author)  # Remove the reaction after processing
-                        if str(reaction.emoji) == '⏹️':  # Check if the stop reaction was added
-                            embed = discord.Embed(description="Stopping.")
-                            await ctx.send(embed=embed)
-                            break
+                        if str(reaction.emoji) == '⬅️' and page_index > 0:  # Check if the previous page reaction was added and it's not the first page
+                            await message.delete()
+                            page_index -= 1
+                        elif str(reaction.emoji) == '➡️' and page_index < len(pages) - 1:  # Check if the next page reaction was added and it's not the last page
+                            await message.delete()
+                            page_index += 1
                     except asyncio.TimeoutError:
-                        embed = discord.Embed(description="No reaction received. Stopping.")
-                        await ctx.send(embed=embed)
+                        await message.delete()
                         break
-        except Exception as e:
-            embed = discord.Embed(description=f"An error occurred during scrolling: {e}.")
+            else:
+                await self._send_aircraft_info(ctx, response)
+        else:
+            embed = discord.Embed(title="Error", description="Error retrieving aircraft information.", color=0xff4545)
             await ctx.send(embed=embed)
 
     @aircraft_group.command(name='ladd', help='Limiting Aircraft Data Displayed (LADD).')
