@@ -62,14 +62,10 @@ class Skysearch(commands.Cog):
             altitude = aircraft_data.get('alt_baro', 'N/A')
             ground_speed = aircraft_data.get('gs', 'N/A')
             if altitude == 'ground':
-                embed.add_field(name="Altitude", value="On the Ground", inline=True)
+                embed.add_field(name="Status", value="On the Ground", inline=True)
             else:
-                embed.add_field(name="Altitude", value=f"{altitude} feet", inline=True)
-            if ground_speed == 'ground':
-                embed.add_field(name="Ground Speed", value="On the Ground", inline=True)
-            else:
-                ground_speed_mph = round(float(ground_speed) * 1.15078) if ground_speed != 'N/A' else 'N/A'  # Convert knots to mph
-                embed.add_field(name="Ground Speed", value=f"{ground_speed_mph} mph", inline=True)
+                altitude_feet = f"{altitude} feet"
+                embed.add_field(name="Altitude", value=f"`{altitude_feet}`", inline=True)
             embed.add_field(name="Heading", value=f"{aircraft_data.get('true_heading', 'N/A')} degrees", inline=True)
             embed.add_field(name="Position", value=f"{aircraft_data.get('lat', 'N/A')}, {aircraft_data.get('lon', 'N/A')}", inline=True)
             embed.add_field(name="Squawk", value=aircraft_data.get('squawk', 'N/A'), inline=True)
