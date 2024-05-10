@@ -358,7 +358,8 @@ class Skysearch(commands.Cog):
                 discord.ui.Button(style=discord.ButtonStyle.primary, label=format_option, custom_id=format_option) for format_option in file_format_options
             ]
             file_format_view = discord.ui.View()
-            file_format_view.add_item(*file_format_buttons)
+            for button in file_format_buttons:
+                file_format_view.add_item(button)
             
             await ctx.send("Please select a file format:", view=file_format_view)
             
