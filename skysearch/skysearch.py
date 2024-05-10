@@ -88,9 +88,9 @@ class Skysearch(commands.Cog):
             await ctx.send(embed=embed, view=view)
             squawk_code = aircraft_data.get('squawk', 'N/A')
             if squawk_code in emergency_squawk_codes:
-                emergency_embed = discord.Embed(title='Emergency declared', color=discord.Colour(0xFF9145))
+                emergency_embed = discord.Embed(title='This aircraft is declaring an air emergency', color=discord.Colour(0xFF9145))
                 if squawk_code == '7500':
-                    emergency_embed.add_field(name="Squawk 7500 - Hijacking", value="The pilots of this aircraft have indicated that the plane is being hijacked.", inline=False)
+                    emergency_embed.add_field(name="Squawk 7500 - Hijacking", value="The pilots of this aircraft have indicated that the plane is being hijacked. Check local news if this is a domestic flight, or the news channels of the airport the flight is scheduled to arrive at.", inline=False)
                 elif squawk_code == '7600':
                     emergency_embed.add_field(name="Squawk 7600 - Radio Failure", value="This code is used to indicate a radio failure. While this code is squawked, assume an aircraft is in a location where reception and/or communication, and thus tracking, may be poor, restricted, or non-existant.", inline=False)
                 elif squawk_code == '7700':
