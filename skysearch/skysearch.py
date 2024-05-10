@@ -606,7 +606,7 @@ class Skysearch(commands.Cog):
                 if alert_channel:
                     next_iteration = self.check_emergency_squawks.next_iteration
                     time_remaining = next_iteration - datetime.datetime.now() if next_iteration else "Not scheduled"
-                    last_check_status = "Successful, squawks found" if self.check_emergency_squawks.last_result else "Successful, no squawks"
+                    last_check_status = "Successful, squawks found" if self.check_emergency_squawks.is_running() else "Successful, no squawks"
                     embed.add_field(name=f"Guild: {guild.name}, Channel: {alert_channel.name}", value=f"Time until next check: {time_remaining}\nLast check status: {last_check_status}", inline=False)
                 else:
                     embed.add_field(name=f"Guild: {guild.name}", value="No alert channel set.", inline=False)
