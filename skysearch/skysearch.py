@@ -135,6 +135,7 @@ class Skysearch(commands.Cog):
             search_registration = discord.ui.Button(label="Search by registration", style=discord.ButtonStyle.green)
             search_squawk = discord.ui.Button(label="Search by squawk", style=discord.ButtonStyle.green)
             search_type = discord.ui.Button(label="Search by type", style=discord.ButtonStyle.green)
+            show_military = discord.ui.Button(label="Show military aircraft", style=discord.ButtonStyle.danger)
             show_the_commands = discord.ui.Button(label="Show available commands", style=discord.ButtonStyle.grey)
 
             # Define button callbacks
