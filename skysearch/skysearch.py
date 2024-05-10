@@ -168,6 +168,8 @@ class Skysearch(commands.Cog):
                 )
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/airplane.png")
                 await ctx.send(embed=embed)
+                fetching_message = await ctx.send(embed=embed)
+                await fetching_message.delete()
                 await self.show_military_aircraft(ctx)
 
             async def search_icao_callback(interaction):
