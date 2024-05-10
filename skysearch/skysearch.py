@@ -23,6 +23,7 @@ class Skysearch(commands.Cog):
         self.api_url = "https://api.airplanes.live/v2"
         self.max_requests_per_user = 10
         self.EMBED_COLOR = discord.Color(0xfffffe)
+        self.check_emergency_squawks.start()
         
     async def cog_unload(self):
         if hasattr(self, '_http_client'):
