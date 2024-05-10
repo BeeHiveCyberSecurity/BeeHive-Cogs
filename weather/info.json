@@ -1,0 +1,8 @@
+{
+    "name": "Weather",
+    "description": "A cog that fetches the current weather for a given location.",
+    "author": ["movelaterally"],
+    "required_cogs": {},
+    "tags": ["weather", "api", "fetch", "location"],
+    "end_user_data_statement": "This cog does not persistently store data or metadata about users."
+}
