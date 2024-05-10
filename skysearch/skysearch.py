@@ -358,17 +358,16 @@ class Skysearch(commands.Cog):
                 discord.ui.Button(style=discord.ButtonStyle.primary, label=format_option, custom_id=format_option) for format_option in file_format_options
             ]
             file_format_view = discord.ui.View()
-            for button in file_format_buttons:
-                file_format_view.add_item(button)
+            file_format_view.add_item(*file_format_buttons)
             
             await ctx.send("Please select a file format:", view=file_format_view)
             
             def check(interaction: discord.Interaction):
-                return interaction.user == ctx.author and interaction.message == ctx.message
+                return interaction.user == ctx.author and interaction.message.id == ctx.message.id
             
             try:
                 interaction = await self.bot.wait_for("interaction", check=check, timeout=60)
-                file_format = interaction.component.custom_id
+                file_format = interaction.data['custom_id']
             except asyncio.TimeoutError:
                 embed = discord.Embed(title="Error", description="No file format selected within the time limit.", color=0xff4545)
                 await ctx.send(embed=embed)
