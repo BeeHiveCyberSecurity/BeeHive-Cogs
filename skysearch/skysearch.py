@@ -66,7 +66,8 @@ class Skysearch(commands.Cog):
             if ground_speed == 'ground':
                 embed.add_field(name="Ground Speed", value="On the Ground", inline=True)
             else:
-                embed.add_field(name="Ground Speed", value=f"{ground_speed} knots", inline=True)
+                ground_speed_mph = round(float(ground_speed) * 1.15078) if ground_speed != 'N/A' else 'N/A'  # Convert knots to mph
+                embed.add_field(name="Ground Speed", value=f"{ground_speed_mph} mph", inline=True)
             embed.add_field(name="Heading", value=f"{aircraft_data.get('true_heading', 'N/A')} degrees", inline=True)
             embed.add_field(name="Position", value=f"{aircraft_data.get('lat', 'N/A')}, {aircraft_data.get('lon', 'N/A')}", inline=True)
             embed.add_field(name="Squawk", value=aircraft_data.get('squawk', 'N/A'), inline=True)
@@ -85,9 +86,9 @@ class Skysearch(commands.Cog):
             if baro_rate == 'N/A':
                 embed.add_field(name="Altitude Rate", value="N/A", inline=True)
             elif int(baro_rate) > 0:
-                embed.add_field(name="Altitude Rate", value="<:pointup:1197006728953339924> **Ascending**\n" + f"{baro_rate} feet/minute", inline=True)
+                embed.add_field(name="Altitude Rate", value="<:pointup:1197006728953339924> **Ascending**\n" + f"{baro_rate} feet/min", inline=True)
             else:
-                embed.add_field(name="Altitude Rate", value="<:pointdown:1197006724377366668> **Descending**\n" + f"{abs(int(baro_rate))} feet/minute", inline=True)
+                embed.add_field(name="Altitude Rate", value="<:pointdown:1197006724377366668> **Descending**\n" + f"{abs(int(baro_rate))} feet/min", inline=True)
             view = discord.ui.View()
             view.add_item(discord.ui.Button(label="Track flight live", url=f"{link}", style=discord.ButtonStyle.link, emoji="<:info:1199305085738553385>"))
             await ctx.send(embed=embed, view=view)
