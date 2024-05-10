@@ -398,9 +398,8 @@ class Skysearch(commands.Cog):
             file_format_buttons = []
             for file_path in file_paths:
                 with open(file_path, 'rb') as fp:
-                    msg = await ctx.send(file=discord.File(fp, filename=os.path.basename(file_path)))
-                    for attachment in msg.attachments:
-                        file_format_buttons.append(discord.ui.Button(style=discord.ButtonStyle.link, label=os.path.splitext(attachment.filename)[1][1:], url=attachment.url))
+                    file_url = await self._upload_file_to_server(fp, filename=os.path.basename(file_path))
+                    file_format_buttons.append(discord.ui.Button(style=discord.ButtonStyle.link, label=os.path.splitext(file_path)[1][1:], url=file_url))
 
             file_format_view = discord.ui.View()
             for button in file_format_buttons:
