@@ -20,8 +20,8 @@ class Skysearch(commands.Cog):
         self.config = Config.get_conf(self, identifier=492089091320446976)  
         self.api_url = "https://api.airplanes.live/v2"
         self.max_requests_per_user = 10
-        self.EMBED_COLOR = discord.Color.blue() 
-
+        self.EMBED_COLOR = discord.Color(0xfffffe)
+        
     async def cog_unload(self):
         if hasattr(self, '_http_client'):
             await self._http_client.close()
@@ -97,7 +97,9 @@ class Skysearch(commands.Cog):
                     emergency_embed.add_field(name="Squawk 7700 - General Emergency", value="This code is used to indicate a general emergency. The pilot currently has ATC priority and is working to resolve the situation. Check local news outlets for more information, or if this is a military flight, look into what squadron the plane belonged to, and if they posted any updates later in the day.", inline=False)
                 await ctx.send(embed=emergency_embed)
         else:
-            await ctx.send("No aircraft information found or the response format is incorrect.\n\nThe plane may be not currently in use or the data is not available at the moment")
+            embed = discord.Embed(title='Error: Aircraft Information Not Found', color=discord.Colour(0xff4545))
+            embed.add_field(name="Details", value="No aircraft information found or the response format is incorrect.\n\nThe plane may be not currently in use or the data is not available at the moment", inline=False)
+            await ctx.send(embed=embed)
 
     async def _get_photo_by_hex(self, hex_id):
         if not hasattr(self, '_http_client'):
@@ -454,7 +456,8 @@ class Skysearch(commands.Cog):
 
                 await ctx.send(embed=embed)
             else:
-                await ctx.send("Incomplete data received from API.")
+                embed = discord.Embed(title="Error", description="Incomplete data received from API.", color=0xff4545)
+                await ctx.send(embed=embed)
         except aiohttp.ClientError as e:
             embed = discord.Embed(title="Error", description=f"Error fetching data: {e}", color=0xff4545)
             await ctx.send(embed=embed)
