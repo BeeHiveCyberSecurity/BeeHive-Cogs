@@ -86,9 +86,9 @@ class Skysearch(commands.Cog):
             if baro_rate == 'N/A':
                 embed.add_field(name="Altitude Rate", value="N/A", inline=True)
             elif int(baro_rate) > 0:
-                embed.add_field(name="Altitude Rate", value="<:pointup:1197006728953339924> **Ascending**\n" + f"{baro_rate} feet/min", inline=True)
+                embed.add_field(name="Altitude Rate", value="<:pointup:1197006728953339924> **Ascending**\n" + f"`{baro_rate} feet/min`", inline=True)
             else:
-                embed.add_field(name="Altitude Rate", value="<:pointdown:1197006724377366668> **Descending**\n" + f"{abs(int(baro_rate))} feet/min", inline=True)
+                embed.add_field(name="Altitude Rate", value="<:pointdown:1197006724377366668> **Descending**\n" + f"`{abs(int(baro_rate))} feet/min`", inline=True)
             view = discord.ui.View()
             view.add_item(discord.ui.Button(label="Track flight live", url=f"{link}", style=discord.ButtonStyle.link, emoji="<:info:1199305085738553385>"))
             await ctx.send(embed=embed, view=view)
