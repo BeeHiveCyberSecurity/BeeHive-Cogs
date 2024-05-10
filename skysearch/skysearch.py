@@ -246,12 +246,46 @@ class Skysearch(commands.Cog):
                 await interaction.response.defer()
                 await ctx.send_help(self.aircraft_group)
 
+            async def search_radius_callback(interaction):
+                if interaction.user != ctx.author:
+                    await interaction.response.send_message("You are not allowed to interact with this button.", ephemeral=True)
+                    return
+                await interaction.response.defer()
+
+                # Prompt for latitude
+                embed = discord.Embed(
+                    title="Query",
+                    description="Please reply with the latitude.",
+                    color=discord.Color.from_str("#fffffe")
+                )
+                embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/search.png")
+                await ctx.send(embed=embed)
+                def check(m):
+                    return m.author == ctx.author
+                message = await self.bot.wait_for('message', check=check)
+                latitude = message.content
+
+                # Prompt for longitude
+                embed.description = "Please reply with the longitude."
+                await ctx.send(embed=embed)
+                message = await self.bot.wait_for('message', check=check)
+                longitude = message.content
+
+                # Prompt for radius
+                embed.description = "Please reply with the radius in miles you want to search within."
+                await ctx.send(embed=embed)
+                message = await self.bot.wait_for('message', check=check)
+                radius = message.content
+
+                await self.aircraft_by_radius(ctx, latitude, longitude, radius)
+
             # Assign callbacks to buttons
             search_callsign.callback = search_callsign_callback
             search_icao.callback = search_icao_callback
             search_registration.callback = search_registration_callback
             search_squawk.callback = search_squawk_callback
             search_type.callback = search_type_callback
+            search_radius.callback = search_radius_callback
             show_military.callback = show_military_callback
             show_the_commands.callback = show_the_commands_callback
             
@@ -262,6 +296,7 @@ class Skysearch(commands.Cog):
             view.add_item(search_registration)
             view.add_item(search_squawk)
             view.add_item(search_type)
+            view.add_item(search_radius)
             view.add_item(show_military)
             view.add_item(show_the_commands)
 
