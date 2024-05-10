@@ -353,8 +353,8 @@ class Skysearch(commands.Cog):
         url = f"{self.api_url}/{search_type}/{search_value}"
         response = await self._make_request(url)
         if response:
-            if file_format not in ["csv", "pdf", "docx", "txt"]:
-                embed = discord.Embed(title="Error", description="Invalid file format specified. Use one of: csv, pdf, docx, or txt.", color=0xfa4545)
+            if file_format not in ["csv", "pdf", "txt", "html"]:
+                embed = discord.Embed(title="Error", description="Invalid file format specified. Use one of: csv, pdf, txt, or html.", color=0xfa4545)
                 await ctx.send(embed=embed)
                 return
 
@@ -390,13 +390,28 @@ class Skysearch(commands.Cog):
                         flowables.append(PageBreak())
 
                     doc.build(flowables)
-                elif file_format.lower() in ["doc", "txt"]:
+                elif file_format.lower() in ["txt"]:
                     with open(file_path, "w", newline='', encoding='utf-8') as file:
                         aircraft_keys = list(response['ac'][0].keys())
                         file.write(' '.join([key.upper() for key in aircraft_keys]) + '\n')
                         for aircraft in response['ac']:
                             aircraft_values = list(map(str, aircraft.values()))
                             file.write(' '.join(aircraft_values) + '\n')
+                elif file_format.lower() == "html":
+                    with open(file_path, "w", newline='', encoding='utf-8') as file:
+                        aircraft_keys = list(response['ac'][0].keys())
+                        file.write('<table>\n')
+                        file.write('<tr>\n')
+                        for key in aircraft_keys:
+                            file.write(f'<th>{key.upper()}</th>\n')
+                        file.write('</tr>\n')
+                        for aircraft in response['ac']:
+                            aircraft_values = list(map(str, aircraft.values()))
+                            file.write('<tr>\n')
+                            for value in aircraft_values:
+                                file.write(f'<td>{value}</td>\n')
+                            file.write('</tr>\n')
+                        file.write('</table>\n')
             except PermissionError as e:
                 embed = discord.Embed(title="Error", description="I do not have permission to write to the file system.", color=0xff4545)
                 await ctx.send(embed=embed)
