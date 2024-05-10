@@ -316,10 +316,10 @@ class Skysearch(commands.Cog):
                     aircraft_squawk = aircraft.get('squawk', 'N/A')  # Squawk
                     aircraft_altitude = aircraft.get('alt', 'N/A')  # Altitude
                     aircraft_type = f"{aircraft_data} ({aircraft.get('t', 'N/A')})"  # Aircraft Type
-                    aircraft_list.append(f"Aircraft Type: {aircraft_type}, ICAO: {aircraft_icao}, Squawk: {aircraft_squawk}, Altitude: {aircraft_altitude}")
+                    aircraft_list.append(f"ICAO: {aircraft_icao}, Squawk: {aircraft_squawk}, Altitude: {aircraft_altitude}")
                 embed = discord.Embed(title="Military Aircraft", color=0x00ff00)
                 for aircraft_info in aircraft_list:
-                    embed.add_field(name="Aircraft Info", value=aircraft_info, inline=False)
+                    embed.add_field(name=f"{aircraft_type}", value=aircraft_info, inline=False)
                 await ctx.send(embed=embed)
             else:
                 await self._send_aircraft_info(ctx, response)
