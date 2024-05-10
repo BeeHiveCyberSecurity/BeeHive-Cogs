@@ -335,6 +335,7 @@ class Skysearch(commands.Cog):
                     aircraft_type = f"{aircraft_data} ({aircraft.get('t', 'N/A')})"  # Aircraft Type
                     aircraft_list.append(f"Aircraft Type: {aircraft_type}, ICAO: {aircraft_icao}, Squawk: {aircraft_squawk}, Altitude: {aircraft_altitude}")
                 embed = discord.Embed(title="Military Aircraft", color=0xfffffe)
+                embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/airplane.png")
                 for aircraft in response['ac'][:10]:  # Limit to first 10 results
                     aircraft_description = aircraft.get('desc', 'N/A')  # Aircraft Description
                     aircraft_squawk = aircraft.get('squawk', 'N/A')  # Squawk
@@ -343,6 +344,7 @@ class Skysearch(commands.Cog):
                     aircraft_speed = aircraft.get('spd', 'N/A')  # Speed
                     aircraft_info = f"Squawk: {aircraft_squawk}, Coordinates: {aircraft_coordinates}, Heading: {aircraft_heading}, Speed: {aircraft_speed}"
                     embed.add_field(name=aircraft_description, value=aircraft_info, inline=False)
+
                 await ctx.send(embed=embed)
             else:
                 await self._send_aircraft_info(ctx, response)
