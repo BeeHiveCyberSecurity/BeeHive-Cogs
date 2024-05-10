@@ -358,6 +358,11 @@ class Skysearch(commands.Cog):
                 await ctx.send(embed=embed)
                 return
 
+            if not response['ac']:
+                embed = discord.Embed(title="Error", description="No aircraft data found.", color=0xfa4545)
+                await ctx.send(embed=embed)
+                return
+
             file_name = f"{search_type}_{search_value}.{file_format.lower()}"
             file_path = os.path.join(tempfile.gettempdir(), file_name)
 
