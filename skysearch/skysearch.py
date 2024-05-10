@@ -593,30 +593,30 @@ class Skysearch(commands.Cog):
             embed = discord.Embed(description=f"An error occurred during scrolling: {e}.")
             await ctx.send(embed=embed)
 
-            @commands.command(name='alertchannel', help='Set a channel to send emergency squawk alerts to.')
-            async def set_alert_channel(self, ctx, channel: discord.TextChannel):
-                await self.config.guild(ctx.guild).alert_channel.set(channel.id)
-                await ctx.send(f"Alert channel set to {channel.mention}")
+    @aircraft_group.command(name='alertchannel', help='Set a channel to send emergency squawk alerts to.')
+    async def set_alert_channel(self, ctx, channel: discord.TextChannel):
+        await self.config.guild(ctx.guild).alert_channel.set(channel.id)
+        await ctx.send(f"Alert channel set to {channel.mention}")
 
-            @tasks.loop(minutes=5)
-            async def check_emergency_squawks(self):
-                guilds = self.bot.guilds
-                for guild in guilds:
-                    alert_channel_id = await self.config.guild(guild).alert_channel()
-                    if alert_channel_id:
-                        alert_channel = self.bot.get_channel(alert_channel_id)
-                        if alert_channel:
-                            url = f"{self.api_url}/emergency"
-                            response = await self._make_request(url)
-                            if response and 'ac' in response:
-                                for aircraft_info in response['ac']:
-                                    squawk_code = aircraft_info.get('squawk', 'N/A')
-                                    if squawk_code in ['7500', '7600', '7700']:
-                                        await self._send_aircraft_info(alert_channel, {'ac': [aircraft_info]})
+        @tasks.loop(minutes=5)
+        async def check_emergency_squawks(self):
+            guilds = self.bot.guilds
+            for guild in guilds:
+                alert_channel_id = await self.config.guild(guild).alert_channel()
+                if alert_channel_id:
+                    alert_channel = self.bot.get_channel(alert_channel_id)
+                    if alert_channel:
+                        url = f"{self.api_url}/emergency"
+                        response = await self._make_request(url)
+                        if response and 'ac' in response:
+                            for aircraft_info in response['ac']:
+                                squawk_code = aircraft_info.get('squawk', 'N/A')
+                                if squawk_code in ['7500', '7600', '7700']:
+                                    await self._send_aircraft_info(alert_channel, {'ac': [aircraft_info]})
 
-            @check_emergency_squawks.before_loop
-            async def before_check_emergency_squawks(self):
-                await self.bot.wait_until_ready()
+        @check_emergency_squawks.before_loop
+        async def before_check_emergency_squawks(self):
+            await self.bot.wait_until_ready()
 
-            def cog_unload(self):
-                self.check_emergency_squawks.cancel()
+        def cog_unload(self):
+            self.check_emergency_squawks.cancel()
