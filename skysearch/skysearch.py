@@ -382,11 +382,13 @@ class Skysearch(commands.Cog):
                         aircraft_lon = aircraft.get('lon', 'N/A')  # Longitude
                         aircraft_heading = aircraft.get('heading', 'N/A')  # Heading
                         aircraft_speed = aircraft.get('spd', 'N/A')  # Speed
+                        aircraft_hex = aircraft.get('hex', 'N/A')  # Hex
 
                         aircraft_info = f"**Squawk:** {aircraft_squawk}\n"
                         aircraft_info += f"**Coordinates:** Lat: {aircraft_lat}, Lon: {aircraft_lon}\n"
                         aircraft_info += f"**Heading:** {aircraft_heading}\n"
-                        aircraft_info += f"**Speed:** {aircraft_speed}"
+                        aircraft_info += f"**Speed:** {aircraft_speed}\n"
+                        aircraft_info += f"**Hex:** {aircraft_hex}"
 
                         embed.add_field(name=aircraft_description, value=aircraft_info, inline=False)
 
