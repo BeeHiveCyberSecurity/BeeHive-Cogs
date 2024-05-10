@@ -366,8 +366,13 @@ class Skysearch(commands.Cog):
             def check(interaction: discord.Interaction):
                 return interaction.user == ctx.author and interaction.message == ctx.message
             
-            interaction = await self.bot.wait_for("interaction", check=check, timeout=60)
-            file_format = interaction.component.custom_id
+            try:
+                interaction = await self.bot.wait_for("interaction", check=check, timeout=60)
+                file_format = interaction.component.custom_id
+            except asyncio.TimeoutError:
+                embed = discord.Embed(title="Error", description="No file format selected within the time limit.", color=0xff4545)
+                await ctx.send(embed=embed)
+                return
 
             file_name = f"{search_type}_{search_value}.{file_format.lower()}"
             file_path = os.path.join(tempfile.gettempdir(), file_name)
