@@ -321,7 +321,7 @@ class Skysearch(commands.Cog):
             await ctx.send(embed=embed)
 
     @aircraft_group.command(name='military', help='Get information about military aircraft.')
-    async def military_aircraft(self, ctx):
+    async def show_military_aircraft(self, ctx):
         url = f"{self.api_url}/mil"
         response = await self._make_request(url)
         if response:
