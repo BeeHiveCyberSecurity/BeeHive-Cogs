@@ -334,7 +334,7 @@ class Skysearch(commands.Cog):
                     aircraft_altitude = aircraft.get('alt', 'N/A')  # Altitude
                     aircraft_type = f"{aircraft_data} ({aircraft.get('t', 'N/A')})"  # Aircraft Type
                     aircraft_list.append(f"Aircraft Type: {aircraft_type}, ICAO: {aircraft_icao}, Squawk: {aircraft_squawk}, Altitude: {aircraft_altitude}")
-                embed = discord.Embed(title="Military Aircraft", color=0x00ff00)
+                embed = discord.Embed(title="Military Aircraft", color=0xfffffe)
                 for aircraft in response['ac'][:10]:  # Limit to first 10 results
                     aircraft_description = aircraft.get('desc', 'N/A')  # Aircraft Description
                     aircraft_squawk = aircraft.get('squawk', 'N/A')  # Squawk
