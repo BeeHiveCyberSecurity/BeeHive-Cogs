@@ -260,11 +260,12 @@ class StripeIdentity(commands.Cog):
                 title="Identity verification required",
                 description=(
                     f"Hello {user.mention},\n\n"
-                    "To enhance safety within our Discord communities, we require a one-time verification of your identity. "
+                    f"To enhance safety within our Discord community, {ctx.guild.name} requires a one-time verification of your identity. "
                     "This process involves confirming your identity with a government-issued ID and biometric verification.\n\n"
                     "### Please have one of the following documents ready\n- State ID\n- Driver's License\n- Driver's Permit\n- Passport\n\n"
                     "### And prepare to...\n- Provide a valid email address\n- Take a series of selfies in a well-lit space\n- Submit an identity document that matches you\n\n"
-                    "We allow 15 minutes to pass before this verification request times out. Failure to verify will result in removal from the server for safety reasons."
+                    "Once you complete verification, the results, including your private information, will be subject to, [BeeHive](<https://www.beehive.systems)'s Privacy Policy.\n\n"
+                    "If you do not wish to provide your personal information, you may instead decline to verify your identity by selecting the option below, which will immediately remove you from the requesting server. Otherwise, this request will time out in **15 minutes**, and you'll be subsequently removed."
                 ),
                 color=discord.Color(0xff4545)
             )
