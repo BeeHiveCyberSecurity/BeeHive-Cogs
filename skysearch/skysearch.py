@@ -91,7 +91,9 @@ class Skysearch(commands.Cog):
                 embed.add_field(name="Altitude Rate", value="<:pointdown:1197006724377366668> **Descending**\n" + f"`{abs(int(baro_rate))} feet/min`", inline=True)
             view = discord.ui.View()
             view.add_item(discord.ui.Button(label=f"Track live", url=f"{link}", style=discord.ButtonStyle.link, emoji="<:info:1199305085738553385>"))
-            view.add_item(discord.ui.Button(label="Close", custom_id="close_embed", style=discord.ButtonStyle.danger))
+            close_button = discord.ui.Button(label="Close", custom_id="close_embed", style=discord.ButtonStyle.danger)
+            close_button.callback = self.close_embed_callback
+            view.add_item(close_button)
             await ctx.send(embed=embed, view=view)
             squawk_code = aircraft_data.get('squawk', 'N/A')
             if squawk_code in emergency_squawk_codes:
