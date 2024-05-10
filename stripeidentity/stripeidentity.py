@@ -260,11 +260,11 @@ class StripeIdentity(commands.Cog):
                 title="Identity verification required",
                 description=(
                     f"Hello {user.mention},\n\n"
-                    f"To enhance safety within our Discord community, {ctx.guild.name} requires a one-time verification of your identity. "
+                    f"To enhance safety within our Discord community, **{ctx.guild.name}** has requested a one-time verification of your identity.\n"
                     "This process involves confirming your identity with a government-issued ID and biometric verification.\n\n"
-                    "### Please have one of the following documents ready\n- State ID\n- Driver's License\n- Driver's Permit\n- Passport\n\n"
-                    "### And prepare to...\n- Provide a valid email address\n- Take a series of selfies in a well-lit space\n- Submit an identity document that matches you\n\n"
-                    "Once you complete verification, the results, including your private information, will be subject to, [BeeHive](<https://www.beehive.systems)'s Privacy Policy.\n\n"
+                    "### Please have one of the following documents ready\n- **State ID**\n- **Driver's License**\n- **Driver's Permit**\n- **Passport**\n\n"
+                    "### And prepare to...\n- Provide a valid email address\n- Take a series of selfies in a well-lit space\n- Submit an above identity document that matches you via biometric modeling and analysis\n\n"
+                    "Once you complete verification, the results, including your private information, will be subject to the following legal agreements:\n- [BeeHive Terms of Service](<https://www.beehive.systems/tos)\n- [BeeHive Privacy Policy](https://www.beehive.systems/privacy)\n- [Stripe Privacy Policy](https://stripe.com/privacy)\n- [Stripe Consumer Terms of Service](https://stripe.com/legal/consumer)\n\n"
                     "If you do not wish to provide your personal information, you may instead decline to verify your identity by selecting the option below, which will immediately remove you from the requesting server. Otherwise, this request will time out in **15 minutes**, and you'll be subsequently removed."
                 ),
                 color=discord.Color(0xff4545)
