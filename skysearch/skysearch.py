@@ -129,7 +129,7 @@ class Skysearch(commands.Cog):
         if ctx.invoked_subcommand is None:
             embed = discord.Embed(
                 title="SkySearch Actions",
-                description="Please select what you'd like to do with SkySearch...",
+                description="You can use this to search the skies for information about planes, including their locations, callsigns, emergency status, and more. Select below what you'd like to use SkySearch to do.",
                 color=discord.Color.from_str("#fffffe")
             )
             embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/airplane.png")
