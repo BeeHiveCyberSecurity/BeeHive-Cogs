@@ -606,7 +606,7 @@ class Skysearch(commands.Cog):
             embed = discord.Embed(description=f"An error occurred during scrolling: {e}.")
             await ctx.send(embed=embed)
 
-    @aircraft_group.command(name='listalertchannels', help='List the alert channels and their statuses.')
+    @aircraft_group.command(name='showalertchannel', help='List the alert channels and their statuses.')
     async def list_alert_channels(self, ctx):
         guild = ctx.guild
         embed = discord.Embed(title=f"Alert Channels Status for {guild.name}", color=0xfffffe)
