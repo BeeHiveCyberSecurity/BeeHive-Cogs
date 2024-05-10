@@ -617,8 +617,12 @@ class Skysearch(commands.Cog):
                 next_iteration = self.check_emergency_squawks.next_iteration
                 now = datetime.datetime.now(datetime.timezone.utc)  # Ensure datetime is timezone aware
                 time_remaining = (next_iteration - now).total_seconds() if next_iteration else self.check_emergency_squawks.seconds
-                last_check_status = "Successful, squawks found" if self.check_emergency_squawks.is_running() else "Successful, no squawks"
-                embed.add_field(name=f"Channel: {alert_channel.name}", value=f"Time until next check: {time_remaining}\nLast check status: {last_check_status}", inline=False)
+                time_remaining_formatted = f"<t:{int(time_remaining)}:R>"
+                if self.check_emergency_squawks.is_running():
+                    last_check_status = f"Checked successfully {time_remaining_formatted} ago"
+                else:
+                    last_check_status = f"Last check failed, retrying in {time_remaining_formatted}"
+                embed.add_field(name=f"Channel: {alert_channel.name}", value=f"Last check status: {last_check_status}", inline=False)
             else:
                 embed.add_field(name="Status", value="No alert channel set.", inline=False)
         else:
