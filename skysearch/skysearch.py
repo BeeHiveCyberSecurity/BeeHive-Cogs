@@ -156,6 +156,20 @@ class Skysearch(commands.Cog):
                 message = await self.bot.wait_for('message', check=check)
                 await self.aircraft_by_callsign(ctx, message.content)
 
+            async def show_military_callback(interaction):
+                if interaction.user != ctx.author:
+                    await interaction.response.send_message("This SkySearch panel doesn't belong to you. Start your own using `[p]skysearch`", ephemeral=True)
+                    return
+                await interaction.response.defer()
+                embed = discord.Embed(
+                    title="Military Aircraft",
+                    description="Fetching data for military aircraft...",
+                    color=discord.Color.from_str("#fffffe")
+                )
+                embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/airplane.png")
+                await ctx.send(embed=embed)
+                await self.show_military_aircraft(ctx)
+
             async def search_icao_callback(interaction):
                 if interaction.user != ctx.author:
                     await interaction.response.send_message("This SkySearch panel doesn't belong to you. Start your own using `[p]skysearch`", ephemeral=True)
@@ -237,7 +251,9 @@ class Skysearch(commands.Cog):
             search_registration.callback = search_registration_callback
             search_squawk.callback = search_squawk_callback
             search_type.callback = search_type_callback
+            show_military.callback = show_military_callback
             show_the_commands.callback = show_the_commands_callback
+            
 
             # Add buttons to the view
             view.add_item(search_callsign)
@@ -245,6 +261,7 @@ class Skysearch(commands.Cog):
             view.add_item(search_registration)
             view.add_item(search_squawk)
             view.add_item(search_type)
+            view.add_item(show_military)
             view.add_item(show_the_commands)
 
             # Send the embed with the view
@@ -316,10 +333,16 @@ class Skysearch(commands.Cog):
                     aircraft_squawk = aircraft.get('squawk', 'N/A')  # Squawk
                     aircraft_altitude = aircraft.get('alt', 'N/A')  # Altitude
                     aircraft_type = f"{aircraft_data} ({aircraft.get('t', 'N/A')})"  # Aircraft Type
-                    aircraft_list.append(f"ICAO: {aircraft_icao}, Squawk: {aircraft_squawk}, Altitude: {aircraft_altitude}")
+                    aircraft_list.append(f"Aircraft Type: {aircraft_type}, ICAO: {aircraft_icao}, Squawk: {aircraft_squawk}, Altitude: {aircraft_altitude}")
                 embed = discord.Embed(title="Military Aircraft", color=0x00ff00)
-                for aircraft_info in aircraft_list:
-                    embed.add_field(name=f"{aircraft_type}", value=aircraft_info, inline=False)
+                for aircraft in response['ac'][:10]:  # Limit to first 10 results
+                    aircraft_description = aircraft.get('desc', 'N/A')  # Aircraft Description
+                    aircraft_squawk = aircraft.get('squawk', 'N/A')  # Squawk
+                    aircraft_coordinates = f"Lat: {aircraft.get('lat', 'N/A')}, Lon: {aircraft.get('lon', 'N/A')}"  # Coordinates
+                    aircraft_heading = aircraft.get('heading', 'N/A')  # Heading
+                    aircraft_speed = aircraft.get('spd', 'N/A')  # Speed
+                    aircraft_info = f"Squawk: {aircraft_squawk}, Coordinates: {aircraft_coordinates}, Heading: {aircraft_heading}, Speed: {aircraft_speed}"
+                    embed.add_field(name=aircraft_description, value=aircraft_info, inline=False)
                 await ctx.send(embed=embed)
             else:
                 await self._send_aircraft_info(ctx, response)
