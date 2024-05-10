@@ -1,7 +1,7 @@
-import discord
-from redbot.core import commands, Config
+import discord #type: ignore
+from redbot.core import commands, Config #type: ignore
 import json
-import aiohttp
+import aiohttp #type: ignore
 import re
 import asyncio
 import typing
