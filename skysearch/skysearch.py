@@ -9,6 +9,7 @@ import typing
 import os
 import tempfile
 import csv
+import datetime
 from reportlab.lib.pagesizes import letter, landscape, A4 #type: ignore
 from reportlab.pdfgen import canvas #type: ignore 
 from reportlab.lib import colors#type: ignore
@@ -617,7 +618,7 @@ class Skysearch(commands.Cog):
         await self.config.guild(ctx.guild).alert_channel.set(channel.id)
         await ctx.send(f"Alert channel set to {channel.mention}")
 
-    @tasks.loop(minutes=5)
+    @tasks.loop(minutes=2)
     async def check_emergency_squawks(self):
         guilds = self.bot.guilds
         for guild in guilds:
