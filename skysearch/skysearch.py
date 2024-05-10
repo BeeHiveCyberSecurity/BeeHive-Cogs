@@ -355,7 +355,7 @@ class Skysearch(commands.Cog):
         if response:
             file_format_options = ["csv", "pdf"]
             file_format_buttons = [
-                discord.ui.Button(style=discord.ButtonStyle.primary, label=format_option) for format_option in file_format_options
+                discord.ui.Button(style=discord.ButtonStyle.primary, label=format_option, custom_id=format_option) for format_option in file_format_options
             ]
             file_format_view = discord.ui.View()
             for button in file_format_buttons:
@@ -367,7 +367,7 @@ class Skysearch(commands.Cog):
                 return interaction.user == ctx.author and interaction.message == ctx.message
             
             interaction = await self.bot.wait_for("interaction", check=check, timeout=60)
-            file_format = interaction.data["custom_id"]
+            file_format = interaction.component.custom_id
 
             file_name = f"{search_type}_{search_value}.{file_format.lower()}"
             file_path = os.path.join(tempfile.gettempdir(), file_name)
