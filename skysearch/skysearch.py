@@ -310,7 +310,7 @@ class Skysearch(commands.Cog):
         if response:
             if len(response['ac']) > 1:
                 aircraft_list = []
-                for aircraft in response['ac']:
+                for aircraft in response['ac'][:10]:  # Limit to first 10 results
                     aircraft_type = aircraft.get('type', 'N/A')
                     aircraft_callsign = aircraft.get('callsign', 'N/A')
                     aircraft_squawk = aircraft.get('squawk', 'N/A')
