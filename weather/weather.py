@@ -1,5 +1,6 @@
 
 import aiohttp
+import asyncio
 import discord #type: ignore
 from redbot.core import Config, commands
 
@@ -7,8 +8,8 @@ class Weather(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=1234567890)  
-        self.api_url = "https://api.weather.com/v3/wx/conditions/current"
-        self.config.register_global(api_key="21d8a80b3d6b444998a80b3d6b1449d3")
+        self.api_url = "https://api.weather.com/v3/location/point"
+        self.config.register_global(api_key="21d8a80b3d6b444998a80b3d6b1449d3", language="en-US")
 
     async def cog_unload(self):
         if hasattr(self, '_http_client'):
@@ -29,7 +30,8 @@ class Weather(commands.Cog):
     async def weather(self, ctx, *, location: str):
         """Fetches the current weather for a given location."""
         api_key = await self.config.api_key()
-        url = f"{self.api_url}?apiKey={api_key}&format=json&language=en-US&location={location}"
+        language = await self.config.language()
+        url = f"{self.api_url}?{location}&language={language}&format=json&apiKey={api_key}"
         response = await self._make_request(url)
         if response:
             embed = discord.Embed(title=f"Weather for {location}", color=discord.Color.blue())
