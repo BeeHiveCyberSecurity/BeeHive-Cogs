@@ -604,7 +604,7 @@ class Skysearch(commands.Cog):
             alert_channel = self.bot.get_channel(alert_channel_id)
             if alert_channel:
                 next_iteration = self.check_emergency_squawks.next_iteration
-                time_remaining = next_iteration - datetime.datetime.now() if next_iteration else self.check_emergency_squawks.seconds
+                time_remaining = (next_iteration - datetime.datetime.now()).total_seconds() if next_iteration else self.check_emergency_squawks.seconds
                 last_check_status = "Successful, squawks found" if self.check_emergency_squawks.is_running() else "Successful, no squawks"
                 embed.add_field(name=f"Channel: {alert_channel.name}", value=f"Time until next check: {time_remaining}\nLast check status: {last_check_status}", inline=False)
             else:
