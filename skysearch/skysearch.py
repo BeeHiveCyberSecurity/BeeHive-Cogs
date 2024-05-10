@@ -92,7 +92,7 @@ class Skysearch(commands.Cog):
             view = discord.ui.View()
             view.add_item(discord.ui.Button(label=f"Track live", url=f"{link}", style=discord.ButtonStyle.link, emoji="<:info:1199305085738553385>"))
             close_button = discord.ui.Button(label="Close", custom_id="close_embed", style=discord.ButtonStyle.danger)
-            close_button.callback = self.close_embed_callback
+            close_button.callback = self._close_embed_callback
             view.add_item(close_button)
             await ctx.send(embed=embed, view=view)
             squawk_code = aircraft_data.get('squawk', 'N/A')
