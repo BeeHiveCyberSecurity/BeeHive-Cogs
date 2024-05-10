@@ -93,6 +93,8 @@ class Skysearch(commands.Cog):
             baro_rate = aircraft_data.get('baro_rate', 'N/A')
             if baro_rate == 'N/A':
                 embed.add_field(name="Altitude Rate", value="N/A", inline=True)
+            elif abs(int(baro_rate)) < 50:
+                embed.add_field(name="Altitude Rate", value="<:pointright:1197006726466130072> **Maintaining altitude**\n" + f"`{baro_rate} feet/min`", inline=True)
             elif int(baro_rate) > 0:
                 embed.add_field(name="Altitude Rate", value="<:pointup:1197006728953339924> **Ascending**\n" + f"`{baro_rate} feet/min`", inline=True)
             else:
