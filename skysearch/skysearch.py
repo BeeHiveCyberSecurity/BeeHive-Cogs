@@ -278,7 +278,7 @@ class Skysearch(commands.Cog):
                 message = await self.bot.wait_for('message', check=check)
                 radius = message.content
 
-                await self.aircraft_by_radius(ctx, latitude, longitude, radius)
+                await self.aircraft_within_radius(ctx, latitude, longitude, radius)
 
             # Assign callbacks to buttons
             search_callsign.callback = search_callsign_callback
