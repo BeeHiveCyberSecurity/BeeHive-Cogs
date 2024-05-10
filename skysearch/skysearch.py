@@ -75,7 +75,12 @@ class Skysearch(commands.Cog):
             embed.add_field(name="Year", value=aircraft_data.get('year', 'N/A'), inline=True)
             embed.add_field(name="Category", value=aircraft_data.get('category', 'N/A'), inline=True)
             embed.add_field(name="Aircraft Type", value=aircraft_data.get('t', 'N/A'), inline=True)
-            embed.add_field(name="Speed", value=f"{aircraft_data.get('gs', 'N/A')} knots", inline=True)
+            ground_speed_knots = aircraft_data.get('gs', 'N/A')
+            if ground_speed_knots != 'N/A':
+                ground_speed_mph = round(float(ground_speed_knots) * 1.15078)  # Convert knots to mph
+                embed.add_field(name="Speed", value=f"{ground_speed_mph} mph", inline=True)
+            else:
+                embed.add_field(name="Speed", value="N/A", inline=True)
             baro_rate = aircraft_data.get('baro_rate', 'N/A')
             if baro_rate == 'N/A':
                 embed.add_field(name="Altitude Rate", value="N/A", inline=True)
