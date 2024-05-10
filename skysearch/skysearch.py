@@ -390,7 +390,7 @@ class Skysearch(commands.Cog):
                         flowables.append(PageBreak())
 
                     doc.build(flowables)
-                elif file_format.lower() in ["docx", "txt"]:
+                elif file_format.lower() in ["doc", "txt"]:
                     with open(file_path, "w", newline='', encoding='utf-8') as file:
                         aircraft_keys = list(response['ac'][0].keys())
                         file.write(' '.join([key.upper() for key in aircraft_keys]) + '\n')
