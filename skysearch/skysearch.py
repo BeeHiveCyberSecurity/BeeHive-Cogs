@@ -594,6 +594,24 @@ class Skysearch(commands.Cog):
             embed = discord.Embed(description=f"An error occurred during scrolling: {e}.")
             await ctx.send(embed=embed)
 
+    @aircraft_group.command(name='listalertchannels', help='List the alert channels and their statuses.')
+    async def list_alert_channels(self, ctx):
+        guilds = self.bot.guilds
+        embed = discord.Embed(title="Alert Channels Status", color=0xfffffe)
+        for guild in guilds:
+            alert_channel_id = await self.config.guild(guild).alert_channel()
+            if alert_channel_id:
+                alert_channel = self.bot.get_channel(alert_channel_id)
+                if alert_channel:
+                    time_remaining = self.check_emergency_squawks.next_iteration - datetime.datetime.now()
+                    last_check_status = "Successful, squawks found" if self.check_emergency_squawks.last_result else "Successful, no squawks"
+                    embed.add_field(name=f"Guild: {guild.name}, Channel: {alert_channel.name}", value=f"Time until next check: {time_remaining}\nLast check status: {last_check_status}", inline=False)
+                else:
+                    embed.add_field(name=f"Guild: {guild.name}", value="No alert channel set.", inline=False)
+            else:
+                embed.add_field(name=f"Guild: {guild.name}", value="No alert channel set.", inline=False)
+        await ctx.send(embed=embed)
+
     @aircraft_group.command(name='alertchannel', help='Set a channel to send emergency squawk alerts to.')
     async def set_alert_channel(self, ctx, channel: discord.TextChannel):
         await self.config.guild(ctx.guild).alert_channel.set(channel.id)
