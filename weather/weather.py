@@ -8,7 +8,7 @@ class Weather(commands.Cog):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=1234567890)  
         self.api_url = "https://api.weather.com/v3/wx/conditions/current"
-        self.config.register_global(api_key="")
+        self.config.register_global(api_key="21d8a80b3d6b444998a80b3d6b1449d3")
 
     async def cog_unload(self):
         if hasattr(self, '_http_client'):
