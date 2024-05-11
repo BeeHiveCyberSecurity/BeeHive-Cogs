@@ -59,12 +59,12 @@ class Skysearch(commands.Cog):
             embed.set_footer(text="")
             embed.add_field(name="Type", value=f"**{aircraft_data.get('desc', 'N/A')} ({aircraft_data.get('t', 'N/A')})**", inline=False)
             embed.add_field(name="Flight", value=f"**{aircraft_data.get('flight', 'N/A').strip()}**", inline=True)
-            embed.add_field(name="Registration", value=aircraft_data.get('reg', 'N/A'), inline=True)
-            embed.add_field(name="ICAO", value=aircraft_data.get('hex', 'N/A').upper(), inline=True)
+            embed.add_field(name="Registration", value=f"**{aircraft_data.get('reg', 'HIDDEN')}**", inline=True)
+            embed.add_field(name="ICAO", value=f"**{aircraft_data.get('hex', 'N/A').upper()}**", inline=True)
             altitude = aircraft_data.get('alt_baro', 'N/A')
             ground_speed = aircraft_data.get('gs', 'N/A')
             if altitude == 'ground':
-                embed.add_field(name="Status", value="On the Ground", inline=True)
+                embed.add_field(name="Status", value="On the ground", inline=True)
             else:
                 altitude_feet = f"{altitude} feet"
                 embed.add_field(name="Altitude", value=f"`{altitude_feet}`", inline=True)
