@@ -779,6 +779,14 @@ class Skysearch(commands.Cog):
                 else:
                     last_check_status = f":x: **Last check failed, retrying {time_remaining_formatted}**"
                 embed.add_field(name="Status", value=f"Channel: {alert_channel.mention}\nLast check: {last_check_status}", inline=False)
+                
+                # Add field for the last time an aircraft squawked an emergency
+                last_emergency_squawk_time = await self.config.guild(guild).last_emergency_squawk_time()
+                if last_emergency_squawk_time:
+                    last_emergency_squawk_time_formatted = f"<t:{int(last_emergency_squawk_time)}:F>"
+                    embed.add_field(name="Last Emergency Squawk", value=f"Time: {last_emergency_squawk_time_formatted}", inline=False)
+                else:
+                    embed.add_field(name="Last Emergency Squawk", value="No emergency squawks yet.", inline=False)
             else:
                 embed.add_field(name="Status", value="No alert channel set.", inline=False)
         else:
