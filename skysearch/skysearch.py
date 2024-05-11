@@ -334,7 +334,7 @@ class Skysearch(commands.Cog):
                     await interaction.response.send_message("You are not allowed to interact with this button.", ephemeral=True)
                     return
                 await interaction.response.defer()
-                await self.show_stats(ctx)
+                await self.stats(ctx)
 
             # Assign callbacks to buttons
             search_callsign.callback = search_callsign_callback
