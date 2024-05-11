@@ -166,9 +166,9 @@ class Skysearch(commands.Cog):
             if icao and icao.upper() in self.suspicious_icao_set:
                 embed.add_field(name="Asset intelligence", value=":warning: **Aircraft exhibits suspicious flight activity**", inline=False)
             if icao and icao.upper() in self.prior_known_accident_set:
-                embed.add_field(name="Asset intelligence", value=":warning: **Aircraft prior involved in one or more accidents**", inline=False)
+                embed.add_field(name="Asset intelligence", value=":boom: **Aircraft prior involved in one or more accidents**", inline=False)
             if icao and icao.upper() in self.ukr_conflict_set:
-                embed.add_field(name="Asset intelligence", value=":warning: **Aircraft utilized within the RussoUkrainian conflict**", inline=False)
+                embed.add_field(name="Asset intelligence", value=":flag_ua: **Aircraft utilized within the RussoUkrainian conflict**", inline=False)
 
             view = discord.ui.View()
             view.add_item(discord.ui.Button(label=f"Track live", url=f"{link}", style=discord.ButtonStyle.link))
