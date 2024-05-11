@@ -146,11 +146,11 @@ class Skysearch(commands.Cog):
             else:
                 baro_rate_fps = round(int(baro_rate) / 60, 2)  # Convert feet per minute to feet per second
                 if abs(baro_rate_fps) < 50/60:
-                    embed.add_field(name="Altitude trend", value=":arrow_right: **Maintaining altitude @ **  " + f"**`{baro_rate_fps} feet/sec`**", inline=False)
+                    embed.add_field(name="Altitude trend", value=":arrow_right: **Maintaining altitude @ **  " + f"**{baro_rate_fps} feet/sec**", inline=False)
                 elif baro_rate_fps > 0:
-                    embed.add_field(name="Altitude trend", value=":arrow_upper_right: **Climbing @**  " + f"**`{baro_rate_fps} feet/sec`**", inline=False)
+                    embed.add_field(name="Altitude trend", value=":arrow_upper_right: **Climbing @**  " + f"**{baro_rate_fps} feet/sec**", inline=False)
                 else:
-                    embed.add_field(name="Altitude trend", value=":arrow_lower_right: **Descending @ ** " + f"**`{abs(baro_rate_fps)} feet/sec`**", inline=False)
+                    embed.add_field(name="Altitude trend", value=":arrow_lower_right: **Descending @ ** " + f"**{abs(baro_rate_fps)} feet/sec**", inline=False)
             embed.add_field(name="Safety status", value=emergency_status, inline=True)
 
 
