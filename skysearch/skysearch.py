@@ -186,7 +186,8 @@ class Skysearch(commands.Cog):
             search_type = discord.ui.Button(label="Search by model", style=discord.ButtonStyle.green, row=1)
             search_radius = discord.ui.Button(label="Search within radius", style=discord.ButtonStyle.green, row=2)
             show_military = discord.ui.Button(label="Show military aircraft", style=discord.ButtonStyle.danger, row=3)
-            show_ladd = discord.ui.Button(label="Show data-restricted aircraft", style=discord.ButtonStyle.danger, row=3)
+            show_ladd = discord.ui.Button(label="Show LADD-restricted aircraft", style=discord.ButtonStyle.danger, row=3)
+            show_pia = discord.ui.Button(label="Show aircraft using private ICAO's", style=discord.ButtonStyle.danger, row=3)
             show_the_commands = discord.ui.Button(label="Show available commands", style=discord.ButtonStyle.grey, row=4)
             show_stats = discord.ui.Button(label="Show stats", style=discord.ButtonStyle.grey, row=4)
 
@@ -345,6 +346,13 @@ class Skysearch(commands.Cog):
                 await interaction.response.defer()
                 await self.ladd_aircraft(ctx)
 
+            async def show_pia_callback(interaction):
+                if interaction.user != ctx.author:
+                    await interaction.response.send_message("You are not allowed to interact with this button", ephemeral=True)
+                    return
+                await interaction.response.defer()
+                await self.pia_aircraft(ctx)
+
             # Assign callbacks to buttons
             search_callsign.callback = search_callsign_callback
             search_icao.callback = search_icao_callback
@@ -356,6 +364,7 @@ class Skysearch(commands.Cog):
             show_the_commands.callback = show_the_commands_callback
             show_stats.callback = show_stats_callback
             show_ladd.callback = show_ladd_callback
+            show_pia.callback = show_pia_callback
 
             # Add buttons to the view
             view.add_item(search_callsign)
@@ -366,6 +375,7 @@ class Skysearch(commands.Cog):
             view.add_item(search_radius)
             view.add_item(show_military)
             view.add_item(show_ladd)
+            view.add_item(show_pia)
             view.add_item(show_the_commands)
             view.add_item(show_stats)
 
