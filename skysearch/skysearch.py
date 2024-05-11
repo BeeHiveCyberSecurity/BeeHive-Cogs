@@ -616,8 +616,18 @@ class Skysearch(commands.Cog):
             if alert_channel:
                 next_iteration = self.check_emergency_squawks.next_iteration
                 now = datetime.datetime.now(datetime.timezone.utc)  # Ensure datetime is timezone aware
-                time_remaining = (next_iteration - now).total_seconds() if next_iteration else self.check_emergency_squawks.seconds
-                time_remaining_formatted = f"<t:{int(time_remaining)}:R>"
+                if next_iteration:
+                    time_remaining = (next_iteration - now).total_seconds()
+                    if time_remaining > 0:  # Ensure time remaining is not negative
+                        time_remaining_formatted = f"<t:{int(now.timestamp() + time_remaining)}:R>"
+                    else:
+                        time_remaining_formatted = "Now"
+                else:
+                    time_remaining = self.check_emergency_squawks.seconds
+                    if time_remaining > 0:  # Ensure time remaining is not negative
+                        time_remaining_formatted = f"<t:{int(now.timestamp() + time_remaining)}:R>"
+                    else:
+                        time_remaining_formatted = "Now"
                 if self.check_emergency_squawks.is_running():
                     last_check_status = f"Checked successfully {time_remaining_formatted} ago"
                 else:
