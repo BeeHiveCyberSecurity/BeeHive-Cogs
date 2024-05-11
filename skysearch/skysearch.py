@@ -57,10 +57,10 @@ class Skysearch(commands.Cog):
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/airplane.png")
             embed.set_image(url=image_url)
             embed.set_footer(text="")
+            embed.add_field(name="Type", value=f"{aircraft_data.get('desc', 'N/A')} ({aircraft_data.get('t', 'N/A')})", inline=True)
             embed.add_field(name="Flight", value=aircraft_data.get('flight', 'N/A').strip(), inline=True)
             embed.add_field(name="Registration", value=aircraft_data.get('reg', 'N/A'), inline=True)
             embed.add_field(name="ICAO", value=aircraft_data.get('hex', 'N/A').upper(), inline=True)
-            embed.add_field(name="Type", value=f"{aircraft_data.get('desc', 'N/A')} ({aircraft_data.get('t', 'N/A')})", inline=True)
             altitude = aircraft_data.get('alt_baro', 'N/A')
             ground_speed = aircraft_data.get('gs', 'N/A')
             if altitude == 'ground':
