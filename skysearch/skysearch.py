@@ -154,7 +154,7 @@ class Skysearch(commands.Cog):
 
             view = discord.ui.View()
             view.add_item(discord.ui.Button(label=f"Track live", url=f"{link}", style=discord.ButtonStyle.link))
-            tweet_text = f"Tracking flight {aircraft_data.get('flight', 'UNKNOWN')} at position {lat}, {lon} with speed {ground_speed_mph} mph. #SkySearch by @BeeHiveCyberSec"
+            tweet_text = f"Tracking flight {aircraft_data.get('flight', 'UNKNOWN')} at position {lat}, {lon} with speed {ground_speed_mph} mph using #SkySearch by @BeeHiveCyberSec. Track planes socially @ https://go.beehive.systems/discord"
             tweet_url = f"https://twitter.com/intent/tweet?text={urllib.parse.quote_plus(tweet_text)}"
             view.add_item(discord.ui.Button(label=f"Share on Twitter", url=tweet_url, style=discord.ButtonStyle.link))
             await ctx.send(embed=embed, view=view)
