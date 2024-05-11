@@ -632,7 +632,7 @@ class Skysearch(commands.Cog):
                     last_check_status = f":white_check_mark: **Checked successfully, next checking {time_remaining_formatted}**"
                 else:
                     last_check_status = f":x: **Last check failed, retrying {time_remaining_formatted}**"
-                embed.add_field(name=f"Channel: {alert_channel.name}", value=f"Last check status: {last_check_status}", inline=False)
+                embed.add_field(name="Status", value=f"Channel: {alert_channel.mention}\nLast check: {last_check_status}", inline=False)
             else:
                 embed.add_field(name="Status", value="No alert channel set.", inline=False)
         else:
