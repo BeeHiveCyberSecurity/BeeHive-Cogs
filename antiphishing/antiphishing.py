@@ -11,7 +11,7 @@ from redbot.core.bot import Red # type: ignore
 from redbot.core.commands import Context # type: ignore
 
 URL_REGEX_PATTERN = re.compile(
-    r"^(?:http[s]?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$"
+    r"^(?:http[s]?:\/\/)?[\w]+(?:\.[\w]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$"
 )
 
 
