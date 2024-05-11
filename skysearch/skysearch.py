@@ -16,7 +16,7 @@ from reportlab.pdfgen import canvas #type: ignore
 from reportlab.lib import colors#type: ignore
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle #type: ignore
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak, Table, TableStyle #type: ignore
-from .icao_codes import law_enforcement_icao_set, military_icao_set
+from .icao_codes import law_enforcement_icao_set, military_icao_set, medical_icao_set
 
 class Skysearch(commands.Cog):
     
@@ -29,6 +29,7 @@ class Skysearch(commands.Cog):
         self.check_emergency_squawks.start()
         self.law_enforcement_icao_set = law_enforcement_icao_set
         self.military_icao_set = military_icao_set
+        self.medical_icao_set = medical_icao_set
 
         
     async def cog_unload(self):
@@ -154,6 +155,8 @@ class Skysearch(commands.Cog):
                 embed.add_field(name="Asset intelligence", value=":police_officer: **This aircraft is known to be used for law enforcement purposes, such as traffic enforcement, or search and rescue missions**", inline=False)
             if icao and icao.upper() in self.military_icao_set:
                 embed.add_field(name="Asset intelligence", value=":military_helmet: **This aircraft is known to be used for military or combat purposes**", inline=False)
+            if icao and icao.upper() in self.medical_icao_set:
+                embed.add_field(name="Asset intelligence", value=":hospital: **This aircraft is known to be used for medical transport or emergency medical response services**", inline=False)
 
             view = discord.ui.View()
             view.add_item(discord.ui.Button(label=f"Track live", url=f"{link}", style=discord.ButtonStyle.link))
