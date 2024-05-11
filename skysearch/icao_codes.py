@@ -4,4 +4,6 @@ military_icao_set = {'AE4E12', 'AE53F9', 'ADFF10', 'AE1E85', 'AE27F4', 'AE07FF',
 
 medical_icao_set = {'A5C4D6', 'A234DB', 'A22B87', 'A740F0'}
 
+ukr_conflict_set = {}
+
 suspicious_icao_set = {}
