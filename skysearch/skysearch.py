@@ -61,7 +61,7 @@ class Skysearch(commands.Cog):
             embed.set_footer(text="")
             embed.add_field(name="Type", value=f"**{aircraft_data.get('desc', 'N/A')} ({aircraft_data.get('t', 'N/A')})**", inline=False)
             embed.add_field(name="Callsign", value=f"**{aircraft_data.get('flight', 'N/A').strip()}**", inline=True)
-            embed.add_field(name="Registration", value=f"**{aircraft_data.get('reg', 'HIDDEN')}**", inline=True)
+            embed.add_field(name="Registration", value=f"**{aircraft_data.get('reg', 'UNKNOWN')}**", inline=True)
             embed.add_field(name="ICAO", value=f"**{aircraft_data.get('hex', 'N/A').upper()}**", inline=True)
             altitude = aircraft_data.get('alt_baro', 'N/A')
             ground_speed = aircraft_data.get('gs', 'N/A')
@@ -99,7 +99,8 @@ class Skysearch(commands.Cog):
                 lon = round(float(lon), 2)
                 lon_dir = "E" if lon >= 0 else "W"
                 lon = f"{abs(lon)}{lon_dir}"
-            embed.add_field(name="Position", value=f"`{lat}, {lon}`", inline=True)
+            if lat != 'N/A' and lon != 'N/A':
+                embed.add_field(name="Position", value=f"`{lat}, {lon}`", inline=True)
             embed.add_field(name="Squawk", value=f"`{aircraft_data.get('squawk', 'SILENT')}`", inline=True)
             embed.add_field(name="Built", value=f"`{aircraft_data.get('year', 'UNKNOWN')}`", inline=True)
             embed.add_field(name="Category", value=f"`{aircraft_data.get('category', 'NONE')}`", inline=True)
