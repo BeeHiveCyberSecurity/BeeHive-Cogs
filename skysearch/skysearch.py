@@ -100,8 +100,8 @@ class Skysearch(commands.Cog):
             embed.add_field(name="Position", value=f"`{lat}, {lon}`", inline=True)
             embed.add_field(name="Squawk", value=f"`{aircraft_data.get('squawk', 'SILENT')}`", inline=True)
             embed.add_field(name="Built", value=f"`{aircraft_data.get('year', 'UNKNOWN')}`", inline=True)
-            embed.add_field(name="Category", value=aircraft_data.get('category', 'N/A'), inline=True)
-            embed.add_field(name="Aircraft type", value=aircraft_data.get('t', 'N/A'), inline=True)
+            embed.add_field(name="Category", value=f"`{aircraft_data.get('category', 'NONE')}`", inline=True)
+            embed.add_field(name="Aircraft type", value=f"`{aircraft_data.get('t', 'UNKNOWN')}`", inline=True)
             ground_speed_knots = aircraft_data.get('gs', 'N/A')
             if ground_speed_knots != 'N/A':
                 ground_speed_mph = round(float(ground_speed_knots) * 1.15078)  # Convert knots to mph
