@@ -148,9 +148,9 @@ class Skysearch(commands.Cog):
 
             icao = aircraft_data.get('hex', None)
             if icao and icao.upper() in self.law_enforcement_icao_set:
-                embed.add_field(name="Historical usage", value=":police_officer: **This aircraft is known to be used for law enforcement purposes, such as traffic enforcement, or search and rescue missions**", inline=False)
+                embed.add_field(name="Asset intelligence", value=":police_officer: **This aircraft is known to be used for law enforcement purposes, such as traffic enforcement, or search and rescue missions**", inline=False)
             if icao and icao.upper() in self.military_icao_set:
-                embed.add_field(name="Historical usage", value=":military_helmet: **This aircraft is known to be used for military or combat purposes**", inline=False)
+                embed.add_field(name="Asset intelligence", value=":military_helmet: **This aircraft is known to be used for military or combat purposes**", inline=False)
 
             view = discord.ui.View()
             view.add_item(discord.ui.Button(label=f"Track live", url=f"{link}", style=discord.ButtonStyle.link))
