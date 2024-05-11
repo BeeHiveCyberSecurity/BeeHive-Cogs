@@ -98,8 +98,7 @@ class Skysearch(commands.Cog):
                 lon_dir = "E" if lon >= 0 else "W"
                 lon = f"{abs(lon)}{lon_dir}"
             embed.add_field(name="Position", value=f"`{lat}, {lon}`", inline=True)
-            embed.add_field(name="Squawk", value=aircraft_data.get('squawk', 'N/A'), inline=True)
-            embed.add_field(name="Emergency", value=emergency_status, inline=True)
+            embed.add_field(name="Squawk", value=f"`{aircraft_data.get('squawk', 'SILENT')}`", inline=True)
             embed.add_field(name="Operator", value=aircraft_data.get('ownOp', 'N/A'), inline=True)
             embed.add_field(name="Year", value=aircraft_data.get('year', 'N/A'), inline=True)
             embed.add_field(name="Category", value=aircraft_data.get('category', 'N/A'), inline=True)
@@ -119,6 +118,7 @@ class Skysearch(commands.Cog):
                 embed.add_field(name="Altitude Trend", value="<:pointup:1197006728953339924> **Climbing**\n" + f"`{baro_rate} feet/min`", inline=False)
             else:
                 embed.add_field(name="Altitude Trend", value="<:pointdown:1197006724377366668> **Descending**\n" + f"`{abs(int(baro_rate))} feet/min`", inline=False)
+            embed.add_field(name="Emergency", value=emergency_status, inline=True)
             view = discord.ui.View()
             view.add_item(discord.ui.Button(label=f"Track live", url=f"{link}", style=discord.ButtonStyle.link, emoji="<:info:1199305085738553385>"))
             await ctx.send(embed=embed, view=view)
