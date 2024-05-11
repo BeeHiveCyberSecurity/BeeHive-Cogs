@@ -115,8 +115,8 @@ class Skysearch(commands.Cog):
                     emergency_embed.add_field(name="Squawk 7700 - General Emergency", value="This code is used to indicate a general emergency. The pilot currently has ATC priority and is working to resolve the situation. Check local news outlets for more information, or if this is a military flight, look into what squadron the plane belonged to, and if they posted any updates later in the day.", inline=False)
                 await ctx.send(embed=emergency_embed)
         else:
-            embed = discord.Embed(title='Error: Aircraft Information Not Found', color=discord.Colour(0xff4545))
-            embed.add_field(name="Details", value="No aircraft information found or the response format is incorrect.\n\nThe plane may be not currently in use or the data is not available at the moment", inline=False)
+            embed = discord.Embed(title='No results found for your query', color=discord.Colour(0xff4545))
+            embed.add_field(name="Details", value="No aircraft information found or the response format is incorrect.", inline=False)
             await ctx.send(embed=embed)
 
     async def _get_photo_by_hex(self, hex_id):
