@@ -50,7 +50,8 @@ class Skysearch(commands.Cog):
             return None
 
     async def _send_aircraft_info(self, ctx, response):
-        if 'ac' in response and response['ac']:                                            
+        if 'ac' in response and response['ac']:      
+            await ctx.trigger_typing()
             aircraft_data = response['ac'][0]
             emergency_squawk_codes = ['7500', '7600', '7700']
             hex_id = aircraft_data.get('hex', '')                                      
