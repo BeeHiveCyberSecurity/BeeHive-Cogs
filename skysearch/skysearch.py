@@ -81,7 +81,7 @@ class Skysearch(commands.Cog):
                 callsign = 'HIDDEN'
             embed.add_field(name="Callsign", value=f"`{callsign}`", inline=True)
             if registration is not None:
-            registration = registration.upper()
+                registration = registration.upper()
             registration = aircraft_data.get('reg', None)
             icao = aircraft_data.get('hex', 'N/A').upper()
             embed.add_field(name="Registration", value=f"`{registration}`", inline=True)
