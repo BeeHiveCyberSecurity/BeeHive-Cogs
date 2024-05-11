@@ -119,6 +119,10 @@ class Skysearch(commands.Cog):
             else:
                 embed.add_field(name="Altitude trend", value="<:pointdown:1197006724377366668> **Descending @ ** " + f"`{abs(int(baro_rate))} feet/min`", inline=False)
             embed.add_field(name="Safety status", value=emergency_status, inline=True)
+            law_enforcement_icao_list = ['A10941', 'AB68C8', 'A9A449']  # Update this list as needed or discovered
+            icao = aircraft_data.get('icao', 'N/A')
+            if icao in law_enforcement_icao_list:
+                embed.add_field(name="Usage", value=":police_officer: **This aircraft is known to be used for law enforcement purposes, such as traffic enforcement, or search and rescue missions**", inline=False)
             view = discord.ui.View()
             view.add_item(discord.ui.Button(label=f"Track live", url=f"{link}", style=discord.ButtonStyle.link))
             await ctx.send(embed=embed, view=view)
