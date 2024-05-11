@@ -142,7 +142,7 @@ class Skysearch(commands.Cog):
                 embed.add_field(name="Operated by", value=f"`{operator}`", inline=True)
             baro_rate = aircraft_data.get('baro_rate', 'N/A')
             if baro_rate == 'N/A':
-                embed.add_field(name="Altitude trend", value=":grey_question: Altitude trends unavailable, not enough data...", inline=False)
+                embed.add_field(name="Altitude trend", value=":grey_question: **Altitude trends unavailable, not enough data...**", inline=False)
             else:
                 baro_rate_fps = round(int(baro_rate) / 60, 2)  # Convert feet per minute to feet per second
                 if abs(baro_rate_fps) < 50/60:
