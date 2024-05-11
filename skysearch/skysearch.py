@@ -115,11 +115,11 @@ class Skysearch(commands.Cog):
             if baro_rate == 'N/A':
                 embed.add_field(name="Altitude trend", value=":grey_question: Altitude trends unavailable, not enough data...", inline=False)
             elif abs(int(baro_rate)) < 50:
-                embed.add_field(name="Altitude trend", value="<:pointright:1197006726466130072> **Maintaining altitude @ **  " + f"**`{baro_rate} feet/min`**", inline=False)
+                embed.add_field(name="Altitude trend", value=":point_right: **Maintaining altitude @ **  " + f"**`{baro_rate} feet/min`**", inline=False)
             elif int(baro_rate) > 0:
-                embed.add_field(name="Altitude trend", value="<:pointup:1197006728953339924> **Climbing @**  " + f"**`{baro_rate} feet/min`**", inline=False)
+                embed.add_field(name="Altitude trend", value=":point_up: **Climbing @**  " + f"**`{baro_rate} feet/min`**", inline=False)
             else:
-                embed.add_field(name="Altitude trend", value="<:pointdown:1197006724377366668> **Descending @ ** " + f"**`{abs(int(baro_rate))} feet/min`**", inline=False)
+                embed.add_field(name="Altitude trend", value=":point_down: **Descending @ ** " + f"**`{abs(int(baro_rate))} feet/min`**", inline=False)
             embed.add_field(name="Safety status", value=emergency_status, inline=True)
 
 
