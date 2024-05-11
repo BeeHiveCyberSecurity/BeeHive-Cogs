@@ -585,23 +585,20 @@ class Skysearch(commands.Cog):
             async with self._http_client.get(url) as response:
                 data = await response.json()
 
-            if "beast" in data and "mlat" in data and "other" in data and "aircraft" in data:
-                beast_stats = data["beast"]
-                mlat_stats = data["mlat"]
-                other_stats = data["other"]
-                aircraft_stats = data["aircraft"]
+            if all(key in data for key in ["beast", "mlat", "other", "aircraft"]):
+                stats_keys = ["beast", "mlat", "other", "aircraft"]
+                stats_values = {key: data[key] for key in stats_keys}
 
                 # Get the count of law enforcement aircraft ICAO's
-                law_enforcement_icao_count = len(self.law_enforcement_icao_set)
+                law_enforcement_icao_set = {'A10941', 'AB68C8', 'A9A449', 'A67117', 'A03325'}  # Update this set as needed or discovered
+                military_icao_set = {}
 
                 embed = discord.Embed(title="Aircraft Data Feeder Stats", description="Data is brought to you free-of-charge by [airplanes.live](https://airplanes.live)", color=0xfffffe)
                 embed.set_image(url="https://asset.brandfetch.io/id1hdkKy3B/idqsgDGEm_.png")
-                embed.add_field(name="Beast", value="{:,} planes".format(beast_stats), inline=False)
-                embed.add_field(name="MLAT", value="{:,} planes".format(mlat_stats), inline=False)
-                embed.add_field(name="Other", value="{:,} planes".format(other_stats), inline=False)
-                embed.add_field(name="Aircraft", value="{:,} planes".format(aircraft_stats), inline=False)
+                for key, value in stats_values.items():
+                    embed.add_field(name=key.capitalize(), value="{:,} planes".format(value), inline=False)
                 embed2 = discord.Embed(title="Enhanced by BeeHive Intelligence", description="BeeHive tracks and supplements this cog's original dataset during day-to-day operations.", color=0xffd966)
-                embed2.add_field(name="Law Enforcement ICAO's", value="{:,} planes".format(law_enforcement_icao_count), inline=False)
+                embed2.add_field(name="Law Enforcement ICAO's", value="{:,} planes".format(len(law_enforcement_icao_set)), inline=False)
 
                 await ctx.send(embed=embed)
                 await ctx.send(embed=embed2)
