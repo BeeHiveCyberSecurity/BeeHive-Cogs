@@ -45,6 +45,7 @@ class Skysearch(commands.Cog):
     async def _send_aircraft_info(self, ctx, response):
         if 'ac' in response and response['ac']:                                            
             aircraft_data = response['ac'][0]
+            emergency_squawk_codes = ['7500', '7600', '7700']
             hex_id = aircraft_data.get('hex', '')                                      
             image_url, photographer = await self._get_photo_by_hex(hex_id)
             link = f"https://globe.airplanes.live/?icao={hex_id}"
