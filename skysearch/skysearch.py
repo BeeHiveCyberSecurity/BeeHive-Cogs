@@ -17,6 +17,8 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle #type: igno
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak, Table, TableStyle #type: ignore
 
 class Skysearch(commands.Cog):
+    law_enforcement_icao_set = {'A10941', 'AB68C8', 'A9A449', 'A67117', 'A03325'}  # Update this set as needed or discovered
+    military_icao_set = {}
     def __init__(self, bot):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=492089091320446976)  
@@ -120,13 +122,11 @@ class Skysearch(commands.Cog):
                 embed.add_field(name="Altitude trend", value="<:pointdown:1197006724377366668> **Descending @ ** " + f"`{abs(int(baro_rate))} feet/min`", inline=False)
             embed.add_field(name="Safety status", value=emergency_status, inline=True)
 
-            law_enforcement_icao_set = {'A10941', 'AB68C8', 'A9A449', 'A67117', 'A03325'}  # Update this set as needed or discovered
-            military_icao_set = {}
 
             icao = aircraft_data.get('hex', None)
-            if icao and icao.upper() in law_enforcement_icao_set:
+            if icao and icao.upper() in self.law_enforcement_icao_set:
                 embed.add_field(name="Historical usage", value=":police_officer: **This aircraft is known to be used for law enforcement purposes, such as traffic enforcement, or search and rescue missions**", inline=False)
-            if icao and icao.upper() in military_icao_set:
+            if icao and icao.upper() in self.military_icao_set:
                 embed.add_field(name="Historical usage", value=":military_helmet: **This aircraft is known to be used for military purposes**", inline=False)
             view = discord.ui.View()
             view.add_item(discord.ui.Button(label=f"Track live", url=f"{link}", style=discord.ButtonStyle.link))
@@ -589,10 +589,6 @@ class Skysearch(commands.Cog):
                 stats_keys = ["beast", "mlat", "other", "aircraft"]
                 stats_values = {key: data[key] for key in stats_keys}
 
-                # Get the count of law enforcement aircraft ICAO's
-                law_enforcement_icao_set = {'A10941', 'AB68C8', 'A9A449', 'A67117', 'A03325'}  # Update this set as needed or discovered
-                military_icao_set = {}
-
                 embed = discord.Embed(title="Data from Airplanes.Live", description="Select data is brought to you free-of-charge by [airplanes.live](https://airplanes.live)", color=0xfffffe)
                 embed.set_image(url="https://asset.brandfetch.io/id1hdkKy3B/idqsgDGEm_.png")
                 embed.set_thumbnail(url="https://asset.brandfetch.io/id1hdkKy3B/idgRk5S59l.jpeg")
@@ -601,8 +597,8 @@ class Skysearch(commands.Cog):
                 embed2 = discord.Embed(title="Enhanced by BeeHive Intelligence", description="BeeHive tracks and supplements this cog's original dataset during day-to-day operations.", color=0xffd966)
                 embed2.set_image(url="https://asset.brandfetch.io/idGpYEfxfH/id0xj4J1xg.png")
                 embed2.set_thumbnail(url="https://asset.brandfetch.io/idGpYEfxfH/idW3166yGx.png")
-                embed2.add_field(name="Law enforcement aircraft catalogued", value="{:,} planes".format(len(law_enforcement_icao_set)), inline=False)
-                embed2.add_field(name="Military aircraft catalogued", value="{:,} planes".format(len(military_icao_set)), inline=False)
+                embed2.add_field(name="Law enforcement aircraft catalogued", value="{:,} planes".format(len(self.law_enforcement_icao_set)), inline=False)
+                embed2.add_field(name="Military aircraft catalogued", value="{:,} planes".format(len(self.military_icao_set)), inline=False)
 
                 await ctx.send(embed=embed)
                 await ctx.send(embed=embed2)
