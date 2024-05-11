@@ -64,7 +64,7 @@ class Skysearch(commands.Cog):
             altitude = aircraft_data.get('alt_baro', 'N/A')
             ground_speed = aircraft_data.get('gs', 'N/A')
             if altitude == 'ground':
-                embed.add_field(name="Status", value="`On the ground`", inline=True)
+                embed.add_field(name="Status", value="`On ground`", inline=True)
             else:
                 altitude_feet = f"{altitude} ft"
                 embed.add_field(name="Altitude", value=f"`{altitude_feet}`", inline=True)
