@@ -119,7 +119,7 @@ class Skysearch(commands.Cog):
             else:
                 embed.add_field(name="Altitude trend", value="<:pointdown:1197006724377366668> **Descending @ ** " + f"`{abs(int(baro_rate))} feet/min`", inline=False)
             embed.add_field(name="Safety status", value=emergency_status, inline=True)
-            law_enforcement_icao_set = {'A10941', 'AB68C8', 'A9A449'}  # Update this set as needed or discovered
+            law_enforcement_icao_set = {'A10941', 'AB68C8', 'A9A449', 'A67117'}  # Update this set as needed or discovered
             military_icao_set = {}
             icao = aircraft_data.get('hex', None)
             if icao and icao.upper() in law_enforcement_icao_set:
