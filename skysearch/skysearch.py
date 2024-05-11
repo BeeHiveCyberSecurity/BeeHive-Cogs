@@ -102,13 +102,13 @@ class Skysearch(commands.Cog):
                 embed.add_field(name="Speed", value="N/A", inline=True)
             baro_rate = aircraft_data.get('baro_rate', 'N/A')
             if baro_rate == 'N/A':
-                embed.add_field(name="Altitude Trend", value="Altitude trends unavailable, not enough data...", inline=True)
+                embed.add_field(name="Altitude Trend", value="Altitude trends unavailable, not enough data...", inline=False)
             elif abs(int(baro_rate)) < 50:
-                embed.add_field(name="Altitude Trend", value="<:pointright:1197006726466130072> **Maintaining altitude**\n" + f"`{baro_rate} feet/min`", inline=True)
+                embed.add_field(name="Altitude Trend", value="<:pointright:1197006726466130072> **Maintaining altitude**\n" + f"`{baro_rate} feet/min`", inline=False)
             elif int(baro_rate) > 0:
-                embed.add_field(name="Altitude Trend", value="<:pointup:1197006728953339924> **Climbing**\n" + f"`{baro_rate} feet/min`", inline=True)
+                embed.add_field(name="Altitude Trend", value="<:pointup:1197006728953339924> **Climbing**\n" + f"`{baro_rate} feet/min`", inline=False)
             else:
-                embed.add_field(name="Altitude Trend", value="<:pointdown:1197006724377366668> **Descending**\n" + f"`{abs(int(baro_rate))} feet/min`", inline=True)
+                embed.add_field(name="Altitude Trend", value="<:pointdown:1197006724377366668> **Descending**\n" + f"`{abs(int(baro_rate))} feet/min`", inline=False)
             view = discord.ui.View()
             view.add_item(discord.ui.Button(label=f"Track live", url=f"{link}", style=discord.ButtonStyle.link, emoji="<:info:1199305085738553385>"))
             await ctx.send(embed=embed, view=view)
