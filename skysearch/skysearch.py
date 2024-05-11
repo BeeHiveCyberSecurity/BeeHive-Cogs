@@ -111,7 +111,7 @@ class Skysearch(commands.Cog):
                 embed.add_field(name="Speed", value="N/A", inline=True)
             baro_rate = aircraft_data.get('baro_rate', 'N/A')
             if baro_rate == 'N/A':
-                embed.add_field(name="Altitude trend", value="Altitude trends unavailable, not enough data...", inline=False)
+                embed.add_field(name="Altitude trend", value=":grey_question: Altitude trends unavailable, not enough data...", inline=False)
             elif abs(int(baro_rate)) < 50:
                 embed.add_field(name="Altitude trend", value="<:pointright:1197006726466130072> **Maintaining altitude**\n" + f"`{baro_rate} feet/min`", inline=False)
             elif int(baro_rate) > 0:
