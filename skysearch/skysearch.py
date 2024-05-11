@@ -53,7 +53,7 @@ class Skysearch(commands.Cog):
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Orange/alert-circle-outline.png")
             else:
                 embed = discord.Embed(title='Aircraft information', color=discord.Colour(0xfffffe))
-                emergency_status = ":shield: This flight seems safe and sound, all normal."
+                emergency_status = "<:shield:1194906995036262420> **This flight seems safe and sound, all normal.**"
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/airplane.png")
             embed.set_image(url=image_url)
             embed.set_footer(text="")
