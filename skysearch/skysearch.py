@@ -672,18 +672,18 @@ class Skysearch(commands.Cog):
     @tasks.loop(minutes=2)
     async def check_emergency_squawks(self):
         try:
-            guilds = self.bot.guilds
-            for guild in guilds:
-                alert_channel_id = await self.config.guild(guild).alert_channel()
-                if alert_channel_id:
-                    alert_channel = self.bot.get_channel(alert_channel_id)
-                    if alert_channel:
-                        url = f"{self.api_url}/emergency"
-                        response = await self._make_request(url)
-                        if response and 'ac' in response:
-                            for aircraft_info in response['ac']:
-                                squawk_code = aircraft_info.get('squawk', 'N/A')
-                                if squawk_code in ['7500', '7600', '7700']:
+            emergency_squawk_codes = ['7500', '7600', '7700']
+            for squawk_code in emergency_squawk_codes:
+                url = f"{self.api_url}/squawk/{squawk_code}"
+                response = await self._make_request(url)
+                if response and 'ac' in response:
+                    for aircraft_info in response['ac']:
+                        guilds = self.bot.guilds
+                        for guild in guilds:
+                            alert_channel_id = await self.config.guild(guild).alert_channel()
+                            if alert_channel_id:
+                                alert_channel = self.bot.get_channel(alert_channel_id)
+                                if alert_channel:
                                     await self._send_aircraft_info(alert_channel, {'ac': [aircraft_info]})
         except Exception as e:
             print(f"Error checking emergency squawks: {e}")
