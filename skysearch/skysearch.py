@@ -884,12 +884,38 @@ class Skysearch(commands.Cog):
         if message.author == self.bot.user:
             return
 
+        auto_icao = await self.config.guild(message.guild).auto_icao()
+        if not auto_icao:
+            return
+
         content = message.content
         icao_pattern = re.compile(r'^[a-fA-F0-9]{6}$')
 
         if icao_pattern.match(content):
             ctx = await self.bot.get_context(message)
             await self.aircraft_by_icao(ctx, content)
+
+    @commands.guild_only()
+    @commands.has_permissions(manage_guild=True)
+    @aircraft_group.command(name='autoicao')
+    async def autoicao(self, ctx, state: bool = None):
+        """Enable or disable automatic ICAO lookup."""
+        if state is None:
+            state = await self.config.guild(ctx.guild).auto_icao()
+            if state:
+                embed = discord.Embed(title="ICAO Lookup Status", description="Automatic ICAO lookup is currently enabled.", color=0x00ff00)
+                await ctx.send(embed=embed)
+            else:
+                embed = discord.Embed(title="ICAO Lookup Status", description="Automatic ICAO lookup is currently disabled.", color=0xff0000)
+                await ctx.send(embed=embed)
+        else:
+            await self.config.guild(ctx.guild).auto_icao.set(state)
+            if state:
+                embed = discord.Embed(title="ICAO Lookup Status", description="Automatic ICAO lookup has been enabled.", color=0x00ff00)
+                await ctx.send(embed=embed)
+            else:
+                embed = discord.Embed(title="ICAO Lookup Status", description="Automatic ICAO lookup has been disabled.", color=0xff0000)
+                await ctx.send(embed=embed)
 
     def cog_unload(self):
         try:
