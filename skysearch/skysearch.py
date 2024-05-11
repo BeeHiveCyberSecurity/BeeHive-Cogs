@@ -158,7 +158,7 @@ class Skysearch(commands.Cog):
             if icao and icao.upper() in self.law_enforcement_icao_set:
                 embed.add_field(name="Asset intelligence", value=":police_officer: **This aircraft is known to be used for law enforcement purposes, such as traffic enforcement, or search and rescue missions**", inline=False)
             if icao and icao.upper() in self.military_icao_set:
-                embed.add_field(name="Asset intelligence", value=":military_helmet: **This aircraft is known to be used for military or defense purposes**", inline=False)
+                embed.add_field(name="Asset intelligence", value=":military_helmet: **This aircraft is known to be used for military or government purposes**", inline=False)
             if icao and icao.upper() in self.medical_icao_set:
                 embed.add_field(name="Asset intelligence", value=":hospital: **This aircraft is known to be used for medical transport or emergency medical response services**", inline=False)
             if icao and icao.upper() in self.suspicious_icao_set:
