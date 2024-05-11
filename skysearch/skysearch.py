@@ -87,7 +87,17 @@ class Skysearch(commands.Cog):
                 else:
                     emoji = ":arrow_up:"
                 embed.add_field(name="Heading", value=f"{emoji} `{heading} degrees`", inline=True)
-            embed.add_field(name="Position", value=f"`{aircraft_data.get('lat', 'N/A')}, {aircraft_data.get('lon', 'N/A')}`", inline=True)
+            lat = aircraft_data.get('lat', 'N/A')
+            lon = aircraft_data.get('lon', 'N/A')
+            if lat != 'N/A':
+                lat = round(float(lat), 2)
+                lat_dir = "N" if lat >= 0 else "S"
+                lat = f"{abs(lat)}{lat_dir}"
+            if lon != 'N/A':
+                lon = round(float(lon), 2)
+                lon_dir = "E" if lon >= 0 else "W"
+                lon = f"{abs(lon)}{lon_dir}"
+            embed.add_field(name="Position", value=f"`{lat}, {lon}`", inline=True)
             embed.add_field(name="Squawk", value=aircraft_data.get('squawk', 'N/A'), inline=True)
             embed.add_field(name="Emergency", value=emergency_status, inline=True)
             embed.add_field(name="Operator", value=aircraft_data.get('ownOp', 'N/A'), inline=True)
