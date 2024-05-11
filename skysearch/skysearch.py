@@ -18,7 +18,7 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak, 
 
 class Skysearch(commands.Cog):
     law_enforcement_icao_set = {'A10941', 'AB68C8', 'A9A449', 'A67117', 'A03325', 'A1B4BB', 'A2C934', 'AD933E', 'AC6E92', 'A64D15', 'A6A665', 'A97B90', 'A7C42B', 'A92BFF'}  # Update this set as needed or discovered
-    military_icao_set = {'AE055F', 'AE0270'}
+    military_icao_set = {'AE055F', 'AE0270', 'AE1462'}
     def __init__(self, bot):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=492089091320446976)  
