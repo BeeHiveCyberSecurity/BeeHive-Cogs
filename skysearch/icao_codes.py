@@ -2,6 +2,6 @@ law_enforcement_icao_set = {'A10941', 'AB68C8', 'A9A449', 'A67117', 'A03325', 'A
 
 military_icao_set = {'AE055F', 'AE0270', 'AE1462', 'AE146E', 'AE0664', 'AE4E0D', 'AE0808', 'AE0800', 'AE146B'}
 
-medical_icao_set = {'A5C4D6', 'A234DB', 'A22B87'}
+medical_icao_set = {'A5C4D6', 'A234DB', 'A22B87', 'A740F0'}
 
 suspicious_icao_set = {}
