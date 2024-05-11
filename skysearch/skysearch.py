@@ -593,7 +593,7 @@ class Skysearch(commands.Cog):
                 law_enforcement_icao_set = {'A10941', 'AB68C8', 'A9A449', 'A67117', 'A03325'}  # Update this set as needed or discovered
                 military_icao_set = {}
 
-                embed = discord.Embed(title="Aircraft Data Feeder Stats", description="Data is brought to you free-of-charge by [airplanes.live](https://airplanes.live)", color=0xfffffe)
+                embed = discord.Embed(title="Data from Airplanes.Live", description="Select data is brought to you free-of-charge by [airplanes.live](https://airplanes.live)", color=0xfffffe)
                 embed.set_image(url="https://asset.brandfetch.io/id1hdkKy3B/idqsgDGEm_.png")
                 for key, value in stats_values.items():
                     embed.add_field(name=key.capitalize(), value="{:,} planes".format(value), inline=False)
