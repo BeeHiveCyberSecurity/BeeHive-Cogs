@@ -598,7 +598,8 @@ class Skysearch(commands.Cog):
                 for key, value in stats_values.items():
                     embed.add_field(name=key.capitalize(), value="{:,} planes".format(value), inline=False)
                 embed2 = discord.Embed(title="Enhanced by BeeHive Intelligence", description="BeeHive tracks and supplements this cog's original dataset during day-to-day operations.", color=0xffd966)
-                embed2.set_image(url="https://asset.brandfetch.io/idGpYEfxfH/idheDX9c1P.png")
+                embed2.set_image(url="https://asset.brandfetch.io/idGpYEfxfH/id0xj4J1xg.png")
+                embed2.set_thumbnail(url="https://asset.brandfetch.io/idGpYEfxfH/idW3166yGx.png")
                 embed2.add_field(name="Law Enforcement Aircraft", value="{:,} planes".format(len(law_enforcement_icao_set)), inline=False)
                 embed2.add_field(name="Military Aircraft", value="{:,} planes".format(len(military_icao_set)), inline=False)
 
