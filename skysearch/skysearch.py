@@ -167,6 +167,11 @@ class Skysearch(commands.Cog):
             tweet_text = f"Tracking flight {aircraft_data.get('flight', 'UNKNOWN')} at position {lat}, {lon} with speed {ground_speed_mph} mph using #SkySearch by @BeeHiveCyberSec. Track planes socially @ https://go.beehive.systems/discord"
             if image_url:
                 tweet_text += f" {image_url}"
+                # Use Twitter API to attach image to the tweet
+                media = api.media_upload(image_url)
+                tweet = api.update_status(status=tweet_text, media_ids=[media.media_id])
+            else:
+                tweet = api.update_status(status=tweet_text)
             tweet_url = f"https://twitter.com/intent/tweet?text={urllib.parse.quote_plus(tweet_text)}"
             view.add_item(discord.ui.Button(label=f"Share on 𝕏", url=tweet_url, style=discord.ButtonStyle.link))
             await ctx.send(embed=embed, view=view)
