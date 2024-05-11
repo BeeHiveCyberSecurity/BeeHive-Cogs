@@ -102,7 +102,8 @@ class Skysearch(commands.Cog):
             if lat != 'N/A' and lon != 'N/A':
                 embed.add_field(name="Position", value=f"`{lat}, {lon}`", inline=True)
             embed.add_field(name="Squawk", value=f"`{aircraft_data.get('squawk', 'SILENT')}`", inline=True)
-            embed.add_field(name="Built", value=f"`{aircraft_data.get('year', 'UNKNOWN')}`", inline=True)
+            if aircraft_data.get('year', None) is not None:
+                embed.add_field(name="Built", value=f"`{aircraft_data.get('year')}`", inline=True)
             embed.add_field(name="Category", value=f"`{aircraft_data.get('category', 'NONE')}`", inline=True)
             embed.add_field(name="Aircraft model", value=f"`{aircraft_data.get('t', 'UNKNOWN')}`", inline=True)
             ground_speed_knots = aircraft_data.get('gs', 'N/A')
