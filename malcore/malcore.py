@@ -28,7 +28,7 @@ class Malcore(commands.Cog):
         }
         try:
             async with ctx.typing():
-                r = requests.post('https://api.malcore.io/api/urlcheck', headers=headers, data=data)
+                r = requests.post('https://api.malcore.io/api/urlcheck', headers=headers, data=data, timeout=5)
                 res = r.text
                 json_data = json.loads(res)
                 threat_level = json_data.get("data", {}).get("data", {}).get("threat_level")
@@ -45,8 +45,8 @@ class Malcore(commands.Cog):
                     embed.color = 0xFF4545  # Red color
                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/warning-outline.png")
                 await ctx.send(embed=embed)
-        except json.JSONDecodeError:
-            await ctx.send(f"Invalid JSON response from Malcore API.")
+        except (json.JSONDecodeError, requests.exceptions.Timeout):
+            await ctx.send(f"Invalid JSON response from Malcore API or request timed out.")
 
 
     @commands.command()
@@ -59,7 +59,11 @@ class Malcore(commands.Cog):
 
         if ctx.message.attachments:
             attachment = ctx.message.attachments[0]
-            response = requests.get(attachment.url)
+            try:
+                response = requests.get(attachment.url, timeout=5)
+            except requests.exceptions.Timeout:
+                await ctx.send("File download timed out.")
+                return
             headers = {
                 "apiKey": mcore_key["api_key"],
                 "X-No-Poll": False
@@ -71,14 +75,14 @@ class Malcore(commands.Cog):
             file_content = response.content
             try:
                 async with ctx.typing():
-                    r = requests.post('https://api.malcore.io/api/upload', headers=headers, files={'filename': ('1', file_content)})
+                    r = requests.post('https://api.malcore.io/api/upload', headers=headers, files={'filename': ('1', file_content)}, timeout=5)
                     res = r.text
                     json_data = json.loads(res)
-                    r2 = requests.post('https://paste.org/', data={'text': json_data})
+                    r2 = requests.post('https://paste.org/', data={'text': json_data}, timeout=5)
                     paste_url = r2.url
                     await ctx.send(f"Uploaded to Paste.org: {paste_url}")
 
-            except json.JSONDecodeError:
-                await ctx.send(f"Invalid JSON response from Malcore API.")
+            except (json.JSONDecodeError, requests.exceptions.Timeout):
+                await ctx.send(f"Invalid JSON response from Malcore API or request timed out.")
         else:
             await ctx.send("Please attach a file!")
