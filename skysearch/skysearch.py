@@ -432,6 +432,7 @@ class Skysearch(commands.Cog):
         else:
             embed = discord.Embed(title="Error", description="Error retrieving aircraft information.", color=0xff4545)
             await ctx.send(embed=embed)
+            
     @aircraft_group.command(name='callsign', help='Get information about an aircraft by its callsign.')
     async def aircraft_by_callsign(self, ctx, callsign: str):
         url = f"{self.api_url}/callsign/{callsign}"
@@ -877,6 +878,18 @@ class Skysearch(commands.Cog):
             await self.bot.wait_until_ready()
         except Exception as e:
             print(f"Error before checking emergency squawks: {e}")
+
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        if message.author == self.bot.user:
+            return
+
+        content = message.content
+        icao_pattern = re.compile(r'^[a-fA-F0-9]{6}$')
+
+        if icao_pattern.match(content):
+            ctx = await self.bot.get_context(message)
+            await self.aircraft_by_icao(ctx, content)
 
     def cog_unload(self):
         try:
