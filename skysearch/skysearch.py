@@ -18,7 +18,7 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak, 
 
 class Skysearch(commands.Cog):
     law_enforcement_icao_set = {'A10941', 'AB68C8', 'A9A449', 'A67117', 'A03325', 'A1B4BB', 'A2C934', 'AD933E', 'AC6E92', 'A64D15', 'A6A665', 'A97B90', 'A7C42B', 'A92BFF'}  # Update this set as needed or discovered
-    military_icao_set = {'AE055F', 'AE0270', 'AE1462', 'AE146E', 'AE0664', 'AE4E0D'}
+    military_icao_set = {'AE055F', 'AE0270', 'AE1462', 'AE146E', 'AE0664', 'AE4E0D', 'AE0808'}
     def __init__(self, bot):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=492089091320446976)  
@@ -73,8 +73,10 @@ class Skysearch(commands.Cog):
             if not callsign or callsign == 'N/A':
                 callsign = 'HIDDEN'
             embed.add_field(name="Callsign", value=f"**{callsign}**", inline=True)
-            embed.add_field(name="Registration", value=f"**{aircraft_data.get('reg', 'UNKNOWN')}**", inline=True)
-            embed.add_field(name="ICAO", value=f"**{aircraft_data.get('hex', 'N/A').upper()}**", inline=True)
+            registration = aircraft_data.get('reg', 'UNKNOWN')
+            icao = aircraft_data.get('hex', 'N/A').upper()
+            embed.add_field(name="Registration", value=f"**{registration}**", inline=True)
+            embed.add_field(name="ICAO", value=f"**{icao}**", inline=True)
             altitude = aircraft_data.get('alt_baro', 'N/A')
             ground_speed = aircraft_data.get('gs', 'N/A')
             if altitude == 'ground':
