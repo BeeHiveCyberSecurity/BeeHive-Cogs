@@ -467,8 +467,8 @@ class Skysearch(commands.Cog):
             await ctx.send(embed=embed)
 
     @aircraft_group.command(name='ladd', help='Limiting Aircraft Data Displayed (LADD).')
-    async def ladd_aircraft(self, ctx, limit: int):
-        url = f"{self.api_url}/ladd/{limit}"
+    async def ladd_aircraft(self, ctx):
+        url = f"{self.api_url}/ladd"
         response = await self._make_request(url)
         if response:
             if len(response['ac']) > 1:
