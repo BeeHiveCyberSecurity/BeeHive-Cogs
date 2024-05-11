@@ -685,6 +685,7 @@ class Skysearch(commands.Cog):
                                 alert_channel = self.bot.get_channel(alert_channel_id)
                                 if alert_channel:
                                     await self._send_aircraft_info(alert_channel, {'ac': [aircraft_info]})
+                await asyncio.sleep(2)  # Add a delay to respect API rate limit
         except Exception as e:
             print(f"Error checking emergency squawks: {e}")
 
