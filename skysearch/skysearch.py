@@ -486,7 +486,7 @@ class Skysearch(commands.Cog):
             embed = discord.Embed(title="Error", description="Error retrieving aircraft information.", color=0xff4545)
             await ctx.send(embed=embed)
 
-    @aircraft_group.command(name='ladd', help='Limiting Aircraft Data Displayed (LADD).')
+    @aircraft_group.command(name='ladd', help='Get information on LADD-restricted aircraft')
     async def ladd_aircraft(self, ctx):
         url = f"{self.api_url}/ladd"
         response = await self._make_request(url)
@@ -687,7 +687,7 @@ class Skysearch(commands.Cog):
             embed = discord.Embed(title="Error", description="Error retrieving aircraft information.", color=0xff4545)
             await ctx.send(embed=embed)
 
-    @aircraft_group.command(name='stats', help='Get feeder stats for airplanes.live')
+    @aircraft_group.command(name='stats', help='Get statistics about SkySearch and the data used here')
     async def stats(self, ctx):
         url = "https://api.airplanes.live/stats"
 
@@ -752,7 +752,7 @@ class Skysearch(commands.Cog):
             embed = discord.Embed(description=f"An error occurred during scrolling: {e}.")
             await ctx.send(embed=embed)
 
-    @aircraft_group.command(name='showalertchannel', help='List the alert channels and their statuses.')
+    @aircraft_group.command(name='showalertchannel', help='Show alert task status and output if set')
     async def list_alert_channels(self, ctx):
         guild = ctx.guild
         embed = discord.Embed(title=f"Squawk alerts for {guild.name}", color=0xfffffe)
