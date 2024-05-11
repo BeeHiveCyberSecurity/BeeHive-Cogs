@@ -601,7 +601,7 @@ class Skysearch(commands.Cog):
                 embed.add_field(name="Other", value="{:,} planes".format(other_stats), inline=False)
                 embed.add_field(name="Aircraft", value="{:,} planes".format(aircraft_stats), inline=False)
                 embed2 = discord.Embed(title="Enhanced by BeeHive Intelligence", description="BeeHive tracks and supplements this cog's original dataset during day-to-day operations.", color=0xffd966)
-                embed.add_field(name="Law Enforcement ICAO's", value="{:,} planes".format(law_enforcement_icao_count), inline=False)
+                embed2.add_field(name="Law Enforcement ICAO's", value="{:,} planes".format(law_enforcement_icao_count), inline=False)
 
                 await ctx.send(embed=embed)
                 await ctx.send(embed=embed2)
