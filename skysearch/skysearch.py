@@ -100,7 +100,7 @@ class Skysearch(commands.Cog):
                     emoji = ":arrow_upper_left:"
                 else:
                     emoji = ":arrow_up:"
-                embed.add_field(name="Heading", value=f"{emoji} `{heading} degrees`", inline=True)
+                embed.add_field(name="Heading", value=f"{emoji} `{heading}°`", inline=True)
             lat = aircraft_data.get('lat', 'N/A')
             lon = aircraft_data.get('lon', 'N/A')
             if lat != 'N/A':
