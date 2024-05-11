@@ -83,7 +83,7 @@ class Skysearch(commands.Cog):
             registration = aircraft_data.get('reg', None)
             if registration is not None:
                 registration = registration.upper()
-            embed.add_field(name="Registration", value=f"`{registration}`", inline=True)
+                embed.add_field(name="Registration", value=f"`{registration}`", inline=True)
             icao = aircraft_data.get('hex', 'N/A').upper()
             embed.add_field(name="ICAO", value=f"`{icao}`", inline=True)
             altitude = aircraft_data.get('alt_baro', 'N/A')
