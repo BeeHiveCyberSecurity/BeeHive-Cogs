@@ -859,15 +859,12 @@ class Skysearch(commands.Cog):
                             if alert_channel_id:
                                 alert_channel = self.bot.get_channel(alert_channel_id)
                                 if alert_channel:
-                                    # Check if the alert has already been sent
-                                    previous_alerts = await alert_channel.history(limit=100).flatten()
-                                    for message in previous_alerts:
-                                        if aircraft_info['icao'] in message.content:
-                                            # If the alert has been sent, delete the old message
-                                            await message.delete()
-                                            break
                                     # Send the new alert
                                     await self._send_aircraft_info(alert_channel, {'ac': [aircraft_info]})
+                                else:
+                                    print(f"Error: Alert channel not found for guild {guild.name}")
+                            else:
+                                print(f"Error: No alert channel set for guild {guild.name}")
                 await asyncio.sleep(2)  # Add a delay to respect API rate limit
         except Exception as e:
             print(f"Error checking emergency squawks: {e}")
