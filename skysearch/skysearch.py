@@ -128,6 +128,7 @@ class Skysearch(commands.Cog):
                 embed.add_field(name="Historical usage", value=":police_officer: **This aircraft is known to be used for law enforcement purposes, such as traffic enforcement, or search and rescue missions**", inline=False)
             if icao and icao.upper() in self.military_icao_set:
                 embed.add_field(name="Historical usage", value=":military_helmet: **This aircraft is known to be used for military purposes**", inline=False)
+                
             view = discord.ui.View()
             view.add_item(discord.ui.Button(label=f"Track live", url=f"{link}", style=discord.ButtonStyle.link))
             await ctx.send(embed=embed, view=view)
