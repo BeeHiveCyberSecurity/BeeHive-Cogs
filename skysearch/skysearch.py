@@ -105,9 +105,9 @@ class Skysearch(commands.Cog):
             ground_speed_knots = aircraft_data.get('gs', 'N/A')
             if ground_speed_knots != 'N/A':
                 ground_speed_mph = round(float(ground_speed_knots) * 1.15078)  # Convert knots to mph
-                embed.add_field(name="Speed", value=f"{ground_speed_mph} mph", inline=True)
+                embed.add_field(name="Speed", value=f"`{ground_speed_mph} mph`", inline=True)
             else:
-                embed.add_field(name="Speed", value="N/A", inline=True)
+                embed.add_field(name="Speed", value="UNKNOWN", inline=True)
             embed.add_field(name="Operated by", value=f"`{aircraft_data.get('ownOp', 'UNKNOWN')}`", inline=True)
             baro_rate = aircraft_data.get('baro_rate', 'N/A')
             if baro_rate == 'N/A':
