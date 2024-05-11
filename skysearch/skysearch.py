@@ -70,14 +70,22 @@ class Skysearch(commands.Cog):
                 embed.add_field(name="Altitude", value=f"`{altitude_feet}`", inline=True)
             heading = aircraft_data.get('true_heading', None)
             if heading is not None:
-                if 0 <= heading < 90:
+                if 0 <= heading < 45:
                     emoji = ":arrow_upper_right:"
-                elif 90 <= heading < 180:
+                elif 45 <= heading < 90:
+                    emoji = ":arrow_right:"
+                elif 90 <= heading < 135:
                     emoji = ":arrow_lower_right:"
-                elif 180 <= heading < 270:
+                elif 135 <= heading < 180:
+                    emoji = ":arrow_down:"
+                elif 180 <= heading < 225:
                     emoji = ":arrow_lower_left:"
-                else:
+                elif 225 <= heading < 270:
+                    emoji = ":arrow_left:"
+                elif 270 <= heading < 315:
                     emoji = ":arrow_upper_left:"
+                else:
+                    emoji = ":arrow_up:"
                 embed.add_field(name="Heading", value=f"{emoji} {heading} degrees", inline=True)
             embed.add_field(name="Position", value=f"{aircraft_data.get('lat', 'N/A')}, {aircraft_data.get('lon', 'N/A')}", inline=True)
             embed.add_field(name="Squawk", value=aircraft_data.get('squawk', 'N/A'), inline=True)
