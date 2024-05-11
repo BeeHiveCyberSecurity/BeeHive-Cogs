@@ -716,8 +716,10 @@ class Skysearch(commands.Cog):
                 embed2.set_thumbnail(url="https://asset.brandfetch.io/idGpYEfxfH/idW3166yGx.png")
                 embed2.add_field(name="Law enforcement aircraft catalogued", value="{:,} planes".format(len(self.law_enforcement_icao_set)), inline=False)
                 embed2.add_field(name="Military aircraft catalogued", value="{:,} planes".format(len(self.military_icao_set)), inline=False)
+                embed3 = discord.Embed(title="Photography courtesy of PlaneSpotters.net", description="Some aircraft have photos available taken by skilled independent photographers - this is where they come from.", color=0xfffffe)
 
                 await ctx.send(embed=embed)
+                await ctx.send(embed=embed3)
                 await ctx.send(embed=embed2)
             else:
                 embed = discord.Embed(title="Error", description="Incomplete data received from API.", color=0xff4545)
