@@ -48,10 +48,18 @@ class Skysearch(commands.Cog):
             hex_id = aircraft_data.get('hex', '')                                      
             image_url, photographer = await self._get_photo_by_hex(hex_id)
             link = f"https://globe.airplanes.live/?icao={hex_id}"
-            emergency_squawk_codes = ['7500', '7600', '7700']
-            if aircraft_data.get('squawk', 'N/A') in emergency_squawk_codes:
+            squawk_code = aircraft_data.get('squawk', 'N/A')
+            if squawk_code == '7500':
                 embed = discord.Embed(title='Aircraft information', color=discord.Colour(0xFF9145))
-                emergency_status = ":warning: **An emergency has been declared by this aircraft**"
+                emergency_status = ":warning: **Aircraft has been hijacked**"
+                embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Orange/alert-circle-outline.png")
+            elif squawk_code == '7600':
+                embed = discord.Embed(title='Aircraft information', color=discord.Colour(0xFF9145))
+                emergency_status = ":warning: **Aircraft has lost radio contact**"
+                embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Orange/alert-circle-outline.png")
+            elif squawk_code == '7700':
+                embed = discord.Embed(title='Aircraft information', color=discord.Colour(0xFF9145))
+                emergency_status = ":warning: **Aircraft has declared an emergency**"
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Orange/alert-circle-outline.png")
             else:
                 embed = discord.Embed(title='Aircraft information', color=discord.Colour(0xfffffe))
@@ -61,7 +69,7 @@ class Skysearch(commands.Cog):
             embed.set_footer(text="")
             embed.add_field(name="Type", value=f"**{aircraft_data.get('desc', 'N/A')} ({aircraft_data.get('t', 'N/A')})**", inline=False)
             callsign = aircraft_data.get('flight', 'N/A').strip()
-            if callsign is None:
+            if not callsign or callsign == 'N/A':
                 callsign = 'HIDDEN'
             embed.add_field(name="Callsign", value=f"**{callsign}**", inline=True)
             embed.add_field(name="Registration", value=f"**{aircraft_data.get('reg', 'UNKNOWN')}**", inline=True)
