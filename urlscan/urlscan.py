@@ -27,7 +27,7 @@ class URLScan(commands.Cog):
         data = {"url": f"{url}", "visibility": "public"}
         try:
             async with ctx.typing():
-                r = requests.post('https://urlscan.io/api/v1/scan/', headers=headers, data=json.dumps(data))
+                r = requests.post('https://urlscan.io/api/v1/scan/', headers=headers, data=json.dumps(data), timeout=10)
                 res = r.json()
                 if 'result' not in res:
                     await ctx.send(f"{res.get('message', 'Unknown error')}")
@@ -36,7 +36,7 @@ class URLScan(commands.Cog):
                 report_url = res['result']
                 report_api = res['api']
                 time.sleep(10)
-                r2 = requests.get(report_api)
+                r2 = requests.get(report_api, timeout=10)
                 res2 = r2.json()
 
                 embed = discord.Embed(url=f"{report_url}")
@@ -60,5 +60,5 @@ class URLScan(commands.Cog):
                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/warning-outline.png")
 
                 await ctx.send(embed=embed)
-        except json.JSONDecodeError:
-            await ctx.send(f"Invalid JSON response from URLScan API.")
+        except (json.JSONDecodeError, requests.exceptions.Timeout):
+            await ctx.send(f"Invalid JSON response from URLScan API or request timed out.")
