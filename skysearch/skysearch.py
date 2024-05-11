@@ -28,13 +28,7 @@ class Skysearch(commands.Cog):
         self.check_emergency_squawks.start()
         self.law_enforcement_icao_set = law_enforcement_icao_set
         self.military_icao_set = military_icao_set
-    def __init__(self, bot):
-        self.bot = bot
-        self.config = Config.get_conf(self, identifier=492089091320446976)  
-        self.api_url = "https://api.airplanes.live/v2"
-        self.max_requests_per_user = 10
-        self.EMBED_COLOR = discord.Color(0xfffffe)
-        self.check_emergency_squawks.start()
+
         
     async def cog_unload(self):
         if hasattr(self, '_http_client'):
