@@ -64,9 +64,9 @@ class Skysearch(commands.Cog):
             altitude = aircraft_data.get('alt_baro', 'N/A')
             ground_speed = aircraft_data.get('gs', 'N/A')
             if altitude == 'ground':
-                embed.add_field(name="Status", value="On the ground", inline=True)
+                embed.add_field(name="Status", value="`On the ground`", inline=True)
             else:
-                altitude_feet = f"{altitude} feet"
+                altitude_feet = f"{altitude} ft"
                 embed.add_field(name="Altitude", value=f"`{altitude_feet}`", inline=True)
             heading = aircraft_data.get('true_heading', None)
             if heading is not None:
@@ -86,8 +86,8 @@ class Skysearch(commands.Cog):
                     emoji = ":arrow_upper_left:"
                 else:
                     emoji = ":arrow_up:"
-                embed.add_field(name="Heading", value=f"{emoji} {heading} degrees", inline=True)
-            embed.add_field(name="Position", value=f"{aircraft_data.get('lat', 'N/A')}, {aircraft_data.get('lon', 'N/A')}", inline=True)
+                embed.add_field(name="Heading", value=f"{emoji} `{heading} degrees`", inline=True)
+            embed.add_field(name="Position", value=f"`{aircraft_data.get('lat', 'N/A')}, {aircraft_data.get('lon', 'N/A')}`", inline=True)
             embed.add_field(name="Squawk", value=aircraft_data.get('squawk', 'N/A'), inline=True)
             embed.add_field(name="Emergency", value=emergency_status, inline=True)
             embed.add_field(name="Operator", value=aircraft_data.get('ownOp', 'N/A'), inline=True)
