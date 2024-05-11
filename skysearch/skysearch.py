@@ -75,15 +75,15 @@ class Skysearch(commands.Cog):
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/airplane.png")
             embed.set_image(url=image_url)
             embed.set_footer(text="")
-            embed.add_field(name="Type", value=f"**{aircraft_data.get('desc', 'N/A')} ({aircraft_data.get('t', 'N/A')})**", inline=False)
+            embed.add_field(name="Type", value=f"`{aircraft_data.get('desc', 'N/A')} ({aircraft_data.get('t', 'N/A')})`", inline=False)
             callsign = aircraft_data.get('flight', 'N/A').strip()
             if not callsign or callsign == 'N/A':
                 callsign = 'HIDDEN'
-            embed.add_field(name="Callsign", value=f"**{callsign}**", inline=True)
+            embed.add_field(name="Callsign", value=f"`{callsign}`", inline=True)
             registration = aircraft_data.get('reg', 'UNKNOWN')
             icao = aircraft_data.get('hex', 'N/A').upper()
-            embed.add_field(name="Registration", value=f"**{registration}**", inline=True)
-            embed.add_field(name="ICAO", value=f"**{icao}**", inline=True)
+            embed.add_field(name="Registration", value=f"`{registration}`", inline=True)
+            embed.add_field(name="ICAO", value=f"`{icao}`", inline=True)
             altitude = aircraft_data.get('alt_baro', 'N/A')
             ground_speed = aircraft_data.get('gs', 'N/A')
             if altitude == 'ground':
@@ -135,8 +135,6 @@ class Skysearch(commands.Cog):
             if ground_speed_knots != 'N/A':
                 ground_speed_mph = round(float(ground_speed_knots) * 1.15078)  # Convert knots to mph
                 embed.add_field(name="Speed", value=f"`{ground_speed_mph} mph`", inline=True)
-            else:
-                embed.add_field(name="Speed", value="UNKNOWN", inline=True)
             operator = aircraft_data.get('ownOp', None)
             if operator is not None:
                 embed.add_field(name="Operated by", value=f"`{operator}`", inline=True)
