@@ -60,7 +60,10 @@ class Skysearch(commands.Cog):
             embed.set_image(url=image_url)
             embed.set_footer(text="")
             embed.add_field(name="Type", value=f"**{aircraft_data.get('desc', 'N/A')} ({aircraft_data.get('t', 'N/A')})**", inline=False)
-            embed.add_field(name="Callsign", value=f"**{aircraft_data.get('flight', 'N/A').strip()}**", inline=True)
+            callsign = aircraft_data.get('flight', 'N/A').strip()
+            if callsign == 'N/A':
+                callsign = 'HIDDEN'
+            embed.add_field(name="Callsign", value=f"**{callsign}**", inline=True)
             embed.add_field(name="Registration", value=f"**{aircraft_data.get('reg', 'UNKNOWN')}**", inline=True)
             embed.add_field(name="ICAO", value=f"**{aircraft_data.get('hex', 'N/A').upper()}**", inline=True)
             altitude = aircraft_data.get('alt_baro', 'N/A')
