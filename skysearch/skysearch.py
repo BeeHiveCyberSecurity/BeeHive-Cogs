@@ -122,7 +122,7 @@ class Skysearch(commands.Cog):
 
             law_enforcement_icao_set = {'A10941', 'AB68C8', 'A9A449', 'A67117', 'A03325'}  # Update this set as needed or discovered
             military_icao_set = {}
-            
+
             icao = aircraft_data.get('hex', None)
             if icao and icao.upper() in law_enforcement_icao_set:
                 embed.add_field(name="Historical usage", value=":police_officer: **This aircraft is known to be used for law enforcement purposes, such as traffic enforcement, or search and rescue missions**", inline=False)
@@ -194,8 +194,8 @@ class Skysearch(commands.Cog):
                     return
                 await interaction.response.defer()
                 embed = discord.Embed(
-                    title="Query",
-                    description="Please reply with the complete `callsign` you want to search the skies for.",
+                    title="",
+                    description="### Please reply with the complete `callsign` you want to search the skies for.",
                     color=discord.Color.from_str("#fffffe")
                 )
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/search.png")
