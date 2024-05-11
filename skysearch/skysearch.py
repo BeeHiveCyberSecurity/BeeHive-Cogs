@@ -99,7 +99,6 @@ class Skysearch(commands.Cog):
                 lon = f"{abs(lon)}{lon_dir}"
             embed.add_field(name="Position", value=f"`{lat}, {lon}`", inline=True)
             embed.add_field(name="Squawk", value=f"`{aircraft_data.get('squawk', 'SILENT')}`", inline=True)
-            embed.add_field(name="Operator", value=aircraft_data.get('ownOp', 'N/A'), inline=True)
             embed.add_field(name="Manufactured", value=aircraft_data.get('year', 'N/A'), inline=True)
             embed.add_field(name="Category", value=aircraft_data.get('category', 'N/A'), inline=True)
             embed.add_field(name="Aircraft type", value=aircraft_data.get('t', 'N/A'), inline=True)
@@ -109,6 +108,7 @@ class Skysearch(commands.Cog):
                 embed.add_field(name="Speed", value=f"{ground_speed_mph} mph", inline=True)
             else:
                 embed.add_field(name="Speed", value="N/A", inline=True)
+            embed.add_field(name="Operated by", value=f"`{aircraft_data.get('ownOp', 'UNKNOWN')}`", inline=True)
             baro_rate = aircraft_data.get('baro_rate', 'N/A')
             if baro_rate == 'N/A':
                 embed.add_field(name="Altitude trend", value=":grey_question: Altitude trends unavailable, not enough data...", inline=False)
