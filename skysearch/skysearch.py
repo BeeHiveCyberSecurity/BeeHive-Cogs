@@ -735,7 +735,7 @@ class Skysearch(commands.Cog):
                 stats_values = {key: data[key] for key in stats_keys}
 
                 embed = discord.Embed(title="Data from Airplanes.Live", description="Select data is brought to you free-of-charge by [airplanes.live](https://airplanes.live)", color=0xfffffe)
-                embed.set_image(url="https://asset.brandfetch.io/id1hdkKy3B/idqsgDGEm_.png")
+                embed.set_image(url="")
                 embed.set_thumbnail(url="https://asset.brandfetch.io/id1hdkKy3B/idgRk5S59l.jpeg")
                 for key, value in stats_values.items():
                     embed.add_field(name=key.capitalize(), value="{:,} planes".format(value), inline=True)
