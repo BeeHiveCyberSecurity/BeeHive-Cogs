@@ -104,7 +104,9 @@ class Skysearch(commands.Cog):
             embed.add_field(name="Squawk", value=f"`{aircraft_data.get('squawk', 'SILENT')}`", inline=True)
             if aircraft_data.get('year', None) is not None:
                 embed.add_field(name="Built", value=f"`{aircraft_data.get('year')}`", inline=True)
-            embed.add_field(name="Category", value=f"`{aircraft_data.get('category', 'NONE')}`", inline=True)
+            category = aircraft_data.get('category', None)
+            if category is not None:
+                embed.add_field(name="Category", value=f"`{category}`", inline=True)
             embed.add_field(name="Aircraft model", value=f"`{aircraft_data.get('t', 'UNKNOWN')}`", inline=True)
             ground_speed_knots = aircraft_data.get('gs', 'N/A')
             if ground_speed_knots != 'N/A':
