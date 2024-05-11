@@ -178,15 +178,15 @@ class Skysearch(commands.Cog):
             view = discord.ui.View(timeout=180)  # Set a timeout for the view
 
             # Create buttons with click actions
-            search_callsign = discord.ui.Button(label=f"Search by callsign", style=discord.ButtonStyle.green)
-            search_icao = discord.ui.Button(label="Search by ICAO", style=discord.ButtonStyle.green)
-            search_registration = discord.ui.Button(label="Search by registration", style=discord.ButtonStyle.green)
-            search_squawk = discord.ui.Button(label="Search by squawk", style=discord.ButtonStyle.green)
-            search_type = discord.ui.Button(label="Search by model", style=discord.ButtonStyle.green)
-            search_radius = discord.ui.Button(label="Search within radius", style=discord.ButtonStyle.green)
-            show_military = discord.ui.Button(label="Show military aircraft", style=discord.ButtonStyle.danger)
-            show_the_commands = discord.ui.Button(label="Show available commands", style=discord.ButtonStyle.grey)
-            show_stats = discord.ui.Button(label="Show stats", style=discord.ButtonStyle.grey)
+            search_callsign = discord.ui.Button(label=f"Search by callsign", style=discord.ButtonStyle.green, row=1)
+            search_icao = discord.ui.Button(label="Search by ICAO", style=discord.ButtonStyle.green, row=1)
+            search_registration = discord.ui.Button(label="Search by registration", style=discord.ButtonStyle.green, row=1)
+            search_squawk = discord.ui.Button(label="Search by squawk", style=discord.ButtonStyle.green, row=1)
+            search_type = discord.ui.Button(label="Search by model", style=discord.ButtonStyle.green, row=1)
+            search_radius = discord.ui.Button(label="Search within radius", style=discord.ButtonStyle.green, row=2)
+            show_military = discord.ui.Button(label="Show military aircraft", style=discord.ButtonStyle.danger, row=3)
+            show_the_commands = discord.ui.Button(label="Show available commands", style=discord.ButtonStyle.grey, row=4)
+            show_stats = discord.ui.Button(label="Show stats", style=discord.ButtonStyle.grey, row=4)
 
             # Define button callbacks
             async def search_callsign_callback(interaction):
