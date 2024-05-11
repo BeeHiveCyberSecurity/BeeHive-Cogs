@@ -61,7 +61,7 @@ class Skysearch(commands.Cog):
             embed.set_footer(text="")
             embed.add_field(name="Type", value=f"**{aircraft_data.get('desc', 'N/A')} ({aircraft_data.get('t', 'N/A')})**", inline=False)
             callsign = aircraft_data.get('flight', 'N/A').strip()
-            if callsign == 'N/A':
+            if callsign is None:
                 callsign = 'HIDDEN'
             embed.add_field(name="Callsign", value=f"**{callsign}**", inline=True)
             embed.add_field(name="Registration", value=f"**{aircraft_data.get('reg', 'UNKNOWN')}**", inline=True)
