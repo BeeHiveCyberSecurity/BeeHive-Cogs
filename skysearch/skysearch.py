@@ -19,6 +19,7 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak, 
 from .icao_codes import law_enforcement_icao_set, military_icao_set
 
 class Skysearch(commands.Cog):
+    
     def __init__(self, bot):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=492089091320446976)  
