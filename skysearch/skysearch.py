@@ -17,7 +17,7 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle #type: igno
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak, Table, TableStyle #type: ignore
 
 class Skysearch(commands.Cog):
-    law_enforcement_icao_set = {'A10941', 'AB68C8', 'A9A449', 'A67117', 'A03325', 'A1B4BB', 'A2C934', 'AD933E', 'AC6E92', 'A64D15', 'A6A665', 'A97B90', 'A7C42B'}  # Update this set as needed or discovered
+    law_enforcement_icao_set = {'A10941', 'AB68C8', 'A9A449', 'A67117', 'A03325', 'A1B4BB', 'A2C934', 'AD933E', 'AC6E92', 'A64D15', 'A6A665', 'A97B90', 'A7C42B', 'A92BFF'}  # Update this set as needed or discovered
     military_icao_set = {}
     def __init__(self, bot):
         self.bot = bot
