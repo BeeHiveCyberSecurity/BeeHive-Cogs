@@ -16,7 +16,7 @@ from reportlab.pdfgen import canvas #type: ignore
 from reportlab.lib import colors#type: ignore
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle #type: ignore
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak, Table, TableStyle #type: ignore
-from .icao_codes import law_enforcement_icao_set, military_icao_set, medical_icao_set
+from .icao_codes import law_enforcement_icao_set, military_icao_set, medical_icao_set, suspicious_icao_set
 
 class Skysearch(commands.Cog):
     
@@ -30,6 +30,7 @@ class Skysearch(commands.Cog):
         self.law_enforcement_icao_set = law_enforcement_icao_set
         self.military_icao_set = military_icao_set
         self.medical_icao_set = medical_icao_set
+        self.suspicious_icao_set = suspicious_icao_set
 
         
     async def cog_unload(self):
@@ -157,6 +158,8 @@ class Skysearch(commands.Cog):
                 embed.add_field(name="Asset intelligence", value=":military_helmet: **This aircraft is known to be used for military or combat purposes**", inline=False)
             if icao and icao.upper() in self.medical_icao_set:
                 embed.add_field(name="Asset intelligence", value=":hospital: **This aircraft is known to be used for medical transport or emergency medical response services**", inline=False)
+            if icao and icao.upper() in self.suspicious_icao_set:
+                embed.add_field(name="Asset intelligence", value=":warning: **This aircraft is known to exhibit behaviors suspicious of surveillance or intensive intelligence collection without a clearly attributed recipient, like a police department or federal agency**", inline=False)
 
             view = discord.ui.View()
             view.add_item(discord.ui.Button(label=f"Track live", url=f"{link}", style=discord.ButtonStyle.link))
@@ -745,6 +748,7 @@ class Skysearch(commands.Cog):
                 embed2.add_field(name="Law enforcement aircraft catalogued", value="{:,} aircraft".format(len(self.law_enforcement_icao_set)), inline=False)
                 embed2.add_field(name="Military aircraft catalogued", value="{:,} aircraft".format(len(self.military_icao_set)), inline=False)
                 embed2.add_field(name="Medical aircraft catalogued", value="{:,} aircraft".format(len(self.medical_icao_set)), inline=False)
+                embed2.add_field(name="Suspicious aircraft under evaluation", value="{:,} aircraft".format(len(self.suspicious_icao_set)), inline=False)
                 embed3 = discord.Embed(title="Photography courtesy of PlaneSpotters.net", description="Some aircraft have photos available taken by skilled independent photographers - this is where they come from.", color=0xfffffe)
                 embed3.set_thumbnail(url="https://asset.brandfetch.io/id30vzxRYa/idInOENa25.png")
 
