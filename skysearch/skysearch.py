@@ -16,7 +16,7 @@ from reportlab.pdfgen import canvas #type: ignore
 from reportlab.lib import colors#type: ignore
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle #type: ignore
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak, Table, TableStyle #type: ignore
-from .icao_codes import law_enforcement_icao_set, military_icao_set, medical_icao_set, suspicious_icao_set
+from .icao_codes import law_enforcement_icao_set, military_icao_set, medical_icao_set, suspicious_icao_set, prior_known_accident_set, ukr_conflict_set
 
 class Skysearch(commands.Cog):
     
@@ -31,6 +31,8 @@ class Skysearch(commands.Cog):
         self.military_icao_set = military_icao_set
         self.medical_icao_set = medical_icao_set
         self.suspicious_icao_set = suspicious_icao_set
+        self.prior_known_accident_set = prior_known_accident_set
+        self.ukr_conflict_set = ukr_conflict_set
 
         
     async def cog_unload(self):
@@ -156,13 +158,17 @@ class Skysearch(commands.Cog):
 
             icao = aircraft_data.get('hex', None)
             if icao and icao.upper() in self.law_enforcement_icao_set:
-                embed.add_field(name="Asset intelligence", value=":police_officer: **This aircraft is known to be used for law enforcement purposes, such as traffic enforcement, or search and rescue missions**", inline=False)
+                embed.add_field(name="Asset intelligence", value=":police_officer: **Aircraft known for use by law enforcement**", inline=False)
             if icao and icao.upper() in self.military_icao_set:
-                embed.add_field(name="Asset intelligence", value=":military_helmet: **This aircraft is known to be used for military or government purposes**", inline=False)
+                embed.add_field(name="Asset intelligence", value=":military_helmet: **Aircraft known for use in military and government**", inline=False)
             if icao and icao.upper() in self.medical_icao_set:
-                embed.add_field(name="Asset intelligence", value=":hospital: **This aircraft is known to be used for medical transport or emergency medical response services**", inline=False)
+                embed.add_field(name="Asset intelligence", value=":hospital: **Aircraft known for use in medical response and transport**", inline=False)
             if icao and icao.upper() in self.suspicious_icao_set:
-                embed.add_field(name="Asset intelligence", value=":warning: **This aircraft is known to exhibit behaviors suspicious of surveillance or intensive intelligence collection without a clearly attributed recipient, like a police department or federal agency**", inline=False)
+                embed.add_field(name="Asset intelligence", value=":warning: **Aircraft exhibits suspicious flight activity**", inline=False)
+            if icao and icao.upper() in self.prior_known_accident_set:
+                embed.add_field(name="Asset intelligence", value=":warning: **Aircraft prior involved in one or more accidents**", inline=False)
+            if icao and icao.upper() in self.ukr_conflict_set:
+                embed.add_field(name="Asset intelligence", value=":warning: **Aircraft utilized within the RussoUkrainian conflict**", inline=False)
 
             view = discord.ui.View()
             view.add_item(discord.ui.Button(label=f"Track live", url=f"{link}", style=discord.ButtonStyle.link))
