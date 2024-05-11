@@ -5,6 +5,7 @@ import json
 import aiohttp #type: ignore
 import re
 import asyncio
+import urllib
 import typing
 import os
 import tempfile
