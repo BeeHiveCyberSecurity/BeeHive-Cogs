@@ -128,7 +128,9 @@ class Skysearch(commands.Cog):
             category = aircraft_data.get('category', None)
             if category is not None:
                 embed.add_field(name="Category", value=f"`{category}`", inline=True)
-            embed.add_field(name="Aircraft model", value=f"`{aircraft_data.get('t', 'UNKNOWN')}`", inline=True)
+            aircraft_model = aircraft_data.get('t', None)
+            if aircraft_model is not None:
+                embed.add_field(name="Aircraft model", value=f"`{aircraft_model}`", inline=True)
             ground_speed_knots = aircraft_data.get('gs', 'N/A')
             if ground_speed_knots != 'N/A':
                 ground_speed_mph = round(float(ground_speed_knots) * 1.15078)  # Convert knots to mph
