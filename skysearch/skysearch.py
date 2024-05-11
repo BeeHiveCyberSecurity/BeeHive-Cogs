@@ -742,9 +742,11 @@ class Skysearch(commands.Cog):
                 embed2 = discord.Embed(title="Enhanced by BeeHive Intelligence", description="BeeHive tracks and supplements this cog's original dataset during day-to-day operations.", color=0xffd966)
                 embed2.set_image(url="https://asset.brandfetch.io/idGpYEfxfH/id0xj4J1xg.png")
                 embed2.set_thumbnail(url="https://asset.brandfetch.io/idGpYEfxfH/idW3166yGx.png")
-                embed2.add_field(name="Law enforcement aircraft catalogued", value="{:,} planes".format(len(self.law_enforcement_icao_set)), inline=False)
-                embed2.add_field(name="Military aircraft catalogued", value="{:,} planes".format(len(self.military_icao_set)), inline=False)
+                embed2.add_field(name="Law enforcement aircraft catalogued", value="{:,} aircraft".format(len(self.law_enforcement_icao_set)), inline=False)
+                embed2.add_field(name="Military aircraft catalogued", value="{:,} aircraft".format(len(self.military_icao_set)), inline=False)
+                embed2.add_field(name="Medical aircraft catalogued", value="{:,} aircraft".format(len(self.medical_icao_set)), inline=False)
                 embed3 = discord.Embed(title="Photography courtesy of PlaneSpotters.net", description="Some aircraft have photos available taken by skilled independent photographers - this is where they come from.", color=0xfffffe)
+                embed3.set_thumbnail(url="https://asset.brandfetch.io/id30vzxRYa/idInOENa25.png")
 
                 await ctx.send(embed=embed)
                 await ctx.send(embed=embed3)
