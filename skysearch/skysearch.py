@@ -903,18 +903,18 @@ class Skysearch(commands.Cog):
         if state is None:
             state = await self.config.guild(ctx.guild).auto_icao()
             if state:
-                embed = discord.Embed(title="ICAO Lookup Status", description="Automatic ICAO lookup is currently enabled.", color=0x00ff00)
+                embed = discord.Embed(title="ICAO Lookup Status", description="Automatic ICAO lookup is currently enabled.", color=0x2BBD8E)
                 await ctx.send(embed=embed)
             else:
-                embed = discord.Embed(title="ICAO Lookup Status", description="Automatic ICAO lookup is currently disabled.", color=0xff0000)
+                embed = discord.Embed(title="ICAO Lookup Status", description="Automatic ICAO lookup is currently disabled.", color=0xff4545)
                 await ctx.send(embed=embed)
         else:
             await self.config.guild(ctx.guild).auto_icao.set(state)
             if state:
-                embed = discord.Embed(title="ICAO Lookup Status", description="Automatic ICAO lookup has been enabled.", color=0x00ff00)
+                embed = discord.Embed(title="ICAO Lookup Status", description="Automatic ICAO lookup has been enabled.", color=0x2BBD8E)
                 await ctx.send(embed=embed)
             else:
-                embed = discord.Embed(title="ICAO Lookup Status", description="Automatic ICAO lookup has been disabled.", color=0xff0000)
+                embed = discord.Embed(title="ICAO Lookup Status", description="Automatic ICAO lookup has been disabled.", color=0xff4545)
                 await ctx.send(embed=embed)
 
     def cog_unload(self):
