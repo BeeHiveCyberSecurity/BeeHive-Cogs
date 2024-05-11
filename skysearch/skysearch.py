@@ -48,12 +48,12 @@ class Skysearch(commands.Cog):
             link = f"https://globe.airplanes.live/?icao={hex_id}"
             emergency_squawk_codes = ['7500', '7600', '7700']
             if aircraft_data.get('squawk', 'N/A') in emergency_squawk_codes:
-                embed = discord.Embed(title='Aircraft Information', color=discord.Colour(0xFF9145))
-                emergency_status = ":warning: **Declared**"
+                embed = discord.Embed(title='Aircraft information', color=discord.Colour(0xFF9145))
+                emergency_status = ":warning: **An emergency has been declared by this aircraft**"
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Orange/alert-circle-outline.png")
             else:
-                embed = discord.Embed(title='Aircraft Information', color=discord.Colour(0xfffffe))
-                emergency_status = "None Reported"
+                embed = discord.Embed(title='Aircraft information', color=discord.Colour(0xfffffe))
+                emergency_status = ":shield: This flight seems safe and sound, all normal."
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/airplane.png")
             embed.set_image(url=image_url)
             embed.set_footer(text="")
@@ -100,7 +100,7 @@ class Skysearch(commands.Cog):
             embed.add_field(name="Position", value=f"`{lat}, {lon}`", inline=True)
             embed.add_field(name="Squawk", value=f"`{aircraft_data.get('squawk', 'SILENT')}`", inline=True)
             embed.add_field(name="Operator", value=aircraft_data.get('ownOp', 'N/A'), inline=True)
-            embed.add_field(name="Year", value=aircraft_data.get('year', 'N/A'), inline=True)
+            embed.add_field(name="Manufactured", value=aircraft_data.get('year', 'N/A'), inline=True)
             embed.add_field(name="Category", value=aircraft_data.get('category', 'N/A'), inline=True)
             embed.add_field(name="Aircraft Type", value=aircraft_data.get('t', 'N/A'), inline=True)
             ground_speed_knots = aircraft_data.get('gs', 'N/A')
@@ -111,14 +111,14 @@ class Skysearch(commands.Cog):
                 embed.add_field(name="Speed", value="N/A", inline=True)
             baro_rate = aircraft_data.get('baro_rate', 'N/A')
             if baro_rate == 'N/A':
-                embed.add_field(name="Altitude Trend", value="Altitude trends unavailable, not enough data...", inline=False)
+                embed.add_field(name="Altitude trend", value="Altitude trends unavailable, not enough data...", inline=False)
             elif abs(int(baro_rate)) < 50:
-                embed.add_field(name="Altitude Trend", value="<:pointright:1197006726466130072> **Maintaining altitude**\n" + f"`{baro_rate} feet/min`", inline=False)
+                embed.add_field(name="Altitude trend", value="<:pointright:1197006726466130072> **Maintaining altitude**\n" + f"`{baro_rate} feet/min`", inline=False)
             elif int(baro_rate) > 0:
-                embed.add_field(name="Altitude Trend", value="<:pointup:1197006728953339924> **Climbing**\n" + f"`{baro_rate} feet/min`", inline=False)
+                embed.add_field(name="Altitude trend", value="<:pointup:1197006728953339924> **Climbing**\n" + f"`{baro_rate} feet/min`", inline=False)
             else:
-                embed.add_field(name="Altitude Trend", value="<:pointdown:1197006724377366668> **Descending**\n" + f"`{abs(int(baro_rate))} feet/min`", inline=False)
-            embed.add_field(name="Emergency", value=emergency_status, inline=True)
+                embed.add_field(name="Altitude trend", value="<:pointdown:1197006724377366668> **Descending**\n" + f"`{abs(int(baro_rate))} feet/min`", inline=False)
+            embed.add_field(name="Safety status", value=emergency_status, inline=True)
             view = discord.ui.View()
             view.add_item(discord.ui.Button(label=f"Track live", url=f"{link}", style=discord.ButtonStyle.link, emoji="<:info:1199305085738553385>"))
             await ctx.send(embed=embed, view=view)
@@ -128,9 +128,9 @@ class Skysearch(commands.Cog):
                 if squawk_code == '7500':
                     emergency_embed.add_field(name="Squawk 7500 - Hijacking", value="The pilots of this aircraft have indicated that the plane is being hijacked. Check local news if this is a domestic flight, or the news channels of the airport the flight is scheduled to arrive at.", inline=False)
                 elif squawk_code == '7600':
-                    emergency_embed.add_field(name="Squawk 7600 - Radio Failure", value="This code is used to indicate a radio failure. While this code is squawked, assume an aircraft is in a location where reception and/or communication, and thus tracking, may be poor, restricted, or non-existant.", inline=False)
+                    emergency_embed.add_field(name="Squawk 7600 - Radio failure", value="This code is used to indicate a radio failure. While this code is squawked, assume an aircraft is in a location where reception and/or communication, and thus tracking, may be poor, restricted, or non-existant.", inline=False)
                 elif squawk_code == '7700':
-                    emergency_embed.add_field(name="Squawk 7700 - General Emergency", value="This code is used to indicate a general emergency. The pilot currently has ATC priority and is working to resolve the situation. Check local news outlets for more information, or if this is a military flight, look into what squadron the plane belonged to, and if they posted any updates later in the day.", inline=False)
+                    emergency_embed.add_field(name="Squawk 7700 - General emergency", value="This code is used to indicate a general emergency. The pilot currently has ATC priority and is working to resolve the situation. Check local news outlets for more information, or if this is a military flight, look into what squadron the plane belonged to, and if they posted any updates later in the day.", inline=False)
                 await ctx.send(embed=emergency_embed)
         else:
             embed = discord.Embed(title='No results found for your query', color=discord.Colour(0xff4545))
