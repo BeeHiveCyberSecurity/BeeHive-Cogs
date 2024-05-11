@@ -186,7 +186,7 @@ class Skysearch(commands.Cog):
             search_type = discord.ui.Button(label="Search by model", style=discord.ButtonStyle.green, row=1)
             search_radius = discord.ui.Button(label="Search within radius", style=discord.ButtonStyle.green, row=2)
             show_military = discord.ui.Button(label="Show military aircraft", style=discord.ButtonStyle.danger, row=3)
-            show_limited = discord.ui.Button(label="Show data-restricted aircraft", style=discord.ButtonStyle.danger, row=3)
+            show_ladd = discord.ui.Button(label="Show data-restricted aircraft", style=discord.ButtonStyle.danger, row=3)
             show_the_commands = discord.ui.Button(label="Show available commands", style=discord.ButtonStyle.grey, row=4)
             show_stats = discord.ui.Button(label="Show stats", style=discord.ButtonStyle.grey, row=4)
 
