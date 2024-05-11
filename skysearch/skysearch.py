@@ -73,9 +73,9 @@ class Skysearch(commands.Cog):
                 if 0 <= heading < 90:
                     emoji = ":arrow_upper_right:"
                 elif 90 <= heading < 180:
-                    emoji = ":arrow_down_right:"
+                    emoji = ":arrow_lower_right:"
                 elif 180 <= heading < 270:
-                    emoji = ":arrow_down_left:"
+                    emoji = ":arrow_lower_left:"
                 else:
                     emoji = ":arrow_upper_left:"
                 embed.add_field(name="Heading", value=f"{emoji} {heading} degrees", inline=True)
