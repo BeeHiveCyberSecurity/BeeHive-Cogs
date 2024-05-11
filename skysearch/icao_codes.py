@@ -7,3 +7,5 @@ medical_icao_set = {'A5C4D6', 'A234DB', 'A22B87', 'A740F0'}
 ukr_conflict_set = {}
 
 suspicious_icao_set = {}
+
+prior_known_accident_set = {}
