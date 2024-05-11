@@ -609,7 +609,7 @@ class Skysearch(commands.Cog):
     @aircraft_group.command(name='showalertchannel', help='List the alert channels and their statuses.')
     async def list_alert_channels(self, ctx):
         guild = ctx.guild
-        embed = discord.Embed(title=f"Alert Channels Status for {guild.name}", color=0xfffffe)
+        embed = discord.Embed(title=f"Squawk alerts for {guild.name}", color=0xfffffe)
         alert_channel_id = await self.config.guild(guild).alert_channel()
         if alert_channel_id:
             alert_channel = self.bot.get_channel(alert_channel_id)
@@ -629,9 +629,9 @@ class Skysearch(commands.Cog):
                     else:
                         time_remaining_formatted = "Now"
                 if self.check_emergency_squawks.is_running():
-                    last_check_status = f"Checked successfully {time_remaining_formatted} ago"
+                    last_check_status = f":white_check_mark: **Checked successfully, next checking {time_remaining_formatted}**"
                 else:
-                    last_check_status = f"Last check failed, retrying in {time_remaining_formatted}"
+                    last_check_status = f":x: **Last check failed, retrying {time_remaining_formatted}**"
                 embed.add_field(name=f"Channel: {alert_channel.name}", value=f"Last check status: {last_check_status}", inline=False)
             else:
                 embed.add_field(name="Status", value="No alert channel set.", inline=False)
