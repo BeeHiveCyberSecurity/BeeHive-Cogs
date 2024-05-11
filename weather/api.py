@@ -172,7 +172,7 @@ class WeatherType:
 
     @property
     def icon_url(self):
-        return f"http://openweathermap.org/img/wn/{self.icon}@4x.png"
+        return f"https://openweathermap.org/img/wn/{self.icon}@4x.png"
 
     @property
     def emoji(self) -> str:
@@ -223,7 +223,7 @@ class Geocoding:
         *,
         session: Optional[aiohttp.ClientSession] = None,
     ) -> List[Geocoding]:
-        url = "http://api.openweathermap.org/geo/1.0/direct"
+        url = "https://api.openweathermap.org/geo/1.0/direct"
         params = {
             "q": search,
             "appid": appid,
@@ -248,7 +248,7 @@ class Geocoding:
         *,
         session: Optional[aiohttp.ClientSession] = None,
     ) -> Geocoding:
-        url = "http://api.openweathermap.org/geo/1.0/zip"
+        url = "https://api.openweathermap.org/geo/1.0/zip"
         params = {
             "zip": zipcode,
             "appid": appid,
@@ -276,7 +276,7 @@ class Geocoding:
         *,
         session: Optional[aiohttp.ClientSession] = None,
     ) -> List[Geocoding]:
-        url = "http://api.openweathermap.org/geo/1.0/reverse"
+        url = "https://api.openweathermap.org/geo/1.0/reverse"
         params = {
             "lat": str(lat),
             "lon": str(lon),
