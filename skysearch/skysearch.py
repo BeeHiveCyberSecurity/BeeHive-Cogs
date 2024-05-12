@@ -1007,6 +1007,7 @@ class Skysearch(commands.Cog):
                 embed = discord.Embed(title="Error", description="No airport found with the provided ICAO or IATA code.", color=0xff4545)
             else:
                 embed = discord.Embed(title=f"Airport information for {code.upper()}", color=0xfffffe)
+                embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/location.png")
                 if 'name' in data:
                     embed.add_field(name="Name", value=f"`{data['name']}`", inline=False)
                 if 'location' in data:
