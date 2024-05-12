@@ -968,6 +968,45 @@ class Skysearch(commands.Cog):
                 embed = discord.Embed(title="ICAO Lookup Status", description="Automatic ICAO lookup has been disabled.", color=0xff4545)
                 await ctx.send(embed=embed)
 
+    @commands.guild_only()
+    @commands.has_permissions(manage_guild=True)
+    @aircraft_group.command(name='airportinfo')
+    async def airportinfo(self, ctx, code: str = None, code_type: str = 'icao'):
+        """Query airport information by ICAO or IATA code."""
+        if code is None:
+            embed = discord.Embed(title="Error", description="Please provide an ICAO or IATA code.", color=0xff4545)
+            await ctx.send(embed=embed)
+            return
+
+        if code_type.lower() not in ['icao', 'iata']:
+            embed = discord.Embed(title="Error", description="Invalid code type. Please use 'icao' or 'iata'.", color=0xff4545)
+            await ctx.send(embed=embed)
+            return
+
+        try:
+            url = f"https://www.airport-data.com/api/ap_info.json?{code_type}={code}"
+            response = requests.get(url)
+            data = response.json()
+
+            if 'error' in data:
+                embed = discord.Embed(title="Error", description=data['error'], color=0xff4545)
+            else:
+                embed = discord.Embed(title=f"Airport Information for {code}", color=0x2BBD8E)
+                embed.add_field(name="Name", value=data['name'], inline=True)
+                embed.add_field(name="City", value=data['city'], inline=True)
+                embed.add_field(name="Country", value=data['country'], inline=True)
+                embed.add_field(name="IATA", value=data['iata'], inline=True)
+                embed.add_field(name="ICAO", value=data['icao'], inline=True)
+                embed.add_field(name="Latitude", value=data['lat'], inline=True)
+                embed.add_field(name="Longitude", value=data['lon'], inline=True)
+                embed.add_field(name="Elevation", value=data['elevation'], inline=True)
+                embed.add_field(name="Timezone", value=data['tz'], inline=True)
+
+            await ctx.send(embed=embed)
+        except Exception as e:
+            embed = discord.Embed(title="Error", description=str(e), color=0xff4545)
+            await ctx.send(embed=embed)
+
     def cog_unload(self):
         try:
             self.check_emergency_squawks.cancel()
