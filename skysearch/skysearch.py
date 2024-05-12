@@ -170,6 +170,8 @@ class Skysearch(commands.Cog):
                 embed.add_field(name="Asset intelligence", value=":boom: **Aircraft prior involved in one or more accidents**", inline=False)
             if icao and icao.upper() in self.ukr_conflict_set:
                 embed.add_field(name="Asset intelligence", value=":flag_ua: **Aircraft utilized within the RussoUkrainian conflict**", inline=False)
+            if icao and icao.upper() in self.newsagency_icao_set:
+                embed.add_field(name="Asset intelligence", value=":camera: **Aircraft used by news or media organization**", inline=False)
 
             view = discord.ui.View()
             view.add_item(discord.ui.Button(label=f"Track live", url=f"{link}", style=discord.ButtonStyle.link))
