@@ -1,5 +1,3 @@
-# These ICAO's are used to identify scenarios or uses we've seen aircraft used in. ICAO's may be present in one or more applicable categories based off of crowdsourced intelligence. 
-# You can PR ICAO's you can document are accurately reflected.
 
 law_enforcement_icao_set = {'A63F2A', 'A7C624', 'ADEE38', 'A4C7EB', 'A6A688', 'A82598', 'A8DD00', 'A10941', 'AB68C8', 'A9A449', 'A67117', 'A03325', 'A1B4BB', 'A2C934', 'AD933E', 'AC6E92', 'A64D15', 'A6A665', 'A97B90', 'A7C42B', 'A92BFF', 'ACD25B', 'AD4835', 'A68A37', 'AD40C7', 'ADBABD'}
 
