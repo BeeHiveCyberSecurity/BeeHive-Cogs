@@ -766,7 +766,7 @@ class Skysearch(commands.Cog):
                 stats_keys = ["beast", "mlat", "other", "aircraft"]
                 stats_values = {key: data[key] for key in stats_keys}
 
-                embed = discord.Embed(title="Data from Airplanes.Live", description="Select data is brought to you free-of-charge by [airplanes.live](https://airplanes.live)", color=0xfffffe)
+                embed = discord.Embed(title="Air traffic data", description="Live flight data powered by [airplanes.live](https://airplanes.live)", color=0xfffffe)
                 embed.set_image(url="")
                 embed.set_thumbnail(url="https://asset.brandfetch.io/id1hdkKy3B/idgRk5S59l.jpeg")
                 for key, value in stats_values.items():
@@ -781,11 +781,13 @@ class Skysearch(commands.Cog):
                 embed2.add_field(name="Damaged aircraft", value="{:,} known".format(len(self.prior_known_accident_set)), inline=False)
                 embed2.add_field(name="Wartime aircraft", value="{:,} observed".format(len(self.ukr_conflict_set)), inline=False)
                 embed2.add_field(name="Suspicious aircraft under evaluation", value="{:,} identifiers".format(len(self.suspicious_icao_set)), inline=False)
-                embed3 = discord.Embed(title="Photography courtesy of PlaneSpotters.net", description="Credit provided where photos are available", color=0xfffffe)
+                embed3 = discord.Embed(title="Photography", description="Photos are powered by [planespotters.net](https://www.planespotters.net/)\n**Appears in**\n`callsign` `icao` `reg` `squawk` `type`", color=0xfffffe)
                 embed3.set_thumbnail(url="https://asset.brandfetch.io/id30vzxRYa/idInOENa25.png")
+                embed4 = discord.Embed(title="Airport information", description="Airport data is powered by [airport-data.com](https://www.airport-data.com/)\n**Appears in**\n`airportinfo`")
 
                 await ctx.send(embed=embed)
                 await ctx.send(embed=embed3)
+                await ctx.send(embed=embed4)
                 await ctx.send(embed=embed2)
             else:
                 embed = discord.Embed(title="Error", description="Incomplete data received from API.", color=0xff4545)
@@ -1001,7 +1003,7 @@ class Skysearch(commands.Cog):
             elif not data or 'name' not in data:
                 embed = discord.Embed(title="Error", description="No airport found with the provided ICAO or IATA code.", color=0xff4545)
             else:
-                embed = discord.Embed(title=f"Airport Information for {code.upper()}", color=0x2BBD8E)
+                embed = discord.Embed(title=f"Airport information for {code.upper()}", color=0xfffffe)
                 if 'name' in data:
                     embed.add_field(name="Name", value=f"`{data['name']}`", inline=False)
                 if 'location' in data:
@@ -1020,7 +1022,7 @@ class Skysearch(commands.Cog):
                     embed.add_field(name="Longitude", value=f"`{data['longitude']}`", inline=False)
                 if 'link' in data:
                     view = discord.ui.View()
-                    view.add_item(discord.ui.Button(label=f"About airport", url=f"{data['link']}", style=discord.ButtonStyle.link))
+                    view.add_item(discord.ui.Button(label=f"More information for airport", url=f"{data['link']}", style=discord.ButtonStyle.link))
 
             if 'link' in data:
                 await ctx.send(embed=embed, view=view)
