@@ -994,23 +994,21 @@ class Skysearch(commands.Cog):
             else:
                 embed = discord.Embed(title=f"Airport Information for {code.upper()}", color=0x2BBD8E)
                 if 'name' in data:
-                    embed.add_field(name="Name", value=data['name'], inline=False)
-                if 'city' in data:
-                    embed.add_field(name="City", value=data['city'], inline=False)
+                    embed.add_field(name="Name", value=f"`{data['name']}`", inline=False)
+                if 'location' in data:
+                    embed.add_field(name="Location", value=f"`{data['location']}`", inline=False)
                 if 'country' in data:
-                    embed.add_field(name="Country", value=data['country'], inline=False)
+                    embed.add_field(name="Country", value=f"`{data['country']}`", inline=False)
                 if 'country_code' in data:
-                    embed.add_field(name="Country Code", value=data['country_code'], inline=False)
+                    embed.add_field(name="Country Code", value=f"`{data['country_code']}`", inline=False)
                 if 'iata' in data:
-                    embed.add_field(name="IATA", value=data['iata'], inline=False)
+                    embed.add_field(name="IATA", value=f"`{data['iata']}`", inline=False)
                 if 'icao' in data:
-                    embed.add_field(name="ICAO", value=data['icao'], inline=False)
+                    embed.add_field(name="ICAO", value=f"`{data['icao']}`", inline=False)
                 if 'latitude' in data:
-                    embed.add_field(name="Latitude", value=data['latitude'], inline=False)
+                    embed.add_field(name="Latitude", value=f"`{data['latitude']}`", inline=False)
                 if 'longitude' in data:
-                    embed.add_field(name="Longitude", value=data['longitude'], inline=False)
-                if 'elevation' in data:
-                    embed.add_field(name="Elevation", value=data['elevation'], inline=False)
+                    embed.add_field(name="Longitude", value=f"`{data['longitude']}`", inline=False)
                 if 'link' in data:
                     view = discord.ui.View()
                     view.add_item(discord.ui.Button(label=f"About airport", url=f"{data['link']}", style=discord.ButtonStyle.link))
