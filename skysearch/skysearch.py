@@ -249,8 +249,8 @@ class Skysearch(commands.Cog):
             search_airport = discord.ui.Button(label="Search airport", style=discord.ButtonStyle.green, row=2)
             search_radius = discord.ui.Button(label="Search radius", style=discord.ButtonStyle.green, row=2)
             show_military = discord.ui.Button(label="Show military", style=discord.ButtonStyle.danger, row=3)
-            show_ladd = discord.ui.Button(label="Show LADD-restricted", style=discord.ButtonStyle.danger, row=3)
-            show_pia = discord.ui.Button(label="Show private ICAO's", style=discord.ButtonStyle.danger, row=3)
+            show_ladd = discord.ui.Button(label="Show limited", style=discord.ButtonStyle.danger, row=3)
+            show_pia = discord.ui.Button(label="Show private", style=discord.ButtonStyle.danger, row=3)
             show_the_commands = discord.ui.Button(label="Show commands", style=discord.ButtonStyle.grey, row=4)
             show_stats = discord.ui.Button(label="Show stats", style=discord.ButtonStyle.grey, row=4)
 
