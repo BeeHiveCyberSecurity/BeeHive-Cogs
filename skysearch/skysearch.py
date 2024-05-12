@@ -866,6 +866,35 @@ class Skysearch(commands.Cog):
         except Exception as e:
             await ctx.send(f"Error setting alert channel: {e}")
 
+    @aircraft_group.command(name='alertmention', help='Set a specific type of mention or roles to be tagged when a squawk alert.')
+    async def set_alert_mention(self, ctx, mention: typing.Union[discord.Role, str]):
+        try:
+            if isinstance(mention, discord.Role):
+                await self.config.guild(ctx.guild).alert_mention.set(mention.id)
+                await ctx.send(f"Alert mention set to {mention.mention}")
+            elif mention.lower() in ["@here", "@everyone", "none"]:
+                await self.config.guild(ctx.guild).alert_mention.set(mention.lower())
+                await ctx.send(f"Alert mention set to {mention.lower()}")
+            else:
+                await ctx.send("Invalid mention. Please provide a valid role, '@here', '@everyone', or 'none'.")
+        except Exception as e:
+            await ctx.send(f"Error setting alert mention: {e}")
+
+    @aircraft_group.command(name='quickalertmention', help='Quickly set a specific type of mention to be tagged when a squawk alert.')
+    async def quick_set_alert_mention(self, ctx):
+        embed = discord.Embed(title="Set Alert Mention", description="Select the type of mention to be tagged when a squawk alert.", color=0xfffffe)
+        view = discord.ui.View()
+        view.add_item(discord.ui.Button(label="No Mention", style=discord.ButtonStyle.green, custom_id="none"))
+        view.add_item(discord.ui.Button(label="@here", style=discord.ButtonStyle.green, custom_id="here"))
+        view.add_item(discord.ui.Button(label="@everyone", style=discord.ButtonStyle.green, custom_id="everyone"))
+        await ctx.send(embed=embed, view=view)
+
+    @commands.Cog.listener()
+    async def on_button_click(self, interaction: discord.Interaction):
+        if interaction.custom_id in ["none", "here", "everyone"]:
+            await self.config.guild(interaction.guild).alert_mention.set(interaction.custom_id)
+            await interaction.response.send_message(f"Alert mention set to {interaction.custom_id}", ephemeral=True)
+
     @tasks.loop(minutes=2)
     async def check_emergency_squawks(self):
         try:
@@ -878,11 +907,22 @@ class Skysearch(commands.Cog):
                         guilds = self.bot.guilds
                         for guild in guilds:
                             alert_channel_id = await self.config.guild(guild).alert_channel()
+                            alert_mention = await self.config.guild(guild).alert_mention()
                             if alert_channel_id:
                                 alert_channel = self.bot.get_channel(alert_channel_id)
                                 if alert_channel:
                                     # Send the new alert
-                                    await self._send_aircraft_info(alert_channel, {'ac': [aircraft_info]})
+                                    if isinstance(alert_mention, int):  # If it's a role ID
+                                        role = guild.get_role(alert_mention)
+                                        if role:
+                                            mention = role.mention
+                                        else:
+                                            mention = ""
+                                    elif alert_mention in ["@here", "@everyone"]:
+                                        mention = alert_mention
+                                    else:
+                                        mention = ""
+                                    await self._send_aircraft_info(alert_channel, {'ac': [aircraft_info]}, mention)
                                 else:
                                     print(f"Error: Alert channel not found for guild {guild.name}")
                             else:
