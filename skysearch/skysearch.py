@@ -951,67 +951,6 @@ class Skysearch(commands.Cog):
                 embed = discord.Embed(title="ICAO Lookup Status", description="Automatic ICAO lookup has been disabled.", color=0xff4545)
                 await ctx.send(embed=embed)
 
-    @tasks.loop(minutes=2)
-    async def check_emergency_squawks(self):
-        try:
-            emergency_squawk_codes = ['7500', '7600', '7700']
-            for squawk_code in emergency_squawk_codes:
-                url = f"{self.api_url}/squawk/{squawk_code}"
-                response = await self._make_request(url)
-                if response and 'ac' in response:
-                    for aircraft_info in response['ac']:
-                        guilds = await self.bot.fetch_guilds().flatten()
-                        for guild in guilds:
-                            alert_channel_id = await self.config.guild(guild).alert_channel()
-                            alert_mention = await self.config.guild(guild).alert_mention()
-                            if alert_channel_id:
-                                alert_channel = self.bot.get_channel(alert_channel_id)
-                                if alert_channel:
-                                    # Send the new alert
-                                    if isinstance(alert_mention, int):  # If it's a role ID
-                                        role = guild.get_role(alert_mention)
-                                        if role:
-                                            mention = role.mention
-                                        else:
-                                            mention = ""
-                                    elif alert_mention in ["@here", "@everyone"]:
-                                        mention = alert_mention
-                                    else:
-                                        mention = ""
-                                    await self._send_aircraft_info(alert_channel, {'ac': [aircraft_info]}, mention)
-                                    await self.config.guild(guild).last_emergency_squawk_time.set(int(time.time()))
-                                else:
-                                    print(f"Error: Alert channel not found for guild {guild.name}")
-                            else:
-                                print(f"Error: No alert channel set for guild {guild.name}")
-                await asyncio.sleep(2)
-        except Exception as e:
-            print(f"Error checking emergency squawks: {e}")
-
-    @check_emergency_squawks.before_loop
-    async def before_check_emergency_squawks(self):
-        try:
-            await self.bot.wait_until_ready()
-        except Exception as e:
-            print(f"Error before checking emergency squawks: {e}")
-
-    @commands.Cog.listener()
-    async def on_message(self, message):
-        if message.author == self.bot.user:
-            return
-
-        auto_icao = await self.config.guild(message.guild).auto_icao()
-        if not auto_icao:
-            return
-
-        content = message.content
-        icao_pattern = re.compile(r'^[a-fA-F0-9]{6}$')
-
-        if icao_pattern.match(content):
-            ctx = await self.bot.get_context(message)
-            await self.aircraft_by_icao(ctx, content)
-
-
     @commands.guild_only()
     @aircraft_group.command(name='airportinfo')
     async def airportinfo(self, ctx, code: str = None):
@@ -1074,6 +1013,66 @@ class Skysearch(commands.Cog):
         except Exception as e:
             embed = discord.Embed(title="Error", description=str(e), color=0xff4545)
             await ctx.send(embed=embed)
+
+    @tasks.loop(minutes=2)
+    async def check_emergency_squawks(self):
+        try:
+            emergency_squawk_codes = ['7500', '7600', '7700']
+            for squawk_code in emergency_squawk_codes:
+                url = f"{self.api_url}/squawk/{squawk_code}"
+                response = await self._make_request(url)
+                if response and 'ac' in response:
+                    for aircraft_info in response['ac']:
+                        guilds = await self.bot.fetch_guilds().flatten()
+                        for guild in guilds:
+                            alert_channel_id = await self.config.guild(guild).alert_channel()
+                            alert_mention = await self.config.guild(guild).alert_mention()
+                            if alert_channel_id:
+                                alert_channel = self.bot.get_channel(alert_channel_id)
+                                if alert_channel:
+                                    # Send the new alert
+                                    if isinstance(alert_mention, int):  # If it's a role ID
+                                        role = guild.get_role(alert_mention)
+                                        if role:
+                                            mention = role.mention
+                                        else:
+                                            mention = ""
+                                    elif alert_mention in ["@here", "@everyone"]:
+                                        mention = alert_mention
+                                    else:
+                                        mention = ""
+                                    await self._send_aircraft_info(alert_channel, {'ac': [aircraft_info]}, mention)
+                                    await self.config.guild(guild).last_emergency_squawk_time.set(int(time.time()))
+                                else:
+                                    print(f"Error: Alert channel not found for guild {guild.name}")
+                            else:
+                                print(f"Error: No alert channel set for guild {guild.name}")
+                await asyncio.sleep(2)
+        except Exception as e:
+            print(f"Error checking emergency squawks: {e}")
+
+    @check_emergency_squawks.before_loop
+    async def before_check_emergency_squawks(self):
+        try:
+            await self.bot.wait_until_ready()
+        except Exception as e:
+            print(f"Error before checking emergency squawks: {e}")
+
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        if message.author == self.bot.user:
+            return
+
+        auto_icao = await self.config.guild(message.guild).auto_icao()
+        if not auto_icao:
+            return
+
+        content = message.content
+        icao_pattern = re.compile(r'^[a-fA-F0-9]{6}$')
+
+        if icao_pattern.match(content):
+            ctx = await self.bot.get_context(message)
+            await self.aircraft_by_icao(ctx, content)
 
     def cog_unload(self):
         try:
