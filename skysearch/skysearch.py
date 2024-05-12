@@ -16,7 +16,7 @@ from reportlab.pdfgen import canvas #type: ignore
 from reportlab.lib import colors#type: ignore
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle #type: ignore
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak, Table, TableStyle #type: ignore
-from .icao_codes import law_enforcement_icao_set, military_icao_set, medical_icao_set, suspicious_icao_set, prior_known_accident_set, ukr_conflict_set
+from .icao_codes import law_enforcement_icao_set, military_icao_set, medical_icao_set, suspicious_icao_set, prior_known_accident_set, ukr_conflict_set, newsagency_icao_set
 
 class Skysearch(commands.Cog):
     
@@ -33,6 +33,7 @@ class Skysearch(commands.Cog):
         self.suspicious_icao_set = suspicious_icao_set
         self.prior_known_accident_set = prior_known_accident_set
         self.ukr_conflict_set = ukr_conflict_set
+        self.newsagency_icao_set = newsagency_icao_set
 
         
     async def cog_unload(self):
@@ -758,6 +759,7 @@ class Skysearch(commands.Cog):
                 embed2.add_field(name="Law enforcement aircraft", value="{:,} tagged".format(len(self.law_enforcement_icao_set)), inline=False)
                 embed2.add_field(name="Military & government aircraft", value="{:,} tagged".format(len(self.military_icao_set)), inline=False)
                 embed2.add_field(name="Medical aircraft", value="{:,} tagged".format(len(self.medical_icao_set)), inline=False)
+                embed2.add_field(name="Media aircraft", value="{:,} known".format(len(self.newsagency_icao_set)), inline=False")
                 embed2.add_field(name="Damaged aircraft", value="{:,} known".format(len(self.prior_known_accident_set)), inline=False)
                 embed2.add_field(name="Wartime aircraft", value="{:,} observed".format(len(self.ukr_conflict_set)), inline=False)
                 embed2.add_field(name="Suspicious aircraft under evaluation", value="{:,} identifiers".format(len(self.suspicious_icao_set)), inline=False)
