@@ -952,7 +952,7 @@ class Skysearch(commands.Cog):
                 await ctx.send(embed=embed)
 
     @commands.guild_only()
-    @aircraft_group.command(name='airportinfo')
+    @aircraft_group.command(name='airportcode')
     async def airportinfo(self, ctx, code: str = None):
         """Query airport information by ICAO or IATA code."""
         if code is None:
