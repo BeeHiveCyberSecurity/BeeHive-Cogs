@@ -759,7 +759,7 @@ class Skysearch(commands.Cog):
                 embed2.add_field(name="Law enforcement aircraft", value="{:,} tagged".format(len(self.law_enforcement_icao_set)), inline=False)
                 embed2.add_field(name="Military & government aircraft", value="{:,} tagged".format(len(self.military_icao_set)), inline=False)
                 embed2.add_field(name="Medical aircraft", value="{:,} tagged".format(len(self.medical_icao_set)), inline=False)
-                embed2.add_field(name="Media aircraft", value="{:,} known".format(len(self.newsagency_icao_set)), inline=False")
+                embed2.add_field(name="Media aircraft", value="{:,} known".format(len(self.newsagency_icao_set)), inline=False)
                 embed2.add_field(name="Damaged aircraft", value="{:,} known".format(len(self.prior_known_accident_set)), inline=False)
                 embed2.add_field(name="Wartime aircraft", value="{:,} observed".format(len(self.ukr_conflict_set)), inline=False)
                 embed2.add_field(name="Suspicious aircraft under evaluation", value="{:,} identifiers".format(len(self.suspicious_icao_set)), inline=False)
