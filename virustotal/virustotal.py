@@ -3,9 +3,9 @@ import json
 import io
 import requests
 import asyncio
-import discord # type: ignore
-from redbot.core import commands
-from redbot.core import app_commands # type: ignore
+import discord #type: ignore
+from redbot.core import commands #type: ignore
+from redbot.core import app_commands # ype: ignore
 
 class VirusTotal(commands.Cog):
     """VirusTotal file upload and analysis via Discord"""
