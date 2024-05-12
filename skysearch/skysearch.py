@@ -997,6 +997,8 @@ class Skysearch(commands.Cog):
                     embed.add_field(name="City", value=data['city'], inline=True)
                 if 'country' in data:
                     embed.add_field(name="Country", value=data['country'], inline=True)
+                if 'country_code' in data:
+                    embed.add_field(name="Country Code", value=data['country_code'], inline=True)
                 if 'iata' in data:
                     embed.add_field(name="IATA", value=data['iata'], inline=True)
                 if 'icao' in data:
@@ -1009,6 +1011,8 @@ class Skysearch(commands.Cog):
                     embed.add_field(name="Elevation", value=data['elevation'], inline=True)
                 if 'tz' in data:
                     embed.add_field(name="Timezone", value=data['tz'], inline=True)
+                if 'link' in data:
+                    embed.add_field(name="Link", value=data['link'], inline=True)
 
             await ctx.send(embed=embed)
         except Exception as e:
