@@ -783,8 +783,9 @@ class Skysearch(commands.Cog):
                 embed2.add_field(name="Suspicious aircraft under evaluation", value="{:,} identifiers".format(len(self.suspicious_icao_set)), inline=False)
                 embed3 = discord.Embed(title="Photography", description="Photos are powered by [planespotters.net](https://www.planespotters.net/)", color=0xfffffe)
                 embed3.add_field(name="Appears in", value="`callsign` `icao` `reg` `squawk` `type`", inline=False)
-                embed3.set_thumbnail(url="https://asset.brandfetch.io/id30vzxRYa/idInOENa25.png")
+                embed3.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/camera.png")
                 embed4 = discord.Embed(title="Airport information", description="Airport data is powered by [airport-data.com](https://www.airport-data.com/)", color=0xfffffe)
+                embed4.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/location.png")
                 embed4.add_field(name="Appears in", value="`airportinfo`", inline=False)
 
                 await ctx.send(embed=embed)
