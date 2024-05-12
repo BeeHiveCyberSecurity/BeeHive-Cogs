@@ -1042,7 +1042,7 @@ class Skysearch(commands.Cog):
                     link = data['link']
                     if link.startswith('/world-airport/'):
                         link = f"https://www.airport-data.com{link}"
-                    if link.startswith('http') or link.startswith('https'):
+                    if link.startswith('http://') or link.startswith('https://'):
                         view = discord.ui.View()
                         view.add_item(discord.ui.Button(label=f"More information for airport", url=link, style=discord.ButtonStyle.link))
                         await ctx.send(embed=embed, view=view)
