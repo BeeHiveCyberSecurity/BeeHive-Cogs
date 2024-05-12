@@ -1040,10 +1040,13 @@ class Skysearch(commands.Cog):
                     embed.add_field(name="Longitude", value=f"`{data['longitude']}`", inline=False)
                 if 'link' in data:
                     view = discord.ui.View()
-                    view.add_item(discord.ui.Button(label=f"More information for airport", url=f"{data['link']}", style=discord.ButtonStyle.link))
+                    link = data['link']
+                    if link.startswith('/world-airport/'):
+                        link = f"https://www.airport-data.com{link}"
+                    view.add_item(discord.ui.Button(label=f"More information for airport", url=link, style=discord.ButtonStyle.link))
 
-            if 'link' in data:
-                await ctx.send(embed=embed, view=view)
+                if 'link' in data:
+                    await ctx.send(embed=embed, view=view)
             else:
                 await ctx.send(embed=embed)
         except Exception as e:
