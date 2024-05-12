@@ -770,7 +770,7 @@ class Skysearch(commands.Cog):
                 embed.set_thumbnail(url="https://asset.brandfetch.io/id1hdkKy3B/idgRk5S59l.jpeg")
                 for key, value in stats_values.items():
                     embed.add_field(name=key.capitalize(), value="{:,} aircraft".format(value), inline=True)
-                embed2 = discord.Embed(title="Enhanced by BeeHive Intelligence", description="BeeHive tracks and supplements this cog's original dataset during day-to-day operations.", color=0xffd966)
+                embed2 = discord.Embed(title="Enhanced by BeeHive Intelligence", description="Additional info available per-aircraft", color=0xffd966)
                 embed2.set_image(url="")
                 embed2.set_thumbnail(url="https://asset.brandfetch.io/idGpYEfxfH/idW3166yGx.png")
                 embed2.add_field(name="Law enforcement aircraft", value="{:,} tagged".format(len(self.law_enforcement_icao_set)), inline=False)
