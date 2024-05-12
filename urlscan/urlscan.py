@@ -1,5 +1,5 @@
 import requests
-import discord
+import discord #type: ignore
 import json
 import time
 from redbot.core import commands #type: ignore 
