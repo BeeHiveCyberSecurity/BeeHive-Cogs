@@ -975,18 +975,18 @@ class Skysearch(commands.Cog):
                 api_token = "2a628a67e9957ffcbfbda1d3dd7f6c62c7eee6fcf5e1b3615fad5cf3c156402accc5d74e14a1ce73c58a5ed952711c9d"
                 urls.append(f"https://airportdb.io/api/v1/airport/{code}?apiToken={api_token}")
 
+            embed = discord.Embed(title=f"Airport information for {code.upper()}", color=0xfffffe)
+            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/location.png")
+            fields = ['name', 'location', 'country', 'country_code', 'iata', 'icao', 'latitude', 'longitude', 'municipality', 'scheduled_service', 'gps_code', 'local_code', 'home_link']
             for url in urls:
                 response = requests.get(url)
                 data = response.json()
 
                 if 'error' in data:
-                    embed = discord.Embed(title="Error", description=data['error'], color=0xff4545)
+                    embed.add_field(name="Error", value=data['error'], inline=False)
                 elif not data or 'name' not in data:
-                    embed = discord.Embed(title="Error", description="No airport found with the provided code.", color=0xff4545)
+                    embed.add_field(name="Error", value="No airport found with the provided code.", inline=False)
                 else:
-                    embed = discord.Embed(title=f"Airport information for {code.upper()}", color=0xfffffe)
-                    embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/location.png")
-                    fields = ['name', 'location', 'country', 'country_code', 'iata', 'icao', 'latitude', 'longitude', 'municipality', 'scheduled_service', 'gps_code', 'local_code', 'home_link']
                     for field in fields:
                         if field in data:
                             value = f"`{data[field]}`" if field != 'home_link' else f"[Link]({data[field]})"
