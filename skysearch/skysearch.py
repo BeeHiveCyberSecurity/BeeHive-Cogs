@@ -1022,7 +1022,10 @@ class Skysearch(commands.Cog):
                     view = discord.ui.View()
                     view.add_item(discord.ui.Button(label=f"About airport", url=f"{data['link']}", style=discord.ButtonStyle.link))
 
-            await ctx.send(embed=embed, view=view)
+            if 'link' in data:
+                await ctx.send(embed=embed, view=view)
+            else:
+                await ctx.send(embed=embed)
         except Exception as e:
             embed = discord.Embed(title="Error", description=str(e), color=0xff4545)
             await ctx.send(embed=embed)
