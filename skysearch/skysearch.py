@@ -845,8 +845,6 @@ class Skysearch(commands.Cog):
                 
                 # Add field for the last time an aircraft squawked an emergency
                 last_emergency_squawk_time = await self.config.guild(guild).last_emergency_squawk_time()
-                if last_emergency_squawk_time is None:
-                    last_emergency_squawk_time = await self.check_emergency_squawks.last_emergency_squawk_time
                 if last_emergency_squawk_time:
                     last_emergency_squawk_time_formatted = f"<t:{int(last_emergency_squawk_time)}:F>"
                     embed.add_field(name="Last Emergency Squawk", value=f"Time: {last_emergency_squawk_time_formatted}", inline=False)
