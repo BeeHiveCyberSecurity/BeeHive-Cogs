@@ -982,7 +982,14 @@ class Skysearch(commands.Cog):
             return
 
         # Determine if the code is ICAO or IATA based on length
-        code_type = 'icao' if len(code) == 4 else 'iata'
+        if len(code) == 4:
+            code_type = 'icao'
+        elif len(code) == 3:
+            code_type = 'iata'
+        else:
+            embed = discord.Embed(title="Error", description="Invalid ICAO or IATA code. ICAO codes are 4 characters long and IATA codes are 3 characters long.", color=0xff4545)
+            await ctx.send(embed=embed)
+            return
 
         try:
             url = f"https://www.airport-data.com/api/ap_info.json?{code_type}={code}"
@@ -991,6 +998,8 @@ class Skysearch(commands.Cog):
 
             if 'error' in data:
                 embed = discord.Embed(title="Error", description=data['error'], color=0xff4545)
+            elif not data or 'name' not in data:
+                embed = discord.Embed(title="Error", description="No airport found with the provided ICAO or IATA code.", color=0xff4545)
             else:
                 embed = discord.Embed(title=f"Airport Information for {code.upper()}", color=0x2BBD8E)
                 if 'name' in data:
