@@ -227,6 +227,7 @@ class Skysearch(commands.Cog):
             pass
         return None, None
 
+    @commands.guild_only()
     @commands.group(name='skysearch', help='Get information about aircraft.', invoke_without_command=True)
     async def aircraft_group(self, ctx):
         """Summon the SkySearch panel"""
@@ -446,6 +447,7 @@ class Skysearch(commands.Cog):
             # Send the embed with the view
             await ctx.send(embed=embed, view=view)
 
+    @commands.guild_only()
     @aircraft_group.command(name='icao', help='Get information about an aircraft by its 24-bit ICAO Address')
     async def aircraft_by_icao(self, ctx, hex_id: str):
         url = f"{self.api_url}/hex/{hex_id}"
@@ -459,7 +461,8 @@ class Skysearch(commands.Cog):
         else:
             embed = discord.Embed(title="Error", description="Error retrieving aircraft information.", color=0xff4545)
             await ctx.send(embed=embed)
-            
+    
+    @commands.guild_only()
     @aircraft_group.command(name='callsign', help='Get information about an aircraft by its callsign.')
     async def aircraft_by_callsign(self, ctx, callsign: str):
         url = f"{self.api_url}/callsign/{callsign}"
@@ -470,6 +473,7 @@ class Skysearch(commands.Cog):
             embed = discord.Embed(title="Error", description="No aircraft found with the specified callsign.", color=0xff4545)
             await ctx.send(embed=embed)
 
+    @commands.guild_only()
     @aircraft_group.command(name='reg', help='Get information about an aircraft by its registration.')
     async def aircraft_by_reg(self, ctx, registration: str):
         url = f"{self.api_url}/reg/{registration}"
@@ -480,6 +484,7 @@ class Skysearch(commands.Cog):
             embed = discord.Embed(title="Error", description="Error retrieving aircraft information.", color=0xff4545)
             await ctx.send(embed=embed)
 
+    @commands.guild_only()
     @aircraft_group.command(name='type', help='Get information about aircraft by its type.')
     async def aircraft_by_type(self, ctx, aircraft_type: str):
         url = f"{self.api_url}/type/{aircraft_type}"
@@ -490,6 +495,7 @@ class Skysearch(commands.Cog):
             embed = discord.Embed(title="Error", description="Error retrieving aircraft information.", color=0xff4545)
             await ctx.send(embed=embed)
 
+    @commands.guild_only()
     @aircraft_group.command(name='squawk', help='Get information about an aircraft by its squawk code.')
     async def aircraft_by_squawk(self, ctx, squawk_value: str):
         url = f"{self.api_url}/squawk/{squawk_value}"
@@ -500,6 +506,7 @@ class Skysearch(commands.Cog):
             embed = discord.Embed(title="Error", description="Error retrieving aircraft information.", color=0xff4545)
             await ctx.send(embed=embed)
 
+    @commands.guild_only()
     @aircraft_group.command(name='military', help='Get information about military aircraft.')
     async def show_military_aircraft(self, ctx):
         url = f"{self.api_url}/mil"
@@ -550,7 +557,8 @@ class Skysearch(commands.Cog):
         else:
             embed = discord.Embed(title="Error", description="Error retrieving aircraft information.", color=0xff4545)
             await ctx.send(embed=embed)
-
+    
+    @commands.guild_only()
     @aircraft_group.command(name='ladd', help='Get information on LADD-restricted aircraft')
     async def ladd_aircraft(self, ctx):
         url = f"{self.api_url}/ladd"
@@ -602,6 +610,7 @@ class Skysearch(commands.Cog):
             embed = discord.Embed(title="Error", description="Error retrieving aircraft information.", color=0xff4545)
             await ctx.send(embed=embed)
 
+    @commands.guild_only()
     @aircraft_group.command(name='pia', help='View live aircraft using private ICAO addresses')
     async def pia_aircraft(self, ctx):
         url = f"{self.api_url}/pia"
@@ -653,6 +662,7 @@ class Skysearch(commands.Cog):
             embed = discord.Embed(title="Error", description="Error retrieving aircraft information.", color=0xff4545)
             await ctx.send(embed=embed)
 
+    @commands.guild_only()
     @aircraft_group.command(name='radius', help='Get information about aircraft within a specified radius.')
     async def aircraft_within_radius(self, ctx, lat: str, lon: str, radius: str):
         url = f"{self.api_url}/point/{lat}/{lon}/{radius}"
@@ -663,6 +673,7 @@ class Skysearch(commands.Cog):
             embed = discord.Embed(title="Error", description="Error retrieving aircraft information for aircraft within the specified radius.", color=0xff4545)
             await ctx.send(embed=embed)
 
+    @commands.guild_only()
     @aircraft_group.command(name='export', help='Search aircraft by ICAO, callsign, squawk, or type and export the results.')
     async def export_aircraft(self, ctx, search_type: str, search_value: str, file_format: str):
         if search_type not in ["icao", "callsign", "squawk", "type"]:
@@ -752,6 +763,7 @@ class Skysearch(commands.Cog):
             embed = discord.Embed(title="Error", description="Error retrieving aircraft information.", color=0xff4545)
             await ctx.send(embed=embed)
 
+    @commands.guild_only()
     @aircraft_group.command(name='stats', help='Get statistics about SkySearch and the data used here')
     async def stats(self, ctx):
         url = "https://api.airplanes.live/stats"
@@ -800,6 +812,7 @@ class Skysearch(commands.Cog):
             embed = discord.Embed(title="Error", description=f"Error fetching data: {e}", color=0xff4545)
             await ctx.send(embed=embed)
 
+    @commands.guild_only()
     @aircraft_group.command(name='scroll', help='Scroll through available planes.')
     async def scroll_planes(self, ctx):
         url = f"{self.api_url}/mil"
