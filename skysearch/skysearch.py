@@ -929,6 +929,28 @@ class Skysearch(commands.Cog):
         except Exception as e:
             await ctx.send(f"Error setting alert mention: {e}")
 
+    @commands.guild_only()
+    @commands.has_permissions(manage_guild=True)
+    @aircraft_group.command(name='autoicao')
+    async def autoicao(self, ctx, state: bool = None):
+        """Enable or disable automatic ICAO lookup."""
+        if state is None:
+            state = await self.config.guild(ctx.guild).auto_icao()
+            if state:
+                embed = discord.Embed(title="ICAO Lookup Status", description="Automatic ICAO lookup is currently enabled.", color=0x2BBD8E)
+                await ctx.send(embed=embed)
+            else:
+                embed = discord.Embed(title="ICAO Lookup Status", description="Automatic ICAO lookup is currently disabled.", color=0xff4545)
+                await ctx.send(embed=embed)
+        else:
+            await self.config.guild(ctx.guild).auto_icao.set(state)
+            if state:
+                embed = discord.Embed(title="ICAO Lookup Status", description="Automatic ICAO lookup has been enabled.", color=0x2BBD8E)
+                await ctx.send(embed=embed)
+            else:
+                embed = discord.Embed(title="ICAO Lookup Status", description="Automatic ICAO lookup has been disabled.", color=0xff4545)
+                await ctx.send(embed=embed)
+
     @tasks.loop(minutes=2)
     async def check_emergency_squawks(self):
         try:
@@ -989,27 +1011,6 @@ class Skysearch(commands.Cog):
             ctx = await self.bot.get_context(message)
             await self.aircraft_by_icao(ctx, content)
 
-    @commands.guild_only()
-    @commands.has_permissions(manage_guild=True)
-    @aircraft_group.command(name='autoicao')
-    async def autoicao(self, ctx, state: bool = None):
-        """Enable or disable automatic ICAO lookup."""
-        if state is None:
-            state = await self.config.guild(ctx.guild).auto_icao()
-            if state:
-                embed = discord.Embed(title="ICAO Lookup Status", description="Automatic ICAO lookup is currently enabled.", color=0x2BBD8E)
-                await ctx.send(embed=embed)
-            else:
-                embed = discord.Embed(title="ICAO Lookup Status", description="Automatic ICAO lookup is currently disabled.", color=0xff4545)
-                await ctx.send(embed=embed)
-        else:
-            await self.config.guild(ctx.guild).auto_icao.set(state)
-            if state:
-                embed = discord.Embed(title="ICAO Lookup Status", description="Automatic ICAO lookup has been enabled.", color=0x2BBD8E)
-                await ctx.send(embed=embed)
-            else:
-                embed = discord.Embed(title="ICAO Lookup Status", description="Automatic ICAO lookup has been disabled.", color=0xff4545)
-                await ctx.send(embed=embed)
 
     @commands.guild_only()
     @aircraft_group.command(name='airportinfo')
