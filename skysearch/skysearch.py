@@ -1004,9 +1004,9 @@ class Skysearch(commands.Cog):
                 if 'icao' in data:
                     embed.add_field(name="ICAO", value=data['icao'], inline=True)
                 if 'latitude' in data:
-                    embed.add_field(name="Latitude", value=data['lat'], inline=True)
+                    embed.add_field(name="Latitude", value=data['latitude'], inline=True)
                 if 'longitude' in data:
-                    embed.add_field(name="Longitude", value=data['lon'], inline=True)
+                    embed.add_field(name="Longitude", value=data['longitude'], inline=True)
                 if 'elevation' in data:
                     embed.add_field(name="Elevation", value=data['elevation'], inline=True)
                 if 'link' in data:
