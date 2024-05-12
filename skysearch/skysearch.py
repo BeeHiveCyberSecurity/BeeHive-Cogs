@@ -183,6 +183,9 @@ class Skysearch(commands.Cog):
             tweet_text = f"Tracking flight {aircraft_data.get('flight', '')} at position {lat}, {lon} with speed {ground_speed_mph} mph using #SkySearch\n\nJoin via Discord to track planes with your friends for free - https://discord.gg/X8huyaeXrA"
             tweet_url = f"https://twitter.com/intent/tweet?text={urllib.parse.quote_plus(tweet_text)}"
             view.add_item(discord.ui.Button(label=f"Share on 𝕏", url=tweet_url, style=discord.ButtonStyle.link))
+            facebook_text = f"Tracking flight {aircraft_data.get('flight', '')} at position {lat}, {lon} with speed {ground_speed_mph} mph using #SkySearch. Join via Discord to track planes with your friends for free - https://discord.gg/X8huyaeXrA"
+            facebook_url = f"https://www.facebook.com/sharer/sharer.php?u={urllib.parse.quote_plus(facebook_text)}"
+            view.add_item(discord.ui.Button(label=f"Share on Facebook", url=facebook_url, style=discord.ButtonStyle.link))
             await ctx.send(embed=embed, view=view)
             squawk_code = aircraft_data.get('squawk', 'N/A')
             if squawk_code in emergency_squawk_codes:
