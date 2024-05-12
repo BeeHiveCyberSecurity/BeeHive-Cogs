@@ -1,6 +1,9 @@
-import requests, discord, json, time
-from redbot.core import commands
-from redbot.core import app_commands
+import requests
+import discord
+import json
+import time
+from redbot.core import commands #type: ignore 
+from redbot.core import app_commands #type: ignore
 
 class URLScan(commands.Cog):
     """URLScan file upload and analysis via Discord"""
