@@ -97,6 +97,8 @@ class Skysearch(commands.Cog):
             if altitude == 'ground':
                 embed.add_field(name="Status", value="`On ground`", inline=True)
             else:
+                if isinstance(altitude, int):
+                    altitude = "{:,}".format(altitude)
                 altitude_feet = f"{altitude} ft"
                 embed.add_field(name="Altitude", value=f"`{altitude_feet}`", inline=True)
             heading = aircraft_data.get('true_heading', None)
