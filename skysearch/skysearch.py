@@ -1003,18 +1003,17 @@ class Skysearch(commands.Cog):
                     embed.add_field(name="IATA", value=data['iata'], inline=True)
                 if 'icao' in data:
                     embed.add_field(name="ICAO", value=data['icao'], inline=True)
-                if 'lat' in data:
+                if 'latitude' in data:
                     embed.add_field(name="Latitude", value=data['lat'], inline=True)
-                if 'lon' in data:
+                if 'longitude' in data:
                     embed.add_field(name="Longitude", value=data['lon'], inline=True)
                 if 'elevation' in data:
                     embed.add_field(name="Elevation", value=data['elevation'], inline=True)
-                if 'tz' in data:
-                    embed.add_field(name="Timezone", value=data['tz'], inline=True)
                 if 'link' in data:
-                    embed.add_field(name="Link", value=data['link'], inline=True)
+                    view = discord.ui.View()
+                    view.add_item(discord.ui.Button(label=f"About airport", url=f"{link}", style=discord.ButtonStyle.link))
 
-            await ctx.send(embed=embed)
+            await ctx.send(embed=embed, view=view)
         except Exception as e:
             embed = discord.Embed(title="Error", description=str(e), color=0xff4545)
             await ctx.send(embed=embed)
