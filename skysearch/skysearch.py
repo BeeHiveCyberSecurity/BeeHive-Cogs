@@ -906,6 +906,8 @@ class Skysearch(commands.Cog):
                                     else:
                                         mention = ""
                                     await self._send_aircraft_info(alert_channel, {'ac': [aircraft_info]}, mention)
+                                    # Save the last emergency squawk time
+                                    await self.config.guild(guild).last_emergency_squawk_time.set(int(time.time()))
                                 else:
                                     print(f"Error: Alert channel not found for guild {guild.name}")
                             else:
