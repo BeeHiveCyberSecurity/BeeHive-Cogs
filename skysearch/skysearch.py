@@ -241,17 +241,17 @@ class Skysearch(commands.Cog):
             view = discord.ui.View(timeout=180)  # Set a timeout for the view
 
             # Create buttons with click actions
-            search_callsign = discord.ui.Button(label=f"Search by callsign", style=discord.ButtonStyle.green, row=1)
-            search_icao = discord.ui.Button(label="Search by ICAO", style=discord.ButtonStyle.green, row=1)
-            search_registration = discord.ui.Button(label="Search by registration", style=discord.ButtonStyle.green, row=1)
-            search_squawk = discord.ui.Button(label="Search by squawk", style=discord.ButtonStyle.green, row=1)
-            search_type = discord.ui.Button(label="Search by model", style=discord.ButtonStyle.green, row=1)
+            search_callsign = discord.ui.Button(label=f"Search callsign", style=discord.ButtonStyle.green, row=1)
+            search_icao = discord.ui.Button(label="Search ICAO", style=discord.ButtonStyle.green, row=1)
+            search_registration = discord.ui.Button(label="Search registration", style=discord.ButtonStyle.green, row=1)
+            search_squawk = discord.ui.Button(label="Search squawk", style=discord.ButtonStyle.green, row=1)
+            search_type = discord.ui.Button(label="Search model", style=discord.ButtonStyle.green, row=1)
             search_airport = discord.ui.Button(label="Search airport", style=discord.ButtonStyle.green, row=2)
-            search_radius = discord.ui.Button(label="Search within radius", style=discord.ButtonStyle.green, row=2)
-            show_military = discord.ui.Button(label="Show military aircraft", style=discord.ButtonStyle.danger, row=3)
-            show_ladd = discord.ui.Button(label="Show LADD-restricted aircraft", style=discord.ButtonStyle.danger, row=3)
-            show_pia = discord.ui.Button(label="Show aircraft using private ICAO's", style=discord.ButtonStyle.danger, row=3)
-            show_the_commands = discord.ui.Button(label="Show available commands", style=discord.ButtonStyle.grey, row=4)
+            search_radius = discord.ui.Button(label="Search radius", style=discord.ButtonStyle.green, row=2)
+            show_military = discord.ui.Button(label="Show military", style=discord.ButtonStyle.danger, row=3)
+            show_ladd = discord.ui.Button(label="Show LADD-restricted", style=discord.ButtonStyle.danger, row=3)
+            show_pia = discord.ui.Button(label="Show private ICAO's", style=discord.ButtonStyle.danger, row=3)
+            show_the_commands = discord.ui.Button(label="Show commands", style=discord.ButtonStyle.grey, row=4)
             show_stats = discord.ui.Button(label="Show stats", style=discord.ButtonStyle.grey, row=4)
 
             # Define button callbacks
