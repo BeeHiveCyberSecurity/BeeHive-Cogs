@@ -825,6 +825,7 @@ class Skysearch(commands.Cog):
             embed = discord.Embed(description=f"An error occurred during scrolling: {e}.")
             await ctx.send(embed=embed)
 
+    @commands.guild_only()
     @aircraft_group.command(name='showalertchannel', help='Show alert task status and output if set')
     async def list_alert_channels(self, ctx):
         guild = ctx.guild
@@ -864,7 +865,8 @@ class Skysearch(commands.Cog):
         else:
             embed.add_field(name="Status", value="No alert channel set.", inline=False)
         await ctx.send(embed=embed)
-        
+
+    @commands.guild_only()   
     @aircraft_group.command(name='alertchannel', help='Set a channel to send emergency squawk alerts to.')
     async def set_alert_channel(self, ctx, channel: discord.TextChannel):
         try:
@@ -873,6 +875,7 @@ class Skysearch(commands.Cog):
         except Exception as e:
             await ctx.send(f"Error setting alert channel: {e}")
 
+    @commands.guild_only()
     @aircraft_group.command(name='alertmention', help='Set a specific type of mention or roles to be tagged when a squawk alert.')
     async def set_alert_mention(self, ctx, mention: typing.Union[discord.Role, str]):
         try:
