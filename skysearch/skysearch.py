@@ -234,7 +234,7 @@ class Skysearch(commands.Cog):
         if ctx.invoked_subcommand is None:
             embed = discord.Embed(
                 title="SkySearch",
-                description="SkySearch is a powerful tool that allows you to search for real-time information about aircraft. You can search by callsign, ICAO, registration, squawk, model, and airport. You can also search within a specific radius, view military aircraft, view LADD-restricted aircraft, view private ICAO's, and view misc stats.\n\nUse a button below to get started",
+                description="SkySearch is a powerful tool that allows you to search for real-time information about aircraft.\n\nYou can search active aircraft by callsign, ICAO, registration, squawk, and model. You can also search within a specific radius, view military aircraft, view LADD-restricted aircraft, view private ICAO's, search for info about specific airports of interest, and view misc stats about SkySearch.\n\n**Use a button below to get started**",
                 color=discord.Color.from_str("#fffffe")
             )
             embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/airplane.png")
