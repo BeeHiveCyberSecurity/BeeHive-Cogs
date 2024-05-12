@@ -79,8 +79,6 @@ class Skysearch(commands.Cog):
                 embed = discord.Embed(title='Aircraft information', color=discord.Colour(0xfffffe))
                 emergency_status = ":shield: **Aircraft is undergoing normal operation**"
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/airplane.png")
-            embed.set_image(url=image_url)
-            embed.set_footer(text="")
             embed.add_field(name="Type", value=f"`{aircraft_data.get('desc', 'N/A')} ({aircraft_data.get('t', 'N/A')})`", inline=False)
             callsign = aircraft_data.get('flight', 'N/A').strip()
             if not callsign or callsign == 'N/A':
@@ -179,6 +177,11 @@ class Skysearch(commands.Cog):
                 embed.add_field(name="Asset intelligence", value=":newspaper: **Aircraft used by news or media organization**", inline=False)
             if icao and icao.upper() in self.safeballoons_icao_set:
                 embed.add_field(name="Asset intelligence", value=":balloon: **Aircraft is a stratospheric research balloon**", inline=False)
+            
+            image_url, photographer = await self._get_photo_by_hex(icao)
+            if image_url and photographer:
+                embed.set_image(url=image_url)
+                embed.set_footer(text=f"Photo by {photographer}")
 
             view = discord.ui.View()
             view.add_item(discord.ui.Button(label=f"Track live", url=f"{link}", style=discord.ButtonStyle.link))
