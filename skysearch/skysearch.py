@@ -363,7 +363,17 @@ class Skysearch(commands.Cog):
                     await interaction.response.send_message("You are not allowed to interact with this button", ephemeral=True)
                     return
                 await interaction.response.defer()
-                await self.airportinfo(self, ctx, code: str = None)
+                embed = discord.Embed(
+                    title="",
+                    description="### Please reply with the `airport code` you want to search.",
+                    color=discord.Color.from_str("#fffffe")
+                )
+                embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/search.png")
+                await ctx.send(embed=embed)
+                def check(m):
+                    return m.author == ctx.author
+                message = await self.bot.wait_for('message', check=check)
+                await self.airportinfo(ctx, message.content)
 
             async def show_the_commands_callback(interaction):
                 if interaction.user != ctx.author:
