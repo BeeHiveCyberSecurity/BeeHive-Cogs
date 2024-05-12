@@ -803,16 +803,16 @@ class Skysearch(commands.Cog):
                     await self._send_aircraft_info(ctx, {'ac': [aircraft_info]})
                     embed = discord.Embed(description=f"Plane {index + 1}/{len(response['ac'])}. React with ➡️ to view the next plane or ⏹️ to stop.")
                     message = await ctx.send(embed=embed)
-                    await message.add_reaction("➡️")  # Adding a reaction to scroll to the next plane
-                    await message.add_reaction("⏹️")  # Adding a reaction to stop scrolling
+                    await message.add_reaction("➡️")
+                    await message.add_reaction("⏹️") 
 
                     def check(reaction, user):
-                        return user == ctx.author and str(reaction.emoji) == '➡️' or str(reaction.emoji) == '⏹️'  # Updated to check for stop reaction as well
+                        return user == ctx.author and str(reaction.emoji) == '➡️' or str(reaction.emoji) == '⏹️'
 
                     try:
                         reaction, user = await self.bot.wait_for('reaction_add', timeout=60.0, check=check)
-                        await message.remove_reaction(reaction.emoji, ctx.author)  # Remove the reaction after processing
-                        if str(reaction.emoji) == '⏹️':  # Check if the stop reaction was added
+                        await message.remove_reaction(reaction.emoji, ctx.author)
+                        if str(reaction.emoji) == '⏹️':
                             embed = discord.Embed(description="Stopping.")
                             await ctx.send(embed=embed)
                             break
@@ -833,16 +833,16 @@ class Skysearch(commands.Cog):
             alert_channel = self.bot.get_channel(alert_channel_id)
             if alert_channel:
                 next_iteration = self.check_emergency_squawks.next_iteration
-                now = datetime.datetime.now(datetime.timezone.utc)  # Ensure datetime is timezone aware
+                now = datetime.datetime.now(datetime.timezone.utc)
                 if next_iteration:
                     time_remaining = (next_iteration - now).total_seconds()
-                    if time_remaining > 0:  # Ensure time remaining is not negative
+                    if time_remaining > 0: 
                         time_remaining_formatted = f"<t:{int(now.timestamp() + time_remaining)}:R>"
                     else:
                         time_remaining_formatted = "Now"
                 else:
                     time_remaining = self.check_emergency_squawks.seconds
-                    if time_remaining > 0:  # Ensure time remaining is not negative
+                    if time_remaining > 0:
                         time_remaining_formatted = f"<t:{int(now.timestamp() + time_remaining)}:R>"
                     else:
                         time_remaining_formatted = "Now"
@@ -852,7 +852,6 @@ class Skysearch(commands.Cog):
                     last_check_status = f":x: **Last check failed, retrying {time_remaining_formatted}**"
                 embed.add_field(name="Status", value=f"Channel: {alert_channel.mention}\nLast check: {last_check_status}", inline=False)
                 
-                # Add field for the last time an aircraft squawked an emergency
                 last_emergency_squawk_time = await self.config.guild(guild).last_emergency_squawk_time()
                 if last_emergency_squawk_time:
                     last_emergency_squawk_time_formatted = f"<t:{int(last_emergency_squawk_time)}:F>"
@@ -915,13 +914,12 @@ class Skysearch(commands.Cog):
                                     else:
                                         mention = ""
                                     await self._send_aircraft_info(alert_channel, {'ac': [aircraft_info]}, mention)
-                                    # Save the last emergency squawk time
                                     await self.config.guild(guild).last_emergency_squawk_time.set(int(time.time()))
                                 else:
                                     print(f"Error: Alert channel not found for guild {guild.name}")
                             else:
                                 print(f"Error: No alert channel set for guild {guild.name}")
-                await asyncio.sleep(2)  # Add a delay to respect API rate limit
+                await asyncio.sleep(2)
         except Exception as e:
             print(f"Error checking emergency squawks: {e}")
 
