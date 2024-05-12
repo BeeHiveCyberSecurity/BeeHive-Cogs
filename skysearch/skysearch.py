@@ -246,6 +246,7 @@ class Skysearch(commands.Cog):
             search_registration = discord.ui.Button(label="Search by registration", style=discord.ButtonStyle.green, row=1)
             search_squawk = discord.ui.Button(label="Search by squawk", style=discord.ButtonStyle.green, row=1)
             search_type = discord.ui.Button(label="Search by model", style=discord.ButtonStyle.green, row=1)
+            search_airport = discord.ui.Button(label="Search airport", style=discord.ButtonStyle.green, row=2)
             search_radius = discord.ui.Button(label="Search within radius", style=discord.ButtonStyle.green, row=2)
             show_military = discord.ui.Button(label="Show military aircraft", style=discord.ButtonStyle.danger, row=3)
             show_ladd = discord.ui.Button(label="Show LADD-restricted aircraft", style=discord.ButtonStyle.danger, row=3)
@@ -357,6 +358,13 @@ class Skysearch(commands.Cog):
                 message = await self.bot.wait_for('message', check=check)
                 await self.aircraft_by_type(ctx, message.content)
 
+            async def search_airport_callback(interaction):
+                if interaction.user != ctx.author:
+                    await interaction.response.send_message("You are not allowed to interact with this button", ephemeral=True)
+                    return
+                await interaction.response.defer()
+                await self.airportinfo(self, ctx, code: str = None)
+
             async def show_the_commands_callback(interaction):
                 if interaction.user != ctx.author:
                     await interaction.response.send_message("You are not allowed to interact with this button.", ephemeral=True)
@@ -430,6 +438,7 @@ class Skysearch(commands.Cog):
             show_stats.callback = show_stats_callback
             show_ladd.callback = show_ladd_callback
             show_pia.callback = show_pia_callback
+            search_airport.callback = search_airport_callback
 
             # Add buttons to the view
             view.add_item(search_callsign)
@@ -438,6 +447,7 @@ class Skysearch(commands.Cog):
             view.add_item(search_squawk)
             view.add_item(search_type)
             view.add_item(search_radius)
+            view.add_item(search_airport)
             view.add_item(show_military)
             view.add_item(show_ladd)
             view.add_item(show_pia)
