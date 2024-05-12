@@ -1047,8 +1047,8 @@ class Skysearch(commands.Cog):
 
                 if 'link' in data:
                     await ctx.send(embed=embed, view=view)
-            else:
-            await ctx.send(embed=embed)
+                else:
+                    await ctx.send(embed=embed)
         except Exception as e:
             embed = discord.Embed(title="Error", description=str(e), color=0xff4545)
             await ctx.send(embed=embed)
