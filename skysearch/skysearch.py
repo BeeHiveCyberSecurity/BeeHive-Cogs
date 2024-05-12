@@ -990,7 +990,7 @@ class Skysearch(commands.Cog):
             if 'error' in data:
                 embed = discord.Embed(title="Error", description=data['error'], color=0xff4545)
             else:
-                embed = discord.Embed(title=f"Airport Information for {code}", color=0x2BBD8E)
+                embed = discord.Embed(title=f"Airport Information for {code.upper()}", color=0x2BBD8E)
                 if 'name' in data:
                     embed.add_field(name="Name", value=data['name'], inline=True)
                 if 'city' in data:
@@ -1011,7 +1011,7 @@ class Skysearch(commands.Cog):
                     embed.add_field(name="Elevation", value=data['elevation'], inline=True)
                 if 'link' in data:
                     view = discord.ui.View()
-                    view.add_item(discord.ui.Button(label=f"About airport", url=f"{link}", style=discord.ButtonStyle.link))
+                    view.add_item(discord.ui.Button(label=f"About airport", url=f"{data['link']}", style=discord.ButtonStyle.link))
 
             await ctx.send(embed=embed, view=view)
         except Exception as e:
