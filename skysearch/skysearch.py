@@ -950,7 +950,6 @@ class Skysearch(commands.Cog):
             else:
                 embed = discord.Embed(title="ICAO Lookup Status", description="Automatic ICAO lookup has been disabled.", color=0xff4545)
                 await ctx.send(embed=embed)
-
     @commands.guild_only()
     @aircraft_group.command(name='airportcode')
     async def airportinfo(self, ctx, code: str = None):
@@ -971,45 +970,39 @@ class Skysearch(commands.Cog):
             return
 
         try:
-            url = f"https://www.airport-data.com/api/ap_info.json?{code_type}={code}"
-            response = requests.get(url)
-            data = response.json()
+            urls = [f"https://www.airport-data.com/api/ap_info.json?{code_type}={code}"]
+            if code_type == 'icao':
+                api_token = "2a628a67e9957ffcbfbda1d3dd7f6c62c7eee6fcf5e1b3615fad5cf3c156402accc5d74e14a1ce73c58a5ed952711c9d"
+                urls.append(f"https://airportdb.io/api/v1/airport/{code}?apiToken={api_token}")
 
-            if 'error' in data:
-                embed = discord.Embed(title="Error", description=data['error'], color=0xff4545)
-            elif not data or 'name' not in data:
-                embed = discord.Embed(title="Error", description="No airport found with the provided ICAO or IATA code.", color=0xff4545)
-            else:
-                embed = discord.Embed(title=f"Airport information for {code.upper()}", color=0xfffffe)
-                embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/location.png")
-                if 'name' in data:
-                    embed.add_field(name="Name", value=f"`{data['name']}`", inline=False)
-                if 'location' in data:
-                    embed.add_field(name="Location", value=f"`{data['location']}`", inline=False)
-                if 'country' in data:
-                    embed.add_field(name="Country", value=f"`{data['country']}`", inline=False)
-                if 'country_code' in data:
-                    embed.add_field(name="Country Code", value=f"`{data['country_code']}`", inline=False)
-                if 'iata' in data:
-                    embed.add_field(name="IATA", value=f"`{data['iata']}`", inline=False)
-                if 'icao' in data:
-                    embed.add_field(name="ICAO", value=f"`{data['icao']}`", inline=False)
-                if 'latitude' in data:
-                    embed.add_field(name="Latitude", value=f"`{data['latitude']}`", inline=False)
-                if 'longitude' in data:
-                    embed.add_field(name="Longitude", value=f"`{data['longitude']}`", inline=False)
-                if 'link' in data:
-                    link = data['link']
-                    if link.startswith('/world-airport/'):
-                        link = f"https://www.airport-data.com{link}"
-                    if link.startswith('http://') or link.startswith('https://'):
-                        view = discord.ui.View()
-                        view.add_item(discord.ui.Button(label=f"More information for airport", url=link, style=discord.ButtonStyle.link))
-                        await ctx.send(embed=embed, view=view)
+            for url in urls:
+                response = requests.get(url)
+                data = response.json()
+
+                if 'error' in data:
+                    embed = discord.Embed(title="Error", description=data['error'], color=0xff4545)
+                elif not data or 'name' not in data:
+                    embed = discord.Embed(title="Error", description="No airport found with the provided code.", color=0xff4545)
+                else:
+                    embed = discord.Embed(title=f"Airport information for {code.upper()}", color=0xfffffe)
+                    embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/location.png")
+                    fields = ['name', 'location', 'country', 'country_code', 'iata', 'icao', 'latitude', 'longitude', 'municipality', 'scheduled_service', 'gps_code', 'local_code', 'home_link']
+                    for field in fields:
+                        if field in data:
+                            value = f"`{data[field]}`" if field != 'home_link' else f"[Link]({data[field]})"
+                            embed.add_field(name=field.capitalize(), value=value, inline=False)
+                    if 'link' in data:
+                        link = data['link']
+                        if link.startswith('/world-airport/'):
+                            link = f"https://www.airport-data.com{link}"
+                        if link.startswith('http://') or link.startswith('https://'):
+                            view = discord.ui.View()
+                            view.add_item(discord.ui.Button(label=f"More information for airport", url=link, style=discord.ButtonStyle.link))
+                            await ctx.send(embed=embed, view=view)
+                        else:
+                            await ctx.send(embed=embed)
                     else:
                         await ctx.send(embed=embed)
-                else:
-                    await ctx.send(embed=embed)
         except Exception as e:
             embed = discord.Embed(title="Error", description=str(e), color=0xff4545)
             await ctx.send(embed=embed)
