@@ -781,9 +781,11 @@ class Skysearch(commands.Cog):
                 embed2.add_field(name="Damaged aircraft", value="{:,} known".format(len(self.prior_known_accident_set)), inline=False)
                 embed2.add_field(name="Wartime aircraft", value="{:,} observed".format(len(self.ukr_conflict_set)), inline=False)
                 embed2.add_field(name="Suspicious aircraft under evaluation", value="{:,} identifiers".format(len(self.suspicious_icao_set)), inline=False)
-                embed3 = discord.Embed(title="Photography", description="Photos are powered by [planespotters.net](https://www.planespotters.net/)\n**Appears in**\n`callsign` `icao` `reg` `squawk` `type`", color=0xfffffe)
+                embed3 = discord.Embed(title="Photography", description="Photos are powered by [planespotters.net](https://www.planespotters.net/)", color=0xfffffe)
+                embed3.add_field(name="Appears in", value="`callsign` `icao` `reg` `squawk` `type`", inline=False)
                 embed3.set_thumbnail(url="https://asset.brandfetch.io/id30vzxRYa/idInOENa25.png")
-                embed4 = discord.Embed(title="Airport information", description="Airport data is powered by [airport-data.com](https://www.airport-data.com/)\n**Appears in**\n`airportinfo`")
+                embed4 = discord.Embed(title="Airport information", description="Airport data is powered by [airport-data.com](https://www.airport-data.com/)", color=0xfffffe)
+                embed4.add_field(name="Appears in", value="`airportinfo`", inline=False)
 
                 await ctx.send(embed=embed)
                 await ctx.send(embed=embed3)
