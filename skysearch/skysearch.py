@@ -880,21 +880,6 @@ class Skysearch(commands.Cog):
         except Exception as e:
             await ctx.send(f"Error setting alert mention: {e}")
 
-    @aircraft_group.command(name='quickalertmention', help='Quickly set a specific type of mention to be tagged when a squawk alert.')
-    async def quick_set_alert_mention(self, ctx):
-        embed = discord.Embed(title="Set Alert Mention", description="Select the type of mention to be tagged when a squawk alert.", color=0xfffffe)
-        view = discord.ui.View()
-        view.add_item(discord.ui.Button(label="No Mention", style=discord.ButtonStyle.green, custom_id="none"))
-        view.add_item(discord.ui.Button(label="@here", style=discord.ButtonStyle.green, custom_id="here"))
-        view.add_item(discord.ui.Button(label="@everyone", style=discord.ButtonStyle.green, custom_id="everyone"))
-        await ctx.send(embed=embed, view=view)
-
-    @commands.Cog.listener()
-    async def on_button_click(self, interaction: discord.Interaction):
-        if interaction.custom_id in ["none", "here", "everyone"]:
-            await self.config.guild(interaction.guild).alert_mention.set(interaction.custom_id)
-            await interaction.response.send_message(f"Alert mention set to {interaction.custom_id}", ephemeral=True)
-
     @tasks.loop(minutes=2)
     async def check_emergency_squawks(self):
         try:
