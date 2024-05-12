@@ -768,12 +768,12 @@ class Skysearch(commands.Cog):
 
                 embed = discord.Embed(title="Air traffic data", description="Live flight data powered by [airplanes.live](https://airplanes.live)", color=0xfffffe)
                 embed.set_image(url="")
-                embed.set_thumbnail(url="https://asset.brandfetch.io/id1hdkKy3B/idgRk5S59l.jpeg")
+                embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/airplane.png")
                 for key, value in stats_values.items():
                     embed.add_field(name=key.capitalize(), value="{:,} aircraft".format(value), inline=True)
                 embed2 = discord.Embed(title="Enhanced by BeeHive Intelligence", description="Additional info available per-aircraft", color=0xffd966)
                 embed2.set_image(url="")
-                embed2.set_thumbnail(url="https://asset.brandfetch.io/idGpYEfxfH/idW3166yGx.png")
+                embed2.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/sparkles.png")
                 embed2.add_field(name="Law enforcement aircraft", value="{:,} tagged".format(len(self.law_enforcement_icao_set)), inline=False)
                 embed2.add_field(name="Military & government aircraft", value="{:,} tagged".format(len(self.military_icao_set)), inline=False)
                 embed2.add_field(name="Medical aircraft", value="{:,} tagged".format(len(self.medical_icao_set)), inline=False)
