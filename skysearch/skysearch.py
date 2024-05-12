@@ -265,6 +265,7 @@ class Skysearch(commands.Cog):
                 await self.aircraft_by_callsign(ctx, message.content)
 
             async def show_military_callback(interaction):
+                await ctx.typing()
                 if interaction.user != ctx.author:
                     await interaction.response.send_message("This SkySearch panel doesn't belong to you. Start your own using `[p]skysearch`", ephemeral=True)
                     return
@@ -280,6 +281,7 @@ class Skysearch(commands.Cog):
                 await self.show_military_aircraft(ctx)
 
             async def search_icao_callback(interaction):
+                await ctx.typing()
                 if interaction.user != ctx.author:
                     await interaction.response.send_message("This SkySearch panel doesn't belong to you. Start your own using `[p]skysearch`", ephemeral=True)
                     return
@@ -297,6 +299,7 @@ class Skysearch(commands.Cog):
                 await self.aircraft_by_icao(ctx, message.content)
 
             async def search_registration_callback(interaction):
+                await ctx.typing()
                 if interaction.user != ctx.author:
                     await interaction.response.send_message("You are not allowed to interact with this button.", ephemeral=True)
                     return
