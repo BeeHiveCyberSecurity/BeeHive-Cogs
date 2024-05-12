@@ -891,7 +891,7 @@ class Skysearch(commands.Cog):
                 response = await self._make_request(url)
                 if response and 'ac' in response:
                     for aircraft_info in response['ac']:
-                        guilds = self.bot.guilds
+                        guilds = await self.bot.fetch_guilds().flatten()
                         for guild in guilds:
                             alert_channel_id = await self.config.guild(guild).alert_channel()
                             alert_mention = await self.config.guild(guild).alert_mention()
