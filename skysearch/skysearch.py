@@ -16,7 +16,7 @@ from reportlab.pdfgen import canvas #type: ignore
 from reportlab.lib import colors#type: ignore
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle #type: ignore
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak, Table, TableStyle #type: ignore
-from .icao_codes import law_enforcement_icao_set, military_icao_set, medical_icao_set, suspicious_icao_set, prior_known_accident_set, ukr_conflict_set, newsagency_icao_set
+from .icao_codes import law_enforcement_icao_set, military_icao_set, medical_icao_set, suspicious_icao_set, prior_known_accident_set, ukr_conflict_set, newsagency_icao_set, safeballoons_icao_set
 
 class Skysearch(commands.Cog):
     
@@ -34,6 +34,8 @@ class Skysearch(commands.Cog):
         self.prior_known_accident_set = prior_known_accident_set
         self.ukr_conflict_set = ukr_conflict_set
         self.newsagency_icao_set = newsagency_icao_set
+        self.safeballoons_icao_set = safeballoons_icao_set
+
 
         
     async def cog_unload(self):
@@ -172,6 +174,8 @@ class Skysearch(commands.Cog):
                 embed.add_field(name="Asset intelligence", value=":flag_ua: **Aircraft utilized within the RussoUkrainian conflict**", inline=False)
             if icao and icao.upper() in self.newsagency_icao_set:
                 embed.add_field(name="Asset intelligence", value=":newspaper: **Aircraft used by news or media organization**", inline=False)
+            if icao and icao.upper() in self.safeballoons_icao_set:
+                embed.add_field(name="Asset intelligence", value=":balloon: **Aircraft is a stratospheric research balloon**", inline=False)
 
             view = discord.ui.View()
             view.add_item(discord.ui.Button(label=f"Track live", url=f"{link}", style=discord.ButtonStyle.link))
