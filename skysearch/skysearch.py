@@ -1040,7 +1040,7 @@ class Skysearch(commands.Cog):
                     embed.add_field(name="Longitude", value=f"`{data['longitude']}`", inline=False)
                 if 'link' in data:
                     link = data['link']
-                    if link.startswith('/world-airport/'):
+                    if link.contains('/world-airport/'):
                         link = f"https://www.airport-data.com{link}"
                     if link.startswith('http') or link.startswith('https'):
                         view = discord.ui.View()
