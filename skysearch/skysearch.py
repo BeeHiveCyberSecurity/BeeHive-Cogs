@@ -974,7 +974,7 @@ class Skysearch(commands.Cog):
             embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/location.png")
             fields = ['icao', 'iata', 'name', 'location', 'country', 'country_code', 'longitude', 'latitude', 'link']
 
-            async with self.bot.session.get(url1) as response1:
+            async with self.bot.http_session.get(url1) as response1:
                 data1 = await response1.json()
 
                 if 'error' in data1:
@@ -1001,7 +1001,7 @@ class Skysearch(commands.Cog):
             api_token = await self.bot.get_shared_api_tokens("airportdbio")
             if api_token and 'api_token' in api_token and code_type == 'icao':
                 url2 = f"https://airportdb.io/api/v1/airport/{code}?apiToken={api_token['api_token']}"
-                async with self.bot.session.get(url2) as response2:
+                async with self.bot.http_session.get(url2) as response2:
                     data2 = await response2.json()
 
                     if 'error' in data2:
