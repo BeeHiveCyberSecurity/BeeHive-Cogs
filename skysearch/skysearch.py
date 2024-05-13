@@ -1007,21 +1007,16 @@ class Skysearch(commands.Cog):
                 else:
                     if 'runways' in data2:
                         runways = data2['runways']
-                        for i in range(0, len(runways), 5):
-                            embed = discord.Embed(title=f"Advanced airport information for {code.upper()}", color=0xfffffe)
-                            for runway in runways[i:i+5]:
-                                value = f"`{runway}`"
-                                if len(value) > 1024:
-                                    value = value[:1021] + "..."
-                                embed.add_field(name=f"Runway {i//5 + 1}", value=value, inline=False)
+                        for runway in runways:
+                            embed = discord.Embed(title=f"Runway information for {code.upper()} :arrow_left: :arrow_right:", color=0xfffffe)
+                            runway_fields = ['id', 'airport_ref', 'airport_ident', 'length_ft', 'width_ft', 'surface', 'lighted', 'closed', 'le_ident', 'le_latitude_deg', 'le_longitude_deg', 'le_elevation_ft', 'le_heading_degT', 'le_displaced_threshold_ft', 'he_ident', 'he_latitude_deg', 'he_longitude_deg', 'he_elevation_ft', 'he_heading_degT', 'he_displaced_threshold_ft', 'he_ils', 'le_ils']
+                            for field in runway_fields:
+                                if field in runway:
+                                    value = f"`{runway[field]}`"
+                                    if len(value) > 1024:
+                                        value = value[:1021] + "..."
+                                    embed.add_field(name=field.capitalize(), value=value, inline=False)
                             await ctx.send(embed=embed)
-                    if 'frequencies' in data2:
-                        value = f"`{data2['frequencies']}`"
-                        if len(value) > 1024:
-                            value = value[:1021] + "..."
-                        embed = discord.Embed(title=f"Advanced airport information for {code.upper()}", color=0xfffffe)
-                        embed.add_field(name="Frequencies", value=value, inline=False)
-                        await ctx.send(embed=embed)
 
         except Exception as e:
             embed = discord.Embed(title="Error", description=str(e), color=0xff4545)
