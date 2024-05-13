@@ -984,10 +984,15 @@ class Skysearch(commands.Cog):
             else:
                 for field in fields:
                     if field in data1:
-                        value = f"`{data1[field]}`" if field != 'link' else f"[Link]({data1[field]})"
-                        embed.add_field(name=field.capitalize(), value=value, inline=False)
-            
-            await ctx.send(embed=embed)
+                        if field != 'link':
+                            value = f"`{data1[field]}`"
+                            embed.add_field(name=field.capitalize(), value=value, inline=False)
+                        else:
+                            view = discord.ui.View(timeout=180)  # Set a timeout for the view
+                            # URL button
+                            view_airport = discord.ui.Button(label="View airport on airport-data.com", url=data1[field], style=discord.ButtonStyle.link)
+                            view.add_item(view_airport)
+            await ctx.send(embed=embed, view=view)
 
             api_token = await self.bot.get_shared_api_tokens("airportdbio")
             if api_token and 'api_token' in api_token and code_type == 'icao':
@@ -1046,17 +1051,16 @@ class Skysearch(commands.Cog):
                                 if i > 0:
                                     i -= 1
                                     await message.edit(embed=runway_pages[i])
-                                    await message.remove_reaction("⬅️", ctx.author)
                             elif str(reaction) == "➡️":
                                 if i < len(runway_pages)-1:
                                     i += 1
                                     await message.edit(embed=runway_pages[i])
-                                    await message.remove_reaction("➡️", ctx.author)
                             elif str(reaction) == "❌":
                                 await message.delete()
                                 break
                             try:
                                 reaction, user = await self.bot.wait_for("reaction_add", timeout=30.0, check=check)
+                                await message.remove_reaction(reaction, user)
                             except asyncio.TimeoutError:
                                 break
 
