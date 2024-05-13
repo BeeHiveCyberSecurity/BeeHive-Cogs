@@ -1021,10 +1021,10 @@ class Skysearch(commands.Cog):
 
                             if  'lighted' in runway:
                                 if runway['lighted'] == 1:
-                                    lighted_status = ":white_check_mark: Lighted"
+                                    lighted_status = ":white_check_mark: `Lighted`"
                                 else:
-                                    lighted_status = ":x: No Lighting"
-                                embed.add_field(name="Lighting", value=f"`{lighted_status}`", inline=True)
+                                    lighted_status = ":x: `No Lighting`"
+                                embed.add_field(name="Lighting", value=f"{lighted_status}", inline=True)
 
                             if 'le_ils' in runway:
                                 embed.add_field(name="Le Ils", value=f"`{runway['le_ils']}`", inline=True)
