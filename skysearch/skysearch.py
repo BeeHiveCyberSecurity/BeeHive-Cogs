@@ -969,133 +969,44 @@ class Skysearch(commands.Cog):
             return
 
         try:
-            # Define the URL for the first API call
-            airport_data_url = f"https://www.airport-data.com/api/ap_info.json?{code_type}={code}"
-            
-            # Create an embed message for the airport information
-            airport_info_embed = discord.Embed(title=f"Airport information for {code.upper()}", color=0xfffffe)
-            airport_info_embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/location.png")
-            
-            # Define the fields to be retrieved from the API response
-            airport_info_fields = {
-                'icao': 'ICAO Code',
-                'iata': 'IATA Code',
-                'name': 'Airport Name',
-                'location': 'Location',
-                'country': 'Country',
-                'country_code': 'Country Code',
-                'longitude': 'Longitude',
-                'latitude': 'Latitude',
-                'link': 'Airport Link'
-            }
+            url1 = f"https://www.airport-data.com/api/ap_info.json?{code_type}={code}"
+            embed = discord.Embed(title=f"Airport information for {code.upper()}", color=0xfffffe)
+            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/location.png")
+            fields = ['icao', 'iata', 'name', 'location', 'country', 'country_code', 'longitude', 'latitude', 'link']
 
-            # Get the API token for the second API call
+            response1 = requests.get(url1)
+            data1 = response1.json()
+
+            if 'error' in data1:
+                embed.add_field(name="Error", value=data1['error'], inline=False)
+            elif not data1 or 'name' not in data1:
+                embed.add_field(name="Error", value="No airport found with the provided code.", inline=False)
+            else:
+                for field in fields:
+                    if field in data1:
+                        value = f"`{data1[field]}`" if field != 'link' else f"[Link]({data1[field]})"
+                        embed.add_field(name=field.capitalize(), value=value, inline=False)
+            
+            await ctx.send(embed=embed)
+
             api_token = await self.bot.get_shared_api_tokens("airportdbio")
             if api_token and 'api_token' in api_token and code_type == 'icao':
-                # Define the URL for the second API call
-                airportdbio_url = f"https://airportdb.io/api/v1/airport/{code}?apiToken={api_token['api_token']}"
-                airportdbio_response = requests.get(airportdbio_url)
-                airportdbio_data = airportdbio_response.json()
+                url2 = f"https://airportdb.io/api/v1/airport/{code}?apiToken={api_token['api_token']}"
+                response2 = requests.get(url2)
+                data2 = response2.json()
 
-                # Define the fields to be retrieved from the API response
-                airportdbio_info_fields = {
-                    'ident': 'Ident',
-                    'type': 'Type',
-                    'name': 'Name',
-                    'latitude_deg': 'Latitude',
-                    'longitude_deg': 'Longitude',
-                    'elevation_ft': 'Elevation',
-                    'continent': 'Continent',
-                    'iso_country': 'ISO Country',
-                    'iso_region': 'ISO Region',
-                    'municipality': 'Municipality',
-                    'scheduled_service': 'Scheduled Service',
-                    'gps_code': 'GPS Code',
-                    'iata_code': 'IATA Code',
-                    'local_code': 'Local Code',
-                    'home_link': 'Website Link',
-                    'wikipedia_link': 'Wikipedia Link',
-                    'keywords': 'Keywords',
-                    'icao_code': 'ICAO Code'
-                }
-
-            # Make the first API call
-            airport_data_response = requests.get(airport_data_url)
-            airport_data = airport_data_response.json()
-
-            # Check for errors in the first API response
-            if 'error' in airport_data:
-                error_field_name = "Error"
-                error_field_value = airport_data['error']
-                error_field_inline = False
-                airport_info_embed.add_field(name=error_field_name, value=error_field_value, inline=error_field_inline)
-            elif not airport_data or 'name' not in airport_data:
-                error_field_name = "Error"
-                error_field_value = "No airport found with the provided code."
-                error_field_inline = False
-                airport_info_embed.add_field(name=error_field_name, value=error_field_value, inline=error_field_inline)
-            else:
-                # Add the retrieved fields to the embed message
-                if 'ident' in airport_data:
-                    airport_info_embed.add_field(name='Ident', value=f"`{airport_data['ident']}`", inline=False)
-                if 'type' in airport_data:
-                    airport_info_embed.add_field(name='Type', value=f"`{airport_data['type']}`", inline=False)
-                if 'name' in airport_data:
-                    airport_info_embed.add_field(name='Name', value=f"`{airport_data['name']}`", inline=False)
-                if 'latitude_deg' in airport_data:
-                    airport_info_embed.add_field(name='Latitude', value=f"`{airport_data['latitude_deg']}`", inline=False)
-                if 'longitude_deg' in airport_data:
-                    airport_info_embed.add_field(name='Longitude', value=f"`{airport_data['longitude_deg']}`", inline=False)
-                if 'elevation_ft' in airport_data:
-                    airport_info_embed.add_field(name='Elevation', value=f"`{airport_data['elevation_ft']}`", inline=False)
-                if 'continent' in airport_data:
-                    airport_info_embed.add_field(name='Continent', value=f"`{airport_data['continent']}`", inline=False)
-                if 'iso_country' in airport_data:
-                    airport_info_embed.add_field(name='ISO Country', value=f"`{airport_data['iso_country']}`", inline=False)
-                if 'iso_region' in airport_data:
-                    airport_info_embed.add_field(name='ISO Region', value=f"`{airport_data['iso_region']}`", inline=False)
-                if 'municipality' in airport_data:
-                    airport_info_embed.add_field(name='Municipality', value=f"`{airport_data['municipality']}`", inline=False)
-                if 'scheduled_service' in airport_data:
-                    airport_info_embed.add_field(name='Scheduled Service', value=f"`{airport_data['scheduled_service']}`", inline=False)
-                if 'gps_code' in airport_data:
-                    airport_info_embed.add_field(name='GPS Code', value=f"`{airport_data['gps_code']}`", inline=False)
-                if 'iata_code' in airport_data:
-                    airport_info_embed.add_field(name='IATA Code', value=f"`{airport_data['iata_code']}`", inline=False)
-                if 'local_code' in airport_data:
-                    airport_info_embed.add_field(name='Local Code', value=f"`{airport_data['local_code']}`", inline=False)
-                if 'home_link' in airport_data:
-                    airport_info_embed.add_field(name='Website Link', value=f"`{airport_data['home_link']}`", inline=False)
-                if 'wikipedia_link' in airport_data:
-                    airport_info_embed.add_field(name='Wikipedia Link', value=f"`{airport_data['wikipedia_link']}`", inline=False)
-                if 'keywords' in airport_data:
-                    airport_info_embed.add_field(name='Keywords', value=f"`{airport_data['keywords']}`", inline=False)
-                if 'icao_code' in airport_data:
-                    airport_info_embed.add_field(name='ICAO Code', value=f"`{airport_data['icao_code']}`", inline=False)
-                        else:
-                            # Create a view with a button to the airport's page
-                            airport_view = discord.ui.View(timeout=180)  # Set a timeout for the view
-                            airport_button_label = "View airport on airport-data.com"
-                            airport_button_url = airport_data[field]
-                            airport_button_style = discord.ButtonStyle.link
-                            airport_button = discord.ui.Button(label=airport_button_label, url=airport_button_url, style=airport_button_style)
-                            airport_view.add_item(airport_button)
-                            
-            await ctx.send(embed=airport_info_embed, view=airport_view)
-
-            if api_token and 'api_token' in api_token and code_type == 'icao':
-                if 'error' in airportdbio_data:
-                    error_message = airportdbio_data['error']
+                if 'error' in data2:
+                    error_message = data2['error']
                     if len(error_message) > 1024:
                         error_message = error_message[:1021] + "..."
                     embed = discord.Embed(title="Error", value=error_message, color=0xff4545)
                     await ctx.send(embed=embed)
-                elif not airportdbio_data or 'name' not in airportdbio_data:
+                elif not data2 or 'name' not in data2:
                     embed = discord.Embed(title="Error", value="No airport found with the provided code.", color=0xff4545)
                     await ctx.send(embed=embed)
                 else:
-                    if 'runways' in airportdbio_data:
-                        runways = airportdbio_data['runways']
+                    if 'runways' in data2:
+                        runways = data2['runways']
                         runway_pages = []
                         for runway in runways:
                             embed = discord.Embed(title=f"Runway information for {code.upper()}", color=0xfffffe)
@@ -1116,17 +1027,15 @@ class Skysearch(commands.Cog):
                                 embed.add_field(name="Lighting", value=f"{lighted_status}", inline=True)
 
                             if 'surface' in runway:
-                                embed.add_field(name="Surface", value=f"`{runway['surface']}`", inline=True)
-                                
+                                embed.add_field(name="Surface", value=f"`{runway['surface']}", inline=True)
                             runway_pages.append(embed)
 
                         message = await ctx.send(embed=runway_pages[0])
                         await message.add_reaction("⬅️")
                         await message.add_reaction("➡️")
-                        await message.add_reaction("❌")
 
                         def check(reaction, user):
-                            return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️", "❌"]
+                            return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️"]
 
                         i = 0
                         reaction = None
@@ -1139,9 +1048,6 @@ class Skysearch(commands.Cog):
                                 if i < len(runway_pages)-1:
                                     i += 1
                                     await message.edit(embed=runway_pages[i])
-                            elif str(reaction) == "❌":
-                                await message.delete()
-                                break
                             try:
                                 reaction, user = await self.bot.wait_for("reaction_add", timeout=30.0, check=check)
                                 await message.remove_reaction(reaction, user)
