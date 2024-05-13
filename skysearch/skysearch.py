@@ -151,12 +151,12 @@ class Skysearch(commands.Cog):
             else:
                 baro_rate_fps = round(int(baro_rate) / 60, 2)  # Convert feet per minute to feet per second
                 if abs(baro_rate_fps) < 50/60:
-                    embed.add_field(name="Altitude trend", value=":arrow_right: **Maintaining altitude @ **  " + f"**{baro_rate_fps} feet/sec**", inline=False)
+                    embed.add_field(name="Altitude data", value=":arrow_right: **Maintaining altitude @ **  " + f"**{baro_rate_fps} feet/sec**", inline=False)
                 elif baro_rate_fps > 0:
-                    embed.add_field(name="Altitude trend", value=":arrow_upper_right: **Climbing @**  " + f"**{baro_rate_fps} feet/sec**", inline=False)
+                    embed.add_field(name="Altitude data", value=":arrow_upper_right: **Climbing @**  " + f"**{baro_rate_fps} feet/sec**", inline=False)
                 else:
-                    embed.add_field(name="Altitude trend", value=":arrow_lower_right: **Descending @ ** " + f"**{abs(baro_rate_fps)} feet/sec**", inline=False)
-            embed.add_field(name="Safety status", value=emergency_status, inline=True)
+                    embed.add_field(name="Altitude data", value=":arrow_lower_right: **Descending @ ** " + f"**{abs(baro_rate_fps)} feet/sec**", inline=False)
+            embed.add_field(name="Flight status", value=emergency_status, inline=True)
 
 
             icao = aircraft_data.get('hex', None)
@@ -260,7 +260,7 @@ class Skysearch(commands.Cog):
                 await interaction.response.defer()
                 embed = discord.Embed(
                     title="",
-                    description="### Please reply with the `callsign` you want to search the skies for.",
+                    description="## Please reply with the `callsign` you want to search the skies for.",
                     color=discord.Color.from_str("#fffffe")
                 )
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/search.png")
@@ -278,7 +278,7 @@ class Skysearch(commands.Cog):
                 await interaction.response.defer()
                 embed = discord.Embed(
                     title="",
-                    description="### Fetching data for military aircraft...",
+                    description="## Fetching data for military aircraft...",
                     color=discord.Color.from_str("#fffffe")
                 )
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/airplane.png")
@@ -294,7 +294,7 @@ class Skysearch(commands.Cog):
                 await interaction.response.defer()
                 embed = discord.Embed(
                     title="",
-                    description="### Please reply with the `ICAO` you want to search.",
+                    description="## Please reply with the `aircraft ICAO` you want to search.",
                     color=discord.Color.from_str("#fffffe")
                 )
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/search.png")
@@ -312,7 +312,7 @@ class Skysearch(commands.Cog):
                 await interaction.response.defer()
                 embed = discord.Embed(
                     title="",
-                    description="### Please reply with the `registration` you want to search.",
+                    description="## Please reply with the `aircraft registration` you want to search.",
                     color=discord.Color.from_str("#fffffe")
                 )
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/search.png")
@@ -329,7 +329,7 @@ class Skysearch(commands.Cog):
                 await interaction.response.defer()
                 embed = discord.Embed(
                     title="",
-                    description="### Please reply with the `squawk code` you want to search.",
+                    description="## Please reply with the `squawk code` you want to search.",
                     color=discord.Color.from_str("#fffffe")
                 )
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/search.png")
@@ -346,7 +346,7 @@ class Skysearch(commands.Cog):
                 await interaction.response.defer()
                 embed = discord.Embed(
                     title="",
-                    description="### Please reply with the `model` you want to search.",
+                    description="## Please reply with the `aircraft model` you want to search.",
                     color=discord.Color.from_str("#fffffe")
                 )
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/search.png")
@@ -363,7 +363,7 @@ class Skysearch(commands.Cog):
                 await interaction.response.defer()
                 embed = discord.Embed(
                     title="",
-                    description="### Please reply with the `airport code` you want to search.",
+                    description="## Please reply with the `airport code` you want to search.",
                     color=discord.Color.from_str("#fffffe")
                 )
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/search.png")
@@ -389,7 +389,7 @@ class Skysearch(commands.Cog):
                 # Prompt for latitude
                 embed = discord.Embed(
                     title="",
-                    description="### Please reply with the latitude.",
+                    description="## Please reply with the latitude.",
                     color=discord.Color.from_str("#fffffe")
                 )
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/search.png")
@@ -400,13 +400,13 @@ class Skysearch(commands.Cog):
                 latitude = message.content
 
                 # Prompt for longitude
-                embed.description = "### Please reply with the longitude."
+                embed.description = "## Please reply with the longitude."
                 await ctx.send(embed=embed)
                 message = await self.bot.wait_for('message', check=check)
                 longitude = message.content
 
                 # Prompt for radius
-                embed.description = "### Please reply with the radius in miles you want to search within."
+                embed.description = "## Please reply with the radius in miles you want to search within, up to 250 miles."
                 await ctx.send(embed=embed)
                 message = await self.bot.wait_for('message', check=check)
                 radius = message.content
