@@ -1056,10 +1056,10 @@ class Skysearch(commands.Cog):
                             freqs = data2['freqs']
                             embed = discord.Embed(title=f"Frequency information for {code.upper()}", color=0xfffffe)
                             for id in freqs:
-                                embed.add_field(name="ID", value=f"`{freqs.get('id', 'N/A')}`", inline=True)
-                                embed.add_field(name="Type", value=f"`{freqs.get('type', 'N/A')}`", inline=True)
-                                embed.add_field(name="Frequency", value=f"`{freqs.get('frequency', 'N/A')}`", inline=True)
-                                embed.add_field(name="Description", value=f"`{freqs.get('description', 'N/A')}`", inline=True)
+                                embed.add_field(name="ID", value=f"`{freqs.('id', 'N/A')}`", inline=True)
+                                embed.add_field(name="Type", value=f"`{freqs.('type', 'N/A')}`", inline=True)
+                                embed.add_field(name="Frequency", value=f"`{freqs.('frequency', 'N/A')}`", inline=True)
+                                embed.add_field(name="Description", value=f"`{freqs.('description', 'N/A')}`", inline=True)
                             combined_pages.append(embed)
 
                         await self.paginate_embed(ctx, combined_pages)
