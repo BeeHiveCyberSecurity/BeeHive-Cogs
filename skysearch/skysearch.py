@@ -977,7 +977,17 @@ class Skysearch(commands.Cog):
             airport_info_embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/location.png")
             
             # Define the fields to be retrieved from the API response
-            airport_info_fields = ['icao', 'iata', 'name', 'location', 'country', 'country_code', 'longitude', 'latitude', 'link']
+            airport_info_fields = {
+                'icao': 'ICAO Code',
+                'iata': 'IATA Code',
+                'name': 'Airport Name',
+                'location': 'Location',
+                'country': 'Country',
+                'country_code': 'Country Code',
+                'longitude': 'Longitude',
+                'latitude': 'Latitude',
+                'link': 'Airport Link'
+            }
 
             # Get the API token for the second API call
             api_token = await self.bot.get_shared_api_tokens("airportdbio")
@@ -998,11 +1008,11 @@ class Skysearch(commands.Cog):
                 airport_info_embed.add_field(name="Error", value="No airport found with the provided code.", inline=False)
             else:
                 # Add the retrieved fields to the embed message
-                for field in airport_info_fields:
+                for field, field_name in airport_info_fields.items():
                     if field in airport_data:
                         if field != 'link':
                             field_value = f"`{airport_data[field]}`"
-                            airport_info_embed.add_field(name=field.capitalize(), value=field_value, inline=False)
+                            airport_info_embed.add_field(name=field_name, value=field_value, inline=False)
                         else:
                             # Create a view with a button to the airport's page
                             airport_view = discord.ui.View(timeout=180)  # Set a timeout for the view
