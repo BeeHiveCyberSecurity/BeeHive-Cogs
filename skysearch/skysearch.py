@@ -1040,7 +1040,6 @@ class Skysearch(commands.Cog):
                             runway_status = ":white_check_mark: **Runway open for use**" if str(runway.get('closed', 0)) == '0' else ":x: **Runway closed**"
                             embed.add_field(name="Runway status", value=runway_status, inline=True)
                             
-                            
                             runway_pages.append(embed)
 
                         message = await ctx.send(embed=runway_pages[0])
