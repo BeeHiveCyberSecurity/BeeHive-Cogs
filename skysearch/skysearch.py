@@ -969,35 +969,48 @@ class Skysearch(commands.Cog):
             return
 
         try:
-            url1 = f"https://www.airport-data.com/api/ap_info.json?{code_type}={code}"
-            embed = discord.Embed(title=f"Airport information for {code.upper()}", color=0xfffffe)
-            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/location.png")
-            fields = ['icao', 'iata', 'name', 'location', 'country', 'country_code', 'longitude', 'latitude', 'link']
+            # Define the URL for the first API call
+            airport_data_url = f"https://www.airport-data.com/api/ap_info.json?{code_type}={code}"
+            
+            # Create an embed message for the airport information
+            airport_info_embed = discord.Embed(title=f"Airport information for {code.upper()}", color=0xfffffe)
+            airport_info_embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/location.png")
+            
+            # Define the fields to be retrieved from the API response
+            airport_info_fields = ['icao', 'iata', 'name', 'location', 'country', 'country_code', 'longitude', 'latitude', 'link']
 
+            # Get the API token for the second API call
             api_token = await self.bot.get_shared_api_tokens("airportdbio")
             if api_token and 'api_token' in api_token and code_type == 'icao':
-                url2 = f"https://airportdb.io/api/v1/airport/{code}?apiToken={api_token['api_token']}"
-                response2 = requests.get(url2)
-                data2 = response2.json()
+                # Define the URL for the second API call
+                airportdbio_url = f"https://airportdb.io/api/v1/airport/{code}?apiToken={api_token['api_token']}"
+                airportdbio_response = requests.get(airportdbio_url)
+                airportdbio_data = airportdbio_response.json()
 
-            response1 = requests.get(url1)
-            data1 = response1.json()
+            # Make the first API call
+            airport_data_response = requests.get(airport_data_url)
+            airport_data = airport_data_response.json()
 
-            if 'error' in data1:
-                embed.add_field(name="Error", value=data1['error'], inline=False)
-            elif not data1 or 'name' not in data1:
-                embed.add_field(name="Error", value="No airport found with the provided code.", inline=False)
+            # Check for errors in the first API response
+            if 'error' in airport_data:
+                airport_info_embed.add_field(name="Error", value=airport_data['error'], inline=False)
+            elif not airport_data or 'name' not in airport_data:
+                airport_info_embed.add_field(name="Error", value="No airport found with the provided code.", inline=False)
             else:
-                for field in fields:
-                    if field in data1:
+                # Add the retrieved fields to the embed message
+                for field in airport_info_fields:
+                    if field in airport_data:
                         if field != 'link':
-                            value = f"`{data1[field]}`"
-                            embed.add_field(name=field.capitalize(), value=value, inline=False)
+                            field_value = f"`{airport_data[field]}`"
+                            airport_info_embed.add_field(name=field.capitalize(), value=field_value, inline=False)
                         else:
-                            view = discord.ui.View(timeout=180)  # Set a timeout for the view
-                            # URL button
-                            view_airport = discord.ui.Button(label="View airport on airport-data.com", url=data1[field], style=discord.ButtonStyle.link)
-                            view.add_item(view_airport)
+                            # Create a view with a button to the airport's page
+                            airport_view = discord.ui.View(timeout=180)  # Set a timeout for the view
+                            airport_button = discord.ui.Button(label="View airport on airport-data.com", url=airport_data[field], style=discord.ButtonStyle.link)
+                            airport_view.add_item(airport_button)
+                            
+                        if 'type' in data2:
+
             await ctx.send(embed=embed, view=view)
 
                 if 'error' in data2:
