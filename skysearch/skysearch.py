@@ -993,19 +993,13 @@ class Skysearch(commands.Cog):
                     if link.startswith('http://') or link.startswith('https://'):
                         view = discord.ui.View()
                         view.add_item(discord.ui.Button(label=f"More information for airport", url=link, style=discord.ButtonStyle.link))
-                        await ctx.send(embed=embed, view=view)
-                    else:
-                        await ctx.send(embed=embed)
-                else:
-                    await ctx.send(embed=embed)
-
+                        
             if code_type == 'icao':
                 api_token = await self.bot.get_shared_api_tokens("airportdbio")
-                if not api_token or 'api_token' not in api_token:
-                    return
-                view = discord.ui.View()
-                view.add_item(discord.ui.Button(label="Advanced info", style=discord.ButtonStyle.grey, custom_id="advanced_info"))
-                await ctx.send(embed=embed, view=view)
+                if api_token and 'api_token' in api_token:
+                    view.add_item(discord.ui.Button(label="Advanced info", style=discord.ButtonStyle.grey, custom_id="advanced_info"))
+            
+            await ctx.send(embed=embed, view=view)
 
         except Exception as e:
             embed = discord.Embed(title="Error", description=str(e), color=0xff4545)
