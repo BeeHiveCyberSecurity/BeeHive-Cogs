@@ -1058,7 +1058,7 @@ class Skysearch(commands.Cog):
                                 freq_embed = discord.Embed(title=f"Frequency information for {code.upper()}", color=0xfffffe)
                                 freq_embed.add_field(name="ID", value=f"`{freq.get('id', 'N/A')}`", inline=True)
                                 freq_embed.add_field(name="Type", value=f"`{freq.get('type', 'N/A')}`", inline=True)
-                                freq_embed.add_field(name="Frequency", value=f"`{freq.get('frequency', 'N/A')}`", inline=True)
+                                freq_embed.add_field(name="Frequency", value=f"`{freq.get('frequency_mhz', 'N/A')}`", inline=True)
                                 freq_embed.add_field(name="Description", value=f"`{freq.get('description', 'N/A')}`", inline=False)
                                 combined_pages.append(freq_embed)
 
