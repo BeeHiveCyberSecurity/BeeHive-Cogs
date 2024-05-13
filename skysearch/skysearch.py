@@ -997,7 +997,7 @@ class Skysearch(commands.Cog):
             if code_type == 'icao':
                 api_token = await self.bot.get_shared_api_tokens("airportdbio")
                 if api_token and 'api_token' in api_token:
-                    view.add_item(discord.ui.Button(label="Advanced info", style=discord.ButtonStyle.grey, custom_id="advanced_info"))
+                    view.add_item(discord.ui.Button(label="Advanced info", style=discord.ButtonStyle.grey, custom_id="advanced_info_{code}"))
             
             await ctx.send(embed=embed, view=view)
 
@@ -1007,32 +1007,35 @@ class Skysearch(commands.Cog):
 
     @commands.Cog.listener()
     async def on_button_click(self, interaction: discord.Interaction):
-        if interaction.custom_id == "advanced_info":
-            url2 = f"https://airportdb.io/api/v1/airport/{code}?apiToken={['api_token']}"
-            response2 = requests.get(url2)
-            data2 = response2.json()
+        if interaction.custom_id.startswith("advanced_info"):
+            code = interaction.custom_id.split("_")[2]
+            api_token = await self.bot.get_shared_api_tokens("airportdbio")
+            if api_token and 'api_token' in api_token:
+                url2 = f"https://airportdb.io/api/v1/airport/{code}?apiToken={api_token['api_token']}"
+                response2 = requests.get(url2)
+                data2 = response2.json()
 
-            if 'error' in data2:
-                embed.add_field(name="Error", value=data2['error'], inline=False)
-            elif not data2 or 'name' not in data2:
-                embed.add_field(name="Error", value="No airport found with the provided code.", inline=False)
-            else:
-                for field in fields:
-                    if field in data2:
-                        value = f"`{data2[field]}`" if field != 'home_link' else f"[Link]({data2[field]})"
-                        embed.add_field(name=field.capitalize(), value=value, inline=False)
-                if 'link' in data2:
-                    link = data2['link']
-                    if link.startswith('/world-airport/'):
-                        link = f"https://www.airport-data.com{link}"
-                    if link.startswith('http://') or link.startswith('https://'):
-                        view = discord.ui.View()
-                        view.add_item(discord.ui.Button(label=f"More information for airport", url=link, style=discord.ButtonStyle.link))
-                        await interaction.response.send_message(embed=embed, view=view)
+                if 'error' in data2:
+                    embed.add_field(name="Error", value=data2['error'], inline=False)
+                elif not data2 or 'name' not in data2:
+                    embed.add_field(name="Error", value="No airport found with the provided code.", inline=False)
+                else:
+                    for field in fields:
+                        if field in data2:
+                            value = f"`{data2[field]}`" if field != 'home_link' else f"[Link]({data2[field]})"
+                            embed.add_field(name=field.capitalize(), value=value, inline=False)
+                    if 'link' in data2:
+                        link = data2['link']
+                        if link.startswith('/world-airport/'):
+                            link = f"https://www.airport-data.com{link}"
+                        if link.startswith('http://') or link.startswith('https://'):
+                            view = discord.ui.View()
+                            view.add_item(discord.ui.Button(label=f"More information for airport", url=link, style=discord.ButtonStyle.link))
+                            await interaction.response.send_message(embed=embed, view=view)
+                        else:
+                            await interaction.response.send_message(embed=embed)
                     else:
                         await interaction.response.send_message(embed=embed)
-                else:
-                    await interaction.response.send_message(embed=embed)
 
     @tasks.loop(minutes=2)
     async def check_emergency_squawks(self):
