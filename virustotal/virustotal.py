@@ -122,3 +122,5 @@ class VirusTotal(commands.Cog):
                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle-outline.png")
                     await ctx.send(embed=embed)
                     break
+
+
