@@ -1034,9 +1034,10 @@ class Skysearch(commands.Cog):
                         message = await ctx.send(embed=runway_pages[0])
                         await message.add_reaction("⬅️")
                         await message.add_reaction("➡️")
+                        await message.add_reaction("❌")
 
                         def check(reaction, user):
-                            return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️"]
+                            return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️", "❌"]
 
                         i = 0
                         reaction = None
@@ -1045,13 +1046,17 @@ class Skysearch(commands.Cog):
                                 if i > 0:
                                     i -= 1
                                     await message.edit(embed=runway_pages[i])
+                                    await message.remove_reaction("⬅️", ctx.author)
                             elif str(reaction) == "➡️":
                                 if i < len(runway_pages)-1:
                                     i += 1
                                     await message.edit(embed=runway_pages[i])
+                                    await message.remove_reaction("➡️", ctx.author)
+                            elif str(reaction) == "❌":
+                                await message.delete()
+                                break
                             try:
                                 reaction, user = await self.bot.wait_for("reaction_add", timeout=30.0, check=check)
-                                await message.remove_reaction(reaction, user)
                             except asyncio.TimeoutError:
                                 break
 
