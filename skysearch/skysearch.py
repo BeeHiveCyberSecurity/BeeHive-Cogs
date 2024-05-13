@@ -996,19 +996,32 @@ class Skysearch(commands.Cog):
                 data2 = response2.json()
 
                 if 'error' in data2:
-                    embed = discord.Embed(title="Error", value=data2['error'], color=0xff4545)
+                    error_message = data2['error']
+                    if len(error_message) > 1024:
+                        error_message = error_message[:1021] + "..."
+                    embed = discord.Embed(title="Error", value=error_message, color=0xff4545)
                     await ctx.send(embed=embed)
                 elif not data2 or 'name' not in data2:
                     embed = discord.Embed(title="Error", value="No airport found with the provided code.", color=0xff4545)
                     await ctx.send(embed=embed)
                 else:
-                    embed = discord.Embed(title=f"Advanced airport information for {code.upper()}", color=0xfffffe)
-                    fields = ['runways', 'frequencies']
-                    for field in fields:
-                        if field in data2:
-                            value = f"`{data2[field]}`"
-                            embed.add_field(name=field.capitalize(), value=value, inline=False)
-                    await ctx.send(embed=embed)
+                    if 'runways' in data2:
+                        runways = data2['runways']
+                        for i in range(0, len(runways), 5):
+                            embed = discord.Embed(title=f"Advanced airport information for {code.upper()}", color=0xfffffe)
+                            for runway in runways[i:i+5]:
+                                value = f"`{runway}`"
+                                if len(value) > 1024:
+                                    value = value[:1021] + "..."
+                                embed.add_field(name=f"Runway {i//5 + 1}", value=value, inline=False)
+                            await ctx.send(embed=embed)
+                    if 'frequencies' in data2:
+                        value = f"`{data2['frequencies']}`"
+                        if len(value) > 1024:
+                            value = value[:1021] + "..."
+                        embed = discord.Embed(title=f"Advanced airport information for {code.upper()}", color=0xfffffe)
+                        embed.add_field(name="Frequencies", value=value, inline=False)
+                        await ctx.send(embed=embed)
 
         except Exception as e:
             embed = discord.Embed(title="Error", description=str(e), color=0xff4545)
