@@ -1056,7 +1056,7 @@ class Skysearch(commands.Cog):
                             
                             runway_pages.append(embed)
 
-                        await self._paginate_embed(ctx, runway_pages)
+                        await self.paginate_embed(ctx, runway_pages)
 
                     if 'freqs' in data2:
                         freqs = data2['freqs']
@@ -1067,40 +1067,40 @@ class Skysearch(commands.Cog):
                                 embed.add_field(name=key.capitalize(), value=f"`{value}`", inline=True)
                             freq_pages.append(embed)
 
-                        await self._paginate_embed(ctx, freq_pages)
-
-                async def _paginate_embed(self, ctx, pages):
-                    message = await ctx.send(embed=pages[0])
-                    await message.add_reaction("⬅️")
-                    await message.add_reaction("❌")
-                    await message.add_reaction("➡️")
-
-                    def check(reaction, user):
-                        return user == ctx.author and str(reaction.emoji) in ["⬅️", "❌", "➡️"]
-
-                    i = 0
-                    reaction = None
-                    while True:
-                        if str(reaction) == "⬅️":
-                            if i > 0:
-                                i -= 1
-                                await message.edit(embed=pages[i])
-                        elif str(reaction) == "➡️":
-                            if i < len(pages) - 1:
-                                i += 1
-                                await message.edit(embed=pages[i])
-                        elif str(reaction) == "❌":
-                            await message.delete()
-                            break
-                        try:
-                            reaction, user = await self.bot.wait_for("reaction_add", timeout=30.0, check=check)
-                            await message.remove_reaction(reaction, user)
-                        except asyncio.TimeoutError:
-                            break
+                        await self.paginate_embed(ctx, freq_pages)
 
         except Exception as e:
             embed = discord.Embed(title="Error", description=str(e), color=0xff4545)
             await ctx.send(embed=embed)
+
+    async def paginate_embed(self, ctx, pages):
+        message = await ctx.send(embed=pages[0])
+        await message.add_reaction("⬅️")
+        await message.add_reaction("❌")
+        await message.add_reaction("➡️")
+
+        def check(reaction, user):
+            return user == ctx.author and str(reaction.emoji) in ["⬅️", "❌", "➡️"]
+
+        i = 0
+        reaction = None
+        while True:
+            if str(reaction) == "⬅️":
+                if i > 0:
+                    i -= 1
+                    await message.edit(embed=pages[i])
+            elif str(reaction) == "➡️":
+                if i < len(pages) - 1:
+                    i += 1
+                    await message.edit(embed=pages[i])
+            elif str(reaction) == "❌":
+                await message.delete()
+                break
+            try:
+                reaction, user = await self.bot.wait_for("reaction_add", timeout=30.0, check=check)
+                await message.remove_reaction(reaction, user)
+            except asyncio.TimeoutError:
+                break
 
     @tasks.loop(minutes=1)
     async def check_emergency_squawks(self):
