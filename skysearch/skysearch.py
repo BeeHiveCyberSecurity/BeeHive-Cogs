@@ -1025,8 +1025,8 @@ class Skysearch(commands.Cog):
                                 embed.add_field(name="Identifier", value=f"`{runway['airport_ident']}`", inline=True)
                             
                             if 'type' in runway:
-                            if runway['type'] == 'large_airport':
-                                embed.add_field(name="Type", value=":airplane: `Large Airport`", inline=True)
+                                if runway['type'] == 'large_airport':
+                                    embed.add_field(name="Type", value=":airplane: `Large Airport`", inline=True)
                             elif runway['type'] == 'medium_airport':
                                 embed.add_field(name="Type", value=":small_airplane: `Medium Airport`", inline=True)
                             elif runway['type'] == 'small_airport':
