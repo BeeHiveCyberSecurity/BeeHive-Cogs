@@ -1042,14 +1042,14 @@ class Skysearch(commands.Cog):
                                 ils_freq = ils_info.get('freq', 'N/A')
                                 ils_course = ils_info.get('course', 'N/A')
                                 ils_value = f"**{runway['le_ident']}**\n**ILS** `{ils_freq}` MHz\n@ `{ils_course}°`"
-                                embed.add_field(name="Low end of runway", value=ils_value, inline=True)
+                                embed.add_field(name="Low end of runway", value=ils_value, inline=False)
 
                             if 'he_ident' in runway:
                                 ils_info = runway.get('he_ils', {})
                                 ils_freq = ils_info.get('freq', 'N/A')
                                 ils_course = ils_info.get('course', 'N/A')
                                 ils_value = f"**{runway['he_ident']}**\n**ILS** `{ils_freq}` MHz\n@ `{ils_course}°`"
-                                embed.add_field(name="High end of runway", value=ils_value, inline=True)
+                                embed.add_field(name="High end of runway", value=ils_value, inline=False)
 
                             runway_status = ":white_check_mark: **Runway open for use**" if str(runway.get('closed', 0)) == '0' else ":x: **Runway closed**"
                             embed.add_field(name="Runway status", value=runway_status, inline=False)
