@@ -24,7 +24,7 @@ class VirusTotal(commands.Cog):
                     if file_url:
                         async with session.post("https://www.virustotal.com/api/v3/urls", headers={"x-apikey": vt_key["api_key"]}, data={"url": file_url}) as response:
                             if response.status != 200:
-                                raise aiohttp.HttpProcessingError(message=f"HTTP error {response.status}", code=response.status)
+                                raise aiohttp.ClientResponseError(response.request_info, response.history, status=response.status, message=f"HTTP error {response.status}", headers=response.headers)
                             data = await response.json()
                             permalink = data.get("data", {}).get("id")
                             if permalink:
@@ -36,11 +36,11 @@ class VirusTotal(commands.Cog):
                         attachment = ctx.message.attachments[0]
                         async with session.get(attachment.url) as response:
                             if response.status != 200:
-                                raise aiohttp.HttpProcessingError(message=f"HTTP error {response.status}", code=response.status)
+                                raise aiohttp.ClientResponseError(response.request_info, response.history, status=response.status, message=f"HTTP error {response.status}", headers=response.headers)
                             file_content = await response.read()
                             async with session.post("https://www.virustotal.com/api/v3/files", headers={"x-apikey": vt_key["api_key"]}, data={"file": file_content}) as response:
                                 if response.status != 200:
-                                    raise aiohttp.HttpProcessingError(message=f"HTTP error {response.status}", code=response.status)
+                                    raise aiohttp.ClientResponseError(response.request_info, response.history, status=response.status, message=f"HTTP error {response.status}", headers=response.headers)
                                 data = await response.json()
                                 analysis_id = data.get("data", {}).get("id")
                                 if analysis_id:
@@ -51,7 +51,7 @@ class VirusTotal(commands.Cog):
                         embed = discord.Embed(title='Error: No file provided', description="The bot was unable to find content to submit for analysis!\nPlease provide one of the following when using this command:\n- URL file can be downloaded from\n- Drag-and-drop a file less than 25mb in size", colour=discord.Colour.red())
                         embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle-outline.png")
                         await ctx.send(embed=embed)
-                except (aiohttp.HttpProcessingError, ValueError) as e:
+                except (aiohttp.ClientResponseError, ValueError) as e:
                     embed = discord.Embed(title='Error: Failed to submit file', description=str(e), colour=discord.Colour.red())
                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle-outline.png")
                     await ctx.send(embed=embed)
@@ -69,7 +69,7 @@ class VirusTotal(commands.Cog):
                 try:
                     async with session.get(f'https://www.virustotal.com/api/v3/analyses/{analysis_id}', headers=headers) as response:
                         if response.status != 200:
-                            raise aiohttp.HttpProcessingError(message=f"HTTP error {response.status}", code=response.status)
+                            raise aiohttp.ClientResponseError(response.request_info, response.history, status=response.status, message=f"HTTP error {response.status}", headers=response.headers)
                         data = await response.json()
                         attributes = data.get("data", {}).get("attributes", {})
                         if attributes.get("status") == "completed":
@@ -107,7 +107,7 @@ class VirusTotal(commands.Cog):
                                 raise ValueError("SHA256 value not found in the analysis response.")
                         else:
                             await asyncio.sleep(3)
-                except (aiohttp.HttpProcessingError, ValueError) as e:
+                except (aiohttp.ClientResponseError, ValueError) as e:
                     embed = discord.Embed(title='Error: Analysis Failed', description=str(e), colour=discord.Colour.red())
                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle-outline.png")
                     await ctx.send(embed=embed)
