@@ -1010,9 +1010,24 @@ class Skysearch(commands.Cog):
                         runway_pages = []
                         for runway in runways:
                             embed = discord.Embed(title=f"Runway information for {code.upper()} :arrow_left: :arrow_right:", color=0xfffffe)
-                            for field in ['id', 'airport_ref', 'airport_ident', 'length_ft', 'width_ft', 'surface', 'lighted', 'closed', 'le_ident', 'le_latitude_deg', 'le_longitude_deg', 'le_elevation_ft', 'le_heading_degT', 'le_displaced_threshold_ft', 'he_ident', 'he_latitude_deg', 'he_longitude_deg', 'he_elevation_ft', 'he_heading_degT', 'he_displaced_threshold_ft', 'he_ils', 'le_ils']:
-                                if field in runway:
-                                    embed.add_field(name=field.capitalize(), value=f"`{runway[field]}`", inline=False)
+                            if 'id' in runway:
+                                embed.add_field(name="Id", value=f"`{runway['id']}`", inline=True)
+
+                            if 'airport_ref' in runway:
+                                embed.add_field(name="Airport Ref", value=f"`{runway['airport_ref']}`", inline=True)
+
+                            if 'airport_ident' in runway:
+                                embed.add_field(name="Airport Ident", value=f"`{runway['airport_ident']}`", inline=True)
+
+                            if  'lighted' in runway:
+                                if runway['lighted'] == 1:
+                                    lighted_status = "Lighted"
+                                else:
+                                    lighted_status = "No Lighting"
+                                embed.add_field(name="Lighting", value=f"`{lighted_status}`", inline=True)
+
+                            if 'le_ils' in runway:
+                                embed.add_field(name="Le Ils", value=f"`{runway['le_ils']}`", inline=True)
                             runway_pages.append(embed)
 
                         message = await ctx.send(embed=runway_pages[0])
