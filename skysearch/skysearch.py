@@ -1009,9 +1009,9 @@ class Skysearch(commands.Cog):
                         runways = data2['runways']
                         runway_pages = []
                         for runway in runways:
-                            embed = discord.Embed(title=f"Runway information for {code.upper()} :arrow_left: :arrow_right:", color=0xfffffe)
+                            embed = discord.Embed(title=f"Runway information for {code.upper()}", color=0xfffffe)
                             if 'id' in runway:
-                                embed.add_field(name="Id", value=f"`{runway['id']}`", inline=True)
+                                embed.add_field(name="ID", value=f"`{runway['id']}`", inline=True)
 
                             if 'airport_ref' in runway:
                                 embed.add_field(name="Airport Ref", value=f"`{runway['airport_ref']}`", inline=True)
