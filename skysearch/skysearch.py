@@ -1037,13 +1037,13 @@ class Skysearch(commands.Cog):
                             if  'length_ft' and 'width_ft' in runway:
                                 embed.add_field(name="Dimensions", value=f"`{runway['length_ft']}ft long`\n`{runway['width_ft']}ft wide`", inline=True)
 
+                            if  'le_ident' in runway:
+                                embed.add_field(name="Low end of runway", value=f"`{runway['le_ident']}`", inline=False)
+                            if 'he_ident' in runway:
+                                embed.add_field(name="High end of runway", value=f"`{runway['he_ident']}`", inline=True)
+
                             runway_status = ":white_check_mark: **Runway open for use**" if str(runway.get('closed', 0)) == '0' else ":x: **Runway closed**"
                             embed.add_field(name="Runway status", value=runway_status, inline=True)
-
-                            if  'le_ident' in runway:
-                                embed.add_field(name="Low end", value=f"`{runway['le_ident']}`", inline=False)
-                            if 'he_ident' in runway:
-                                embed.add_field(name="High end", value=f"`{runway['he_ident']}`", inline=True)
                             
                             runway_pages.append(embed)
 
