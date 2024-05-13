@@ -1043,7 +1043,7 @@ class Skysearch(commands.Cog):
                             if  'le_ident' in runway:
                                 embed.add_field(name="Low end", value=f"`{runway['le_ident']}`", inline=False)
                             if 'he_ident' in runway:
-                                embed.add_field(name="High end", value=f"`{runway}['he_ident']}`", inline=True)
+                                embed.add_field(name="High end", value=f"`{runway['he_ident']}`", inline=True)
                             
                             runway_pages.append(embed)
 
