@@ -1054,11 +1054,12 @@ class Skysearch(commands.Cog):
 
                         if 'freqs' in data2:
                             freqs = data2['freqs']
+                            embed = discord.Embed(title=f"Frequency information for {code.upper()}", color=0xfffffe)
                             for freq in freqs:
-                                for key, value in freq.items():
-                                    embed.add_field(name=key.capitalize(), value=f"`{value}`", inline=True)
-                                combined_pages.append(embed)
-                                embed = discord.Embed(title=f"Frequency information for {code.upper()}", color=0xfffffe)
+                                embed.add_field(name="Type", value=f"`{freq.get('type', 'N/A')}`", inline=True)
+                                embed.add_field(name="Frequency", value=f"`{freq.get('frequency', 'N/A')}`", inline=True)
+                                embed.add_field(name="Description", value=f"`{freq.get('description', 'N/A')}`", inline=True)
+                            combined_pages.append(embed)
 
                         await self.paginate_embed(ctx, combined_pages)
 
