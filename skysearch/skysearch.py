@@ -1035,12 +1035,12 @@ class Skysearch(commands.Cog):
                                         ils_info = runway.get('le_ils', {})
                                         ils_freq = ils_info.get('freq', 'N/A')
                                         ils_course = ils_info.get('course', 'N/A')
-                                        ils_value += f"**{runway['le_ident']}**\n**ILS** `{ils_freq} MHz @ {ils_course}°`\n"
+                                        ils_value += f"**{runway['le_ident']}** `{ils_freq} MHz @ {ils_course}°`\n"
                                     if 'he_ident' in runway:
                                         ils_info = runway.get('he_ils', {})
                                         ils_freq = ils_info.get('freq', 'N/A')
                                         ils_course = ils_info.get('course', 'N/A')
-                                        ils_value += f"**{runway['he_ident']}**\n**ILS** `{ils_freq} MHz @ {ils_course}°`\n"
+                                        ils_value += f"**{runway['he_ident']}** `{ils_freq} MHz @ {ils_course}°`\n"
                                     embed.add_field(name="Landing assistance", value=ils_value.strip(), inline=False)
 
                                 runway_status = ":white_check_mark: **Open**" if str(runway.get('closed', 0)) == '0' else ":x: **Closed**"
