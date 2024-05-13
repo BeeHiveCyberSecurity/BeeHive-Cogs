@@ -1027,7 +1027,7 @@ class Skysearch(commands.Cog):
                                 embed.add_field(name="Lighting", value=f"{lighted_status}", inline=True)
 
                             if 'surface' in runway:
-                                embed.add_field(name="Surface", value=f"`{runway['surface']}", inline=True)
+                                embed.add_field(name="Surface", value=f"`{runway['surface']}`", inline=True)
                             runway_pages.append(embed)
 
                         message = await ctx.send(embed=runway_pages[0])
