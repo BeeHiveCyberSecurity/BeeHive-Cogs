@@ -1053,7 +1053,7 @@ class Skysearch(commands.Cog):
                                 embed = discord.Embed(title=f"Runway information for {code.upper()}", color=0xfffffe)
 
                         if 'freqs' in data2:
-                            freq = data2['freqs']
+                            freqs = data2['freqs']
                             embed = discord.Embed(title=f"Frequency information for {code.upper()}", color=0xfffffe)
                             for freq in freqs:
                                 embed.add_field(name="ID", value=f"`{freq.get('id', 'N/A')}`", inline=True)
