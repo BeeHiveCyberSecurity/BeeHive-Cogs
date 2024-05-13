@@ -1016,7 +1016,7 @@ class Skysearch(commands.Cog):
                 else:
                     combined_pages = []
                     if 'runways' in data2 or 'freqs' in data2:
-                        embed = discord.Embed(title=f"Airport information for {code.upper()}", color=0xfffffe)
+                        embed = discord.Embed(title=f"Runway information for {code.upper()}", color=0xfffffe)
                         if 'runways' in data2:
                             runways = data2['runways']
                             for runway in runways:
@@ -1058,11 +1058,9 @@ class Skysearch(commands.Cog):
                                 for key, value in freq.items():
                                     embed.add_field(name=key.capitalize(), value=f"`{value}`", inline=True)
                                 combined_pages.append(embed)
-                                embed = discord.Embed(title=f"Airport information for {code.upper()}", color=0xfffffe)
+                                embed = discord.Embed(title=f"Frequency information for {code.upper()}", color=0xfffffe)
 
                         await self.paginate_embed(ctx, combined_pages)
-
-                        await self.paginate_embed(ctx, freq_pages)
 
         except Exception as e:
             embed = discord.Embed(title="Error", description=str(e), color=0xff4545)
