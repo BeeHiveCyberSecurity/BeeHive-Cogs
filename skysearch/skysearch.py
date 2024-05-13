@@ -1028,14 +1028,13 @@ class Skysearch(commands.Cog):
                             if 'airport_ident' in runway:
                                 embed.add_field(name="Identifier", value=f"`{runway['airport_ident']}`", inline=True)
 
-
                             if 'surface' in runway:
                                 embed.add_field(name="Surface", value=f"`{runway['surface']}`", inline=True)
 
-                            if  'length_ft' and 'width_ft' in runway:
+                            if 'length_ft' in runway and 'width_ft' in runway:
                                 embed.add_field(name="Dimensions", value=f"`{runway['length_ft']}ft long`\n`{runway['width_ft']}ft wide`", inline=True)
 
-                            if  'le_ident' in runway:
+                            if 'le_ident' in runway:
                                 ils_info = runway.get('le_ils', {})
                                 ils_freq = ils_info.get('freq', 'N/A')
                                 ils_course = ils_info.get('course', 'N/A')
@@ -1057,33 +1056,47 @@ class Skysearch(commands.Cog):
                             
                             runway_pages.append(embed)
 
-                        message = await ctx.send(embed=runway_pages[0])
-                        await message.add_reaction("⬅️")
-                        await message.add_reaction("❌")
-                        await message.add_reaction("➡️")
+                        await self._paginate_embed(ctx, runway_pages)
 
-                        def check(reaction, user):
-                            return user == ctx.author and str(reaction.emoji) in ["⬅️", "❌", "➡️"]
+                    if 'freqs' in data2:
+                        freqs = data2['freqs']
+                        freq_pages = []
+                        for freq in freqs:
+                            embed = discord.Embed(title=f"Frequency information for {code.upper()}", color=0xfffffe)
+                            for key, value in freq.items():
+                                embed.add_field(name=key.capitalize(), value=f"`{value}`", inline=True)
+                            freq_pages.append(embed)
 
-                        i = 0
-                        reaction = None
-                        while True:
-                            if str(reaction) == "⬅️":
-                                if i > 0:
-                                    i -= 1
-                                    await message.edit(embed=runway_pages[i])
-                            elif str(reaction) == "➡️":
-                                if i < len(runway_pages)-1:
-                                    i += 1
-                                    await message.edit(embed=runway_pages[i])
-                            elif str(reaction) == "❌":
-                                await message.delete()
-                                break
-                            try:
-                                reaction, user = await self.bot.wait_for("reaction_add", timeout=30.0, check=check)
-                                await message.remove_reaction(reaction, user)
-                            except asyncio.TimeoutError:
-                                break
+                        await self._paginate_embed(ctx, freq_pages)
+
+                async def _paginate_embed(self, ctx, pages):
+                    message = await ctx.send(embed=pages[0])
+                    await message.add_reaction("⬅️")
+                    await message.add_reaction("❌")
+                    await message.add_reaction("➡️")
+
+                    def check(reaction, user):
+                        return user == ctx.author and str(reaction.emoji) in ["⬅️", "❌", "➡️"]
+
+                    i = 0
+                    reaction = None
+                    while True:
+                        if str(reaction) == "⬅️":
+                            if i > 0:
+                                i -= 1
+                                await message.edit(embed=pages[i])
+                        elif str(reaction) == "➡️":
+                            if i < len(pages) - 1:
+                                i += 1
+                                await message.edit(embed=pages[i])
+                        elif str(reaction) == "❌":
+                            await message.delete()
+                            break
+                        try:
+                            reaction, user = await self.bot.wait_for("reaction_add", timeout=30.0, check=check)
+                            await message.remove_reaction(reaction, user)
+                        except asyncio.TimeoutError:
+                            break
 
         except Exception as e:
             embed = discord.Embed(title="Error", description=str(e), color=0xff4545)
