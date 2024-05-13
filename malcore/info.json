@@ -19,6 +19,6 @@
         "security",
         "safety"
     ],
-    "short": "Use Malcore API To Analyz Files And URL's",
+    "short": "Use the Malcore API to analyze files and URLs",
     "min_bot_version": "3.5.0"
 }

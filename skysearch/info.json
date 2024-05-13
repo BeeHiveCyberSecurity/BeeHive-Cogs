@@ -1,6 +1,6 @@
 {
     "author": ["movelaterally"],
-    "install_msg": "",
+    "install_msg": "## :white_check_mark: Successfully installed SkySearch.\n**Questions?** [We're listening](<https://www.beehive.systems/contact-us>)\n**Interested in CyberSecurity and CyberSafety?** Join our Discord! https://discord.gg/ckdzsm7mTs\n\n**IMPORTANT** - Before you can use this cog, you'll need to sign up for an Airportdb.io account, then add your API token to your Red instance.\n`[p]set api airportdbio api_token XXXXXXXXXXXXXXXXXX`)",
     "name": "skysearch",
     "short": "Check on plane data thru Red-Discordbot",
     "description": "airplanes tracking cog for the https://airplanes.live api.",
