@@ -974,68 +974,100 @@ class Skysearch(commands.Cog):
             embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/location.png")
             fields = ['icao', 'iata', 'name', 'location', 'country', 'country_code', 'longitude', 'latitude', 'link']
 
-            async with self.bot.http_session.get(url1) as response1:
-                data1 = await response1.json()
+            response1 = requests.get(url1)
+            data1 = response1.json()
 
-                if 'error' in data1:
-                    embed.add_field(name="Error", value=data1['error'], inline=False)
-                elif not data1 or 'name' not in data1:
-                    embed.add_field(name="Error", value="No airport found with the provided code.", inline=False)
-                else:
-                    for field in fields:
-                        if field in data1:
-                            if field != 'link':
-                                value = f"`{data1[field]}`"
-                                embed.add_field(name=field.capitalize(), value=value, inline=False)
-                            else:
-                                # Ensure the URL is well-formed
-                                link = data1[field]
-                                if not (link.startswith('http://') or link.startswith('https://')):
-                                    link = 'https://www.airport-data.com' + link
-                                view = discord.ui.View(timeout=180)  # Set a timeout for the view
-                                # URL button
-                                view_airport = discord.ui.Button(label="View airport on airport-data.com", url=link, style=discord.ButtonStyle.link)
-                                view.add_item(view_airport)
-                    await ctx.send(embed=embed, view=view)
+            if 'error' in data1:
+                embed.add_field(name="Error", value=data1['error'], inline=False)
+            elif not data1 or 'name' not in data1:
+                embed.add_field(name="Error", value="No airport found with the provided code.", inline=False)
+            else:
+                for field in fields:
+                    if field in data1:
+                        if field != 'link':
+                            value = f"`{data1[field]}`"
+                            embed.add_field(name=field.capitalize(), value=value, inline=False)
+                        else:
+                            # Ensure the URL is well-formed
+                            link = data1[field]
+                            if not (link.startswith('http://') or link.startswith('https://')):
+                                link = 'https://www.airport-data.com' + link
+                            view = discord.ui.View(timeout=180)  # Set a timeout for the view
+                            # URL button
+                            view_airport = discord.ui.Button(label="View airport on airport-data.com", url=link, style=discord.ButtonStyle.link)
+                            view.add_item(view_airport)
+            await ctx.send(embed=embed, view=view)
 
             api_token = await self.bot.get_shared_api_tokens("airportdbio")
             if api_token and 'api_token' in api_token and code_type == 'icao':
                 url2 = f"https://airportdb.io/api/v1/airport/{code}?apiToken={api_token['api_token']}"
-                async with self.bot.http_session.get(url2) as response2:
-                    data2 = await response2.json()
+                response2 = requests.get(url2)
+                data2 = response2.json()
 
-                    if 'error' in data2:
-                        error_message = data2['error']
-                        if len(error_message) > 1024:
-                            error_message = error_message[:1021] + "..."
-                        embed = discord.Embed(title="Error", value=error_message, color=0xff4545)
-                        await ctx.send(embed=embed)
-                    elif not data2 or 'name' not in data2:
-                        embed = discord.Embed(title="Error", value="No airport found with the provided code.", color=0xff4545)
-                        await ctx.send(embed=embed)
-                    else:
-                        if 'runways' in data2:
-                            runways = data2['runways']
-                            runway_pages = []
-                            for runway in runways:
-                                embed = discord.Embed(title=f"Runway information for {code.upper()}", color=0xfffffe)
-                                for key, value in runway.items():
-                                    if key not in ['le_ils', 'he_ils']:
-                                        embed.add_field(name=key.capitalize(), value=f"`{value}`", inline=True)
-                                runway_pages.append(embed)
+                if 'error' in data2:
+                    error_message = data2['error']
+                    if len(error_message) > 1024:
+                        error_message = error_message[:1021] + "..."
+                    embed = discord.Embed(title="Error", value=error_message, color=0xff4545)
+                    await ctx.send(embed=embed)
+                elif not data2 or 'name' not in data2:
+                    embed = discord.Embed(title="Error", value="No airport found with the provided code.", color=0xff4545)
+                    await ctx.send(embed=embed)
+                else:
+                    if 'runways' in data2:
+                        runways = data2['runways']
+                        runway_pages = []
+                        for runway in runways:
+                            embed = discord.Embed(title=f"Runway information for {code.upper()}", color=0xfffffe)
+                            if 'id' in runway:
+                                embed.add_field(name="ID", value=f"`{runway['id']}`", inline=True)
 
-                            await self.paginate_embed(ctx, runway_pages)
+                            if 'airport_ref' in runway:
+                                embed.add_field(name="Reference", value=f"`{runway['airport_ref']}`", inline=True)
 
-                        if 'freqs' in data2:
-                            freqs = data2['freqs']
-                            freq_pages = []
-                            for freq in freqs:
-                                embed = discord.Embed(title=f"Frequency information for {code.upper()}", color=0xfffffe)
-                                for key, value in freq.items():
-                                    embed.add_field(name=key.capitalize(), value=f"`{value}`", inline=True)
-                                freq_pages.append(embed)
+                            if 'airport_ident' in runway:
+                                embed.add_field(name="Identifier", value=f"`{runway['airport_ident']}`", inline=True)
 
-                            await self.paginate_embed(ctx, freq_pages)
+                            if 'surface' in runway:
+                                embed.add_field(name="Surface", value=f"`{runway['surface']}`", inline=True)
+
+                            if 'length_ft' in runway and 'width_ft' in runway:
+                                embed.add_field(name="Dimensions", value=f"`{runway['length_ft']}ft long`\n`{runway['width_ft']}ft wide`", inline=True)
+
+                            if 'le_ident' in runway:
+                                ils_info = runway.get('le_ils', {})
+                                ils_freq = ils_info.get('freq', 'N/A')
+                                ils_course = ils_info.get('course', 'N/A')
+                                ils_value = f"**{runway['le_ident']}**\n**LAT** `{runway['le_latitude_deg']}°`\n**LON** `{runway['le_longitude_deg']}°`\n**ILS** `{ils_freq} MHz @ {ils_course}°`"
+                                embed.add_field(name="Low end of runway", value=ils_value, inline=False)
+
+                            if 'he_ident' in runway:
+                                ils_info = runway.get('he_ils', {})
+                                ils_freq = ils_info.get('freq', 'N/A')
+                                ils_course = ils_info.get('course', 'N/A')
+                                ils_value = f"**{runway['he_ident']}**\n**LAT** `{runway['he_latitude_deg']}°`\n**LON** `{runway['he_longitude_deg']}°`\n**ILS** `{ils_freq} MHz @ {ils_course}°`"
+                                embed.add_field(name="High end of runway", value=ils_value, inline=False)
+
+                            runway_status = ":white_check_mark: **Runway open for use**" if str(runway.get('closed', 0)) == '0' else ":x: **Runway closed**"
+                            embed.add_field(name="Runway status", value=runway_status, inline=False)
+
+                            lighted_status = ":bulb: **Runway has environmental lighting**" if str(runway.get('lighted', 0)) == '1' else ":x: **Runway has no lighting equipment registered in-use**"
+                            embed.add_field(name="Lighting", value=lighted_status, inline=True)
+                            
+                            runway_pages.append(embed)
+
+                        await self.paginate_embed(ctx, runway_pages)
+
+                    if 'freqs' in data2:
+                        freqs = data2['freqs']
+                        freq_pages = []
+                        for freq in freqs:
+                            embed = discord.Embed(title=f"Frequency information for {code.upper()}", color=0xfffffe)
+                            for key, value in freq.items():
+                                embed.add_field(name=key.capitalize(), value=f"`{value}`", inline=True)
+                            freq_pages.append(embed)
+
+                        await self.paginate_embed(ctx, freq_pages)
 
         except Exception as e:
             embed = discord.Embed(title="Error", description=str(e), color=0xff4545)
@@ -1065,7 +1097,7 @@ class Skysearch(commands.Cog):
                 await message.delete()
                 break
             try:
-                reaction, user = await self.bot.wait_for("reaction_add", timeout=60.0, check=check)
+                reaction, user = await self.bot.wait_for("reaction_add", timeout=30.0, check=check)
                 await message.remove_reaction(reaction, user)
             except asyncio.TimeoutError:
                 break
