@@ -1038,9 +1038,17 @@ class Skysearch(commands.Cog):
                                 embed.add_field(name="Dimensions", value=f"`{runway['length_ft']}ft long`\n`{runway['width_ft']}ft wide`", inline=True)
 
                             if  'le_ident' in runway:
-                                embed.add_field(name="Low end of runway", value=f"`{runway['le_ident']}`", inline=True)
+                                ils_info = runway.get('le_ils', {})
+                                ils_freq = ils_info.get('freq', 'N/A')
+                                ils_course = ils_info.get('course', 'N/A')
+                                ils_value = f"**{runway['le_ident']}**\n**ILS Frequency:** `{ils_freq}` MHz\n**ILS Course:** `{ils_course}`°"
+                                embed.add_field(name="Low end of runway", value=ils_value, inline=True)
                             if 'he_ident' in runway:
-                                embed.add_field(name="High end of runway", value=f"`{runway['he_ident']}`", inline=True)
+                                ils_info = runway.get('he_ils', {})
+                                ils_freq = ils_info.get('freq', 'N/A')
+                                ils_course = ils_info.get('course', 'N/A')
+                                ils_value = f"**{runway['le_ident']}**\n**ILS Frequency:** `{ils_freq}` MHz\n**ILS Course:** `{ils_course}`°"
+                                embed.add_field(name="Low end of runway", value=ils_value, inline=True)
 
                             runway_status = ":white_check_mark: **Runway open for use**" if str(runway.get('closed', 0)) == '0' else ":x: **Runway closed**"
                             embed.add_field(name="Runway status", value=runway_status, inline=False)
