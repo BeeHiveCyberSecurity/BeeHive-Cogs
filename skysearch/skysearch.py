@@ -1007,53 +1007,37 @@ class Skysearch(commands.Cog):
                 else:
                     if 'runways' in data2:
                         runways = data2['runways']
+                        runway_pages = []
                         for runway in runways:
                             embed = discord.Embed(title=f"Runway information for {code.upper()} :arrow_left: :arrow_right:", color=0xfffffe)
-                            if 'id' in runway:
-                                embed.add_field(name="Id", value=f"`{runway['id']}`", inline=False)
-                            if 'airport_ref' in runway:
-                                embed.add_field(name="Airport Ref", value=f"`{runway['airport_ref']}`", inline=False)
-                            if 'airport_ident' in runway:
-                                embed.add_field(name="Airport Ident", value=f"`{runway['airport_ident']}`", inline=False)
-                            if 'length_ft' in runway:
-                                embed.add_field(name="Length Ft", value=f"`{runway['length_ft']}`", inline=False)
-                            if 'width_ft' in runway:
-                                embed.add_field(name="Width Ft", value=f"`{runway['width_ft']}`", inline=False)
-                            if 'surface' in runway:
-                                embed.add_field(name="Surface", value=f"`{runway['surface']}`", inline=False)
-                            if 'lighted' in runway:
-                                embed.add_field(name="Lighted", value=f"`{runway['lighted']}`", inline=False)
-                            if 'closed' in runway:
-                                embed.add_field(name="Closed", value=f"`{runway['closed']}`", inline=False)
-                            if 'le_ident' in runway:
-                                embed.add_field(name="Le Ident", value=f"`{runway['le_ident']}`", inline=False)
-                            if 'le_latitude_deg' in runway:
-                                embed.add_field(name="Le Latitude Deg", value=f"`{runway['le_latitude_deg']}`", inline=False)
-                            if 'le_longitude_deg' in runway:
-                                embed.add_field(name="Le Longitude Deg", value=f"`{runway['le_longitude_deg']}`", inline=False)
-                            if 'le_elevation_ft' in runway:
-                                embed.add_field(name="Le Elevation Ft", value=f"`{runway['le_elevation_ft']}`", inline=False)
-                            if 'le_heading_degT' in runway:
-                                embed.add_field(name="Le Heading DegT", value=f"`{runway['le_heading_degT']}`", inline=False)
-                            if 'le_displaced_threshold_ft' in runway:
-                                embed.add_field(name="Le Displaced Threshold Ft", value=f"`{runway['le_displaced_threshold_ft']}`", inline=False)
-                            if 'he_ident' in runway:
-                                embed.add_field(name="He Ident", value=f"`{runway['he_ident']}`", inline=False)
-                            if 'he_latitude_deg' in runway:
-                                embed.add_field(name="He Latitude Deg", value=f"`{runway['he_latitude_deg']}`", inline=False)
-                            if 'he_longitude_deg' in runway:
-                                embed.add_field(name="He Longitude Deg", value=f"`{runway['he_longitude_deg']}`", inline=False)
-                            if 'he_elevation_ft' in runway:
-                                embed.add_field(name="He Elevation Ft", value=f"`{runway['he_elevation_ft']}`", inline=False)
-                            if 'he_heading_degT' in runway:
-                                embed.add_field(name="He Heading DegT", value=f"`{runway['he_heading_degT']}`", inline=False)
-                            if 'he_displaced_threshold_ft' in runway:
-                                embed.add_field(name="He Displaced Threshold Ft", value=f"`{runway['he_displaced_threshold_ft']}`", inline=False)
-                            if 'he_ils' in runway:
-                                embed.add_field(name="He Ils", value=f"`{runway['he_ils']}`", inline=False)
-                            if 'le_ils' in runway:
-                                embed.add_field(name="Le Ils", value=f"`{runway['le_ils']}`", inline=False)
-                            await ctx.send(embed=embed)
+                            for field in ['id', 'airport_ref', 'airport_ident', 'length_ft', 'width_ft', 'surface', 'lighted', 'closed', 'le_ident', 'le_latitude_deg', 'le_longitude_deg', 'le_elevation_ft', 'le_heading_degT', 'le_displaced_threshold_ft', 'he_ident', 'he_latitude_deg', 'he_longitude_deg', 'he_elevation_ft', 'he_heading_degT', 'he_displaced_threshold_ft', 'he_ils', 'le_ils']:
+                                if field in runway:
+                                    embed.add_field(name=field.capitalize(), value=f"`{runway[field]}`", inline=False)
+                            runway_pages.append(embed)
+
+                        message = await ctx.send(embed=runway_pages[0])
+                        await message.add_reaction("⬅️")
+                        await message.add_reaction("➡️")
+
+                        def check(reaction, user):
+                            return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️"]
+
+                        i = 0
+                        reaction = None
+                        while True:
+                            if str(reaction) == "⬅️":
+                                if i > 0:
+                                    i -= 1
+                                    await message.edit(embed=runway_pages[i])
+                            elif str(reaction) == "➡️":
+                                if i < len(runway_pages)-1:
+                                    i += 1
+                                    await message.edit(embed=runway_pages[i])
+                            try:
+                                reaction, user = await self.bot.wait_for("reaction_add", timeout=30.0, check=check)
+                                await message.remove_reaction(reaction, user)
+                            except asyncio.TimeoutError:
+                                break
 
         except Exception as e:
             embed = discord.Embed(title="Error", description=str(e), color=0xff4545)
