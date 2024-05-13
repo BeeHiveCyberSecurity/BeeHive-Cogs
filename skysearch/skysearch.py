@@ -1050,7 +1050,7 @@ class Skysearch(commands.Cog):
                                 embed.add_field(name="Lighting", value=lighted_status, inline=True)
 
                                 combined_pages.append(embed)
-                                embed = discord.Embed(title=f"Airport information for {code.upper()}", color=0xfffffe)
+                                embed = discord.Embed(title=f"Runway information for {code.upper()}", color=0xfffffe)
 
                         if 'freqs' in data2:
                             freqs = data2['freqs']
