@@ -1039,6 +1039,9 @@ class Skysearch(commands.Cog):
 
                             runway_status = ":white_check_mark: **Runway open for use**" if str(runway.get('closed', 0)) == '0' else ":x: **Runway closed**"
                             embed.add_field(name="Runway status", value=runway_status, inline=True)
+
+                            if  'le_ident' in runway:
+                                embed.add_field(name="Low End", value=f"`{runway[le_ident]}", inline=False)
                             
                             runway_pages.append(embed)
 
