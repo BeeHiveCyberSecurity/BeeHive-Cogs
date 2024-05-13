@@ -70,6 +70,9 @@ class VirusTotal(commands.Cog):
             data = await response.json()
         except aiohttp.ContentTypeError:
             raise ValueError(f"Invalid response received from {analysis_type} analysis: not a JSON response.")
+        except ValueError:
+            content = await response.text()
+            raise ValueError(f"Invalid response received from {analysis_type} analysis: not a JSON response. Response content: {content}")
         analysis_id = data.get("data", {}).get("id")
         if analysis_id:
             await self.check_results(ctx, analysis_id, ctx.author.id)
