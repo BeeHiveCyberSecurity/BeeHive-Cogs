@@ -1041,10 +1041,10 @@ class Skysearch(commands.Cog):
                                         ils_freq = ils_info.get('freq', 'N/A')
                                         ils_course = ils_info.get('course', 'N/A')
                                         ils_value += f"**{runway['he_ident']}**\n**ILS** `{ils_freq} MHz @ {ils_course}°`\n"
-                                    embed.add_field(name="ILS Information", value=ils_value.strip(), inline=False)
+                                    embed.add_field(name="Landing assistance", value=ils_value.strip(), inline=False)
 
                                 runway_status = ":white_check_mark: **Open**" if str(runway.get('closed', 0)) == '0' else ":x: **Closed**"
-                                embed.add_field(name="Runway Status", value=runway_status, inline=True)
+                                embed.add_field(name="Runway status", value=runway_status, inline=True)
 
                                 lighted_status = ":bulb: **Lighted**" if str(runway.get('lighted', 0)) == '1' else ":x: **Not Lighted**"
                                 embed.add_field(name="Lighting", value=lighted_status, inline=True)
