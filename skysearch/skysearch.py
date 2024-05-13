@@ -1004,7 +1004,7 @@ class Skysearch(commands.Cog):
                 if not api_token or 'api_token' not in api_token:
                     return
                 view = discord.ui.View()
-                view.add_item(discord.ui.Button(label="Advanced info", style=discord.ButtonStyle.link, custom_id="advanced_info"))
+                view.add_item(discord.ui.Button(label="Advanced info", style=discord.ButtonStyle.grey, custom_id="advanced_info"))
                 await ctx.send(embed=embed, view=view)
 
         except Exception as e:
