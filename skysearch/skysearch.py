@@ -1028,7 +1028,7 @@ class Skysearch(commands.Cog):
                             if 'airport_ident' in runway:
                                 embed.add_field(name="Identifier", value=f"`{runway['airport_ident']}`", inline=True)
 
-                            lighted_status = ":bulb: **Lighted**" if str(runway.get('lighted', 0)) == '1' else ":x: **Not Lit**"
+                            lighted_status = ":bulb: **Lighted**" if str(runway.get('lighted', 0)) == '1' else ":x: `Not Lit`"
                             embed.add_field(name="Lighting", value=lighted_status, inline=True)
 
                             if 'surface' in runway:
