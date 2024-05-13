@@ -1014,20 +1014,20 @@ class Skysearch(commands.Cog):
                                 embed.add_field(name="ID", value=f"`{runway['id']}`", inline=True)
 
                             if 'airport_ref' in runway:
-                                embed.add_field(name="Airport Ref", value=f"`{runway['airport_ref']}`", inline=True)
+                                embed.add_field(name="Reference", value=f"`{runway['airport_ref']}`", inline=True)
 
                             if 'airport_ident' in runway:
-                                embed.add_field(name="Airport Ident", value=f"`{runway['airport_ident']}`", inline=True)
+                                embed.add_field(name="Identifier", value=f"`{runway['airport_ident']}`", inline=True)
 
                             if  'lighted' in runway:
                                 if runway['lighted'] == 1:
-                                    lighted_status = ":white_check_mark: `Lighted`"
+                                    lighted_status = ":bulb: `Lighted`"
                                 else:
                                     lighted_status = ":x: `No Lighting`"
                                 embed.add_field(name="Lighting", value=f"{lighted_status}", inline=True)
 
-                            if 'le_ils' in runway:
-                                embed.add_field(name="Le Ils", value=f"`{runway['le_ils']}`", inline=True)
+                            if 'surface' in runway:
+                                embed.add_field(name="Surface", value=f"`{runway['surface']}", inline=True)
                             runway_pages.append(embed)
 
                         message = await ctx.send(embed=runway_pages[0])
