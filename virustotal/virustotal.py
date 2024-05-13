@@ -1,4 +1,5 @@
-import aiohttp
+import aiohttp #type: ignore
+import asyncio
 import discord #type: ignore
 from redbot.core import commands #type: ignore
 
