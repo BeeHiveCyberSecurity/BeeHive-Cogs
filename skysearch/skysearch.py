@@ -1035,7 +1035,7 @@ class Skysearch(commands.Cog):
                                 embed.add_field(name="Surface", value=f"`{runway['surface']}`", inline=True)
 
                             if  'length_ft' and 'width_ft' in runway:
-                                embed.add_field(name="Dimensions", value=f"`{runway['length_ft']} ft long`\n`{runway['width_ft']} wide`", inline=False)
+                                embed.add_field(name="Dimensions", value=f"`{runway['length_ft']}ft long`\n`{runway['width_ft']}ft wide`", inline=False)
                                 
                             runway_pages.append(embed)
 
