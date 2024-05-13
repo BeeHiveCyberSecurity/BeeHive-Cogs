@@ -1027,7 +1027,7 @@ class Skysearch(commands.Cog):
             embed = discord.Embed(title="Error", description=str(e), color=0xff4545)
             await ctx.send(embed=embed)
 
-    @tasks.loop(minutes=2)
+    @tasks.loop(minutes=1)
     async def check_emergency_squawks(self):
         try:
             emergency_squawk_codes = ['7500', '7600', '7700']
