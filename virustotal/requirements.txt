@@ -1,4 +1,0 @@
-requests
-asyncio
-json
-io

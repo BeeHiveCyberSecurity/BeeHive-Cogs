@@ -3,16 +3,15 @@ import datetime
 import re
 from typing import List
 from urllib.parse import urlparse
-
-import aiohttp
-import discord
-from discord.ext import tasks
-from redbot.core import Config, commands, modlog
-from redbot.core.bot import Red
-from redbot.core.commands import Context
+import aiohttp # type: ignore
+import discord # type: ignore
+from discord.ext import tasks # type: ignore
+from redbot.core import Config, commands, modlog # type: ignore
+from redbot.core.bot import Red # type: ignore
+from redbot.core.commands import Context # type: ignore
 
 URL_REGEX_PATTERN = re.compile(
-    r"^(?:http[s]?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$"
+    r"^(?:http[s]?:\/\/)?[\w]+(?:\.[\w]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$"
 )
 
 
@@ -21,12 +20,12 @@ class AntiPhishing(commands.Cog):
     Guard users from malicious links and phishing attempts with customizable protection options.
     """
 
-    __version__ = "2.0.0"
+    __version__ = "1.0.0"
 
     def __init__(self, bot: Red):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=73835)
-        self.config.register_guild(action="ignore", caught=0)
+        self.config.register_guild(action="notify", caught=0)
         self.session = aiohttp.ClientSession()
         self.bot.loop.create_task(self.register_casetypes())
         self.bot.loop.create_task(self.get_phishing_domains())
@@ -78,7 +77,7 @@ class AntiPhishing(commands.Cog):
         domains = []
 
         headers = {
-            "X-Identity": f"Sentri, AntiPhishing v{self.__version__} (https://www.beehive.systems)",
+            "X-Identity": f"BeeHive AntiPhishing v{self.__version__} (https://www.beehive.systems/sentri)",
         }
 
         async with self.session.get(
@@ -89,7 +88,7 @@ class AntiPhishing(commands.Cog):
                 domains.extend(data)
 
         async with self.session.get(
-            "https://bad-domains.walshy.dev/domains.json"
+            "https://www.beehive.systems/hubfs/blocklist/blocklist.json", headers=headers
         ) as request:
             if request.status == 200:
                 data = await request.json()
@@ -132,15 +131,15 @@ class AntiPhishing(commands.Cog):
             if message.channel.permissions_for(message.guild.me).send_messages:
                 with contextlib.suppress(discord.NotFound):
                     embed = discord.Embed(
-                        title="Link Warning",
-                        description=f"{message.author.mention} has sent a dangerous link.\n\nThis link is known malicious by one or more security vendors, and might be intended to deliver malicious software, or trick you into handing over sensitive information.",
-                        color=await self.bot.get_embed_color(message.guild),
+                        title="Dangerous link detected!",
+                        description=f"This message contains a malicious website or URL.\n\nThis URL could be anything from a fraudulent online seller, to an IP logger, to a page delivering malware intended to steal Discord accounts.\n\n**Don't click any links in this message, and notify server moderators ASAP**",
+                        color=16729413,
                     )
-                    embed.set_author(
-                        name=message.author.display_name,
-                        icon_url=message.author.display_avatar.url,
-                    )
+                    embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/warning-outline.png")
+                    embed.timestamp = datetime.datetime.utcnow()
+                    embed.set_footer(text="Link scanning powered by BeeHive",icon_url="")
                     await message.reply(embed=embed)
+                    
                 await modlog.create_case(
                     guild=message.guild,
                     bot=self.bot,
@@ -258,23 +257,29 @@ class AntiPhishing(commands.Cog):
         url = url.strip("<>")
         urls = self.extract_urls(url)
         if not urls:
-            await ctx.send("That's not a valid URL.")
+            embed = discord.Embed(title='Error: Invalid URL', description=f"You provided an invalid URL.\n\nCheck the formatting of any links and try again...", colour=16729413,)
+            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle-outline.png")
+            await ctx.send(embed=embed)
             return
 
         real_url = urls[0]
         domain = urlparse(real_url).netloc
 
         if domain in self.domains:
-            await ctx.send("That URL is likely a phishing scam.")
+            embed = discord.Embed(title="Link query: Detected!", description=f"**This is a known dangerous website!**\n\nThis website is blocklisted for malicious behavior or content.", colour=16729413,)
+            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle-outline.png")
+            await ctx.send(embed=embed)
         else:
-            await ctx.send("That URL is likely not a phishing scam.")
+            embed = discord.Embed(title="Link query: No detections", description=f"**This link looks clean.**\n\nYou should be able to proceed safely. Apply caution to your best judgement while browsing this site, and leave the site if at any time your sense of trust is impaired.", colour=2866574,)
+            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/checkmark-circle-outline.png")
+            await ctx.send(embed=embed)
 
     @commands.group(aliases=["antiphish"])
     @commands.guild_only()
     @commands.admin_or_permissions(manage_guild=True)
     async def antiphishing(self, ctx: Context):
         """
-        Settings to set up the anti-phishing integration.
+        Settings to configure link safety in this server.
         """
 
     @antiphishing.command()
@@ -283,20 +288,22 @@ class AntiPhishing(commands.Cog):
         Choose the action that occurs when a user sends a phishing scam.
 
         Options:
-        `ignore` - Disables the anti-phishing integration (default)
-        `notify` - Sends a message to the channel and says it's a phishing scam
+        `ignore` - Disables phishing protection
+        `notify` - Alerts in channel when malicious links detected (default)
         `delete` - Deletes the message
-        `kick` - Kicks the author (also deletes the message)
-        `ban` - Bans the author (also deletes the message)
+        `kick` - Delete message and kick sender
+        `ban` - Delete message and ban sender (recommended)
         """
         if action not in ["ignore", "notify", "delete", "kick", "ban"]:
-            await ctx.send(
-                "That's not a valid action.\n\nOptions: `ignore`, `notify`, `delete`, `kick`, `ban`"
-            )
+            embed = discord.Embed(title='Error: Invalid action', description=f"You provided an invalid action. You are able to choose any of the following actions to occur when a malicious link is detected...\n\n`ignore` - Disables phishing protection\n`notify` - Alerts in channel when malicious links detected (default)\n`delete` - Deletes the message\n`kick` - Delete message and kick sender\n`ban` - Delete message and ban sender (recommended)\n\nRetry that command with one of the above options.", colour=16729413,)
+            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle-outline.png")
+            await ctx.send(embed=embed)
             return
 
         await self.config.guild(ctx.guild).action.set(action)
-        await ctx.send(f"Set the action to `{action}`.")
+        embed = discord.Embed(title='Settings changed', description=f"Malicious links will now trigger a **`{action}`** event when detected in chat.\n\nYou can make changes to this setting at any time.", colour=2866574,)
+        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/checkmark-circle-outline.png")
+        await ctx.send(embed=embed)
 
     @antiphishing.command()
     async def stats(self, ctx: Context):
@@ -305,4 +312,6 @@ class AntiPhishing(commands.Cog):
         """
         caught = await self.config.guild(ctx.guild).caught()
         s = "s" if caught != 1 else ""
-        await ctx.send(f"I've caught `{caught}` phishing scam{s} in this server!")
+        embed = discord.Embed(title='Link protection statistics', description=f"I've caught and alerted to **`{caught}`** malicious link{s} since being added to this server.\n\nKeep me around to continue defending your community with protection powered by [**BeeHive's Comprehensive CyberThreat Intelligence**](<https://www.beehive.systems/>)", colour=16767334,)
+        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/shield-checkmark-outline.png")
+        await ctx.send(embed=embed)

@@ -1,8 +1,25 @@
 {
-    "author": ["BeeHive"],
-    "description": "Analyze files via VirusTotal thru Red-DiscordBot",
-    "install_msg": "## Thanks for installing!\n\nThis is a cog co-engineered between the BeeHive team and community members. If you have any issues with it, please open an issue via GitHub, or create a ticket [here](<https://www.beehive.systems/support>).\n\nLooking for a security-minded Discord server? You're welcome to join ours <3\nhttps://discord.gg/X8huyaeXrA",
+    "author": [
+        "movelaterally",
+        "Sorted"
+    ],
+    "description": "Analyze files via VirusTotal thru Red-DiscordBot using the VirusTotal API",
+    "install_msg": "## :white_check_mark: Successfully installed VirusTotal.\n**Questions?** [We're listening](<https://www.beehive.systems/contact-us>)\n**Interested in CyberSecurity and CyberSafety?** [Join our Discord](https://discord.gg/ckdzsm7mTs).\n\n**IMPORTANT** - Before you can use this cog, you'll need to sign up for a VirusTotal account, then add your API Key to your Red instance.",
     "name": "VirusTotal",
-    "short": "Analyze files via Discord for malicious content",
+    "hidden": false,
+    "disabled": false,
+    "requirements": [
+        "requests",
+        "asyncio"
+    ],
+    "tags": [
+        "file scanning",
+        "antivirus",
+        "virustotal",
+        "file analysis",
+        "security",
+        "safety"
+    ],
+    "short": "Check files using VirusTotal and an API key",
     "min_bot_version": "3.5.0"
 }
