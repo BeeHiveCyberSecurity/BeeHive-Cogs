@@ -988,9 +988,13 @@ class Skysearch(commands.Cog):
                             value = f"`{data1[field]}`"
                             embed.add_field(name=field.capitalize(), value=value, inline=False)
                         else:
+                            # Ensure the URL is well-formed
+                            link = data1[field]
+                            if not (link.startswith('http://') or link.startswith('https://')):
+                                link = 'https://www.airport-data.com' + link
                             view = discord.ui.View(timeout=180)  # Set a timeout for the view
                             # URL button
-                            view_airport = discord.ui.Button(label="View airport on airport-data.com", url=data1[field], style=discord.ButtonStyle.link)
+                            view_airport = discord.ui.Button(label="View airport on airport-data.com", url=link, style=discord.ButtonStyle.link)
                             view.add_item(view_airport)
             await ctx.send(embed=embed, view=view)
 
