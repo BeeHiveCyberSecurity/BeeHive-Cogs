@@ -984,10 +984,15 @@ class Skysearch(commands.Cog):
             else:
                 for field in fields:
                     if field in data1:
-                        value = f"`{data1[field]}`" if field != 'link' else f"[Link]({data1[field]})"
-                        embed.add_field(name=field.capitalize(), value=value, inline=False)
-            
-            await ctx.send(embed=embed)
+                        if field != 'link':
+                            value = f"`{data1[field]}`"
+                            embed.add_field(name=field.capitalize(), value=value, inline=False)
+                        else:
+                            view = discord.ui.View(timeout=180)  # Set a timeout for the view
+                            # URL button
+                            view_airport = discord.ui.Button(label="View airport on airport-data.com", url=data1[field], style=discord.ButtonStyle.link)
+                            view.add_item(view_airport)
+            await ctx.send(embed=embed, view=view)
 
             api_token = await self.bot.get_shared_api_tokens("airportdbio")
             if api_token and 'api_token' in api_token and code_type == 'icao':
@@ -1027,15 +1032,17 @@ class Skysearch(commands.Cog):
                                 embed.add_field(name="Lighting", value=f"{lighted_status}", inline=True)
 
                             if 'surface' in runway:
-                                embed.add_field(name="Surface", value=f"`{runway['surface']}", inline=True)
+                                embed.add_field(name="Surface", value=f"`{runway['surface']}`", inline=True)
+                                
                             runway_pages.append(embed)
 
                         message = await ctx.send(embed=runway_pages[0])
                         await message.add_reaction("⬅️")
                         await message.add_reaction("➡️")
+                        await message.add_reaction("❌")
 
                         def check(reaction, user):
-                            return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️"]
+                            return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️", "❌"]
 
                         i = 0
                         reaction = None
@@ -1048,6 +1055,9 @@ class Skysearch(commands.Cog):
                                 if i < len(runway_pages)-1:
                                     i += 1
                                     await message.edit(embed=runway_pages[i])
+                            elif str(reaction) == "❌":
+                                await message.delete()
+                                break
                             try:
                                 reaction, user = await self.bot.wait_for("reaction_add", timeout=30.0, check=check)
                                 await message.remove_reaction(reaction, user)
