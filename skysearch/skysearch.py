@@ -1053,13 +1053,13 @@ class Skysearch(commands.Cog):
                                 embed = discord.Embed(title=f"Runway information for {code.upper()}", color=0xfffffe)
 
                         if 'freqs' in data2:
-                            freqs = data2['freqs']
+                            freq = data2['freqs']
                             embed = discord.Embed(title=f"Frequency information for {code.upper()}", color=0xfffffe)
-                            for id in freqs:
-                                embed.add_field(name="ID", value=f"`{freqs.('id', 'N/A')}`", inline=True)
-                                embed.add_field(name="Type", value=f"`{freqs.('type', 'N/A')}`", inline=True)
-                                embed.add_field(name="Frequency", value=f"`{freqs.('frequency', 'N/A')}`", inline=True)
-                                embed.add_field(name="Description", value=f"`{freqs.('description', 'N/A')}`", inline=True)
+                            for freq in freqs:
+                                embed.add_field(name="ID", value=f"`{freq.get('id', 'N/A')}`", inline=True)
+                                embed.add_field(name="Type", value=f"`{freq.get('type', 'N/A')}`", inline=True)
+                                embed.add_field(name="Frequency", value=f"`{freq.get('frequency', 'N/A')}`", inline=True)
+                                embed.add_field(name="Description", value=f"`{freq.get('description', 'N/A')}`", inline=True)
                             combined_pages.append(embed)
 
                         await self.paginate_embed(ctx, combined_pages)
