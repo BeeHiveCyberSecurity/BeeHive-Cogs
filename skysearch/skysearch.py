@@ -1038,11 +1038,11 @@ class Skysearch(commands.Cog):
 
                         message = await ctx.send(embed=runway_pages[0])
                         await message.add_reaction("⬅️")
-                        await message.add_reaction("➡️")
                         await message.add_reaction("❌")
+                        await message.add_reaction("➡️")
 
                         def check(reaction, user):
-                            return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️", "❌"]
+                            return user == ctx.author and str(reaction.emoji) in ["⬅️", "❌", "➡️"]
 
                         i = 0
                         reaction = None
