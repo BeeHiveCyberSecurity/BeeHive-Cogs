@@ -974,6 +974,12 @@ class Skysearch(commands.Cog):
             embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/location.png")
             fields = ['icao', 'iata', 'name', 'location', 'country', 'country_code', 'longitude', 'latitude', 'link']
 
+            api_token = await self.bot.get_shared_api_tokens("airportdbio")
+            if api_token and 'api_token' in api_token and code_type == 'icao':
+                url2 = f"https://airportdb.io/api/v1/airport/{code}?apiToken={api_token['api_token']}"
+                response2 = requests.get(url2)
+                data2 = response2.json()
+
             response1 = requests.get(url1)
             data1 = response1.json()
 
@@ -993,12 +999,6 @@ class Skysearch(commands.Cog):
                             view_airport = discord.ui.Button(label="View airport on airport-data.com", url=data1[field], style=discord.ButtonStyle.link)
                             view.add_item(view_airport)
             await ctx.send(embed=embed, view=view)
-
-            api_token = await self.bot.get_shared_api_tokens("airportdbio")
-            if api_token and 'api_token' in api_token and code_type == 'icao':
-                url2 = f"https://airportdb.io/api/v1/airport/{code}?apiToken={api_token['api_token']}"
-                response2 = requests.get(url2)
-                data2 = response2.json()
 
                 if 'error' in data2:
                     error_message = data2['error']
@@ -1024,14 +1024,7 @@ class Skysearch(commands.Cog):
                             if 'airport_ident' in runway:
                                 embed.add_field(name="Identifier", value=f"`{runway['airport_ident']}`", inline=True)
                             
-                            if 'type' in runway:
-                                airport_type = runway['type']
-                                airport_type_dict = {
-                                    'large_airport': ":airplane: `Large Airport`",
-                                    'medium_airport': ":small_airplane: `Medium Airport`",
-                                    'small_airport': ":helicopter: `Small Airport`"
-                                }
-                                embed.add_field(name="Type", value=airport_type_dict.get(airport_type, f"`{airport_type}`"), inline=True)
+
 
                             if  'lighted' in runway:
                                 if runway['lighted'] == 1:
