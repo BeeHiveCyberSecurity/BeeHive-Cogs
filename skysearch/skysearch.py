@@ -1026,7 +1026,7 @@ class Skysearch(commands.Cog):
 
                             if  'lighted' in runway:
                                 if runway['lighted'] == 1:
-                                    lighted_status = ":bulb: `Lighted`"
+                                    lighted_status = ":bulb: **Lighted**`"
                                 else:
                                     lighted_status = ":x: `No Lighting`"
                                 embed.add_field(name="Lighting", value=f"{lighted_status}", inline=True)
@@ -1036,7 +1036,8 @@ class Skysearch(commands.Cog):
 
                             if  'length_ft' and 'width_ft' in runway:
                                 embed.add_field(name="Dimensions", value=f"`{runway['length_ft']}ft long`\n`{runway['width_ft']}ft wide`", inline=False)
-                                
+                            
+                            
                             runway_pages.append(embed)
 
                         message = await ctx.send(embed=runway_pages[0])
