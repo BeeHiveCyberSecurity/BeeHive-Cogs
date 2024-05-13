@@ -1014,58 +1014,53 @@ class Skysearch(commands.Cog):
                     embed = discord.Embed(title="Error", value="No airport found with the provided code.", color=0xff4545)
                     await ctx.send(embed=embed)
                 else:
-                    if 'runways' in data2:
-                        runways = data2['runways']
-                        runway_pages = []
-                        for runway in runways:
-                            embed = discord.Embed(title=f"Runway information for {code.upper()}", color=0xfffffe)
-                            if 'id' in runway:
-                                embed.add_field(name="ID", value=f"`{runway['id']}`", inline=True)
+                    combined_pages = []
+                    if 'runways' in data2 or 'freqs' in data2:
+                        embed = discord.Embed(title=f"Airport information for {code.upper()}", color=0xfffffe)
+                        if 'runways' in data2:
+                            runways = data2['runways']
+                            for runway in runways:
+                                if 'id' in runway:
+                                    embed.add_field(name="Runway ID", value=f"`{runway['id']}`", inline=True)
 
-                            if 'airport_ref' in runway:
-                                embed.add_field(name="Reference", value=f"`{runway['airport_ref']}`", inline=True)
+                                if 'surface' in runway:
+                                    embed.add_field(name="Surface", value=f"`{runway['surface']}`", inline=True)
 
-                            if 'airport_ident' in runway:
-                                embed.add_field(name="Identifier", value=f"`{runway['airport_ident']}`", inline=True)
+                                if 'length_ft' in runway and 'width_ft' in runway:
+                                    embed.add_field(name="Dimensions", value=f"`{runway['length_ft']}ft long`\n`{runway['width_ft']}ft wide`", inline=True)
 
-                            if 'surface' in runway:
-                                embed.add_field(name="Surface", value=f"`{runway['surface']}`", inline=True)
+                                if 'le_ident' in runway or 'he_ident' in runway:
+                                    ils_value = ""
+                                    if 'le_ident' in runway:
+                                        ils_info = runway.get('le_ils', {})
+                                        ils_freq = ils_info.get('freq', 'N/A')
+                                        ils_course = ils_info.get('course', 'N/A')
+                                        ils_value += f"**{runway['le_ident']}**\n**ILS** `{ils_freq} MHz @ {ils_course}°`\n"
+                                    if 'he_ident' in runway:
+                                        ils_info = runway.get('he_ils', {})
+                                        ils_freq = ils_info.get('freq', 'N/A')
+                                        ils_course = ils_info.get('course', 'N/A')
+                                        ils_value += f"**{runway['he_ident']}**\n**ILS** `{ils_freq} MHz @ {ils_course}°`\n"
+                                    embed.add_field(name="ILS Information", value=ils_value.strip(), inline=False)
 
-                            if 'length_ft' in runway and 'width_ft' in runway:
-                                embed.add_field(name="Dimensions", value=f"`{runway['length_ft']}ft long`\n`{runway['width_ft']}ft wide`", inline=True)
+                                runway_status = ":white_check_mark: **Open**" if str(runway.get('closed', 0)) == '0' else ":x: **Closed**"
+                                embed.add_field(name="Runway Status", value=runway_status, inline=True)
 
-                            if 'le_ident' in runway:
-                                ils_info = runway.get('le_ils', {})
-                                ils_freq = ils_info.get('freq', 'N/A')
-                                ils_course = ils_info.get('course', 'N/A')
-                                ils_value = f"**{runway['le_ident']}**\n**LAT** `{runway['le_latitude_deg']}°`\n**LON** `{runway['le_longitude_deg']}°`\n**ILS** `{ils_freq} MHz @ {ils_course}°`"
-                                embed.add_field(name="Low end of runway", value=ils_value, inline=False)
+                                lighted_status = ":bulb: **Lighted**" if str(runway.get('lighted', 0)) == '1' else ":x: **Not Lighted**"
+                                embed.add_field(name="Lighting", value=lighted_status, inline=True)
 
-                            if 'he_ident' in runway:
-                                ils_info = runway.get('he_ils', {})
-                                ils_freq = ils_info.get('freq', 'N/A')
-                                ils_course = ils_info.get('course', 'N/A')
-                                ils_value = f"**{runway['he_ident']}**\n**LAT** `{runway['he_latitude_deg']}°`\n**LON** `{runway['he_longitude_deg']}°`\n**ILS** `{ils_freq} MHz @ {ils_course}°`"
-                                embed.add_field(name="High end of runway", value=ils_value, inline=False)
+                                combined_pages.append(embed)
+                                embed = discord.Embed(title=f"Airport information for {code.upper()}", color=0xfffffe)
 
-                            runway_status = ":white_check_mark: **Runway open for use**" if str(runway.get('closed', 0)) == '0' else ":x: **Runway closed**"
-                            embed.add_field(name="Runway status", value=runway_status, inline=False)
+                        if 'freqs' in data2:
+                            freqs = data2['freqs']
+                            for freq in freqs:
+                                for key, value in freq.items():
+                                    embed.add_field(name=key.capitalize(), value=f"`{value}`", inline=True)
+                                combined_pages.append(embed)
+                                embed = discord.Embed(title=f"Airport information for {code.upper()}", color=0xfffffe)
 
-                            lighted_status = ":bulb: **Runway has environmental lighting**" if str(runway.get('lighted', 0)) == '1' else ":x: **Runway has no lighting equipment registered in-use**"
-                            embed.add_field(name="Lighting", value=lighted_status, inline=True)
-                            
-                            runway_pages.append(embed)
-
-                        await self.paginate_embed(ctx, runway_pages)
-
-                    if 'freqs' in data2:
-                        freqs = data2['freqs']
-                        freq_pages = []
-                        for freq in freqs:
-                            embed = discord.Embed(title=f"Frequency information for {code.upper()}", color=0xfffffe)
-                            for key, value in freq.items():
-                                embed.add_field(name=key.capitalize(), value=f"`{value}`", inline=True)
-                            freq_pages.append(embed)
+                        await self.paginate_embed(ctx, combined_pages)
 
                         await self.paginate_embed(ctx, freq_pages)
 
