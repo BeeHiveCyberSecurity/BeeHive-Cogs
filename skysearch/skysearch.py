@@ -1033,7 +1033,7 @@ class Skysearch(commands.Cog):
                             if  'length_ft' and 'width_ft' in runway:
                                 embed.add_field(name="Dimensions", value=f"`{runway['length_ft']}ft long`\n`{runway['width_ft']}ft wide`", inline=True)
 
-                            runway_status = "Runway open for use" if str(runway.get('closed', 0)) == '0' else "Runway closed"
+                            runway_status = ":white_check_mark: **Runway open for use**" if str(runway.get('closed', 0)) == '0' else ":x: **Runway closed**"
                             embed.add_field(name="Runway status", value=runway_status, inline=True)
                             
                             
