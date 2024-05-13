@@ -1009,22 +1009,21 @@ class Skysearch(commands.Cog):
                             airport_button = discord.ui.Button(label="View airport on airport-data.com", url=airport_data[field], style=discord.ButtonStyle.link)
                             airport_view.add_item(airport_button)
                             
-                        if 'type' in data2:
+            await ctx.send(embed=airport_info_embed, view=airport_view)
 
-            await ctx.send(embed=embed, view=view)
-
-                if 'error' in data2:
-                    error_message = data2['error']
+            if api_token and 'api_token' in api_token and code_type == 'icao':
+                if 'error' in airportdbio_data:
+                    error_message = airportdbio_data['error']
                     if len(error_message) > 1024:
                         error_message = error_message[:1021] + "..."
                     embed = discord.Embed(title="Error", value=error_message, color=0xff4545)
                     await ctx.send(embed=embed)
-                elif not data2 or 'name' not in data2:
+                elif not airportdbio_data or 'name' not in airportdbio_data:
                     embed = discord.Embed(title="Error", value="No airport found with the provided code.", color=0xff4545)
                     await ctx.send(embed=embed)
                 else:
-                    if 'runways' in data2:
-                        runways = data2['runways']
+                    if 'runways' in airportdbio_data:
+                        runways = airportdbio_data['runways']
                         runway_pages = []
                         for runway in runways:
                             embed = discord.Embed(title=f"Runway information for {code.upper()}", color=0xfffffe)
@@ -1036,8 +1035,6 @@ class Skysearch(commands.Cog):
 
                             if 'airport_ident' in runway:
                                 embed.add_field(name="Identifier", value=f"`{runway['airport_ident']}`", inline=True)
-                            
-
 
                             if  'lighted' in runway:
                                 if runway['lighted'] == 1:
