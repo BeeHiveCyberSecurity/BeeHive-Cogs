@@ -1028,8 +1028,6 @@ class Skysearch(commands.Cog):
                             if 'airport_ident' in runway:
                                 embed.add_field(name="Identifier", value=f"`{runway['airport_ident']}`", inline=True)
 
-                            lighted_status = ":bulb: **Lighted**" if str(runway.get('lighted', 0)) == '1' else ":x: `Not Lit`"
-                            embed.add_field(name="Lighting", value=lighted_status, inline=True)
 
                             if 'surface' in runway:
                                 embed.add_field(name="Surface", value=f"`{runway['surface']}`", inline=True)
@@ -1053,6 +1051,9 @@ class Skysearch(commands.Cog):
 
                             runway_status = ":white_check_mark: **Runway open for use**" if str(runway.get('closed', 0)) == '0' else ":x: **Runway closed**"
                             embed.add_field(name="Runway status", value=runway_status, inline=False)
+
+                            lighted_status = ":bulb: **Runway has environmental lighting**" if str(runway.get('lighted', 0)) == '1' else ":x: **Runway has no lighting equipment registered in-use**"
+                            embed.add_field(name="Lighting", value=lighted_status, inline=True)
                             
                             runway_pages.append(embed)
 
