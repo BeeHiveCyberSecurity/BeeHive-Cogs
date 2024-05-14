@@ -80,10 +80,6 @@ class VirusTotal(commands.Cog):
                         data = await response.json()
                         attributes = data.get("data", {}).get("attributes", {})
                         if attributes.get("status") == "completed":
-                            threat_classification = attributes.get("popular_threat_classification", {})
-                            threat_category = threat_classification.get("popular_threat_category", [])
-                            threat_name = threat_classification.get("popular_threat_name", [])
-                            suggested_threat_label = threat_classification.get("suggested_threat_label", "Unknown")
                             stats = attributes.get("stats", {})
                             malicious_count = stats.get("malicious", 0)
                             suspicious_count = stats.get("suspicious", 0)
@@ -105,7 +101,7 @@ class VirusTotal(commands.Cog):
                                 content = f"||<@{presid}>||"
                                 if malicious_count >= 11:
                                     embed.title = "Malicious file found"
-                                    embed.description = f"### {int(percent)}% of security vendors rated this file dangerous!\n`{suggested_threat_label}`- **{malicious_count}** malicious\n- **{suspicious_count}** suspicious\n- **{safe_count}** detected no threats\n- **{noanswer_count}** engines couldn't check this file."
+                                    embed.description = f"### {int(percent)}% of security vendors rated this file dangerous!\n- **{malicious_count}** malicious\n- **{suspicious_count}** suspicious\n- **{safe_count}** detected no threats\n- **{noanswer_count}** engines couldn't check this file."
                                     embed.color = discord.Colour(0xff4545)
                                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/warning-outline.png")
                                 elif 1 < malicious_count < 11:
@@ -116,7 +112,7 @@ class VirusTotal(commands.Cog):
                                 else:
                                     embed.title = "No threat found"
                                     embed.color = discord.Colour(0x2BBD8E)
-                                    embed.description = "You should be safe to use this file.\nWant a [second opinion?](https://discord.gg/6PbaH6AfvF)"
+                                    embed.description = "### No security vendors currently flag this file as malicious - it should be safe to use."
                                     embed.add_field(name="Overall verdict", value="Clean", inline=False)
                                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/checkmark-circle-outline.png")
                                 file_name = meta.get("name", "Unknown file name")
@@ -126,6 +122,7 @@ class VirusTotal(commands.Cog):
                                 embed.add_field(name="MD5", value=f"`{md5}`", inline=False)
                                 # Create the button for the virustotal results link
                                 button = discord.ui.Button(label="View results on VirusTotal", url=f"https://www.virustotal.com/gui/file/{sha256}", emoji="🌐", style=discord.ButtonStyle.url)
+                                button2 = discord.ui.Button(label="Get a second opinion", url="https://discord.gg/6PbaH6AfvF", emoji="", style=discord.ButtonStyle.url)
                                 view = discord.ui.View()
                                 view.add_item(button)
                                 await ctx.send(content, embed=embed, view=view)
