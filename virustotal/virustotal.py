@@ -110,7 +110,7 @@ class VirusTotal(commands.Cog):
                     if sha256 and sha1 and md5:
                         embed = discord.Embed()
                         content = f"||<@{presid}>||"
-                        labels = ['Malicious', 'Suspicious', 'Undetected', 'Harmless', 'Failure', 'Unsupported']
+                        labels = ['Malicious', 'Suspicious', 'No Verdict', 'Harmless', 'Failed', 'Unsupported']
                         sizes = [malicious_count, suspicious_count, undetected_count, harmless_count, failure_count, unsupported_count]
                         colors = ['#ff4545', '#ff9144', '#dddddd', '#2BBD8E', '#ffcccb', '#ececec']
 
