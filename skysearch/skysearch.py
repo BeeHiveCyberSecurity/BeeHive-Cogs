@@ -18,7 +18,7 @@ from reportlab.pdfgen import canvas #type: ignore
 from reportlab.lib import colors#type: ignore
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle #type: ignore
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak, Table, TableStyle #type: ignore
-from .icao_codes import law_enforcement_icao_set, military_icao_set, medical_icao_set, suspicious_icao_set, prior_known_accident_set, ukr_conflict_set, newsagency_icao_set, safeballoons_icao_set
+from .icao_codes import us_law_enforcement_icao_set, us_military_icao_set, us_medical_icao_set, us_suspicious_icao_set, us_newsagency_icao_set, us_balloons_icao_set, global_prior_known_accident_set, ukr_conflict_set
 
 class Skysearch(commands.Cog):
     
@@ -29,14 +29,14 @@ class Skysearch(commands.Cog):
         self.max_requests_per_user = 10
         self.EMBED_COLOR = discord.Color(0xfffffe)
         self.check_emergency_squawks.start()
-        self.law_enforcement_icao_set = law_enforcement_icao_set
-        self.military_icao_set = military_icao_set
-        self.medical_icao_set = medical_icao_set
-        self.suspicious_icao_set = suspicious_icao_set
-        self.prior_known_accident_set = prior_known_accident_set
+        self.us_law_enforcement_icao_set = us_law_enforcement_icao_set
+        self.us_military_icao_set = us_military_icao_set
+        self.us_medical_icao_set = us_medical_icao_set
+        self.us_suspicious_icao_set = us_suspicious_icao_set
+        self.us_newsagency_icao_set = us_newsagency_icao_set
+        self.us_balloons_icao_set = us_balloons_icao_set
+        self.global_prior_known_accident_set = global_prior_known_accident_set
         self.ukr_conflict_set = ukr_conflict_set
-        self.newsagency_icao_set = newsagency_icao_set
-        self.safeballoons_icao_set = safeballoons_icao_set
         
     async def cog_unload(self):
         if hasattr(self, '_http_client'):
@@ -81,7 +81,7 @@ class Skysearch(commands.Cog):
             embed.add_field(name="Type", value=f"`{aircraft_data.get('desc', 'N/A')} ({aircraft_data.get('t', 'N/A')})`", inline=False)
             callsign = aircraft_data.get('flight', 'N/A').strip()
             if not callsign or callsign == 'N/A':
-                callsign = 'HIDDEN'
+                callsign = 'BLOCKED'
             embed.add_field(name="Callsign", value=f"`{callsign}`", inline=True)
             registration = aircraft_data.get('reg', None)
             if registration is not None:
@@ -129,7 +129,7 @@ class Skysearch(commands.Cog):
                 lon = f"{abs(lon)}{lon_dir}"
             if lat != 'N/A' and lon != 'N/A':
                 embed.add_field(name="Position", value=f"`{lat}, {lon}`", inline=True)
-            embed.add_field(name="Squawk", value=f"`{aircraft_data.get('squawk', 'SILENT')}`", inline=True)
+            embed.add_field(name="Squawk", value=f"`{aircraft_data.get('squawk', 'BLOCKED')}`", inline=True)
             if aircraft_data.get('year', None) is not None:
                 embed.add_field(name="Built", value=f"`{aircraft_data.get('year')}`", inline=True)
             category = aircraft_data.get('category', None)
@@ -160,22 +160,22 @@ class Skysearch(commands.Cog):
 
 
             icao = aircraft_data.get('hex', None)
-            if icao and icao.upper() in self.law_enforcement_icao_set:
+            if icao and icao.upper() in self.us_law_enforcement_icao_set:
                 embed.add_field(name="Asset intelligence", value=":police_officer: **Aircraft known for use by law enforcement**", inline=False)
-            if icao and icao.upper() in self.military_icao_set:
+            if icao and icao.upper() in self.us_military_icao_set:
                 embed.add_field(name="Asset intelligence", value=":military_helmet: **Aircraft known for use in military and government**", inline=False)
-            if icao and icao.upper() in self.medical_icao_set:
+            if icao and icao.upper() in self.us_medical_icao_set:
                 embed.add_field(name="Asset intelligence", value=":hospital: **Aircraft known for use in medical response and transport**", inline=False)
-            if icao and icao.upper() in self.suspicious_icao_set:
+            if icao and icao.upper() in self.us_suspicious_icao_set:
                 embed.add_field(name="Asset intelligence", value=":warning: **Aircraft exhibits suspicious flight activity**", inline=False)
-            if icao and icao.upper() in self.prior_known_accident_set:
+            if icao and icao.upper() in self.global_prior_known_accident_set:
                 embed.add_field(name="Asset intelligence", value=":boom: **Aircraft prior involved in one or more accidents**", inline=False)
             if icao and icao.upper() in self.ukr_conflict_set:
                 embed.add_field(name="Asset intelligence", value=":flag_ua: **Aircraft utilized within the RussoUkrainian conflict**", inline=False)
-            if icao and icao.upper() in self.newsagency_icao_set:
+            if icao and icao.upper() in self.us_newsagency_icao_set:
                 embed.add_field(name="Asset intelligence", value=":newspaper: **Aircraft used by news or media organization**", inline=False)
-            if icao and icao.upper() in self.safeballoons_icao_set:
-                embed.add_field(name="Asset intelligence", value=":balloon: **Aircraft is a stratospheric research balloon**", inline=False)
+            if icao and icao.upper() in self.us_balloons_icao_set:
+                embed.add_field(name="Asset intelligence", value=":balloon: **Aircraft is a balloon**", inline=False)
             
             image_url, photographer = await self._get_photo_by_hex(icao)
             if image_url and photographer:
