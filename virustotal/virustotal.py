@@ -89,7 +89,7 @@ class VirusTotal(commands.Cog):
                             unsupported_count = stats.get("type-unsupported", 0)
                             meta = data.get("meta", {}).get("file_info", {}).get("sha256")
                             if meta:
-                                embed = discord.Embed(url=f"https://www.virustotal.com/gui/file/{meta}")
+                                embed = discord.Embed()
                                 content = f"||<@{presid}>||"
                                 if malicious_count >= 11:
                                     embed.title = "That file looks malicious!"
@@ -112,7 +112,12 @@ class VirusTotal(commands.Cog):
                                 safe_count = harmless_count + undetected_count
                                 percent = round((malicious_count / total_count) * 100, 2) if total_count > 0 else 0
                                 embed.add_field(name="Analysis results", value=f"**{percent}%** of security vendors rated this file dangerous!\n- **{malicious_count}** malicious\n- **{suspicious_count}** suspicious\n- **{safe_count}** detected no threats\n- **{noanswer_count}** engines couldn't check this file.", inline=False)
-                                await ctx.send(content, embed=embed)
+                                
+                                # Create the button for the virustotal results link
+                                button = discord.ui.Button(label="View results on VirusTotal", url=f"https://www.virustotal.com/gui/file/{meta}", style=discord.ButtonStyle.url)
+                                view = discord.ui.View()
+                                view.add_item(button)
+                                await ctx.send(content, embed=embed, view=view)
                                 break
                             else:
                                 raise ValueError("SHA256 value not found in the analysis response.")
