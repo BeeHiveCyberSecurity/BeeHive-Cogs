@@ -176,6 +176,7 @@ class VirusTotal(commands.Cog):
                         button2 = discord.ui.Button(label="Get a second opinion", url="https://discord.gg/6PbaH6AfvF", style=discord.ButtonStyle.url)
                         view = discord.ui.View()
                         view.add_item(button)
+                        view.add_item(button2)
                         await ctx.send(content=content, file=bar_chart_file, embed=embed, view=view)
                     else:
                         raise ValueError("Required hash values not found in the analysis response.")
