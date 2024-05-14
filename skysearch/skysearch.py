@@ -548,7 +548,7 @@ class Skysearch(commands.Cog):
                         aircraft_info += f"**Coordinates:** Lat: {aircraft_lat}, Lon: {aircraft_lon}\n"
                         aircraft_info += f"**Heading:** {aircraft_heading}\n"
                         aircraft_info += f"**Speed:** {aircraft_speed}\n"
-                        aircraft_info += f"**Hex:** {aircraft_hex}"
+                        aircraft_info += f"**ICAO:** {aircraft_hex}"
 
                         embed.add_field(name=aircraft_description, value=aircraft_info, inline=False)
 
@@ -600,7 +600,7 @@ class Skysearch(commands.Cog):
                         aircraft_info += f"**Coordinates:** Lat: {aircraft_lat}, Lon: {aircraft_lon}\n"
                         aircraft_info += f"**Heading:** {aircraft_heading}\n"
                         aircraft_info += f"**Speed:** {aircraft_speed}\n"
-                        aircraft_info += f"**Hex:** {aircraft_hex}"
+                        aircraft_info += f"**ICAO:** {aircraft_hex}"
 
                         embed.add_field(name=aircraft_description, value=aircraft_info, inline=False)
 
