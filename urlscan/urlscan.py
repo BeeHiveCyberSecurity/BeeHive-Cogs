@@ -50,7 +50,7 @@ class URLScan(commands.Cog):
                     report_url = res['result']
                     report_api = res['api']
                     time.sleep(10)
-                    r2 = requests.get(report_api, timeout=15)
+                    r2 = requests.get(report_api, timeout=60)
                     res2 = r2.json()
 
                     embed = discord.Embed(url=report_url)
