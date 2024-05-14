@@ -59,13 +59,13 @@ class URLScan(commands.Cog):
                     if 'verdicts' in res2 and 'overall' in res2['verdicts'] and 'score' in res2['verdicts']['overall']:
                         threat_level = res2['verdicts']['overall']['score']
                         if threat_level != 0:
-                            embed.title = f"This URL looks suspicious!"
+                            embed.title = f"URL is suspicious"
                             embed.description = f"URLScan says {url} is suspicious!\n\nFor your own safety, please don't click it."
                             embed.color = 0xFF4545
                             embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/warning-outline.png")
                             view.add_item(discord.ui.Button(label=f"View results", url=f"{report_url}", style=discord.ButtonStyle.link))
                         else:
-                            embed.title = f"That URL looks safe"
+                            embed.title = f"URL is safe"
                             embed.color = 0x2BBD8E
                             embed.description = f"URLScan did not detect any threats associated with {url}"
                             embed.add_field(name="Overall verdict", value="Scanned and found safe", inline=False)
