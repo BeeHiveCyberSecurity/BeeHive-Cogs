@@ -130,7 +130,7 @@ class VirusTotal(commands.Cog):
                         
                         # Save the animation as a GIF image in memory.
                         pie_chart_buffer = io.BytesIO()
-                        anim.save(pie_chart_buffer, writer='imagemagick', format='gif')
+                        anim.save(pie_chart_buffer, writer='imagemagick')
                         pie_chart_buffer.seek(0)  # rewind the buffer to the beginning so we can read its content
                         
                         # Set the pie chart image as the embed image
