@@ -1082,29 +1082,28 @@ class Skysearch(commands.Cog):
             except asyncio.TimeoutError:
                 break
 
-    @tasks.loop(minutes=1)
+    @tasks.loop(minutes=2)
     async def check_emergency_squawks(self):
         try:
             emergency_squawk_codes = ['7500', '7600', '7700']
-            guilds = await self.bot.fetch_guilds().flatten()  # Fetch guilds once outside the loop
             for squawk_code in emergency_squawk_codes:
                 url = f"{self.api_url}/squawk/{squawk_code}"
                 response = await self._make_request(url)
                 if response and 'ac' in response:
                     for aircraft_info in response['ac']:
+                        guilds = self.bot.guilds
                         for guild in guilds:
                             alert_channel_id = await self.config.guild(guild).alert_channel()
                             if alert_channel_id:
                                 alert_channel = self.bot.get_channel(alert_channel_id)
                                 if alert_channel:
                                     # Send the new alert
-                                    await self._send_aircraft_info(alert_channel, {'ac': [aircraft_info]}, "")
-                                    await self.config.guild(guild).last_emergency_squawk_time.set(int(time.time()))
+                                    await self._send_aircraft_info(alert_channel, {'ac': [aircraft_info]})
                                 else:
                                     print(f"Error: Alert channel not found for guild {guild.name}")
                             else:
                                 print(f"Error: No alert channel set for guild {guild.name}")
-                await asyncio.sleep(2)  # Consider if this sleep is necessary, as it may delay processing
+                await asyncio.sleep(2)  # Add a delay to respect API rate limit
         except Exception as e:
             print(f"Error checking emergency squawks: {e}")
 
