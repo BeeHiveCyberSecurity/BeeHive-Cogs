@@ -2,6 +2,7 @@ import aiohttp
 import io
 import os
 import tempfile
+import math
 import asyncio
 import discord #type: ignore
 import matplotlib.pyplot as plt
@@ -117,8 +118,11 @@ class VirusTotal(commands.Cog):
                         values = sizes
                         N = len(categories)
 
+                        # Import the math module to access pi
+                        import math
+
                         # What will be the angle of each axis in the plot? (we divide the plot / number of variable)
-                        angles = [n / float(N) * 2 * pi for n in range(N)]
+                        angles = [n / float(N) * 2 * math.pi for n in range(N)]
                         values += values[:1]
                         angles += angles[:1]
 
