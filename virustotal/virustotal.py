@@ -1,5 +1,7 @@
 import aiohttp
 import io
+import os
+import tempfile
 import asyncio
 import discord #type: ignore
 import matplotlib.pyplot as plt
