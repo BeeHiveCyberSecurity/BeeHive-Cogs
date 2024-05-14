@@ -112,32 +112,48 @@ class VirusTotal(commands.Cog):
                         labels = ['Malicious', 'Suspicious', 'Undetected', 'Harmless', 'Failure', 'Unsupported']
                         sizes = [malicious_count, suspicious_count, undetected_count, harmless_count, failure_count, unsupported_count]
                         colors = ['#ff4545', '#ff9144', '#dddddd', '#2BBD8E', '#ffcccb', '#ececec']
-                        explode = [0.1 if malicious_count > 0 else 0] * len(labels)  # explode the first slice if there are malicious results
+                        # Create a spider graph instead of a pie chart
+                        categories = labels
+                        values = sizes
+                        N = len(categories)
 
-                        # Plot
-                        plt.figure(figsize=(10, 8))  # Increase the figure size to make the text more legible
-                        pie, texts, autotexts = plt.pie(sizes, explode=explode, colors=colors, startangle=140, autopct='%1.1f%%', shadow=True)
-                        plt.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+                        # What will be the angle of each axis in the plot? (we divide the plot / number of variable)
+                        angles = [n / float(N) * 2 * pi for n in range(N)]
+                        values += values[:1]
+                        angles += angles[:1]
 
-                        # Increase the text size for better legibility
-                        plt.setp(texts, size='x-large')
-                        plt.setp(autotexts, size='x-large')
-                        plt.legend(pie, labels, loc="best")
+                        # Initialise the spider plot
+                        plt.figure(figsize=(10, 8))
+                        ax = plt.subplot(111, polar=True)
 
-                        # Save the pie chart as a PNG image in memory.
-                        pie_chart_buffer = io.BytesIO()
-                        plt.savefig(pie_chart_buffer, format='png')
-                        pie_chart_buffer.seek(0)  # rewind the buffer to the beginning so we can read its content
+                        # Draw one axe per variable + add labels
+                        plt.xticks(angles[:-1], categories, color='grey', size=8)
 
-                        # Set the pie chart image as the embed image
-                        embed.set_image(url="attachment://pie_chart.png")
+                        # Draw ylabels
+                        ax.set_rlabel_position(0)
+                        plt.yticks([10, 20, 30], ["10", "20", "30"], color="grey", size=7)
+                        plt.ylim(0, max(values))
+
+                        # Plot data
+                        ax.plot(angles, values, linewidth=1, linestyle='solid')
+
+                        # Fill area
+                        ax.fill(angles, values, colors[0], alpha=0.1)
+
+                        # Save the spider graph as a PNG image in memory.
+                        spider_chart_buffer = io.BytesIO()
+                        plt.savefig(spider_chart_buffer, format='png')
+                        spider_chart_buffer.seek(0)  # rewind the buffer to the beginning so we can read its content
+
+                        # Set the spider graph image as the embed image
+                        embed.set_image(url="attachment://spider_chart.png")
 
                         # Clear the matplotlib figure
                         plt.clf()
                         plt.close('all')
 
                         # Create a discord file from the image in memory
-                        pie_chart_file = discord.File(pie_chart_buffer, filename='pie_chart.png')
+                        spider_chart_file = discord.File(spider_chart_buffer, filename='spider_chart.png')
 
                         if malicious_count >= 11:
                             embed.title = "Malicious file found"
