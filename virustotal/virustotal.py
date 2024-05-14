@@ -67,7 +67,7 @@ class VirusTotal(commands.Cog):
                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle-outline.png")
                     await ctx.send(embed=embed)
 
-async def check_results(self, ctx, analysis_id, presid):
+    async def check_results(self, ctx, analysis_id, presid):
         vt_key = await self.bot.get_shared_api_tokens("virustotal")
         headers = {"x-apikey": vt_key["api_key"]}
 
