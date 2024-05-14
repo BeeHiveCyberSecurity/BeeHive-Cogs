@@ -93,7 +93,9 @@ class VirusTotal(commands.Cog):
                             md5 = meta.get("md5")
                             names = attributes.get("names", [])
                             last_analysis_stats = attributes.get("last_analysis_stats", {})
-                            threat_label = attributes.get("popular_threat_classification", {}).get("suggested_threat_label", "Unknown")
+                            threat_label = attributes.get("popular_threat_classification", {}).get("suggested_threat_label")
+                            if threat_label is None:
+                                threat_label = "Unknown"
                             if sha256 and sha1 and md5:
                                 embed = discord.Embed()
                                 content = f"||<@{presid}>||"
