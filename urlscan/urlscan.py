@@ -52,6 +52,7 @@ class URLScan(commands.Cog):
                     time.sleep(10)
                     r2 = requests.get(report_api, timeout=60)
                     res2 = r2.json()
+                    view = discord.ui.View()
 
                     embed = discord.Embed(url=report_url)
                     if 'verdicts' in res2 and 'overall' in res2['verdicts'] and 'score' in res2['verdicts']['overall']:
@@ -61,20 +62,24 @@ class URLScan(commands.Cog):
                             embed.description = f"URLScan says {url} is suspicious!\n\nFor your own safety, please don't click it."
                             embed.color = 0xFF4545
                             embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/warning-outline.png")
+                            view.add_item(discord.ui.Button(label=f"View results", url=f"{report_url}", style=discord.ButtonStyle.link))
                         else:
                             embed.title = f"That URL looks safe"
                             embed.color = 0x2BBD8E
                             embed.description = f"URLScan did not detect any threats associated with {url}"
                             embed.add_field(name="Overall verdict", value="Scanned and found safe", inline=False)
                             embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/checkmark-circle-outline.png")
+                            view.add_item(discord.ui.Button(label=f"View results", url=f"{report_url}", style=discord.ButtonStyle.link))
                     else:
                         embed.title = f"Error occurred during URLScan"
                         embed.description = f"Unable to determine the threat level for {url}."
                         embed.color = 0xFFD700
                         embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/warning-outline.png")
 
-                    view = discord.ui.View()
-                    view.add_item(discord.ui.Button(label=f"View results", url=f"{report_url}", style=discord.ButtonStyle.link))
-                    await ctx.send(embed=embed, view=view)
+                    if 'verdicts' in res2:
+                        await ctx.send(embed=embed, view=view)
+                    else:
+                        await ctx.send(embed=embed)
             except (json.JSONDecodeError, requests.exceptions.Timeout):
+                    await ctx.send(f"Invalid JSON response from URLScan API or request timed out for {url}.")
                 await ctx.send(f"Invalid JSON response from URLScan API or request timed out for {url}.")
