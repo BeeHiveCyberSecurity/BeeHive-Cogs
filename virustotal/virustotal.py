@@ -1,6 +1,8 @@
 import aiohttp
+import io
 import asyncio
 import discord #type: ignore
+import matplotlib.pyplot as plt
 from redbot.core import commands #type: ignore
 
 class VirusTotal(commands.Cog):
@@ -104,6 +106,32 @@ class VirusTotal(commands.Cog):
                                     embed.description = f"### {int(percent)}% of security vendors rated this file dangerous!\n- **{malicious_count}** malicious\n- **{suspicious_count}** suspicious\n- **{safe_count}** detected no threats\n- **{noanswer_count}** engines couldn't check this file."
                                     embed.color = discord.Colour(0xff4545)
                                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/warning-outline.png")
+
+                                # Data to plot
+                                labels = 'Malicious', 'Suspicious', 'Undetected', 'Harmless', 'Failure', 'Unsupported'
+                                sizes = [malicious_count, suspicious_count, undetected_count, harmless_count, failure_count, unsupported_count]
+                                colors = ['#ff4545', '#ff9144', '#dddddd', '#2BBD8E', '#ffcccb', '#ececec']
+                                explode = (0.1, 0, 0, 0, 0, 0)  # explode the first slice (Malicious)
+
+                                # Plot
+                                plt.figure(figsize=(6, 4))
+                                plt.pie(sizes, explode=explode, labels=labels, colors=colors, autopct='%1.1f%%', shadow=True, startangle=140)
+
+                                plt.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+
+                                # Save the pie chart as a PNG image in memory.
+                                pie_chart_buffer = io.BytesIO()
+                                plt.savefig(pie_chart_buffer, format='png')
+                                pie_chart_buffer.seek(0)  # rewind the buffer to the beginning so we can read its content
+
+                                # Create a discord file from the image in memory
+                                pie_chart_file = discord.File(pie_chart_buffer, filename='pie_chart.png')
+                                embed.set_image(url='attachment://pie_chart.png')
+
+                                # Clear the matplotlib figure
+                                plt.clf()
+                                plt.close('all')
+
                                 elif 1 < malicious_count < 11:
                                     embed.title = "Suspicious file found"
                                     embed.description = f"### {int(percent)}% of security vendors rated this file dangerous!\n- **{malicious_count}** malicious\n- **{suspicious_count}** suspicious\n- **{safe_count}** detected no threats\n- **{noanswer_count}** engines couldn't check this file."
@@ -115,8 +143,6 @@ class VirusTotal(commands.Cog):
                                     embed.description = "### No security vendors currently flag this file as malicious - it should be safe to use."
                                     embed.add_field(name="Overall verdict", value="Clean", inline=False)
                                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/checkmark-circle-outline.png")
-                                file_name = meta.get("name", "Unknown file name")
-                                embed.add_field(name="File Name", value=f"`{file_name}`", inline=False)
                                 embed.add_field(name="SHA-256", value=f"`{sha256}`", inline=False)
                                 embed.add_field(name="SHA-1", value=f"`{sha1}`", inline=False)
                                 embed.add_field(name="MD5", value=f"`{md5}`", inline=False)
