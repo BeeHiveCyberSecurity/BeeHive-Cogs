@@ -10,6 +10,6 @@ safeballoons_icao_set = {'A0973A'}
 
 ukr_conflict_set = {'AE5240', 'AE6821'}
 
-suspicious_icao_set = {'A9739F'}
+suspicious_icao_set = {'A9739F', 'A1AFEA'}
 
 prior_known_accident_set = {}
