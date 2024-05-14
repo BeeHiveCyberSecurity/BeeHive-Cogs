@@ -168,11 +168,11 @@ class VirusTotal(commands.Cog):
                     else:
                         raise ValueError("Required hash values not found in the analysis response.")
             except (aiohttp.ClientResponseError, ValueError) as e:
-                embed = discord.Embed(title='Error: Analysis Failed', description=str(e), colour=discord.Colour.red())
+                embed = discord.Embed(title='Analysis failed', description=str(e), colour=discord.Colour.red())
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle-outline.png")
                 await ctx.send(embed=embed)
             except asyncio.TimeoutError:
-                embed = discord.Embed(title='Error: Request Timeout', description="The bot was unable to complete the request due to a timeout.", colour=discord.Colour.red())
+                embed = discord.Embed(title='Request timed out', description="The bot was unable to complete the request due to a timeout.", colour=discord.Colour.red())
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle-outline.png")
                 await ctx.send(embed=embed)
 
