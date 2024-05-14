@@ -10,7 +10,7 @@ us_newsagency_icao_set = {'AADE9D'}
 
 us_balloons_icao_set = {'A0973A'}
 
-us_agri_utility_set = {'A2A4BF', 'A86F46', 'A543CA', 'A0DC49', 'A991D9', 'A986FA', 'A1B275'}
+us_agri_utility_set = {'A2A4BF', 'A86F46', 'A543CA', 'A0DC49', 'A991D9', 'A986FA', 'A1B275', 'A89EA5'}
 
 ukr_conflict_set = {'AE5240', 'AE6821'}
 
