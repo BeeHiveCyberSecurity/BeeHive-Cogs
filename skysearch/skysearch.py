@@ -181,9 +181,9 @@ class Skysearch(commands.Cog):
                 embed.add_field(name="Asset intelligence", value=":corn: **Aircraft is used for agriculture surveys, easement validation, or land inspection**", inline=False)
 
             seen_pos= aircraft_data.get('seen_pos', 'N/A')
-            last_checked_in_value = "Just now" if seen_pos < 1 else f"{seen_pos} seconds ago"
+            last_checked_in_value = ":arrows_counterclockwise: **Just now**" if seen_pos < 1 else f":hourglass_flowing_sand: **{seen_pos} seconds ago**"
             embed.add_field(name="Last checked in", value=last_checked_in_value, inline=False)
-            
+
             image_url, photographer = await self._get_photo_by_hex(icao)
             if image_url and photographer:
                 embed.set_image(url=image_url)
