@@ -113,52 +113,44 @@ class VirusTotal(commands.Cog):
                         labels = ['Malicious', 'Suspicious', 'Undetected', 'Harmless', 'Failure', 'Unsupported']
                         sizes = [malicious_count, suspicious_count, undetected_count, harmless_count, failure_count, unsupported_count]
                         colors = ['#ff4545', '#ff9144', '#dddddd', '#2BBD8E', '#ffcccb', '#ececec']
-                        # Create a spider graph instead of a pie chart
-                        categories = labels
-                        values = sizes
-                        N = len(categories)
 
-                        # Import the math module to access pi
-                        import math
-
-                        # What will be the angle of each axis in the plot? (we divide the plot / number of variable)
-                        angles = [n / float(N) * 2 * math.pi for n in range(N)]
-                        values += values[:1]
-                        angles += angles[:1]
-
-                        # Initialise the spider plot
+                        # Create a bar chart instead of a spider graph
                         plt.figure(figsize=(10, 8))
-                        ax = plt.subplot(111, polar=True)
+                        ax = plt.subplot(111)
 
-                        # Draw one axe per variable + add labels
-                        plt.xticks(angles[:-1], categories, color='grey', size=8)
+                        # Create the bar chart
+                        ax.bar(labels, sizes, color=colors)
 
-                        # Draw ylabels
-                        ax.set_rlabel_position(0)
-                        plt.yticks([10, 20, 30], ["10", "20", "30"], color="grey", size=7)
-                        plt.ylim(0, max(values))
+                        # Add some text for labels, title and custom x-axis tick labels, etc.
+                        ax.set_ylabel('Counts')
+                        ax.set_title('Analysis Results')
+                        ax.set_xticks(labels)
+                        ax.set_xticklabels(labels)
+                        ax.legend()
 
-                        # Plot data
-                        ax.plot(angles, values, linewidth=1, linestyle='solid')
+                        # Attach a text label above each bar in *rects*, displaying its height.
+                        for rect in ax.patches:
+                            height = rect.get_height()
+                            ax.annotate('{}'.format(height),
+                                        xy=(rect.get_x() + rect.get_width() / 2, height),
+                                        xytext=(0, 3),  # 3 points vertical offset
+                                        textcoords="offset points",
+                                        ha='center', va='bottom')
 
-                        # Fill area
-                        ax.fill(angles, values, colors[0], alpha=0.1)
+                        # Save the bar chart as a PNG image in memory.
+                        bar_chart_buffer = io.BytesIO()
+                        plt.savefig(bar_chart_buffer, format='png')
+                        bar_chart_buffer.seek(0)  # rewind the buffer to the beginning so we can read its content
 
-                        # Save the spider graph as a PNG image in memory.
-                        spider_chart_buffer = io.BytesIO()
-                        plt.savefig(spider_chart_buffer, format='png')
-                        spider_chart_buffer.seek(0)  # rewind the buffer to the beginning so we can read its content
-
-                        # Set the spider graph image as the embed image
-                        embed.set_image(url="attachment://spider_chart.png")
+                        # Set the bar chart image as the embed image
+                        embed.set_image(url="attachment://bar_chart.png")
 
                         # Clear the matplotlib figure
                         plt.clf()
                         plt.close('all')
 
                         # Create a discord file from the image in memory
-                        spider_chart_file = discord.File(spider_chart_buffer, filename='spider_chart.png')
-
+                        bar_chart_file = discord.File(bar_chart_buffer, filename='bar_chart.png')
                         if malicious_count >= 11:
                             embed.title = "Malicious file found"
                             embed.description = f"### {int(percent)}% of security vendors rated this file dangerous!\nYou should avoid this file completely, and delete it from your systems to ensure security."
@@ -184,7 +176,7 @@ class VirusTotal(commands.Cog):
                         button2 = discord.ui.Button(label="Get a second opinion", url="https://discord.gg/6PbaH6AfvF", style=discord.ButtonStyle.url)
                         view = discord.ui.View()
                         view.add_item(button)
-                        await ctx.send(content=content, file=spider_chart_file, embed=embed, view=view)
+                        await ctx.send(content=content, file=bar_chart_file, embed=embed, view=view)
                     else:
                         raise ValueError("Required hash values not found in the analysis response.")
             except (aiohttp.ClientResponseError, ValueError) as e:
