@@ -14,6 +14,7 @@ class URLScan(commands.Cog):
         
     @commands.hybrid_command(name="urlscan", description="Utilize URLScan's /scan endpoint to scan a URL")
     async def urlscan(self, ctx, *, urls: str = None):
+        """Scan a URL using urlscan.io"""
         urlscan_key = await self.bot.get_shared_api_tokens("urlscan")
         if urlscan_key.get("api_key") is None:
             await ctx.send("The URLScan API key has not been set.")

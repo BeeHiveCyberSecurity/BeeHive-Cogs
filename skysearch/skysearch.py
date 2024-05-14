@@ -77,7 +77,7 @@ class Skysearch(commands.Cog):
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Orange/alert-circle-outline.png")
             else:
                 embed = discord.Embed(title='Aircraft information', color=discord.Colour(0xfffffe))
-                emergency_status = ":shield: **Aircraft is undergoing normal operation**"
+                emergency_status = ":shield: **Aircraft reporting normal operating conditions**"
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/airplane.png")
             embed.add_field(name="Type", value=f"`{aircraft_data.get('desc', 'N/A')} ({aircraft_data.get('t', 'N/A')})`", inline=False)
             callsign = aircraft_data.get('flight', 'N/A').strip()
