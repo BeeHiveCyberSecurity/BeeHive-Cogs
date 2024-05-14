@@ -159,7 +159,7 @@ class Skysearch(commands.Cog):
             embed.add_field(name="Flight status", value=emergency_status, inline=True)
 
 
-            icao = aircraft_data.get('hex', None)
+            icao = aircraft_data.get('hex', None).upper()
             if icao and icao.upper() in self.us_law_enforcement_icao_set:
                 embed.add_field(name="Asset intelligence", value=":police_officer: **Aircraft known for use by state law enforcement**", inline=False)
             if icao and icao.upper() in self.us_military_icao_set:
