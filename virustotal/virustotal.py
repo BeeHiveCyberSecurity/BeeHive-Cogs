@@ -91,9 +91,11 @@ class VirusTotal(commands.Cog):
                             sha256 = meta.get("sha256")
                             sha1 = meta.get("sha1")
                             md5 = meta.get("md5")
-                            threat_classification = data.get("popular_threat_classification", {})
-                            threat_label = threat_classification.get("suggested_threat_label")
-                            if sha256 and sha1 and md5 and threat_label:
+                            names = attributes.get("names", [])
+                            last_analysis_stats = attributes.get("last_analysis_stats", {})
+                            threat_classification = attributes.get("popular_threat_classification", {})
+                            threat_label = threat_classification.get("suggested_threat_label") if threat_classification else "Unknown"
+                            if sha256 and sha1 and md5:
                                 embed = discord.Embed()
                                 content = f"||<@{presid}>||"
                                 if malicious_count >= 11:
@@ -117,7 +119,9 @@ class VirusTotal(commands.Cog):
                                 safe_count = harmless_count + undetected_count
                                 percent = round((malicious_count / total_count) * 100, 2) if total_count > 0 else 0
                                 embed.add_field(name="Analysis results", value=f"**{percent}%** of security vendors rated this file dangerous!\n- **{malicious_count}** malicious\n- **{suspicious_count}** suspicious\n- **{safe_count}** detected no threats\n- **{noanswer_count}** engines couldn't check this file.", inline=False)
+                                embed.add_field(name="File Names", value=", ".join(names), inline=False)
                                 embed.add_field(name="File Hashes", value=f"SHA-256: `{sha256}`\nSHA-1: `{sha1}`\nMD5: `{md5}`", inline=False)
+                                embed.add_field(name="Last Analysis Stats", value=f"Malicious: {last_analysis_stats.get('malicious', 0)}\nSuspicious: {last_analysis_stats.get('suspicious', 0)}\nUndetected: {last_analysis_stats.get('undetected', 0)}\nHarmless: {last_analysis_stats.get('harmless', 0)}\nTimeout: {last_analysis_stats.get('timeout', 0)}\nConfirmed Timeout: {last_analysis_stats.get('confirmed-timeout', 0)}\nFailure: {last_analysis_stats.get('failure', 0)}\nType Unsupported: {last_analysis_stats.get('type-unsupported', 0)}", inline=False)
                                 
                                 # Create the button for the virustotal results link
                                 button = discord.ui.Button(label="View results on VirusTotal", url=f"https://www.virustotal.com/gui/file/{sha256}", emoji="🌐", style=discord.ButtonStyle.url)
