@@ -185,7 +185,11 @@ class Skysearch(commands.Cog):
             view = discord.ui.View()
             view.add_item(discord.ui.Button(label=f"Track live", url=f"{link}", style=discord.ButtonStyle.link))
             ground_speed_mph = ground_speed_mph if 'ground_speed_mph' in locals() else 'UNKNOWN'
-            tweet_text = f"Tracking flight {aircraft_data.get('flight', '')} at position {lat}, {lon} with speed {ground_speed_mph} mph using #SkySearch\n\nJoin via Discord to track planes with your friends for free - https://discord.gg/X8huyaeXrA"
+            squawk_code = aircraft_data.get('squawk', 'N/A')
+            if squawk_code in emergency_squawk_codes:
+                tweet_text = f"Spotted an aircraft declaring an emergency! Squawk {squawk_code}, flight {aircraft_data.get('flight', '')} at position {lat}, {lon} with speed {ground_speed_mph} mph. #SkySearch #Emergency\n\nJoin via Discord to track planes with your friends for free - https://discord.gg/X8huyaeXrA"
+            else:
+                tweet_text = f"Tracking flight {aircraft_data.get('flight', '')} at position {lat}, {lon} with speed {ground_speed_mph} mph using #SkySearch\n\nJoin via Discord to track planes with your friends for free - https://discord.gg/X8huyaeXrA"
             tweet_url = f"https://twitter.com/intent/tweet?text={urllib.parse.quote_plus(tweet_text)}"
             view.add_item(discord.ui.Button(label=f"Share on 𝕏", url=tweet_url, style=discord.ButtonStyle.link))
             await ctx.send(embed=embed, view=view)
