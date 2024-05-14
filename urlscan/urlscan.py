@@ -72,7 +72,8 @@ class URLScan(commands.Cog):
                         embed.description = f"Unable to determine the threat level for {url}."
                         embed.color = 0xFFD700
                         embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/warning-outline.png")
-
-                    await ctx.send(embed=embed)
+                    view = discord.ui.View()
+                    view.add_item(discord.ui.Button(label=f"View report", url=f"{report_url}", style=discord.ButtonStyle.link))
+                    await ctx.send(embed=embed, view=view)
             except (json.JSONDecodeError, requests.exceptions.Timeout):
                 await ctx.send(f"Invalid JSON response from URLScan API or request timed out for {url}.")
