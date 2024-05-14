@@ -2,7 +2,6 @@ import requests
 import discord #type: ignore
 import json
 import time
-import re
 from redbot.core import commands #type: ignore 
 from redbot.core import app_commands #type: ignore
 
@@ -41,7 +40,7 @@ class URLScan(commands.Cog):
             data = {"url": url, "visibility": "public"}
             try:
                 async with ctx.typing():
-                    r = requests.post('https://urlscan.io/api/v1/scan/', headers=headers, data=json.dumps(data), timeout=15)
+                    r = requests.post('https://urlscan.io/api/v1/scan/', headers=headers, data=json.dumps(data), timeout=60)
                     res = r.json()
                     if 'result' not in res:
                         await ctx.send(f"{res.get('message', 'Unknown error')}")
@@ -72,8 +71,7 @@ class URLScan(commands.Cog):
                         embed.description = f"Unable to determine the threat level for {url}."
                         embed.color = 0xFFD700
                         embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/warning-outline.png")
-                    view = discord.ui.View()
-                    view.add_item(discord.ui.Button(label=f"View report", url=f"{report_url}", style=discord.ButtonStyle.link))
-                    await ctx.send(embed=embed, view=view)
+
+                    await ctx.send(embed=embed)
             except (json.JSONDecodeError, requests.exceptions.Timeout):
                 await ctx.send(f"Invalid JSON response from URLScan API or request timed out for {url}.")
