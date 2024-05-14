@@ -5,7 +5,6 @@ import tempfile
 import asyncio
 import discord #type: ignore
 import matplotlib.pyplot as plt
-import matplotlib.animation as animation
 from redbot.core import commands #type: ignore
 
 class VirusTotal(commands.Cog):
@@ -115,33 +114,30 @@ class VirusTotal(commands.Cog):
                         colors = ['#ff4545', '#ff9144', '#dddddd', '#2BBD8E', '#ffcccb', '#ececec']
                         explode = [0.1 if malicious_count > 0 else 0] * len(labels)  # explode the first slice if there are malicious results
 
-                        # Animate the plot
-                        fig, ax = plt.subplots(figsize=(8, 6))  # Increase the figure size to make the text more legible
-                        
-                        def animate(i):
-                            ax.clear()
-                            pie, texts, autotexts = ax.pie(sizes, explode=explode, colors=colors, startangle=140 + i, autopct='%1.1f%%', shadow=True)
-                            ax.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
-                            plt.setp(texts, size='large')
-                            plt.setp(autotexts, size='large')
-                            ax.legend(pie, labels, loc="best")
-                        
-                        anim = animation.FuncAnimation(fig, animate, frames=range(0, 360, 2), interval=100)
-                        
-                        # Save the animation as a GIF image in memory.
+                        # Plot
+                        plt.figure(figsize=(10, 8))  # Increase the figure size to make the text more legible
+                        pie, texts, autotexts = plt.pie(sizes, explode=explode, colors=colors, startangle=140, autopct='%1.1f%%', shadow=True)
+                        plt.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+
+                        # Increase the text size for better legibility
+                        plt.setp(texts, size='x-large')
+                        plt.setp(autotexts, size='x-large')
+                        plt.legend(pie, labels, loc="best")
+
+                        # Save the pie chart as a PNG image in memory.
                         pie_chart_buffer = io.BytesIO()
-                        anim.save(pie_chart_buffer, writer='imagemagick')
+                        plt.savefig(pie_chart_buffer, format='png')
                         pie_chart_buffer.seek(0)  # rewind the buffer to the beginning so we can read its content
-                        
+
                         # Set the pie chart image as the embed image
-                        embed.set_image(url="attachment://pie_chart.gif")
-                        
+                        embed.set_image(url="attachment://pie_chart.png")
+
                         # Clear the matplotlib figure
                         plt.clf()
                         plt.close('all')
-                        
+
                         # Create a discord file from the image in memory
-                        pie_chart_file = discord.File(pie_chart_buffer, filename='pie_chart.gif')
+                        pie_chart_file = discord.File(pie_chart_buffer, filename='pie_chart.png')
 
                         if malicious_count >= 11:
                             embed.title = "Malicious file found"
