@@ -22,6 +22,12 @@ class VirusTotal(commands.Cog):
 
             async with aiohttp.ClientSession() as session:
                 try:
+                    # Check if a file URL is provided or if there are attachments in the message or the referenced message
+                    attachments = ctx.message.attachments
+                    if ctx.message.reference and not attachments:
+                        ref_message = await ctx.channel.fetch_message(ctx.message.reference.message_id)
+                        attachments = ref_message.attachments
+
                     if file_url:
                         async with session.post("https://www.virustotal.com/api/v3/urls", headers={"x-apikey": vt_key["api_key"]}, data={"url": file_url}) as response:
                             if response.status != 200:
@@ -33,8 +39,8 @@ class VirusTotal(commands.Cog):
                                 await self.check_results(ctx, permalink, ctx.author.id)
                             else:
                                 raise ValueError("No permalink found in the response.")
-                    elif ctx.message.attachments:
-                        attachment = ctx.message.attachments[0]
+                    elif attachments:
+                        attachment = attachments[0]
                         async with session.get(attachment.url) as response:
                             if response.status != 200:
                                 raise aiohttp.ClientResponseError(response.request_info, response.history, status=response.status, message=f"HTTP error {response.status}", headers=response.headers)
@@ -49,7 +55,7 @@ class VirusTotal(commands.Cog):
                                 else:
                                     raise ValueError("No analysis ID found in the response.")
                     else:
-                        embed = discord.Embed(title='Error: No file provided', description="The bot was unable to find content to submit for analysis!\nPlease provide one of the following when using this command:\n- URL file can be downloaded from\n- Drag-and-drop a file less than 25mb in size", colour=discord.Colour.red())
+                        embed = discord.Embed(title='Error: No file provided', description="The bot was unable to find content to submit for analysis!\nPlease provide one of the following when using this command:\n- URL file can be downloaded from\n- Drag-and-drop a file less than 25mb in size\n- Reply to a message containing a file", colour=discord.Colour.red())
                         embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle-outline.png")
                         await ctx.send(embed=embed)
                 except (aiohttp.ClientResponseError, ValueError) as e:
@@ -61,7 +67,7 @@ class VirusTotal(commands.Cog):
                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle-outline.png")
                     await ctx.send(embed=embed)
 
-    async def check_results(self, ctx, analysis_id, presid):
+async def check_results(self, ctx, analysis_id, presid):
         vt_key = await self.bot.get_shared_api_tokens("virustotal")
         headers = {"x-apikey": vt_key["api_key"]}
 
@@ -122,6 +128,4 @@ class VirusTotal(commands.Cog):
                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle-outline.png")
                     await ctx.send(embed=embed)
                     break
-
-
 
