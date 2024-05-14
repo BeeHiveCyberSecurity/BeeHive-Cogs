@@ -82,4 +82,3 @@ class URLScan(commands.Cog):
                         await ctx.send(embed=embed)
             except (json.JSONDecodeError, requests.exceptions.Timeout):
                     await ctx.send(f"Invalid JSON response from URLScan API or request timed out for {url}.")
-                await ctx.send(f"Invalid JSON response from URLScan API or request timed out for {url}.")
