@@ -55,16 +55,16 @@ class VirusTotal(commands.Cog):
                                 else:
                                     raise ValueError("No analysis ID found in the response.")
                     else:
-                        embed = discord.Embed(title='Error: No file provided', description="The bot was unable to find content to submit for analysis!\nPlease provide one of the following when using this command:\n- URL file can be downloaded from\n- Drag-and-drop a file less than 25mb in size\n- Reply to a message containing a file", colour=discord.Colour.red())
-                        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle-outline.png")
+                        embed = discord.Embed(title='Error: No file provided', description="The bot was unable to find content to submit for analysis!\nPlease provide one of the following when using this command:\n- URL file can be downloaded from\n- Drag-and-drop a file less than 25mb in size\n- Reply to a message containing a file", colour=discord.Colour(0xff4545))
+                        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close.png")
                         await ctx.send(embed=embed)
                 except (aiohttp.ClientResponseError, ValueError) as e:
-                    embed = discord.Embed(title='Error: Failed to submit file', description=str(e), colour=discord.Colour.red())
-                    embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle-outline.png")
+                    embed = discord.Embed(title='Error: Failed to submit file', description=str(e), colour=discord.Colour(0xff4545))
+                    embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close.png")
                     await ctx.send(embed=embed)
                 except asyncio.TimeoutError:
-                    embed = discord.Embed(title='Error: Request Timeout', description="The bot was unable to complete the request due to a timeout.", colour=discord.Colour.red())
-                    embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle-outline.png")
+                    embed = discord.Embed(title='Error: Request Timeout', description="The bot was unable to complete the request due to a timeout.", colour=discord.Colour(0xff4545))
+                    embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close.png")
                     await ctx.send(embed=embed)
 
     async def check_results(self, ctx, analysis_id, presid):
@@ -94,16 +94,16 @@ class VirusTotal(commands.Cog):
                                 if malicious_count >= 11:
                                     embed.title = "That file looks malicious!"
                                     embed.description = "You should avoid running, using, or handling the file out of an abundance of caution."
-                                    embed.color = discord.Colour.red()
+                                    embed.color = discord.Colour(0xff4545)
                                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/warning-outline.png")
                                 elif 1 < malicious_count < 11:
                                     embed.title = "That file looks suspicious!"
                                     embed.description = "This file might be harmful. Exercise caution and consider further analysis."
-                                    embed.color = discord.Colour.orange()
+                                    embed.color = discord.Colour(0xff9144)
                                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Orange/alert-outline.png")
                                 else:
                                     embed.title = "That file looks safe!"
-                                    embed.color = discord.Colour.green()
+                                    embed.color = discord.Colour(0x2BBD8E)
                                     embed.description = "You should be safe to use this file.\nWant a [second opinion?](https://discord.gg/6PbaH6AfvF)"
                                     embed.add_field(name="Overall verdict", value="Clean", inline=False)
                                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/checkmark-circle-outline.png")
