@@ -180,7 +180,7 @@ class Skysearch(commands.Cog):
             image_url, photographer = await self._get_photo_by_hex(icao)
             if image_url and photographer:
                 embed.set_image(url=image_url)
-                embed.set_footer(text=f"Photo by {photographer}")
+                embed.set_footer(text=f"📸 {photographer}")
 
             view = discord.ui.View()
             view.add_item(discord.ui.Button(label=f"Track {callsign} live", url=f"{link}", style=discord.ButtonStyle.link))
