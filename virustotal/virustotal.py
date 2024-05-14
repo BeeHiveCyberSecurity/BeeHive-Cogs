@@ -117,7 +117,6 @@ class VirusTotal(commands.Cog):
                                     # Plot
                                     plt.figure(figsize=(6, 4))
                                     plt.pie(sizes, explode=explode, labels=labels, colors=colors, autopct='%1.1f%%', shadow=True, startangle=140)
-
                                     plt.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
 
                                     # Save the pie chart as a PNG image in memory.
@@ -125,13 +124,18 @@ class VirusTotal(commands.Cog):
                                     plt.savefig(pie_chart_buffer, format='png')
                                     pie_chart_buffer.seek(0)  # rewind the buffer to the beginning so we can read its content
 
-                                    # Create a discord file from the image in memory
-                                    pie_chart_file = discord.File(pie_chart_buffer, filename='pie_chart.png')
-                                    embed.set_image(url='attachment://pie_chart.png')
+                                    # Set the pie chart image as the embed image
+                                    embed.set_image(url="attachment://pie_chart.png")
 
                                     # Clear the matplotlib figure
                                     plt.clf()
                                     plt.close('all')
+
+                                    # Create a discord file from the image in memory
+                                    pie_chart_file = discord.File(pie_chart_buffer, filename='pie_chart.png')
+
+                                    # Send the embed with the file
+                                    await ctx.send(content=content, file=pie_chart_file, embed=embed)
 
                                 elif 1 < malicious_count < 11:
                                     embed.title = "Suspicious file found"
