@@ -165,7 +165,6 @@ class VirusTotal(commands.Cog):
                             embed.title = "No threat found"
                             embed.color = discord.Colour(0x2BBD8E)
                             embed.description = "### No security vendors currently flag this file as malicious - it should be safe to use."
-                            embed.add_field(name="Overall verdict", value="Clean", inline=False)
                             embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/checkmark-circle-outline.png")
 
                         embed.add_field(name="SHA-256", value=f"`{sha256}`", inline=False)
