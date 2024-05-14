@@ -161,17 +161,17 @@ class Skysearch(commands.Cog):
 
             icao = aircraft_data.get('hex', None)
             if icao and icao.upper() in self.us_law_enforcement_icao_set:
-                embed.add_field(name="Asset intelligence", value=":police_officer: **Aircraft known for use by law enforcement**", inline=False)
+                embed.add_field(name="Asset intelligence", value=":police_officer: **Aircraft known for use by state law enforcement**", inline=False)
             if icao and icao.upper() in self.us_military_icao_set:
                 embed.add_field(name="Asset intelligence", value=":military_helmet: **Aircraft known for use in military and government**", inline=False)
             if icao and icao.upper() in self.us_medical_icao_set:
                 embed.add_field(name="Asset intelligence", value=":hospital: **Aircraft known for use in medical response and transport**", inline=False)
             if icao and icao.upper() in self.us_suspicious_icao_set:
-                embed.add_field(name="Asset intelligence", value=":warning: **Aircraft exhibits suspicious flight activity**", inline=False)
+                embed.add_field(name="Asset intelligence", value=":warning: **Aircraft exhibits suspicious flight or surveillance activity**", inline=False)
             if icao and icao.upper() in self.global_prior_known_accident_set:
-                embed.add_field(name="Asset intelligence", value=":boom: **Aircraft prior involved in one or more accidents**", inline=False)
+                embed.add_field(name="Asset intelligence", value=":boom: **Aircraft prior involved in one or more documented accidents**", inline=False)
             if icao and icao.upper() in self.ukr_conflict_set:
-                embed.add_field(name="Asset intelligence", value=":flag_ua: **Aircraft utilized within the RussoUkrainian conflict**", inline=False)
+                embed.add_field(name="Asset intelligence", value=":flag_ua: **Aircraft utilized within the [Russo-Ukrainian conflict](https://en.wikipedia.org/wiki/Russian-occupied_territories_of_Ukraine)**", inline=False)
             if icao and icao.upper() in self.us_newsagency_icao_set:
                 embed.add_field(name="Asset intelligence", value=":newspaper: **Aircraft used by news or media organization**", inline=False)
             if icao and icao.upper() in self.us_balloons_icao_set:
