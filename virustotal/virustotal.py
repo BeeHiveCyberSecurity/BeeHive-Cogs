@@ -91,22 +91,17 @@ class VirusTotal(commands.Cog):
                             sha256 = meta.get("sha256")
                             sha1 = meta.get("sha1")
                             md5 = meta.get("md5")
-                            names = attributes.get("names", [])
-                            last_analysis_stats = attributes.get("last_analysis_stats", {})
-                            threat_label = attributes.get("popular_threat_classification", {}).get("suggested_threat_label")
-                            if threat_label is None:
-                                threat_label = "Unknown"
                             if sha256 and sha1 and md5:
                                 embed = discord.Embed()
                                 content = f"||<@{presid}>||"
                                 if malicious_count >= 11:
                                     embed.title = "That file looks malicious!"
-                                    embed.description = f"Threat identified: {threat_label}\nYou should avoid running, using, or handling the file out of an abundance of caution."
+                                    embed.description = "You should avoid running, using, or handling the file out of an abundance of caution."
                                     embed.color = discord.Colour(0xff4545)
                                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/warning-outline.png")
                                 elif 1 < malicious_count < 11:
                                     embed.title = "That file looks suspicious!"
-                                    embed.description = f"Threat identified: {threat_label}\nThis file might be harmful. Exercise caution and consider further analysis."
+                                    embed.description = "This file might be harmful. Exercise caution and consider further analysis."
                                     embed.color = discord.Colour(0xff9144)
                                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Orange/alert-outline.png")
                                 else:
@@ -123,6 +118,9 @@ class VirusTotal(commands.Cog):
                                 embed.add_field(name="SHA-256", value=f"```{sha256}```", inline=False)
                                 embed.add_field(name="SHA-1", value=f"```{sha1}```", inline=False)
                                 embed.add_field(name="MD5", value=f"```{md5}```", inline=False)
+                                suggested_threat_label = attributes.get("suggested_threat_label")
+                                if suggested_threat_label:
+                                    embed.add_field(name="Suggested Threat Label", value=suggested_threat_label, inline=False)
                                 # Create the button for the virustotal results link
                                 button = discord.ui.Button(label="View results on VirusTotal", url=f"https://www.virustotal.com/gui/file/{sha256}", emoji="🌐", style=discord.ButtonStyle.url)
                                 view = discord.ui.View()
