@@ -99,7 +99,7 @@ class VirusTotal(commands.Cog):
                                 embed = discord.Embed()
                                 content = f"||<@{presid}>||"
                                 if malicious_count >= 11:
-                                    embed.title = "Threat found"
+                                    embed.title = "Malicious file found"
                                     embed.description = f"### {int(percent)}% of security vendors rated this file dangerous!\n- **{malicious_count}** malicious\n- **{suspicious_count}** suspicious\n- **{safe_count}** detected no threats\n- **{noanswer_count}** engines couldn't check this file."
                                     embed.color = discord.Colour(0xff4545)
                                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/warning-outline.png")
