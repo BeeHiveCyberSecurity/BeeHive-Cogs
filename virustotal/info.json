@@ -10,7 +10,8 @@
     "disabled": false,
     "requirements": [
         "requests",
-        "asyncio"
+        "asyncio",
+        "matplotlib"
     ],
     "tags": [
         "file scanning",
