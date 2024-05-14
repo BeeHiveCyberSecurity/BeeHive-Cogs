@@ -80,6 +80,10 @@ class VirusTotal(commands.Cog):
                         data = await response.json()
                         attributes = data.get("data", {}).get("attributes", {})
                         if attributes.get("status") == "completed":
+                            threat_classification = attributes.get("popular_threat_classification", {})
+                            threat_category = threat_classification.get("popular_threat_category", [])
+                            threat_name = threat_classification.get("popular_threat_name", [])
+                            suggested_threat_label = threat_classification.get("suggested_threat_label", "Unknown")
                             stats = attributes.get("stats", {})
                             malicious_count = stats.get("malicious", 0)
                             suspicious_count = stats.get("suspicious", 0)
@@ -91,6 +95,7 @@ class VirusTotal(commands.Cog):
                             sha256 = meta.get("sha256")
                             sha1 = meta.get("sha1")
                             md5 = meta.get("md5")
+
                             total_count = malicious_count + suspicious_count + undetected_count + harmless_count + failure_count + unsupported_count
                             noanswer_count = failure_count + unsupported_count
                             safe_count = harmless_count + undetected_count
@@ -100,7 +105,7 @@ class VirusTotal(commands.Cog):
                                 content = f"||<@{presid}>||"
                                 if malicious_count >= 11:
                                     embed.title = "Malicious file found"
-                                    embed.description = f"### {int(percent)}% of security vendors rated this file dangerous!\n- **{malicious_count}** malicious\n- **{suspicious_count}** suspicious\n- **{safe_count}** detected no threats\n- **{noanswer_count}** engines couldn't check this file."
+                                    embed.description = f"### {int(percent)}% of security vendors rated this file dangerous!\n`{suggested_threat_label}`- **{malicious_count}** malicious\n- **{suspicious_count}** suspicious\n- **{safe_count}** detected no threats\n- **{noanswer_count}** engines couldn't check this file."
                                     embed.color = discord.Colour(0xff4545)
                                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/warning-outline.png")
                                 elif 1 < malicious_count < 11:
