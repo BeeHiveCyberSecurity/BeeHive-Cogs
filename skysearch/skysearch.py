@@ -133,9 +133,36 @@ class Skysearch(commands.Cog):
             embed.add_field(name="Squawk", value=f"`{aircraft_data.get('squawk', 'BLOCKED')}`", inline=True)
             if aircraft_data.get('year', None) is not None:
                 embed.add_field(name="Built", value=f"`{aircraft_data.get('year')}`", inline=True)
+            category_code_to_label = {
+                "A0": "No ADS-B emitter category information",
+                "A1": "Light (< 15500 lbs)",
+                "A2": "Small (15500 to 75000 lbs)",
+                "A3": "Large (75000 to 300000 lbs)",
+                "A4": "High vortex large (aircraft such as B-757)",
+                "A5": "Heavy (> 300000 lbs)",
+                "A6": "High performance (> 5g acceleration and 400 kts)",
+                "A7": "Rotorcraft",
+                "B0": "No ADS-B emitter category information",
+                "B1": "Glider / sailplane",
+                "B2": "Lighter-than-air",
+                "B3": "Parachutist / skydiver",
+                "B4": "Ultralight / hang-glider / paraglider",
+                "B5": "Reserved",
+                "B6": "Unmanned aerial vehicle",
+                "B7": "Space / trans-atmospheric vehicle",
+                "C0": "No ADS-B emitter category information",
+                "C1": "Surface vehicle – emergency vehicle",
+                "C2": "Surface vehicle – service vehicle",
+                "C3": "Point obstacle",
+                "C4": "Cluster obstacle",
+                "C5": "Line obstacle",
+                "C6": "Reserved",
+                "C7": "Reserved"
+            }
             category = aircraft_data.get('category', None)
             if category is not None:
-                embed.add_field(name="Category", value=f"`{category}`", inline=True)
+                category_label = category_code_to_label.get(category, "Unknown category")
+                embed.add_field(name="Category", value=f"`{category_label}`", inline=True)
             aircraft_model = aircraft_data.get('t', None)
             if aircraft_model is not None:
                 embed.add_field(name="Model", value=f"`{aircraft_model}`", inline=True)
