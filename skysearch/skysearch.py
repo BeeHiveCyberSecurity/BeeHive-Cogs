@@ -175,6 +175,7 @@ class Skysearch(commands.Cog):
                 embed.add_field(name="Operated by", value=f"`{operator}`", inline=True)
             
             seen_pos= aircraft_data.get('seen_pos', 'N/A')
+            seen_pos = int(seen_pos) if seen_pos != 'N/A' else 0
             last_checked_in_value = ":arrows_counterclockwise: **Just now**" if seen_pos < 1 else f":hourglass_flowing_sand: **{seen_pos} seconds ago**"
             embed.add_field(name="Last checked in", value=last_checked_in_value, inline=False)
             
