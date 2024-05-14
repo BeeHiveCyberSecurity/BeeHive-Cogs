@@ -91,8 +91,9 @@ class VirusTotal(commands.Cog):
                             sha256 = meta.get("sha256")
                             sha1 = meta.get("sha1")
                             md5 = meta.get("md5")
-                            threat_label = attributes.get("suggested_threat_label")
-                            if sha256 and sha1 and md5:
+                            threat_classification = attributes.get("popular_threat_classification", {})
+                            threat_label = threat_classification.get("suggested_threat_label")
+                            if sha256 and sha1 and md5 and threat_label:
                                 embed = discord.Embed()
                                 content = f"||<@{presid}>||"
                                 if malicious_count >= 11:
