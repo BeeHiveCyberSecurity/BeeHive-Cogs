@@ -18,7 +18,7 @@ from reportlab.pdfgen import canvas #type: ignore
 from reportlab.lib import colors#type: ignore
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle #type: ignore
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak, Table, TableStyle #type: ignore
-from .icao_codes import us_law_enforcement_icao_set, us_military_icao_set, us_medical_icao_set, us_suspicious_icao_set, us_newsagency_icao_set, us_balloons_icao_set, global_prior_known_accident_set, ukr_conflict_set
+from .icao_codes import us_law_enforcement_icao_set, us_military_icao_set, us_medical_icao_set, us_suspicious_icao_set, us_newsagency_icao_set, us_balloons_icao_set, global_prior_known_accident_set, ukr_conflict_set, us_agri_utility_set
 
 class Skysearch(commands.Cog):
     
@@ -37,6 +37,7 @@ class Skysearch(commands.Cog):
         self.us_balloons_icao_set = us_balloons_icao_set
         self.global_prior_known_accident_set = global_prior_known_accident_set
         self.ukr_conflict_set = ukr_conflict_set
+        self.us_agri_utility_set = us_agri_utility_set
         
     async def cog_unload(self):
         if hasattr(self, '_http_client'):
@@ -176,6 +177,8 @@ class Skysearch(commands.Cog):
                 embed.add_field(name="Asset intelligence", value=":newspaper: **Aircraft used by news or media organization**", inline=False)
             if icao and icao.upper() in self.us_balloons_icao_set:
                 embed.add_field(name="Asset intelligence", value=":balloon: **Aircraft is a balloon**", inline=False)
+            if icao and icao.upper() in self.us_agri_utility_set:
+                embed.add_field(name-"Asset intelligence", value=":farm: **Aircraft is used for agriculture, easement, or land inspection**", inline=False)
             
             image_url, photographer = await self._get_photo_by_hex(icao)
             if image_url and photographer:
