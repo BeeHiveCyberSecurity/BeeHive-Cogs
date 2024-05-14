@@ -146,6 +146,11 @@ class Skysearch(commands.Cog):
             operator = aircraft_data.get('ownOp', None)
             if operator is not None:
                 embed.add_field(name="Operated by", value=f"`{operator}`", inline=True)
+            
+            seen_pos= aircraft_data.get('seen_pos', 'N/A')
+            last_checked_in_value = ":arrows_counterclockwise: **Just now**" if seen_pos < 1 else f":hourglass_flowing_sand: **{seen_pos} seconds ago**"
+            embed.add_field(name="Last checked in", value=last_checked_in_value, inline=False)
+            
             baro_rate = aircraft_data.get('baro_rate', 'N/A')
             if baro_rate == 'N/A':
                 embed.add_field(name="Altitude trend", value=":grey_question: **Altitude trends unavailable, not enough data...**", inline=False)
@@ -179,10 +184,6 @@ class Skysearch(commands.Cog):
                 embed.add_field(name="Asset intelligence", value=":balloon: **Aircraft is a balloon**", inline=False)
             if icao and icao.upper() in self.agri_utility_set:
                 embed.add_field(name="Asset intelligence", value=":corn: **Aircraft is used for agriculture surveys, easement validation, or land inspection**", inline=False)
-
-            seen_pos= aircraft_data.get('seen_pos', 'N/A')
-            last_checked_in_value = ":arrows_counterclockwise: **Just now**" if seen_pos < 1 else f":hourglass_flowing_sand: **{seen_pos} seconds ago**"
-            embed.add_field(name="Last checked in", value=last_checked_in_value, inline=False)
 
             image_url, photographer = await self._get_photo_by_hex(icao)
             if image_url and photographer:
