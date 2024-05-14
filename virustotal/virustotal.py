@@ -141,12 +141,12 @@ class VirusTotal(commands.Cog):
 
                         if malicious_count >= 11:
                             embed.title = "Malicious file found"
-                            embed.description = f"### {int(percent)}% of security vendors rated this file dangerous!\n- **{malicious_count}** malicious\n- **{suspicious_count}** suspicious\n- **{safe_count}** detected no threats\n- **{noanswer_count}** engines couldn't check this file."
+                            embed.description = f"### {int(percent)}% of security vendors rated this file dangerous!\nYou should avoid this file completely, and delete it from your systems to ensure security."
                             embed.color = discord.Colour(0xff4545)
                             embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/warning-outline.png")
                         elif 1 < malicious_count < 11:
                             embed.title = "Suspicious file found"
-                            embed.description = f"### {int(percent)}% of security vendors rated this file dangerous!\n- **{malicious_count}** malicious\n- **{suspicious_count}** suspicious\n- **{safe_count}** detected no threats\n- **{noanswer_count}** engines couldn't check this file."
+                            embed.description = f"### {int(percent)}% of security vendors rated this file dangerous!\nWhile there are malicious ratings available for this file, there aren't many, so this could be a false positive. You should investigate further."
                             embed.color = discord.Colour(0xff9144)
                             embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Orange/alert-outline.png")
                         else:
