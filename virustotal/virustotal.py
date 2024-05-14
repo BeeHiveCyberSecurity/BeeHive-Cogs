@@ -115,7 +115,7 @@ class VirusTotal(commands.Cog):
                         colors = ['#ff4545', '#ff9144', '#dddddd', '#2BBD8E', '#ffcccb', '#ececec']
 
                         # Create a bar chart instead of a spider graph
-                        plt.figure(figsize=(10, 8))
+                        plt.figure(figsize=(8, 6))
                         ax = plt.subplot(111)
 
                         # Create the bar chart
