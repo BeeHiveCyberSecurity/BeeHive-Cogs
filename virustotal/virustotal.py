@@ -114,15 +114,11 @@ class VirusTotal(commands.Cog):
                                     embed.description = "You should be safe to use this file.\nWant a [second opinion?](https://discord.gg/6PbaH6AfvF)"
                                     embed.add_field(name="Overall verdict", value="Clean", inline=False)
                                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/checkmark-circle-outline.png")
-                                embed.add_field(name="SHA-256", value=f"```{sha256}```", inline=False)
-                                embed.add_field(name="SHA-1", value=f"```{sha1}```", inline=False)
-                                embed.add_field(name="MD5", value=f"```{md5}```", inline=False)
-                                type_tags = attributes.get("type_tags", [])
-                                if type_tags:
-                                    embed.add_field(name="Type Tags", value=", ".join(type_tags), inline=False)
-                                suggested_threat_label = attributes.get("suggested_threat_label")
-                                if suggested_threat_label:
-                                    embed.add_field(name="Suggested Threat Label", value=suggested_threat_label, inline=False)
+                                file_name = meta.get("name", "Unknown file name")
+                                embed.add_field(name="File Name", value=f"`{file_name}`", inline=False)
+                                embed.add_field(name="SHA-256", value=f"`{sha256}`", inline=False)
+                                embed.add_field(name="SHA-1", value=f"`{sha1}`", inline=False)
+                                embed.add_field(name="MD5", value=f"`{md5}`", inline=False)
                                 # Create the button for the virustotal results link
                                 button = discord.ui.Button(label="View results on VirusTotal", url=f"https://www.virustotal.com/gui/file/{sha256}", emoji="🌐", style=discord.ButtonStyle.url)
                                 view = discord.ui.View()
