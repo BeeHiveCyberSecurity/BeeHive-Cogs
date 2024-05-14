@@ -109,30 +109,29 @@ class VirusTotal(commands.Cog):
                                     embed.color = discord.Colour(0xff4545)
                                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/warning-outline.png")
 
-                                # Data to plot
-                                labels = 'Malicious', 'Suspicious', 'Undetected', 'Harmless', 'Failure', 'Unsupported'
-                                sizes = [malicious_count, suspicious_count, undetected_count, harmless_count, failure_count, unsupported_count]
-                                colors = ['#ff4545', '#ff9144', '#dddddd', '#2BBD8E', '#ffcccb', '#ececec']
-                                explode = (0.1, 0, 0, 0, 0, 0)  # explode the first slice (Malicious)
+                                    labels = 'Malicious', 'Suspicious', 'Undetected', 'Harmless', 'Failure', 'Unsupported'
+                                    sizes = [malicious_count, suspicious_count, undetected_count, harmless_count, failure_count, unsupported_count]
+                                    colors = ['#ff4545', '#ff9144', '#dddddd', '#2BBD8E', '#ffcccb', '#ececec']
+                                    explode = (0.1, 0, 0, 0, 0, 0)  # explode the first slice (Malicious)
 
-                                # Plot
-                                plt.figure(figsize=(6, 4))
-                                plt.pie(sizes, explode=explode, labels=labels, colors=colors, autopct='%1.1f%%', shadow=True, startangle=140)
+                                    # Plot
+                                    plt.figure(figsize=(6, 4))
+                                    plt.pie(sizes, explode=explode, labels=labels, colors=colors, autopct='%1.1f%%', shadow=True, startangle=140)
 
-                                plt.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+                                    plt.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
 
-                                # Save the pie chart as a PNG image in memory.
-                                pie_chart_buffer = io.BytesIO()
-                                plt.savefig(pie_chart_buffer, format='png')
-                                pie_chart_buffer.seek(0)  # rewind the buffer to the beginning so we can read its content
+                                    # Save the pie chart as a PNG image in memory.
+                                    pie_chart_buffer = io.BytesIO()
+                                    plt.savefig(pie_chart_buffer, format='png')
+                                    pie_chart_buffer.seek(0)  # rewind the buffer to the beginning so we can read its content
 
-                                # Create a discord file from the image in memory
-                                pie_chart_file = discord.File(pie_chart_buffer, filename='pie_chart.png')
-                                embed.set_image(url='attachment://pie_chart.png')
+                                    # Create a discord file from the image in memory
+                                    pie_chart_file = discord.File(pie_chart_buffer, filename='pie_chart.png')
+                                    embed.set_image(url='attachment://pie_chart.png')
 
-                                # Clear the matplotlib figure
-                                plt.clf()
-                                plt.close('all')
+                                    # Clear the matplotlib figure
+                                    plt.clf()
+                                    plt.close('all')
 
                                 elif 1 < malicious_count < 11:
                                     embed.title = "Suspicious file found"
