@@ -114,7 +114,7 @@ class VirusTotal(commands.Cog):
                                 embed.add_field(name="Analysis results", value=f"**{percent}%** of security vendors rated this file dangerous!\n- **{malicious_count}** malicious\n- **{suspicious_count}** suspicious\n- **{safe_count}** detected no threats\n- **{noanswer_count}** engines couldn't check this file.", inline=False)
                                 
                                 # Create the button for the virustotal results link
-                                button = discord.ui.Button(label="View results on VirusTotal", url=f"https://www.virustotal.com/gui/file/{meta}", style=discord.ButtonStyle.url)
+                                button = discord.ui.Button(label="View results on VirusTotal", url=f"https://www.virustotal.com/gui/file/{meta}", emoji="🌐", style=discord.ButtonStyle.url)
                                 view = discord.ui.View()
                                 view.add_item(button)
                                 await ctx.send(content, embed=embed, view=view)
