@@ -913,21 +913,6 @@ class Skysearch(commands.Cog):
             await ctx.send(f"Error setting alert channel: {e}")
 
     @commands.guild_only()
-    @aircraft_group.command(name='alertmention', help='Set a specific type of mention or roles to be tagged when a squawk alert.')
-    async def set_alert_mention(self, ctx, mention: typing.Union[discord.Role, str]):
-        try:
-            if isinstance(mention, discord.Role):
-                await self.config.guild(ctx.guild).alert_mention.set(mention.id)
-                await ctx.send(f"Alert mention set to {mention.mention}")
-            elif mention.lower() in ["@here", "@everyone", "none"]:
-                await self.config.guild(ctx.guild).alert_mention.set(mention.lower())
-                await ctx.send(f"Alert mention set to {mention.lower()}")
-            else:
-                await ctx.send("Invalid mention. Please provide a valid role, '@here', '@everyone', or 'none'.")
-        except Exception as e:
-            await ctx.send(f"Error setting alert mention: {e}")
-
-    @commands.guild_only()
     @commands.has_permissions(manage_guild=True)
     @aircraft_group.command(name='autoicao')
     async def autoicao(self, ctx, state: bool = None):
@@ -1109,20 +1094,11 @@ class Skysearch(commands.Cog):
                     for aircraft_info in response['ac']:
                         for guild in guilds:
                             alert_channel_id = await self.config.guild(guild).alert_channel()
-                            alert_mention = await self.config.guild(guild).alert_mention()
                             if alert_channel_id:
                                 alert_channel = self.bot.get_channel(alert_channel_id)
                                 if alert_channel:
                                     # Send the new alert
-                                    mention = ""
-                                    if isinstance(alert_mention, int):  # If it's a role ID
-                                        role = guild.get_role(alert_mention)
-                                        if role:
-                                            mention = role.mention
-                                    elif alert_mention in ["@here", "@everyone"]:
-                                        mention = alert_mention
-                                    
-                                    await self._send_aircraft_info(alert_channel, {'ac': [aircraft_info]}, mention)
+                                    await self._send_aircraft_info(alert_channel, {'ac': [aircraft_info]}, "")
                                     await self.config.guild(guild).last_emergency_squawk_time.set(int(time.time()))
                                 else:
                                     print(f"Error: Alert channel not found for guild {guild.name}")
