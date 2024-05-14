@@ -122,8 +122,8 @@ class VirusTotal(commands.Cog):
                         ax.bar(labels, sizes, color=colors)
 
                         # Add some text for labels, title and custom x-axis tick labels, etc.
-                        ax.set_ylabel('Counts')
-                        ax.set_title('Analysis Results')
+                        ax.set_ylabel('Verdicts')
+                        ax.set_title('Security Vendor Analysis Distribution')
                         ax.set_xticks(labels)
                         ax.set_xticklabels(labels)
                         ax.legend()
