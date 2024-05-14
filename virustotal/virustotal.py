@@ -91,30 +91,29 @@ class VirusTotal(commands.Cog):
                             sha256 = meta.get("sha256")
                             sha1 = meta.get("sha1")
                             md5 = meta.get("md5")
+                            total_count = malicious_count + suspicious_count + undetected_count + harmless_count + failure_count + unsupported_count
+                            noanswer_count = failure_count + unsupported_count
+                            safe_count = harmless_count + undetected_count
+                            percent = round((malicious_count / total_count) * 100, 2) if total_count > 0 else 0
                             if sha256 and sha1 and md5:
                                 embed = discord.Embed()
                                 content = f"||<@{presid}>||"
                                 if malicious_count >= 11:
-                                    embed.title = "That file looks malicious!"
-                                    embed.description = "You should avoid running, using, or handling the file out of an abundance of caution."
+                                    embed.title = "Threat found"
+                                    embed.description = f"**{percent}%** of security vendors rated this file dangerous!\n- **{malicious_count}** malicious\n- **{suspicious_count}** suspicious\n- **{safe_count}** detected no threats\n- **{noanswer_count}** engines couldn't check this file."
                                     embed.color = discord.Colour(0xff4545)
                                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/warning-outline.png")
                                 elif 1 < malicious_count < 11:
-                                    embed.title = "That file looks suspicious!"
-                                    embed.description = "This file might be harmful. Exercise caution and consider further analysis."
+                                    embed.title = "Suspicious file found"
+                                    embed.description = f"**{percent}%** of security vendors rated this file dangerous!\n- **{malicious_count}** malicious\n- **{suspicious_count}** suspicious\n- **{safe_count}** detected no threats\n- **{noanswer_count}** engines couldn't check this file."
                                     embed.color = discord.Colour(0xff9144)
                                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Orange/alert-outline.png")
                                 else:
-                                    embed.title = "That file looks safe!"
+                                    embed.title = "No threat found"
                                     embed.color = discord.Colour(0x2BBD8E)
                                     embed.description = "You should be safe to use this file.\nWant a [second opinion?](https://discord.gg/6PbaH6AfvF)"
                                     embed.add_field(name="Overall verdict", value="Clean", inline=False)
                                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/checkmark-circle-outline.png")
-                                total_count = malicious_count + suspicious_count + undetected_count + harmless_count + failure_count + unsupported_count
-                                noanswer_count = failure_count + unsupported_count
-                                safe_count = harmless_count + undetected_count
-                                percent = round((malicious_count / total_count) * 100, 2) if total_count > 0 else 0
-                                embed.add_field(name="Analysis results", value=f"**{percent}%** of security vendors rated this file dangerous!\n- **{malicious_count}** malicious\n- **{suspicious_count}** suspicious\n- **{safe_count}** detected no threats\n- **{noanswer_count}** engines couldn't check this file.", inline=False)
                                 embed.add_field(name="SHA-256", value=f"```{sha256}```", inline=False)
                                 embed.add_field(name="SHA-1", value=f"```{sha1}```", inline=False)
                                 embed.add_field(name="MD5", value=f"```{md5}```", inline=False)
