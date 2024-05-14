@@ -2,6 +2,7 @@ import aiohttp
 import io
 import os
 import tempfile
+import math
 import asyncio
 import discord #type: ignore
 import matplotlib.pyplot as plt
@@ -117,8 +118,11 @@ class VirusTotal(commands.Cog):
                         values = sizes
                         N = len(categories)
 
+                        # Import the math module to access pi
+                        import math
+
                         # What will be the angle of each axis in the plot? (we divide the plot / number of variable)
-                        angles = [n / float(N) * 2 * pi for n in range(N)]
+                        angles = [n / float(N) * 2 * math.pi for n in range(N)]
                         values += values[:1]
                         angles += angles[:1]
 
@@ -180,7 +184,7 @@ class VirusTotal(commands.Cog):
                         button2 = discord.ui.Button(label="Get a second opinion", url="https://discord.gg/6PbaH6AfvF", style=discord.ButtonStyle.url)
                         view = discord.ui.View()
                         view.add_item(button)
-                        await ctx.send(content=content, file=pie_chart_file, embed=embed, view=view)
+                        await ctx.send(content=content, file=spider_chart_file, embed=embed, view=view)
                     else:
                         raise ValueError("Required hash values not found in the analysis response.")
             except (aiohttp.ClientResponseError, ValueError) as e:
