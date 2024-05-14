@@ -2,6 +2,7 @@ import requests
 import discord #type: ignore
 import json
 import time
+import re
 from redbot.core import commands #type: ignore 
 from redbot.core import app_commands #type: ignore
 
@@ -72,6 +73,8 @@ class URLScan(commands.Cog):
                         embed.color = 0xFFD700
                         embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/warning-outline.png")
 
-                    await ctx.send(embed=embed)
+                    view = discord.ui.View()
+                    view.add_item(discord.ui.Button(label=f"View results", url=f"{report_url}", style=discord.ButtonStyle.link))
+                    await ctx.send(embed=embed, view=view)
             except (json.JSONDecodeError, requests.exceptions.Timeout):
                 await ctx.send(f"Invalid JSON response from URLScan API or request timed out for {url}.")
