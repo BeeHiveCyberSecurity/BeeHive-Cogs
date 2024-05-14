@@ -5,7 +5,7 @@ import tempfile
 import asyncio
 import discord #type: ignore
 import matplotlib.pyplot as plt
-import animation
+import matplotlib.animation as animation
 from redbot.core import commands #type: ignore
 
 class VirusTotal(commands.Cog):
