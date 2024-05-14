@@ -2,6 +2,7 @@ import requests
 import discord #type: ignore
 import json
 import time
+import re
 from redbot.core import commands #type: ignore 
 from redbot.core import app_commands #type: ignore
 
