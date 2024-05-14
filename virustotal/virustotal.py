@@ -124,7 +124,7 @@ class VirusTotal(commands.Cog):
 
                         # Save the pie chart as a PNG image in memory.
                         pie_chart_buffer = io.BytesIO()
-                        plt.savefig(pie_chart_buffer, format='png', bbox_inches='tight')  # Use bbox_inches='tight' to fit the legend in the figure
+                        plt.savefig(pie_chart_buffer, format='png')
                         pie_chart_buffer.seek(0)  # rewind the buffer to the beginning so we can read its content
 
                         # Set the pie chart image as the embed image
