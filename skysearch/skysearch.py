@@ -58,11 +58,15 @@ class Skysearch(commands.Cog):
         if 'ac' in response and response['ac']:
             await ctx.typing()
             aircraft_data = response['ac'][0]
-            emergency_squawk_codes = ['7500', '7600', '7700']
+            emergency_squawk_codes = ['7400', '7500', '7600', '7700']
             hex_id = aircraft_data.get('hex', '')                                      
             image_url, photographer = await self._get_photo_by_hex(hex_id)
             link = f"https://globe.airplanes.live/?icao={hex_id}"
             squawk_code = aircraft_data.get('squawk', 'N/A')
+            if squawk_code == '7400':
+                embed = discord.Embed(title='Aircraft information', color=discord.Colour(0xff9145))
+                emergency_status = ":warning: **UAV has lost radio contact**"
+                embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Orange/alert-circle-outline.png")
             if squawk_code == '7500':
                 embed = discord.Embed(title='Aircraft information', color=discord.Colour(0xFF9145))
                 emergency_status = ":warning: **Aircraft has been hijacked**"
@@ -692,7 +696,7 @@ class Skysearch(commands.Cog):
                         aircraft_info += f"**Coordinates:** Lat: {aircraft_lat}, Lon: {aircraft_lon}\n"
                         aircraft_info += f"**Heading:** {aircraft_heading}\n"
                         aircraft_info += f"**Speed:** {aircraft_speed}\n"
-                        aircraft_info += f"**Hex:** {aircraft_hex}"
+                        aircraft_info += f"**ICAO:** {aircraft_hex}"
 
                         embed.add_field(name=aircraft_description, value=aircraft_info, inline=False)
 
@@ -1127,7 +1131,7 @@ class Skysearch(commands.Cog):
     @tasks.loop(minutes=2)
     async def check_emergency_squawks(self):
         try:
-            emergency_squawk_codes = ['7500', '7600', '7700']
+            emergency_squawk_codes = ['7400', '7500', '7600', '7700']
             for squawk_code in emergency_squawk_codes:
                 url = f"{self.api_url}/squawk/{squawk_code}"
                 response = await self._make_request(url)
