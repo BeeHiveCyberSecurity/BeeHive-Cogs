@@ -117,6 +117,9 @@ class VirusTotal(commands.Cog):
                                 embed.add_field(name="SHA-256", value=f"```{sha256}```", inline=False)
                                 embed.add_field(name="SHA-1", value=f"```{sha1}```", inline=False)
                                 embed.add_field(name="MD5", value=f"```{md5}```", inline=False)
+                                type_tags = attributes.get("type_tags", [])
+                                if type_tags:
+                                    embed.add_field(name="Type Tags", value=", ".join(type_tags), inline=False)
                                 suggested_threat_label = attributes.get("suggested_threat_label")
                                 if suggested_threat_label:
                                     embed.add_field(name="Suggested Threat Label", value=suggested_threat_label, inline=False)
