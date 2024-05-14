@@ -112,15 +112,17 @@ class VirusTotal(commands.Cog):
                         labels = ['Malicious', 'Suspicious', 'Undetected', 'Harmless', 'Failure', 'Unsupported']
                         sizes = [malicious_count, suspicious_count, undetected_count, harmless_count, failure_count, unsupported_count]
                         colors = ['#ff4545', '#ff9144', '#dddddd', '#2BBD8E', '#ffcccb', '#ececec']
-                        explode = (0.1 if malicious_count > 0 else 0, 0, 0, 0, 0, 0)  # explode the first slice if there are malicious results
+                        explode = [0.1 if malicious_count > 0 else 0] * len(labels)  # explode the first slice if there are malicious results
 
                         # Plot
                         plt.figure(figsize=(8, 6))  # Increase the figure size to make the text more legible
-                        pie, _ = plt.pie(sizes, explode=explode, colors=colors, startangle=140, autopct='%1.1f%%', shadow=True)
+                        pie, texts, autotexts = plt.pie(sizes, explode=explode, colors=colors, startangle=140, autopct='%1.1f%%', shadow=True)
                         plt.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
 
                         # Increase the text size for better legibility
-                        plt.legend(pie, labels, loc="best", fontsize='large')
+                        plt.setp(texts, size='large')
+                        plt.setp(autotexts, size='large')
+                        plt.legend(pie, labels, loc="best")
 
                         # Save the pie chart as a PNG image in memory.
                         pie_chart_buffer = io.BytesIO()
@@ -159,7 +161,7 @@ class VirusTotal(commands.Cog):
                         embed.add_field(name="MD5", value=f"`{md5}`", inline=False)
                         # Create the button for the virustotal results link
                         button = discord.ui.Button(label="View results on VirusTotal", url=f"https://www.virustotal.com/gui/file/{sha256}", emoji="🌐", style=discord.ButtonStyle.url)
-                        button2 = discord.ui.Button(label="Get a second opinion", url="https://discord.gg/6PbaH6AfvF", emoji="", style=discord.ButtonStyle.url)
+                        button2 = discord.ui.Button(label="Get a second opinion", url="https://discord.gg/6PbaH6AfvF", style=discord.ButtonStyle.url)
                         view = discord.ui.View()
                         view.add_item(button)
                         await ctx.send(content=content, file=pie_chart_file, embed=embed, view=view)
