@@ -178,7 +178,7 @@ class Skysearch(commands.Cog):
             if icao and icao.upper() in self.us_balloons_icao_set:
                 embed.add_field(name="Asset intelligence", value=":balloon: **Aircraft is a balloon**", inline=False)
             if icao and icao.upper() in self.us_agri_utility_set:
-                embed.add_field(name-"Asset intelligence", value=":farm: **Aircraft is used for agriculture, easement, or land inspection**", inline=False)
+                embed.add_field(name="Asset intelligence", value=":farm: **Aircraft is used for agriculture surveys, easement validation, or land inspection**", inline=False)
             
             image_url, photographer = await self._get_photo_by_hex(icao)
             if image_url and photographer:
