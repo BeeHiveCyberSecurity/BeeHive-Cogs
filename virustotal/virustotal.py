@@ -109,19 +109,22 @@ class VirusTotal(commands.Cog):
                     if sha256 and sha1 and md5:
                         embed = discord.Embed()
                         content = f"||<@{presid}>||"
-                        labels = 'Malicious', 'Suspicious', 'Undetected', 'Harmless', 'Failure', 'Unsupported'
+                        labels = ['Malicious', 'Suspicious', 'Undetected', 'Harmless', 'Failure', 'Unsupported']
                         sizes = [malicious_count, suspicious_count, undetected_count, harmless_count, failure_count, unsupported_count]
                         colors = ['#ff4545', '#ff9144', '#dddddd', '#2BBD8E', '#ffcccb', '#ececec']
                         explode = (0.1 if malicious_count > 0 else 0, 0, 0, 0, 0, 0)  # explode the first slice if there are malicious results
 
                         # Plot
-                        plt.figure(figsize=(6, 4))
-                        plt.pie(sizes, explode=explode, labels=labels, colors=colors, autopct='%1.1f%%', shadow=True, startangle=140)
+                        plt.figure(figsize=(8, 6))  # Increase the figure size to make the text more legible
+                        pie, _ = plt.pie(sizes, explode=explode, colors=colors, startangle=140, autopct='%1.1f%%', shadow=True)
                         plt.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+
+                        # Increase the text size for better legibility
+                        plt.legend(pie, labels, loc="best", fontsize='large')
 
                         # Save the pie chart as a PNG image in memory.
                         pie_chart_buffer = io.BytesIO()
-                        plt.savefig(pie_chart_buffer, format='png')
+                        plt.savefig(pie_chart_buffer, format='png', bbox_inches='tight')  # Use bbox_inches='tight' to fit the legend in the figure
                         pie_chart_buffer.seek(0)  # rewind the buffer to the beginning so we can read its content
 
                         # Set the pie chart image as the embed image
