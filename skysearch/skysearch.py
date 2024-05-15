@@ -179,11 +179,12 @@ class Skysearch(commands.Cog):
                 embed.add_field(name="Operated by", value=f"`{operator}`", inline=True)
             
             seen_pos = aircraft_data.get('seen_pos', 'N/A')
+            current_timestamp = int(time.time())
             if seen_pos != 'N/A':
-                seen_pos_timestamp = int(time.time()) - int(seen_pos)
-                last_checked_in_value = f":small_orange_diamond: <t:{seen_pos_timestamp}:R>"
+                seen_pos_timestamp = current_timestamp - int(seen_pos)
+                last_checked_in_value = f"<t:{seen_pos_timestamp}:R>"
             else:
-                last_checked_in_value = ":green_circle: **Just now**"
+                last_checked_in_value = "<t:{current_timestamp}:R>"
             embed.add_field(name="Last checked in", value=last_checked_in_value, inline=False)
             
             baro_rate = aircraft_data.get('baro_rate', 'N/A')
