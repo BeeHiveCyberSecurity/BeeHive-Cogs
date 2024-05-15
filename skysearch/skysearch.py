@@ -829,10 +829,10 @@ class Skysearch(commands.Cog):
                     raise aiohttp.ClientError(f"API responded with status code: {response.status}")
 
             stats_fields = {
-                "beast": {"name": "Beast Mode", "value": "{} feeders"},
-                "mlat": {"name": "MLAT", "value": "{} feeders"},
-                "other": {"name": "Other", "value": "{} feeders"},
-                "aircraft": {"name": "Total Aircraft", "value": "{} aircraft"}
+                "beast": {"name": "Beast Mode", "value": "**`{} feeders`**"},
+                "mlat": {"name": "MLAT", "value": "**`{} feeders`**"},
+                "other": {"name": "Other", "value": "**`{} feeders`**"},
+                "aircraft": {"name": "Total Aircraft", "value": "**`{} aircraft`**"}
             }
 
             embed = discord.Embed(title="Air traffic data", description="Live flight data powered by [airplanes.live](https://airplanes.live) API", color=0xfffffe)
@@ -847,27 +847,27 @@ class Skysearch(commands.Cog):
 
             embed2 = discord.Embed(title="Enhanced by BeeHive Intelligence", description="Additional info available per-aircraft", color=0xffd966)
             embed2.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/sparkles.png")
-            embed2.add_field(name="Law enforcement aircraft", value="{:,} tagged".format(len(self.law_enforcement_icao_set)), inline=True)
-            embed2.add_field(name="Military & government aircraft", value="{:,} tagged".format(len(self.military_icao_set)), inline=True)
-            embed2.add_field(name="Medical aircraft", value="{:,} tagged".format(len(self.medical_icao_set)), inline=True)
-            embed2.add_field(name="Media aircraft", value="{:,} known".format(len(self.newsagency_icao_set)), inline=True)
-            embed2.add_field(name="Damaged aircraft", value="{:,} known".format(len(self.global_prior_known_accident_set)), inline=True)
-            embed2.add_field(name="Wartime aircraft", value="{:,} observed".format(len(self.ukr_conflict_set)), inline=True)
-            embed2.add_field(name="Utility aircraft", value="{:,} spotted".format(len(self.agri_utility_set)), inline=True)
-            embed2.add_field(name="Balloons", value="{:,} known".format(len(self.balloons_icao_set)), inline=True)
-            embed2.add_field(name="Suspicious aircraft", value="{:,} identifiers".format(len(self.suspicious_icao_set)), inline=True)
+            embed2.add_field(name="Law enforcement aircraft", value="**`{:,} tagged`**".format(len(self.law_enforcement_icao_set)), inline=True)
+            embed2.add_field(name="Military & government aircraft", value="**`{:,} tagged`**".format(len(self.military_icao_set)), inline=True)
+            embed2.add_field(name="Medical aircraft", value="**`{:,} tagged`**".format(len(self.medical_icao_set)), inline=True)
+            embed2.add_field(name="Media aircraft", value="**`{:,} known`**".format(len(self.newsagency_icao_set)), inline=True)
+            embed2.add_field(name="Damaged aircraft", value="**`{:,} known`**".format(len(self.global_prior_known_accident_set)), inline=True)
+            embed2.add_field(name="Wartime aircraft", value="**`{:,} observed`**".format(len(self.ukr_conflict_set)), inline=True)
+            embed2.add_field(name="Utility aircraft", value="**`{:,} spotted`**".format(len(self.agri_utility_set)), inline=True)
+            embed2.add_field(name="Balloons", value="**`{:,} known`**".format(len(self.balloons_icao_set)), inline=True)
+            embed2.add_field(name="Suspicious aircraft", value="**`{:,} identifiers`**".format(len(self.suspicious_icao_set)), inline=True)
 
             embed3 = discord.Embed(title="Photography", description="Photos are powered by community contributions at [planespotters.net](https://www.planespotters.net/)", color=0xfffffe)
             embed3.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/camera.png")
-            embed3.add_field(name="Appears in", value="`aircraft callsign` `aircraft icao` `aircraft reg` `aircraft squawk` `aircraft type`", inline=False)
+            embed3.add_field(name="Appears in", value="**`aircraft callsign` `aircraft icao` `aircraft reg` `aircraft squawk` `aircraft type`**", inline=False)
 
             embed4 = discord.Embed(title="Airport information", description="Airport data is powered by the [airport-data.com](https://www.airport-data.com/) API", color=0xfffffe)
             embed4.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/location.png")
-            embed4.add_field(name="Appears in", value="`airport about` `airport runway`", inline=False)
+            embed4.add_field(name="Appears in", value="**`airport about` `airport runway`**", inline=False)
 
             embed5 = discord.Embed(title="Mapping and imagery", description="Mapping and ground imagery powered by [Google Maps](https://maps.google.com) and the [Maps Static API](https://developers.google.com/maps/documentation/maps-static)", color=0xfffffe)
             embed5.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/logo-google.png")
-            embed5.add_field(name="Appears in", value="`airport about`", inline=False)
+            embed5.add_field(name="Appears in", value="**`airport about`**", inline=False)
 
             await ctx.send(embed=embed)
             await ctx.send(embed=embed2)
