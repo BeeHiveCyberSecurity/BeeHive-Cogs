@@ -285,7 +285,7 @@ class Skysearch(commands.Cog):
         if ctx.invoked_subcommand is None:
             embed = discord.Embed(
                 title="Search aircraft",
-                description="**SkySearch is a powerful tool that allows you to search for real-time information about aircraft**\n\nYou can search **active** aircraft by `callsign`, `ICAO`, `registration`, `squawk`, and `model`.\n\nYou can also search within a specific `radius`, view military aircraft, view LADD-restricted aircraft, view private ICAO's, search for info about specific airports of interest, and view misc stats about SkySearch.\n\n**Use a button below to get started**",
+                description="**SkySearch is a powerful tool that allows you to search for real-time information about aircraft**\n\nYou can search **active** aircraft by `callsign`, `ICAO`, `registration`, `squawk`, and `model`.\n\nYou can also search within a specific `radius`, view military aircraft, view LADD-restricted aircraft, view aircraft using private ICAO addresses, and more...\n\n**Use a button below to get started**",
                 color=discord.Color.from_str("#fffffe")
             )
             embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/airplane.png")
@@ -848,11 +848,14 @@ class Skysearch(commands.Cog):
                 embed2.add_field(name="Balloons", value="{:,} known".format(len(self.balloons_icao_set)), inline=False)
                 embed2.add_field(name="Suspicious aircraft under evaluation", value="{:,} identifiers".format(len(self.suspicious_icao_set)), inline=False)
                 embed3 = discord.Embed(title="Photography", description="Photos are powered by [planespotters.net](https://www.planespotters.net/)", color=0xfffffe)
-                embed3.add_field(name="Appears in", value="`callsign` `icao` `reg` `squawk` `type`", inline=False)
+                embed3.add_field(name="Appears in", value="`aircraft callsign` `aircraft icao` `aircraft reg` `aircraft squawk` `aircraft type`", inline=False)
                 embed3.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/camera.png")
                 embed4 = discord.Embed(title="Airport information", description="Airport data is powered by [airport-data.com](https://www.airport-data.com/)", color=0xfffffe)
                 embed4.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/location.png")
-                embed4.add_field(name="Appears in", value="`airportinfo`", inline=False)
+                embed4.add_field(name="Appears in", value="`airport about` `airport runway`", inline=False)
+                embed5 = discord.Embed(title="Mapping and imagery", description="Mapping and ground imagery powered by [Google Maps](https://maps.google.com) and the [Maps Static API](https://developers.google.com/maps/documentation/maps-static)", color=0xfffffe)
+                embed5.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/logo-google.png")
+                embed5.add_field(name="Appears in", value="`airport about`", inline=False)
 
                 await ctx.send(embed=embed)
                 await ctx.send(embed=embed3)

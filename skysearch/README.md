@@ -7,7 +7,7 @@ SkySearch is a cog for Red-Discordbot that makes getting information about airpl
 Before SkySearch functions properly on your own instance of Red, you'll need to set a few specific API keys to make sure all data is accessible to the cog as designed. Since Red is, inherrently, free, we've tried to target as many "Free" or "Freemium" API's here as possible compared to adding paid-only API's. That being said, some of these API's can be somewhat complex to interact with and actually configure. Ideally, any of these are optional - but, then this cog will be somewhat boring, less technical, you know the deal.
 
 ### Google Maps integration
-**Function** - The cog will fetch down a static map image of the airport queried using `airportinfo`. 
+**Function** - The cog will fetch down a static map image of the airport queried using `airport about`. 
 
 **Requirement** - You must set a `googlemaps` `api_key` within your Red instance.
 
