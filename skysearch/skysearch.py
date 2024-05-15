@@ -1070,6 +1070,7 @@ class Skysearch(commands.Cog):
             googlemaps_tokens = await self.bot.get_shared_api_tokens("googlemaps")
             google_street_view_api_key = googlemaps_tokens.get("api_key", "YOUR_API_KEY")  # Use the API key from the shared tokens, default to "YOUR_API_KEY" if not found
             
+            file = None  # Initialize file to None to handle cases where no image is available
             if google_street_view_api_key != "YOUR_API_KEY":
                 street_view_base_url = "https://maps.googleapis.com/maps/api/staticmap"
                 street_view_params = {
@@ -1091,27 +1092,31 @@ class Skysearch(commands.Cog):
                     # Handle the error accordingly, e.g., log it or send a message to the user
                     pass
 
+            view = discord.ui.View(timeout=180)  # Initialize view outside of the else block
             if 'error' in data1:
                 embed.add_field(name="Error", value=data1['error'], inline=False)
             elif not data1 or 'name' not in data1:
                 embed.add_field(name="Error", value="No airport found with the provided code.", inline=False)
             else:
                 for field, name in fields.items():
-                    if field in data1:
-                        if field != 'link':
-                            value = f"`{data1[field]}`"
-                            embed.add_field(name=name, value=value, inline=False)
-                        else:
-                            # Ensure the URL is well-formed
-                            link = data1[field]
-                            if not (link.startswith('http://') or link.startswith('https://')):
-                                link = 'https://www.airport-data.com' + link
-                            view = discord.ui.View(timeout=180)  # Set a timeout for the view
-                            # URL button
-                            view_airport = discord.ui.Button(label="View airport on airport-data.com", url=link, style=discord.ButtonStyle.link)
-                            view.add_item(view_airport)
+                    if field in data1 and field != 'link':
+                        value = f"`{data1[field]}`"
+                        embed.add_field(name=name, value=value, inline=False)
+                
+                # Check if 'link' is in data1 and add it to the view
+                if 'link' in data1:
+                    link = data1['link']
+                    if not (link.startswith('http://') or link.startswith('https://')):
+                        link = 'https://www.airport-data.com' + link
+                    # URL button
+                    view_airport = discord.ui.Button(label="View airport on airport-data.com", url=link, style=discord.ButtonStyle.link)
+                    view.add_item(view_airport)
 
-                await ctx.send(embed=embed, view=view, file=file)
+            # Send the message with the embed, view, and file (if available)
+            await ctx.send(embed=embed, view=view, file=file)
+        except Exception as e:
+            # Handle exceptions, e.g., log them or send a message to the user
+            pass
 
             api_token = await self.bot.get_shared_api_tokens("airportdbio")
             if api_token and 'api_token' in api_token and code_type == 'icao':
