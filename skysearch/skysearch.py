@@ -1110,7 +1110,8 @@ class Skysearch(commands.Cog):
                             # URL button
                             view_airport = discord.ui.Button(label="View airport on airport-data.com", url=link, style=discord.ButtonStyle.link)
                             view.add_item(view_airport)
-            await ctx.send(embed=embed, view=view, file=file)
+
+                await ctx.send(embed=embed, view=view, file=file)
 
             api_token = await self.bot.get_shared_api_tokens("airportdbio")
             if api_token and 'api_token' in api_token and code_type == 'icao':
