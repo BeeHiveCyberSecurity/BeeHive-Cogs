@@ -278,9 +278,9 @@ class Skysearch(commands.Cog):
         return None, None
 
     @commands.guild_only()
-    @commands.group(name='skysearch', help='Get information about aircraft.', invoke_without_command=True)
+    @commands.group(name='aircraft', help='Get information about aircraft.', alias='skysearch', invoke_without_command=True)
     async def aircraft_group(self, ctx):
-        """Summon the SkySearch panel"""
+        """Summon the aircraft panel"""
         if ctx.invoked_subcommand is None:
             embed = discord.Embed(
                 title="SkySearch",
@@ -408,23 +408,6 @@ class Skysearch(commands.Cog):
                 message = await self.bot.wait_for('message', check=check)
                 await self.aircraft_by_type(ctx, message.content)
 
-            async def search_airport_callback(interaction):
-                if interaction.user != ctx.author:
-                    await interaction.response.send_message("You are not allowed to interact with this button", ephemeral=True)
-                    return
-                await interaction.response.defer()
-                embed = discord.Embed(
-                    title="",
-                    description="## Please reply with the `airport code` you want to search.",
-                    color=discord.Color.from_str("#fffffe")
-                )
-                embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/search.png")
-                await ctx.send(embed=embed)
-                def check(m):
-                    return m.author == ctx.author
-                message = await self.bot.wait_for('message', check=check)
-                await self.airportinfo(ctx, message.content)
-
             async def show_the_commands_callback(interaction):
                 if interaction.user != ctx.author:
                     await interaction.response.send_message("You are not allowed to interact with this button.", ephemeral=True)
@@ -498,7 +481,6 @@ class Skysearch(commands.Cog):
             show_stats.callback = show_stats_callback
             show_ladd.callback = show_ladd_callback
             show_pia.callback = show_pia_callback
-            search_airport.callback = search_airport_callback
 
             # Add buttons to the view
             view.add_item(search_callsign)
@@ -987,9 +969,70 @@ class Skysearch(commands.Cog):
             else:
                 embed = discord.Embed(title="ICAO Lookup Status", description="Automatic ICAO lookup has been disabled.", color=0xff4545)
                 await ctx.send(embed=embed)
-                
+
     @commands.guild_only()
-    @aircraft_group.command(name='airportcode')
+    @commands.group(name='airport', help='Get information about aircraft.', alias='skysearch', invoke_without_command=True)
+    async def airport_group(self, ctx):
+         if ctx.invoked_subcommand is None:
+            embed = discord.Embed(
+                title="SkySearch for Airports",
+                description="**SkySearch is a powerful tool that allows you to search for real-time information about aircraft**\n\nYou can search **active** aircraft by `callsign`, `ICAO`, `registration`, `squawk`, and `model`.\n\nYou can also search within a specific `radius`, view military aircraft, view LADD-restricted aircraft, view private ICAO's, search for info about specific airports of interest, and view misc stats about SkySearch.\n\n**Use a button below to get started**",
+                color=discord.Color.from_str("#fffffe")
+            )
+            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/airplane.png")
+            view = discord.ui.View(timeout=180)  # Set a timeout for the view
+
+            # Create buttons with click actions
+            search_airport = discord.ui.Button(label="Search airport", style=discord.ButtonStyle.green, row=2)
+            show_the_commands = discord.ui.Button(label="Show help", style=discord.ButtonStyle.grey, row=4)
+            show_stats = discord.ui.Button(label="Show stats", style=discord.ButtonStyle.grey, row=4)
+
+            async def search_airport_callback(interaction):
+                if interaction.user != ctx.author:
+                    await interaction.response.send_message("You are not allowed to interact with this button", ephemeral=True)
+                    return
+                await interaction.response.defer()
+                embed = discord.Embed(
+                    title="",
+                    description="## Please reply with the `airport code` you want to search.",
+                    color=discord.Color.from_str("#fffffe")
+                )
+                embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/search.png")
+                await ctx.send(embed=embed)
+                def check(m):
+                    return m.author == ctx.author
+                message = await self.bot.wait_for('message', check=check)
+                await self.airportinfo(ctx, message.content)
+
+            async def show_stats_callback(interaction):
+                if interaction.user != ctx.author:
+                    await interaction.response.send_message("You are not allowed to interact with this button.", ephemeral=True)
+                    return
+                await interaction.response.defer()
+                await self.stats(ctx)
+
+            async def show_the_commands_callback(interaction):
+                if interaction.user != ctx.author:
+                    await interaction.response.send_message("You are not allowed to interact with this button.", ephemeral=True)
+                    return
+                await interaction.response.defer()
+                await ctx.send_help(self.airport_group)
+
+            search_airport.callback = search_airport_callback
+            show_the_commands.callback = show_the_commands_callback
+            show_stats.callback = show_stats_callback
+
+            # Add buttons to the view
+
+            view.add_item(search_airport)
+            view.add_item(show_the_commands)
+            view.add_item(show_stats)
+
+            # Send the embed with the view
+            await ctx.send(embed=embed, view=view)
+
+    @commands.guild_only()
+    @aircraft_group.command(name='info')
     async def airportinfo(self, ctx, code: str = None):
         """Query airport information by ICAO or IATA code."""
         if code is None:
