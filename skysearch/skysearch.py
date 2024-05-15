@@ -861,11 +861,11 @@ class Skysearch(commands.Cog):
             embed3.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/camera.png")
             embed3.add_field(name="Appears in", value="**`aircraft callsign` `aircraft icao` `aircraft reg` `aircraft squawk` `aircraft type`**", inline=False)
 
-            embed4 = discord.Embed(title="Airport data", description="Airport data is powered by the [airport-data.com](https://www.airport-data.com/) API", color=0xfffffe)
+            embed4 = discord.Embed(title="Airport data", description="Airport data is powered by the [airport-data.com](https://www.airport-data.com/) API service", color=0xfffffe)
             embed4.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/location.png")
             embed4.add_field(name="Appears in", value="**`airport about`**", inline=False)
 
-            embed5 = discord.Embed(title="Runway data", description="Runway data is powered by the [airportdb.io](https://airportdb.io) API", color=0xfffffe)
+            embed5 = discord.Embed(title="Runway data", description="Runway data is powered by the [airportdb.io](https://airportdb.io) API service", color=0xfffffe)
             embed5.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/layers.png")
             embed5.add_field(name="Appears in", value="**`airport runway`**", inline=False)
 
