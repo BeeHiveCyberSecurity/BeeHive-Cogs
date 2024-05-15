@@ -834,7 +834,7 @@ class Skysearch(commands.Cog):
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/airplane.png")
                 for key, value in stats_values.items():
                     embed.add_field(name=key.capitalize(), value="{:,} aircraft".format(value), inline=True)
-                embed.add_field(name="Appears in", value="`callsign` `squawk` `icao`", inline=False)
+                embed.add_field(name="Appears in", value="`aircraft callsign` `aircraft icao` `aircraft reg` `aircraft squawk` `aircraft type` `aircraft radius` `aircraft pia` `aircraft mil` `aircraft ladd`", inline=False)
                 embed2 = discord.Embed(title="Enhanced by BeeHive Intelligence", description="Additional info available per-aircraft", color=0xffd966)
                 embed2.set_image(url="")
                 embed2.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/sparkles.png")
