@@ -1058,6 +1058,30 @@ class Skysearch(commands.Cog):
             response1 = requests.get(url1)
             data1 = response1.json()
 
+            googlemaps_tokens = await self.bot.get_shared_api_tokens("googlemaps")
+            google_street_view_api_key = googlemaps_tokens.get("api_key", "YOUR_API_KEY")  # Use the API key from the shared tokens, default to "YOUR_API_KEY" if not found
+            
+            if google_street_view_api_key == "YOUR_API_KEY":
+                return
+            else:
+                street_view_base_url = "https://maps.googleapis.com/maps/api/streetview"
+                street_view_params = {
+                    "size": "1920x1080",  # Image size (width x height)
+                    "location": f"{data1['latitude']},{data1['longitude']}",  # Latitude and Longitude as comma-separated string
+                    "key": google_street_view_api_key
+                }
+                street_view_response = requests.get(street_view_base_url, params=street_view_params)
+                if street_view_response.status_code == 200:
+                    # Assuming the API returns the image directly, we need to save it temporarily
+                    with open("street_view_image.jpg", "wb") as image_file:
+                        image_file.write(street_view_response.content)
+                    with open("street_view_image.jpg", "rb") as image_file:
+                        file = discord.File(fp=image_file, filename="street_view_image.jpg")
+                    embed.set_image(url="attachment://street_view_image.jpg")
+                else:
+                    # Handle the error accordingly, e.g., log it or send a message to the user
+                    pass
+
             if 'error' in data1:
                 embed.add_field(name="Error", value=data1['error'], inline=False)
             elif not data1 or 'name' not in data1:
