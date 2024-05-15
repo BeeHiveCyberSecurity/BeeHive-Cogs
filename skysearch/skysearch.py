@@ -969,12 +969,13 @@ class Skysearch(commands.Cog):
                 await ctx.send(embed=embed)
 
     @commands.guild_only()
-    @commands.group(name='airport', help='Get information about aircraft.', alias='skysearch', invoke_without_command=True)
+    @commands.group(name='airport', help='Get information about airports.', invoke_without_command=True, aliases=["groundsearch"])
     async def airport_group(self, ctx):
+         """Summon SkySearch ground search panel"""
          if ctx.invoked_subcommand is None:
             embed = discord.Embed(
-                title="SkySearch for Airports",
-                description="**SkySearch is a powerful tool that allows you to search for real-time information about aircraft**\n\nYou can search **active** aircraft by `callsign`, `ICAO`, `registration`, `squawk`, and `model`.\n\nYou can also search within a specific `radius`, view military aircraft, view LADD-restricted aircraft, view private ICAO's, search for info about specific airports of interest, and view misc stats about SkySearch.\n\n**Use a button below to get started**",
+                title="Airport search",
+                description="**You can search for real time information about airports using SkySearch. Select what you'd like to search below.**",
                 color=discord.Color.from_str("#fffffe")
             )
             embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/airplane.png")
