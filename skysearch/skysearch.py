@@ -843,7 +843,7 @@ class Skysearch(commands.Cog):
                     value = field["value"].format("{:,}".format(data[key]))
                     embed.add_field(name=name, value=value, inline=True)
 
-            embed.add_field(name="Appears in", value="**`aircraft callsign` `aircraft icao` `aircraft reg` `aircraft squawk` `aircraft type` `aircraft radius` `aircraft pia` `aircraft mil` `aircraft ladd`**", inline=False)
+            embed.add_field(name="Appears in", value="**`aircraft callsign` `aircraft icao` `aircraft reg` `aircraft squawk` `aircraft type` `aircraft radius` `aircraft pia` `aircraft mil` `aircraft ladd` `aircraft export`**", inline=False)
 
             embed2 = discord.Embed(title="Aircraft tags", description="Aircraft and air asset intelligence tags are powered by [BeeHive](https://www.beehive.systems). From time to time, you'll see tags on aircraft you query that contain cool or useful bits of information about them.", color=0xffd966)
             embed2.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/sparkles.png")
