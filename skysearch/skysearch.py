@@ -944,15 +944,19 @@ class Skysearch(commands.Cog):
         if channel:
             try:
                 await self.config.guild(ctx.guild).alert_channel.set(channel.id)
-                await ctx.send(f"Alert channel set to {channel.mention}")
+                embed = discord.Embed(description=f"Alert channel set to {channel.mention}", color=0xfffffe)
+                await ctx.send(embed=embed)
             except Exception as e:
-                await ctx.send(f"Error setting alert channel: {e}")
+                embed = discord.Embed(description=f"Error setting alert channel: {e}", color=0xff4545)
+                await ctx.send(embed=embed)
         else:
             try:
                 await self.config.guild(ctx.guild).alert_channel.clear()
-                await ctx.send("Alert channel cleared. No more alerts will be sent.")
+                embed = discord.Embed(description="Alert channel cleared. No more alerts will be sent.", color=0xfffffe)
+                await ctx.send(embed=embed)
             except Exception as e:
-                await ctx.send(f"Error clearing alert channel: {e}")
+                embed = discord.Embed(description=f"Error clearing alert channel: {e}", color=0xff4545)
+                await ctx.send(embed=embed)
 
     @commands.guild_only()
     @commands.has_permissions(manage_guild=True)
