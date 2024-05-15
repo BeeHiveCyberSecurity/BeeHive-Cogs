@@ -1128,6 +1128,8 @@ class Skysearch(commands.Cog):
             except asyncio.TimeoutError:
                 break
 
+
+
     @tasks.loop(minutes=2)
     async def check_emergency_squawks(self):
         try:

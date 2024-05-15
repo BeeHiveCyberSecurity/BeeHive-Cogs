@@ -232,7 +232,7 @@ class StripeIdentity(commands.Cog):
     @checks.admin_or_permissions(manage_guild=True)
     async def identity_check(self, ctx: commands.Context, user: discord.Member):
         """
-        Perform a full identity check on a user using Stripe Identity.
+        Perform a biometric verification of a Discord user's identity.
         """
         await ctx.message.delete()
         embed = discord.Embed(description="**Attempting to create verification session, please wait...**", color=discord.Color(0x2BBD8E))
@@ -260,12 +260,12 @@ class StripeIdentity(commands.Cog):
                 title="Identity verification required",
                 description=(
                     f"Hello {user.mention},\n\n"
-                    f"To enhance safety within our Discord community, **{ctx.guild.name}** has requested a one-time verification of your identity.\n"
-                    "This process involves confirming your identity with a government-issued ID and biometric verification.\n\n"
-                    "### Please have one of the following documents ready\n- **State ID**\n- **Driver's License**\n- **Driver's Permit**\n- **Passport**\n\n"
-                    "### And prepare to...\n- Provide a valid email address\n- Take a series of selfies in a well-lit space\n- Submit an above identity document that matches you via biometric modeling and analysis\n\n"
-                    "Once you complete verification, the results, including your private information, will be subject to the following legal agreements:\n- [BeeHive Terms of Service](<https://www.beehive.systems/tos)\n- [BeeHive Privacy Policy](https://www.beehive.systems/privacy)\n- [Stripe Privacy Policy](https://stripe.com/privacy)\n- [Stripe Consumer Terms of Service](https://stripe.com/legal/consumer)\n\n"
-                    "If you do not wish to provide your personal information, you may instead decline to verify your identity by selecting the option below, which will immediately remove you from the requesting server. Otherwise, this request will time out in **15 minutes**, and you'll be subsequently removed."
+                    f"To enhance safety and security within our community, **{ctx.guild.name}** requires you to verify your identity, and link it to your Discord account. \n"
+                    "This procedure involves the confirmation of your identity using a government-issued ID and biometric verification.\n\n"
+                    "### Please ensure you have one of the following documents:\n- **State ID**\n- **Driver's License**\n- **Driver's Permit**\n- **Passport**\n\n"
+                    "### You will also need to:\n- Provide a valid email address\n- Take a series of selfies in a well-lit area\n- Submit the identity document mentioned above for biometric matching and analysis\n\n"
+                    "Upon completing the verification, your personal information will be handled according to the following legal agreements:\n- **[BeeHive Terms of Service](<https://www.beehive.systems/tos)**\n- **[BeeHive Privacy Policy](https://www.beehive.systems/privacy)**\n- **[Stripe Privacy Policy](https://stripe.com/privacy)**\n- **[Stripe Consumer Terms of Service](https://stripe.com/legal/consumer)**\n\n"
+                    "Should you choose not to provide your personal information, you can opt out of the verification process by selecting the option below. This action will result in your immediate removal from the server. If no action is taken within **15 minutes**, you will be automatically removed from the server."
                 ),
                 color=discord.Color(0xff4545)
             )
