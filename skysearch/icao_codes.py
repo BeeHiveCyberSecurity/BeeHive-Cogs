@@ -15,3 +15,5 @@ agri_utility_set = {'A2A4BF', 'A86F46', 'A543CA', 'A0DC49', 'A991D9', 'A986FA', 
 ukr_conflict_set = {'AE5240', 'AE6821', '50FFD8'}
 
 global_prior_known_accident_set = {}
+
+trainer_educational_set = {}

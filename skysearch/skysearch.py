@@ -63,25 +63,25 @@ class Skysearch(commands.Cog):
             image_url, photographer = await self._get_photo_by_hex(hex_id)
             link = f"https://globe.airplanes.live/?icao={hex_id}"
             squawk_code = aircraft_data.get('squawk', 'N/A')
-            if squawk_code == '7400':
-                embed = discord.Embed(title='Aircraft information', color=discord.Colour(0xff9145))
-                emergency_status = ":warning: **UAV has lost radio contact**"
-                embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Orange/alert-circle-outline.png")
+#            if squawk_code == '7400':
+#                embed = discord.Embed(title='Aircraft information', color=discord.Colour(0xff9145))
+#                emergency_status = ":warning: **UAV has lost radio contact**"
+#                embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Orange/alert-circle-outline.png")
             if squawk_code == '7500':
                 embed = discord.Embed(title='Aircraft information', color=discord.Colour(0xFF9145))
-                emergency_status = ":warning: **Aircraft has been hijacked**"
+                emergency_status = ":rotating_light: **Aircraft has been hijacked**"
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Orange/alert-circle-outline.png")
             elif squawk_code == '7600':
                 embed = discord.Embed(title='Aircraft information', color=discord.Colour(0xFF9145))
-                emergency_status = ":warning: **Aircraft has lost radio contact**"
+                emergency_status = ":signal_strength: **Aircraft has lost radio contact**"
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Orange/alert-circle-outline.png")
             elif squawk_code == '7700':
                 embed = discord.Embed(title='Aircraft information', color=discord.Colour(0xFF9145))
-                emergency_status = ":warning: **Aircraft has declared an emergency**"
+                emergency_status = ":large_orange_diamond: **Aircraft has declared an emergency**"
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Orange/alert-circle-outline.png")
             else:
                 embed = discord.Embed(title='Aircraft information', color=discord.Colour(0xfffffe))
-                emergency_status = ":white_check_mark: **Aircraft reports normal operating conditions**"
+                emergency_status = ":ballot_box_with_check: **Aircraft reports normal operating conditions**"
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/airplane.png")
             embed.add_field(name="Type", value=f"`{aircraft_data.get('desc', 'N/A')} ({aircraft_data.get('t', 'N/A')})`", inline=False)
             callsign = aircraft_data.get('flight', 'N/A').strip()
