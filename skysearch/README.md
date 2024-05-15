@@ -8,7 +8,9 @@ Before SkySearch functions properly on your own instance of Red, you'll need to 
 
 ### Google Maps integration
 **Function** - The cog will fetch down a static map image of the airport queried using `airportinfo`. 
+
 **Requirement** - You must set a `googlemaps` `api_key` within your Red instance.
+
 **API in use** - [Maps Static API](https://developers.google.com/maps/documentation/maps-static/start)
 
 ### For airportdb.io integration
