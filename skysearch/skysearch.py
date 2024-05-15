@@ -939,13 +939,20 @@ class Skysearch(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.guild_only()   
-    @aircraft_group.command(name='alertchannel', help='Set a channel to send emergency squawk alerts to.')
-    async def set_alert_channel(self, ctx, channel: discord.TextChannel):
-        try:
-            await self.config.guild(ctx.guild).alert_channel.set(channel.id)
-            await ctx.send(f"Alert channel set to {channel.mention}")
-        except Exception as e:
-            await ctx.send(f"Error setting alert channel: {e}")
+    @aircraft_group.command(name='alertchannel', help='Set or clear a channel to send emergency squawk alerts to. Clear with no channel.')
+    async def set_alert_channel(self, ctx, channel: discord.TextChannel = None):
+        if channel:
+            try:
+                await self.config.guild(ctx.guild).alert_channel.set(channel.id)
+                await ctx.send(f"Alert channel set to {channel.mention}")
+            except Exception as e:
+                await ctx.send(f"Error setting alert channel: {e}")
+        else:
+            try:
+                await self.config.guild(ctx.guild).alert_channel.clear()
+                await ctx.send("Alert channel cleared. No more alerts will be sent.")
+            except Exception as e:
+                await ctx.send(f"Error clearing alert channel: {e}")
 
     @commands.guild_only()
     @commands.has_permissions(manage_guild=True)
