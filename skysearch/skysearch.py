@@ -857,10 +857,11 @@ class Skysearch(commands.Cog):
                 embed5.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/logo-google.png")
                 embed5.add_field(name="Appears in", value="`airport about`", inline=False)
 
+                await ctx.send(embed=embed2)
                 await ctx.send(embed=embed)
                 await ctx.send(embed=embed3)
                 await ctx.send(embed=embed4)
-                await ctx.send(embed=embed2)
+                await ctx.send(embed=embed5)
             else:
                 embed = discord.Embed(title="Error", description="Incomplete data received from API.", color=0xff4545)
                 await ctx.send(embed=embed)
