@@ -983,7 +983,8 @@ class Skysearch(commands.Cog):
             view = discord.ui.View(timeout=180)  # Set a timeout for the view
 
             # Create buttons with click actions
-            search_airport = discord.ui.Button(label="Search airport", style=discord.ButtonStyle.green, row=2)
+            search_airport = discord.ui.Button(label="Airport info", style=discord.ButtonStyle.green, row=1)
+            search_runway = discord.ui.Button(label="Runway info", style=discord.ButtonStyle.green, row=1)
             show_the_commands = discord.ui.Button(label="Show help", style=discord.ButtonStyle.grey, row=4)
             show_stats = discord.ui.Button(label="Show stats", style=discord.ButtonStyle.grey, row=4)
 
@@ -1004,6 +1005,23 @@ class Skysearch(commands.Cog):
                 message = await self.bot.wait_for('message', check=check)
                 await self.airportinfo(ctx, message.content)
 
+            async def search_runway_callback(interaction):
+                if interaction.user != ctx.author:
+                    await interaction.response.send_message("You are not allowed to interact with this button", ephemeral=True)
+                    return
+                await interaction.response.defer()
+                embed = discord.Embed(
+                    title="",
+                    description="## Please reply with the `airport code` you want to search.",
+                    color=discord.Color.from_str("#fffffe")
+                )
+                embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/search.png")
+                await ctx.send(embed=embed)
+                def check(m):
+                    return m.author == ctx.author
+                message = await self.bot.wait_for('message', check=check)
+                await self.runwayinfo(ctx, message.content)
+
             async def show_stats_callback(interaction):
                 if interaction.user != ctx.author:
                     await interaction.response.send_message("You are not allowed to interact with this button.", ephemeral=True)
@@ -1021,10 +1039,12 @@ class Skysearch(commands.Cog):
             search_airport.callback = search_airport_callback
             show_the_commands.callback = show_the_commands_callback
             show_stats.callback = show_stats_callback
+            search_runway.callback = search_runway_callback
 
             # Add buttons to the view
 
             view.add_item(search_airport)
+            view.add_item(search_runway)
             view.add_item(show_the_commands)
             view.add_item(show_stats)
 
