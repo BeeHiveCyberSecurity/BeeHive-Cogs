@@ -204,23 +204,23 @@ class Skysearch(commands.Cog):
 
             icao = aircraft_data.get('hex', None).upper()
             if icao and icao.upper() in self.law_enforcement_icao_set:
-                embed.add_field(name="Asset intelligence", value=":police_officer: **Aircraft known for use by state law enforcement**", inline=False)
+                embed.add_field(name="Asset intelligence", value=":police_officer: **Known for use by state law enforcement**", inline=False)
             if icao and icao.upper() in self.military_icao_set:
-                embed.add_field(name="Asset intelligence", value=":military_helmet: **Aircraft known for use in military and government**", inline=False)
+                embed.add_field(name="Asset intelligence", value=":military_helmet: **Known for use in military and government**", inline=False)
             if icao and icao.upper() in self.medical_icao_set:
-                embed.add_field(name="Asset intelligence", value=":hospital: **Aircraft known for use in medical response and transport**", inline=False)
+                embed.add_field(name="Asset intelligence", value=":hospital: **Known for use in medical response and transport**", inline=False)
             if icao and icao.upper() in self.suspicious_icao_set:
-                embed.add_field(name="Asset intelligence", value=":warning: **Aircraft exhibits suspicious flight or surveillance activity**", inline=False)
+                embed.add_field(name="Asset intelligence", value=":warning: **Exhibits suspicious flight or surveillance activity**", inline=False)
             if icao and icao.upper() in self.global_prior_known_accident_set:
-                embed.add_field(name="Asset intelligence", value=":boom: **Aircraft prior involved in one or more documented accidents**", inline=False)
+                embed.add_field(name="Asset intelligence", value=":boom: **Prior involved in one or more documented accidents**", inline=False)
             if icao and icao.upper() in self.ukr_conflict_set:
-                embed.add_field(name="Asset intelligence", value=":flag_ua: **Aircraft utilized within the [Russo-Ukrainian conflict](https://en.wikipedia.org/wiki/Russian-occupied_territories_of_Ukraine)**", inline=False)
+                embed.add_field(name="Asset intelligence", value=":flag_ua: **Utilized within the [Russo-Ukrainian conflict](https://en.wikipedia.org/wiki/Russian-occupied_territories_of_Ukraine)**", inline=False)
             if icao and icao.upper() in self.newsagency_icao_set:
-                embed.add_field(name="Asset intelligence", value=":newspaper: **Aircraft used by news or media organization**", inline=False)
+                embed.add_field(name="Asset intelligence", value=":newspaper: **Used by news or media organization**", inline=False)
             if icao and icao.upper() in self.balloons_icao_set:
                 embed.add_field(name="Asset intelligence", value=":balloon: **Aircraft is a balloon**", inline=False)
             if icao and icao.upper() in self.agri_utility_set:
-                embed.add_field(name="Asset intelligence", value=":corn: **Aircraft is used for agriculture surveys, easement validation, or land inspection**", inline=False)
+                embed.add_field(name="Asset intelligence", value=":corn: **Used for agriculture surveys, easement validation, or land inspection**", inline=False)
 
             image_url, photographer = await self._get_photo_by_hex(icao)
             if image_url and photographer:
