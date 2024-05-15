@@ -228,7 +228,7 @@ class Skysearch(commands.Cog):
                 embed.set_footer(text=f"📸 {photographer}")
 
             view = discord.ui.View()
-            view.add_item(discord.ui.Button(label=f"Track {icao} live", emoji="<:map:>", url=f"{link}", style=discord.ButtonStyle.link))
+            view.add_item(discord.ui.Button(label=f"Track {icao} live", emoji="🗺️", url=f"{link}", style=discord.ButtonStyle.link))
             ground_speed_mph = ground_speed_mph if 'ground_speed_mph' in locals() else 'unknown'
             squawk_code = aircraft_data.get('squawk', 'N/A')
             if squawk_code in emergency_squawk_codes:
