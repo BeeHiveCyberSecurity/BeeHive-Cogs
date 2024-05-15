@@ -236,7 +236,7 @@ class Skysearch(commands.Cog):
             else:
                 tweet_text = f"Tracking flight {aircraft_data.get('flight', '')} at position {lat}, {lon} with speed {ground_speed_mph} mph using #SkySearch\n\nJoin via Discord to search and discuss planes with your friends for free - https://discord.gg/X8huyaeXrA"
             tweet_url = f"https://twitter.com/intent/tweet?text={urllib.parse.quote_plus(tweet_text)}"
-            view.add_item(discord.ui.Button(label=f"Share on 𝕏", url=tweet_url, style=discord.ButtonStyle.link))
+            view.add_item(discord.ui.Button(label=f"Share on 𝕏", emoji="📣", url=tweet_url, style=discord.ButtonStyle.link))
             await ctx.send(embed=embed, view=view)
 
 #           squawk_code = aircraft_data.get('squawk', 'N/A')
