@@ -278,12 +278,12 @@ class Skysearch(commands.Cog):
         return None, None
 
     @commands.guild_only()
-    @commands.group(name='aircraft', help='Get information about aircraft.', alias='skysearch', invoke_without_command=True)
+    @commands.group(name='aircraft', help='Get information about aircraft.', invoke_without_command=True, aliases=["skysearch"])
     async def aircraft_group(self, ctx):
         """Summon the aircraft panel"""
         if ctx.invoked_subcommand is None:
             embed = discord.Embed(
-                title="SkySearch",
+                title="Search aircraft",
                 description="**SkySearch is a powerful tool that allows you to search for real-time information about aircraft**\n\nYou can search **active** aircraft by `callsign`, `ICAO`, `registration`, `squawk`, and `model`.\n\nYou can also search within a specific `radius`, view military aircraft, view LADD-restricted aircraft, view private ICAO's, search for info about specific airports of interest, and view misc stats about SkySearch.\n\n**Use a button below to get started**",
                 color=discord.Color.from_str("#fffffe")
             )
@@ -296,7 +296,6 @@ class Skysearch(commands.Cog):
             search_registration = discord.ui.Button(label="Search registration", style=discord.ButtonStyle.green, row=1)
             search_squawk = discord.ui.Button(label="Search squawk", style=discord.ButtonStyle.green, row=1)
             search_type = discord.ui.Button(label="Search model", style=discord.ButtonStyle.green, row=1)
-            search_airport = discord.ui.Button(label="Search airport", style=discord.ButtonStyle.green, row=2)
             search_radius = discord.ui.Button(label="Search radius", style=discord.ButtonStyle.green, row=2)
             show_military = discord.ui.Button(label="Show military", style=discord.ButtonStyle.danger, row=3)
             show_ladd = discord.ui.Button(label="Show limited", style=discord.ButtonStyle.danger, row=3)
