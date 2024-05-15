@@ -182,9 +182,9 @@ class Skysearch(commands.Cog):
             current_timestamp = int(time.time())
             if seen_pos != 'N/A':
                 seen_pos_timestamp = current_timestamp - int(seen_pos)
-                last_checked_in_value = f"<t:{seen_pos_timestamp}:R>"
+                last_checked_in_value = f"**<t:{seen_pos_timestamp}:R>**"
             else:
-                last_checked_in_value = "<t:{current_timestamp}:R>"
+                last_checked_in_value = "**<t:{current_timestamp}:R>**"
             embed.add_field(name="Last checked in", value=last_checked_in_value, inline=False)
             
             baro_rate = aircraft_data.get('baro_rate', 'N/A')
