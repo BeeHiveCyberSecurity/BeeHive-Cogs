@@ -6,6 +6,7 @@ import asyncio
 import urllib
 import typing
 import os
+import io
 import tempfile
 import csv
 import datetime
