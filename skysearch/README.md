@@ -1,91 +1,121 @@
 # SkySearch
-SkySearch is a cog for Red-Discordbot that makes getting information about airplanes, helicopters, blimps, drones, and nearly any other airborne item that can be tracked via radio formats like ADS-B, MLAT, and others. 
+SkySearch is a cog for Red-Discordbot that makes getting information about airplanes, helicopters, blimps, drones, and nearly any other airborne item that can be tracked via radio formats like ADS-B, MLAT, and others, as well as airport information, runway status and related information, airport weather forecasts, and more.
 
 [Leave a donation to support development efforts in any amount that works for you!](https://donate.stripe.com/eVag0y2kI9BI36McNa)
 
 # Commands
-## skysearch
- - Usage: `!skysearch `
+# aircraft
+ - Usage: `[p]aircraft `
+ - Aliases: `skysearch`
+ - Checks: `server_only`
 
-Summon the SkySearch panel
+Summon the aircraft panel
 
-## skysearch squawk
- - Usage: `!skysearch squawk <squawk_value> `
+## aircraft squawk
+ - Usage: `[p]aircraft squawk <squawk_value> `
+ - Checks: `server_only`
 
 Get information about an aircraft by its squawk code.
 
-## skysearch pia
- - Usage: `!skysearch pia `
-
-View live aircraft using private ICAO addresses
-
-## skysearch showalertchannel
- - Usage: `!skysearch showalertchannel `
-
-Show alert task status and output if set
-
-## skysearch type
- - Usage: `!skysearch type <aircraft_type> `
-
-Get information about aircraft by its type.
-
-## skysearch military
- - Usage: `!skysearch military `
-
-Get information about military aircraft.
-
-## skysearch ladd
- - Usage: `!skysearch ladd `
-
-Get information on LADD-restricted aircraft
-
-## skysearch alertmention
- - Usage: `!skysearch alertmention <mention> `
-
-Set a specific type of mention or roles to be tagged when a squawk alert.
-
-## skysearch reg
- - Usage: `!skysearch reg <registration> `
-
-Get information about an aircraft by its registration.
-
-## skysearch stats
- - Usage: `!skysearch stats `
+## aircraft stats
+ - Usage: `[p]aircraft stats `
+ - Checks: `server_only`
 
 Get statistics about SkySearch and the data used here
 
-## skysearch scroll
- - Usage: `!skysearch scroll `
+## aircraft callsign
+ - Usage: `[p]aircraft callsign <callsign> `
+ - Checks: `server_only`
+
+Get information about an aircraft by its callsign.
+
+## aircraft pia
+ - Usage: `[p]aircraft pia `
+ - Checks: `server_only`
+
+View live aircraft using private ICAO addresses
+
+## aircraft showalertchannel
+ - Usage: `[p]aircraft showalertchannel `
+ - Checks: `server_only`
+
+Show alert task status and output if set
+
+## aircraft alertchannel
+ - Usage: `[p]aircraft alertchannel <channel> `
+ - Checks: `server_only`
+
+Set a channel to send emergency squawk alerts to.
+
+## aircraft radius
+ - Usage: `[p]aircraft radius <lat> <lon> <radius> `
+ - Checks: `server_only`
+
+Get information about aircraft within a specified radius.
+
+## aircraft scroll
+ - Usage: `[p]aircraft scroll `
+ - Checks: `server_only`
 
 Scroll through available planes.
 
-## skysearch autoicao
- - Usage: `!skysearch autoicao [state=None] `
+## aircraft reg
+ - Usage: `[p]aircraft reg <registration> `
+ - Checks: `server_only`
+
+Get information about an aircraft by its registration.
+
+## aircraft military
+ - Usage: `[p]aircraft military `
+ - Checks: `server_only`
+
+Get information about military aircraft.
+
+## aircraft type
+ - Usage: `[p]aircraft type <aircraft_type> `
+ - Checks: `server_only`
+
+Get information about aircraft by its type.
+
+## aircraft ladd
+ - Usage: `[p]aircraft ladd `
+ - Checks: `server_only`
+
+Get information on LADD-restricted aircraft
+
+## aircraft icao
+ - Usage: `[p]aircraft icao <hex_id> `
+ - Checks: `server_only`
+
+Get information about an aircraft by its 24-bit ICAO Address
+
+## aircraft export
+ - Usage: `[p]aircraft export <search_type> <search_value> <file_format> `
+ - Checks: `server_only`
+
+Search aircraft by ICAO, callsign, squawk, or type and export the results.
+
+## aircraft autoicao
+ - Usage: `[p]aircraft autoicao [state=None] `
  - Checks: `server_only`
 
 Enable or disable automatic ICAO lookup.
 
-## skysearch icao
- - Usage: `!skysearch icao <hex_id> `
+# airport
+ - Usage: `[p]airport `
+ - Aliases: `groundsearch`
+ - Checks: `server_only`
 
-Get information about an aircraft by its 24-bit ICAO Address
+Summon SkySearch ground search panel
 
-## skysearch alertchannel
- - Usage: `!skysearch alertchannel <channel> `
+## airport runway
+ - Usage: `[p]airport runway <code> `
+ - Checks: `server_only`
 
-Set a channel to send emergency squawk alerts to.
+Query runway information by ICAO code.
 
-## skysearch export
- - Usage: `!skysearch export <search_type> <search_value> <file_format> `
+## airport about
+ - Usage: `[p]airport about [code=None] `
+ - Checks: `server_only`
 
-Search aircraft by ICAO, callsign, squawk, or type and export the results.
-
-## skysearch radius
- - Usage: `!skysearch radius <lat> <lon> <radius> `
-
-Get information about aircraft within a specified radius.
-
-## skysearch callsign
- - Usage: `!skysearch callsign <callsign> `
-
-Get information about an aircraft by its callsign.
+Query airport information by ICAO or IATA code.
