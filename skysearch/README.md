@@ -8,7 +8,7 @@ Before SkySearch functions properly on your own instance of Red, you'll need to 
 
 ### Google Maps integration
 
-**Price** - **FREE** for up to 28,500 maploads per month. 
+**Price** - **FREE** for up to 28,500 maploads per month (919/day in a 31 day month)
 
 **Function** - The cog will fetch down a static map image of the airport queried using `airport about`. 
 
