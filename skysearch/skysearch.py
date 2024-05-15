@@ -1078,7 +1078,7 @@ class Skysearch(commands.Cog):
                     "zoom": "12",
                     "scale": "2",  # Image size (width x height)
                     "center": f"{data1['latitude']},{data1['longitude']}",  # Latitude and Longitude as comma-separated string
-                    "maptype": "terrain",
+                    "maptype": "hybrid",
                     "key": google_street_view_api_key
                 }
                 street_view_response = requests.get(street_view_base_url, params=street_view_params)
