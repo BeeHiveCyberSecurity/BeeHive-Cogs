@@ -1115,11 +1115,21 @@ class Skysearch(commands.Cog):
             # Send the message with the embed, view, and file (if available)
             await ctx.send(embed=embed, view=view, file=file)
         except Exception as e:
-            # Handle exceptions, e.g., log them or send a message to the user
-            pass
+            embed = discord.Embed(title="Error", description=str(e), color=0xff4545)
+            await ctx.send(embed=embed)
 
+    @commands.guild_only()
+    @airport_group.command(name='runwayinfo')
+    async def runwayinfo(self, ctx, code: str):
+        """Query runway information by ICAO code."""
+        if len(code) != 4:
+            embed = discord.Embed(title="Error", description="Invalid ICAO code. ICAO codes are 4 characters long.", color=0xff4545)
+            await ctx.send(embed=embed)
+            return
+
+        try:
             api_token = await self.bot.get_shared_api_tokens("airportdbio")
-            if api_token and 'api_token' in api_token and code_type == 'icao':
+            if api_token and 'api_token' in api_token:
                 url2 = f"https://airportdb.io/api/v1/airport/{code}?apiToken={api_token['api_token']}"
                 response2 = requests.get(url2)
                 data2 = response2.json()
@@ -1135,55 +1145,46 @@ class Skysearch(commands.Cog):
                     await ctx.send(embed=embed)
                 else:
                     combined_pages = []
-                    if 'runways' in data2 or 'freqs' in data2:
+                    if 'runways' in data2:
                         embed = discord.Embed(title=f"Runway information for {code.upper()}", color=0xfffffe)
-                        if 'runways' in data2:
-                            runways = data2['runways']
-                            for runway in runways:
-                                if 'id' in runway:
-                                    embed.add_field(name="Runway ID", value=f"`{runway['id']}`", inline=True)
+                        runways = data2['runways']
+                        for runway in runways:
+                            if 'id' in runway:
+                                embed.add_field(name="Runway ID", value=f"`{runway['id']}`", inline=True)
 
-                                if 'surface' in runway:
-                                    embed.add_field(name="Surface", value=f"`{runway['surface']}`", inline=True)
+                            if 'surface' in runway:
+                                embed.add_field(name="Surface", value=f"`{runway['surface']}`", inline=True)
 
-                                if 'length_ft' in runway and 'width_ft' in runway:
-                                    embed.add_field(name="Dimensions", value=f"`{runway['length_ft']}ft long`\n`{runway['width_ft']}ft wide`", inline=True)
+                            if 'length_ft' in runway and 'width_ft' in runway:
+                                embed.add_field(name="Dimensions", value=f"`{runway['length_ft']}ft long`\n`{runway['width_ft']}ft wide`", inline=True)
 
-                                if 'le_ident' in runway or 'he_ident' in runway:
-                                    ils_value = ""
-                                    if 'le_ident' in runway:
-                                        ils_info = runway.get('le_ils', {})
-                                        ils_freq = ils_info.get('freq', 'N/A')
-                                        ils_course = ils_info.get('course', 'N/A')
-                                        ils_value += f"**{runway['le_ident']}** `{ils_freq} MHz @ {ils_course}°`\n"
-                                    if 'he_ident' in runway:
-                                        ils_info = runway.get('he_ils', {})
-                                        ils_freq = ils_info.get('freq', 'N/A')
-                                        ils_course = ils_info.get('course', 'N/A')
-                                        ils_value += f"**{runway['he_ident']}** `{ils_freq} MHz @ {ils_course}°`\n"
-                                    embed.add_field(name="Landing assistance", value=ils_value.strip(), inline=False)
+                            if 'le_ident' in runway or 'he_ident' in runway:
+                                ils_value = ""
+                                if 'le_ident' in runway:
+                                    ils_info = runway.get('le_ils', {})
+                                    ils_freq = ils_info.get('freq', 'N/A')
+                                    ils_course = ils_info.get('course', 'N/A')
+                                    ils_value += f"**{runway['le_ident']}** `{ils_freq} MHz @ {ils_course}°`\n"
+                                if 'he_ident' in runway:
+                                    ils_info = runway.get('he_ils', {})
+                                    ils_freq = ils_info.get('freq', 'N/A')
+                                    ils_course = ils_info.get('course', 'N/A')
+                                    ils_value += f"**{runway['he_ident']}** `{ils_freq} MHz @ {ils_course}°`\n"
+                                embed.add_field(name="Landing assistance", value=ils_value.strip(), inline=False)
 
-                                runway_status = ":white_check_mark: **Open**" if str(runway.get('closed', 0)) == '0' else ":x: **Closed**"
-                                embed.add_field(name="Runway status", value=runway_status, inline=True)
+                            runway_status = ":white_check_mark: **Open**" if str(runway.get('closed', 0)) == '0' else ":x: **Closed**"
+                            embed.add_field(name="Runway status", value=runway_status, inline=True)
 
-                                lighted_status = ":bulb: **Lighted**" if str(runway.get('lighted', 0)) == '1' else ":x: **Not Lighted**"
-                                embed.add_field(name="Lighting", value=lighted_status, inline=True)
+                            lighted_status = ":bulb: **Lighted**" if str(runway.get('lighted', 0)) == '1' else ":x: **Not Lighted**"
+                            embed.add_field(name="Lighting", value=lighted_status, inline=True)
 
-                                combined_pages.append(embed)
-                                embed = discord.Embed(title=f"Runway information for {code.upper()}", color=0xfffffe)
+                            combined_pages.append(embed)
+                            embed = discord.Embed(title=f"Runway information for {code.upper()}", color=0xfffffe)
 
-                        if 'freqs' in data2:
-                            freqs = data2['freqs']
-                            for freq in freqs:
-                                freq_embed = discord.Embed(title=f"Frequency information for {code.upper()}", color=0xfffffe)
-                                freq_embed.add_field(name="ID", value=f"`{freq.get('id', 'N/A')}`", inline=True)
-                                freq_embed.add_field(name="Type", value=f"`{freq.get('type', 'N/A')}`", inline=True)
-                                freq_embed.add_field(name="Frequency", value=f"`{freq.get('frequency_mhz', 'N/A')} mhz`", inline=True)
-                                freq_embed.add_field(name="Description", value=f"`{freq.get('description', 'N/A')}`", inline=False)
-                                combined_pages.append(freq_embed)
-
-                        await self.paginate_embed(ctx, combined_pages)
-
+                    await self.paginate_embed(ctx, combined_pages)
+            else:
+                embed = discord.Embed(title="Error", description="API token for airportdb.io not configured.", color=0xff4545)
+                await ctx.send(embed=embed)
         except Exception as e:
             embed = discord.Embed(title="Error", description=str(e), color=0xff4545)
             await ctx.send(embed=embed)
