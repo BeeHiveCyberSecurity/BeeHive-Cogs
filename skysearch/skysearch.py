@@ -856,6 +856,7 @@ class Skysearch(commands.Cog):
             embed2.add_field(name="Utility aircraft", value="**`{:,} spotted`**".format(len(self.agri_utility_set)), inline=True)
             embed2.add_field(name="Balloons", value="**`{:,} known`**".format(len(self.balloons_icao_set)), inline=True)
             embed2.add_field(name="Suspicious aircraft", value="**`{:,} identifiers`**".format(len(self.suspicious_icao_set)), inline=True)
+            embed2.add_field(name="Appears in", value="**`aircraft callsign` `aircraft icao` `aircraft reg` `aircraft squawk` `aircraft type` `aircraft radius` `aircraft pia` `aircraft mil` `aircraft ladd`**", inline=False)
 
             embed3 = discord.Embed(title="Photography", description="Photos are powered by community contributions at [planespotters.net](https://www.planespotters.net/)", color=0xfffffe)
             embed3.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/camera.png")
