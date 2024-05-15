@@ -1062,7 +1062,7 @@ class Skysearch(commands.Cog):
             google_street_view_api_key = googlemaps_tokens.get("api_key", "YOUR_API_KEY")  # Use the API key from the shared tokens, default to "YOUR_API_KEY" if not found
             
             if google_street_view_api_key == "YOUR_API_KEY":
-                return
+                pass
             else:
                 street_view_base_url = "https://maps.googleapis.com/maps/api/streetview"
                 street_view_params = {
@@ -1072,11 +1072,9 @@ class Skysearch(commands.Cog):
                 }
                 street_view_response = requests.get(street_view_base_url, params=street_view_params)
                 if street_view_response.status_code == 200:
-                    # Assuming the API returns the image directly, we need to save it temporarily
-                    with open("street_view_image.jpg", "wb") as image_file:
-                        image_file.write(street_view_response.content)
-                    with open("street_view_image.jpg", "rb") as image_file:
-                        file = discord.File(fp=image_file, filename="street_view_image.jpg")
+                    # Instead of saving the image to disk, we keep it in memory using BytesIO
+                    street_view_image_stream = io.BytesIO(street_view_response.content)
+                    file = discord.File(fp=street_view_image_stream, filename="street_view_image.jpg")
                     embed.set_image(url="attachment://street_view_image.jpg")
                 else:
                     # Handle the error accordingly, e.g., log it or send a message to the user
