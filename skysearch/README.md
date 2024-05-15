@@ -11,7 +11,7 @@ Before SkySearch functions properly on your own instance of Red, you'll need to 
 
 **Requirement** - You must set a `googlemaps` `api_key` within your Red instance.
 
-**API in use** - [Maps Static API](https://developers.google.com/maps/documentation/maps-static/start)
+**API in use** - [Maps Static API](https://developers.google.com/maps/documentation/maps-static)
 
 **Command** - `[p] set api googlemaps api_key YOURAPIKEYHERE`
 
