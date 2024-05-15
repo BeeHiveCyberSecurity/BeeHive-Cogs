@@ -1137,15 +1137,12 @@ class Skysearch(commands.Cog):
                                     if key in runway:
                                         if key == 'length_ft' and 'width_ft' in runway:
                                             value = f"`{runway['length_ft']}ft long`\n`{runway['width_ft']}ft wide`"
-                                        elif key in ['le_ident', 'he_ident']:
+                                        elif key == 'le_ident' or key == 'he_ident':
                                             ils_value = ""
-                                            ils_keys = ['le_ident', 'he_ident']
-                                            for ils_key in ils_keys:
-                                                if ils_key in runway:
-                                                    ils_info = runway.get(f'{ils_key}_ils', {})
-                                                    ils_freq = ils_info.get('freq', 'N/A')
-                                                    ils_course = ils_info.get('course', 'N/A')
-                                                    ils_value += f"**{runway[ils_key]}** `{ils_freq} MHz @ {ils_course}°`\n"
+                                            ils_info = runway.get(f'{key}_ils', {})
+                                            ils_freq = ils_info.get('freq', 'N/A')
+                                            ils_course = ils_info.get('course', 'N/A')
+                                            ils_value = f"**{runway[key]}** `{ils_freq} MHz @ {ils_course}°`"
                                             value = ils_value.strip()
                                         elif key == 'closed':
                                             value = ":white_check_mark: **Open**" if str(runway[key]) == '0' else ":x: **Closed**"
@@ -1154,7 +1151,7 @@ class Skysearch(commands.Cog):
                                         else:
                                             value = f"`{runway[key]}`"
 
-                                        if value:
+                                        if value and name:
                                             embed.add_field(name=name, value=value, inline=inline)
 
                                 combined_pages.append(embed)
