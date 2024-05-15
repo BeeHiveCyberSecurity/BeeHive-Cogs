@@ -16,10 +16,20 @@ Before SkySearch functions properly on your own instance of Red, you'll need to 
 
 **API in use** - [Maps Static API](https://developers.google.com/maps/documentation/maps-static)
 
-**Command** - `[p] set api googlemaps api_key YOURAPIKEYHERE`
+**Command** - `[p]set api googlemaps api_key YOURAPIKEYHERE`
 
 
-### For airportdb.io integration
+### airportdb.io integration
+
+**Price** - **FREE** for up to 5,000 queries / month
+
+**Function** - The cog will fetch information about airports, like runway details, using `airport runway`
+
+**Requirement** - You must set a `airportdbio` `api_token` within your Red instance.
+
+**API in use** - [airportdb.io api](https://airportdb.io/#)
+
+**Command** - `[p]set api airportdbio api_token YOURAPITOKENHERE`
 
 # Commands
 # aircraft

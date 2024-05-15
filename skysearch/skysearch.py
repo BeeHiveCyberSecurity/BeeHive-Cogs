@@ -825,15 +825,21 @@ class Skysearch(commands.Cog):
             async with self._http_client.get(url) as response:
                 data = await response.json()
 
-            if all(key in data for key in ["beast", "mlat", "other", "aircraft"]):
-                stats_keys = ["beast", "mlat", "other", "aircraft"]
-                stats_values = {key: data[key] for key in stats_keys}
+            stats_fields = {
+                "beast": {"name": "Beast Mode", "value": "{} feeders"},
+                "mlat": {"name": "MLAT", "value": "{} feeders"},
+                "other": {"name": "Other", "value": "{} feeders"},
+                "aircraft": {"name": "Total Aircraft", "value": "{} aircraft"}
+            }
 
-                embed = discord.Embed(title="Air traffic data", description="Live flight data powered by [airplanes.live](https://airplanes.live) API", color=0xfffffe)
-                embed.set_image(url="")
-                embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/airplane.png")
-                for key, value in stats_values.items():
-                    embed.add_field(name=key.capitalize(), value="{:,} aircraft".format(value), inline=True)
+            embed = discord.Embed(title="Air traffic data", description="Live flight data powered by [airplanes.live](https://airplanes.live) API", color=0xfffffe)
+            embed.set_image(url="")
+            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/airplane.png")
+            for key, field in stats_fields.items():
+                if key in data:
+                    name = field["name"]
+                    value = field["value"].format("{:,}".format(data[key]))
+                    embed.add_field(name=name, value=value, inline=True)
                 embed.add_field(name="Appears in", value="`aircraft callsign` `aircraft icao` `aircraft reg` `aircraft squawk` `aircraft type` `aircraft radius` `aircraft pia` `aircraft mil` `aircraft ladd`", inline=False)
                 embed2 = discord.Embed(title="Enhanced by BeeHive Intelligence", description="Additional info available per-aircraft", color=0xffd966)
                 embed2.set_image(url="")
