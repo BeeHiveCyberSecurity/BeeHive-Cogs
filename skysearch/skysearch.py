@@ -489,7 +489,6 @@ class Skysearch(commands.Cog):
             view.add_item(search_squawk)
             view.add_item(search_type)
             view.add_item(search_radius)
-            view.add_item(search_airport)
             view.add_item(show_military)
             view.add_item(show_ladd)
             view.add_item(show_pia)
