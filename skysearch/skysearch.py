@@ -1075,7 +1075,7 @@ class Skysearch(commands.Cog):
                 street_view_base_url = "https://maps.googleapis.com/maps/api/staticmap"
                 street_view_params = {
                     "size": "600x400",
-                    "zoom": "20",
+                    "zoom": "15",
                     "scale": "2",  # Image size (width x height)
                     "center": f"{data1['latitude']},{data1['longitude']}",  # Latitude and Longitude as comma-separated string
                     "key": google_street_view_api_key
