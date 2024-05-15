@@ -137,6 +137,14 @@ class Skysearch(commands.Cog):
             embed.add_field(name="Squawk", value=f"`{aircraft_data.get('squawk', 'BLOCKED')}`", inline=True)
             if aircraft_data.get('year', None) is not None:
                 embed.add_field(name="Built", value=f"`{aircraft_data.get('year')}`", inline=True)
+            
+            aircraft_model = aircraft_data.get('t', None)
+            if aircraft_model is not None:
+                embed.add_field(name="Model", value=f"`{aircraft_model}`", inline=True)
+            ground_speed_knots = aircraft_data.get('gs', 'N/A')
+            if ground_speed_knots != 'N/A':
+                ground_speed_mph = round(float(ground_speed_knots) * 1.15078)  # Convert knots to mph
+                embed.add_field(name="Speed", value=f"`{ground_speed_mph} mph`", inline=True)
             category_code_to_label = {
                 "A0": "No info available",
                 "A1": "Light (< 15500 lbs)",
@@ -166,14 +174,8 @@ class Skysearch(commands.Cog):
             category = aircraft_data.get('category', None)
             if category is not None:
                 category_label = category_code_to_label.get(category, "Unknown category")
-                embed.add_field(name="Category", value=f"`{category_label}`", inline=True)
-            aircraft_model = aircraft_data.get('t', None)
-            if aircraft_model is not None:
-                embed.add_field(name="Model", value=f"`{aircraft_model}`", inline=True)
-            ground_speed_knots = aircraft_data.get('gs', 'N/A')
-            if ground_speed_knots != 'N/A':
-                ground_speed_mph = round(float(ground_speed_knots) * 1.15078)  # Convert knots to mph
-                embed.add_field(name="Speed", value=f"`{ground_speed_mph} mph`", inline=True)
+                embed.add_field(name="Category", value=f"`{category_label}`", inline=False)
+
             operator = aircraft_data.get('ownOp', None)
             if operator is not None:
                 embed.add_field(name="Operated by", value=f"`{operator}`", inline=True)
