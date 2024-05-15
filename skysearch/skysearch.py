@@ -58,7 +58,7 @@ class Skysearch(commands.Cog):
         if 'ac' in response and response['ac']:
             await ctx.typing()
             aircraft_data = response['ac'][0]
-            emergency_squawk_codes = ['7400', '7500', '7600', '7700']
+            emergency_squawk_codes = ['7500', '7600', '7700']
             hex_id = aircraft_data.get('hex', '')                                      
             image_url, photographer = await self._get_photo_by_hex(hex_id)
             link = f"https://globe.airplanes.live/?icao={hex_id}"
@@ -98,7 +98,7 @@ class Skysearch(commands.Cog):
             ground_speed = aircraft_data.get('gs', 'N/A')
             if altitude == 'ground':
                 embed.add_field(name="Status", value="`On ground`", inline=True)
-            else:
+            elif altitude != 'N/A':
                 if isinstance(altitude, int):
                     altitude = "{:,}".format(altitude)
                 altitude_feet = f"{altitude} ft"
@@ -1133,7 +1133,7 @@ class Skysearch(commands.Cog):
     @tasks.loop(minutes=2)
     async def check_emergency_squawks(self):
         try:
-            emergency_squawk_codes = ['7400', '7500', '7600', '7700']
+            emergency_squawk_codes = ['7500', '7600', '7700']
             for squawk_code in emergency_squawk_codes:
                 url = f"{self.api_url}/squawk/{squawk_code}"
                 response = await self._make_request(url)
