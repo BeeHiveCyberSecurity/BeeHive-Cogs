@@ -13,6 +13,9 @@ Before SkySearch functions properly on your own instance of Red, you'll need to 
 
 **API in use** - [Maps Static API](https://developers.google.com/maps/documentation/maps-static/start)
 
+**Command** - `[p] set api googlemaps api_key YOURAPIKEYHERE`
+
+
 ### For airportdb.io integration
 
 # Commands
