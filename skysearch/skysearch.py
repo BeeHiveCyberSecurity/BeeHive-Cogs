@@ -1057,13 +1057,12 @@ class Skysearch(commands.Cog):
             fields = {
                 'icao': 'ICAO Code',
                 'iata': 'IATA Code',
-                'name': 'Airport Name',
+                'name': 'Name',
                 'location': 'Location',
                 'country': 'Country',
                 'country_code': 'Country Code',
                 'longitude': 'Longitude',
-                'latitude': 'Latitude',
-                'link': 'More Information'
+                'latitude': 'Latitude'
             }
             response1 = requests.get(url1)
             data1 = response1.json()
@@ -1097,11 +1096,11 @@ class Skysearch(commands.Cog):
             elif not data1 or 'name' not in data1:
                 embed.add_field(name="Error", value="No airport found with the provided code.", inline=False)
             else:
-                for field in fields:
+                for field, name in fields.items():
                     if field in data1:
                         if field != 'link':
                             value = f"`{data1[field]}`"
-                            embed.add_field(name=field.capitalize(), value=value, inline=False)
+                            embed.add_field(name=name, value=value, inline=False)
                         else:
                             # Ensure the URL is well-formed
                             link = data1[field]
