@@ -1076,7 +1076,6 @@ class Skysearch(commands.Cog):
                     embed.set_image(url=street_view_image_url)
                     street_view_image_stream = io.BytesIO(street_view_response.content)
                     file = discord.File(fp=street_view_image_stream, filename="street_view_image.jpg")
-                    await ctx.send(file=file, embed=embed)  # Send the file along with the embed
                 else:
                     # Handle the error accordingly, e.g., log it or send a message to the user
                     pass
@@ -1100,7 +1099,7 @@ class Skysearch(commands.Cog):
                             # URL button
                             view_airport = discord.ui.Button(label="View airport on airport-data.com", url=link, style=discord.ButtonStyle.link)
                             view.add_item(view_airport)
-            await ctx.send(embed=embed, view=view)
+            await ctx.send(embed=embed, view=view, file=file)
 
             api_token = await self.bot.get_shared_api_tokens("airportdbio")
             if api_token and 'api_token' in api_token and code_type == 'icao':
