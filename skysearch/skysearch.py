@@ -1434,12 +1434,13 @@ class Skysearch(commands.Cog):
                 await ctx.send(embed=discord.Embed(title="Error", description="Could not fetch forecast details.", color=0xff4545))
                 return
 
-            embed = discord.Embed(title="Weather Forecast", color=0x1e90ff)
-            icon_url = data3.get('properties', {}).get('icon')
-            if icon_url:
-                embed.set_thumbnail(url=icon_url)
-
+            combined_pages = []
             for period in periods:
+                embed = discord.Embed(title=f"Weather Forecast for {code.upper()}", color=0x1e90ff)
+                icon_url = period.get('icon')
+                if icon_url:
+                    embed.set_thumbnail(url=icon_url)
+
                 field_value = f"**Temperature:** {period['temperature']} {period['temperatureUnit']}\n"
                 field_value += f"**Wind:** {period['windSpeed']} {period['windDirection']}\n"
                 field_value += f"**Forecast:** {period['shortForecast']}\n"
@@ -1447,7 +1448,9 @@ class Skysearch(commands.Cog):
                     field_value += f"**Chance of Precipitation:** {period['probabilityOfPrecipitation']['value']}%\n"
                 embed.add_field(name=period['name'], value=field_value, inline=False)
 
-            await ctx.send(embed=embed)
+                combined_pages.append(embed)
+
+            await self.paginate_embed(ctx, combined_pages)
 
         except Exception as e:
             await ctx.send(embed=discord.Embed(title="Error", description=str(e), color=0xff4545))
