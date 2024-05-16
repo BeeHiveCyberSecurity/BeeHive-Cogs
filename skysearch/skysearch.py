@@ -564,6 +564,61 @@ class Skysearch(commands.Cog):
         else:
             embed = discord.Embed(title="Error", description="Error retrieving aircraft information.", color=0xff4545)
             await ctx.send(embed=embed)
+
+    @commands.guild_only()
+    @aircraft_group.command(name='military', help='Get information about military aircraft.')
+    async def show_military_aircraft(self, ctx):
+        url = f"{self.api_url}/mil"
+        response = await self._make_request(url)
+        if response:
+            aircraft_list = response['ac']
+            if aircraft_list:
+                page_index = 0
+
+                def create_embed(aircraft):
+                    embed = discord.Embed(title=f"Military Aircraft (Page {page_index + 1}/{len(aircraft_list)})", color=0xfffffe)
+                    embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/airplane.png")
+                    aircraft_description = aircraft.get('desc', 'N/A')  # Aircraft Description
+                    aircraft_squawk = aircraft.get('squawk', 'N/A')  # Squawk
+                    aircraft_lat = aircraft.get('lat', 'N/A')  # Latitude
+                    aircraft_lon = aircraft.get('lon', 'N/A')  # Longitude
+                    aircraft_heading = aircraft.get('heading', 'N/A')  # Heading
+                    aircraft_speed = aircraft.get('spd', 'N/A')  # Speed
+                    aircraft_hex = aircraft.get('hex', 'N/A')  # Hex
+
+                    aircraft_info = f"**Squawk:** {aircraft_squawk}\n"
+                    aircraft_info += f"**Coordinates:** Lat: {aircraft_lat}, Lon: {aircraft_lon}\n"
+                    aircraft_info += f"**Heading:** {aircraft_heading}\n"
+                    aircraft_info += f"**Speed:** {aircraft_speed}\n"
+                    aircraft_info += f"**ICAO:** {aircraft_hex}"
+
+                    embed.add_field(name=aircraft_description, value=aircraft_info, inline=False)
+                    return embed
+
+                message = await ctx.send(embed=create_embed(aircraft_list[page_index]))
+                await message.add_reaction("⬅️")  # Adding a reaction to scroll to the previous page
+                await message.add_reaction("➡️")  # Adding a reaction to scroll to the next page
+
+                def check(reaction, user):
+                    return user == ctx.author and str(reaction.emoji) in ['⬅️', '➡️']
+
+                while True:
+                    try:
+                        reaction, user = await self.bot.wait_for('reaction_add', timeout=60.0, check=check)
+                        if str(reaction.emoji) == '⬅️' and page_index > 0:  # Check if the previous page reaction was added and it's not the first page
+                            page_index -= 1
+                        elif str(reaction.emoji) == '➡️' and page_index < len(aircraft_list) - 1:  # Check if the next page reaction was added and it's not the last page
+                            page_index += 1
+                        await message.edit(embed=create_embed(aircraft_list[page_index]))
+                        await message.remove_reaction(reaction, user)
+                    except asyncio.TimeoutError:
+                        await message.clear_reactions()
+                        break
+            else:
+                await self._send_aircraft_info(ctx, response)
+        else:
+            embed = discord.Embed(title="Error", description="Error retrieving aircraft information.", color=0xff4545)
+            await ctx.send(embed=embed)
     
     @commands.guild_only()
     @aircraft_group.command(name='ladd', help='Get information on LADD-restricted aircraft')
@@ -841,46 +896,32 @@ class Skysearch(commands.Cog):
             await ctx.send(embed=embed)
 
     @commands.guild_only()
-    @aircraft_group.command(name='military', help='Scroll through live military planes.')
+    @aircraft_group.command(name='scroll', help='Scroll through available planes.')
     async def scroll_planes(self, ctx):
         url = f"{self.api_url}/mil"
         try:
             response = await self._make_request(url)
             if response and 'ac' in response:
-                index = 0
-                message = None
+                for index, aircraft_info in enumerate(response['ac']):
+                    await self._send_aircraft_info(ctx, {'ac': [aircraft_info]})
+                    embed = discord.Embed(description=f"Plane {index + 1}/{len(response['ac'])}. React with ➡️ to view the next plane or ⏹️ to stop.")
+                    message = await ctx.send(embed=embed)
+                    await message.add_reaction("➡️")
+                    await message.add_reaction("⏹️") 
 
-                def check(reaction, user):
-                    return user == ctx.author and str(reaction.emoji) in ['➡️', '⬅️', '⏹️']
-
-                while True:
-                    aircraft_info = response['ac'][index]
-                    embed = discord.Embed(description=f"Plane {index + 1}/{len(response['ac'])}. React with ⬅️ to view the previous plane, ➡️ to view the next plane, or ⏹️ to stop.")
-                    
-                    if message is None:
-                        message = await ctx.send(embed=embed)
-                        await message.add_reaction("⬅️")
-                        await message.add_reaction("➡️")
-                        await message.add_reaction("⏹️")
-                    else:
-                        await message.edit(embed=embed)
+                    def check(reaction, user):
+                        return user == ctx.author and str(reaction.emoji) == '➡️' or str(reaction.emoji) == '⏹️'
 
                     try:
                         reaction, user = await self.bot.wait_for('reaction_add', timeout=60.0, check=check)
-                        
+                        await message.remove_reaction(reaction.emoji, ctx.author)
                         if str(reaction.emoji) == '⏹️':
                             embed = discord.Embed(description="Stopping.")
-                            await message.edit(embed=embed)
+                            await ctx.send(embed=embed)
                             break
-                        elif str(reaction.emoji) == '➡️':
-                            index = (index + 1) % len(response['ac'])
-                        elif str(reaction.emoji) == '⬅️':
-                            index = (index - 1) % len(response['ac'])
-                        
-                        await message.remove_reaction(reaction.emoji, user)
                     except asyncio.TimeoutError:
                         embed = discord.Embed(description="No reaction received. Stopping.")
-                        await message.edit(embed=embed)
+                        await ctx.send(embed=embed)
                         break
         except Exception as e:
             embed = discord.Embed(description=f"An error occurred during scrolling: {e}.")
