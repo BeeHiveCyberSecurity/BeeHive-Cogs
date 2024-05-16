@@ -855,7 +855,6 @@ class Skysearch(commands.Cog):
 
                 while True:
                     aircraft_info = response['ac'][index]
-                    await self._send_aircraft_info(ctx, {'ac': [aircraft_info]})
                     embed = discord.Embed(description=f"Plane {index + 1}/{len(response['ac'])}. React with ⬅️ to view the previous plane, ➡️ to view the next plane, or ⏹️ to stop.")
                     
                     if message is None:
