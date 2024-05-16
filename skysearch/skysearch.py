@@ -629,6 +629,7 @@ class Skysearch(commands.Cog):
 
                         await message.remove_reaction(reaction, user)
                     except asyncio.TimeoutError:
+                        await message.clear_reactions()
                         break
             else:
                 await self._send_aircraft_info(ctx, response)
