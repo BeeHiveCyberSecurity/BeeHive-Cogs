@@ -1290,11 +1290,27 @@ class Skysearch(commands.Cog):
     async def navaidinfo(self, ctx, code: str):
         """Query navaid information by ICAO code."""
         if len(code) != 4:
-            embed = discord.Embed(title="Error", description="Invalid ICAO code. ICAO codes are 4 characters long.", color=0xff4545)
-            await ctx.send(embed=embed)
-            return
+            if len(code) == 3:
+                code_type = 'iata'
+            else:
+                embed = discord.Embed(title="Error", description="Invalid ICAO or IATA code. ICAO codes are 4 characters long and IATA codes are 3 characters long.", color=0xff4545)
+                await ctx.send(embed=embed)
+                return
+        else:
+            code_type = 'icao'
 
         try:
+            if code_type == 'iata':
+                url1 = f"https://www.airport-data.com/api/ap_info.json?iata={code}"
+                response1 = requests.get(url1)
+                data1 = response1.json()
+                if 'icao' in data1:
+                    code = data1['icao']
+                else:
+                    embed = discord.Embed(title="Error", description="No ICAO code found for the provided IATA code.", color=0xff4545)
+                    await ctx.send(embed=embed)
+                    return
+
             api_token = await self.bot.get_shared_api_tokens("airportdbio")
             if api_token and 'api_token' in api_token:
                 url = f"https://airportdb.io/api/v1/airport/{code}?apiToken={api_token['api_token']}"
