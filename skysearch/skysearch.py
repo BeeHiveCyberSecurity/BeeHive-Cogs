@@ -576,7 +576,7 @@ class Skysearch(commands.Cog):
                 page_index = 0
 
                 def create_embed(aircraft):
-                    embed = discord.Embed(title=f"Military Aircraft (Page {page_index + 1}/{len(aircraft_list)})", color=0xfffffe)
+                    embed = discord.Embed(title=f"Live military aircraft ({page_index + 1}/{len(aircraft_list)})", color=0xfffffe)
                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/airplane.png")
                     aircraft_description = aircraft.get('desc', 'N/A')  # Aircraft Description
                     aircraft_squawk = aircraft.get('squawk', 'N/A')  # Squawk
