@@ -1407,9 +1407,9 @@ class Skysearch(commands.Cog):
             await ctx.send(embed=embed)
 
     @commands.guild_only()
-    @airport_group.command(name='weatheralerts', help='Get current weather conditions for an airport by ICAO or IATA code.')
-    async def check_weather_alerts(self, ctx, code: str):
-        """Fetch the latitude and longitude of an airport via IATA or ICAO code, then query the current weather conditions and active severe weather alerts."""
+    @airport_group.command(name='forecast', help='Get the future weather format for an airport by ICAO or IATA code.')
+    async def check_weather_forecast(self, ctx, code: str):
+        """Fetch the latitude and longitude of an airport via IATA or ICAO code, then show the forecast"""
         code_type = 'icao' if len(code) == 4 else 'iata' if len(code) == 3 else None
         if not code_type:
             await ctx.send(embed=discord.Embed(title="Error", description="Invalid ICAO or IATA code. ICAO codes are 4 characters long and IATA codes are 3 characters long.", color=0xff4545))
@@ -1434,7 +1434,13 @@ class Skysearch(commands.Cog):
                 await ctx.send(embed=discord.Embed(title="Error", description="Could not fetch forecast details.", color=0xff4545))
                 return
 
-            forecast_message = "\n\n".join([f"{period['name']}: {period['detailedForecast']}" for period in periods])
+            forecast_message = ""
+            for period in periods:
+                forecast_message += f"**{period['name']}**\n"
+                forecast_message += f"**Temperature:** {period['temperature']} {period['temperatureUnit']}\n"
+                forecast_message += f"**Wind:** {period['windSpeed']} {period['windDirection']}\n"
+                forecast_message += f"**Forecast:** {period['detailedForecast']}\n\n"
+
             embed = discord.Embed(title="Weather Forecast", description=forecast_message, color=0x1e90ff)
             await ctx.send(embed=embed)
 
