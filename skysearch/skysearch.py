@@ -1461,12 +1461,62 @@ class Skysearch(commands.Cog):
                 if icon_url:
                     embed.set_thumbnail(url=icon_url)
 
-                embed.add_field(name="Temperature", value=f"**`{period['temperature']}° {period['temperatureUnit']}`**", inline=True)
-                embed.add_field(name="Wind", value=f"**`{period['windSpeed']} {period['windDirection']}`**", inline=True)
+                temperature = period['temperature']
+                temperature_unit = period['temperatureUnit']
+                
+                # Determine the emoji based on temperature
+                if temperature_unit == 'F':
+                    if temperature >= 90:
+                        emoji = '🔥'  # Hot
+                    elif temperature <= 32:
+                        emoji = '❄️'  # Cold
+                    else:
+                        emoji = '🌡️'  # Moderate
+                else:  # Assuming Celsius
+                    if temperature >= 32:
+                        emoji = '🔥'  # Hot
+                    elif temperature <= 0:
+                        emoji = '❄️'  # Cold
+                    else:
+                        emoji = '🌡️'  # Moderate
+
+                embed.add_field(name="Temperature", value=f"{emoji} **`{temperature}° {temperature_unit}`**", inline=True)
+
+                wind_speed = period['windSpeed']
+                wind_direction = period['windDirection']
+
+                # Determine the emoji based on wind speed
+                try:
+                    speed_value = int(wind_speed.split()[0])
+                    if speed_value >= 30:
+                        wind_emoji = '💨'  # Strong wind
+                    elif speed_value >= 15:
+                        wind_emoji = '🌬️'  # Moderate wind
+                    else:
+                        wind_emoji = '🍃'  # Light wind
+                except ValueError:
+                    wind_emoji = '🍃'  # Default to light wind if parsing fails
+
+                # Determine the emoji based on wind direction
+                direction_emoji = {
+                    'N': '⬆️',
+                    'NE': '↗️',
+                    'E': '➡️',
+                    'SE': '↘️',
+                    'S': '⬇️',
+                    'SW': '↙️',
+                    'W': '⬅️',
+                    'NW': '↖️'
+                }.get(wind_direction, '❓')  # Default to question mark if direction is unknown
+
+                embed.add_field(name="Wind", value=f"{wind_emoji} {direction_emoji} **`{wind_speed} {wind_direction}`**", inline=True)
+                
                 if 'relativeHumidity' in period and period['relativeHumidity']['value'] is not None:
                     embed.add_field(name="Humidity", value=f"**`{period['relativeHumidity']['value']}%`**", inline=True)
+
                 if 'probabilityOfPrecipitation' in period and period['probabilityOfPrecipitation']['value'] is not None:
                     embed.add_field(name="Chance of Precipitation", value=f"**`{period['probabilityOfPrecipitation']['value']}%`**", inline=True)
+                    
                 if 'dewpoint' in period and period['dewpoint']['value'] is not None:
                     dewpoint_celsius = period['dewpoint']['value']
                     dewpoint_fahrenheit = (dewpoint_celsius * 9/5) + 32
