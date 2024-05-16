@@ -16,4 +16,4 @@ ukr_conflict_set = {'AE5240', 'AE6821', '50FFD8'}
 
 global_prior_known_accident_set = {}
 
-trainer_educational_set = {}
+trainer_educational_set = {'A2FBF7'}
