@@ -587,12 +587,12 @@ class Skysearch(commands.Cog):
                     aircraft_hex = aircraft.get('hex', 'N/A')  # Hex
 
                     embed.description = f"# {aircraft_description}"
-                    embed.add_field(name="Squawk", value=f"**`{aircraft_squawk}`**", inline=False)
-                    embed.add_field(name="Latitude", value=f"**`{aircraft_lat}`**", inline=False)
-                    embed.add_field(name="Longitude", value=f"**`{aircraft_lon}`**", inline=False)
-                    embed.add_field(name="Heading", value=f"**`{aircraft_heading}`**", inline=False)
-                    embed.add_field(name="Speed", value=f"**`{aircraft_speed}`**", inline=False)
-                    embed.add_field(name="ICAO", value=f"**`{aircraft_hex}`**", inline=False)
+                    embed.add_field(name="Squawk", value=f"**`{aircraft_squawk}`**", inline=True)
+                    embed.add_field(name="Latitude", value=f"**`{aircraft_lat}`**", inline=True)
+                    embed.add_field(name="Longitude", value=f"**`{aircraft_lon}`**", inline=True)
+                    embed.add_field(name="Heading", value=f"**`{aircraft_heading}`**", inline=True)
+                    embed.add_field(name="Speed", value=f"**`{aircraft_speed}`**", inline=True)
+                    embed.add_field(name="ICAO", value=f"**`{aircraft_hex}`**", inline=True)
 
                     return embed
 
