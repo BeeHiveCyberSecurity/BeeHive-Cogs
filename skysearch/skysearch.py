@@ -829,10 +829,10 @@ class Skysearch(commands.Cog):
                     raise aiohttp.ClientError(f"API responded with status code: {response.status}")
 
             stats_fields = {
-                "beast": {"name": "Beast Mode", "value": "**`{} feeders`**"},
+                "beast": {"name": "Beast", "value": "**`{} feeders`**"},
                 "mlat": {"name": "MLAT", "value": "**`{} feeders`**"},
-                "other": {"name": "Other", "value": "**`{} feeders`**"},
-                "aircraft": {"name": "Total Aircraft", "value": "**`{} aircraft`**"}
+                "other": {"name": "Other Freq's", "value": "**`{} feeders`**"},
+                "aircraft": {"name": "Aircraft tracked right now", "value": "**`{} aircraft`**"}
             }
 
             embed = discord.Embed(title="Air traffic data", description="Live flight data powered by [airplanes.live](https://airplanes.live) API", color=0xfffffe)
