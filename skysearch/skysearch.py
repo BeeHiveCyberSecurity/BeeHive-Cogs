@@ -1302,7 +1302,7 @@ class Skysearch(commands.Cog):
                         navaids = data['navaids']
                         for navaid in navaids:
                             if 'ident' in navaid:
-                                embed.add_field(name="Navaid ID", value=f"**`{navaid['ident']}`**", inline=True)
+                                embed.add_field(name="Ident", value=f"**`{navaid['ident']}`**", inline=True)
 
                             if 'name' in navaid:
                                 embed.add_field(name="Name", value=f"**`{navaid['name']}`**", inline=True)
