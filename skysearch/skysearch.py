@@ -1017,35 +1017,15 @@ class Skysearch(commands.Cog):
 
         url = f"https://globe.airplanes.live/?icao={icao}"
         try:
-
-            # Set up the webdriver
-            options = webdriver.ChromeOptions()
-            options.add_argument('--headless')
-            options.add_argument('--no-sandbox')
-            options.add_argument('--disable-dev-shm-usage')
-            options.add_argument('--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36')
-            driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
-
-            # Load the webpage
-            driver.get(url)
-            driver.set_window_size(1920, 1080)
-
-            # Take a screenshot
-            screenshot = driver.get_screenshot_as_png()
-            driver.quit()
-
-            # Convert the screenshot to an image
-            image = Image.open(io.BytesIO(screenshot))
-            image.save("aircraft_path.png")
-
-            # Send the image to the user
-            await ctx.send(file=discord.File("aircraft_path.png"))
-
-        except AttributeError as e:
-            if "'NoneType' object has no attribute 'split'" in str(e):
-                await ctx.send(embed=discord.Embed(title="Error", description="An error occurred while fetching the aircraft path: The webpage might not have loaded correctly.", color=0xff4545))
+            # Use the requests and PIL libraries to fetch and process the screenshot
+            response = requests.get(url, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36'})
+            if response.status_code == 200:
+                image = Image.open(io.BytesIO(response.content))
+                image.save("aircraft_path.png")
+                await ctx.send(file=discord.File("aircraft_path.png"))
             else:
-                await ctx.send(embed=discord.Embed(title="Error", description=f"An error occurred while fetching the aircraft path: {e}", color=0xff4545))
+                await ctx.send(embed=discord.Embed(title="Error", description="Failed to load the webpage.", color=0xff4545))
+
         except Exception as e:
             await ctx.send(embed=discord.Embed(title="Error", description=f"An error occurred while fetching the aircraft path: {e}", color=0xff4545))
 
