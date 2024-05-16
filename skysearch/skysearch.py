@@ -871,7 +871,7 @@ class Skysearch(commands.Cog):
             embed5.add_field(name="Appears in", value="**`airport runway`**", inline=False)
 
             embed6 = discord.Embed(title="Mapping and imagery", description="Mapping and ground imagery powered by [Google Maps](https://maps.google.com) and the [Maps Static API](https://developers.google.com/maps/documentation/maps-static)", color=0xfffffe)
-            embed6.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/logo-google.png")
+            embed6.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/map.png")
             embed6.add_field(name="Appears in", value="**`airport about`**", inline=False)
 
             await ctx.send(embed=embed)
