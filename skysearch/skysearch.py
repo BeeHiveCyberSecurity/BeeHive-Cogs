@@ -1322,8 +1322,11 @@ class Skysearch(commands.Cog):
                             if 'usageType' in navaid:
                                 embed.add_field(name="Usage Type", value=f"**`{navaid['usageType']}`**", inline=True)
 
+                            if 'power' in navaid:
+                                embed.add_field(name="Signal power", balue=f"**`{navaid['power']}`**", inline=True)
+
                             if 'associated_airport' in navaid:
-                                embed.add_field(name="Associated Airport", value=f"**`{navaid['associated_airport']}`**", inline=True)
+                                embed.add_field(name="Airport", value=f"**`{navaid['associated_airport']}`**", inline=True)
 
                             combined_pages.append(embed)
                             embed = discord.Embed(title=f"Navaid information for {code.upper()}", color=0xfffffe)
