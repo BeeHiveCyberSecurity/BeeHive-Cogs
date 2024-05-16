@@ -841,7 +841,7 @@ class Skysearch(commands.Cog):
             await ctx.send(embed=embed)
 
     @commands.guild_only()
-    @aircraft_group.command(name='scroll', help='Scroll through available planes.')
+    @aircraft_group.command(name='military', help='Scroll through live military planes.')
     async def scroll_planes(self, ctx):
         url = f"{self.api_url}/mil"
         try:
