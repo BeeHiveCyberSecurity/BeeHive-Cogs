@@ -496,7 +496,11 @@ class Skysearch(commands.Cog):
             view.add_item(show_stats)
 
             # Send the embed with the view
-            await ctx.send(embed=embed, view=view)
+            message = await ctx.send(embed=embed, view=view)
+
+            # Wait for the view to timeout and then remove the buttons
+            await view.wait()
+            await message.edit(view=None)
 
     @commands.guild_only()
     @aircraft_group.command(name='icao', help='Get information about an aircraft by its 24-bit ICAO Address')
