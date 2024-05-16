@@ -1300,28 +1300,30 @@ class Skysearch(commands.Cog):
                         navaids = data['navaids']
                         for navaid in navaids:
                             if 'ident' in navaid:
-                                embed.add_field(name="Navaid ID", value=f"`{navaid['ident']}`", inline=True)
+                                embed.add_field(name="Navaid ID", value=f"**`{navaid['ident']}`**", inline=True)
 
                             if 'name' in navaid:
-                                embed.add_field(name="Name", value=f"`{navaid['name']}`", inline=True)
+                                embed.add_field(name="Name", value=f"**`{navaid['name']}`**", inline=True)
 
                             if 'type' in navaid:
-                                embed.add_field(name="Type", value=f"`{navaid['type']}`", inline=True)
+                                embed.add_field(name="Type", value=f"**`{navaid['type']}`**", inline=True)
 
                             if 'frequency_khz' in navaid:
-                                embed.add_field(name="Frequency (kHz)", value=f"`{navaid['frequency_khz']}`", inline=True)
+                                embed.add_field(name="Frequency (kHz)", value=f"**`{navaid['frequency_khz']}`**", inline=True)
 
                             if 'latitude_deg' in navaid and 'longitude_deg' in navaid:
-                                embed.add_field(name="Coordinates", value=f"`{navaid['latitude_deg']}°, {navaid['longitude_deg']}°`", inline=True)
+                                latitude = f"{navaid['latitude_deg']:.6f}"
+                                longitude = f"{navaid['longitude_deg']:.6f}"
+                                embed.add_field(name="Coordinates", value=f"**`{latitude}°, {longitude}°`**", inline=True)
 
                             if 'elevation_ft' in navaid:
-                                embed.add_field(name="Elevation (ft)", value=f"`{navaid['elevation_ft']}`", inline=True)
+                                embed.add_field(name="Elevation (ft)", value=f"**`{navaid['elevation_ft']}`**", inline=True)
 
                             if 'usageType' in navaid:
-                                embed.add_field(name="Usage Type", value=f"`{navaid['usageType']}`", inline=True)
+                                embed.add_field(name="Usage Type", value=f"**`{navaid['usageType']}`**", inline=True)
 
                             if 'associated_airport' in navaid:
-                                embed.add_field(name="Associated Airport", value=f"`{navaid['associated_airport']}`", inline=True)
+                                embed.add_field(name="Associated Airport", value=f"**`{navaid['associated_airport']}`**", inline=True)
 
                             combined_pages.append(embed)
                             embed = discord.Embed(title=f"Navaid information for {code.upper()}", color=0xfffffe)
