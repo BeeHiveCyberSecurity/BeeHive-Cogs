@@ -1441,7 +1441,9 @@ class Skysearch(commands.Cog):
             if not latitude or not longitude:
                 await ctx.send(embed=discord.Embed(title="Error", description="Could not fetch latitude and longitude for the provided code.", color=0xff4545))
                 return
-
+            if data1.get('country_code') != 'US':
+                await ctx.send(embed=discord.Embed(title="Error", description="Weather forecasts are currently only available for airports in the United States.", color=0xff4545))
+                return
             data2 = requests.get(f"https://api.weather.gov/points/{latitude},{longitude}").json()
             forecast_url = data2.get('properties', {}).get('forecast')
             if not forecast_url:
