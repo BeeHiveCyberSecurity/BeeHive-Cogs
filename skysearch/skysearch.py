@@ -1365,9 +1365,6 @@ class Skysearch(commands.Cog):
                             combined_pages.append(embed)
                             embed = discord.Embed(title=f"Navaid information for {code.upper()}", color=0xfffffe)
 
-                            combined_pages.append(embed)
-                            embed = discord.Embed(title=f"Navaid information for {code.upper()}", color=0xfffffe)
-
                     await self.paginate_embed(ctx, combined_pages)
             else:
                 embed = discord.Embed(title="Error", description="API token for airportdb.io not configured.", color=0xff4545)
