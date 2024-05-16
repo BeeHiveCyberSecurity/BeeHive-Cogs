@@ -1017,10 +1017,10 @@ class Skysearch(commands.Cog):
             view = discord.ui.View(timeout=180)  # Set a timeout for the view
 
             # Create buttons with click actions
-            search_airport = discord.ui.Button(label="Airport info", style=discord.ButtonStyle.green, row=1)
-            search_runway = discord.ui.Button(label="Runway info", style=discord.ButtonStyle.green, row=1)
-            search_navaid = discord.ui.Button(label="Navaid info", style=discord.ButtonStyle.green, row=1)
-            get_forecast = discord.ui.Button(label="Get forecast", style=discord.ButtonStyle.green, row=1)
+            search_airport = discord.ui.Button(label="Get airport info", style=discord.ButtonStyle.green, row=1)
+            search_runway = discord.ui.Button(label="Get runway info", style=discord.ButtonStyle.green, row=1)
+            search_navaid = discord.ui.Button(label="Get navaid info", style=discord.ButtonStyle.green, row=1)
+            get_forecast = discord.ui.Button(label="Get weather forecast", style=discord.ButtonStyle.green, row=1)
             show_the_commands = discord.ui.Button(label="Show help", style=discord.ButtonStyle.grey, row=4)
             show_stats = discord.ui.Button(label="Show stats", style=discord.ButtonStyle.grey, row=4)
 
