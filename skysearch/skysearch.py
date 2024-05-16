@@ -1439,9 +1439,15 @@ class Skysearch(commands.Cog):
                 forecast_message += f"**{period['name']}**\n"
                 forecast_message += f"**Temperature:** {period['temperature']} {period['temperatureUnit']}\n"
                 forecast_message += f"**Wind:** {period['windSpeed']} {period['windDirection']}\n"
-                forecast_message += f"**Forecast:** {period['detailedForecast']}\n\n"
+                forecast_message += f"**Forecast:** {period['shortForecast']}\n"
+                if 'probabilityOfPrecipitation' in period:
+                    forecast_message += f"**Chance of Precipitation:** {period['probabilityOfPrecipitation']['value']}%\n"
+                forecast_message += "\n"
 
             embed = discord.Embed(title="Weather Forecast", description=forecast_message, color=0x1e90ff)
+            icon_url = data3.get('properties', {}).get('icon')
+            if icon_url:
+                embed.set_thumbnail(url=icon_url)
             await ctx.send(embed=embed)
 
         except Exception as e:
