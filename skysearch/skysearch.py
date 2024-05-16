@@ -1312,9 +1312,9 @@ class Skysearch(commands.Cog):
                                 embed.add_field(name="Frequency (kHz)", value=f"**`{navaid['frequency_khz']}`**", inline=True)
 
                             if 'latitude_deg' in navaid and 'longitude_deg' in navaid:
-                                latitude = f"{navaid['latitude_deg']:.6f}"
-                                longitude = f"{navaid['longitude_deg']:.6f}"
-                                embed.add_field(name="Coordinates", value=f"**`{latitude}°, {longitude}°`**", inline=True)
+                                latitude = "{:.6f}".format(navaid['latitude_deg'])
+                                longitude = "{:.6f}".format(navaid['longitude_deg'])
+                                embed.add_field(name="Coordinates", value="**`{}°, {}°`**".format(latitude, longitude), inline=True)
 
                             if 'elevation_ft' in navaid:
                                 embed.add_field(name="Elevation (ft)", value=f"**`{navaid['elevation_ft']}`**", inline=True)
