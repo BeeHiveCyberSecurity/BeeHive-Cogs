@@ -1407,8 +1407,8 @@ class Skysearch(commands.Cog):
             await ctx.send(embed=embed)
 
     @commands.guild_only()
-    @airport_group.command(name='weather', help='Get current weather conditions for an airport by ICAO or IATA code.')
-    async def check_weather(self, ctx, code: str):
+    @airport_group.command(name='wxalerts', help='Get current weather conditions for an airport by ICAO or IATA code.')
+    async def check_weather_alerts(self, ctx, code: str):
         """Fetch the latitude and longitude of an airport via IATA or ICAO code, then query the current weather conditions."""
         if len(code) == 4:
             code_type = 'icao'
@@ -1438,17 +1438,31 @@ class Skysearch(commands.Cog):
                 embed = discord.Embed(title="Error", description="API key for The Weather Company not configured.", color=0xff4545)
                 await ctx.send(embed=embed)
                 return
-            weather_url = f"https://api.weather.com/v3/wx/conditions/current?geocode={latitude},{longitude}&format=json&apiKey={api_key}"
+            weather_url = f"https://api.weather.com/v1/geocode/{latitude}/{longitude}/observations/current.json?language=en-US&units=e&apiKey={api_key}"
             response2 = requests.get(weather_url)
             weather_data = response2.json()
 
-            if 'temperature' in weather_data and 'narrative' in weather_data:
-                temperature = weather_data['temperature']
-                narrative = weather_data['narrative']
+            if 'observation' in weather_data and 'temp' in weather_data['observation'] and 'wx_phrase' in weather_data['observation']:
+                temperature = weather_data['observation']['temp']
+                narrative = weather_data['observation']['wx_phrase']
                 embed = discord.Embed(title=f"Current Weather for {code.upper()}", description=f"{narrative}", color=0x2BBD8E)
                 embed.add_field(name="Temperature", value=f"{temperature}°C", inline=True)
                 embed.add_field(name="Latitude", value=f"{latitude}°", inline=True)
                 embed.add_field(name="Longitude", value=f"{longitude}°", inline=True)
+                
+                # Check for active weather alerts
+                alerts_url = f"https://api.weather.gov/alerts/active?point={latitude},{longitude}"
+                response3 = requests.get(alerts_url)
+                alerts_data = response3.json()
+                
+                if 'features' in alerts_data and len(alerts_data['features']) > 0:
+                    alerts = alerts_data['features']
+                    for alert in alerts:
+                        if 'properties' in alert:
+                            alert_title = alert['properties'].get('headline', 'Weather Alert')
+                            alert_description = alert['properties'].get('description', 'No description available.')
+                            embed.add_field(name=alert_title, value=alert_description, inline=False)
+                
                 await ctx.send(embed=embed)
             else:
                 embed = discord.Embed(title="Error", description="Could not fetch weather data for the provided coordinates.", color=0xff4545)
