@@ -598,9 +598,10 @@ class Skysearch(commands.Cog):
                 message = await ctx.send(embed=create_embed(aircraft_list[page_index]))
                 await message.add_reaction("⬅️")  # Adding a reaction to scroll to the previous page
                 await message.add_reaction("➡️")  # Adding a reaction to scroll to the next page
+                await message.add_reaction("❌")  # Adding a reaction to close the embed
 
                 def check(reaction, user):
-                    return user == ctx.author and str(reaction.emoji) in ['⬅️', '➡️']
+                    return user == ctx.author and str(reaction.emoji) in ['⬅️', '➡️', '❌']
 
                 while True:
                     try:
@@ -609,6 +610,9 @@ class Skysearch(commands.Cog):
                             page_index -= 1
                         elif str(reaction.emoji) == '➡️' and page_index < len(aircraft_list) - 1:  # Check if the next page reaction was added and it's not the last page
                             page_index += 1
+                        elif str(reaction.emoji) == '❌':  # Check if the close reaction was added
+                            await message.delete()
+                            break
                         await message.edit(embed=create_embed(aircraft_list[page_index]))
                         await message.remove_reaction(reaction, user)
                     except asyncio.TimeoutError:
