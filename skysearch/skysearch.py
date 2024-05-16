@@ -1500,13 +1500,21 @@ class Skysearch(commands.Cog):
                 # Determine the emoji based on wind direction
                 direction_emoji = {
                     'N': '⬆️',
+                    'NNE': '⬆️↗️',
                     'NE': '↗️',
+                    'ENE': '↗️➡️',
                     'E': '➡️',
+                    'ESE': '➡️↘️',
                     'SE': '↘️',
+                    'SSE': '↘️⬇️',
                     'S': '⬇️',
+                    'SSW': '⬇️↙️',
                     'SW': '↙️',
+                    'WSW': '↙️⬅️',
                     'W': '⬅️',
-                    'NW': '↖️'
+                    'WNW': '⬅️↖️',
+                    'NW': '↖️',
+                    'NNW': '↖️⬆️'
                 }.get(wind_direction, '❓')  # Default to question mark if direction is unknown
 
                 embed.add_field(name="Wind", value=f"{wind_emoji} {direction_emoji} **`{wind_speed} {wind_direction}`**", inline=True)
