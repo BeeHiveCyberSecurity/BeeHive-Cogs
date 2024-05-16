@@ -1410,53 +1410,36 @@ class Skysearch(commands.Cog):
     @airport_group.command(name='weatheralerts', help='Get current weather conditions for an airport by ICAO or IATA code.')
     async def check_weather_alerts(self, ctx, code: str):
         """Fetch the latitude and longitude of an airport via IATA or ICAO code, then query the current weather conditions and active severe weather alerts."""
-        if len(code) == 4:
-            code_type = 'icao'
-        elif len(code) == 3:
-            code_type = 'iata'
-        else:
-            embed = discord.Embed(title="Error", description="Invalid ICAO or IATA code. ICAO codes are 4 characters long and IATA codes are 3 characters long.", color=0xff4545)
-            await ctx.send(embed=embed)
+        code_type = 'icao' if len(code) == 4 else 'iata' if len(code) == 3 else None
+        if not code_type:
+            await ctx.send(embed=discord.Embed(title="Error", description="Invalid ICAO or IATA code. ICAO codes are 4 characters long and IATA codes are 3 characters long.", color=0xff4545))
             return
 
         try:
-            url1 = f"https://www.airport-data.com/api/ap_info.json?{code_type}={code}"
-            response1 = requests.get(url1)
-            data1 = response1.json()
-
-            if 'latitude' in data1 and 'longitude' in data1:
-                latitude = data1['latitude']
-                longitude = data1['longitude']
-            else:
-                embed = discord.Embed(title="Error", description="Could not fetch latitude and longitude for the provided code.", color=0xff4545)
-                await ctx.send(embed=embed)
+            data1 = requests.get(f"https://www.airport-data.com/api/ap_info.json?{code_type}={code}").json()
+            latitude, longitude = data1.get('latitude'), data1.get('longitude')
+            if not latitude or not longitude:
+                await ctx.send(embed=discord.Embed(title="Error", description="Could not fetch latitude and longitude for the provided code.", color=0xff4545))
                 return
 
-            # Query the weather alerts
-            url2 = f"https://api.weather.gov/points/{latitude},{longitude}"
-            response2 = requests.get(url2)
-            data2 = response2.json()
+            data2 = requests.get(f"https://api.weather.gov/points/{latitude},{longitude}").json()
+            forecast_url = data2.get('properties', {}).get('forecast')
+            if not forecast_url:
+                await ctx.send(embed=discord.Embed(title="Error", description="Could not fetch forecast URL.", color=0xff4545))
+                return
 
-            if 'properties' in data2 and 'forecast' in data2['properties']:
-                forecast_url = data2['properties']['forecast']
-                response3 = requests.get(forecast_url)
-                data3 = response3.json()
+            data3 = requests.get(forecast_url).json()
+            periods = data3.get('properties', {}).get('periods')
+            if not periods:
+                await ctx.send(embed=discord.Embed(title="Error", description="Could not fetch forecast details.", color=0xff4545))
+                return
 
-                if 'properties' in data3 and 'periods' in data3['properties']:
-                    periods = data3['properties']['periods']
-                    forecast_descriptions = [f"{period['name']}: {period['detailedForecast']}" for period in periods]
-                    forecast_message = "\n\n".join(forecast_descriptions)
-                    embed = discord.Embed(title="Weather Forecast", description=forecast_message, color=0x1e90ff)
-                else:
-                    embed = discord.Embed(title="Error", description="Could not fetch forecast details.", color=0xff4545)
-            else:
-                embed = discord.Embed(title="Error", description="Could not fetch forecast URL.", color=0xff4545)
-
+            forecast_message = "\n\n".join([f"{period['name']}: {period['detailedForecast']}" for period in periods])
+            embed = discord.Embed(title="Weather Forecast", description=forecast_message, color=0x1e90ff)
             await ctx.send(embed=embed)
 
         except Exception as e:
-            embed = discord.Embed(title="Error", description=str(e), color=0xff4545)
-            await ctx.send(embed=embed)
+            await ctx.send(embed=discord.Embed(title="Error", description=str(e), color=0xff4545))
 
 
 
