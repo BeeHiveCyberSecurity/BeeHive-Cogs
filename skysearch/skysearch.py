@@ -1433,17 +1433,24 @@ class Skysearch(commands.Cog):
                 return
 
             # Query the weather alerts
-            url2 = f"https://api.weather.gov/alerts/active?point={latitude},{longitude}"
+            url2 = f"https://api.weather.gov/points/{latitude},{longitude}"
             response2 = requests.get(url2)
             data2 = response2.json()
 
-            if 'features' in data2 and data2['features']:
-                alerts = data2['features']
-                alert_descriptions = [alert['properties']['description'] for alert in alerts if 'properties' in alert and 'description' in alert['properties']]
-                alert_message = "\n\n".join(alert_descriptions)
-                embed = discord.Embed(title="Severe Weather Alerts", description=alert_message, color=0xffa500)
+            if 'properties' in data2 and 'forecast' in data2['properties']:
+                forecast_url = data2['properties']['forecast']
+                response3 = requests.get(forecast_url)
+                data3 = response3.json()
+
+                if 'properties' in data3 and 'periods' in data3['properties']:
+                    periods = data3['properties']['periods']
+                    forecast_descriptions = [f"{period['name']}: {period['detailedForecast']}" for period in periods]
+                    forecast_message = "\n\n".join(forecast_descriptions)
+                    embed = discord.Embed(title="Weather Forecast", description=forecast_message, color=0x1e90ff)
+                else:
+                    embed = discord.Embed(title="Error", description="Could not fetch forecast details.", color=0xff4545)
             else:
-                embed = discord.Embed(title="No Severe Weather Alerts", description="There are no active severe weather alerts for the provided location.", color=0x00ff00)
+                embed = discord.Embed(title="Error", description="Could not fetch forecast URL.", color=0xff4545)
 
             await ctx.send(embed=embed)
 
