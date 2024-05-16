@@ -12,6 +12,10 @@ import csv
 import datetime
 import time
 import requests
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
+from PIL import Image
 from discord.ext import tasks, commands #type: ignore
 from redbot.core import commands, Config #type: ignore
 from reportlab.lib.pagesizes import letter, landscape, A4 #type: ignore
@@ -1002,6 +1006,42 @@ class Skysearch(commands.Cog):
             else:
                 embed = discord.Embed(title="ICAO Lookup Status", description="Automatic ICAO lookup has been disabled.", color=0xff4545)
                 await ctx.send(embed=embed)
+
+    @commands.guild_only()
+    @aircraft_group.command(name='path', help='Get a screenshot of the aircraft path by ICAO code.')
+    async def get_aircraft_path(self, ctx, icao: str):
+        """Fetch the aircraft path by ICAO code and return a screenshot of it."""
+        if len(icao) != 6:
+            await ctx.send(embed=discord.Embed(title="Error", description="Invalid ICAO code. ICAO codes are 6 characters long.", color=0xff4545))
+            return
+
+        url = f"https://globe.airplanes.live/?icao={icao}"
+        try:
+
+            # Set up the webdriver
+            options = webdriver.ChromeOptions()
+            options.add_argument('--headless')
+            options.add_argument('--no-sandbox')
+            options.add_argument('--disable-dev-shm-usage')
+            driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+
+            # Load the webpage
+            driver.get(url)
+            driver.set_window_size(1920, 1080)
+
+            # Take a screenshot
+            screenshot = driver.get_screenshot_as_png()
+            driver.quit()
+
+            # Convert the screenshot to an image
+            image = Image.open(io.BytesIO(screenshot))
+            image.save("aircraft_path.png")
+
+            # Send the image to the user
+            await ctx.send(file=discord.File("aircraft_path.png"))
+
+        except Exception as e:
+            await ctx.send(embed=discord.Embed(title="Error", description=f"An error occurred while fetching the aircraft path: {e}", color=0xff4545))
 
     @commands.guild_only()
     @commands.group(name='airport', help='Get information about airports.', invoke_without_command=True, aliases=["groundsearch"])
