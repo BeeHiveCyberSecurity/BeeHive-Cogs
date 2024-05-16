@@ -1268,6 +1268,72 @@ class Skysearch(commands.Cog):
             except asyncio.TimeoutError:
                 break
 
+    @commands.guild_only()
+    @airport_group.command(name='navaid')
+    async def navaidinfo(self, ctx, code: str):
+        """Query navaid information by ICAO code."""
+        if len(code) != 4:
+            embed = discord.Embed(title="Error", description="Invalid ICAO code. ICAO codes are 4 characters long.", color=0xff4545)
+            await ctx.send(embed=embed)
+            return
+
+        try:
+            api_token = await self.bot.get_shared_api_tokens("airportdbio")
+            if api_token and 'api_token' in api_token:
+                url = f"https://airportdb.io/api/v1/airport/{code}?apiToken={api_token['api_token']}"
+                response = requests.get(url)
+                data = response.json()
+
+                if 'error' in data:
+                    error_message = data['error']
+                    if len(error_message) > 1024:
+                        error_message = error_message[:1021] + "..."
+                    embed = discord.Embed(title="Error", description=error_message, color=0xff4545)
+                    await ctx.send(embed=embed)
+                elif not data or 'name' not in data:
+                    embed = discord.Embed(title="Error", description="No airport found with the provided code.", color=0xff4545)
+                    await ctx.send(embed=embed)
+                else:
+                    combined_pages = []
+                    if 'navaids' in data:
+                        embed = discord.Embed(title=f"Navaid information for {code.upper()}", color=0xfffffe)
+                        navaids = data['navaids']
+                        for navaid in navaids:
+                            if 'ident' in navaid:
+                                embed.add_field(name="Navaid ID", value=f"`{navaid['ident']}`", inline=True)
+
+                            if 'name' in navaid:
+                                embed.add_field(name="Name", value=f"`{navaid['name']}`", inline=True)
+
+                            if 'type' in navaid:
+                                embed.add_field(name="Type", value=f"`{navaid['type']}`", inline=True)
+
+                            if 'frequency_khz' in navaid:
+                                embed.add_field(name="Frequency (kHz)", value=f"`{navaid['frequency_khz']}`", inline=True)
+
+                            if 'latitude_deg' in navaid and 'longitude_deg' in navaid:
+                                embed.add_field(name="Coordinates", value=f"`{navaid['latitude_deg']}°, {navaid['longitude_deg']}°`", inline=True)
+
+                            if 'elevation_ft' in navaid:
+                                embed.add_field(name="Elevation (ft)", value=f"`{navaid['elevation_ft']}`", inline=True)
+
+                            if 'usageType' in navaid:
+                                embed.add_field(name="Usage Type", value=f"`{navaid['usageType']}`", inline=True)
+
+                            if 'associated_airport' in navaid:
+                                embed.add_field(name="Associated Airport", value=f"`{navaid['associated_airport']}`", inline=True)
+
+                            combined_pages.append(embed)
+                            embed = discord.Embed(title=f"Navaid information for {code.upper()}", color=0xfffffe)
+
+                    await self.paginate_embed(ctx, combined_pages)
+            else:
+                embed = discord.Embed(title="Error", description="API token for airportdb.io not configured.", color=0xff4545)
+                await ctx.send(embed=embed)
+        except Exception as e:
+            embed = discord.Embed(title="Error", description=str(e), color=0xff4545)
+            await ctx.send(embed=embed)
+
 
 
     @tasks.loop(minutes=2)
