@@ -573,7 +573,7 @@ class Skysearch(commands.Cog):
         if response:
             aircraft_list = response['ac']
             if aircraft_list:
-                await self._send_aircraft_info(ctx, response, paginated=True)
+                await self._send_aircraft_info(ctx, response)
             else:
                 await self._send_aircraft_info(ctx, response)
         else:
@@ -862,23 +862,37 @@ class Skysearch(commands.Cog):
         try:
             response = await self._make_request(url)
             if response and 'ac' in response:
-                for index, aircraft_info in enumerate(response['ac']):
-                    await self._send_aircraft_info(ctx, {'ac': [aircraft_info]})
-                    embed = discord.Embed(description=f"Plane {index + 1}/{len(response['ac'])}. React with ➡️ to view the next plane or ⏹️ to stop.")
-                    message = await ctx.send(embed=embed)
-                    await message.add_reaction("➡️")
-                    await message.add_reaction("⏹️") 
+                index = 0
+                message = None
 
-                    def check(reaction, user):
-                        return user == ctx.author and str(reaction.emoji) == '➡️' or str(reaction.emoji) == '⏹️'
+                def check(reaction, user):
+                    return user == ctx.author and str(reaction.emoji) in ['➡️', '⬅️', '⏹️']
+
+                while True:
+                    aircraft_info = response['ac'][index]
+                    await self._send_aircraft_info(ctx, {'ac': [aircraft_info]})
+                    embed = discord.Embed(description=f"Plane {index + 1}/{len(response['ac'])}. React with ⬅️ to view the previous plane, ➡️ to view the next plane, or ⏹️ to stop.")
+                    
+                    if message is None:
+                        message = await ctx.send(embed=embed)
+                        await message.add_reaction("⬅️")
+                        await message.add_reaction("➡️")
+                        await message.add_reaction("⏹️")
+                    else:
+                        await message.edit(embed=embed)
 
                     try:
                         reaction, user = await self.bot.wait_for('reaction_add', timeout=60.0, check=check)
                         await message.remove_reaction(reaction.emoji, ctx.author)
+                        
                         if str(reaction.emoji) == '⏹️':
                             embed = discord.Embed(description="Stopping.")
                             await ctx.send(embed=embed)
                             break
+                        elif str(reaction.emoji) == '➡️':
+                            index = (index + 1) % len(response['ac'])
+                        elif str(reaction.emoji) == '⬅️':
+                            index = (index - 1) % len(response['ac'])
                     except asyncio.TimeoutError:
                         embed = discord.Embed(description="No reaction received. Stopping.")
                         await ctx.send(embed=embed)
