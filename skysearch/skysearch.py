@@ -1150,7 +1150,7 @@ class Skysearch(commands.Cog):
             else:
                 for field, name in fields.items():
                     if field in data1 and field != 'link':
-                        value = f"`{data1[field]}`"
+                        value = f"**`{data1[field]}`**"
                         embed.add_field(name=name, value=value, inline=False)
                 
                 # Check if 'link' is in data1 and add it to the view
