@@ -1008,28 +1008,6 @@ class Skysearch(commands.Cog):
                 await ctx.send(embed=embed)
 
     @commands.guild_only()
-    @aircraft_group.command(name='path', help='Get a screenshot of the aircraft path by callsign.')
-    async def get_aircraft_path(self, ctx, callsign: str):
-        """Fetch the aircraft path by callsign and return a screenshot of it."""
-        if not callsign:
-            await ctx.send(embed=discord.Embed(title="Error", description="Invalid callsign. Callsign cannot be empty.", color=0xff4545))
-            return
-
-        url = f"https://www.flightradar24.com/{callsign}"
-        try:
-            # Use the requests and PIL libraries to fetch and process the screenshot
-            response = requests.get(url, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36'})
-            if response.status_code == 200:
-                image = Image.open(io.BytesIO(response.content))
-                image.save("aircraft_path.png")
-                await ctx.send(file=discord.File("aircraft_path.png"))
-            else:
-                await ctx.send(embed=discord.Embed(title="Error", description="Failed to load the webpage.", color=0xff4545))
-
-        except Exception as e:
-            await ctx.send(embed=discord.Embed(title="Error", description=f"An error occurred while fetching the aircraft path: {e}", color=0xff4545))
-
-    @commands.guild_only()
     @commands.group(name='airport', help='Get information about airports.', invoke_without_command=True, aliases=["groundsearch"])
     async def airport_group(self, ctx):
          """Summon SkySearch ground search panel"""
