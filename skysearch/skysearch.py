@@ -1134,10 +1134,10 @@ class Skysearch(commands.Cog):
                 street_view_response = requests.get(street_view_base_url, params=street_view_params)
                 if street_view_response.status_code == 200:
                     # Save the raw binary that the API returns as an image to set in embed.set_image
-                    street_view_image_url = "attachment://street_view_image.jpg"
+                    street_view_image_url = "attachment://street_view_image.png"
                     embed.set_image(url=street_view_image_url)
                     street_view_image_stream = io.BytesIO(street_view_response.content)
-                    file = discord.File(fp=street_view_image_stream, filename="street_view_image.jpg")
+                    file = discord.File(fp=street_view_image_stream, filename="street_view_image.png")
                 else:
                     # Handle the error accordingly, e.g., log it or send a message to the user
                     pass
