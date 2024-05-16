@@ -1445,9 +1445,13 @@ class Skysearch(commands.Cog):
                 embed.add_field(name="Wind", value=f"**`{period['windSpeed']} {period['windDirection']}`**", inline=True)
                 if 'relativeHumidity' in period and period['relativeHumidity']['value'] is not None:
                     embed.add_field(name="Humidity", value=f"**`{period['relativeHumidity']['value']}%`**", inline=True)
-                embed.add_field(name="Forecast", value=f"**`{period['detailedForecast']}`**", inline=True)
                 if 'probabilityOfPrecipitation' in period and period['probabilityOfPrecipitation']['value'] is not None:
                     embed.add_field(name="Chance of Precipitation", value=f"**`{period['probabilityOfPrecipitation']['value']}%`**", inline=True)
+                if 'dewpoint' in period and period['dewpoint']['value'] is not None:
+                    dewpoint_celsius = period['dewpoint']['value']
+                    dewpoint_fahrenheit = (dewpoint_celsius * 9/5) + 32
+                    embed.add_field(name="Dewpoint", value=f"**`{dewpoint_fahrenheit:.1f}°F`**", inline=True)
+                embed.add_field(name="Forecast", value=f"**`{period['detailedForecast']}`**", inline=False)
 
                 combined_pages.append(embed)
 
