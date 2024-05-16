@@ -594,19 +594,22 @@ class Skysearch(commands.Cog):
                     embed.add_field(name="Speed", value=f"**`{aircraft_speed}`**", inline=True)
                     embed.add_field(name="ICAO", value=f"**`{aircraft_hex}`**", inline=True)
 
-                    return embed
+                    view = discord.ui.View()
+                    view.add_item(discord.ui.Button(label=f"Track {aircraft_hex} live", url=f"https://globe.airplanes.live/{aircraft_hex}"))
+
+                    return embed, view
 
                 async def update_message(message, page_index):
-                    embed = create_embed(aircraft_list[page_index])
-                    await message.edit(embed=embed)
+                    embed, view = create_embed(aircraft_list[page_index])
+                    await message.edit(embed=embed, view=view)
 
-                message = await ctx.send(embed=create_embed(aircraft_list[page_index]))
+                embed, view = create_embed(aircraft_list[page_index])
+                message = await ctx.send(embed=embed, view=view)
 
                 await message.add_reaction("⬅️")
                 await message.add_reaction("❌")
                 await message.add_reaction("➡️")
                 
-
                 def check(reaction, user):
                     return user == ctx.author and str(reaction.emoji) in ["⬅️", "❌", "➡️"]
 
