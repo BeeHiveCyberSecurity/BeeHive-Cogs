@@ -1023,6 +1023,7 @@ class Skysearch(commands.Cog):
             options.add_argument('--headless')
             options.add_argument('--no-sandbox')
             options.add_argument('--disable-dev-shm-usage')
+            options.add_argument('--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36')
             driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
             # Load the webpage
@@ -1040,6 +1041,11 @@ class Skysearch(commands.Cog):
             # Send the image to the user
             await ctx.send(file=discord.File("aircraft_path.png"))
 
+        except AttributeError as e:
+            if "'NoneType' object has no attribute 'split'" in str(e):
+                await ctx.send(embed=discord.Embed(title="Error", description="An error occurred while fetching the aircraft path: The webpage might not have loaded correctly.", color=0xff4545))
+            else:
+                await ctx.send(embed=discord.Embed(title="Error", description=f"An error occurred while fetching the aircraft path: {e}", color=0xff4545))
         except Exception as e:
             await ctx.send(embed=discord.Embed(title="Error", description=f"An error occurred while fetching the aircraft path: {e}", color=0xff4545))
 
