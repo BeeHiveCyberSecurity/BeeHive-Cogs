@@ -1020,6 +1020,7 @@ class Skysearch(commands.Cog):
             search_airport = discord.ui.Button(label="Airport info", style=discord.ButtonStyle.green, row=1)
             search_runway = discord.ui.Button(label="Runway info", style=discord.ButtonStyle.green, row=1)
             search_navaid = discord.ui.Button(label="Navaid info", style=discord.ButtonStyle.green, row=1)
+            get_forecast = discord.ui.Button(label="Get forecast", style=discord.ButtonStyle.green, row=1)
             show_the_commands = discord.ui.Button(label="Show help", style=discord.ButtonStyle.grey, row=4)
             show_stats = discord.ui.Button(label="Show stats", style=discord.ButtonStyle.grey, row=4)
 
@@ -1074,6 +1075,23 @@ class Skysearch(commands.Cog):
                 message = await self.bot.wait_for('message', check=check)
                 await self.navaidinfo(ctx, message.content)
 
+            async def get_forecast_callback(interaction):
+                if interaction.user != ctx.author:
+                    await interaction.response.send_message("You are not allowed to interact with this button", ephemeral=True)
+                    return
+                await interaction.response.defer()
+                embed = discord.Embed(
+                    title="",
+                    description="## Please reply with the `airport code` you want to get the forecast for.",
+                    color=discord.Color.from_str("#fffffe")
+                )
+                embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/search.png")
+                await ctx.send(embed=embed)
+                def check(m):
+                    return m.author == ctx.author
+                message = await self.bot.wait_for('message', check=check)
+                await self.get_forecast(ctx, message.content)
+
             async def show_stats_callback(interaction):
                 if interaction.user != ctx.author:
                     await interaction.response.send_message("You are not allowed to interact with this button.", ephemeral=True)
@@ -1093,12 +1111,14 @@ class Skysearch(commands.Cog):
             show_stats.callback = show_stats_callback
             search_runway.callback = search_runway_callback
             search_navaid.callback = search_navaid_callback
+            get_forecast.callback = get_forecast_callback
 
             # Add buttons to the view
 
             view.add_item(search_airport)
             view.add_item(search_runway)
             view.add_item(search_navaid)
+            view.add_item(get_forecast)
             view.add_item(show_the_commands)
             view.add_item(show_stats)
 
@@ -1408,7 +1428,7 @@ class Skysearch(commands.Cog):
 
     @commands.guild_only()
     @airport_group.command(name='forecast', help='Get the future weather format for an airport by ICAO or IATA code.')
-    async def check_weather_forecast(self, ctx, code: str):
+    async def get_forecast(self, ctx, code: str):
         """Fetch the latitude and longitude of an airport via IATA or ICAO code, then show the forecast"""
         code_type = 'icao' if len(code) == 4 else 'iata' if len(code) == 3 else None
         if not code_type:
