@@ -1030,7 +1030,7 @@ class Skysearch(commands.Cog):
                 await interaction.response.defer()
                 embed = discord.Embed(
                     title="",
-                    description="## Please reply with the `airport code` you want to search.",
+                    description="## Please reply with the `airport code` you want to get information for.",
                     color=discord.Color.from_str("#fffffe")
                 )
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/search.png")
@@ -1047,7 +1047,7 @@ class Skysearch(commands.Cog):
                 await interaction.response.defer()
                 embed = discord.Embed(
                     title="",
-                    description="## Please reply with the `airport code` you want to search.",
+                    description="## Please reply with the `airport code` you want to view runway information for.",
                     color=discord.Color.from_str("#fffffe")
                 )
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/search.png")
@@ -1064,7 +1064,7 @@ class Skysearch(commands.Cog):
                 await interaction.response.defer()
                 embed = discord.Embed(
                     title="",
-                    description="## Please reply with the `navaid code` you want to search.",
+                    description="## Please reply with the `airport code` you want to view navaids for.",
                     color=discord.Color.from_str("#fffffe")
                 )
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/search.png")
