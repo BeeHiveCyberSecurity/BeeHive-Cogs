@@ -1264,6 +1264,7 @@ class Skysearch(commands.Cog):
                 break
             try:
                 reaction, user = await self.bot.wait_for("reaction_add", timeout=30.0, check=check)
+                await asyncio.sleep(1)  # Adding a short delay before removing the reaction
                 await message.remove_reaction(reaction, user)
             except asyncio.TimeoutError:
                 break
