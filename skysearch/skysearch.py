@@ -571,45 +571,48 @@ class Skysearch(commands.Cog):
         url = f"{self.api_url}/mil"
         response = await self._make_request(url)
         if response:
-            if len(response['ac']) > 1:
-                pages = [response['ac'][i:i + 10] for i in range(0, len(response['ac']), 10)]  # Split aircraft list into pages of 10
-                for page_index, page in enumerate(pages):
-                    embed = discord.Embed(title=f"Military Aircraft (Page {page_index + 1}/{len(pages)})", color=0xfffffe)
+            aircraft_list = response['ac']
+            if aircraft_list:
+                page_index = 0
+
+                def create_embed(aircraft):
+                    embed = discord.Embed(title=f"Military Aircraft (Page {page_index + 1}/{len(aircraft_list)})", color=0xfffffe)
                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/airplane.png")
-                    for aircraft in page:
-                        aircraft_description = aircraft.get('desc', 'N/A')  # Aircraft Description
-                        aircraft_squawk = aircraft.get('squawk', 'N/A')  # Squawk
-                        aircraft_lat = aircraft.get('lat', 'N/A')  # Latitude
-                        aircraft_lon = aircraft.get('lon', 'N/A')  # Longitude
-                        aircraft_heading = aircraft.get('heading', 'N/A')  # Heading
-                        aircraft_speed = aircraft.get('spd', 'N/A')  # Speed
-                        aircraft_hex = aircraft.get('hex', 'N/A')  # Hex
+                    aircraft_description = aircraft.get('desc', 'N/A')  # Aircraft Description
+                    aircraft_squawk = aircraft.get('squawk', 'N/A')  # Squawk
+                    aircraft_lat = aircraft.get('lat', 'N/A')  # Latitude
+                    aircraft_lon = aircraft.get('lon', 'N/A')  # Longitude
+                    aircraft_heading = aircraft.get('heading', 'N/A')  # Heading
+                    aircraft_speed = aircraft.get('spd', 'N/A')  # Speed
+                    aircraft_hex = aircraft.get('hex', 'N/A')  # Hex
 
-                        aircraft_info = f"**Squawk:** {aircraft_squawk}\n"
-                        aircraft_info += f"**Coordinates:** Lat: {aircraft_lat}, Lon: {aircraft_lon}\n"
-                        aircraft_info += f"**Heading:** {aircraft_heading}\n"
-                        aircraft_info += f"**Speed:** {aircraft_speed}\n"
-                        aircraft_info += f"**ICAO:** {aircraft_hex}"
+                    aircraft_info = f"**Squawk:** {aircraft_squawk}\n"
+                    aircraft_info += f"**Coordinates:** Lat: {aircraft_lat}, Lon: {aircraft_lon}\n"
+                    aircraft_info += f"**Heading:** {aircraft_heading}\n"
+                    aircraft_info += f"**Speed:** {aircraft_speed}\n"
+                    aircraft_info += f"**ICAO:** {aircraft_hex}"
 
-                        embed.add_field(name=aircraft_description, value=aircraft_info, inline=False)
+                    embed.add_field(name=aircraft_description, value=aircraft_info, inline=False)
+                    return embed
 
-                    message = await ctx.send(embed=embed)
-                    await message.add_reaction("⬅️")  # Adding a reaction to scroll to the previous page
-                    await message.add_reaction("➡️")  # Adding a reaction to scroll to the next page
+                message = await ctx.send(embed=create_embed(aircraft_list[page_index]))
+                await message.add_reaction("⬅️")  # Adding a reaction to scroll to the previous page
+                await message.add_reaction("➡️")  # Adding a reaction to scroll to the next page
 
-                    def check(reaction, user):
-                        return user == ctx.author and str(reaction.emoji) in ['⬅️', '➡️']
+                def check(reaction, user):
+                    return user == ctx.author and str(reaction.emoji) in ['⬅️', '➡️']
 
+                while True:
                     try:
                         reaction, user = await self.bot.wait_for('reaction_add', timeout=60.0, check=check)
                         if str(reaction.emoji) == '⬅️' and page_index > 0:  # Check if the previous page reaction was added and it's not the first page
-                            await message.delete()
                             page_index -= 1
-                        elif str(reaction.emoji) == '➡️' and page_index < len(pages) - 1:  # Check if the next page reaction was added and it's not the last page
-                            await message.delete()
+                        elif str(reaction.emoji) == '➡️' and page_index < len(aircraft_list) - 1:  # Check if the next page reaction was added and it's not the last page
                             page_index += 1
+                        await message.edit(embed=create_embed(aircraft_list[page_index]))
+                        await message.remove_reaction(reaction, user)
                     except asyncio.TimeoutError:
-                        await message.delete()
+                        await message.clear_reactions()
                         break
             else:
                 await self._send_aircraft_info(ctx, response)
