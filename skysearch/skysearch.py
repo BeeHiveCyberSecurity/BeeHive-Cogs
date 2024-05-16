@@ -584,7 +584,7 @@ class Skysearch(commands.Cog):
                     aircraft_lon = aircraft.get('lon', 'N/A')  # Longitude
                     aircraft_heading = aircraft.get('heading', 'N/A')  # Heading
                     aircraft_speed = aircraft.get('spd', 'N/A')  # Speed
-                    aircraft_hex = aircraft.get('hex', 'N/A')  # Hex
+                    aircraft_hex = aircraft.get('hex', 'N/A').upper()  # Hex 
 
                     embed.description = f"# {aircraft_description}"
                     embed.add_field(name="Squawk", value=f"**`{aircraft_squawk}`**", inline=True)
