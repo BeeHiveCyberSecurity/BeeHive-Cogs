@@ -1406,6 +1406,56 @@ class Skysearch(commands.Cog):
             embed = discord.Embed(title="Error", description=str(e), color=0xff4545)
             await ctx.send(embed=embed)
 
+    @commands.guild_only()
+    @airport_group.command(name='weather', help='Get current weather conditions for an airport by ICAO or IATA code.')
+    async def check_weather(self, ctx, code: str):
+        """Fetch the latitude and longitude of an airport via IATA or ICAO code, then query the current weather conditions."""
+        if len(code) == 4:
+            code_type = 'icao'
+        elif len(code) == 3:
+            code_type = 'iata'
+        else:
+            embed = discord.Embed(title="Error", description="Invalid ICAO or IATA code. ICAO codes are 4 characters long and IATA codes are 3 characters long.", color=0xff4545)
+            await ctx.send(embed=embed)
+            return
+
+        try:
+            url1 = f"https://www.airport-data.com/api/ap_info.json?{code_type}={code}"
+            response1 = requests.get(url1)
+            data1 = response1.json()
+
+            if 'latitude' in data1 and 'longitude' in data1:
+                latitude = data1['latitude']
+                longitude = data1['longitude']
+            else:
+                embed = discord.Embed(title="Error", description="Could not fetch latitude and longitude for the provided code.", color=0xff4545)
+                await ctx.send(embed=embed)
+                return
+
+            api_key = await self.bot.get_shared_api_tokens("theweathercompany").get("api_key")
+            if not api_key:
+                embed = discord.Embed(title="Error", description="API key for The Weather Company not configured.", color=0xff4545)
+                await ctx.send(embed=embed)
+                return
+            weather_url = f"https://api.weather.com/v3/wx/conditions/current?geocode={latitude},{longitude}&format=json&apiKey={api_key}"
+            response2 = requests.get(weather_url)
+            weather_data = response2.json()
+
+            if 'temperature' in weather_data and 'narrative' in weather_data:
+                temperature = weather_data['temperature']
+                narrative = weather_data['narrative']
+                embed = discord.Embed(title=f"Current Weather for {code.upper()}", description=f"{narrative}", color=0x2BBD8E)
+                embed.add_field(name="Temperature", value=f"{temperature}°C", inline=True)
+                embed.add_field(name="Latitude", value=f"{latitude}°", inline=True)
+                embed.add_field(name="Longitude", value=f"{longitude}°", inline=True)
+                await ctx.send(embed=embed)
+            else:
+                embed = discord.Embed(title="Error", description="Could not fetch weather data for the provided coordinates.", color=0xff4545)
+                await ctx.send(embed=embed)
+
+        except Exception as e:
+            embed = discord.Embed(title="Error", description=str(e), color=0xff4545)
+            await ctx.send(embed=embed)
 
 
     @tasks.loop(minutes=2)
