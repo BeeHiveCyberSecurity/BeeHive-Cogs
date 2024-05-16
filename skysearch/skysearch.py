@@ -1436,17 +1436,16 @@ class Skysearch(commands.Cog):
 
             combined_pages = []
             for period in periods:
-                embed = discord.Embed(title=f"Weather forecast for {code.upper()}", description=f" # {period['name']}", color=0x1e90ff)
+                embed = discord.Embed(title=f"Weather forecast for {code.upper()}", description=f" # {period['name']}", color=0xfffffe)
                 icon_url = period.get('icon')
                 if icon_url:
                     embed.set_thumbnail(url=icon_url)
 
-                field_value = f"**Temperature:** {period['temperature']} {period['temperatureUnit']}\n"
-                field_value += f"**Wind:** {period['windSpeed']} {period['windDirection']}\n"
-                field_value += f"**Forecast:** {period['shortForecast']}\n"
+                embed.add_field(name="Temperature", value=f"{period['temperature']} {period['temperatureUnit']}", inline=True)
+                embed.add_field(name="Wind", value=f"{period['windSpeed']} {period['windDirection']}", inline=True)
+                embed.add_field(name="Forecast", value=period['detailedForecast'], inline=True)
                 if 'probabilityOfPrecipitation' in period:
-                    field_value += f"**Chance of Precipitation:** {period['probabilityOfPrecipitation']['value']}%\n"
-                embed.add_field(name=period['name'], value=field_value, inline=False)
+                    embed.add_field(name="Chance of Precipitation", value=f"{period['probabilityOfPrecipitation']['value']}%", inline=True)
 
                 combined_pages.append(embed)
 
