@@ -1124,9 +1124,9 @@ class Skysearch(commands.Cog):
             if google_street_view_api_key != "YOUR_API_KEY":
                 street_view_base_url = "https://maps.googleapis.com/maps/api/staticmap"
                 street_view_params = {
-                    "size": "700x500",
+                    "size": "700x500", # Width x Height
                     "zoom": "13",
-                    "scale": "2",  # Image size (width x height)
+                    "scale": "2", 
                     "center": f"{data1['latitude']},{data1['longitude']}",  # Latitude and Longitude as comma-separated string
                     "maptype": "satellite",
                     "key": google_street_view_api_key
