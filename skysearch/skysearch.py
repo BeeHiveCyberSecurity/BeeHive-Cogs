@@ -586,13 +586,13 @@ class Skysearch(commands.Cog):
                     aircraft_speed = aircraft.get('spd', 'N/A')  # Speed
                     aircraft_hex = aircraft.get('hex', 'N/A')  # Hex
 
-                    aircraft_info = f"**Squawk:** {aircraft_squawk}\n"
-                    aircraft_info += f"**Coordinates:** Lat: {aircraft_lat}, Lon: {aircraft_lon}\n"
-                    aircraft_info += f"**Heading:** {aircraft_heading}\n"
-                    aircraft_info += f"**Speed:** {aircraft_speed}\n"
-                    aircraft_info += f"**ICAO:** {aircraft_hex}"
+                    embed.description = f"# {aircraft_description}"
+                    embed.add_field(name="Squawk", value=aircraft_squawk, inline=False)
+                    embed.add_field(name="Coordinates", value=f"Lat: {aircraft_lat}, Lon: {aircraft_lon}", inline=False)
+                    embed.add_field(name="Heading", value=aircraft_heading, inline=False)
+                    embed.add_field(name="Speed", value=aircraft_speed, inline=False)
+                    embed.add_field(name="ICAO", value=aircraft_hex, inline=False)
 
-                    embed.add_field(name=aircraft_description, value=aircraft_info, inline=False)
                     return embed
 
                 message = await ctx.send(embed=create_embed(aircraft_list[page_index]))
