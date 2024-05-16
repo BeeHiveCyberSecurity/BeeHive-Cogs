@@ -883,7 +883,6 @@ class Skysearch(commands.Cog):
 
                     try:
                         reaction, user = await self.bot.wait_for('reaction_add', timeout=60.0, check=check)
-                        await message.remove_reaction(reaction.emoji, ctx.author)
                         
                         if str(reaction.emoji) == '⏹️':
                             embed = discord.Embed(description="Stopping.")
@@ -893,6 +892,8 @@ class Skysearch(commands.Cog):
                             index = (index + 1) % len(response['ac'])
                         elif str(reaction.emoji) == '⬅️':
                             index = (index - 1) % len(response['ac'])
+                        
+                        await message.remove_reaction(reaction.emoji, user)
                     except asyncio.TimeoutError:
                         embed = discord.Embed(description="No reaction received. Stopping.")
                         await ctx.send(embed=embed)
