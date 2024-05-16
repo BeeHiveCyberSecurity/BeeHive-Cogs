@@ -1213,6 +1213,7 @@ class Skysearch(commands.Cog):
                     combined_pages = []
                     if 'runways' in data2:
                         embed = discord.Embed(title=f"Runway information for {code.upper()}", color=0xfffffe)
+                        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/layers.png")
                         runways = data2['runways']
                         for runway in runways:
                             if 'id' in runway:
@@ -1246,6 +1247,7 @@ class Skysearch(commands.Cog):
 
                             combined_pages.append(embed)
                             embed = discord.Embed(title=f"Runway information for {code.upper()}", color=0xfffffe)
+                            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/layers.png")
 
                     await self.paginate_embed(ctx, combined_pages)
             else:
