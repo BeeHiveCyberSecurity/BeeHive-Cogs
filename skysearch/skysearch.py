@@ -1436,7 +1436,7 @@ class Skysearch(commands.Cog):
 
             combined_pages = []
             for period in periods:
-                embed = discord.Embed(title=f"Weather forecast for {code.upper()}", description=f" # {period['name']}" color=0x1e90ff)
+                embed = discord.Embed(title=f"Weather forecast for {code.upper()}", description=f" # {period['name']}", color=0x1e90ff)
                 icon_url = period.get('icon')
                 if icon_url:
                     embed.set_thumbnail(url=icon_url)
