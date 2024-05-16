@@ -1217,13 +1217,13 @@ class Skysearch(commands.Cog):
                         runways = data2['runways']
                         for runway in runways:
                             if 'id' in runway:
-                                embed.add_field(name="Runway ID", value=f"`{runway['id']}`", inline=True)
+                                embed.add_field(name="Runway ID", value=f"**`{runway['id']}`**", inline=True)
 
                             if 'surface' in runway:
-                                embed.add_field(name="Surface", value=f"`{runway['surface']}`", inline=True)
+                                embed.add_field(name="Surface", value=f"**`{runway['surface']}`**", inline=True)
 
                             if 'length_ft' in runway and 'width_ft' in runway:
-                                embed.add_field(name="Dimensions", value=f"`{runway['length_ft']}ft long`\n`{runway['width_ft']}ft wide`", inline=True)
+                                embed.add_field(name="Dimensions", value=f"**`{runway['length_ft']}ft long`\n`{runway['width_ft']}ft wide`**", inline=True)
 
                             if 'le_ident' in runway or 'he_ident' in runway:
                                 ils_value = ""
@@ -1231,18 +1231,18 @@ class Skysearch(commands.Cog):
                                     ils_info = runway.get('le_ils', {})
                                     ils_freq = ils_info.get('freq', 'N/A')
                                     ils_course = ils_info.get('course', 'N/A')
-                                    ils_value += f"**{runway['le_ident']}** `{ils_freq} MHz @ {ils_course}°`\n"
+                                    ils_value += f"**{runway['le_ident']}** *`{ils_freq} MHz @ {ils_course}°`*\n"
                                 if 'he_ident' in runway:
                                     ils_info = runway.get('he_ils', {})
                                     ils_freq = ils_info.get('freq', 'N/A')
                                     ils_course = ils_info.get('course', 'N/A')
-                                    ils_value += f"**{runway['he_ident']}** `{ils_freq} MHz @ {ils_course}°`\n"
+                                    ils_value += f"**{runway['he_ident']}** *`{ils_freq} MHz @ {ils_course}°`*\n"
                                 embed.add_field(name="Landing assistance", value=ils_value.strip(), inline=True)
 
-                            runway_status = ":white_check_mark: **Open**" if str(runway.get('closed', 0)) == '0' else ":x: **Closed**"
+                            runway_status = ":white_check_mark: **`Open`**" if str(runway.get('closed', 0)) == '0' else ":x: **`Closed`**"
                             embed.add_field(name="Runway status", value=runway_status, inline=True)
 
-                            lighted_status = ":bulb: **Lighted**" if str(runway.get('lighted', 0)) == '1' else ":x: **Not Lighted**"
+                            lighted_status = ":bulb: **`Lighted`**" if str(runway.get('lighted', 0)) == '1' else ":x: **`Not Lighted`**"
                             embed.add_field(name="Lighting", value=lighted_status, inline=True)
 
                             combined_pages.append(embed)
