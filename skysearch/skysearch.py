@@ -576,7 +576,7 @@ class Skysearch(commands.Cog):
                 page_index = 0
 
                 def create_embed(aircraft):
-                    embed = discord.Embed(title=f"Live military aircraft ({page_index + 1}/{len(aircraft_list)})", color=0xfffffe)
+                    embed = discord.Embed(title=f"Live military aircraft ({page_index + 1} of {len(aircraft_list)})", color=0xfffffe)
                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/airplane.png")
                     aircraft_description = aircraft.get('desc', 'N/A')  # Aircraft Description
                     aircraft_squawk = aircraft.get('squawk', 'N/A')  # Squawk
@@ -587,11 +587,12 @@ class Skysearch(commands.Cog):
                     aircraft_hex = aircraft.get('hex', 'N/A')  # Hex
 
                     embed.description = f"# {aircraft_description}"
-                    embed.add_field(name="Squawk", value=aircraft_squawk, inline=False)
-                    embed.add_field(name="Coordinates", value=f"Lat: {aircraft_lat}, Lon: {aircraft_lon}", inline=False)
-                    embed.add_field(name="Heading", value=aircraft_heading, inline=False)
-                    embed.add_field(name="Speed", value=aircraft_speed, inline=False)
-                    embed.add_field(name="ICAO", value=aircraft_hex, inline=False)
+                    embed.add_field(name="Squawk", value=f"**`{aircraft_squawk}`**", inline=False)
+                    embed.add_field(name="Latitude", value=f"**`{aircraft_lat}`**", inline=False)
+                    embed.add_field(name="Longitude", value=f"**`{aircraft_lon}`**", inline=False)
+                    embed.add_field(name="Heading", value=f"**`{aircraft_heading}`**", inline=False)
+                    embed.add_field(name="Speed", value=f"**`{aircraft_speed}`**", inline=False)
+                    embed.add_field(name="ICAO", value=f"**`{aircraft_hex}`**", inline=False)
 
                     return embed
 
