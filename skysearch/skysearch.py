@@ -1364,6 +1364,7 @@ class Skysearch(commands.Cog):
 
                             combined_pages.append(embed)
                             embed = discord.Embed(title=f"Navaid information for {code.upper()}", color=0xfffffe)
+                            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/navigate.png")
 
                     await self.paginate_embed(ctx, combined_pages)
             else:
