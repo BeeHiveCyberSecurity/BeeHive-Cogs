@@ -1434,20 +1434,19 @@ class Skysearch(commands.Cog):
                 await ctx.send(embed=discord.Embed(title="Error", description="Could not fetch forecast details.", color=0xff4545))
                 return
 
-            forecast_message = ""
-            for period in periods:
-                forecast_message += f"**{period['name']}**\n"
-                forecast_message += f"**Temperature:** {period['temperature']} {period['temperatureUnit']}\n"
-                forecast_message += f"**Wind:** {period['windSpeed']} {period['windDirection']}\n"
-                forecast_message += f"**Forecast:** {period['shortForecast']}\n"
-                if 'probabilityOfPrecipitation' in period:
-                    forecast_message += f"**Chance of Precipitation:** {period['probabilityOfPrecipitation']['value']}%\n"
-                forecast_message += "\n"
-
-            embed = discord.Embed(title="Weather Forecast", description=forecast_message, color=0x1e90ff)
+            embed = discord.Embed(title="Weather Forecast", color=0x1e90ff)
             icon_url = data3.get('properties', {}).get('icon')
             if icon_url:
                 embed.set_thumbnail(url=icon_url)
+
+            for period in periods:
+                field_value = f"**Temperature:** {period['temperature']} {period['temperatureUnit']}\n"
+                field_value += f"**Wind:** {period['windSpeed']} {period['windDirection']}\n"
+                field_value += f"**Forecast:** {period['shortForecast']}\n"
+                if 'probabilityOfPrecipitation' in period:
+                    field_value += f"**Chance of Precipitation:** {period['probabilityOfPrecipitation']['value']}%\n"
+                embed.add_field(name=period['name'], value=field_value, inline=False)
+
             await ctx.send(embed=embed)
 
         except Exception as e:
