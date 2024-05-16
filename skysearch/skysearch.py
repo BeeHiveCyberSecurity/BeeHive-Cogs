@@ -1102,12 +1102,11 @@ class Skysearch(commands.Cog):
 
         try:
             url1 = f"https://www.airport-data.com/api/ap_info.json?{code_type}={code}"
-            embed = discord.Embed(title=f"Airport information for {code.upper()}", color=0xfffffe)
+            embed = discord.Embed(title=f"Airport information for {code.upper()}", description=f"# {name}", color=0xfffffe)
             embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/location.png")
             fields = {
                 'icao': 'ICAO Code',
                 'iata': 'IATA Code',
-                'name': 'Name',
                 'location': 'Location',
                 'country': 'Country',
                 'country_code': 'Country Code',
