@@ -564,21 +564,6 @@ class Skysearch(commands.Cog):
         else:
             embed = discord.Embed(title="Error", description="Error retrieving aircraft information.", color=0xff4545)
             await ctx.send(embed=embed)
-
-    @commands.guild_only()
-    @aircraft_group.command(name='military', help='Get information about military aircraft.')
-    async def show_military_aircraft(self, ctx):
-        url = f"{self.api_url}/mil"
-        response = await self._make_request(url)
-        if response:
-            aircraft_list = response['ac']
-            if aircraft_list:
-                await self._send_aircraft_info(ctx, response)
-            else:
-                await self._send_aircraft_info(ctx, response)
-        else:
-            embed = discord.Embed(title="Error", description="Error retrieving aircraft information.", color=0xff4545)
-            await ctx.send(embed=embed)
     
     @commands.guild_only()
     @aircraft_group.command(name='ladd', help='Get information on LADD-restricted aircraft')
@@ -886,7 +871,7 @@ class Skysearch(commands.Cog):
                         
                         if str(reaction.emoji) == '⏹️':
                             embed = discord.Embed(description="Stopping.")
-                            await ctx.send(embed=embed)
+                            await message.edit(embed=embed)
                             break
                         elif str(reaction.emoji) == '➡️':
                             index = (index + 1) % len(response['ac'])
@@ -896,7 +881,7 @@ class Skysearch(commands.Cog):
                         await message.remove_reaction(reaction.emoji, user)
                     except asyncio.TimeoutError:
                         embed = discord.Embed(description="No reaction received. Stopping.")
-                        await ctx.send(embed=embed)
+                        await message.edit(embed=embed)
                         break
         except Exception as e:
             embed = discord.Embed(description=f"An error occurred during scrolling: {e}.")
