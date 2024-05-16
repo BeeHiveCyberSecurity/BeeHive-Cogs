@@ -596,29 +596,35 @@ class Skysearch(commands.Cog):
 
                     return embed
 
-                message = await ctx.send(embed=create_embed(aircraft_list[page_index]))
-                await message.add_reaction("⬅️")  # Adding a reaction to scroll to the previous page
-                await message.add_reaction("➡️")  # Adding a reaction to scroll to the next page
-                await message.add_reaction("❌")  # Adding a reaction to close the embed
+                class AircraftView(discord.ui.View):
+                    def __init__(self, aircraft_list):
+                        super().__init__(timeout=60.0)
+                        self.aircraft_list = aircraft_list
+                        self.page_index = 0
 
-                def check(reaction, user):
-                    return user == ctx.author and str(reaction.emoji) in ['⬅️', '➡️', '❌']
+                    async def update_message(self, interaction):
+                        embed = create_embed(self.aircraft_list[self.page_index])
+                        await interaction.response.edit_message(embed=embed, view=self)
 
-                while True:
-                    try:
-                        reaction, user = await self.bot.wait_for('reaction_add', timeout=60.0, check=check)
-                        if str(reaction.emoji) == '⬅️' and page_index > 0:  # Check if the previous page reaction was added and it's not the first page
-                            page_index -= 1
-                        elif str(reaction.emoji) == '➡️' and page_index < len(aircraft_list) - 1:  # Check if the next page reaction was added and it's not the last page
-                            page_index += 1
-                        elif str(reaction.emoji) == '❌':  # Check if the close reaction was added
-                            await message.delete()
-                            break
-                        await message.edit(embed=create_embed(aircraft_list[page_index]))
-                        await message.remove_reaction(reaction, user)
-                    except asyncio.TimeoutError:
-                        await message.clear_reactions()
-                        break
+                    @discord.ui.button(label="Previous", style=discord.ButtonStyle.primary)
+                    async def previous(self, button: discord.ui.Button, interaction: discord.Interaction):
+                        if self.page_index > 0:
+                            self.page_index -= 1
+                            await self.update_message(interaction)
+
+                    @discord.ui.button(label="Next", style=discord.ButtonStyle.primary)
+                    async def next(self, button: discord.ui.Button, interaction: discord.Interaction):
+                        if self.page_index < len(self.aircraft_list) - 1:
+                            self.page_index += 1
+                            await self.update_message(interaction)
+
+                    @discord.ui.button(label="Close", style=discord.ButtonStyle.danger)
+                    async def close(self, button: discord.ui.Button, interaction: discord.Interaction):
+                        await interaction.message.delete()
+                        self.stop()
+
+                view = AircraftView(aircraft_list)
+                await ctx.send(embed=create_embed(aircraft_list[page_index]), view=view)
             else:
                 await self._send_aircraft_info(ctx, response)
         else:
