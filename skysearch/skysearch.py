@@ -1309,7 +1309,7 @@ class Skysearch(commands.Cog):
                                 embed.add_field(name="Type", value=f"**`{navaid['type']}`**", inline=True)
 
                             if 'frequency_khz' in navaid:
-                                embed.add_field(name="Frequency (kHz)", value=f"**`{navaid['frequency_khz']}`**", inline=True)
+                                embed.add_field(name="Frequency", value=f"**`{navaid['frequency_khz']}khz`**", inline=True)
 
                             if 'latitude_deg' in navaid and 'longitude_deg' in navaid:
                                 latitude = "{:.6f}".format(float(navaid['latitude_deg']))
@@ -1317,10 +1317,10 @@ class Skysearch(commands.Cog):
                                 embed.add_field(name="Coordinates", value="**`{}°, {}°`**".format(latitude, longitude), inline=True)
 
                             if 'elevation_ft' in navaid:
-                                embed.add_field(name="Elevation (ft)", value=f"**`{navaid['elevation_ft']}`**", inline=True)
+                                embed.add_field(name="Elevation", value=f"**`{navaid['elevation_ft']}ft`**", inline=True)
 
                             if 'usageType' in navaid:
-                                embed.add_field(name="Usage Type", value=f"**`{navaid['usageType']}`**", inline=True)
+                                embed.add_field(name="Usage", value=f"**`{navaid['usageType']}`**", inline=True)
 
                             if 'power' in navaid:
                                 embed.add_field(name="Signal power", value=f"**`{navaid['power']}`**", inline=True)
