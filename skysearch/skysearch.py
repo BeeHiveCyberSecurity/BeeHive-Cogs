@@ -1516,14 +1516,14 @@ class Skysearch(commands.Cog):
                     'NW': '↖️',
                     'NNW': '↖️⬆️'
                 }.get(wind_direction, '❓')  # Default to question mark if direction is unknown
-
-                embed.add_field(name="Wind", value=f"{wind_emoji} {direction_emoji} **`{wind_speed} {wind_direction}`**", inline=True)
+                embed.add_field(name="Wind speed", value=f"{wind_emoji} **`{wind_speed}`**", inline=True)
+                embed.add_field(name="Wind direction", value=f"{direction_emoji} **`{wind_direction}`**", inline=True)
                 
                 if 'relativeHumidity' in period and period['relativeHumidity']['value'] is not None:
                     embed.add_field(name="Humidity", value=f"**`{period['relativeHumidity']['value']}%`**", inline=True)
 
                 if 'probabilityOfPrecipitation' in period and period['probabilityOfPrecipitation']['value'] is not None:
-                    embed.add_field(name="Chance of Precipitation", value=f"**`{period['probabilityOfPrecipitation']['value']}%`**", inline=True)
+                    embed.add_field(name="Chance of precipitation", value=f"**`{period['probabilityOfPrecipitation']['value']}%`**", inline=True)
                     
                 if 'dewpoint' in period and period['dewpoint']['value'] is not None:
                     dewpoint_celsius = period['dewpoint']['value']
