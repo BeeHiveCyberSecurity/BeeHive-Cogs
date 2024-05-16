@@ -1102,6 +1102,9 @@ class Skysearch(commands.Cog):
 
         try:
             url1 = f"https://www.airport-data.com/api/ap_info.json?{code_type}={code}"
+            response1 = requests.get(url1)
+            data1 = response1.json()
+            
             embed = discord.Embed(title=f"Airport information for {code.upper()}", description=f"{data1.get('name', 'Unknown Airport')}", color=0xfffffe)
             embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/location.png")
             fields = {
@@ -1113,8 +1116,6 @@ class Skysearch(commands.Cog):
                 'longitude': 'Longitude',
                 'latitude': 'Latitude'
             }
-            response1 = requests.get(url1)
-            data1 = response1.json()
 
             googlemaps_tokens = await self.bot.get_shared_api_tokens("googlemaps")
             google_street_view_api_key = googlemaps_tokens.get("api_key", "YOUR_API_KEY")  # Use the API key from the shared tokens, default to "YOUR_API_KEY" if not found
