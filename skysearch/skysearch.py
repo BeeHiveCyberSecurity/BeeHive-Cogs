@@ -1103,7 +1103,12 @@ class Skysearch(commands.Cog):
             view.add_item(show_stats)
 
             # Send the embed with the view
-            await ctx.send(embed=embed, view=view)
+            message = await ctx.send(embed=embed, view=view)
+
+            # Wait for the view to timeout
+            await view.wait()
+            # Edit the message to remove the buttons after timeout
+            await message.edit(view=None)
 
     @commands.guild_only()
     @airport_group.command(name='about')
