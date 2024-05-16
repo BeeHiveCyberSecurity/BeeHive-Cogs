@@ -1432,7 +1432,8 @@ class Skysearch(commands.Cog):
                 await ctx.send(embed=embed)
                 return
 
-            api_key = await self.bot.get_shared_api_tokens("theweathercompany").get("api_key")
+            api_tokens = await self.bot.get_shared_api_tokens("theweathercompany")
+            api_key = api_tokens.get("api_key") if api_tokens else None
             if not api_key:
                 embed = discord.Embed(title="Error", description="API key for The Weather Company not configured.", color=0xff4545)
                 await ctx.send(embed=embed)
