@@ -9,7 +9,8 @@
     "hidden": false,
     "disabled": false,
     "requirements": [
-        "requests"
+        "aiohttp",
+        "asyncio"
     ],
     "tags": [
         "file scanning",
