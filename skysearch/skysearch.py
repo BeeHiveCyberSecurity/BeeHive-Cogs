@@ -12,9 +12,6 @@ import csv
 import datetime
 import time
 import requests
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
 from PIL import Image
 from discord.ext import tasks, commands #type: ignore
 from redbot.core import commands, Config #type: ignore
