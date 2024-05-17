@@ -3,10 +3,7 @@ import discord
 from discord.ui import View
 
 class Orchestrator(commands.Cog):
-    """See info about the servers your bot is in.
-    
-    For bot owners only.
-    """
+    """Manage your bot"""
 
     def __init__(self, bot):
         self.config = Config.get_conf(self, identifier=806715409318936616)
