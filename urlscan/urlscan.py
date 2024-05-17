@@ -21,13 +21,17 @@ class URLScan(commands.Cog):
     @urlscan_group.command(name="autoscan", description="Toggle automatic URL scanning in messages")
     async def autoscan(self, ctx):
         """Toggle automatic URL scanning in messages"""
-        if hasattr(self.bot, 'autoscan_enabled'):
-            self.bot.autoscan_enabled = not self.bot.autoscan_enabled
-        else:
-            self.bot.autoscan_enabled = True
+        guild_id = ctx.guild.id
+        if not hasattr(self.bot, 'autoscan_enabled_guilds'):
+            self.bot.autoscan_enabled_guilds = {}
 
-        status = "enabled" if self.bot.autoscan_enabled else "disabled"
-        await ctx.send(f"Automatic URL scanning is now {status}.")
+        if guild_id in self.bot.autoscan_enabled_guilds:
+            self.bot.autoscan_enabled_guilds[guild_id] = not self.bot.autoscan_enabled_guilds[guild_id]
+        else:
+            self.bot.autoscan_enabled_guilds[guild_id] = True
+
+        status = "enabled" if self.bot.autoscan_enabled_guilds[guild_id] else "disabled"
+        await ctx.send(f"Automatic URL scanning is now {status} for this guild.")
 
     async def scan_urls(self, ctx, urls: str = None):
         urlscan_key = await self.bot.get_shared_api_tokens("urlscan")
@@ -108,7 +112,7 @@ class URLScan(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if not hasattr(self.bot, 'autoscan_enabled') or not self.bot.autoscan_enabled:
+        if not hasattr(self.bot, 'autoscan_enabled_guilds') or not self.bot.autoscan_enabled_guilds.get(message.guild.id, False):
             return
 
         if message.author.bot:
