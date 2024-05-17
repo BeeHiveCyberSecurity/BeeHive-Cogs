@@ -42,7 +42,7 @@ class ReviewsCog(commands.Cog):
             review = reviews.get(str(review_id))
             if review:
                 review['rating'] = rating
-                embed = discord.Embed(description=f"Thank you for rating the review {rating} stars!", color=discord.Color.from_str("#2bbd8e"))
+                embed = discord.Embed(description=f"Thank you for rating the experience {rating} stars!", color=discord.Color.from_str("#2bbd8e"))
                 await interaction.response.send_message(embed=embed, ephemeral=True)
             else:
                 embed = discord.Embed(description="Review not found.", color=discord.Color(0xff4545))
