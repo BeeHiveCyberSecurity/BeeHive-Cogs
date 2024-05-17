@@ -186,7 +186,7 @@ class Skysearch(commands.Cog):
             
             last_seen = aircraft_data.get('seen', 'N/A')
             if last_seen != 'N/A':
-                last_seen_text = ":green_circle: **`Just now`**" if float(last_seen) < 1 else f"**:hourglass: `{last_seen} seconds ago`**"
+                last_seen_text = ":green_circle: **`Just now`**" if float(last_seen) < 1 else f":hourglass: **`{last_seen} seconds ago`**"
                 embed.add_field(name="Last check in", value=last_seen_text, inline=False)
             
             last_seen_pos = aircraft_data.get('seen_pos', 'N/A')
