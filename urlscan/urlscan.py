@@ -61,7 +61,13 @@ class URLScan(commands.Cog):
                             res = await r.json()
                             if 'result' not in res:
                                 if res.get('message', '').startswith("Scan prevented"):
-                                    await ctx.send(f"Scan prevented for {url}: {res.get('message')}")
+                                    embed = discord.Embed(
+                                        title="URL is whitelisted and known safe",
+                                        description=f"The URL {url} is known to be safe and has been whitelisted.",
+                                        color=0x2BBD8E
+                                    )
+                                    embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/checkmark-circle-outline.png")
+                                    await ctx.send(embed=embed)
                                 else:
                                     await ctx.send(f"{res.get('message', 'Unknown error')}")
                                 continue
@@ -128,7 +134,13 @@ class URLScan(commands.Cog):
                     res = await r.json()
                     if 'result' not in res:
                         if res.get('message', '').startswith("Scan prevented"):
-                            await message.channel.send(f"Scan prevented for {url}: {res.get('message')}")
+                            embed = discord.Embed(
+                                title="URL is whitelisted and known safe",
+                                description=f"The URL {url} is known to be safe and has been whitelisted.",
+                                color=0x2BBD8E
+                            )
+                            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/checkmark-circle-outline.png")
+                            await message.channel.send(embed=embed)
                         continue
 
                     report_api = res['api']
