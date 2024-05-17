@@ -11,10 +11,24 @@ class URLScan(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        
+
     @commands.hybrid_command(name="urlscan", description="Utilize URLScan's /scan endpoint to scan a URL")
     async def urlscan(self, ctx, *, urls: str = None):
         """Scan a URL using urlscan.io"""
+        await self.scan_urls(ctx, urls)
+
+    @commands.hybrid_command(name="urlscan autoscan", description="Toggle automatic URL scanning in messages")
+    async def autoscan(self, ctx):
+        """Toggle automatic URL scanning in messages"""
+        if hasattr(self.bot, 'autoscan_enabled'):
+            self.bot.autoscan_enabled = not self.bot.autoscan_enabled
+        else:
+            self.bot.autoscan_enabled = True
+
+        status = "enabled" if self.bot.autoscan_enabled else "disabled"
+        await ctx.send(f"Automatic URL scanning is now {status}.")
+
+    async def scan_urls(self, ctx, urls: str = None):
         urlscan_key = await self.bot.get_shared_api_tokens("urlscan")
         if urlscan_key.get("api_key") is None:
             await ctx.send("The URLScan API key has not been set.")
@@ -84,3 +98,43 @@ class URLScan(commands.Cog):
                                     await ctx.send(embed=embed)
                 except (json.JSONDecodeError, aiohttp.ClientError, asyncio.TimeoutError):
                     await ctx.send(f"Invalid JSON response from URLScan API or request timed out for {url}.")
+
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        if not hasattr(self.bot, 'autoscan_enabled') or not self.bot.autoscan_enabled:
+            return
+
+        if message.author.bot:
+            return
+
+        urls_to_scan = re.findall(r'(https?://\S+)', message.content)
+        if not urls_to_scan:
+            return
+
+        ctx = await self.bot.get_context(message)
+        for url in urls_to_scan:
+            await self.scan_urls(ctx, url)
+            urlscan_key = await self.bot.get_shared_api_tokens("urlscan")
+            headers = {
+                "Content-Type": "application/json",
+                "API-Key": urlscan_key["api_key"]
+            }
+            async with aiohttp.ClientSession() as session:
+                data = {"url": url, "visibility": "public"}
+                async with session.post('https://urlscan.io/api/v1/scan/', headers=headers, json=data, timeout=10) as r:
+                    res = await r.json()
+                    if 'result' not in res:
+                        continue
+
+                    report_api = res['api']
+                    await asyncio.sleep(30)
+                    async with session.get(report_api, timeout=10) as r2:
+                        res2 = await r2.json()
+                        if 'verdicts' in res2 and 'overall' in res2['verdicts'] and 'score' in res2['verdicts']['overall']:
+                            threat_level = res2['verdicts']['overall']['score']
+                            if threat_level != 0:
+                                await message.delete()
+                                await message.channel.send(f"Deleted a suspicious URL posted by {message.author.mention}.")
+                                break
+
+            
