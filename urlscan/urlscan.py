@@ -17,7 +17,7 @@ class URLScan(commands.Cog):
         """Scan a URL using urlscan.io"""
         await self.scan_urls(ctx, urls)
 
-    @commands.hybrid_command(name="urlscan autoscan", description="Toggle automatic URL scanning in messages")
+    @commands.hybrid_command(name="urlscan_autoscan", description="Toggle automatic URL scanning in messages")
     async def autoscan(self, ctx):
         """Toggle automatic URL scanning in messages"""
         if hasattr(self.bot, 'autoscan_enabled'):
