@@ -145,7 +145,12 @@ class URLScan(commands.Cog):
                             threat_level = res2['verdicts']['overall']['score']
                             if threat_level != 0:
                                 await message.delete()
-                                await message.channel.send(f"Deleted a suspicious URL posted by {message.author.mention}.")
+                                embed = discord.Embed(
+                                    title="Suspicious URL detected",
+                                    description=f"Deleted a suspicious URL posted by {message.author.mention}.",
+                                    color=ff4545
+                                )
+                                await message.channel.send(embed=embed)
                                 break
 
             
