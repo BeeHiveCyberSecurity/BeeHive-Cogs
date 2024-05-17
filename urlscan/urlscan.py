@@ -1,4 +1,4 @@
-import aiohttp
+import aiohttp #type: ignore
 import asyncio
 import discord #type: ignore
 import json

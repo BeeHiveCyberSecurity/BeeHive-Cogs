@@ -1,4 +1,4 @@
-import aiohttp
+import aiohttp #type: ignore
 import asyncio
 import re
 import json

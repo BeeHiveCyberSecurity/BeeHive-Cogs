@@ -1171,8 +1171,9 @@ class Skysearch(commands.Cog):
 
         try:
             url1 = f"https://www.airport-data.com/api/ap_info.json?{code_type}={code}"
-            response1 = requests.get(url1)
-            data1 = response1.json()
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url1) as response1:
+                    data1 = await response1.json()
             
             embed = discord.Embed(title=f"Airport information for {code.upper()}", description=f"# {data1.get('name', 'Unknown Airport')}", color=0xfffffe)
             embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/location.png")
@@ -1200,16 +1201,17 @@ class Skysearch(commands.Cog):
                     "maptype": "satellite",
                     "key": google_street_view_api_key
                 }
-                street_view_response = requests.get(street_view_base_url, params=street_view_params)
-                if street_view_response.status_code == 200:
-                    # Save the raw binary that the API returns as an image to set in embed.set_image
-                    street_view_image_url = "attachment://street_view_image.png"
-                    embed.set_image(url=street_view_image_url)
-                    street_view_image_stream = io.BytesIO(street_view_response.content)
-                    file = discord.File(fp=street_view_image_stream, filename="street_view_image.png")
-                else:
-                    # Handle the error accordingly, e.g., log it or send a message to the user
-                    pass
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(street_view_base_url, params=street_view_params) as street_view_response:
+                        if street_view_response.status == 200:
+                            # Save the raw binary that the API returns as an image to set in embed.set_image
+                            street_view_image_url = "attachment://street_view_image.png"
+                            embed.set_image(url=street_view_image_url)
+                            street_view_image_stream = io.BytesIO(await street_view_response.read())
+                            file = discord.File(fp=street_view_image_stream, filename="street_view_image.png")
+                        else:
+                            # Handle the error accordingly, e.g., log it or send a message to the user
+                            pass
 
             view = discord.ui.View(timeout=180)  # Initialize view outside of the else block
             if 'error' in data1:
@@ -1254,20 +1256,22 @@ class Skysearch(commands.Cog):
         try:
             if code_type == 'iata':
                 url1 = f"https://www.airport-data.com/api/ap_info.json?iata={code}"
-                response1 = requests.get(url1)
-                data1 = response1.json()
-                if 'icao' in data1:
-                    code = data1['icao']
-                else:
-                    embed = discord.Embed(title="Error", description="No ICAO code found for the provided IATA code.", color=0xff4545)
-                    await ctx.send(embed=embed)
-                    return
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(url1) as response1:
+                        data1 = await response1.json()
+                        if 'icao' in data1:
+                            code = data1['icao']
+                        else:
+                            embed = discord.Embed(title="Error", description="No ICAO code found for the provided IATA code.", color=0xff4545)
+                            await ctx.send(embed=embed)
+                            return
 
             api_token = await self.bot.get_shared_api_tokens("airportdbio")
             if api_token and 'api_token' in api_token:
                 url2 = f"https://airportdb.io/api/v1/airport/{code}?apiToken={api_token['api_token']}"
-                response2 = requests.get(url2)
-                data2 = response2.json()
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(url2) as response2:
+                        data2 = await response2.json()
 
                 if 'error' in data2:
                     error_message = data2['error']
@@ -1374,20 +1378,22 @@ class Skysearch(commands.Cog):
         try:
             if code_type == 'iata':
                 url1 = f"https://www.airport-data.com/api/ap_info.json?iata={code}"
-                response1 = requests.get(url1)
-                data1 = response1.json()
-                if 'icao' in data1:
-                    code = data1['icao']
-                else:
-                    embed = discord.Embed(title="Error", description="No ICAO code found for the provided IATA code.", color=0xff4545)
-                    await ctx.send(embed=embed)
-                    return
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(url1) as response1:
+                        data1 = await response1.json()
+                        if 'icao' in data1:
+                            code = data1['icao']
+                        else:
+                            embed = discord.Embed(title="Error", description="No ICAO code found for the provided IATA code.", color=0xff4545)
+                            await ctx.send(embed=embed)
+                            return
 
             api_token = await self.bot.get_shared_api_tokens("airportdbio")
             if api_token and 'api_token' in api_token:
                 url = f"https://airportdb.io/api/v1/airport/{code}?apiToken={api_token['api_token']}"
-                response = requests.get(url)
-                data = response.json()
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(url) as response:
+                        data = await response.json()
 
                 if 'error' in data:
                     error_message = data['error']
@@ -1456,25 +1462,30 @@ class Skysearch(commands.Cog):
             return
 
         try:
-            data1 = requests.get(f"https://www.airport-data.com/api/ap_info.json?{code_type}={code}").json()
-            latitude, longitude = data1.get('latitude'), data1.get('longitude')
-            if not latitude or not longitude:
-                await ctx.send(embed=discord.Embed(title="Error", description="Could not fetch latitude and longitude for the provided code.", color=0xff4545))
-                return
-            if data1.get('country_code') != 'US':
-                await ctx.send(embed=discord.Embed(title="Error", description="Weather forecasts are currently only available for airports in the United States.", color=0xff4545))
-                return
-            data2 = requests.get(f"https://api.weather.gov/points/{latitude},{longitude}").json()
-            forecast_url = data2.get('properties', {}).get('forecast')
-            if not forecast_url:
-                await ctx.send(embed=discord.Embed(title="Error", description="Could not fetch forecast URL.", color=0xff4545))
-                return
+            async with aiohttp.ClientSession() as session:
+                async with session.get(f"https://www.airport-data.com/api/ap_info.json?{code_type}={code}") as response1:
+                    data1 = await response1.json()
+                    latitude, longitude = data1.get('latitude'), data1.get('longitude')
+                    if not latitude or not longitude:
+                        await ctx.send(embed=discord.Embed(title="Error", description="Could not fetch latitude and longitude for the provided code.", color=0xff4545))
+                        return
+                    if data1.get('country_code') != 'US':
+                        await ctx.send(embed=discord.Embed(title="Error", description="Weather forecasts are currently only available for airports in the United States.", color=0xff4545))
+                        return
 
-            data3 = requests.get(forecast_url).json()
-            periods = data3.get('properties', {}).get('periods')
-            if not periods:
-                await ctx.send(embed=discord.Embed(title="Error", description="Could not fetch forecast details.", color=0xff4545))
-                return
+                async with session.get(f"https://api.weather.gov/points/{latitude},{longitude}") as response2:
+                    data2 = await response2.json()
+                    forecast_url = data2.get('properties', {}).get('forecast')
+                    if not forecast_url:
+                        await ctx.send(embed=discord.Embed(title="Error", description="Could not fetch forecast URL.", color=0xff4545))
+                        return
+
+                async with session.get(forecast_url) as response3:
+                    data3 = await response3.json()
+                    periods = data3.get('properties', {}).get('periods')
+                    if not periods:
+                        await ctx.send(embed=discord.Embed(title="Error", description="Could not fetch forecast details.", color=0xff4545))
+                        return
 
             combined_pages = []
             
