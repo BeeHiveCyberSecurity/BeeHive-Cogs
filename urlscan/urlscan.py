@@ -79,26 +79,26 @@ class URLScan(commands.Cog):
                                 if 'verdicts' in res2 and 'overall' in res2['verdicts'] and 'score' in res2['verdicts']['overall']:
                                     threat_level = res2['verdicts']['overall']['score']
                                     if threat_level != 0:
-                                        embed.title = f"URL is suspicious"
+                                        embed.title = "URL is suspicious"
                                         embed.description = f"URLScan says {url} is suspicious!\n\nFor your own safety, please don't click it."
                                         embed.color = 0xFF4545
                                         embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/warning-outline.png")
-                                        view.add_item(discord.ui.Button(label=f"View results", url=f"{report_url}", style=discord.ButtonStyle.link))
+                                        view.add_item(discord.ui.Button(label="View results", url=report_url, style=discord.ButtonStyle.link))
                                     else:
-                                        embed.title = f"URL is safe"
+                                        embed.title = "URL is safe"
                                         embed.color = 0x2BBD8E
                                         embed.description = f"URLScan did not detect any threats associated with {url}"
                                         embed.add_field(name="Overall verdict", value="Scanned and found safe", inline=False)
                                         embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/checkmark-circle-outline.png")
-                                        view.add_item(discord.ui.Button(label=f"View results", url=f"{report_url}", style=discord.ButtonStyle.link))
+                                        view.add_item(discord.ui.Button(label="View results", url=report_url, style=discord.ButtonStyle.link))
                                 elif 'message' in res2 and res2['message'] == "Scan prevented ...":
-                                    embed.title = f"Domain is whitelisted"
+                                    embed.title = "Domain is whitelisted"
                                     embed.description = f"The domain for {url} is whitelisted and safe from scanning."
                                     embed.color = 0x2BBD8E
                                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/checkmark-circle-outline.png")
-                                    view.add_item(discord.ui.Button(label=f"View results", url=f"{report_url}", style=discord.ButtonStyle.link))
+                                    view.add_item(discord.ui.Button(label="View results", url=report_url, style=discord.ButtonStyle.link))
                                 else:
-                                    embed.title = f"Error occurred during URLScan"
+                                    embed.title = "Error occurred during URLScan"
                                     embed.description = f"Unable to determine the threat level for {url}."
                                     embed.color = 0xFFD700
                                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/warning-outline.png")
@@ -107,8 +107,8 @@ class URLScan(commands.Cog):
                                     await ctx.send(embed=embed, view=view)
                                 else:
                                     await ctx.send(embed=embed)
-                except (json.JSONDecodeError, aiohttp.ClientError, asyncio.TimeoutError):
-                    await ctx.send(f"Invalid JSON response from URLScan API or request timed out for {url}.")
+                except (json.JSONDecodeError, aiohttp.ClientError, asyncio.TimeoutError) as e:
+                    await ctx.send(f"Error: {str(e)} for {url}.")
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -148,7 +148,7 @@ class URLScan(commands.Cog):
                                 embed = discord.Embed(
                                     title="Suspicious URL detected",
                                     description=f"Deleted a suspicious URL posted by {message.author.mention}.",
-                                    color=ff4545
+                                    color=0xFF4545
                                 )
                                 await message.channel.send(embed=embed)
                                 break
