@@ -182,17 +182,17 @@ class Skysearch(commands.Cog):
 
             operator = aircraft_data.get('ownOp', None)
             if operator is not None:
-                embed.add_field(name="Operated by", value=f"**`{operator}`**", inline=True)
+                embed.add_field(name="Operated by", value=f"**`{operator}`**", inline=False)
             
             last_seen = aircraft_data.get('seen', 'N/A')
             if last_seen != 'N/A':
                 last_seen_text = ":green_circle: **Just now**" if float(last_seen) < 1 else f":hourglass: **{last_seen} seconds ago**"
-                embed.add_field(name="Last check in", value=last_seen_text, inline=False)
+                embed.add_field(name="Last check in", value=last_seen_text, inline=True)
             
             last_seen_pos = aircraft_data.get('seen_pos', 'N/A')
             if last_seen_pos != 'N/A':
                 last_seen_pos_text = ":green_circle: **Just now**" if float(last_seen_pos) < 1 else f":hourglass **{last_seen_pos} seconds ago**"
-                embed.add_field(name="Last position update", value=last_seen_pos_text, inline=False)
+                embed.add_field(name="Last position update", value=last_seen_pos_text, inline=True)
             
             baro_rate = aircraft_data.get('baro_rate', 'N/A')
             if baro_rate == 'N/A':
