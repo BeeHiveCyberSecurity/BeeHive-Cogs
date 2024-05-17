@@ -24,7 +24,6 @@ class Orchestrator(commands.Cog):
         """See and manage the servers that your bot instance is in."""
         await ctx.defer()
         guilds = [guild async for guild in self.bot.fetch_guilds(limit=None)]
-        # No need to filter out guilds as we want to list all guilds the bot is in
         guilds_sorted = sorted(guilds, key=lambda x: x.member_count if hasattr(x, 'member_count') and x.member_count is not None else 0, reverse=True)
         if not guilds_sorted:
             return await ctx.send("No guilds available.")
@@ -84,17 +83,20 @@ class Orchestrator(commands.Cog):
                 self.leave_button.disabled = True
                 self.stop()
 
-            async def previous_button_callback(self, interaction):
+            @discord.ui.button(label="Previous", style=discord.ButtonStyle.primary, row=2)
+            async def previous_button_callback(self, button, interaction):
                 if self.current_page > 0:
                     self.current_page -= 1
                     await interaction.response.edit_message(embed=self.embeds[self.current_page], view=self)
             
-            async def next_button_callback(self, interaction):
+            @discord.ui.button(label="Next", style=discord.ButtonStyle.primary, row=2)
+            async def next_button_callback(self, button, interaction):
                 if self.current_page < len(self.embeds) - 1:
                     self.current_page += 1
                     await interaction.response.edit_message(embed=self.embeds[self.current_page], view=self)
             
-            async def invite_button_callback(self, interaction):
+            @discord.ui.button(emoji="🔗", label="Generate invite", style=discord.ButtonStyle.secondary, row=1)
+            async def invite_button_callback(self, button, interaction):
                 guild_id = self.guild_ids[self.current_page]
                 guild = self.bot.get_guild(guild_id)
                 if not guild:
@@ -124,7 +126,8 @@ class Orchestrator(commands.Cog):
 
                 await interaction.response.send_message(f"Invite for {guild.name}: {invite.url}", ephemeral=True)
             
-            async def leave_button_callback(self, interaction):
+            @discord.ui.button(emoji="🗑️", label="Leave server", style=discord.ButtonStyle.danger, row=1)
+            async def leave_button_callback(self, button, interaction):
                 guild_id = self.guild_ids[self.current_page]
                 guild = self.bot.get_guild(guild_id)
                 if guild:
@@ -142,9 +145,5 @@ class Orchestrator(commands.Cog):
                     await interaction.response.send_message(f"Could not leave guild with ID: {guild_id}", ephemeral=True)
         
         paginator_view = PaginatorView(embeds, guild_ids)
-        paginator_view.invite_button.callback = paginator_view.invite_button_callback
-        paginator_view.leave_button.callback = paginator_view.leave_button_callback
-        paginator_view.previous_button.callback = paginator_view.previous_button_callback
-        paginator_view.next_button.callback = paginator_view.next_button_callback
         
         await ctx.send(embed=embeds[0], view=paginator_view)
