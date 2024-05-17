@@ -1599,6 +1599,9 @@ class Skysearch(commands.Cog):
         if message.author == self.bot.user:
             return
 
+        if message.guild is None:
+            return
+
         auto_icao = await self.config.guild(message.guild).auto_icao()
         if not auto_icao:
             return
