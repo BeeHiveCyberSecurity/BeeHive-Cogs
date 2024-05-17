@@ -18,7 +18,7 @@ class URLScan(commands.Cog):
         await self.scan_urls(ctx, urls)
 
     @commands.guild_only()
-    @urlscan_group.command(name="autoscan", description="Toggle automatic URL scanning in messages")
+    @urlscan.command(name="autoscan", description="Toggle automatic URL scanning in messages")
     async def autoscan(self, ctx):
         """Toggle automatic URL scanning in messages"""
         guild_id = ctx.guild.id
