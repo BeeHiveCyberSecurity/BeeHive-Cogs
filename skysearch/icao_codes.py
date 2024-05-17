@@ -4,7 +4,7 @@ military_icao_set = {'AE152C', 'AE203C', 'AE4D36', 'ADEDBE', 'AE1FED', 'AE290E',
 
 medical_icao_set = {'A4E840', 'A51D46', 'A4229E', 'A0B5DF', 'A57E5C', 'A5396D', 'A5C4D6', 'A234DB', 'A22B87', 'A740F0', 'ABD3A3', 'A38D95', 'A4E489', 'AD8FE3', 'C009B6', 'AC9B9A', 'AB600B', 'A4C83D', 'A07B5D', 'A4B1A5', 'A07C1A', '48605B', '4857B3', '485E49', 'A61FF5', 'A5696D', 'A4FC36', 'A4C861', 'AB5606', 'C01D49', 'AB597F', 'A0B57D', 'A52323', 'A55D35'}
 
-suspicious_icao_set = {'A9739F', 'A1AFEA'}
+suspicious_icao_set = {'A9739F', 'A1AFEA', 'A2609D'}
 
 newsagency_icao_set = {'AADE9D'}
 
