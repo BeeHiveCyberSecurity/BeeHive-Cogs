@@ -186,7 +186,7 @@ class Skysearch(commands.Cog):
             
             last_seen_pos = aircraft_data.get('seen_pos', 'N/A')
             if last_seen_pos != 'N/A':
-                last_seen_pos_text = ":green_circle: **Just now**" if float(last_seen_pos) < 1 else f":hourglass **{last_seen_pos} seconds ago**"
+                last_seen_pos_text = ":green_circle: **Just now**" if float(last_seen_pos) < 1 else f":hourglass: **{last_seen_pos} seconds ago**"
                 embed.add_field(name="Last position update", value=last_seen_pos_text, inline=True)
             
             baro_rate = aircraft_data.get('baro_rate', 'N/A')
