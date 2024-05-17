@@ -1,4 +1,5 @@
 import aiohttp
+import asyncio
 import discord #type: ignore
 import json
 import re
