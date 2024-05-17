@@ -60,16 +60,7 @@ class URLScan(commands.Cog):
                         async with session.post('https://urlscan.io/api/v1/scan/', headers=headers, json=data, timeout=10) as r:
                             res = await r.json()
                             if 'result' not in res:
-                                if res.get('message', '').startswith("Scan prevented"):
-                                    embed = discord.Embed(
-                                        title="URL is whitelisted and known safe",
-                                        description=f"The URL {url} is known to be safe and has been whitelisted.",
-                                        color=0x2BBD8E
-                                    )
-                                    embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/checkmark-circle-outline.png")
-                                    await ctx.send(embed=embed)
-                                else:
-                                    await ctx.send(f"{res.get('message', 'Unknown error')}")
+                                await ctx.send(f"{res.get('message', 'Unknown error')}")
                                 continue
 
                             report_url = res['result']
@@ -95,6 +86,12 @@ class URLScan(commands.Cog):
                                         embed.add_field(name="Overall verdict", value="Scanned and found safe", inline=False)
                                         embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/checkmark-circle-outline.png")
                                         view.add_item(discord.ui.Button(label=f"View results", url=f"{report_url}", style=discord.ButtonStyle.link))
+                                elif 'message' in res2 and res2['message'].startswith("Scan prevented"):
+                                    embed.title = f"Domain is whitelisted"
+                                    embed.description = f"The domain for {url} is whitelisted and safe from scanning."
+                                    embed.color = 0x2BBD8E
+                                    embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/checkmark-circle-outline.png")
+                                    view.add_item(discord.ui.Button(label=f"View results", url=f"{report_url}", style=discord.ButtonStyle.link))
                                 else:
                                     embed.title = f"Error occurred during URLScan"
                                     embed.description = f"Unable to determine the threat level for {url}."
@@ -122,6 +119,7 @@ class URLScan(commands.Cog):
 
         ctx = await self.bot.get_context(message)
         for url in urls_to_scan:
+            await self.scan_urls(ctx, url)
             urlscan_key = await self.bot.get_shared_api_tokens("urlscan")
             headers = {
                 "Content-Type": "application/json",
@@ -132,14 +130,6 @@ class URLScan(commands.Cog):
                 async with session.post('https://urlscan.io/api/v1/scan/', headers=headers, json=data, timeout=10) as r:
                     res = await r.json()
                     if 'result' not in res:
-                        if res.get('message', '').startswith("Scan prevented"):
-                            embed = discord.Embed(
-                                title="URL is whitelisted and known safe",
-                                description=f"The URL {url} is known to be safe and has been whitelisted.",
-                                color=0x2BBD8E
-                            )
-                            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/checkmark-circle-outline.png")
-                            await message.channel.send(embed=embed)
                         continue
 
                     report_api = res['api']
