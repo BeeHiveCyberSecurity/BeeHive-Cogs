@@ -86,7 +86,7 @@ class URLScan(commands.Cog):
                                         embed.add_field(name="Overall verdict", value="Scanned and found safe", inline=False)
                                         embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/checkmark-circle-outline.png")
                                         view.add_item(discord.ui.Button(label=f"View results", url=f"{report_url}", style=discord.ButtonStyle.link))
-                                elif 'message' in res2 and res2['message'].startswith("Scan prevented"):
+                                elif 'message' in res2 and res2['message'] == "Scan prevented":
                                     embed.title = f"Domain is whitelisted"
                                     embed.description = f"The domain for {url} is whitelisted and safe from scanning."
                                     embed.color = 0x2BBD8E
@@ -98,7 +98,7 @@ class URLScan(commands.Cog):
                                     embed.color = 0xFFD700
                                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/warning-outline.png")
 
-                                if 'verdicts' in res2:
+                                if 'verdicts' in res2 or ('message' in res2 and res2['message'] == "Scan prevented"):
                                     await ctx.send(embed=embed, view=view)
                                 else:
                                     await ctx.send(embed=embed)
