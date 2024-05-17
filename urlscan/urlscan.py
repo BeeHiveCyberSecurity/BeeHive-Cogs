@@ -60,7 +60,10 @@ class URLScan(commands.Cog):
                         async with session.post('https://urlscan.io/api/v1/scan/', headers=headers, json=data, timeout=10) as r:
                             res = await r.json()
                             if 'result' not in res:
-                                await ctx.send(f"{res.get('message', 'Unknown error')}")
+                                if res.get('message', '').startswith("Scan prevented"):
+                                    await ctx.send(f"Scan prevented for {url}: {res.get('message')}")
+                                else:
+                                    await ctx.send(f"{res.get('message', 'Unknown error')}")
                                 continue
 
                             report_url = res['result']
@@ -124,6 +127,8 @@ class URLScan(commands.Cog):
                 async with session.post('https://urlscan.io/api/v1/scan/', headers=headers, json=data, timeout=10) as r:
                     res = await r.json()
                     if 'result' not in res:
+                        if res.get('message', '').startswith("Scan prevented"):
+                            await message.channel.send(f"Scan prevented for {url}: {res.get('message')}")
                         continue
 
                     report_api = res['api']
