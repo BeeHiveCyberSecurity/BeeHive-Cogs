@@ -1,6 +1,6 @@
 from redbot.core import Config, commands
 import discord
-from discord.ui import Button, View
+from discord.ui import View
 
 class Orchestrator(commands.Cog):
     """See info about the servers your bot is in.
@@ -57,93 +57,94 @@ class Orchestrator(commands.Cog):
             embeds.append(embed)
             guild_ids.append(guild.id)
         
-        # Paginator view with buttons
+        # Paginator view with reactions
         class PaginatorView(View):
             def __init__(self, embeds, guild_ids):
-                super().__init__()
+                super().__init__(timeout=60)
                 self.embeds = embeds
                 self.guild_ids = guild_ids
                 self.current_page = 0
-                self.invite_button = Button(emoji="🔗", label="Generate invite", style=discord.ButtonStyle.secondary, row=1, custom_id="invite_btn")
-                self.leave_button = Button(emoji="🗑️", label="Leave server", style=discord.ButtonStyle.danger, row=1, custom_id="leave_btn")
-                self.previous_button = Button(label="Previous", style=discord.ButtonStyle.primary, row=2, custom_id="previous_btn")
-                self.next_button = Button(label="Next", style=discord.ButtonStyle.primary, row=2, custom_id="next_btn")
-                self.add_item(self.previous_button)
-                self.add_item(self.next_button)
-                self.add_item(self.invite_button)
-                self.add_item(self.leave_button)
             
             async def interaction_check(self, interaction):
                 return interaction.user == ctx.author
             
             async def on_timeout(self):
-                self.previous_button.disabled = True
-                self.next_button.disabled = True
-                self.invite_button.disabled = True
-                self.leave_button.disabled = True
+                await ctx.message.clear_reactions()
                 self.stop()
 
-            @discord.ui.button(label="Previous", style=discord.ButtonStyle.primary, row=2)
-            async def previous_button_callback(self, button, interaction):
-                if self.current_page > 0:
-                    self.current_page -= 1
-                    await interaction.response.edit_message(embed=self.embeds[self.current_page], view=self)
-            
-            @discord.ui.button(label="Next", style=discord.ButtonStyle.primary, row=2)
-            async def next_button_callback(self, button, interaction):
-                if self.current_page < len(self.embeds) - 1:
-                    self.current_page += 1
-                    await interaction.response.edit_message(embed=self.embeds[self.current_page], view=self)
-            
-            @discord.ui.button(emoji="🔗", label="Generate invite", style=discord.ButtonStyle.secondary, row=1)
-            async def invite_button_callback(self, button, interaction):
-                guild_id = self.guild_ids[self.current_page]
-                guild = self.bot.get_guild(guild_id)
-                if not guild:
-                    await interaction.response.send_message(f"Unable to access guild with ID: {guild_id}", ephemeral=True)
+            async def handle_reaction(self, payload):
+                if payload.user_id != ctx.author.id:
                     return
-
-                # Check if the bot has permissions to create an invite
-                if guild.me.guild_permissions.create_instant_invite:
-                    try:
-                        # Try to get an existing invite
-                        invites = await guild.invites()
-                        invite = invites[0] if invites else None
-                        # If no existing invites, create a new one
-                        if not invite:
-                            # Check if the guild has text channels before creating an invite
-                            if guild.text_channels:
-                                invite = await guild.text_channels[0].create_invite(max_age=300)  # Invite expires after 5 minutes
-                            else:
-                                await interaction.response.send_message("Guild does not have any text channels to create an invite.", ephemeral=True)
-                                return
-                    except Exception as e:
-                        await interaction.response.send_message(f"Unable to create an invite: {str(e)}", ephemeral=True)
+                if payload.emoji.name == "⬅️":
+                    if self.current_page > 0:
+                        self.current_page -= 1
+                        await ctx.message.edit(embed=self.embeds[self.current_page])
+                elif payload.emoji.name == "➡️":
+                    if self.current_page < len(self.embeds) - 1:
+                        self.current_page += 1
+                        await ctx.message.edit(embed=self.embeds[self.current_page])
+                elif payload.emoji.name == "🔗":
+                    guild_id = self.guild_ids[self.current_page]
+                    guild = self.bot.get_guild(guild_id)
+                    if not guild:
+                        await ctx.send(f"Unable to access guild with ID: {guild_id}", ephemeral=True)
                         return
-                else:
-                    await interaction.response.send_message("Bot does not have permissions to create an invite.", ephemeral=True)
-                    return
 
-                await interaction.response.send_message(f"Invite for {guild.name}: {invite.url}", ephemeral=True)
-            
-            @discord.ui.button(emoji="🗑️", label="Leave server", style=discord.ButtonStyle.danger, row=1)
-            async def leave_button_callback(self, button, interaction):
-                guild_id = self.guild_ids[self.current_page]
-                guild = self.bot.get_guild(guild_id)
-                if guild:
-                    await guild.leave()
-                    await interaction.response.send_message(f"Left guild: {guild.name} (ID: {guild_id})", ephemeral=True)
-                    # Update the embeds and guild_ids to reflect the change
-                    del self.embeds[self.current_page]
-                    del self.guild_ids[self.current_page]
-                    # If the current page is now out of range, move back one
-                    if self.current_page >= len(self.embeds):
-                        self.current_page = max(len(self.embeds) - 1, 0)
-                    # Update the message with the new current page embed
-                    await interaction.message.edit(embed=self.embeds[self.current_page] if self.embeds else None, view=self)
-                else:
-                    await interaction.response.send_message(f"Could not leave guild with ID: {guild_id}", ephemeral=True)
+                    # Check if the bot has permissions to create an invite
+                    if guild.me.guild_permissions.create_instant_invite:
+                        try:
+                            # Try to get an existing invite
+                            invites = await guild.invites()
+                            invite = invites[0] if invites else None
+                            # If no existing invites, create a new one
+                            if not invite:
+                                # Check if the guild has text channels before creating an invite
+                                if guild.text_channels:
+                                    invite = await guild.text_channels[0].create_invite(max_age=300)  # Invite expires after 5 minutes
+                                else:
+                                    await ctx.send("Guild does not have any text channels to create an invite.", ephemeral=True)
+                                    return
+                        except Exception as e:
+                            await ctx.send(f"Unable to create an invite: {str(e)}", ephemeral=True)
+                            return
+                    else:
+                        await ctx.send("Bot does not have permissions to create an invite.", ephemeral=True)
+                        return
+
+                    await ctx.send(f"Invite for {guild.name}: {invite.url}", ephemeral=True)
+                elif payload.emoji.name == "🗑️":
+                    guild_id = self.guild_ids[self.current_page]
+                    guild = self.bot.get_guild(guild_id)
+                    if guild:
+                        await guild.leave()
+                        await ctx.send(f"Left guild: {guild.name} (ID: {guild_id})", ephemeral=True)
+                        # Update the embeds and guild_ids to reflect the change
+                        del self.embeds[self.current_page]
+                        del self.guild_ids[self.current_page]
+                        # If the current page is now out of range, move back one
+                        if self.current_page >= len(self.embeds):
+                            self.current_page = max(len(self.embeds) - 1, 0)
+                        # Update the message with the new current page embed
+                        await ctx.message.edit(embed=self.embeds[self.current_page] if self.embeds else None)
+                    else:
+                        await ctx.send(f"Could not leave guild with ID: {guild_id}", ephemeral=True)
         
         paginator_view = PaginatorView(embeds, guild_ids)
         
-        await ctx.send(embed=embeds[0], view=paginator_view)
+        message = await ctx.send(embed=embeds[0])
+        await message.add_reaction("⬅️")
+        await message.add_reaction("➡️")
+        await message.add_reaction("🔗")
+        await message.add_reaction("🗑️")
+
+        def check(payload):
+            return payload.message_id == message.id and payload.user_id == ctx.author.id and str(payload.emoji) in ["⬅️", "➡️", "🔗", "🗑️"]
+
+        while True:
+            try:
+                payload = await self.bot.wait_for("raw_reaction_add", timeout=60.0, check=check)
+                await paginator_view.handle_reaction(payload)
+                await message.remove_reaction(payload.emoji, ctx.author)
+            except asyncio.TimeoutError:
+                await paginator_view.on_timeout()
+                break
