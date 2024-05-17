@@ -142,5 +142,7 @@ class URLScan(commands.Cog):
                                 await message.delete()
                                 await message.channel.send(f"Deleted a suspicious URL posted by {message.author.mention}.")
                                 break
+                        elif 'message' in res2 and res2['message'] == "Scan prevented ...":
+                            await message.channel.send(f"The domain for {url} is whitelisted and safe from scanning.")
 
             
