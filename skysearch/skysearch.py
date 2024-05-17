@@ -11,8 +11,6 @@ import tempfile
 import csv
 import datetime
 import time
-import requests
-from PIL import Image
 from discord.ext import tasks, commands #type: ignore
 from redbot.core import commands, Config #type: ignore
 from reportlab.lib.pagesizes import letter, landscape, A4 #type: ignore
