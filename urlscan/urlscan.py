@@ -12,12 +12,13 @@ class URLScan(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.hybrid_command(name="urlscan", description="Utilize URLScan's /scan endpoint to scan a URL")
+    @commands.group(name='urlscan', help="Scan URL's for dangerous content", invoke_without_command=True)
     async def urlscan(self, ctx, *, urls: str = None):
         """Scan a URL using urlscan.io"""
         await self.scan_urls(ctx, urls)
 
-    @commands.hybrid_command(name="urlscan_autoscan", description="Toggle automatic URL scanning in messages")
+    @commands.guild_only()
+    @urlscan_group.command(name="autoscan", description="Toggle automatic URL scanning in messages")
     async def autoscan(self, ctx):
         """Toggle automatic URL scanning in messages"""
         if hasattr(self.bot, 'autoscan_enabled'):
@@ -142,7 +143,5 @@ class URLScan(commands.Cog):
                                 await message.delete()
                                 await message.channel.send(f"Deleted a suspicious URL posted by {message.author.mention}.")
                                 break
-                        elif 'message' in res2 and res2['message'] == "Scan prevented ...":
-                            await message.channel.send(f"The domain for {url} is whitelisted and safe from scanning.")
 
             
