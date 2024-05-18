@@ -571,7 +571,7 @@ class Skysearch(commands.Cog):
             if aircraft_list:
                 page_index = 0
 
-                def create_embed(aircraft):
+                async def create_embed(aircraft):
                     embed = discord.Embed(title=f"Live military aircraft ({page_index + 1} of {len(aircraft_list)})", color=0xfffffe)
                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/airplane.png")
                     aircraft_description = aircraft.get('desc', 'N/A')  # Aircraft Description
@@ -590,16 +590,20 @@ class Skysearch(commands.Cog):
                     embed.add_field(name="Speed", value=f"**`{aircraft_speed}`**", inline=True)
                     embed.add_field(name="ICAO", value=f"**`{aircraft_hex}`**", inline=True)
 
+                    photo_url, photographer = await self._get_photo_by_hex(aircraft_hex)
+                    if photo_url:
+                        embed.set_image(url=photo_url)
+
                     view = discord.ui.View()
                     view.add_item(discord.ui.Button(label=f"Track {aircraft_hex} live", url=f"https://globe.airplanes.live/{aircraft_hex}"))
 
                     return embed, view
 
                 async def update_message(message, page_index):
-                    embed, view = create_embed(aircraft_list[page_index])
+                    embed, view = await create_embed(aircraft_list[page_index])
                     await message.edit(embed=embed, view=view)
 
-                embed, view = create_embed(aircraft_list[page_index])
+                embed, view = await create_embed(aircraft_list[page_index])
                 message = await ctx.send(embed=embed, view=view)
 
                 await message.add_reaction("⬅️")
