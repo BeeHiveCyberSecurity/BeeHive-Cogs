@@ -593,6 +593,8 @@ class Skysearch(commands.Cog):
                     photo_url, photographer = await self._get_photo_by_hex(aircraft_hex)
                     if photo_url:
                         embed.set_image(url=photo_url)
+                    if photographer:
+                        embed.set_footer(text=f"Photo by {photographer}")
 
                     view = discord.ui.View()
                     view.add_item(discord.ui.Button(label=f"Track {aircraft_hex} live", url=f"https://globe.airplanes.live/{aircraft_hex}"))
