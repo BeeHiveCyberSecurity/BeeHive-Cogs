@@ -11,13 +11,6 @@ class URLScan(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.bot.loop.create_task(self.load_autoscan_settings())
-
-    async def load_autoscan_settings(self):
-        self.bot.autoscan_enabled_guilds = await self.bot.get_cog_data("autoscan_enabled_guilds", default={})
-
-    async def save_autoscan_settings(self):
-        await self.bot.set_cog_data("autoscan_enabled_guilds", self.bot.autoscan_enabled_guilds)
 
     @commands.group(name='urlscan', help="Scan URL's for dangerous content", invoke_without_command=True)
     async def urlscan(self, ctx, *, urls: str = None):
@@ -29,12 +22,13 @@ class URLScan(commands.Cog):
     async def autoscan(self, ctx):
         """Toggle automatic URL scanning in messages"""
         guild_id = ctx.guild.id
+        if not hasattr(self.bot, 'autoscan_enabled_guilds'):
+            self.bot.autoscan_enabled_guilds = {}
+
         if guild_id in self.bot.autoscan_enabled_guilds:
             self.bot.autoscan_enabled_guilds[guild_id] = not self.bot.autoscan_enabled_guilds[guild_id]
         else:
             self.bot.autoscan_enabled_guilds[guild_id] = True
-
-        await self.save_autoscan_settings()
 
         status = "enabled" if self.bot.autoscan_enabled_guilds[guild_id] else "disabled"
         await ctx.send(f"Automatic URL scanning is now {status} for this guild.")
