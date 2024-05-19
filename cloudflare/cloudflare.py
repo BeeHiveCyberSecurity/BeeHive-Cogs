@@ -738,7 +738,7 @@ class Cloudflare(commands.Cog):
             "Content-Type": "application/json"
         }
         payload = {
-            "target": target
+            "targets": [target]
         }
 
         async with self.session.post(url, headers=headers, json=payload) as response:
