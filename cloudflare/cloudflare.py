@@ -50,8 +50,9 @@ class Cloudflare(commands.Cog):
     async def setaccountid(self, ctx, account_id: str):
         """Set the Cloudflare Account ID."""
         await self.config.account_id.set(account_id)
-        await ctx.send("Cloudflare Account ID set.")
-
+        obfuscated_account_id = account_id[:4] + "****" + account_id[-4:]
+        await ctx.send(f"Cloudflare Account ID set: {obfuscated_account_id}")
+        
     @commands.is_owner()
     @cloudflare.command()
     async def getzones(self, ctx):
