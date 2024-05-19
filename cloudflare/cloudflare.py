@@ -310,6 +310,18 @@ class Cloudflare(commands.Cog):
             if "administrative_referral_url" in whois_info:
                 button = discord.ui.Button(label="Administrative Referral URL", url=whois_info["administrative_referral_url"])
                 view.add_item(button)
+            if "billing_referral_url" in whois_info:
+                button = discord.ui.Button(label="Billing contact", url=whois_info["billing_referral_url"])
+                view.add_item(button)
+            if "registrant_referral_url" in whois_info:
+                button = discord.ui.Button(label="Registrant contact", url=whois_info["registrant_referral_url"])
+                view.add_item(button)
+            if "registrar_referral_url" in whois_info:
+                button = discord.ui.Button(label="Registrar contact", url=whois_info["registrar_referral_url"])
+                view.add_item(button)
+            if "technical_referral_url" in whois_info:
+                button = discord.ui.Button(label="Technical contact", url=whois_info["technical_referral_url"])
+                view.add_item(button)
 
             message = await ctx.send(embed=pages[0], view=view)
 
