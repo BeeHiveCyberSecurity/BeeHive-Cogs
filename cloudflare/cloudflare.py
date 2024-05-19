@@ -249,13 +249,17 @@ class Cloudflare(commands.Cog):
                 registrant_fax = f"**`{whois_info['registrant_fax']}`**"
                 page = add_field_to_page(page, "Registrant Fax", registrant_fax)
             if "registrant_fax_ext" in whois_info:
-                page = add_field_to_page(page, "Registrant Fax Ext", whois_info["registrant_fax_ext"])
+                registrant_fax_ext = f"**`{whois_info['registrant_fax_ext']}`**"
+                page = add_field_to_page(page, "Registrant Fax Ext", registrant_fax_ext)
             if "registrant_id" in whois_info:
-                page = add_field_to_page(page, "Registrant ID", whois_info["registrant_id"])
+                registrant_id = f"**`{whois_info['registrant_id']}`**"
+                page = add_field_to_page(page, "Registrant ID", registrant_id)
             if "registrant_name" in whois_info:
-                page = add_field_to_page(page, "Registrant Name", whois_info["registrant_name"])
+                registrant_name = f"**`{whois_info['registrant_name']}`**"
+                page = add_field_to_page(page, "Registrant Name", registrant_name)
             if "registrant_org" in whois_info:
-                page = add_field_to_page(page, "Registrant Org", whois_info["registrant_org"])
+                registrant_org = f"**`{whois_info['registrant_org']}`**"
+                page = add_field_to_page(page, "Registrant Org", registrant_org)
             if "registrant_phone" in whois_info:
                 page = add_field_to_page(page, "Registrant Phone", whois_info["registrant_phone"])
             if "registrant_phone_ext" in whois_info:
