@@ -497,13 +497,22 @@ class Cloudflare(commands.Cog):
                 if data["success"]:
                     result = data["result"]
                     embed = discord.Embed(title="Domain Intelligence", description=f"Information for {domain}")
-                    embed.add_field(name="Domain", value=result.get("domain", "N/A"), inline=False)
-                    embed.add_field(name="Risk Score", value=result.get("risk_score", "N/A"), inline=False)
-                    embed.add_field(name="Popularity Rank", value=result.get("popularity_rank", "N/A"), inline=False)
-                    embed.add_field(name="Application", value=result.get("application", {}).get("name", "N/A"), inline=False)
-                    embed.add_field(name="Suspected Malware Family", value=result.get("additional_information", {}).get("suspected_malware_family", "N/A"), inline=False)
-                    embed.add_field(name="Content Categories", value=", ".join([cat["name"] for cat in result.get("content_categories", [])]), inline=False)
-                    embed.add_field(name="Resolves To", value=", ".join([ref["value"] for ref in result.get("resolves_to_refs", [])]), inline=False)
+                    
+                    if "domain" in result:
+                        embed.add_field(name="Domain", value=f"**`{result['domain']}`**", inline=False)
+                    if "risk_score" in result:
+                        embed.add_field(name="Risk Score", value=f"**`{result['risk_score']}`**", inline=False)
+                    if "popularity_rank" in result:
+                        embed.add_field(name="Popularity Rank", value=f"**`{result['popularity_rank']}`**", inline=False)
+                    if "application" in result and "name" in result["application"]:
+                        embed.add_field(name="Application", value=f"**`{result['application']['name']}`**", inline=False)
+                    if "additional_information" in result and "suspected_malware_family" in result["additional_information"]:
+                        embed.add_field(name="Suspected Malware Family", value=f"`{result['additional_information']['suspected_malware_family']}`", inline=False)
+                    if "content_categories" in result:
+                        embed.add_field(name="Content Categories", value=", ".join([f"**`{cat['name']}`**" for cat in result["content_categories"]]), inline=False)
+                    if "resolves_to_refs" in result:
+                        embed.add_field(name="Resolves To", value=", ".join([f"**`{ref['value']}`**" for ref in result["resolves_to_refs"]]), inline=False)
+                    
                     await ctx.send(embed=embed)
                 else:
                     await ctx.send(f"Error: {data['errors']}")
