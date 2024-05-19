@@ -57,6 +57,8 @@ class VirusTotal(commands.Cog):
                                 analysis_id = data.get("data", {}).get("id")
                                 if analysis_id:
                                     await self.check_results(ctx, analysis_id, ctx.author.id)
+                                    # Delete the attachment from the channel
+                                    await attachment.delete()
                                 else:
                                     raise ValueError("No analysis ID found in the response.")
                     else:
@@ -160,7 +162,7 @@ class VirusTotal(commands.Cog):
                             embed.title = "Suspicious file found"
                             embed.description = f"### {int(percent)}% of security vendors rated this file dangerous!\nWhile there are malicious ratings available for this file, there aren't many, so this could be a false positive. You should investigate further."
                             embed.color = discord.Colour(0xff9144)
-                            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Orange/alert-outline.png")
+                            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Orange/alert-circle-outline.png")
                         else:
                             embed.title = "No threat found"
                             embed.color = discord.Colour(0x2BBD8E)
