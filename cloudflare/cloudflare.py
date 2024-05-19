@@ -711,5 +711,85 @@ class Cloudflare(commands.Cog):
             else:
                 await ctx.send(f"Failed to query Cloudflare API. Status code: {response.status}")
 
+    @commands.is_owner()
+    @commands.group()
+    async def emailrouting(self, ctx):
+        """Manage Cloudflare Email Routing"""
+        if ctx.invoked_subcommand is None:
+            await ctx.send("Invalid Cloudflare command passed.")
+            
+    @emailrouting.command(name="list")
+    async def list_email_routing_addresses(self, ctx):
+        """List Email Routing addresses"""
+        api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
+        email = api_tokens.get("email")
+        api_key = api_tokens.get("api_key")
+        bearer_token = api_tokens.get("bearer_token")
+        account_id = api_tokens.get("account_id")
+
+        if not all([email, api_key, bearer_token, account_id]):
+            await ctx.send("Missing one or more required API tokens. Please check your configuration.")
+            return
+
+        headers = {
+            "X-Auth-Email": email,
+            "X-Auth-Key": api_key,
+            "Authorization": f"Bearer {bearer_token}",
+            "Content-Type": "application/json"
+        }
+
+        async with self.session.get(f"https://api.cloudflare.com/client/v4/accounts/{account_id}/email/routing/addresses", headers=headers) as response:
+            if response.status != 200:
+                await ctx.send(f"Failed to fetch Email Routing addresses: {response.status}")
+                return
+
+            data = await response.json()
+            if not data.get("success", False):
+                await ctx.send("Failed to fetch Email Routing addresses.")
+                return
+
+            addresses = data.get("result", [])
+            if not addresses:
+                await ctx.send("No Email Routing addresses found.")
+                return
+
+            pages = [addresses[i:i + 10] for i in range(0, len(addresses), 10)]
+            current_page = 0
+
+            embed = discord.Embed(title="Email Routing Addresses", description="\n".join([f"**`{addr['email']}`**" for addr in pages[current_page]]), color=discord.Color.blue())
+            message = await ctx.send(embed=embed)
+
+            if len(pages) > 1:
+                await message.add_reaction("◀️")
+                await message.add_reaction("❌")
+                await message.add_reaction("▶️")
+
+                def check(reaction, user):
+                    return user == ctx.author and str(reaction.emoji) in ["◀️", "❌", "▶️"] and reaction.message.id == message.id
+
+                while True:
+                    try:
+                        reaction, user = await self.bot.wait_for("reaction_add", timeout=30.0, check=check)
+
+                        if str(reaction.emoji) == "▶️" and current_page < len(pages) - 1:
+                            current_page += 1
+                            embed.description = "\n".join([f"**`{addr['email']}`**" for addr in pages[current_page]])
+                            await message.edit(embed=embed)
+                            await message.remove_reaction(reaction, user)
+
+                        elif str(reaction.emoji) == "◀️" and current_page > 0:
+                            current_page -= 1
+                            embed.description = "\n".join([f"**`{addr['email']}`**" for addr in pages[current_page]])
+                            await message.edit(embed=embed)
+                            await message.remove_reaction(reaction, user)
+
+                        elif str(reaction.emoji) == "❌":
+                            await message.delete()
+                            break
+
+                    except asyncio.TimeoutError:
+                        await message.clear_reactions()
+                        break
+
     def cog_unload(self):
         self.bot.loop.create_task(self.session.close())
