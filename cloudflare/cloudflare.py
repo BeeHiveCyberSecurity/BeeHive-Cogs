@@ -116,7 +116,7 @@ class Cloudflare(commands.Cog):
                     except asyncio.TimeoutError:
                         break
 
-    @commands.command(name="whois")
+    @cloudflare.command(name="whois")
     async def whois(self, ctx, domain: str):
         """
         Query WHOIS information for a given domain.
