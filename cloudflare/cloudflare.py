@@ -497,13 +497,13 @@ class Cloudflare(commands.Cog):
                 if data["success"]:
                     result = data["result"]
                     embed = discord.Embed(title="Domain Intelligence", description=f"Information for {domain}")
-                    embed.add_field(name="Domain", value=result["domain"], inline=False)
-                    embed.add_field(name="Risk Score", value=result["risk_score"], inline=False)
-                    embed.add_field(name="Popularity Rank", value=result["popularity_rank"], inline=False)
-                    embed.add_field(name="Application", value=result["application"]["name"], inline=False)
-                    embed.add_field(name="Suspected Malware Family", value=result["additional_information"]["suspected_malware_family"], inline=False)
-                    embed.add_field(name="Content Categories", value=", ".join([cat["name"] for cat in result["content_categories"]]), inline=False)
-                    embed.add_field(name="Resolves To", value=", ".join([ref["value"] for ref in result["resolves_to_refs"]]), inline=False)
+                    embed.add_field(name="Domain", value=result.get("domain", "N/A"), inline=False)
+                    embed.add_field(name="Risk Score", value=result.get("risk_score", "N/A"), inline=False)
+                    embed.add_field(name="Popularity Rank", value=result.get("popularity_rank", "N/A"), inline=False)
+                    embed.add_field(name="Application", value=result.get("application", {}).get("name", "N/A"), inline=False)
+                    embed.add_field(name="Suspected Malware Family", value=result.get("additional_information", {}).get("suspected_malware_family", "N/A"), inline=False)
+                    embed.add_field(name="Content Categories", value=", ".join([cat["name"] for cat in result.get("content_categories", [])]), inline=False)
+                    embed.add_field(name="Resolves To", value=", ".join([ref["value"] for ref in result.get("resolves_to_refs", [])]), inline=False)
                     await ctx.send(embed=embed)
                 else:
                     await ctx.send(f"Error: {data['errors']}")
