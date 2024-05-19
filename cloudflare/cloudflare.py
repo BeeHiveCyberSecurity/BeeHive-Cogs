@@ -18,7 +18,8 @@ class Cloudflare(commands.Cog):
     @commands.group()
     async def cloudflare(self, ctx):
         """Cloudflare command group."""
-        pass
+        if ctx.invoked_subcommand is None:
+            await ctx.send("Invalid Cloudflare command passed.")
 
     @cloudflare.command()
     async def setapikey(self, ctx, api_key: str):
