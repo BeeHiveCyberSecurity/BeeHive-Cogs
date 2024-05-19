@@ -858,12 +858,22 @@ class Cloudflare(commands.Cog):
 
         async with self.session.get(url, headers=headers) as response:
             if response.status != 200:
-                await ctx.send(f"Failed to fetch email routing addresses. Status code: {response.status}")
+                embed = discord.Embed(
+                    title="Error",
+                    description=f"Failed to fetch email routing addresses. Status code: {response.status}",
+                    color=discord.Color.red()
+                )
+                await ctx.send(embed=embed)
                 return
 
             data = await response.json()
             if not data.get("success", False):
-                await ctx.send("Failed to fetch email routing addresses.")
+                embed = discord.Embed(
+                    title="Error",
+                    description="Failed to fetch email routing addresses.",
+                    color=discord.Color.red()
+                )
+                await ctx.send(embed=embed)
                 return
 
             addresses = data.get("result", [])
@@ -874,7 +884,12 @@ class Cloudflare(commands.Cog):
                     break
 
             if not address_id:
-                await ctx.send(f"No email routing address found for {email}.")
+                embed = discord.Embed(
+                    title="Error",
+                    description=f"No email routing address found for **`{email}`**.",
+                    color=discord.Color.red()
+                )
+                await ctx.send(embed=embed)
                 return
 
         # Ask for confirmation
