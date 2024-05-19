@@ -484,8 +484,8 @@ class Cloudflare(commands.Cog):
         headers = {
             "Authorization": f"Bearer {bearer_token}",
             "X-Auth-Email": email,
-            "X-Auth-Key": api_key
-            "Content-Type": "application/json"
+            "X-Auth-Key": api_key,
+            "Content-Type": "application/json",
         }
         params = {
             "domain": domain
