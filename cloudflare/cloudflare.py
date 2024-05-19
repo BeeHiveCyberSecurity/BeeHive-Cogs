@@ -181,13 +181,23 @@ class Cloudflare(commands.Cog):
             if "billing_street" in whois_info:
                 page.add_field(name="Billing Street", value=whois_info["billing_street"], inline=False)
             if "created_date" in whois_info:
-                page.add_field(name="Created Date", value=whois_info["created_date"], inline=False)
-            if "dnssec" in whois_info:
+                if "created_date" in whois_info:
+                    created_date = whois_info["created_date"]
+                    if isinstance(created_date, str):
+                        created_date = datetime.strptime(created_date, "%Y-%m-%dT%H:%M:%S")
+                    unix_timestamp = int(created_date.timestamp())
+                    discord_timestamp = f"<t:{unix_timestamp}:F>"
+                    page.add_field(name="Created Date", value=discord_timestamp, inline=False)
                 page.add_field(name="DNSSEC", value=whois_info["dnssec"], inline=False)
             if "domain" in whois_info:
                 page.add_field(name="Domain", value=whois_info["domain"], inline=False)
             if "expiration_date" in whois_info:
-                page.add_field(name="Expiration Date", value=whois_info["expiration_date"], inline=False)
+                expiration_date = whois_info["expiration_date"]
+                if isinstance(expiration_date, str):
+                    expiration_date = datetime.strptime(expiration_date, "%Y-%m-%dT%H:%M:%S")
+                unix_timestamp = int(expiration_date.timestamp())
+                discord_timestamp = f"<t:{unix_timestamp}:F>"
+                page.add_field(name="Expiration Date", value=discord_timestamp, inline=False)
             if "extension" in whois_info:
                 page.add_field(name="Extension", value=whois_info["extension"], inline=False)
             if "found" in whois_info:
