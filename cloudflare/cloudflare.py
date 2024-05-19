@@ -956,6 +956,7 @@ class Cloudflare(commands.Cog):
         api_key = api_tokens.get("api_key")
         bearer_token = api_tokens.get("bearer_token")
         account_id = api_tokens.get("account_id")
+        zone_identifier = api_tokens.get("zone_id")
 
         if not all([email, api_key, bearer_token, account_id]):
             await ctx.send("Missing one or more required API tokens. Please check your configuration.")
