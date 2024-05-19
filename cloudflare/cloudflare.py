@@ -711,13 +711,13 @@ class Cloudflare(commands.Cog):
             else:
                 await ctx.send(f"Failed to query Cloudflare API. Status code: {response.status}")
 
-    @commands.is_owner()
     @commands.group()
     async def emailrouting(self, ctx):
         """Manage Cloudflare Email Routing"""
         if ctx.invoked_subcommand is None:
             await ctx.send("Invalid Cloudflare command passed.")
-            
+
+    @commands.is_owner()
     @emailrouting.command(name="list")
     async def list_email_routing_addresses(self, ctx):
         """List Email Routing addresses"""
@@ -791,6 +791,7 @@ class Cloudflare(commands.Cog):
                         await message.clear_reactions()
                         break
 
+    @commands.is_owner()
     @emailrouting.command(name="create")
     async def create_email_routing_address(self, ctx, email: str):
         """Create a new email routing destination address."""
@@ -831,6 +832,6 @@ class Cloudflare(commands.Cog):
                     await ctx.send(f"Error: {data['errors']}")
             else:
                 await ctx.send(f"Failed to create email routing address. Status code: {response.status}")
-                
+
     def cog_unload(self):
         self.bot.loop.create_task(self.session.close())
