@@ -997,6 +997,7 @@ class Cloudflare(commands.Cog):
             embed.add_field(name="Name", value=f"`{settings.get('name', 'N/A')}`", inline=False)
             embed.add_field(name="Skipped wizard", value=f"`{settings.get('skip_wizard', 'N/A')}`", inline=False)
             embed.add_field(name="Status", value=f"`{settings.get('status', 'N/A')}`", inline=False)
+            embed.add_field(name="Synced", value=f"`{settings.get('synced', 'N/A')}`", inline=False)
             embed.add_field(name="Tag", value=f"`{settings.get('tag', 'N/A')}`", inline=False)
 
             await ctx.send(embed=embed)
