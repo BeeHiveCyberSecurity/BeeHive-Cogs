@@ -993,7 +993,7 @@ class Cloudflare(commands.Cog):
             )
             created_timestamp = settings.get('created', 'N/A')
             if created_timestamp != 'N/A':
-                created_timestamp = f"<t:{int(datetime.datetime.fromisoformat(created_timestamp).timestamp())}:F>"
+                created_timestamp = f"<t:{int(datetime.fromisoformat(created_timestamp).timestamp())}:F>"
             embed.add_field(name="Created", value=f"**{created_timestamp}**", inline=False)
             embed.add_field(name="Enabled", value=f"**`{settings.get('enabled', 'N/A')}`**", inline=False)
             embed.add_field(name="ID", value=f"**`{settings.get('id', 'N/A').upper()}`**", inline=False)
