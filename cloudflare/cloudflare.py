@@ -1,6 +1,6 @@
 import discord
 import asyncio
-import datetime
+from datetime import datetime
 from redbot.core import commands, Config
 import aiohttp
 
@@ -182,13 +182,14 @@ class Cloudflare(commands.Cog):
             if "billing_street" in whois_info:
                 page.add_field(name="Billing Street", value=whois_info["billing_street"], inline=False)
             if "created_date" in whois_info:
-                if "created_date" in whois_info:
-                    created_date = whois_info["created_date"]
-                    if isinstance(created_date, str):
-                        created_date = datetime.strptime(created_date, "%Y-%m-%dT%H:%M:%S")
-                    unix_timestamp = int(created_date.timestamp())
-                    discord_timestamp = f"<t:{unix_timestamp}:F>"
-                    page.add_field(name="Created Date", value=discord_timestamp, inline=False)
+                created_date = whois_info["created_date"]
+                if isinstance(created_date, str):
+                    from datetime import datetime
+                    created_date = datetime.strptime(created_date, "%Y-%m-%dT%H:%M:%S")
+                unix_timestamp = int(created_date.timestamp())
+                discord_timestamp = f"<t:{unix_timestamp}:F>"
+                page.add_field(name="Created Date", value=discord_timestamp, inline=False)
+            if "dnssec" in whois_info:
                 page.add_field(name="DNSSEC", value=whois_info["dnssec"], inline=False)
             if "domain" in whois_info:
                 page.add_field(name="Domain", value=whois_info["domain"], inline=False)
