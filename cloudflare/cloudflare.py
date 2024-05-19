@@ -995,10 +995,10 @@ class Cloudflare(commands.Cog):
             embed.add_field(name="ID", value=f"**`{settings.get('id', 'N/A').upper()}`**", inline=False)
             embed.add_field(name="Modified", value=f"**`{settings.get('modified', 'N/A')}`**", inline=False)
             embed.add_field(name="Name", value=f"**`{settings.get('name', 'N/A')}`**", inline=False)
-            embed.add_field(name="Skipped wizard", value=f"**`{settings.get('skip_wizard', 'N/A').upper()}`**", inline=False)
-            embed.add_field(name="Status", value=f"**`{settings.get('status', 'N/A').upper()}`**", inline=False)
-            embed.add_field(name="Synced", value=f"**`{settings.get('synced', 'N/A').upper()}`**", inline=False)
-            embed.add_field(name="Tag", value=f"**`{settings.get('tag', 'N/A').upper()}`**", inline=False)
+            embed.add_field(name="Skipped wizard", value=f"**`{str(settings.get('skip_wizard', 'N/A')).upper()}`**", inline=False)
+            embed.add_field(name="Status", value=f"**`{str(settings.get('status', 'N/A')).upper()}`**", inline=False)
+            embed.add_field(name="Synced", value=f"**`{str(settings.get('synced', 'N/A')).upper()}`**", inline=False)
+            embed.add_field(name="Tag", value=f"**`{str(settings.get('tag', 'N/A')).upper()}`**", inline=False)
 
             await ctx.send(embed=embed)
     def cog_unload(self):
