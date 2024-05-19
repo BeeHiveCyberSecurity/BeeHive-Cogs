@@ -520,7 +520,7 @@ class Cloudflare(commands.Cog):
                 await ctx.send(f"Failed to query Cloudflare API. Status code: {response.status}")
 
     @tools.command(name="ipintel")
-    async def query_ip(self, ctx, ip: str):
+    async def query_ip(self, ctx, ipv4: str = None, ipv6: str = None):
         """Query Cloudflare API for IP intelligence."""
         api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
         email = api_tokens.get("email")
@@ -534,9 +534,11 @@ class Cloudflare(commands.Cog):
             "X-Auth-Key": api_key,
             "Content-Type": "application/json",
         }
-        params = {
-            "ip": ip
-        }
+        params = {}
+        if ipv4:
+            params["ipv4"] = ipv4
+        if ipv6:
+            params["ipv6"] = ipv6
 
         async with self.session.get(url, headers=headers, params=params) as response:
             if response.status == 200:
@@ -562,6 +564,8 @@ class Cloudflare(commands.Cog):
                     await ctx.send(embed=embed)
                 else:
                     await ctx.send(f"Error: {data['errors']}")
+            elif response.status == 400:
+                await ctx.send("Bad Request: The server could not understand the request due to invalid syntax.")
             else:
                 await ctx.send(f"Failed to query Cloudflare API. Status code: {response.status}")
 
