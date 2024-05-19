@@ -225,11 +225,13 @@ class Cloudflare(commands.Cog):
             pages = []
             page = discord.Embed(title=f"WHOIS Information for {domain}", color=discord.Color.blue())
             for name, value in fields:
-                if len(page.fields) == 25:
-                    pages.append(page)
-                    page = discord.Embed(title=f"WHOIS Information for {domain}", color=discord.Color.blue())
-                page.add_field(name=name, value=value, inline=False)
-            pages.append(page)
+                if value != "N/A":
+                    if len(page.fields) == 15:
+                        pages.append(page)
+                        page = discord.Embed(title=f"WHOIS Information for {domain}", color=discord.Color.blue())
+                    page.add_field(name=name, value=value, inline=False)
+            if page.fields:
+                pages.append(page)
 
             message = await ctx.send(embed=pages[0])
 
