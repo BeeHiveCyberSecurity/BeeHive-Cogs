@@ -237,13 +237,17 @@ class Cloudflare(commands.Cog):
             if "registrant" in whois_info:
                 page = add_field_to_page(page, "Registrant", whois_info["registrant"])
             if "registrant_city" in whois_info:
-                page = add_field_to_page(page, "Registrant City", whois_info["registrant_city"])
+                registrant_city = f"**`{whois_info['registrant_city']}`**"
+                page = add_field_to_page(page, "Registrant City", registrant_city)
             if "registrant_country" in whois_info:
-                page = add_field_to_page(page, "Registrant Country", whois_info["registrant_country"])
+                registrant_country = f"**`{whois_info['registrant_country']}`**"
+                page = add_field_to_page(page, "Registrant Country", registrant_country)
             if "registrant_email" in whois_info:
-                page = add_field_to_page(page, "Registrant Email", whois_info["registrant_email"])
+                registrant_email = f"**`{whois_info['registrant_email']}`**"
+                page = add_field_to_page(page, "Registrant Email", registrant_email)
             if "registrant_fax" in whois_info:
-                page = add_field_to_page(page, "Registrant Fax", whois_info["registrant_fax"])
+                registrant_fax = f"**`{whois_info['registrant_fax']}`**"
+                page = add_field_to_page(page, "Registrant Fax", registrant_fax)
             if "registrant_fax_ext" in whois_info:
                 page = add_field_to_page(page, "Registrant Fax Ext", whois_info["registrant_fax_ext"])
             if "registrant_id" in whois_info:
