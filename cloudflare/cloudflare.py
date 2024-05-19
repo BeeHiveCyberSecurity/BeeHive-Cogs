@@ -988,7 +988,7 @@ class Cloudflare(commands.Cog):
 
             embed = discord.Embed(
                 title="Email Routing Settings",
-                description=f"Settings for zone: **`{zone_identifier}`**\n*Change your zone using `[p]set api cloudflare zone_id`*",
+                description=f"Settings for zone: **`{zone_identifier.upper()}`**\n*Change your zone using `[p]set api cloudflare zone_id`*",
                 color=discord.Color.blue()
             )
             embed.add_field(name="Created", value=f"**`{settings.get('created', 'N/A')}`**", inline=False)
