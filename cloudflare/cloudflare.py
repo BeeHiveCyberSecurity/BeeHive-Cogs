@@ -880,7 +880,7 @@ class Cloudflare(commands.Cog):
         # Ask for confirmation
         embed = discord.Embed(
             title="Confirm destructive action",
-            description=f"Are you sure you want to remove the email routing address: {email}?",
+            description=f"**Are you sure you want to remove this email routing address**\n**`{email}`**",
             color=discord.Color.red()
         )
         embed.set_footer(text="React to confirm or cancel this request")
