@@ -29,21 +29,24 @@ class Cloudflare(commands.Cog):
     async def setapikey(self, ctx, api_key: str):
         """Set the Cloudflare API key."""
         await self.config.api_key.set(api_key)
-        await ctx.send("Cloudflare API key set.")
+        obfuscated_api_key = api_key[:4] + "****" + api_key[-4:]
+        await ctx.send(f"Cloudflare API key set: {obfuscated_api_key}")
 
     @commands.is_owner()
     @cloudflare.command()
     async def setemail(self, ctx, email: str):
         """Set the Cloudflare account email."""
         await self.config.email.set(email)
-        await ctx.send("Cloudflare email set.")
+        obfuscated_email = email[:2] + "****" + email.split("@")[-1]
+        await ctx.send(f"Cloudflare email set: {obfuscated_email}")
 
     @commands.is_owner()
     @cloudflare.command()
     async def setbearer(self, ctx, bearer_token: str):
         """Set the Cloudflare Bearer token."""
         await self.config.api_key.set(bearer_token)
-        await ctx.send("Cloudflare Bearer token set.")
+        obfuscated_bearer_token = bearer_token[:4] + "****" + bearer_token[-4:]
+        await ctx.send(f"Cloudflare Bearer token set: {obfuscated_bearer_token}")
 
     @commands.is_owner()
     @cloudflare.command()
