@@ -473,7 +473,7 @@ class Cloudflare(commands.Cog):
                         break
 
     @tools.command(name="domainintel")
-    async def query_domain(self, ctx, account_id: str, domain: str):
+    async def query_domain(self, ctx, domain: str):
         """Query Cloudflare API for domain intelligence."""
         api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
         email = api_tokens.get("email")
