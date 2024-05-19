@@ -1281,7 +1281,7 @@ class Cloudflare(commands.Cog):
             embeds = []
             for rule in rules:
                 actions = ", ".join([action["type"] for action in rule["actions"]])
-                destinations = ", ".join([value if isinstance(value, str) else str(value) for action in rule["actions"] for value in action.get("value", [])])
+                destinations = ", ".join([value if isinstance(value, str) else str(value) for action in rule["actions"] for value in (action.get("value", []) if isinstance(action.get("value", []), list) else [action.get("value", [])])])
                 matchers = ", ".join([f"{matcher.get('field', 'unknown')}: {matcher.get('value', 'unknown')}" for matcher in rule["matchers"]])
                 embed = discord.Embed(title="Email Routing Rules", color=discord.Color.from_rgb(255, 128, 0))
                 embed.add_field(
