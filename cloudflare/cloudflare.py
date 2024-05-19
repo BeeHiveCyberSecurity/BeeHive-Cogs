@@ -150,8 +150,6 @@ class Cloudflare(commands.Cog):
                 page.add_field(name="Administrative Postal Code", value=whois_info["administrative_postal_code"], inline=False)
             if "administrative_province" in whois_info:
                 page.add_field(name="Administrative Province", value=whois_info["administrative_province"], inline=False)
-            if "administrative_referral_url" in whois_info:
-                page.add_field(name="Administrative Referral URL", value=whois_info["administrative_referral_url"], inline=False)
             if "administrative_street" in whois_info:
                 page.add_field(name="Administrative Street", value=whois_info["administrative_street"], inline=False)
             if "billing_city" in whois_info:
@@ -178,8 +176,6 @@ class Cloudflare(commands.Cog):
                 page.add_field(name="Billing Postal Code", value=whois_info["billing_postal_code"], inline=False)
             if "billing_province" in whois_info:
                 page.add_field(name="Billing Province", value=whois_info["billing_province"], inline=False)
-            if "billing_referral_url" in whois_info:
-                page.add_field(name="Billing Referral URL", value=whois_info["billing_referral_url"], inline=False)
             if "billing_street" in whois_info:
                 page.add_field(name="Billing Street", value=whois_info["billing_street"], inline=False)
             if "created_date" in whois_info:
@@ -243,8 +239,6 @@ class Cloudflare(commands.Cog):
                 page.add_field(name="Registrant Postal Code", value=whois_info["registrant_postal_code"], inline=False)
             if "registrant_province" in whois_info:
                 page.add_field(name="Registrant Province", value=whois_info["registrant_province"], inline=False)
-            if "registrant_referral_url" in whois_info:
-                page.add_field(name="Registrant Referral URL", value=whois_info["registrant_referral_url"], inline=False)
             if "registrant_street" in whois_info:
                 page.add_field(name="Registrant Street", value=whois_info["registrant_street"], inline=False)
             if "registrar" in whois_info:
@@ -273,8 +267,6 @@ class Cloudflare(commands.Cog):
                 page.add_field(name="Registrar Postal Code", value=whois_info["registrar_postal_code"], inline=False)
             if "registrar_province" in whois_info:
                 page.add_field(name="Registrar Province", value=whois_info["registrar_province"], inline=False)
-            if "registrar_referral_url" in whois_info:
-                page.add_field(name="Registrar Referral URL", value=whois_info["registrar_referral_url"], inline=False)
             if "registrar_street" in whois_info:
                 page.add_field(name="Registrar Street", value=whois_info["registrar_street"], inline=False)
             if "status" in whois_info:
@@ -303,8 +295,6 @@ class Cloudflare(commands.Cog):
                 page.add_field(name="Technical Postal Code", value=whois_info["technical_postal_code"], inline=False)
             if "technical_province" in whois_info:
                 page.add_field(name="Technical Province", value=whois_info["technical_province"], inline=False)
-            if "technical_referral_url" in whois_info:
-                page.add_field(name="Technical Referral URL", value=whois_info["technical_referral_url"], inline=False)
             if "technical_street" in whois_info:
                 page.add_field(name="Technical Street", value=whois_info["technical_street"], inline=False)
             if "updated_date" in whois_info:
@@ -315,7 +305,13 @@ class Cloudflare(commands.Cog):
             if page.fields:
                 pages.append(page)
 
-            message = await ctx.send(embed=pages[0])
+            # Create a view with a button
+            view = discord.ui.View()
+            if "administrative_referral_url" in whois_info:
+                button = discord.ui.Button(label="Administrative Referral URL", url=whois_info["administrative_referral_url"])
+                view.add_item(button)
+
+            message = await ctx.send(embed=pages[0], view=view)
 
             current_page = 0
             if len(pages) > 1:
