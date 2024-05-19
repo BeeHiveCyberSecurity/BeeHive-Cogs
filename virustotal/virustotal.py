@@ -155,18 +155,18 @@ class VirusTotal(commands.Cog):
                         bar_chart_file = discord.File(bar_chart_buffer, filename='bar_chart.png')
                         if malicious_count >= 11:
                             embed.title = "Malicious file found"
-                            embed.description = f"### {int(percent)}% of security vendors rated this file dangerous!\nYou should avoid this file completely, and delete it from your systems to ensure security."
+                            embed.description = f"# {int(percent)}% of security vendors rated this file dangerous!\nYou should avoid this file completely, and delete it from your systems to ensure security."
                             embed.color = discord.Colour(0xff4545)
                             embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/warning-outline.png")
                         elif 1 < malicious_count < 11:
                             embed.title = "Suspicious file found"
-                            embed.description = f"### {int(percent)}% of security vendors rated this file dangerous!\nWhile there are malicious ratings available for this file, there aren't many, so this could be a false positive. You should investigate further."
+                            embed.description = f"# {int(percent)}% of security vendors rated this file dangerous!\nWhile there are malicious ratings available for this file, there aren't many, so this could be a false positive. You should investigate further."
                             embed.color = discord.Colour(0xff9144)
                             embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Orange/alert-circle-outline.png")
                         else:
                             embed.title = "No threat found"
                             embed.color = discord.Colour(0x2BBD8E)
-                            embed.description = "### No security vendors currently flag this file as malicious - it should be safe to use."
+                            embed.description = "# No security vendors currently flag this file as malicious\nYou should be safe to run and use it. Check back on the results later to see if vendors change their minds - it happens"
                             embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/checkmark-circle-outline.png")
 
                         embed.add_field(name="SHA-256", value=f"`{sha256}`", inline=False)
