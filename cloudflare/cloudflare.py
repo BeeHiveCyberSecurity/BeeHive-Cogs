@@ -949,7 +949,7 @@ class Cloudflare(commands.Cog):
 
     @commands.is_owner()
     @emailrouting.command(name="settings")
-    async def get_email_routing_settings(self, ctx, zone_identifier: str):
+    async def get_email_routing_settings(self, ctx):
         """Get and display the current Email Routing settings for a specific zone"""
         api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
         email = api_tokens.get("email")
@@ -958,7 +958,7 @@ class Cloudflare(commands.Cog):
         account_id = api_tokens.get("account_id")
         zone_identifier = api_tokens.get("zone_id")
 
-        if not all([email, api_key, bearer_token, account_id]):
+        if not all([email, api_key, bearer_token, account_id, zone_identifier]):
             await ctx.send("Missing one or more required API tokens. Please check your configuration.")
             return
 
