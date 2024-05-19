@@ -1076,7 +1076,52 @@ class Cloudflare(commands.Cog):
 
             await ctx.send(f"Email Routing has been successfully disabled for zone `{zone_identifier.upper()}`.")
     
-    
+    @commands.is_owner()
+    @emailrouting.command(name="reqrecords")
+    async def get_email_routing_dns_records(self, ctx):
+        """Get the required DNS records to setup Email Routing"""
+        api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
+        email = api_tokens.get("email")
+        api_key = api_tokens.get("api_key")
+        bearer_token = api_tokens.get("bearer_token")
+        zone_identifier = api_tokens.get("zone_id")
+
+        if not all([email, api_key, bearer_token, zone_identifier]):
+            await ctx.send("Missing one or more required API tokens. Please check your configuration.")
+            return
+
+        headers = {
+            "X-Auth-Email": email,
+            "X-Auth-Key": api_key,
+            "Authorization": f"Bearer {bearer_token}",
+            "Content-Type": "application/json"
+        }
+
+        url = f"https://api.cloudflare.com/client/v4/zones/{zone_identifier}/email/routing/dns"
+        async with self.session.get(url, headers=headers) as response:
+            if response.status != 200:
+                await ctx.send(f"Failed to fetch DNS records for Email Routing: {response.status}")
+                return
+
+            data = await response.json()
+            if not data.get("success", False):
+                await ctx.send("Failed to fetch DNS records for Email Routing.")
+                return
+
+            records = data.get("result", [])
+            if not records:
+                await ctx.send("No DNS records found for Email Routing.")
+                return
+
+            embed = discord.Embed(title="Email Routing DNS Records", color=discord.Color.from_rgb(255, 128, 0))
+            for record in records:
+                embed.add_field(
+                    name=f"{record['type']} Record",
+                    value=f"**Name:** {record['name']}\n**Content:** {record['content']}\n**Priority:** {record.get('priority', 'N/A')}\n**TTL:** {record['ttl']}",
+                    inline=False
+                )
+
+            await ctx.send(embed=embed)
     
     
     
