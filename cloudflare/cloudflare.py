@@ -733,8 +733,8 @@ class Cloudflare(commands.Cog):
         url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/diagnostics/traceroute"
         headers = {
             "Authorization": f"Bearer {bearer_token}",
-            "X-Auth-Email": email
-            "X-Auth-Key": api_key
+            "X-Auth-Email": email,
+            "X-Auth-Key": api_key,
             "Content-Type": "application/json"
         }
         payload = {
