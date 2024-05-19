@@ -198,11 +198,17 @@ class Cloudflare(commands.Cog):
                     except ValueError:
                         created_date = datetime.strptime(created_date, "%Y-%m-%dT%H:%M:%S")
                 unix_timestamp = int(created_date.timestamp())
-                discord_timestamp = f"<t:{unix_timestamp}:F>"
+                discord_timestamp = f"**<t:{unix_timestamp}:F>**"
                 page = add_field_to_page(page, "Created Date", discord_timestamp)
             if "dnssec" in whois_info:
-                page = add_field_to_page(page, "DNSSEC", whois_info["dnssec"])
-            if "domain" in whois_info:
+                if "dnssec" in whois_info:
+                    dnssec_value = whois_info["dnssec"]
+                    dnssec_value = f"**`{dnssec_value}`**"
+                    page = add_field_to_page(page, "DNSSEC", dnssec_value)
+                if "domain" in whois_info:
+                    domain_value = whois_info["domain"]
+                    domain_value = f"**`{domain_value}`**"
+                    page = add_field_to_page(page, "Domain", domain_value)
                 page = add_field_to_page(page, "Domain", whois_info["domain"])
             if "expiration_date" in whois_info:
                 expiration_date = whois_info["expiration_date"]
