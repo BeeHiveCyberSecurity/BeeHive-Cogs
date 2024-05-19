@@ -1,9 +1,9 @@
-import discord
+import discord #type: ignore
 import asyncio
 import time
 from datetime import datetime
-from redbot.core import commands, Config
-import aiohttp
+from redbot.core import commands, Config #type: ignore
+import aiohttp #type: ignore
 
 class Cloudflare(commands.Cog):
     """A Red-Discordbot cog to interact with the Cloudflare API."""
@@ -21,10 +21,10 @@ class Cloudflare(commands.Cog):
         self.session = aiohttp.ClientSession()
 
     @commands.group()
-    async def tools(self, ctx)
-         """Different utility tools provided by Cloudflare."""
-    if ctx.invoked_subcommand is None:
-        await ctx.send("Invalid Cloudflare command passed.")
+    async def tools(self, ctx):
+        """Different utility tools provided by Cloudflare."""
+        if ctx.invoked_subcommand is None:
+            await ctx.send("Invalid Cloudflare command passed.")
         
     @commands.group()
     async def cloudflare(self, ctx):
