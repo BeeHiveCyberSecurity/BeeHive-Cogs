@@ -117,7 +117,7 @@ class VirusTotal(commands.Cog):
                         colors = ['#ff4545', '#ff9144', '#444444', '#2BBD8E', '#ffcccb', '#666666']
 
                         plt.figure(figsize=(8, 6))
-                        ax = plt.subplot(111, facecolor='#2e2e2e')
+                        ax = plt.subplot(111, facecolor='#323338')
                         ax.bar(labels, sizes, color=colors)
 
                         # Add some text for labels, title and custom x-axis tick labels, etc.
@@ -138,11 +138,11 @@ class VirusTotal(commands.Cog):
                                         color='white')
 
                         # Set the background color of the figure
-                        plt.gcf().set_facecolor('#2e2e2e')
+                        plt.gcf().set_facecolor('#323338')
 
                         # Save the bar chart as a PNG image in memory.
                         bar_chart_buffer = io.BytesIO()
-                        plt.savefig(bar_chart_buffer, format='png', facecolor='#2e2e2e')
+                        plt.savefig(bar_chart_buffer, format='png', facecolor='#323338')
                         bar_chart_buffer.seek(0)  # rewind the buffer to the beginning so we can read its content
 
                         # Set the bar chart image as the embed image
