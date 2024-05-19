@@ -114,20 +114,17 @@ class VirusTotal(commands.Cog):
                         content = f"||<@{presid}>||"
                         labels = ['Malicious', 'Suspicious', 'No Verdict', 'Harmless', 'Failed', 'Unsupported']
                         sizes = [malicious_count, suspicious_count, undetected_count, harmless_count, failure_count, unsupported_count]
-                        colors = ['#ff4545', '#ff9144', '#dddddd', '#2BBD8E', '#ffcccb', '#ececec']
+                        colors = ['#ff4545', '#ff9144', '#444444', '#2BBD8E', '#ffcccb', '#666666']
 
-                        # Create a bar chart instead of a spider graph
                         plt.figure(figsize=(8, 6))
-                        ax = plt.subplot(111)
-
-                        # Create the bar chart
+                        ax = plt.subplot(111, facecolor='#2e2e2e')
                         ax.bar(labels, sizes, color=colors)
 
                         # Add some text for labels, title and custom x-axis tick labels, etc.
-                        ax.set_ylabel('Verdicts')
-                        ax.set_title('Vendor ratings summary')
-                        ax.set_xticks(labels)
-                        ax.set_xticklabels(labels)
+                        ax.set_ylabel('Verdicts', color='white')
+                        ax.set_title('Vendor ratings summary', color='white')
+                        ax.set_xticks(range(len(labels)))
+                        ax.set_xticklabels(labels, color='white')
                         ax.legend()
 
                         # Attach a text label above each bar in *rects*, displaying its height.
@@ -137,11 +134,15 @@ class VirusTotal(commands.Cog):
                                         xy=(rect.get_x() + rect.get_width() / 2, height),
                                         xytext=(0, 3),  # 3 points vertical offset
                                         textcoords="offset points",
-                                        ha='center', va='bottom')
+                                        ha='center', va='bottom',
+                                        color='white')
+
+                        # Set the background color of the figure
+                        plt.gcf().set_facecolor('#2e2e2e')
 
                         # Save the bar chart as a PNG image in memory.
                         bar_chart_buffer = io.BytesIO()
-                        plt.savefig(bar_chart_buffer, format='png')
+                        plt.savefig(bar_chart_buffer, format='png', facecolor='#2e2e2e')
                         bar_chart_buffer.seek(0)  # rewind the buffer to the beginning so we can read its content
 
                         # Set the bar chart image as the embed image
