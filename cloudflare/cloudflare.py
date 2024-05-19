@@ -711,5 +711,67 @@ class Cloudflare(commands.Cog):
             else:
                 await ctx.send(f"Failed to query Cloudflare API. Status code: {response.status}")
 
+    @commands.command(name="traceroute")
+    async def traceroute(self, ctx, target: str):
+        """
+        Perform a traceroute using Cloudflare's API and fetch the response.
+        
+        :param ctx: The context of the command.
+        :param target: The target IP or hostname for the traceroute.
+        """
+        api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
+        account_id = api_tokens.get("account_id")
+        bearer_token = api_tokens.get("bearer_token")
+        email = api_tokens.get("email")
+        api_key = api_tokens.get("api_key")
+
+        # Check if any required token is missing
+        if not all([account_id, bearer_token]):
+            await ctx.send("Missing one or more required API tokens. Please check your configuration.")
+            return
+
+        url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/diagnostics/traceroute"
+        headers = {
+            "Authorization": f"Bearer {bearer_token}",
+            "X-Auth-Email": email
+            "X-Auth-Key": api_key
+            "Content-Type": "application/json"
+        }
+        payload = {
+            "target": target
+        }
+
+        async with self.session.post(url, headers=headers, json=payload) as response:
+            data = await response.json()
+
+            if response.status == 200:
+                if data.get("success"):
+                    embed = discord.Embed(title=f"Traceroute to {target}", color=0x00ff00)
+                    for result in data["result"]:
+                        for colo in result["colos"]:
+                            embed.add_field(name="Colo", value=f"{colo['colo']['city']} ({colo['colo']['name']})", inline=False)
+                            for hop in colo["hops"]:
+                                for node in hop["nodes"]:
+                                    embed.add_field(
+                                        name=f"Hop {hop['packets_ttl']}",
+                                        value=(
+                                            f"IP: {node['ip']}\n"
+                                            f"Name: {node['name']}\n"
+                                            f"ASN: {node['asn']}\n"
+                                            f"Min Latency: {node['min_latency_ms']} ms\n"
+                                            f"Mean Latency: {node['mean_latency_ms']} ms\n"
+                                            f"Max Latency: {node['max_latency_ms']} ms\n"
+                                            f"Std Dev Latency: {node['std_dev_latency_ms']} ms\n"
+                                            f"Packet Count: {node['packet_count']}"
+                                        ),
+                                        inline=False
+                                    )
+                    await ctx.send(embed=embed)
+                else:
+                    await ctx.send(f"Error: {data['errors']}")
+            elif response.status == 400:
+                await ctx.send("Bad Request: The server could not understand the request due to invalid syntax.")
+            else:
+                await ctx.send(f"Failed to perform traceroute. Status code: {response.status}")
     def cog_unload(self):
         self.bot.loop.create_task(self.session.close())
