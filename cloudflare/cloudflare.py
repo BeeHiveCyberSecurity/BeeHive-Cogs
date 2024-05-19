@@ -988,10 +988,13 @@ class Cloudflare(commands.Cog):
 
             embed = discord.Embed(
                 title="Email Routing Settings",
-                description=f"Settings for zone: **`{zone_identifier.upper()}`**\n*Change your zone using `[p]set api cloudflare zone_id`*",
+                description=f"Settings for zone: **`{zone_identifier.upper()}`**\n\n*Change your zone using `[p]set api cloudflare zone_id`*",
                 color=discord.Color.blue()
             )
-            embed.add_field(name="Created", value=f"**`{settings.get('created', 'N/A')}`**", inline=False)
+            created_timestamp = settings.get('created', 'N/A')
+            if created_timestamp != 'N/A':
+                created_timestamp = f"<t:{int(datetime.datetime.fromisoformat(created_timestamp).timestamp())}:F>"
+            embed.add_field(name="Created", value=f"**{created_timestamp}**", inline=False)
             embed.add_field(name="Enabled", value=f"**`{settings.get('enabled', 'N/A')}`**", inline=False)
             embed.add_field(name="ID", value=f"**`{settings.get('id', 'N/A').upper()}`**", inline=False)
             embed.add_field(name="Modified", value=f"**`{settings.get('modified', 'N/A')}`**", inline=False)
