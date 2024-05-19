@@ -1295,9 +1295,33 @@ class Cloudflare(commands.Cog):
             for embed in embeds:
                 paginator.add_line(embed.to_dict())
 
-            message = await ctx.send(embed=embeds[0])
-            for embed in embeds[1:]:
-                await ctx.send(embed=embed)
+            pages = [paginator.pages[i:i + 1] for i in range(0, len(paginator.pages), 1)]
+            current_page = 0
+
+            message = await ctx.send(embed=discord.Embed.from_dict(pages[current_page][0]))
+
+            if len(pages) > 1:
+                await message.add_reaction("◀️")
+                await message.add_reaction("▶️")
+
+                def check(reaction, user):
+                    return user == ctx.author and str(reaction.emoji) in ["◀️", "▶️"] and reaction.message.id == message.id
+
+                while True:
+                    try:
+                        reaction, user = await self.bot.wait_for("reaction_add", timeout=60.0, check=check)
+
+                        if str(reaction.emoji) == "▶️" and current_page < len(pages) - 1:
+                            current_page += 1
+                            await message.edit(embed=discord.Embed.from_dict(pages[current_page][0]))
+                        elif str(reaction.emoji) == "◀️" and current_page > 0:
+                            current_page -= 1
+                            await message.edit(embed=discord.Embed.from_dict(pages[current_page][0]))
+
+                        await message.remove_reaction(reaction, user)
+                    except asyncio.TimeoutError:
+                        break
+                await message.clear_reactions()
     
     
     
