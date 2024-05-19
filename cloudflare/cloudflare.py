@@ -1022,6 +1022,24 @@ class Cloudflare(commands.Cog):
             await ctx.send("Missing one or more required API tokens. Please check your configuration.")
             return
 
+        def check(m):
+            return m.author == ctx.author and m.channel == ctx.channel
+
+        await ctx.send(
+            "Enabling Email Routing will allow Cloudflare to proxy your emails for the selected zone. "
+            "This might affect how your emails are delivered. Type `yes` to confirm or `no` to cancel."
+        )
+
+        try:
+            confirmation = await self.bot.wait_for('message', check=check, timeout=30.0)
+        except asyncio.TimeoutError:
+            await ctx.send("Confirmation timed out. Email Routing enable operation cancelled.")
+            return
+
+        if confirmation.content.lower() != 'yes':
+            await ctx.send("Email Routing enable operation cancelled.")
+            return
+
         headers = {
             "X-Auth-Email": email,
             "X-Auth-Key": api_key,
@@ -1054,6 +1072,24 @@ class Cloudflare(commands.Cog):
 
         if not all([email, api_key, bearer_token, zone_identifier]):
             await ctx.send("Missing one or more required API tokens. Please check your configuration.")
+            return
+
+        def check(m):
+            return m.author == ctx.author and m.channel == ctx.channel
+
+        await ctx.send(
+            "Are you sure you want to disable Email Routing? This will stop emails from being proxied by Cloudflare, "
+            "and you might miss critical communications. Type `yes` to confirm or `no` to cancel."
+        )
+
+        try:
+            confirmation = await self.bot.wait_for('message', check=check, timeout=30.0)
+        except asyncio.TimeoutError:
+            await ctx.send("Confirmation timed out. Email Routing disable operation cancelled.")
+            return
+
+        if confirmation.content.lower() != 'yes':
+            await ctx.send("Email Routing disable operation cancelled.")
             return
 
         headers = {
