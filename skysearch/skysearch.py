@@ -1361,7 +1361,7 @@ class Skysearch(commands.Cog):
                 break
             try:
                 reaction, user = await self.bot.wait_for("reaction_add", timeout=30.0, check=check)
-                await asyncio.sleep(1)  # Adding a short delay before removing the reaction
+                await asyncio.sleep(1)
                 await message.remove_reaction(reaction, user)
             except asyncio.TimeoutError:
                 await message.clear_reactions()
@@ -1413,7 +1413,7 @@ class Skysearch(commands.Cog):
                 else:
                     combined_pages = []
                     if 'navaids' in data:
-                        embed = discord.Embed(title=f"Navaid information for {code.upper()}", color=0xfffffe)
+                        embed = discord.Embed(title=f"Navigational aids at {code.upper()}", color=0xfffffe)
                         embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/navigate.png")
                         navaids = data['navaids']
                         for navaid in navaids:
