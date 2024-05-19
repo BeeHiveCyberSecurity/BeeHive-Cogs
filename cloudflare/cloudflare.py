@@ -999,9 +999,6 @@ class Cloudflare(commands.Cog):
             embed.add_field(name="Status", value=f"`{settings.get('status', 'N/A')}`", inline=False)
             embed.add_field(name="Tag", value=f"`{settings.get('tag', 'N/A')}`", inline=False)
 
-            for key, value in settings.items():
-                embed.add_field(name=key, value=str(value), inline=False)
-
             await ctx.send(embed=embed)
     def cog_unload(self):
         self.bot.loop.create_task(self.session.close())
