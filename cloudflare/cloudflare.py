@@ -1280,9 +1280,12 @@ class Cloudflare(commands.Cog):
 
             embed = discord.Embed(title="Email Routing Rules", color=discord.Color.from_rgb(255, 128, 0))
             for rule in rules:
+                actions = ", ".join([action["type"] for action in rule["actions"]])
+                destinations = ", ".join([value for action in rule["actions"] for value in action["value"]])
+                matchers = ", ".join([f"{matcher['field']}: {matcher['value']}" for matcher in rule["matchers"]])
                 embed.add_field(
                     name=f"Rule ID: {rule['id']}",
-                    value=f"**Source:** {rule['source']}\n**Destination:** {rule['destination']}",
+                    value=f"**Name:** {rule['name']}\n**Enabled:** {rule['enabled']}\n**Actions:** {actions}\n**Destinations:** {destinations}\n**Matchers:** {matchers}\n**Priority:** {rule['priority']}\n**Tag:** {rule['tag']}",
                     inline=False
                 )
 
