@@ -833,5 +833,62 @@ class Cloudflare(commands.Cog):
             else:
                 await ctx.send(f"Failed to create email routing address. Status code: {response.status}")
 
+    @commands.is_owner()
+    @emailrouting.command(name="remove")
+    async def remove_email_routing_address(self, ctx, email: str):
+        """Remove a destination address from your Email Routing service."""
+        api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
+        email_token = api_tokens.get("email")
+        api_key = api_tokens.get("api_key")
+        bearer_token = api_tokens.get("bearer_token")
+        account_id = api_tokens.get("account_id")
+
+        if not all([email_token, api_key, bearer_token, account_id]):
+            await ctx.send("Missing one or more required API tokens. Please check your configuration.")
+            return
+
+        # Query to get the ID of the address to be deleted
+        url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/email/routing/addresses"
+        headers = {
+            "Authorization": f"Bearer {bearer_token}",
+            "X-Auth-Email": email_token,
+            "X-Auth-Key": api_key,
+            "Content-Type": "application/json",
+        }
+
+        async with self.session.get(url, headers=headers) as response:
+            if response.status != 200:
+                await ctx.send(f"Failed to fetch email routing addresses. Status code: {response.status}")
+                return
+
+            data = await response.json()
+            if not data.get("success", False):
+                await ctx.send("Failed to fetch email routing addresses.")
+                return
+
+            addresses = data.get("result", [])
+            address_id = None
+            for address in addresses:
+                if address["email"] == email:
+                    address_id = address["id"]
+                    break
+
+            if not address_id:
+                await ctx.send(f"No email routing address found for {email}.")
+                return
+
+        # Delete the address
+        delete_url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/email/routing/addresses/{address_id}"
+        async with self.session.delete(delete_url, headers=headers) as response:
+            if response.status == 200:
+                data = await response.json()
+                if data["success"]:
+                    await ctx.send(f"Successfully removed email routing address: {email}")
+                else:
+                    await ctx.send(f"Error: {data['errors']}")
+            else:
+                await ctx.send(f"Failed to remove email routing address. Status code: {response.status}")
+
+
     def cog_unload(self):
         self.bot.loop.create_task(self.session.close())
