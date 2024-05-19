@@ -4,6 +4,7 @@ import time
 from datetime import datetime
 from redbot.core import commands, Config #type: ignore
 import aiohttp #type: ignore
+import ipaddress
 
 class Cloudflare(commands.Cog):
     """A Red-Discordbot cog to interact with the Cloudflare API."""
@@ -520,8 +521,9 @@ class Cloudflare(commands.Cog):
                 await ctx.send(f"Failed to query Cloudflare API. Status code: {response.status}")
 
     @tools.command(name="ipintel")
-    async def query_ip(self, ctx, ipv4: str = None, ipv6: str = None):
+    async def query_ip(self, ctx, ip: str):
         """Query Cloudflare API for IP intelligence."""
+
         api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
         email = api_tokens.get("email")
         api_key = api_tokens.get("api_key")
@@ -535,10 +537,15 @@ class Cloudflare(commands.Cog):
             "Content-Type": "application/json",
         }
         params = {}
-        if ipv4:
-            params["ipv4"] = ipv4
-        if ipv6:
-            params["ipv6"] = ipv6
+        try:
+            ip_obj = ipaddress.ip_address(ip)
+            if ip_obj.version == 4:
+                params["ipv4"] = ip
+            elif ip_obj.version == 6:
+                params["ipv6"] = ip
+        except ValueError:
+            await ctx.send("Invalid IP address format.")
+            return
 
         async with self.session.get(url, headers=headers, params=params) as response:
             if response.status == 200:
