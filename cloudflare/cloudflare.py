@@ -877,17 +877,33 @@ class Cloudflare(commands.Cog):
                 await ctx.send(f"No email routing address found for {email}.")
                 return
 
-        # Delete the address
-        delete_url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/email/routing/addresses/{address_id}"
-        async with self.session.delete(delete_url, headers=headers) as response:
-            if response.status == 200:
-                data = await response.json()
-                if data["success"]:
-                    await ctx.send(f"Successfully removed email routing address: {email}")
-                else:
-                    await ctx.send(f"Error: {data['errors']}")
-            else:
-                await ctx.send(f"Failed to remove email routing address. Status code: {response.status}")
+        # Ask for confirmation
+        confirmation_message = await ctx.send(f"Are you sure you want to remove the email routing address: {email}? React with ✅ to confirm or ❌ to cancel.")
+        await confirmation_message.add_reaction("✅")
+        await confirmation_message.add_reaction("❌")
+
+        def check(reaction, user):
+            return user == ctx.author and str(reaction.emoji) in ["✅", "❌"] and reaction.message.id == confirmation_message.id
+
+        try:
+            reaction, user = await self.bot.wait_for("reaction_add", timeout=60.0, check=check)
+            if str(reaction.emoji) == "❌":
+                await ctx.send("Email routing address removal cancelled.")
+                return
+            elif str(reaction.emoji) == "✅":
+                # Delete the address
+                delete_url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/email/routing/addresses/{address_id}"
+                async with self.session.delete(delete_url, headers=headers) as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        if data["success"]:
+                            await ctx.send(f"Successfully removed email routing address: {email}")
+                        else:
+                            await ctx.send(f"Error: {data['errors']}")
+                    else:
+                        await ctx.send(f"Failed to remove email routing address. Status code: {response.status}")
+        except asyncio.TimeoutError:
+            await ctx.send("Confirmation timed out. Email routing address removal cancelled.")
 
 
     def cog_unload(self):
