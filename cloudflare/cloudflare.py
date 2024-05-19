@@ -655,15 +655,55 @@ class Cloudflare(commands.Cog):
                 data = await response.json()
                 if data["success"]:
                     result = data["result"]
-                    embed = discord.Embed(title=f"ASN subnets for {asn}", color=0xfffffe)
+                    subnets = result.get("subnets", [])
                     
-                    if "subnets" in result and result["subnets"]:
-                        for subnet in result["subnets"]:
+                    if subnets:
+                        pages = [subnets[i:i + 10] for i in range(0, len(subnets), 10)]
+                        current_page = 0
+                        embed = discord.Embed(title=f"ASN subnets for {asn}", color=0xfffffe)
+                        for subnet in pages[current_page]:
                             embed.add_field(name="Subnet", value=f"**`{subnet}`**", inline=False)
+                        message = await ctx.send(embed=embed)
+
+                        if len(pages) > 1:
+                            await message.add_reaction("◀️")
+                            await message.add_reaction("❌")
+                            await message.add_reaction("▶️")
+
+                            def check(reaction, user):
+                                return user == ctx.author and str(reaction.emoji) in ["◀️", "❌", "▶️"] and reaction.message.id == message.id
+
+                            while True:
+                                try:
+                                    reaction, user = await self.bot.wait_for("reaction_add", timeout=30.0, check=check)
+
+                                    if str(reaction.emoji) == "▶️" and current_page < len(pages) - 1:
+                                        current_page += 1
+                                        embed.clear_fields()
+                                        for subnet in pages[current_page]:
+                                            embed.add_field(name="Subnet", value=f"**`{subnet}`**", inline=False)
+                                        await message.edit(embed=embed)
+                                        await message.remove_reaction(reaction, user)
+
+                                    elif str(reaction.emoji) == "◀️" and current_page > 0:
+                                        current_page -= 1
+                                        embed.clear_fields()
+                                        for subnet in pages[current_page]:
+                                            embed.add_field(name="Subnet", value=f"**`{subnet}`**", inline=False)
+                                        await message.edit(embed=embed)
+                                        await message.remove_reaction(reaction, user)
+
+                                    elif str(reaction.emoji) == "❌":
+                                        await message.delete()
+                                        break
+
+                                except asyncio.TimeoutError:
+                                    await message.clear_reactions()
+                                    break
                     else:
+                        embed = discord.Embed(title=f"ASN subnets for {asn}", color=0xfffffe)
                         embed.add_field(name="Subnets", value="No subnets found for this ASN.", inline=False)
-                    
-                    await ctx.send(embed=embed)
+                        await ctx.send(embed=embed)
                 else:
                     await ctx.send(f"Error: {data['errors']}")
             elif response.status == 400:
