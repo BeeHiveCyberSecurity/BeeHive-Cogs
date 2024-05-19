@@ -18,20 +18,26 @@ class URLScan(commands.Cog):
         await self.scan_urls(ctx, urls)
 
     @commands.guild_only()
+    @commands.has_permissions(manage_guild=True)
     @urlscan.command(name="autoscan", description="Toggle automatic URL scanning in messages")
-    async def autoscan(self, ctx):
+    async def autoscan(self, ctx, state: bool = None):
         """Toggle automatic URL scanning in messages"""
-        guild_id = ctx.guild.id
-        if not hasattr(self.bot, 'autoscan_enabled_guilds'):
-            self.bot.autoscan_enabled_guilds = {}
-
-        if guild_id in self.bot.autoscan_enabled_guilds:
-            self.bot.autoscan_enabled_guilds[guild_id] = not self.bot.autoscan_enabled_guilds[guild_id]
+        if state is None:
+            state = await self.config.guild(ctx.guild).autoscan_enabled()
+            if state:
+                embed = discord.Embed(title="URLScan Status", description="Automatic URL scanning is currently enabled.", color=0x2BBD8E)
+                await ctx.send(embed=embed)
+            else:
+                embed = discord.Embed(title="URLScan Status", description="Automatic URL scanning is currently disabled.", color=0xff4545)
+                await ctx.send(embed=embed)
         else:
-            self.bot.autoscan_enabled_guilds[guild_id] = True
-
-        status = "enabled" if self.bot.autoscan_enabled_guilds[guild_id] else "disabled"
-        await ctx.send(f"Automatic URL scanning is now {status} for this guild.")
+            await self.config.guild(ctx.guild).autoscan_enabled.set(state)
+            if state:
+                embed = discord.Embed(title="URLScan Status", description="Automatic URL scanning has been enabled.", color=0x2BBD8E)
+                await ctx.send(embed=embed)
+            else:
+                embed = discord.Embed(title="URLScan Status", description="Automatic URL scanning has been disabled.", color=0xff4545)
+                await ctx.send(embed=embed)
 
     async def scan_urls(self, ctx, urls: str = None):
         urlscan_key = await self.bot.get_shared_api_tokens("urlscan")
