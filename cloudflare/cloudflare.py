@@ -1278,50 +1278,18 @@ class Cloudflare(commands.Cog):
                 await ctx.send("No Email Routing rules found.")
                 return
 
-            embeds = []
+            embed = discord.Embed(title="Email Routing Rules", color=discord.Color.from_rgb(255, 128, 0))
             for rule in rules:
                 actions = ", ".join([action["type"] for action in rule["actions"]])
                 destinations = ", ".join([value if isinstance(value, str) else str(value) for action in rule["actions"] for value in (action.get("value", []) if isinstance(action.get("value", []), list) else [action.get("value", [])])])
                 matchers = ", ".join([f"{matcher.get('field', 'unknown')}: {matcher.get('value', 'unknown')}" for matcher in rule["matchers"]])
-                embed = discord.Embed(title="Email Routing Rules", color=discord.Color.from_rgb(255, 128, 0))
                 embed.add_field(
                     name=f"Rule ID: {rule['id']}",
                     value=f"**Name:** {rule['name']}\n**Enabled:** {rule['enabled']}\n**Actions:** {actions}\n**Destinations:** {destinations}\n**Matchers:** {matchers}\n**Priority:** {rule['priority']}\n**Tag:** {rule['tag']}",
                     inline=False
                 )
-                embeds.append(embed)
 
-            paginator = commands.Paginator()
-            for embed in embeds:
-                paginator.add_line(embed.to_dict())
-
-            pages = [paginator.pages[i:i + 1] for i in range(0, len(paginator.pages), 1)]
-            current_page = 0
-
-            message = await ctx.send(embed=discord.Embed.from_dict(pages[current_page][0]))
-
-            if len(pages) > 1:
-                await message.add_reaction("◀️")
-                await message.add_reaction("▶️")
-
-                def check(reaction, user):
-                    return user == ctx.author and str(reaction.emoji) in ["◀️", "▶️"] and reaction.message.id == message.id
-
-                while True:
-                    try:
-                        reaction, user = await self.bot.wait_for("reaction_add", timeout=60.0, check=check)
-
-                        if str(reaction.emoji) == "▶️" and current_page < len(pages) - 1:
-                            current_page += 1
-                            await message.edit(embed=discord.Embed.from_dict(pages[current_page][0]))
-                        elif str(reaction.emoji) == "◀️" and current_page > 0:
-                            current_page -= 1
-                            await message.edit(embed=discord.Embed.from_dict(pages[current_page][0]))
-
-                        await message.remove_reaction(reaction, user)
-                    except asyncio.TimeoutError:
-                        break
-                await message.clear_reactions()
+            await ctx.send(embed=embed)
     
     
     
