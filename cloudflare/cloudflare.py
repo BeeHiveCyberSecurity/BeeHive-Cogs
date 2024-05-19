@@ -878,7 +878,13 @@ class Cloudflare(commands.Cog):
                 return
 
         # Ask for confirmation
-        confirmation_message = await ctx.send(f"Are you sure you want to remove the email routing address: {email}? React with ✅ to confirm or ❌ to cancel.")
+        embed = discord.Embed(
+            title="Confirm destructive action",
+            description=f"Are you sure you want to remove the email routing address: {email}?",
+            color=discord.Color.red()
+        )
+        embed.set_footer(text="React to confirm or cancel this request")
+        confirmation_message = await ctx.send(embed=embed)
         await confirmation_message.add_reaction("✅")
         await confirmation_message.add_reaction("❌")
 
@@ -892,6 +898,7 @@ class Cloudflare(commands.Cog):
                 return
             elif str(reaction.emoji) == "✅":
                 # Delete the address
+                await asyncio.sleep(5)  # Wait for 5 seconds to avoid rate limiting
                 delete_url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/email/routing/addresses/{address_id}"
                 async with self.session.delete(delete_url, headers=headers) as response:
                     if response.status == 200:
