@@ -122,10 +122,17 @@ class Cloudflare(commands.Cog):
         Query WHOIS information for a given domain.
         """
         api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
-        email = api_tokens["email"]
-        api_key = api_tokens["api_key"]
-        bearer_token = api_tokens["bearer_token"]
-        account_id = api_tokens["account_id"]
+        
+        # Safely retrieve API tokens with default values
+        email = api_tokens.get("email")
+        api_key = api_tokens.get("api_key")
+        bearer_token = api_tokens.get("bearer_token")
+        account_id = api_tokens.get("account_id")
+
+        # Check if any required token is missing
+        if not all([email, api_key, bearer_token, account_id]):
+            await ctx.send("Missing one or more required API tokens. Please check your configuration.")
+            return
 
         headers = {
             "X-Auth-Email": email,
