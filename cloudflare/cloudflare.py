@@ -125,59 +125,70 @@ class Cloudflare(commands.Cog):
 
             pages = []
             page = discord.Embed(title=f"WHOIS Information for {domain}", color=discord.Color.blue())
+            field_count = 0
+
+            def add_field_to_page(page, name, value):
+                nonlocal field_count, pages
+                page.add_field(name=name, value=value, inline=False)
+                field_count += 1
+                if field_count == 10:
+                    pages.append(page)
+                    page = discord.Embed(title=f"WHOIS Information for {domain}", color=discord.Color.blue())
+                    field_count = 0
+                return page
 
             if "administrative_city" in whois_info:
-                page.add_field(name="Administrative City", value=whois_info["administrative_city"], inline=False)
+                page = add_field_to_page(page, "Administrative City", whois_info["administrative_city"])
             if "administrative_country" in whois_info:
-                page.add_field(name="Administrative Country", value=whois_info["administrative_country"], inline=False)
+                page = add_field_to_page(page, "Administrative Country", whois_info["administrative_country"])
             if "administrative_email" in whois_info:
-                page.add_field(name="Administrative Email", value=whois_info["administrative_email"], inline=False)
+                page = add_field_to_page(page, "Administrative Email", whois_info["administrative_email"])
             if "administrative_fax" in whois_info:
-                page.add_field(name="Administrative Fax", value=whois_info["administrative_fax"], inline=False)
+                page = add_field_to_page(page, "Administrative Fax", whois_info["administrative_fax"])
             if "administrative_fax_ext" in whois_info:
-                page.add_field(name="Administrative Fax Ext", value=whois_info["administrative_fax_ext"], inline=False)
+                page = add_field_to_page(page, "Administrative Fax Ext", whois_info["administrative_fax_ext"])
             if "administrative_id" in whois_info:
-                page.add_field(name="Administrative ID", value=whois_info["administrative_id"], inline=False)
+                page = add_field_to_page(page, "Administrative ID", whois_info["administrative_id"])
             if "administrative_name" in whois_info:
-                page.add_field(name="Administrative Name", value=whois_info["administrative_name"], inline=False)
+                page = add_field_to_page(page, "Administrative Name", whois_info["administrative_name"])
             if "administrative_org" in whois_info:
-                page.add_field(name="Administrative Org", value=whois_info["administrative_org"], inline=False)
+                page = add_field_to_page(page, "Administrative Org", whois_info["administrative_org"])
             if "administrative_phone" in whois_info:
-                page.add_field(name="Administrative Phone", value=whois_info["administrative_phone"], inline=False)
+                page = add_field_to_page(page, "Administrative Phone", whois_info["administrative_phone"])
             if "administrative_phone_ext" in whois_info:
-                page.add_field(name="Administrative Phone Ext", value=whois_info["administrative_phone_ext"], inline=False)
+                page = add_field_to_page(page, "Administrative Phone Ext", whois_info["administrative_phone_ext"])
             if "administrative_postal_code" in whois_info:
-                page.add_field(name="Administrative Postal Code", value=whois_info["administrative_postal_code"], inline=False)
+                page = add_field_to_page(page, "Administrative Postal Code", whois_info["administrative_postal_code"])
             if "administrative_province" in whois_info:
-                page.add_field(name="Administrative Province", value=whois_info["administrative_province"], inline=False)
+                page = add_field_to_page(page, "Administrative Province", whois_info["administrative_province"])
             if "administrative_street" in whois_info:
-                page.add_field(name="Administrative Street", value=whois_info["administrative_street"], inline=False)
+                page = add_field_to_page(page, "Administrative Street", whois_info["administrative_street"])
             if "billing_city" in whois_info:
-                page.add_field(name="Billing City", value=whois_info["billing_city"], inline=False)
+                page = add_field_to_page(page, "Billing City", whois_info["billing_city"])
             if "billing_country" in whois_info:
-                page.add_field(name="Billing Country", value=whois_info["billing_country"], inline=False)
+                page = add_field_to_page(page, "Billing Country", whois_info["billing_country"])
             if "billing_email" in whois_info:
-                page.add_field(name="Billing Email", value=whois_info["billing_email"], inline=False)
+                page = add_field_to_page(page, "Billing Email", whois_info["billing_email"])
             if "billing_fax" in whois_info:
-                page.add_field(name="Billing Fax", value=whois_info["billing_fax"], inline=False)
+                page = add_field_to_page(page, "Billing Fax", whois_info["billing_fax"])
             if "billing_fax_ext" in whois_info:
-                page.add_field(name="Billing Fax Ext", value=whois_info["billing_fax_ext"], inline=False)
+                page = add_field_to_page(page, "Billing Fax Ext", whois_info["billing_fax_ext"])
             if "billing_id" in whois_info:
-                page.add_field(name="Billing ID", value=whois_info["billing_id"], inline=False)
+                page = add_field_to_page(page, "Billing ID", whois_info["billing_id"])
             if "billing_name" in whois_info:
-                page.add_field(name="Billing Name", value=whois_info["billing_name"], inline=False)
+                page = add_field_to_page(page, "Billing Name", whois_info["billing_name"])
             if "billing_org" in whois_info:
-                page.add_field(name="Billing Org", value=whois_info["billing_org"], inline=False)
+                page = add_field_to_page(page, "Billing Org", whois_info["billing_org"])
             if "billing_phone" in whois_info:
-                page.add_field(name="Billing Phone", value=whois_info["billing_phone"], inline=False)
+                page = add_field_to_page(page, "Billing Phone", whois_info["billing_phone"])
             if "billing_phone_ext" in whois_info:
-                page.add_field(name="Billing Phone Ext", value=whois_info["billing_phone_ext"], inline=False)
+                page = add_field_to_page(page, "Billing Phone Ext", whois_info["billing_phone_ext"])
             if "billing_postal_code" in whois_info:
-                page.add_field(name="Billing Postal Code", value=whois_info["billing_postal_code"], inline=False)
+                page = add_field_to_page(page, "Billing Postal Code", whois_info["billing_postal_code"])
             if "billing_province" in whois_info:
-                page.add_field(name="Billing Province", value=whois_info["billing_province"], inline=False)
+                page = add_field_to_page(page, "Billing Province", whois_info["billing_province"])
             if "billing_street" in whois_info:
-                page.add_field(name="Billing Street", value=whois_info["billing_street"], inline=False)
+                page = add_field_to_page(page, "Billing Street", whois_info["billing_street"])
             if "created_date" in whois_info:
                 created_date = whois_info["created_date"]
                 if isinstance(created_date, str):
@@ -188,11 +199,11 @@ class Cloudflare(commands.Cog):
                         created_date = datetime.strptime(created_date, "%Y-%m-%dT%H:%M:%S")
                 unix_timestamp = int(created_date.timestamp())
                 discord_timestamp = f"<t:{unix_timestamp}:F>"
-                page.add_field(name="Created Date", value=discord_timestamp, inline=False)
+                page = add_field_to_page(page, "Created Date", discord_timestamp)
             if "dnssec" in whois_info:
-                page.add_field(name="DNSSEC", value=whois_info["dnssec"], inline=False)
+                page = add_field_to_page(page, "DNSSEC", whois_info["dnssec"])
             if "domain" in whois_info:
-                page.add_field(name="Domain", value=whois_info["domain"], inline=False)
+                page = add_field_to_page(page, "Domain", whois_info["domain"])
             if "expiration_date" in whois_info:
                 expiration_date = whois_info["expiration_date"]
                 if isinstance(expiration_date, str):
@@ -202,105 +213,105 @@ class Cloudflare(commands.Cog):
                         expiration_date = datetime.strptime(expiration_date, "%Y-%m-%dT%H:%M:%S")
                 unix_timestamp = int(expiration_date.timestamp())
                 discord_timestamp = f"<t:{unix_timestamp}:F>"
-                page.add_field(name="Expiration Date", value=discord_timestamp, inline=False)
+                page = add_field_to_page(page, "Expiration Date", discord_timestamp)
             if "extension" in whois_info:
-                page.add_field(name="Extension", value=whois_info["extension"], inline=False)
+                page = add_field_to_page(page, "Extension", whois_info["extension"])
             if "found" in whois_info:
-                page.add_field(name="Found", value=whois_info["found"], inline=False)
+                page = add_field_to_page(page, "Found", whois_info["found"])
             if "id" in whois_info:
-                page.add_field(name="ID", value=whois_info["id"], inline=False)
+                page = add_field_to_page(page, "ID", whois_info["id"])
             if "nameservers" in whois_info:
-                page.add_field(name="Nameservers", value=", ".join(whois_info["nameservers"]), inline=False)
+                page = add_field_to_page(page, "Nameservers", ", ".join(whois_info["nameservers"]))
             if "punycode" in whois_info:
-                page.add_field(name="Punycode", value=whois_info["punycode"], inline=False)
+                page = add_field_to_page(page, "Punycode", whois_info["punycode"])
             if "registrant" in whois_info:
-                page.add_field(name="Registrant", value=whois_info["registrant"], inline=False)
+                page = add_field_to_page(page, "Registrant", whois_info["registrant"])
             if "registrant_city" in whois_info:
-                page.add_field(name="Registrant City", value=whois_info["registrant_city"], inline=False)
+                page = add_field_to_page(page, "Registrant City", whois_info["registrant_city"])
             if "registrant_country" in whois_info:
-                page.add_field(name="Registrant Country", value=whois_info["registrant_country"], inline=False)
+                page = add_field_to_page(page, "Registrant Country", whois_info["registrant_country"])
             if "registrant_email" in whois_info:
-                page.add_field(name="Registrant Email", value=whois_info["registrant_email"], inline=False)
+                page = add_field_to_page(page, "Registrant Email", whois_info["registrant_email"])
             if "registrant_fax" in whois_info:
-                page.add_field(name="Registrant Fax", value=whois_info["registrant_fax"], inline=False)
+                page = add_field_to_page(page, "Registrant Fax", whois_info["registrant_fax"])
             if "registrant_fax_ext" in whois_info:
-                page.add_field(name="Registrant Fax Ext", value=whois_info["registrant_fax_ext"], inline=False)
+                page = add_field_to_page(page, "Registrant Fax Ext", whois_info["registrant_fax_ext"])
             if "registrant_id" in whois_info:
-                page.add_field(name="Registrant ID", value=whois_info["registrant_id"], inline=False)
+                page = add_field_to_page(page, "Registrant ID", whois_info["registrant_id"])
             if "registrant_name" in whois_info:
-                page.add_field(name="Registrant Name", value=whois_info["registrant_name"], inline=False)
+                page = add_field_to_page(page, "Registrant Name", whois_info["registrant_name"])
             if "registrant_org" in whois_info:
-                page.add_field(name="Registrant Org", value=whois_info["registrant_org"], inline=False)
+                page = add_field_to_page(page, "Registrant Org", whois_info["registrant_org"])
             if "registrant_phone" in whois_info:
-                page.add_field(name="Registrant Phone", value=whois_info["registrant_phone"], inline=False)
+                page = add_field_to_page(page, "Registrant Phone", whois_info["registrant_phone"])
             if "registrant_phone_ext" in whois_info:
-                page.add_field(name="Registrant Phone Ext", value=whois_info["registrant_phone_ext"], inline=False)
+                page = add_field_to_page(page, "Registrant Phone Ext", whois_info["registrant_phone_ext"])
             if "registrant_postal_code" in whois_info:
-                page.add_field(name="Registrant Postal Code", value=whois_info["registrant_postal_code"], inline=False)
+                page = add_field_to_page(page, "Registrant Postal Code", whois_info["registrant_postal_code"])
             if "registrant_province" in whois_info:
-                page.add_field(name="Registrant Province", value=whois_info["registrant_province"], inline=False)
+                page = add_field_to_page(page, "Registrant Province", whois_info["registrant_province"])
             if "registrant_street" in whois_info:
-                page.add_field(name="Registrant Street", value=whois_info["registrant_street"], inline=False)
+                page = add_field_to_page(page, "Registrant Street", whois_info["registrant_street"])
             if "registrar" in whois_info:
-                page.add_field(name="Registrar", value=whois_info["registrar"], inline=False)
+                page = add_field_to_page(page, "Registrar", whois_info["registrar"])
             if "registrar_city" in whois_info:
-                page.add_field(name="Registrar City", value=whois_info["registrar_city"], inline=False)
+                page = add_field_to_page(page, "Registrar City", whois_info["registrar_city"])
             if "registrar_country" in whois_info:
-                page.add_field(name="Registrar Country", value=whois_info["registrar_country"], inline=False)
+                page = add_field_to_page(page, "Registrar Country", whois_info["registrar_country"])
             if "registrar_email" in whois_info:
-                page.add_field(name="Registrar Email", value=whois_info["registrar_email"], inline=False)
+                page = add_field_to_page(page, "Registrar Email", whois_info["registrar_email"])
             if "registrar_fax" in whois_info:
-                page.add_field(name="Registrar Fax", value=whois_info["registrar_fax"], inline=False)
+                page = add_field_to_page(page, "Registrar Fax", whois_info["registrar_fax"])
             if "registrar_fax_ext" in whois_info:
-                page.add_field(name="Registrar Fax Ext", value=whois_info["registrar_fax_ext"], inline=False)
+                page = add_field_to_page(page, "Registrar Fax Ext", whois_info["registrar_fax_ext"])
             if "registrar_id" in whois_info:
-                page.add_field(name="Registrar ID", value=whois_info["registrar_id"], inline=False)
+                page = add_field_to_page(page, "Registrar ID", whois_info["registrar_id"])
             if "registrar_name" in whois_info:
-                page.add_field(name="Registrar Name", value=whois_info["registrar_name"], inline=False)
+                page = add_field_to_page(page, "Registrar Name", whois_info["registrar_name"])
             if "registrar_org" in whois_info:
-                page.add_field(name="Registrar Org", value=whois_info["registrar_org"], inline=False)
+                page = add_field_to_page(page, "Registrar Org", whois_info["registrar_org"])
             if "registrar_phone" in whois_info:
-                page.add_field(name="Registrar Phone", value=whois_info["registrar_phone"], inline=False)
+                page = add_field_to_page(page, "Registrar Phone", whois_info["registrar_phone"])
             if "registrar_phone_ext" in whois_info:
-                page.add_field(name="Registrar Phone Ext", value=whois_info["registrar_phone_ext"], inline=False)
+                page = add_field_to_page(page, "Registrar Phone Ext", whois_info["registrar_phone_ext"])
             if "registrar_postal_code" in whois_info:
-                page.add_field(name="Registrar Postal Code", value=whois_info["registrar_postal_code"], inline=False)
+                page = add_field_to_page(page, "Registrar Postal Code", whois_info["registrar_postal_code"])
             if "registrar_province" in whois_info:
-                page.add_field(name="Registrar Province", value=whois_info["registrar_province"], inline=False)
+                page = add_field_to_page(page, "Registrar Province", whois_info["registrar_province"])
             if "registrar_street" in whois_info:
-                page.add_field(name="Registrar Street", value=whois_info["registrar_street"], inline=False)
+                page = add_field_to_page(page, "Registrar Street", whois_info["registrar_street"])
             if "status" in whois_info:
-                page.add_field(name="Status", value=", ".join(whois_info["status"]), inline=False)
+                page = add_field_to_page(page, "Status", ", ".join(whois_info["status"]))
             if "technical_city" in whois_info:
-                page.add_field(name="Technical City", value=whois_info["technical_city"], inline=False)
+                page = add_field_to_page(page, "Technical City", whois_info["technical_city"])
             if "technical_country" in whois_info:
-                page.add_field(name="Technical Country", value=whois_info["technical_country"], inline=False)
+                page = add_field_to_page(page, "Technical Country", whois_info["technical_country"])
             if "technical_email" in whois_info:
-                page.add_field(name="Technical Email", value=whois_info["technical_email"], inline=False)
+                page = add_field_to_page(page, "Technical Email", whois_info["technical_email"])
             if "technical_fax" in whois_info:
-                page.add_field(name="Technical Fax", value=whois_info["technical_fax"], inline=False)
+                page = add_field_to_page(page, "Technical Fax", whois_info["technical_fax"])
             if "technical_fax_ext" in whois_info:
-                page.add_field(name="Technical Fax Ext", value=whois_info["technical_fax_ext"], inline=False)
+                page = add_field_to_page(page, "Technical Fax Ext", whois_info["technical_fax_ext"])
             if "technical_id" in whois_info:
-                page.add_field(name="Technical ID", value=whois_info["technical_id"], inline=False)
+                page = add_field_to_page(page, "Technical ID", whois_info["technical_id"])
             if "technical_name" in whois_info:
-                page.add_field(name="Technical Name", value=whois_info["technical_name"], inline=False)
+                page = add_field_to_page(page, "Technical Name", whois_info["technical_name"])
             if "technical_org" in whois_info:
-                page.add_field(name="Technical Org", value=whois_info["technical_org"], inline=False)
+                page = add_field_to_page(page, "Technical Org", whois_info["technical_org"])
             if "technical_phone" in whois_info:
-                page.add_field(name="Technical Phone", value=whois_info["technical_phone"], inline=False)
+                page = add_field_to_page(page, "Technical Phone", whois_info["technical_phone"])
             if "technical_phone_ext" in whois_info:
-                page.add_field(name="Technical Phone Ext", value=whois_info["technical_phone_ext"], inline=False)
+                page = add_field_to_page(page, "Technical Phone Ext", whois_info["technical_phone_ext"])
             if "technical_postal_code" in whois_info:
-                page.add_field(name="Technical Postal Code", value=whois_info["technical_postal_code"], inline=False)
+                page = add_field_to_page(page, "Technical Postal Code", whois_info["technical_postal_code"])
             if "technical_province" in whois_info:
-                page.add_field(name="Technical Province", value=whois_info["technical_province"], inline=False)
+                page = add_field_to_page(page, "Technical Province", whois_info["technical_province"])
             if "technical_street" in whois_info:
-                page.add_field(name="Technical Street", value=whois_info["technical_street"], inline=False)
+                page = add_field_to_page(page, "Technical Street", whois_info["technical_street"])
             if "updated_date" in whois_info:
-                page.add_field(name="Updated Date", value=whois_info["updated_date"], inline=False)
+                page = add_field_to_page(page, "Updated Date", whois_info["updated_date"])
             if "whois_server" in whois_info:
-                page.add_field(name="WHOIS Server", value=whois_info["whois_server"], inline=False)
+                page = add_field_to_page(page, "WHOIS Server", whois_info["whois_server"])
 
             if page.fields:
                 pages.append(page)
