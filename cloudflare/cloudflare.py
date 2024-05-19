@@ -186,7 +186,10 @@ class Cloudflare(commands.Cog):
                 created_date = whois_info["created_date"]
                 if isinstance(created_date, str):
                     from datetime import datetime
-                    created_date = datetime.strptime(created_date, "%Y-%m-%dT%H:%M:%S")
+                    try:
+                        created_date = datetime.strptime(created_date, "%Y-%m-%dT%H:%M:%S.%fZ")
+                    except ValueError:
+                        created_date = datetime.strptime(created_date, "%Y-%m-%dT%H:%M:%S")
                 unix_timestamp = int(created_date.timestamp())
                 discord_timestamp = f"<t:{unix_timestamp}:F>"
                 page.add_field(name="Created Date", value=discord_timestamp, inline=False)
@@ -197,7 +200,10 @@ class Cloudflare(commands.Cog):
             if "expiration_date" in whois_info:
                 expiration_date = whois_info["expiration_date"]
                 if isinstance(expiration_date, str):
-                    expiration_date = datetime.strptime(expiration_date, "%Y-%m-%dT%H:%M:%S")
+                    try:
+                        expiration_date = datetime.strptime(expiration_date, "%Y-%m-%dT%H:%M:%S.%fZ")
+                    except ValueError:
+                        expiration_date = datetime.strptime(expiration_date, "%Y-%m-%dT%H:%M:%S")
                 unix_timestamp = int(expiration_date.timestamp())
                 discord_timestamp = f"<t:{unix_timestamp}:F>"
                 page.add_field(name="Expiration Date", value=discord_timestamp, inline=False)
