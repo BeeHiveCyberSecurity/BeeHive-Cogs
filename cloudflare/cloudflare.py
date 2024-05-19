@@ -989,7 +989,7 @@ class Cloudflare(commands.Cog):
             embed = discord.Embed(
                 title="Current settings for Email Routing",
                 description=f"**Settings for zone `{zone_identifier.upper()}`**\n\n*Change your zone using `[p]set api cloudflare zone_id`*",
-                color=discord.Color.from_rgb(255, 128, 0)  # Cloudflare orange
+                color=discord.Color.from_rgb(255, 128, 0))  # Cloudflare orange
             created_timestamp = settings.get('created', 'N/A')
             if created_timestamp != 'N/A':
                 created_timestamp = f"<t:{int(datetime.fromisoformat(created_timestamp).timestamp())}:F>"
