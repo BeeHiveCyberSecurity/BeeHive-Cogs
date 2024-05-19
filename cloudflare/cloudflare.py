@@ -63,14 +63,15 @@ class Cloudflare(commands.Cog):
 
             if len(pages) > 1:
                 await message.add_reaction("◀️")
+                await message.add_reaction("❌")
                 await message.add_reaction("▶️")
 
                 def check(reaction, user):
-                    return user == ctx.author and str(reaction.emoji) in ["◀️", "▶️"] and reaction.message.id == message.id
+                    return user == ctx.author and str(reaction.emoji) in ["◀️", "❌", "▶️"] and reaction.message.id == message.id
 
                 while True:
                     try:
-                        reaction, user = await self.bot.wait_for("reaction_add", timeout=60.0, check=check)
+                        reaction, user = await self.bot.wait_for("reaction_add", timeout=30.0, check=check)
 
                         if str(reaction.emoji) == "▶️" and current_page < len(pages) - 1:
                             current_page += 1
@@ -84,8 +85,18 @@ class Cloudflare(commands.Cog):
                             await message.edit(embed=embed)
                             await message.remove_reaction(reaction, user)
 
+                        elif str(reaction.emoji) == "❌":
+                            await message.delete()
+                            break
+
                     except asyncio.TimeoutError:
                         break
+
+                # Remove reactions after timeout
+                try:
+                    await message.clear_reactions()
+                except discord.Forbidden:
+                    pass
 
     @cloudflare.command(name="whois")
     async def whois(self, ctx, domain: str):
