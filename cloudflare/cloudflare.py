@@ -20,12 +20,6 @@ class Cloudflare(commands.Cog):
         }
         self.config.register_global(**default_global)
         self.session = aiohttp.ClientSession()
-
-    @commands.group()
-    async def intel(self, ctx):
-        """Different utility tools provided by Cloudflare."""
-        if ctx.invoked_subcommand is None:
-            await ctx.send("Invalid Cloudflare command passed.")
         
     @commands.group()
     async def cloudflare(self, ctx):
@@ -104,6 +98,12 @@ class Cloudflare(commands.Cog):
                     await message.clear_reactions()
                 except discord.Forbidden:
                     pass
+
+    @commands.group()
+    async def intel(self, ctx):
+        """Different utility tools provided by Cloudflare."""
+        if ctx.invoked_subcommand is None:
+            await ctx.send("Invalid Cloudflare command passed.")
 
     @intel.command(name="whois")
     async def whois(self, ctx, domain: str):
@@ -1159,6 +1159,129 @@ class Cloudflare(commands.Cog):
 
             await ctx.send(embed=embed)
     
+    @emailrouting.group(name="rules", invoke_without_command=True)
+    async def email_routing_rules(self, ctx):
+        """Manage Email Routing rules"""
+        await ctx.send_help(ctx.command)
+
+    @email_routing_rules.command(name="add")
+    async def add_email_routing_rule(self, ctx, source: str, destination: str):
+        """Add a new Email Routing rule"""
+        api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
+        email = api_tokens.get("email")
+        api_key = api_tokens.get("api_key")
+        bearer_token = api_tokens.get("bearer_token")
+        zone_identifier = api_tokens.get("zone_id")
+
+        if not all([email, api_key, bearer_token, zone_identifier]):
+            await ctx.send("Missing one or more required API tokens. Please check your configuration.")
+            return
+
+        headers = {
+            "X-Auth-Email": email,
+            "X-Auth-Key": api_key,
+            "Authorization": f"Bearer {bearer_token}",
+            "Content-Type": "application/json"
+        }
+
+        url = f"https://api.cloudflare.com/client/v4/zones/{zone_identifier}/email/routing/rules"
+        payload = {
+            "source": source,
+            "destination": destination
+        }
+
+        async with self.session.post(url, headers=headers, json=payload) as response:
+            if response.status != 200:
+                await ctx.send(f"Failed to add Email Routing rule: {response.status}")
+                return
+
+            data = await response.json()
+            if not data.get("success", False):
+                await ctx.send("Failed to add Email Routing rule.")
+                return
+
+            await ctx.send(f"Email Routing rule added successfully: {source} -> {destination}")
+
+    @email_routing_rules.command(name="remove")
+    async def remove_email_routing_rule(self, ctx, rule_id: str):
+        """Remove an existing Email Routing rule"""
+        api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
+        email = api_tokens.get("email")
+        api_key = api_tokens.get("api_key")
+        bearer_token = api_tokens.get("bearer_token")
+        zone_identifier = api_tokens.get("zone_id")
+
+        if not all([email, api_key, bearer_token, zone_identifier]):
+            await ctx.send("Missing one or more required API tokens. Please check your configuration.")
+            return
+
+        headers = {
+            "X-Auth-Email": email,
+            "X-Auth-Key": api_key,
+            "Authorization": f"Bearer {bearer_token}",
+            "Content-Type": "application/json"
+        }
+
+        url = f"https://api.cloudflare.com/client/v4/zones/{zone_identifier}/email/routing/rules/{rule_id}"
+
+        async with self.session.delete(url, headers=headers) as response:
+            if response.status != 200:
+                await ctx.send(f"Failed to remove Email Routing rule: {response.status}")
+                return
+
+            data = await response.json()
+            if not data.get("success", False):
+                await ctx.send("Failed to remove Email Routing rule.")
+                return
+
+            await ctx.send(f"Email Routing rule removed successfully: {rule_id}")
+
+    @email_routing_rules.command(name="list")
+    async def list_email_routing_rules(self, ctx):
+        """List all Email Routing rules"""
+        api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
+        email = api_tokens.get("email")
+        api_key = api_tokens.get("api_key")
+        bearer_token = api_tokens.get("bearer_token")
+        zone_identifier = api_tokens.get("zone_id")
+
+        if not all([email, api_key, bearer_token, zone_identifier]):
+            await ctx.send("Missing one or more required API tokens. Please check your configuration.")
+            return
+
+        headers = {
+            "X-Auth-Email": email,
+            "X-Auth-Key": api_key,
+            "Authorization": f"Bearer {bearer_token}",
+            "Content-Type": "application/json"
+        }
+
+        url = f"https://api.cloudflare.com/client/v4/zones/{zone_identifier}/email/routing/rules"
+
+        async with self.session.get(url, headers=headers) as response:
+            if response.status != 200:
+                await ctx.send(f"Failed to fetch Email Routing rules: {response.status}")
+                return
+
+            data = await response.json()
+            if not data.get("success", False):
+                await ctx.send("Failed to fetch Email Routing rules.")
+                return
+
+            rules = data.get("result", [])
+            if not rules:
+                await ctx.send("No Email Routing rules found.")
+                return
+
+            embed = discord.Embed(title="Email Routing Rules", color=discord.Color.from_rgb(255, 128, 0))
+            for rule in rules:
+                embed.add_field(
+                    name=f"Rule ID: {rule['id']}",
+                    value=f"**Source:** {rule['source']}\n**Destination:** {rule['destination']}",
+                    inline=False
+                )
+
+            await ctx.send(embed=embed)
     
     
     
