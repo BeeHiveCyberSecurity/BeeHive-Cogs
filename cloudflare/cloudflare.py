@@ -791,5 +791,46 @@ class Cloudflare(commands.Cog):
                         await message.clear_reactions()
                         break
 
+    @emailrouting.command(name="create")
+    async def create_email_routing_address(self, ctx, email: str):
+        """Create a new email routing destination address."""
+        api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
+        email_token = api_tokens.get("email")
+        api_key = api_tokens.get("api_key")
+        bearer_token = api_tokens.get("bearer_token")
+        account_id = api_tokens.get("account_id")
+
+        if not all([email_token, api_key, bearer_token, account_id]):
+            await ctx.send("Missing one or more required API tokens. Please check your configuration.")
+            return
+
+        url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/email/routing/addresses"
+        headers = {
+            "Authorization": f"Bearer {bearer_token}",
+            "X-Auth-Email": email_token,
+            "X-Auth-Key": api_key,
+            "Content-Type": "application/json",
+        }
+        payload = {
+            "email": email
+        }
+
+        async with self.session.post(url, headers=headers, json=payload) as response:
+            if response.status == 200:
+                data = await response.json()
+                if data["success"]:
+                    result = data["result"]
+                    embed = discord.Embed(title="Email Routing Address Created", color=discord.Color.green())
+                    embed.add_field(name="Email", value=result["email"], inline=False)
+                    embed.add_field(name="ID", value=result["id"], inline=False)
+                    embed.add_field(name="Created", value=result["created"], inline=False)
+                    embed.add_field(name="Modified", value=result["modified"], inline=False)
+                    embed.add_field(name="Verified", value=result["verified"], inline=False)
+                    await ctx.send(embed=embed)
+                else:
+                    await ctx.send(f"Error: {data['errors']}")
+            else:
+                await ctx.send(f"Failed to create email routing address. Status code: {response.status}")
+                
     def cog_unload(self):
         self.bot.loop.create_task(self.session.close())
