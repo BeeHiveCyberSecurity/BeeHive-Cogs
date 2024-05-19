@@ -22,7 +22,7 @@ class Cloudflare(commands.Cog):
         self.session = aiohttp.ClientSession()
 
     @commands.group()
-    async def tools(self, ctx):
+    async def intel(self, ctx):
         """Different utility tools provided by Cloudflare."""
         if ctx.invoked_subcommand is None:
             await ctx.send("Invalid Cloudflare command passed.")
@@ -105,7 +105,7 @@ class Cloudflare(commands.Cog):
                 except discord.Forbidden:
                     pass
 
-    @tools.command(name="whois")
+    @intel.command(name="whois")
     async def whois(self, ctx, domain: str):
         """
         Query WHOIS information for a given domain.
@@ -473,7 +473,7 @@ class Cloudflare(commands.Cog):
                         await message.clear_reactions()
                         break
 
-    @tools.command(name="domainintel")
+    @intel.command(name="domain")
     async def query_domain(self, ctx, domain: str):
         """Query Cloudflare API for domain intelligence."""
         api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
@@ -520,7 +520,7 @@ class Cloudflare(commands.Cog):
             else:
                 await ctx.send(f"Failed to query Cloudflare API. Status code: {response.status}")
 
-    @tools.command(name="ipintel")
+    @intel.command(name="ip")
     async def query_ip(self, ctx, ip: str):
         """Query Cloudflare API for IP intelligence."""
 
@@ -576,7 +576,7 @@ class Cloudflare(commands.Cog):
             else:
                 await ctx.send(f"Failed to query Cloudflare API. Status code: {response.status}")
 
-    @tools.command(name="asnintel")
+    @intel.command(name="asn")
     async def asnintel(self, ctx, asn: int):
         """
         Fetch and display ASN intelligence from Cloudflare.
@@ -617,6 +617,51 @@ class Cloudflare(commands.Cog):
                         embed.add_field(name="Type", value=f"**`{result['type']}`**", inline=False)
                     if "risk_score" in result:
                         embed.add_field(name="Risk Score", value=f"**`{result['risk_score']}`**", inline=False)
+                    
+                    await ctx.send(embed=embed)
+                else:
+                    await ctx.send(f"Error: {data['errors']}")
+            elif response.status == 400:
+                await ctx.send("Bad Request: The server could not understand the request due to invalid syntax.")
+            else:
+                await ctx.send(f"Failed to query Cloudflare API. Status code: {response.status}")
+
+    @intel.command(name="subnets")
+    async def asnsubnets(self, ctx, asn: int):
+        """
+        Fetch and display ASN subnets intelligence from Cloudflare.
+        """
+        api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
+        email = api_tokens.get("email")
+        api_key = api_tokens.get("api_key")
+        bearer_token = api_tokens.get("bearer_token")
+        account_id = api_tokens.get("account_id")
+
+        # Check if any required token is missing
+        if not all([email, api_key, bearer_token, account_id]):
+            await ctx.send("Missing one or more required API tokens. Please check your configuration.")
+            return
+
+        url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/intel/asn/{asn}/subnets"
+        headers = {
+            "Authorization": f"Bearer {bearer_token}",
+            "X-Auth-Email": email,
+            "X-Auth-Key": api_key,
+            "Content-Type": "application/json",
+        }
+
+        async with self.session.get(url, headers=headers) as response:
+            if response.status == 200:
+                data = await response.json()
+                if data["success"]:
+                    result = data["result"]
+                    embed = discord.Embed(title=f"ASN subnets for {asn}", color=0xfffffe)
+                    
+                    if "subnets" in result and result["subnets"]:
+                        for subnet in result["subnets"]:
+                            embed.add_field(name="Subnet", value=f"**`{subnet}`**", inline=False)
+                    else:
+                        embed.add_field(name="Subnets", value="No subnets found for this ASN.", inline=False)
                     
                     await ctx.send(embed=embed)
                 else:
