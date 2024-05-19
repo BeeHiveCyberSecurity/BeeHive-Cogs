@@ -30,8 +30,9 @@ class Cloudflare(commands.Cog):
     @cloudflare.command()
     async def getzones(self, ctx):
         """Get the list of zones from Cloudflare."""
-        api_key = await self.config.api_key()
-        email = await self.config.email()
+        api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
+        api_key = api_tokens.get("api_key")
+        email = api_tokens.get("email")
         if not api_key or not email:
             await ctx.send("API key or email not set.")
             return
