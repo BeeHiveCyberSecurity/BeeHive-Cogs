@@ -23,8 +23,6 @@ class Cloudflare(commands.Cog):
         if ctx.invoked_subcommand is None:
             await ctx.send("Invalid Cloudflare command passed.")
 
-
-
     @cloudflare.command()
     async def setapikey(self, ctx, api_key: str):
         """Set the Cloudflare API key."""
