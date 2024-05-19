@@ -1,5 +1,6 @@
 import discord
 import asyncio
+import time
 from datetime import datetime
 from redbot.core import commands, Config
 import aiohttp
