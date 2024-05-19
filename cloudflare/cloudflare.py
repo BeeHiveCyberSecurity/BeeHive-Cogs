@@ -23,24 +23,28 @@ class Cloudflare(commands.Cog):
         if ctx.invoked_subcommand is None:
             await ctx.send("Invalid Cloudflare command passed.")
 
+    @commands.is_owner()
     @cloudflare.command()
     async def setapikey(self, ctx, api_key: str):
         """Set the Cloudflare API key."""
         await self.config.api_key.set(api_key)
         await ctx.send("Cloudflare API key set.")
 
+    @commands.is_owner()
     @cloudflare.command()
     async def setemail(self, ctx, email: str):
         """Set the Cloudflare account email."""
         await self.config.email.set(email)
         await ctx.send("Cloudflare email set.")
 
+    @commands.is_owner()
     @cloudflare.command()
     async def setbearer(self, ctx, bearer_token: str):
         """Set the Cloudflare Bearer token."""
         await self.config.api_key.set(bearer_token)
         await ctx.send("Cloudflare Bearer token set.")
 
+    @commands.is_owner()
     @cloudflare.command()
     async def getzones(self, ctx):
         """Get the list of zones from Cloudflare."""
