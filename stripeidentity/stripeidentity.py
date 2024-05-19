@@ -1,9 +1,9 @@
-import stripe #type: ignore
-from redbot.core import Config, commands, checks #type: ignore
-from redbot.core.bot import Red #type: ignore
-import discord #type: ignore
+import stripe  # type: ignore
+from redbot.core import Config, commands, checks  # type: ignore
+from redbot.core.bot import Red  # type: ignore
+import discord  # type: ignore
 import asyncio
-from datetime import datetime
+from datetime import datetime, timedelta
 
 class StripeIdentity(commands.Cog):
     def __init__(self, bot: Red):
@@ -81,7 +81,7 @@ class StripeIdentity(commands.Cog):
         else:
             embed = discord.Embed(description=f"No pending verification session found for {user.display_name}.", color=discord.Color.orange())
             await ctx.send(embed=embed)
-            
+
     @commands.is_owner()
     @commands.guild_only()
     @commands.command(name="bypassverification")
@@ -159,14 +159,6 @@ class StripeIdentity(commands.Cog):
                     await self.config.pending_verification_sessions.clear_raw(str(user.id))
                     await interaction.response.send_message(f"You have declined the verification and have been banned from {ctx.guild.name}.", ephemeral=True)
                     await ctx.guild.ban(user, reason="User declined age verification")
-            modlog_channel = self.bot.get_channel(self.modlog_channel_id)
-            if modlog_channel:
-                modlog_embed = discord.Embed(
-                    title="Modlog: User Ban",
-                    description=f"**User:** {user} ({user.id})\n**Action:** Ban\n**Reason:** User declined age verification",
-                    color=discord.Color.red()
-                )
-                await modlog_channel.send(embed=modlog_embed)
             decline_button.callback = decline_verification
             view.add_item(decline_button)
             try:
@@ -270,7 +262,7 @@ class StripeIdentity(commands.Cog):
                     "> This procedure involves the confirmation of your identity using a government-issued ID and biometric verification.\n"
                     "### Please ensure you have one of the following documents:\n- **State ID**\n- **Driver's License**\n- **Driver's Permit**\n- **Passport**\n"
                     "### You will also need to:\n- **Provide a valid email address**\n- **Take a series of selfies in a well-lit area**\n- **Submit the identity document mentioned above for biometric matching and analysis**\n\n"
-                    "Upon completing the verification, your personal information will be handled according to the following legal agreements:\n- **[BeeHive Terms of Service](<https://www.beehive.systems/tos)**\n- **[BeeHive Privacy Policy](https://www.beehive.systems/privacy)**\n- **[Stripe Privacy Policy](https://stripe.com/privacy)**\n- **[Stripe Consumer Terms of Service](https://stripe.com/legal/consumer)**\n\n"
+                    "Upon completing the verification, your personal information will be handled according to the following legal agreements:\n- **[BeeHive Terms of Service](<https://www.beehive.systems/tos>)**\n- **[BeeHive Privacy Policy](https://www.beehive.systems/privacy)**\n- **[Stripe Privacy Policy](https://stripe.com/privacy)**\n- **[Stripe Consumer Terms of Service](https://stripe.com/legal/consumer)**\n\n"
                     "Should you choose not to provide your personal information, you can opt out of the verification process by selecting the option below. This action will result in your immediate removal from the server. If no action is taken within **15 minutes**, you will be automatically removed from the server."
                 ),
                 color=discord.Color(0xff4545)
