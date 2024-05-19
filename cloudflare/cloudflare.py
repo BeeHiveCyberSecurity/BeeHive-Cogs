@@ -261,19 +261,26 @@ class Cloudflare(commands.Cog):
                 registrant_org = f"**`{whois_info['registrant_org']}`**"
                 page = add_field_to_page(page, "Registrant Org", registrant_org)
             if "registrant_phone" in whois_info:
-                page = add_field_to_page(page, "Registrant Phone", whois_info["registrant_phone"])
+                registrant_phone = f"**`{whois_info['registrant_phone']}`**"
+                page = add_field_to_page(page, "Registrant Phone", registrant_phone)
             if "registrant_phone_ext" in whois_info:
-                page = add_field_to_page(page, "Registrant Phone Ext", whois_info["registrant_phone_ext"])
+                registrant_phone_ext = f"**`{whois_info['registrant_phone_ext']}`**"
+                page = add_field_to_page(page, "Registrant Phone Ext", registrant_phone_ext)
             if "registrant_postal_code" in whois_info:
-                page = add_field_to_page(page, "Registrant Postal Code", whois_info["registrant_postal_code"])
+                registrant_postal_code = f"**`{whois_info['registrant_postal_code']}`**"
+                page = add_field_to_page(page, "Registrant Postal Code", registrant_postal_code)
             if "registrant_province" in whois_info:
-                page = add_field_to_page(page, "Registrant Province", whois_info["registrant_province"])
+                registrant_province = f"**`{whois_info['registrant_province']}`**"
+                page = add_field_to_page(page, "Registrant Province", registrant_province)
             if "registrant_street" in whois_info:
-                page = add_field_to_page(page, "Registrant Street", whois_info["registrant_street"])
+                registrant_street = f"**`{whois_info['registrant_street']}`**"
+                page = add_field_to_page(page, "Registrant Street", registrant_street)
             if "registrar" in whois_info:
-                page = add_field_to_page(page, "Registrar", whois_info["registrar"])
+                registrar_value = f"**`{whois_info['registrar']}`**"
+                page = add_field_to_page(page, "Registrar", registrar_value)
             if "registrar_city" in whois_info:
-                page = add_field_to_page(page, "Registrar City", whois_info["registrar_city"])
+                registrar_city = f"**`{whois_info['registrar_city']}`**"
+                page = add_field_to_page(page, "Registrar City", registrar_city)
             if "registrar_country" in whois_info:
                 page = add_field_to_page(page, "Registrar Country", whois_info["registrar_country"])
             if "registrar_email" in whois_info:
