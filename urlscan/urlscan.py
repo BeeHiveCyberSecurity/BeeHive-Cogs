@@ -130,7 +130,6 @@ class URLScan(commands.Cog):
 
         ctx = await self.bot.get_context(message)
         for url in urls_to_scan:
-            await self.scan_urls(ctx, url)
             urlscan_key = await self.bot.get_shared_api_tokens("urlscan")
             headers = {
                 "Content-Type": "application/json",
