@@ -576,6 +576,55 @@ class Cloudflare(commands.Cog):
             else:
                 await ctx.send(f"Failed to query Cloudflare API. Status code: {response.status}")
 
+    @tools.command(name="asnintel")
+    async def asnintel(self, ctx, asn: int):
+        """
+        Fetch and display ASN intelligence from Cloudflare.
+        """
+        api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
+        email = api_tokens.get("email")
+        api_key = api_tokens.get("api_key")
+        bearer_token = api_tokens.get("bearer_token")
+        account_id = api_tokens.get("account_id")
+
+        # Check if any required token is missing
+        if not all([email, api_key, bearer_token, account_id]):
+            await ctx.send("Missing one or more required API tokens. Please check your configuration.")
+            return
+
+        url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/intel/asn/{asn}"
+        headers = {
+            "Authorization": f"Bearer {bearer_token}",
+            "X-Auth-Email": email,
+            "X-Auth-Key": api_key,
+            "Content-Type": "application/json",
+        }
+
+        async with self.session.get(url, headers=headers) as response:
+            if response.status == 200:
+                data = await response.json()
+                if data["success"]:
+                    result = data["result"]
+                    embed = discord.Embed(title=f"ASN intelligence for {asn}", color=0xfffffe)
+                    
+                    if "asn" in result:
+                        embed.add_field(name="ASN", value=f"**`{result['asn']}`**", inline=False)
+                    if "description" in result:
+                        embed.add_field(name="Description", value=f"**`{result['description']}`**", inline=False)
+                    if "country" in result:
+                        embed.add_field(name="Country", value=f"**`{result['country']}`**", inline=False)
+                    if "type" in result:
+                        embed.add_field(name="Type", value=f"**`{result['type']}`**", inline=False)
+                    if "risk_score" in result:
+                        embed.add_field(name="Risk Score", value=f"**`{result['risk_score']}`**", inline=False)
+                    
+                    await ctx.send(embed=embed)
+                else:
+                    await ctx.send(f"Error: {data['errors']}")
+            elif response.status == 400:
+                await ctx.send("Bad Request: The server could not understand the request due to invalid syntax.")
+            else:
+                await ctx.send(f"Failed to query Cloudflare API. Status code: {response.status}")
 
     def cog_unload(self):
         self.bot.loop.create_task(self.session.close())
