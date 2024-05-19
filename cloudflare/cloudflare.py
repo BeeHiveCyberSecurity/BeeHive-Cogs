@@ -1007,5 +1007,79 @@ class Cloudflare(commands.Cog):
             embed.add_field(name="Tag", value=f"**`{str(settings.get('tag', 'N/A')).upper()}`**", inline=False)
 
             await ctx.send(embed=embed)
+    
+    @commands.is_owner()
+    @emailrouting.command(name="enable")
+    async def enable_email_routing(self, ctx):
+        """Enable Email Routing for the selected zone"""
+        api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
+        email = api_tokens.get("email")
+        api_key = api_tokens.get("api_key")
+        bearer_token = api_tokens.get("bearer_token")
+        zone_identifier = api_tokens.get("zone_id")
+
+        if not all([email, api_key, bearer_token, zone_identifier]):
+            await ctx.send("Missing one or more required API tokens. Please check your configuration.")
+            return
+
+        headers = {
+            "X-Auth-Email": email,
+            "X-Auth-Key": api_key,
+            "Authorization": f"Bearer {bearer_token}",
+            "Content-Type": "application/json"
+        }
+
+        url = f"https://api.cloudflare.com/client/v4/zones/{zone_identifier}/email/routing/enable"
+        async with self.session.post(url, headers=headers) as response:
+            if response.status != 200:
+                await ctx.send(f"Failed to enable Email Routing: {response.status}")
+                return
+
+            data = await response.json()
+            if not data.get("success", False):
+                await ctx.send("Failed to enable Email Routing.")
+                return
+
+            await ctx.send(f"Email Routing has been successfully enabled for zone `{zone_identifier.upper()}`.")
+    
+    @commands.is_owner()
+    @emailrouting.command(name="disable")
+    async def disable_email_routing(self, ctx):
+        """Disable Email Routing for the selected zone"""
+        api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
+        email = api_tokens.get("email")
+        api_key = api_tokens.get("api_key")
+        bearer_token = api_tokens.get("bearer_token")
+        zone_identifier = api_tokens.get("zone_id")
+
+        if not all([email, api_key, bearer_token, zone_identifier]):
+            await ctx.send("Missing one or more required API tokens. Please check your configuration.")
+            return
+
+        headers = {
+            "X-Auth-Email": email,
+            "X-Auth-Key": api_key,
+            "Authorization": f"Bearer {bearer_token}",
+            "Content-Type": "application/json"
+        }
+
+        url = f"https://api.cloudflare.com/client/v4/zones/{zone_identifier}/email/routing/disable"
+        async with self.session.post(url, headers=headers) as response:
+            if response.status != 200:
+                await ctx.send(f"Failed to disable Email Routing: {response.status}")
+                return
+
+            data = await response.json()
+            if not data.get("success", False):
+                await ctx.send("Failed to disable Email Routing.")
+                return
+
+            await ctx.send(f"Email Routing has been successfully disabled for zone `{zone_identifier.upper()}`.")
+    
+    
+    
+    
+    
+    
     def cog_unload(self):
         self.bot.loop.create_task(self.session.close())
