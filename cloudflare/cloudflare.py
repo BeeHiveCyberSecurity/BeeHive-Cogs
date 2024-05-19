@@ -720,7 +720,7 @@ class Cloudflare(commands.Cog):
     @commands.is_owner()
     @emailrouting.command(name="list")
     async def list_email_routing_addresses(self, ctx):
-        """List Email Routing addresses"""
+        """List current destination addresses"""
         api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
         email = api_tokens.get("email")
         api_key = api_tokens.get("api_key")
@@ -792,9 +792,9 @@ class Cloudflare(commands.Cog):
                         break
 
     @commands.is_owner()
-    @emailrouting.command(name="create")
+    @emailrouting.command(name="add")
     async def create_email_routing_address(self, ctx, email: str):
-        """Create a new email routing destination address."""
+        """Add a new destination address to your Email Routing service."""
         api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
         email_token = api_tokens.get("email")
         api_key = api_tokens.get("api_key")
