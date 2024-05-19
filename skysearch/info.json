@@ -6,5 +6,6 @@
     "description": "SkySearch is made to let you fetch information about aircraft, and airports. You can query active flights by a selection of variables, or get airport information, runway information, airport forecasts, and more. ",
     "tags": ["airplanes", "airplaneslive", "aircraft", "aircraft tracking", "ADS-B", "plane spotting"],
     "end_user_data_statement": "SkySearch stores no user data. Usage of external API integrations provided in SkySearch is subject to the Privacy Policy, and Terms of Service, of the respective service.",
-    "requirements": ["reportlab"]
+    "requirements": ["reportlab"],
+    "min_bot_version": "3.5.0"
 }
