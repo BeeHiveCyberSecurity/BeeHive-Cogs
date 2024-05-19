@@ -169,9 +169,10 @@ class VirusTotal(commands.Cog):
                             embed.description = "# No security vendors currently flag this file as malicious\nYou should be safe to run and use it. Check back on the results later to see if vendors change their minds - it happens"
                             embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/checkmark-circle-outline.png")
 
-                        embed.add_field(name="SHA-256", value=f"**`{sha256}`**", inline=False)
-                        embed.add_field(name="SHA-1", value=f"**`{sha1}`**", inline=False)
                         embed.add_field(name="MD5", value=f"**`{md5}`**", inline=False)
+                        embed.add_field(name="SHA-1", value=f"**`{sha1}`**", inline=False)
+                        embed.add_field(name="SHA-256", value=f"**`{sha256}`**", inline=False)
+                        
                         # Create the button for the virustotal results link
                         button = discord.ui.Button(label="View results on VirusTotal", url=f"https://www.virustotal.com/gui/file/{sha256}", emoji="🌐", style=discord.ButtonStyle.url)
                         button2 = discord.ui.Button(label="Get a second opinion", url="https://discord.gg/6PbaH6AfvF", style=discord.ButtonStyle.url)
