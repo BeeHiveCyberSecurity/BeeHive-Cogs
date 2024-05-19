@@ -904,14 +904,33 @@ class Cloudflare(commands.Cog):
                     if response.status == 200:
                         data = await response.json()
                         if data["success"]:
-                            await ctx.send(f"Successfully removed email routing address: {email}")
+                            embed = discord.Embed(
+                                title="Destination address removed",
+                                description=f"**Successfully removed email routing address**\n**`{email}`**",
+                                color=discord.Color.green()
+                            )
+                            await ctx.send(embed=embed)
                         else:
-                            await ctx.send(f"Error: {data['errors']}")
+                            embed = discord.Embed(
+                                title="Error",
+                                description=f"**Error:** {data['errors']}",
+                                color=discord.Color.red()
+                            )
+                            await ctx.send(embed=embed)
                     else:
-                        await ctx.send(f"Failed to remove email routing address. Status code: {response.status}")
+                        embed = discord.Embed(
+                            title="Error",
+                            description=f"Failed to remove email routing address. Status code: {response.status}",
+                            color=discord.Color.red()
+                        )
+                        await ctx.send(embed=embed)
         except asyncio.TimeoutError:
-            await ctx.send("Confirmation timed out. Email routing address removal cancelled.")
-
+            embed = discord.Embed(
+                title="Timeout",
+                description="Confirmation timed out. Email routing address removal cancelled.",
+                color=discord.Color.red()
+            )
+            await ctx.send(embed=embed)
 
     def cog_unload(self):
         self.bot.loop.create_task(self.session.close())
