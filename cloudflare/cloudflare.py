@@ -339,11 +339,11 @@ class Cloudflare(commands.Cog):
             current_page = 0
             if len(pages) > 1:
                 await message.add_reaction("◀️")
-                await message.add_reaction("▶️")
                 await message.add_reaction("❌")
+                await message.add_reaction("▶️")
 
                 def check(reaction, user):
-                    return user == ctx.author and str(reaction.emoji) in ["◀️", "▶️", "❌"] and reaction.message.id == message.id
+                    return user == ctx.author and str(reaction.emoji) in ["◀️", "❌", "▶️"] and reaction.message.id == message.id
 
                 while True:
                     try:
