@@ -232,8 +232,8 @@ class Cloudflare(commands.Cog):
             if "nameservers" in whois_info:
                 nameservers_list = "\n".join(f"- **`{ns}`**" for ns in whois_info["nameservers"])
                 page = add_field_to_page(page, "Nameservers", nameservers_list)
-            if "punycode" in whois_info:
-                page = add_field_to_page(page, "Punycode", whois_info["punycode"])
+#            if "punycode" in whois_info:
+#                page = add_field_to_page(page, "Punycode", whois_info["punycode"])
             if "registrant" in whois_info:
                 page = add_field_to_page(page, "Registrant", whois_info["registrant"])
             if "registrant_city" in whois_info:
