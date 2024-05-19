@@ -116,5 +116,44 @@ class Cloudflare(commands.Cog):
                     except asyncio.TimeoutError:
                         break
 
+    @commands.command(name="whois")
+    async def whois(self, ctx, domain: str):
+        """
+        Query WHOIS information for a given domain.
+        """
+        api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
+        email = api_tokens["email"]
+        api_key = api_tokens["api_key"]
+        bearer_token = api_tokens["bearer_token"]
+        account_id = api_tokens["account_id"]
+
+        headers = {
+            "X-Auth-Email": email,
+            "X-Auth-Key": api_key,
+            "Authorization": f"Bearer {bearer_token}",
+            "Content-Type": "application/json"
+        }
+
+        async with self.session.get(f"https://api.cloudflare.com/client/v4/accounts/{account_id}/intel/whois?domain={domain}", headers=headers) as response:
+            if response.status != 200:
+                await ctx.send(f"Failed to fetch WHOIS information: {response.status}")
+                return
+
+            data = await response.json()
+            if not data.get("success", False):
+                await ctx.send("Failed to fetch WHOIS information.")
+                return
+
+            whois_info = data.get("result", {})
+
+            embed = discord.Embed(title=f"WHOIS Information for {domain}", color=discord.Color.blue())
+            for key, value in whois_info.items():
+                embed.add_field(name=key, value=value, inline=False)
+
+            await ctx.send(embed=embed)
+
+
+
+
     def cog_unload(self):
         self.bot.loop.create_task(self.session.close())
