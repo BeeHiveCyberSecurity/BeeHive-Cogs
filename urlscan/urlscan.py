@@ -158,7 +158,7 @@ class URLScan(commands.Cog):
                                 try:
                                     await message.delete()
                                     embed = discord.Embed(
-                                        title="Suspicious URL detected",
+                                        title="Threat detected by URLScan",
                                         description=f"Deleted a suspicious URL posted by {message.author.mention}.",
                                         color=0xFF4545
                                     )
@@ -169,7 +169,7 @@ class URLScan(commands.Cog):
                                 except discord.Forbidden:
                                     # Bot does not have permission to delete the message
                                     embed = discord.Embed(
-                                        title="Suspicious URL detected",
+                                        title="Threat detected by URLScan",
                                         description=f"Detected a suspicious URL posted by {message.author.mention}, but I don't have permission to delete it.",
                                         color=0xFF4545
                                     )
