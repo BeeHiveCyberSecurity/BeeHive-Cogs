@@ -1159,11 +1159,13 @@ class Cloudflare(commands.Cog):
 
             await ctx.send(embed=embed)
     
+    @commands.is_owner()
     @emailrouting.group(name="rules", invoke_without_command=True)
     async def email_routing_rules(self, ctx):
         """Manage Email Routing rules"""
         await ctx.send_help(ctx.command)
 
+    @commands.is_owner()
     @email_routing_rules.command(name="add")
     async def add_email_routing_rule(self, ctx, source: str, destination: str):
         """Add a new Email Routing rule"""
@@ -1202,6 +1204,8 @@ class Cloudflare(commands.Cog):
 
             await ctx.send(f"Email Routing rule added successfully: {source} -> {destination}")
 
+
+    @commands.is_owner()
     @email_routing_rules.command(name="remove")
     async def remove_email_routing_rule(self, ctx, rule_id: str):
         """Remove an existing Email Routing rule"""
@@ -1236,6 +1240,7 @@ class Cloudflare(commands.Cog):
 
             await ctx.send(f"Email Routing rule removed successfully: {rule_id}")
 
+    @commands.is_owner()
     @email_routing_rules.command(name="list")
     async def list_email_routing_rules(self, ctx):
         """List all Email Routing rules"""
