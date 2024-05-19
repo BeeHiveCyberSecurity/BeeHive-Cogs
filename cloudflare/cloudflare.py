@@ -1278,18 +1278,25 @@ class Cloudflare(commands.Cog):
                 await ctx.send("No Email Routing rules found.")
                 return
 
-            embed = discord.Embed(title="Email Routing Rules", color=discord.Color.from_rgb(255, 128, 0))
+            embeds = []
             for rule in rules:
                 actions = ", ".join([action["type"] for action in rule["actions"]])
                 destinations = ", ".join([value for action in rule["actions"] for value in action.get("value", [])])
                 matchers = ", ".join([f"{matcher.get('field', 'unknown')}: {matcher.get('value', 'unknown')}" for matcher in rule["matchers"]])
+                embed = discord.Embed(title="Email Routing Rules", color=discord.Color.from_rgb(255, 128, 0))
                 embed.add_field(
                     name=f"Rule ID: {rule['id']}",
                     value=f"**Name:** {rule['name']}\n**Enabled:** {rule['enabled']}\n**Actions:** {actions}\n**Destinations:** {destinations}\n**Matchers:** {matchers}\n**Priority:** {rule['priority']}\n**Tag:** {rule['tag']}",
                     inline=False
                 )
+                embeds.append(embed)
 
-            await ctx.send(embed=embed)
+            paginator = commands.Paginator()
+            for embed in embeds:
+                paginator.add_page(embed)
+
+            message = await ctx.send(embed=paginator.pages[0])
+            await paginator.paginate(message, ctx.author)
     
     
     
