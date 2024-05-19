@@ -1,0 +1,20 @@
+{
+    "author": [
+        "movelaterally"
+    ],
+    "description": "Interact with Cloudflare's API via Discord",
+    "install_msg": "## :white_check_mark: Successfully installed Cloudflare.\n**Questions?** [We're listening](<https://www.beehive.systems/contact-us>)\n**Interested in CyberSecurity and CyberSafety?** Join our Discord! https://discord.gg/ckdzsm7mTs",
+    "name": "Cloudflare",
+    "hidden": true,
+    "disabled": false,
+    "requirements": [
+        "requests",
+        "discord-py-interactions"
+    ],
+    "tags": [
+        "cloudflare",
+        "waf"
+    ],
+    "short": "View information about company products",
+    "min_bot_version": "3.5.0"
+}
