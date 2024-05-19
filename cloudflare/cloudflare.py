@@ -822,11 +822,11 @@ class Cloudflare(commands.Cog):
                 if data["success"]:
                     result = data["result"]
                     embed = discord.Embed(title="Destination address added", description="You or the owner of this inbox will need to click the link they were sent just now to enable their email as a destination within your Cloudflare account", color=discord.Color.green())
-                    embed.add_field(name="Email", value=result["email"], inline=False)
-                    embed.add_field(name="ID", value=result["id"], inline=False)
-                    embed.add_field(name="Created", value=result["created"], inline=False)
-                    embed.add_field(name="Modified", value=result["modified"], inline=False)
-                    embed.add_field(name="Verified", value=result["verified"], inline=False)
+                    embed.add_field(name="Email", value=f"**`{result['email']}`**", inline=False)
+                    embed.add_field(name="ID", value=f"**`{result['id']}`**", inline=False)
+                    embed.add_field(name="Created", value=f"**`{result['created']}`**", inline=False)
+                    embed.add_field(name="Modified", value=f"**`{result['modified']}`**", inline=False)
+                    embed.add_field(name="Verified", value=f"**`{result['verified']}`**", inline=False)
                     await ctx.send(embed=embed)
                 else:
                     await ctx.send(f"Error: {data['errors']}")
