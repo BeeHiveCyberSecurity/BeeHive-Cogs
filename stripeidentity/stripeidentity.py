@@ -169,7 +169,13 @@ class StripeIdentity(commands.Cog):
                 await modlog_channel.send(embed=modlog_embed)
             decline_button.callback = decline_verification
             view.add_item(decline_button)
-            dm_message = await user.send(embed=dm_embed, view=view)
+            try:
+                dm_message = await user.send(embed=dm_embed, view=view)
+            except discord.Forbidden:
+                embed = discord.Embed(description=f":x: **Failed to send DM to {user.display_name}**. They might have DMs disabled.", color=discord.Color(0xff4545))
+                await ctx.send(embed=embed)
+                return
+
             embed = discord.Embed(description=f":white_check_mark: **`AGE` verification session created for {user.mention}. They've been sent instructions on how to continue.**", color=discord.Color(0x2BBD8E))
             await ctx.send(embed=embed)
 
@@ -281,7 +287,12 @@ class StripeIdentity(commands.Cog):
                     await self.config.pending_verification_sessions.clear_raw(str(user.id))
             decline_button.callback = decline_verification
             view.add_item(decline_button)
-            dm_message = await user.send(embed=dm_embed, view=view)
+            try:
+                dm_message = await user.send(embed=dm_embed, view=view)
+            except discord.Forbidden:
+                embed = discord.Embed(description=f":x: **Failed to send DM to {user.display_name}**. They might have DMs disabled.", color=discord.Color(0xff4545))
+                await ctx.send(embed=embed)
+                return
 
             embed = discord.Embed(description=f":white_check_mark: **`IDENTITY` verification session created for {user.mention}. They've been sent instructions on how to continue.**", color=discord.Color(0x2BBD8E))
             await ctx.send(embed=embed)
