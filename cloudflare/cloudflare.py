@@ -947,5 +947,52 @@ class Cloudflare(commands.Cog):
             )
             await ctx.send(embed=embed)
 
+    @commands.is_owner()
+    @emailrouting.command(name="settings")
+    async def get_email_routing_settings(self, ctx, zone_identifier: str):
+        """Get and display the current Email Routing settings for a specific zone"""
+        api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
+        email = api_tokens.get("email")
+        api_key = api_tokens.get("api_key")
+        bearer_token = api_tokens.get("bearer_token")
+        account_id = api_tokens.get("account_id")
+
+        if not all([email, api_key, bearer_token, account_id]):
+            await ctx.send("Missing one or more required API tokens. Please check your configuration.")
+            return
+
+        headers = {
+            "X-Auth-Email": email,
+            "X-Auth-Key": api_key,
+            "Authorization": f"Bearer {bearer_token}",
+            "Content-Type": "application/json"
+        }
+
+        url = f"https://api.cloudflare.com/client/v4/zones/{zone_identifier}/email/routing"
+        async with self.session.get(url, headers=headers) as response:
+            if response.status != 200:
+                await ctx.send(f"Failed to fetch Email Routing settings: {response.status}")
+                return
+
+            data = await response.json()
+            if not data.get("success", False):
+                await ctx.send("Failed to fetch Email Routing settings.")
+                return
+
+            settings = data.get("result", {})
+            if not settings:
+                await ctx.send("No Email Routing settings found.")
+                return
+
+            embed = discord.Embed(
+                title="Email Routing Settings",
+                description=f"Settings for zone: **`{zone_identifier}`**",
+                color=discord.Color.blue()
+            )
+
+            for key, value in settings.items():
+                embed.add_field(name=key, value=str(value), inline=False)
+
+            await ctx.send(embed=embed)
     def cog_unload(self):
         self.bot.loop.create_task(self.session.close())
