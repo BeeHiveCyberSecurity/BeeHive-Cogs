@@ -57,8 +57,8 @@ class VirusTotal(commands.Cog):
                                 analysis_id = data.get("data", {}).get("id")
                                 if analysis_id:
                                     await self.check_results(ctx, analysis_id, ctx.author.id)
-                                    # Delete the attachment from the channel
-                                    await attachment.delete()
+                                    # Delete the attachment message from the channel
+                                    await ctx.message.delete()
                                 else:
                                     raise ValueError("No analysis ID found in the response.")
                     else:
@@ -189,4 +189,5 @@ class VirusTotal(commands.Cog):
                 embed = discord.Embed(title='Request timed out', description="The bot was unable to complete the request due to a timeout.", colour=discord.Colour.red())
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle-outline.png")
                 await ctx.send(embed=embed)
+
 
