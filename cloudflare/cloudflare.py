@@ -282,61 +282,89 @@ class Cloudflare(commands.Cog):
                 registrar_city = f"**`{whois_info['registrar_city']}`**"
                 page = add_field_to_page(page, "Registrar City", registrar_city)
             if "registrar_country" in whois_info:
-                page = add_field_to_page(page, "Registrar Country", whois_info["registrar_country"])
+                registrar_country = f"**`{whois_info['registrar_country']}`**"
+                page = add_field_to_page(page, "Registrar Country", registrar_country)
             if "registrar_email" in whois_info:
-                page = add_field_to_page(page, "Registrar Email", whois_info["registrar_email"])
+                registrar_email = f"**`{whois_info['registrar_email']}`**"
+                page = add_field_to_page(page, "Registrar Email", registrar_email)
             if "registrar_fax" in whois_info:
-                page = add_field_to_page(page, "Registrar Fax", whois_info["registrar_fax"])
+                registrar_fax = f"**`{whois_info['registrar_fax']}`**"
+                page = add_field_to_page(page, "Registrar Fax", registrar_fax)
             if "registrar_fax_ext" in whois_info:
-                page = add_field_to_page(page, "Registrar Fax Ext", whois_info["registrar_fax_ext"])
+                registrar_fax_ext = f"**`{whois_info['registrar_fax_ext']}`**"
+                page = add_field_to_page(page, "Registrar Fax Ext", registrar_fax_ext)
             if "registrar_id" in whois_info:
-                page = add_field_to_page(page, "Registrar ID", whois_info["registrar_id"])
+                registrar_id = f"**`{whois_info['registrar_id']}`**"
+                page = add_field_to_page(page, "Registrar ID", registrar_id)
             if "registrar_name" in whois_info:
-                page = add_field_to_page(page, "Registrar Name", whois_info["registrar_name"])
+                registrar_name = f"**`{whois_info['registrar_name']}`**"
+                page = add_field_to_page(page, "Registrar Name", registrar_name)
             if "registrar_org" in whois_info:
-                page = add_field_to_page(page, "Registrar Org", whois_info["registrar_org"])
+                registrar_org = f"**`{whois_info['registrar_org']}`**"
+                page = add_field_to_page(page, "Registrar Org", registrar_org)
             if "registrar_phone" in whois_info:
-                page = add_field_to_page(page, "Registrar Phone", whois_info["registrar_phone"])
+                registrar_phone = f"**`{whois_info['registrar_phone']}`**"
+                page = add_field_to_page(page, "Registrar Phone", registrar_phone)
             if "registrar_phone_ext" in whois_info:
-                page = add_field_to_page(page, "Registrar Phone Ext", whois_info["registrar_phone_ext"])
+                registrar_phone_ext = f"**`{whois_info['registrar_phone_ext']}`**"
+                page = add_field_to_page(page, "Registrar Phone Ext", registrar_phone_ext)
             if "registrar_postal_code" in whois_info:
-                page = add_field_to_page(page, "Registrar Postal Code", whois_info["registrar_postal_code"])
+                registrar_postal_code = f"**`{whois_info['registrar_postal_code']}`**"
+                page = add_field_to_page(page, "Registrar Postal Code", registrar_postal_code)
             if "registrar_province" in whois_info:
-                page = add_field_to_page(page, "Registrar Province", whois_info["registrar_province"])
+                registrar_province = f"**`{whois_info['registrar_province']}`**"
+                page = add_field_to_page(page, "Registrar Province", registrar_province)
             if "registrar_street" in whois_info:
-                page = add_field_to_page(page, "Registrar Street", whois_info["registrar_street"])
+                registrar_street = f"**`{whois_info['registrar_street']}`**"
+                page = add_field_to_page(page, "Registrar Street", registrar_street)
             if "status" in whois_info:
-                page = add_field_to_page(page, "Status", ", ".join(whois_info["status"]))
+                status_value = f"**`{', '.join(whois_info['status'])}`**"
+                page = add_field_to_page(page, "Status", status_value)
             if "technical_city" in whois_info:
-                page = add_field_to_page(page, "Technical City", whois_info["technical_city"])
+                technical_city = f"**`{whois_info['technical_city']}`**"
+                page = add_field_to_page(page, "Technical City", technical_city)
             if "technical_country" in whois_info:
-                page = add_field_to_page(page, "Technical Country", whois_info["technical_country"])
+                technical_country = f"**`{whois_info['technical_country']}`**"
+                page = add_field_to_page(page, "Technical Country", technical_country)
             if "technical_email" in whois_info:
-                page = add_field_to_page(page, "Technical Email", whois_info["technical_email"])
+                technical_email = f"**`{whois_info['technical_email']}`**"
+                page = add_field_to_page(page, "Technical Email", technical_email)
             if "technical_fax" in whois_info:
-                page = add_field_to_page(page, "Technical Fax", whois_info["technical_fax"])
+                technical_fax = f"**`{whois_info['technical_fax']}`**"
+                page = add_field_to_page(page, "Technical Fax", technical_fax)
             if "technical_fax_ext" in whois_info:
-                page = add_field_to_page(page, "Technical Fax Ext", whois_info["technical_fax_ext"])
+                technical_fax_ext = f"**`{whois_info['technical_fax_ext']}`**"
+                page = add_field_to_page(page, "Technical Fax Ext", technical_fax_ext)
             if "technical_id" in whois_info:
-                page = add_field_to_page(page, "Technical ID", whois_info["technical_id"])
+                technical_id = f"**`{whois_info['technical_id']}`**"
+                page = add_field_to_page(page, "Technical ID", technical_id)
             if "technical_name" in whois_info:
-                page = add_field_to_page(page, "Technical Name", whois_info["technical_name"])
+                technical_name = f"**`{whois_info['technical_name']}`**"
+                page = add_field_to_page(page, "Technical Name", technical_name)
             if "technical_org" in whois_info:
-                page = add_field_to_page(page, "Technical Org", whois_info["technical_org"])
+                technical_org = f"**`{whois_info['technical_org']}`**"
+                page = add_field_to_page(page, "Technical Org", technical_org)
             if "technical_phone" in whois_info:
-                page = add_field_to_page(page, "Technical Phone", whois_info["technical_phone"])
+                technical_phone = f"**`{whois_info['technical_phone']}`**"
+                page = add_field_to_page(page, "Technical Phone", technical_phone)
             if "technical_phone_ext" in whois_info:
-                page = add_field_to_page(page, "Technical Phone Ext", whois_info["technical_phone_ext"])
+                technical_phone_ext = f"**`{whois_info['technical_phone_ext']}`**"
+                page = add_field_to_page(page, "Technical Phone Ext", technical_phone_ext)
             if "technical_postal_code" in whois_info:
-                page = add_field_to_page(page, "Technical Postal Code", whois_info["technical_postal_code"])
+                technical_postal_code = f"**`{whois_info['technical_postal_code']}`**"
+                page = add_field_to_page(page, "Technical Postal Code", technical_postal_code)
             if "technical_province" in whois_info:
-                page = add_field_to_page(page, "Technical Province", whois_info["technical_province"])
+                technical_province = f"**`{whois_info['technical_province']}`**"
+                page = add_field_to_page(page, "Technical Province", technical_province)
             if "technical_street" in whois_info:
-                page = add_field_to_page(page, "Technical Street", whois_info["technical_street"])
+                technical_street = f"**`{whois_info['technical_street']}`**"
+                page = add_field_to_page(page, "Technical Street", technical_street)
             if "updated_date" in whois_info:
-                page = add_field_to_page(page, "Updated Date", whois_info["updated_date"])
+                updated_date = int(whois_info["updated_date"].timestamp())
+                page = add_field_to_page(page, "Updated Date", f"**<t:{updated_date}:F>**")
             if "whois_server" in whois_info:
-                page = add_field_to_page(page, "WHOIS Server", whois_info["whois_server"])
+                whois_server = f"**`{whois_info['whois_server']}`**"
+                page = add_field_to_page(page, "WHOIS Server", whois_server)
 
             if page.fields:
                 pages.append(page)
@@ -344,19 +372,19 @@ class Cloudflare(commands.Cog):
             # Create a view with a button
             view = discord.ui.View()
             if "administrative_referral_url" in whois_info:
-                button = discord.ui.Button(label="Administrative Referral URL", url=whois_info["administrative_referral_url"])
+                button = discord.ui.Button(label="Admin", url=whois_info["administrative_referral_url"])
                 view.add_item(button)
             if "billing_referral_url" in whois_info:
-                button = discord.ui.Button(label="Billing contact", url=whois_info["billing_referral_url"])
+                button = discord.ui.Button(label="Billing", url=whois_info["billing_referral_url"])
                 view.add_item(button)
             if "registrant_referral_url" in whois_info:
-                button = discord.ui.Button(label="Registrant contact", url=whois_info["registrant_referral_url"])
+                button = discord.ui.Button(label="Registrant", url=whois_info["registrant_referral_url"])
                 view.add_item(button)
             if "registrar_referral_url" in whois_info:
-                button = discord.ui.Button(label="Registrar contact", url=whois_info["registrar_referral_url"])
+                button = discord.ui.Button(label="Registrar", url=whois_info["registrar_referral_url"])
                 view.add_item(button)
             if "technical_referral_url" in whois_info:
-                button = discord.ui.Button(label="Technical contact", url=whois_info["technical_referral_url"])
+                button = discord.ui.Button(label="Technical", url=whois_info["technical_referral_url"])
                 view.add_item(button)
 
             message = await ctx.send(embed=pages[0], view=view)
