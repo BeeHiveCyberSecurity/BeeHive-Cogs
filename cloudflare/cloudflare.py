@@ -217,16 +217,21 @@ class Cloudflare(commands.Cog):
                     except ValueError:
                         expiration_date = datetime.strptime(expiration_date, "%Y-%m-%dT%H:%M:%S")
                 unix_timestamp = int(expiration_date.timestamp())
-                discord_timestamp = f"<t:{unix_timestamp}:F>"
+                discord_timestamp = f"**<t:{unix_timestamp}:F>**"
                 page = add_field_to_page(page, "Expiration Date", discord_timestamp)
             if "extension" in whois_info:
-                page = add_field_to_page(page, "Extension", whois_info["extension"])
+                extension_value = whois_info["extension"]
+                extension_value = f"**`{extension_value}`**"
+                page = add_field_to_page(page, "Extension", extension_value)
             if "found" in whois_info:
-                page = add_field_to_page(page, "Found", whois_info["found"])
+                found_value = f"**`{whois_info['found']}`**"
+                page = add_field_to_page(page, "Found", found_value)
             if "id" in whois_info:
-                page = add_field_to_page(page, "ID", whois_info["id"])
+                id_value = f"**`{whois_info['id']}`**"
+                page = add_field_to_page(page, "ID", id_value)
             if "nameservers" in whois_info:
-                page = add_field_to_page(page, "Nameservers", ", ".join(whois_info["nameservers"]))
+                nameservers_list = "\n".join(f"- **`{ns}`**" for ns in whois_info["nameservers"])
+                page = add_field_to_page(page, "Nameservers", nameservers_list)
             if "punycode" in whois_info:
                 page = add_field_to_page(page, "Punycode", whois_info["punycode"])
             if "registrant" in whois_info:
