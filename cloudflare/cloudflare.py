@@ -121,101 +121,178 @@ class Cloudflare(commands.Cog):
 
             whois_info = data.get("result", {})
 
-            fields = [
-                ("Administrative City", whois_info.get("administrative_city", "N/A")),
-                ("Administrative Country", whois_info.get("administrative_country", "N/A")),
-                ("Administrative Email", whois_info.get("administrative_email", "N/A")),
-                ("Administrative Fax", whois_info.get("administrative_fax", "N/A")),
-                ("Administrative Fax Ext", whois_info.get("administrative_fax_ext", "N/A")),
-                ("Administrative ID", whois_info.get("administrative_id", "N/A")),
-                ("Administrative Name", whois_info.get("administrative_name", "N/A")),
-                ("Administrative Org", whois_info.get("administrative_org", "N/A")),
-                ("Administrative Phone", whois_info.get("administrative_phone", "N/A")),
-                ("Administrative Phone Ext", whois_info.get("administrative_phone_ext", "N/A")),
-                ("Administrative Postal Code", whois_info.get("administrative_postal_code", "N/A")),
-                ("Administrative Province", whois_info.get("administrative_province", "N/A")),
-                ("Administrative Referral URL", whois_info.get("administrative_referral_url", "N/A")),
-                ("Administrative Street", whois_info.get("administrative_street", "N/A")),
-                ("Billing City", whois_info.get("billing_city", "N/A")),
-                ("Billing Country", whois_info.get("billing_country", "N/A")),
-                ("Billing Email", whois_info.get("billing_email", "N/A")),
-                ("Billing Fax", whois_info.get("billing_fax", "N/A")),
-                ("Billing Fax Ext", whois_info.get("billing_fax_ext", "N/A")),
-                ("Billing ID", whois_info.get("billing_id", "N/A")),
-                ("Billing Name", whois_info.get("billing_name", "N/A")),
-                ("Billing Org", whois_info.get("billing_org", "N/A")),
-                ("Billing Phone", whois_info.get("billing_phone", "N/A")),
-                ("Billing Phone Ext", whois_info.get("billing_phone_ext", "N/A")),
-                ("Billing Postal Code", whois_info.get("billing_postal_code", "N/A")),
-                ("Billing Province", whois_info.get("billing_province", "N/A")),
-                ("Billing Referral URL", whois_info.get("billing_referral_url", "N/A")),
-                ("Billing Street", whois_info.get("billing_street", "N/A")),
-                ("Created Date", whois_info.get("created_date", "N/A")),
-                ("DNSSEC", whois_info.get("dnssec", "N/A")),
-                ("Domain", whois_info.get("domain", "N/A")),
-                ("Expiration Date", whois_info.get("expiration_date", "N/A")),
-                ("Extension", whois_info.get("extension", "N/A")),
-                ("Found", whois_info.get("found", "N/A")),
-                ("ID", whois_info.get("id", "N/A")),
-                ("Nameservers", ", ".join(whois_info.get("nameservers", []))),
-                ("Punycode", whois_info.get("punycode", "N/A")),
-                ("Registrant", whois_info.get("registrant", "N/A")),
-                ("Registrant City", whois_info.get("registrant_city", "N/A")),
-                ("Registrant Country", whois_info.get("registrant_country", "N/A")),
-                ("Registrant Email", whois_info.get("registrant_email", "N/A")),
-                ("Registrant Fax", whois_info.get("registrant_fax", "N/A")),
-                ("Registrant Fax Ext", whois_info.get("registrant_fax_ext", "N/A")),
-                ("Registrant ID", whois_info.get("registrant_id", "N/A")),
-                ("Registrant Name", whois_info.get("registrant_name", "N/A")),
-                ("Registrant Org", whois_info.get("registrant_org", "N/A")),
-                ("Registrant Phone", whois_info.get("registrant_phone", "N/A")),
-                ("Registrant Phone Ext", whois_info.get("registrant_phone_ext", "N/A")),
-                ("Registrant Postal Code", whois_info.get("registrant_postal_code", "N/A")),
-                ("Registrant Province", whois_info.get("registrant_province", "N/A")),
-                ("Registrant Referral URL", whois_info.get("registrant_referral_url", "N/A")),
-                ("Registrant Street", whois_info.get("registrant_street", "N/A")),
-                ("Registrar", whois_info.get("registrar", "N/A")),
-                ("Registrar City", whois_info.get("registrar_city", "N/A")),
-                ("Registrar Country", whois_info.get("registrar_country", "N/A")),
-                ("Registrar Email", whois_info.get("registrar_email", "N/A")),
-                ("Registrar Fax", whois_info.get("registrar_fax", "N/A")),
-                ("Registrar Fax Ext", whois_info.get("registrar_fax_ext", "N/A")),
-                ("Registrar ID", whois_info.get("registrar_id", "N/A")),
-                ("Registrar Name", whois_info.get("registrar_name", "N/A")),
-                ("Registrar Org", whois_info.get("registrar_org", "N/A")),
-                ("Registrar Phone", whois_info.get("registrar_phone", "N/A")),
-                ("Registrar Phone Ext", whois_info.get("registrar_phone_ext", "N/A")),
-                ("Registrar Postal Code", whois_info.get("registrar_postal_code", "N/A")),
-                ("Registrar Province", whois_info.get("registrar_province", "N/A")),
-                ("Registrar Referral URL", whois_info.get("registrar_referral_url", "N/A")),
-                ("Registrar Street", whois_info.get("registrar_street", "N/A")),
-                ("Status", ", ".join(whois_info.get("status", []))),
-                ("Technical City", whois_info.get("technical_city", "N/A")),
-                ("Technical Country", whois_info.get("technical_country", "N/A")),
-                ("Technical Email", whois_info.get("technical_email", "N/A")),
-                ("Technical Fax", whois_info.get("technical_fax", "N/A")),
-                ("Technical Fax Ext", whois_info.get("technical_fax_ext", "N/A")),
-                ("Technical ID", whois_info.get("technical_id", "N/A")),
-                ("Technical Name", whois_info.get("technical_name", "N/A")),
-                ("Technical Org", whois_info.get("technical_org", "N/A")),
-                ("Technical Phone", whois_info.get("technical_phone", "N/A")),
-                ("Technical Phone Ext", whois_info.get("technical_phone_ext", "N/A")),
-                ("Technical Postal Code", whois_info.get("technical_postal_code", "N/A")),
-                ("Technical Province", whois_info.get("technical_province", "N/A")),
-                ("Technical Referral URL", whois_info.get("technical_referral_url", "N/A")),
-                ("Technical Street", whois_info.get("technical_street", "N/A")),
-                ("Updated Date", whois_info.get("updated_date", "N/A")),
-                ("WHOIS Server", whois_info.get("whois_server", "N/A"))
-            ]
-
             pages = []
             page = discord.Embed(title=f"WHOIS Information for {domain}", color=discord.Color.blue())
-            for name, value in fields:
-                if value != "N/A":
-                    if len(page.fields) == 15:
-                        pages.append(page)
-                        page = discord.Embed(title=f"WHOIS Information for {domain}", color=discord.Color.blue())
-                    page.add_field(name=name, value=value, inline=False)
+
+            if "administrative_city" in whois_info:
+                page.add_field(name="Administrative City", value=whois_info["administrative_city"], inline=False)
+            if "administrative_country" in whois_info:
+                page.add_field(name="Administrative Country", value=whois_info["administrative_country"], inline=False)
+            if "administrative_email" in whois_info:
+                page.add_field(name="Administrative Email", value=whois_info["administrative_email"], inline=False)
+            if "administrative_fax" in whois_info:
+                page.add_field(name="Administrative Fax", value=whois_info["administrative_fax"], inline=False)
+            if "administrative_fax_ext" in whois_info:
+                page.add_field(name="Administrative Fax Ext", value=whois_info["administrative_fax_ext"], inline=False)
+            if "administrative_id" in whois_info:
+                page.add_field(name="Administrative ID", value=whois_info["administrative_id"], inline=False)
+            if "administrative_name" in whois_info:
+                page.add_field(name="Administrative Name", value=whois_info["administrative_name"], inline=False)
+            if "administrative_org" in whois_info:
+                page.add_field(name="Administrative Org", value=whois_info["administrative_org"], inline=False)
+            if "administrative_phone" in whois_info:
+                page.add_field(name="Administrative Phone", value=whois_info["administrative_phone"], inline=False)
+            if "administrative_phone_ext" in whois_info:
+                page.add_field(name="Administrative Phone Ext", value=whois_info["administrative_phone_ext"], inline=False)
+            if "administrative_postal_code" in whois_info:
+                page.add_field(name="Administrative Postal Code", value=whois_info["administrative_postal_code"], inline=False)
+            if "administrative_province" in whois_info:
+                page.add_field(name="Administrative Province", value=whois_info["administrative_province"], inline=False)
+            if "administrative_referral_url" in whois_info:
+                page.add_field(name="Administrative Referral URL", value=whois_info["administrative_referral_url"], inline=False)
+            if "administrative_street" in whois_info:
+                page.add_field(name="Administrative Street", value=whois_info["administrative_street"], inline=False)
+            if "billing_city" in whois_info:
+                page.add_field(name="Billing City", value=whois_info["billing_city"], inline=False)
+            if "billing_country" in whois_info:
+                page.add_field(name="Billing Country", value=whois_info["billing_country"], inline=False)
+            if "billing_email" in whois_info:
+                page.add_field(name="Billing Email", value=whois_info["billing_email"], inline=False)
+            if "billing_fax" in whois_info:
+                page.add_field(name="Billing Fax", value=whois_info["billing_fax"], inline=False)
+            if "billing_fax_ext" in whois_info:
+                page.add_field(name="Billing Fax Ext", value=whois_info["billing_fax_ext"], inline=False)
+            if "billing_id" in whois_info:
+                page.add_field(name="Billing ID", value=whois_info["billing_id"], inline=False)
+            if "billing_name" in whois_info:
+                page.add_field(name="Billing Name", value=whois_info["billing_name"], inline=False)
+            if "billing_org" in whois_info:
+                page.add_field(name="Billing Org", value=whois_info["billing_org"], inline=False)
+            if "billing_phone" in whois_info:
+                page.add_field(name="Billing Phone", value=whois_info["billing_phone"], inline=False)
+            if "billing_phone_ext" in whois_info:
+                page.add_field(name="Billing Phone Ext", value=whois_info["billing_phone_ext"], inline=False)
+            if "billing_postal_code" in whois_info:
+                page.add_field(name="Billing Postal Code", value=whois_info["billing_postal_code"], inline=False)
+            if "billing_province" in whois_info:
+                page.add_field(name="Billing Province", value=whois_info["billing_province"], inline=False)
+            if "billing_referral_url" in whois_info:
+                page.add_field(name="Billing Referral URL", value=whois_info["billing_referral_url"], inline=False)
+            if "billing_street" in whois_info:
+                page.add_field(name="Billing Street", value=whois_info["billing_street"], inline=False)
+            if "created_date" in whois_info:
+                page.add_field(name="Created Date", value=whois_info["created_date"], inline=False)
+            if "dnssec" in whois_info:
+                page.add_field(name="DNSSEC", value=whois_info["dnssec"], inline=False)
+            if "domain" in whois_info:
+                page.add_field(name="Domain", value=whois_info["domain"], inline=False)
+            if "expiration_date" in whois_info:
+                page.add_field(name="Expiration Date", value=whois_info["expiration_date"], inline=False)
+            if "extension" in whois_info:
+                page.add_field(name="Extension", value=whois_info["extension"], inline=False)
+            if "found" in whois_info:
+                page.add_field(name="Found", value=whois_info["found"], inline=False)
+            if "id" in whois_info:
+                page.add_field(name="ID", value=whois_info["id"], inline=False)
+            if "nameservers" in whois_info:
+                page.add_field(name="Nameservers", value=", ".join(whois_info["nameservers"]), inline=False)
+            if "punycode" in whois_info:
+                page.add_field(name="Punycode", value=whois_info["punycode"], inline=False)
+            if "registrant" in whois_info:
+                page.add_field(name="Registrant", value=whois_info["registrant"], inline=False)
+            if "registrant_city" in whois_info:
+                page.add_field(name="Registrant City", value=whois_info["registrant_city"], inline=False)
+            if "registrant_country" in whois_info:
+                page.add_field(name="Registrant Country", value=whois_info["registrant_country"], inline=False)
+            if "registrant_email" in whois_info:
+                page.add_field(name="Registrant Email", value=whois_info["registrant_email"], inline=False)
+            if "registrant_fax" in whois_info:
+                page.add_field(name="Registrant Fax", value=whois_info["registrant_fax"], inline=False)
+            if "registrant_fax_ext" in whois_info:
+                page.add_field(name="Registrant Fax Ext", value=whois_info["registrant_fax_ext"], inline=False)
+            if "registrant_id" in whois_info:
+                page.add_field(name="Registrant ID", value=whois_info["registrant_id"], inline=False)
+            if "registrant_name" in whois_info:
+                page.add_field(name="Registrant Name", value=whois_info["registrant_name"], inline=False)
+            if "registrant_org" in whois_info:
+                page.add_field(name="Registrant Org", value=whois_info["registrant_org"], inline=False)
+            if "registrant_phone" in whois_info:
+                page.add_field(name="Registrant Phone", value=whois_info["registrant_phone"], inline=False)
+            if "registrant_phone_ext" in whois_info:
+                page.add_field(name="Registrant Phone Ext", value=whois_info["registrant_phone_ext"], inline=False)
+            if "registrant_postal_code" in whois_info:
+                page.add_field(name="Registrant Postal Code", value=whois_info["registrant_postal_code"], inline=False)
+            if "registrant_province" in whois_info:
+                page.add_field(name="Registrant Province", value=whois_info["registrant_province"], inline=False)
+            if "registrant_referral_url" in whois_info:
+                page.add_field(name="Registrant Referral URL", value=whois_info["registrant_referral_url"], inline=False)
+            if "registrant_street" in whois_info:
+                page.add_field(name="Registrant Street", value=whois_info["registrant_street"], inline=False)
+            if "registrar" in whois_info:
+                page.add_field(name="Registrar", value=whois_info["registrar"], inline=False)
+            if "registrar_city" in whois_info:
+                page.add_field(name="Registrar City", value=whois_info["registrar_city"], inline=False)
+            if "registrar_country" in whois_info:
+                page.add_field(name="Registrar Country", value=whois_info["registrar_country"], inline=False)
+            if "registrar_email" in whois_info:
+                page.add_field(name="Registrar Email", value=whois_info["registrar_email"], inline=False)
+            if "registrar_fax" in whois_info:
+                page.add_field(name="Registrar Fax", value=whois_info["registrar_fax"], inline=False)
+            if "registrar_fax_ext" in whois_info:
+                page.add_field(name="Registrar Fax Ext", value=whois_info["registrar_fax_ext"], inline=False)
+            if "registrar_id" in whois_info:
+                page.add_field(name="Registrar ID", value=whois_info["registrar_id"], inline=False)
+            if "registrar_name" in whois_info:
+                page.add_field(name="Registrar Name", value=whois_info["registrar_name"], inline=False)
+            if "registrar_org" in whois_info:
+                page.add_field(name="Registrar Org", value=whois_info["registrar_org"], inline=False)
+            if "registrar_phone" in whois_info:
+                page.add_field(name="Registrar Phone", value=whois_info["registrar_phone"], inline=False)
+            if "registrar_phone_ext" in whois_info:
+                page.add_field(name="Registrar Phone Ext", value=whois_info["registrar_phone_ext"], inline=False)
+            if "registrar_postal_code" in whois_info:
+                page.add_field(name="Registrar Postal Code", value=whois_info["registrar_postal_code"], inline=False)
+            if "registrar_province" in whois_info:
+                page.add_field(name="Registrar Province", value=whois_info["registrar_province"], inline=False)
+            if "registrar_referral_url" in whois_info:
+                page.add_field(name="Registrar Referral URL", value=whois_info["registrar_referral_url"], inline=False)
+            if "registrar_street" in whois_info:
+                page.add_field(name="Registrar Street", value=whois_info["registrar_street"], inline=False)
+            if "status" in whois_info:
+                page.add_field(name="Status", value=", ".join(whois_info["status"]), inline=False)
+            if "technical_city" in whois_info:
+                page.add_field(name="Technical City", value=whois_info["technical_city"], inline=False)
+            if "technical_country" in whois_info:
+                page.add_field(name="Technical Country", value=whois_info["technical_country"], inline=False)
+            if "technical_email" in whois_info:
+                page.add_field(name="Technical Email", value=whois_info["technical_email"], inline=False)
+            if "technical_fax" in whois_info:
+                page.add_field(name="Technical Fax", value=whois_info["technical_fax"], inline=False)
+            if "technical_fax_ext" in whois_info:
+                page.add_field(name="Technical Fax Ext", value=whois_info["technical_fax_ext"], inline=False)
+            if "technical_id" in whois_info:
+                page.add_field(name="Technical ID", value=whois_info["technical_id"], inline=False)
+            if "technical_name" in whois_info:
+                page.add_field(name="Technical Name", value=whois_info["technical_name"], inline=False)
+            if "technical_org" in whois_info:
+                page.add_field(name="Technical Org", value=whois_info["technical_org"], inline=False)
+            if "technical_phone" in whois_info:
+                page.add_field(name="Technical Phone", value=whois_info["technical_phone"], inline=False)
+            if "technical_phone_ext" in whois_info:
+                page.add_field(name="Technical Phone Ext", value=whois_info["technical_phone_ext"], inline=False)
+            if "technical_postal_code" in whois_info:
+                page.add_field(name="Technical Postal Code", value=whois_info["technical_postal_code"], inline=False)
+            if "technical_province" in whois_info:
+                page.add_field(name="Technical Province", value=whois_info["technical_province"], inline=False)
+            if "technical_referral_url" in whois_info:
+                page.add_field(name="Technical Referral URL", value=whois_info["technical_referral_url"], inline=False)
+            if "technical_street" in whois_info:
+                page.add_field(name="Technical Street", value=whois_info["technical_street"], inline=False)
+            if "updated_date" in whois_info:
+                page.add_field(name="Updated Date", value=whois_info["updated_date"], inline=False)
+            if "whois_server" in whois_info:
+                page.add_field(name="WHOIS Server", value=whois_info["whois_server"], inline=False)
+
             if page.fields:
                 pages.append(page)
 
