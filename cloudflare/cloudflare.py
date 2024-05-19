@@ -997,7 +997,10 @@ class Cloudflare(commands.Cog):
             embed.add_field(name="Created", value=f"**{created_timestamp}**", inline=False)
             embed.add_field(name="Enabled", value=f"**`{settings.get('enabled', 'N/A')}`**", inline=False)
             embed.add_field(name="ID", value=f"**`{settings.get('id', 'N/A').upper()}`**", inline=False)
-            embed.add_field(name="Modified", value=f"**`{settings.get('modified', 'N/A')}`**", inline=False)
+            modified_timestamp = settings.get('modified', 'N/A')
+            if modified_timestamp != 'N/A':
+                modified_timestamp = f"<t:{int(datetime.fromisoformat(modified_timestamp).timestamp())}:F>"
+            embed.add_field(name="Modified", value=f"**{modified_timestamp}**", inline=False)
             embed.add_field(name="Name", value=f"**`{settings.get('name', 'N/A')}`**", inline=False)
             embed.add_field(name="Skipped wizard", value=f"**`{str(settings.get('skip_wizard', 'N/A')).upper()}`**", inline=False)
             embed.add_field(name="Status", value=f"**`{str(settings.get('status', 'N/A')).upper()}`**", inline=False)
