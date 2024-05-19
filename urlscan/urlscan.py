@@ -5,12 +5,18 @@ import json
 import re
 from redbot.core import commands #type: ignore 
 from redbot.core import app_commands #type: ignore
+from redbot.core import Config #type: ignore
 
 class URLScan(commands.Cog):
     """URLScan file upload and analysis via Discord"""
 
     def __init__(self, bot):
         self.bot = bot
+        self.config = Config.get_conf(self, identifier=1234567890)
+        default_guild = {
+            "autoscan_enabled": False
+        }
+        self.config.register_guild(**default_guild)
 
     @commands.group(name='urlscan', help="Scan URL's for dangerous content", invoke_without_command=True)
     async def urlscan(self, ctx, *, urls: str = None):
