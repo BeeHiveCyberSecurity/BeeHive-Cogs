@@ -164,7 +164,7 @@ class URLScan(commands.Cog):
                                     )
                                     await message.channel.send(embed=embed)
                                 except discord.NotFound:
-                                    # Message was already deleted
+                                    # Message was already deleted, possibly by another link filtering module
                                     pass
                                 except discord.Forbidden:
                                     # Bot does not have permission to delete the message
