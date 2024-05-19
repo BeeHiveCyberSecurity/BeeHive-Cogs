@@ -21,7 +21,7 @@ class Cloudflare(commands.Cog):
         self.session = aiohttp.ClientSession()
 
     @commands.group()
-    async def tools(self, ctx)
+    async def tools(self, ctx):
          """Different utility tools provided by Cloudflare."""
     if ctx.invoked_subcommand is None:
         await ctx.send("Invalid Cloudflare command passed.")
