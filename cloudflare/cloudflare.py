@@ -756,7 +756,7 @@ class Cloudflare(commands.Cog):
             pages = [addresses[i:i + 10] for i in range(0, len(addresses), 10)]
             current_page = 0
 
-            embed = discord.Embed(title="Email Routing Addresses", description="\n".join([f"**`{addr['email']}`**" for addr in pages[current_page]]), color=discord.Color.blue())
+            embed = discord.Embed(title="Email Routing address list", description="\n".join([f"**`{addr['email']}`**" for addr in pages[current_page]]), color=discord.Color.from_rgb(255, 128, 0))
             message = await ctx.send(embed=embed)
 
             if len(pages) > 1:
