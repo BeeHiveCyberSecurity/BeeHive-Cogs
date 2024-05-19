@@ -133,62 +133,88 @@ class Cloudflare(commands.Cog):
                 field_count += 1
                 if field_count == 10:
                     pages.append(page)
-                    page = discord.Embed(title=f"WHOIS Information for {domain}", color=discord.Color.blue())
+                    page = discord.Embed(title=f"WHOIS Information for {domain}", color=0xfffffe)
                     field_count = 0
                 return page
 
             if "administrative_city" in whois_info:
-                page = add_field_to_page(page, "Administrative City", whois_info["administrative_city"])
+                administrative_city_value = f"**`{whois_info['administrative_city']}`**"
+                page = add_field_to_page(page, "Administrative City", administrative_city_value)
             if "administrative_country" in whois_info:
-                page = add_field_to_page(page, "Administrative Country", whois_info["administrative_country"])
+                administrative_country_value = f"**`{whois_info['administrative_country']}`**"
+                page = add_field_to_page(page, "Administrative Country", administrative_country_value)
             if "administrative_email" in whois_info:
-                page = add_field_to_page(page, "Administrative Email", whois_info["administrative_email"])
+                administrative_email_value = f"**`{whois_info['administrative_email']}`**"
+                page = add_field_to_page(page, "Administrative Email", administrative_email_value)
             if "administrative_fax" in whois_info:
-                page = add_field_to_page(page, "Administrative Fax", whois_info["administrative_fax"])
+                administrative_fax_value = f"**`{whois_info['administrative_fax']}`**"
+                page = add_field_to_page(page, "Administrative Fax", administrative_fax_value)
             if "administrative_fax_ext" in whois_info:
-                page = add_field_to_page(page, "Administrative Fax Ext", whois_info["administrative_fax_ext"])
+                administrative_fax_ext_value = f"**`{whois_info['administrative_fax_ext']}`**"
+                page = add_field_to_page(page, "Administrative Fax Ext", administrative_fax_ext_value)
             if "administrative_id" in whois_info:
-                page = add_field_to_page(page, "Administrative ID", whois_info["administrative_id"])
+                administrative_id_value = f"**`{whois_info['administrative_id']}`**"
+                page = add_field_to_page(page, "Administrative ID", administrative_id_value)
             if "administrative_name" in whois_info:
-                page = add_field_to_page(page, "Administrative Name", whois_info["administrative_name"])
+                administrative_name_value = f"**`{whois_info['administrative_name']}`**"
+                page = add_field_to_page(page, "Administrative Name", administrative_name_value)
             if "administrative_org" in whois_info:
-                page = add_field_to_page(page, "Administrative Org", whois_info["administrative_org"])
+                administrative_org_value = f"**`{whois_info['administrative_org']}`**"
+                page = add_field_to_page(page, "Administrative Org", administrative_org_value)
             if "administrative_phone" in whois_info:
-                page = add_field_to_page(page, "Administrative Phone", whois_info["administrative_phone"])
+                administrative_phone_value = f"**`{whois_info['administrative_phone']}`**"
+                page = add_field_to_page(page, "Administrative Phone", administrative_phone_value)
             if "administrative_phone_ext" in whois_info:
-                page = add_field_to_page(page, "Administrative Phone Ext", whois_info["administrative_phone_ext"])
+                administrative_phone_ext_value = f"**`{whois_info['administrative_phone_ext']}`**"
+                page = add_field_to_page(page, "Administrative Phone Ext", administrative_phone_ext_value)
             if "administrative_postal_code" in whois_info:
-                page = add_field_to_page(page, "Administrative Postal Code", whois_info["administrative_postal_code"])
+                administrative_postal_code_value = f"**`{whois_info['administrative_postal_code']}`**"
+                page = add_field_to_page(page, "Administrative Postal Code", administrative_postal_code_value)
             if "administrative_province" in whois_info:
-                page = add_field_to_page(page, "Administrative Province", whois_info["administrative_province"])
+                administrative_province_value = f"**`{whois_info['administrative_province']}`**"
+                page = add_field_to_page(page, "Administrative Province", administrative_province_value)
             if "administrative_street" in whois_info:
-                page = add_field_to_page(page, "Administrative Street", whois_info["administrative_street"])
+                administrative_street_value = f"**`{whois_info['administrative_street']}`**"
+                page = add_field_to_page(page, "Administrative Street", administrative_street_value)
             if "billing_city" in whois_info:
-                page = add_field_to_page(page, "Billing City", whois_info["billing_city"])
+                billing_city_value = f"**`{whois_info['billing_city']}`**"
+                page = add_field_to_page(page, "Billing City", billing_city_value)
             if "billing_country" in whois_info:
-                page = add_field_to_page(page, "Billing Country", whois_info["billing_country"])
+                billing_country_value = f"**`{whois_info['billing_country']}`**"
+                page = add_field_to_page(page, "Billing Country", billing_country_value)
             if "billing_email" in whois_info:
-                page = add_field_to_page(page, "Billing Email", whois_info["billing_email"])
+                billing_email_value = f"**`{whois_info['billing_email']}`**"
+                page = add_field_to_page(page, "Billing Email", billing_email_value)
             if "billing_fax" in whois_info:
-                page = add_field_to_page(page, "Billing Fax", whois_info["billing_fax"])
+                billing_fax_value = f"**`{whois_info['billing_fax']}`**"
+                page = add_field_to_page(page, "Billing Fax", billing_fax_value)
             if "billing_fax_ext" in whois_info:
-                page = add_field_to_page(page, "Billing Fax Ext", whois_info["billing_fax_ext"])
+                billing_fax_ext_value = f"**`{whois_info['billing_fax_ext']}`**"
+                page = add_field_to_page(page, "Billing Fax Ext", billing_fax_ext_value)
             if "billing_id" in whois_info:
-                page = add_field_to_page(page, "Billing ID", whois_info["billing_id"])
+                billing_id_value = f"**`{whois_info['billing_id']}`**"
+                page = add_field_to_page(page, "Billing ID", billing_id_value)
             if "billing_name" in whois_info:
-                page = add_field_to_page(page, "Billing Name", whois_info["billing_name"])
+                billing_name_value = f"**`{whois_info['billing_name']}`**"
+                page = add_field_to_page(page, "Billing Name", billing_name_value)
             if "billing_org" in whois_info:
-                page = add_field_to_page(page, "Billing Org", whois_info["billing_org"])
+                billing_org_value = f"**`{whois_info['billing_org']}`**"
+                page = add_field_to_page(page, "Billing Org", billing_org_value)
             if "billing_phone" in whois_info:
-                page = add_field_to_page(page, "Billing Phone", whois_info["billing_phone"])
+                billing_phone_value = f"**`{whois_info['billing_phone']}`**"
+                page = add_field_to_page(page, "Billing Phone", billing_phone_value)
             if "billing_phone_ext" in whois_info:
-                page = add_field_to_page(page, "Billing Phone Ext", whois_info["billing_phone_ext"])
+                billing_phone_ext_value = f"**`{whois_info['billing_phone_ext']}`**"
+                page = add_field_to_page(page, "Billing Phone Ext", billing_phone_ext_value)
             if "billing_postal_code" in whois_info:
-                page = add_field_to_page(page, "Billing Postal Code", whois_info["billing_postal_code"])
+                billing_postal_code_value = f"**`{whois_info['billing_postal_code']}`**"
+                page = add_field_to_page(page, "Billing Postal Code", billing_postal_code_value)
             if "billing_province" in whois_info:
-                page = add_field_to_page(page, "Billing Province", whois_info["billing_province"])
+                billing_province_value = f"**`{whois_info['billing_province']}`**"
+                page = add_field_to_page(page, "Billing Province", billing_province_value)
             if "billing_street" in whois_info:
-                page = add_field_to_page(page, "Billing Street", whois_info["billing_street"])
+                billing_street_value = f"**`{whois_info['billing_street']}`**"
+                page = add_field_to_page(page, "Billing Street", billing_street_value)
             if "created_date" in whois_info:
                 created_date = whois_info["created_date"]
                 if isinstance(created_date, str):
