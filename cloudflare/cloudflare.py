@@ -360,8 +360,13 @@ class Cloudflare(commands.Cog):
                 technical_street = f"**`{whois_info['technical_street']}`**"
                 page = add_field_to_page(page, "Technical Street", technical_street)
             if "updated_date" in whois_info:
-                updated_date = int(whois_info["updated_date"].timestamp())
-                page = add_field_to_page(page, "Updated Date", f"**<t:{updated_date}:F>**")
+                try:
+                    updated_date = int(datetime.strptime(whois_info["updated_date"], "%Y-%m-%dT%H:%M:%S").timestamp())
+                    page = add_field_to_page(page, "Updated Date", f"**<t:{updated_date}:F>**")
+                except ValueError:
+                    pass  # Handle the case where the date format is incorrect
+                except AttributeError:
+                    pass  # Handle the case where the date is not a string
             if "whois_server" in whois_info:
                 whois_server = f"**`{whois_info['whois_server']}`**"
                 page = add_field_to_page(page, "WHOIS Server", whois_server)
