@@ -13,6 +13,7 @@ class Cloudflare(commands.Cog):
             "api_key": None,
             "email": None,
             "bearer_token": None,
+            "account_id": None,
         }
         self.config.register_global(**default_global)
         self.session = aiohttp.ClientSession()
@@ -43,6 +44,13 @@ class Cloudflare(commands.Cog):
         """Set the Cloudflare Bearer token."""
         await self.config.api_key.set(bearer_token)
         await ctx.send("Cloudflare Bearer token set.")
+
+    @commands.is_owner()
+    @cloudflare.command()
+    async def setaccountid(self, ctx, account_id: str):
+        """Set the Cloudflare Account ID."""
+        await self.config.account_id.set(account_id)
+        await ctx.send("Cloudflare Account ID set.")
 
     @commands.is_owner()
     @cloudflare.command()
