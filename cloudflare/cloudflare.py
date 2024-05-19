@@ -1296,7 +1296,8 @@ class Cloudflare(commands.Cog):
                 paginator.add_line(embed.to_dict())
 
             message = await ctx.send(embed=embeds[0])
-            await paginator.paginate(message, ctx.author)
+            for embed in embeds[1:]:
+                await ctx.send(embed=embed)
     
     
     
