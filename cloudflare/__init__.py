@@ -1,5 +1,6 @@
+from redbot.core.bot import Red
 from .cloudflare import Cloudflare
 
 async def setup(bot):
     cog = Cloudflare(bot)
-    bot.add_cog(cog)
+    await bot.add_cog(cog)
