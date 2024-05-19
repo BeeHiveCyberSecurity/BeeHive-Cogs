@@ -710,7 +710,8 @@ class Cloudflare(commands.Cog):
                 await ctx.send("Bad Request: The server could not understand the request due to invalid syntax.")
             else:
                 await ctx.send(f"Failed to query Cloudflare API. Status code: {response.status}")
-
+   
+    @commands.is_owner()
     @commands.group()
     async def emailrouting(self, ctx):
         """Manage Cloudflare Email Routing"""
