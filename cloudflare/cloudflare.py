@@ -23,20 +23,6 @@ class Cloudflare(commands.Cog):
         """Cloudflare command group."""
         if ctx.invoked_subcommand is None:
             await ctx.send("Invalid Cloudflare command passed.")
-
-        """Set the Cloudflare Account ID."""
-        await self.config.account_id.set(account_id)
-        obfuscated_account_id = account_id[:4] + "****" + account_id[-4:]
-        await ctx.send(f"Cloudflare Account ID set: **`{obfuscated_account_id}`**")
-        """Set the Cloudflare Account ID."""
-        tokens = await self.bot.get_shared_api_tokens("cloudflare")
-        await tokens.set_raw("account_id", value=account_id)
-        obfuscated_account_id = account_id[:4] + "****" + account_id[-4:]
-        await ctx.send(f"Cloudflare Account ID set: **`{obfuscated_account_id}`**")
-        """Set the Cloudflare Account ID."""
-        await self.bot.get_shared_api_tokens("cloudflare").set_raw("account_id", value=account_id)
-        obfuscated_account_id = account_id[:4] + "****" + account_id[-4:]
-        await ctx.send(f"Cloudflare Account ID set: **`{obfuscated_account_id}`**")
         
     @commands.is_owner()
     @cloudflare.command()
