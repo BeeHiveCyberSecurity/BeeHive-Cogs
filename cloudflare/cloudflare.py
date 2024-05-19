@@ -519,6 +519,51 @@ class Cloudflare(commands.Cog):
             else:
                 await ctx.send(f"Failed to query Cloudflare API. Status code: {response.status}")
 
+    @tools.command(name="ipintel")
+    async def query_ip(self, ctx, ip: str):
+        """Query Cloudflare API for IP intelligence."""
+        api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
+        email = api_tokens.get("email")
+        api_key = api_tokens.get("api_key")
+        bearer_token = api_tokens.get("bearer_token")
+        account_id = api_tokens.get("account_id")
+        url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/intel/ip"
+        headers = {
+            "Authorization": f"Bearer {bearer_token}",
+            "X-Auth-Email": email,
+            "X-Auth-Key": api_key,
+            "Content-Type": "application/json",
+        }
+        params = {
+            "ip": ip
+        }
+
+        async with self.session.get(url, headers=headers, params=params) as response:
+            if response.status == 200:
+                data = await response.json()
+                if data["success"]:
+                    result = data["result"][0]
+                    embed = discord.Embed(title=f"IP intelligence for {result['ip']}", color=0xfffffe)
+                    
+                    if "ip" in result:
+                        embed.add_field(name="IP", value=f"**`{result['ip']}`**", inline=False)
+                    if "belongs_to_ref" in result:
+                        belongs_to = result["belongs_to_ref"]
+                        if "description" in belongs_to:
+                            embed.add_field(name="Belongs To", value=f"**`{belongs_to['description']}`**", inline=False)
+                        if "country" in belongs_to:
+                            embed.add_field(name="Country", value=f"**`{belongs_to['country']}`**", inline=False)
+                        if "type" in belongs_to:
+                            embed.add_field(name="Type", value=f"**`{belongs_to['type']}`**", inline=False)
+                    if "risk_types" in result:
+                        risk_types = ", ".join([f"**`{risk['name']}`**" for risk in result["risk_types"]])
+                        embed.add_field(name="Risk Types", value=risk_types, inline=False)
+                    
+                    await ctx.send(embed=embed)
+                else:
+                    await ctx.send(f"Error: {data['errors']}")
+            else:
+                await ctx.send(f"Failed to query Cloudflare API. Status code: {response.status}")
 
 
     def cog_unload(self):
