@@ -57,7 +57,7 @@ class Cloudflare(commands.Cog):
             pages = [zone_names[i:i + 10] for i in range(0, len(zone_names), 10)]
 
             current_page = 0
-            embed = discord.Embed(title="Cloudflare Zones", description="\n".join(pages[current_page]), color=discord.Color.blue())
+            embed = discord.Embed(title="Cloudflare Zones", description="\n".join(pages[current_page]), color=discord.Color.orange())
             message = await ctx.send(embed=embed)
 
             if len(pages) > 1:
