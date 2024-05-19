@@ -1,4 +1,5 @@
 import discord
+import asyncio
 from redbot.core import commands, Config
 import aiohttp
 
@@ -59,8 +60,38 @@ class Cloudflare(commands.Cog):
                 await ctx.send("No zones found.")
                 return
 
-            zone_list = "\n".join([zone["name"] for zone in zones])
-            await ctx.send(f"Zones:\n{zone_list}")
+            zone_names = [zone["name"] for zone in zones]
+            pages = [zone_names[i:i + 10] for i in range(0, len(zone_names), 10)]
+
+            current_page = 0
+            embed = discord.Embed(title="Cloudflare Zones", description="\n".join(pages[current_page]), color=discord.Color.blue())
+            message = await ctx.send(embed=embed)
+
+            if len(pages) > 1:
+                await message.add_reaction("◀️")
+                await message.add_reaction("▶️")
+
+                def check(reaction, user):
+                    return user == ctx.author and str(reaction.emoji) in ["◀️", "▶️"] and reaction.message.id == message.id
+
+                while True:
+                    try:
+                        reaction, user = await self.bot.wait_for("reaction_add", timeout=60.0, check=check)
+
+                        if str(reaction.emoji) == "▶️" and current_page < len(pages) - 1:
+                            current_page += 1
+                            embed.description = "\n".join(pages[current_page])
+                            await message.edit(embed=embed)
+                            await message.remove_reaction(reaction, user)
+
+                        elif str(reaction.emoji) == "◀️" and current_page > 0:
+                            current_page -= 1
+                            embed.description = "\n".join(pages[current_page])
+                            await message.edit(embed=embed)
+                            await message.remove_reaction(reaction, user)
+
+                    except asyncio.TimeoutError:
+                        break
 
     def cog_unload(self):
         self.bot.loop.create_task(self.session.close())
