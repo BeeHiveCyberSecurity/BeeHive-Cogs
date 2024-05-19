@@ -821,7 +821,7 @@ class Cloudflare(commands.Cog):
                 data = await response.json()
                 if data["success"]:
                     result = data["result"]
-                    embed = discord.Embed(title="Email Routing Address Created", color=discord.Color.green())
+                    embed = discord.Embed(title="Destination address added", description="You or the owner of this inbox will need to click the link they were sent just now to enable their email as a destination within your Cloudflare account", color=discord.Color.green())
                     embed.add_field(name="Email", value=result["email"], inline=False)
                     embed.add_field(name="ID", value=result["id"], inline=False)
                     embed.add_field(name="Created", value=result["created"], inline=False)
