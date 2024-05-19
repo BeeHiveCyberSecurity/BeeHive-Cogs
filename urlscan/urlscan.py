@@ -155,13 +155,25 @@ class URLScan(commands.Cog):
                         if 'verdicts' in res2 and 'overall' in res2['verdicts'] and 'score' in res2['verdicts']['overall']:
                             threat_level = res2['verdicts']['overall']['score']
                             if threat_level != 0:
-                                await message.delete()
-                                embed = discord.Embed(
-                                    title="Suspicious URL detected",
-                                    description=f"Deleted a suspicious URL posted by {message.author.mention}.",
-                                    color=0xFF4545
-                                )
-                                await message.channel.send(embed=embed)
+                                try:
+                                    await message.delete()
+                                    embed = discord.Embed(
+                                        title="Suspicious URL detected",
+                                        description=f"Deleted a suspicious URL posted by {message.author.mention}.",
+                                        color=0xFF4545
+                                    )
+                                    await message.channel.send(embed=embed)
+                                except discord.NotFound:
+                                    # Message was already deleted
+                                    pass
+                                except discord.Forbidden:
+                                    # Bot does not have permission to delete the message
+                                    embed = discord.Embed(
+                                        title="Suspicious URL detected",
+                                        description=f"Detected a suspicious URL posted by {message.author.mention}, but I don't have permission to delete it.",
+                                        color=0xFF4545
+                                    )
+                                    await message.channel.send(embed=embed)
                                 break
 
             
