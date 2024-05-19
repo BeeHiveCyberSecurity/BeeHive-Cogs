@@ -110,8 +110,6 @@ class Cloudflare(commands.Cog):
         Query WHOIS information for a given domain.
         """
         api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
-        
-        # Safely retrieve API tokens with default values
         email = api_tokens.get("email")
         api_key = api_tokens.get("api_key")
         bearer_token = api_tokens.get("bearer_token")
@@ -474,6 +472,43 @@ class Cloudflare(commands.Cog):
                         await message.clear_reactions()
                         break
 
+    @tools.command(name="domainintel")
+    async def query_domain(self, ctx, account_id: str, domain: str):
+        """Query Cloudflare API for domain intelligence."""
+        api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
+        email = api_tokens.get("email")
+        api_key = api_tokens.get("api_key")
+        bearer_token = api_tokens.get("bearer_token")
+        account_id = api_tokens.get("account_id")
+        url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/intel/domain"
+        headers = {
+            "Authorization": f"Bearer {bearer_token}",
+            "X-Auth-Email": email,
+            "X-Auth-Key": api_key
+            "Content-Type": "application/json"
+        }
+        params = {
+            "domain": domain
+        }
+
+        async with self.session.get(url, headers=headers, params=params) as response:
+            if response.status == 200:
+                data = await response.json()
+                if data["success"]:
+                    result = data["result"]
+                    embed = discord.Embed(title="Domain Intelligence", description=f"Information for {domain}")
+                    embed.add_field(name="Domain", value=result["domain"], inline=False)
+                    embed.add_field(name="Risk Score", value=result["risk_score"], inline=False)
+                    embed.add_field(name="Popularity Rank", value=result["popularity_rank"], inline=False)
+                    embed.add_field(name="Application", value=result["application"]["name"], inline=False)
+                    embed.add_field(name="Suspected Malware Family", value=result["additional_information"]["suspected_malware_family"], inline=False)
+                    embed.add_field(name="Content Categories", value=", ".join([cat["name"] for cat in result["content_categories"]]), inline=False)
+                    embed.add_field(name="Resolves To", value=", ".join([ref["value"] for ref in result["resolves_to_refs"]]), inline=False)
+                    await ctx.send(embed=embed)
+                else:
+                    await ctx.send(f"Error: {data['errors']}")
+            else:
+                await ctx.send(f"Failed to query Cloudflare API. Status code: {response.status}")
 
 
 
