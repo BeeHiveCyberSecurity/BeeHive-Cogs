@@ -12,6 +12,7 @@ class Cloudflare(commands.Cog):
         default_global = {
             "api_key": None,
             "email": None,
+            "bearer_token": None,
         }
         self.config.register_global(**default_global)
         self.session = aiohttp.ClientSession()
@@ -21,6 +22,8 @@ class Cloudflare(commands.Cog):
         """Cloudflare command group."""
         if ctx.invoked_subcommand is None:
             await ctx.send("Invalid Cloudflare command passed.")
+
+
 
     @cloudflare.command()
     async def setapikey(self, ctx, api_key: str):
@@ -33,6 +36,12 @@ class Cloudflare(commands.Cog):
         """Set the Cloudflare account email."""
         await self.config.email.set(email)
         await ctx.send("Cloudflare email set.")
+
+    @cloudflare.command()
+    async def setbearer(self, ctx, bearer_token: str):
+        """Set the Cloudflare Bearer token."""
+        await self.config.api_key.set(bearer_token)
+        await ctx.send("Cloudflare Bearer token set.")
 
     @cloudflare.command()
     async def getzones(self, ctx):
