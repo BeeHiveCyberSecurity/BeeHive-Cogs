@@ -496,7 +496,7 @@ class Cloudflare(commands.Cog):
                 data = await response.json()
                 if data["success"]:
                     result = data["result"]
-                    embed = discord.Embed(title=f"Domain Intelligence for {result['domain']}", color=0xfffffe)
+                    embed = discord.Embed(title=f"Domain intelligence for {result['domain']}", color=0xfffffe)
                     
                     if "domain" in result:
                         embed.add_field(name="Domain", value=f"**`{result['domain']}`**", inline=False)
