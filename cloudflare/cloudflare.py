@@ -206,10 +206,8 @@ class Cloudflare(commands.Cog):
                     dnssec_value = f"**`{dnssec_value}`**"
                     page = add_field_to_page(page, "DNSSEC", dnssec_value)
                 if "domain" in whois_info:
-                    domain_value = whois_info["domain"]
                     domain_value = f"**`{domain_value}`**"
                     page = add_field_to_page(page, "Domain", domain_value)
-                page = add_field_to_page(page, "Domain", whois_info["domain"])
             if "expiration_date" in whois_info:
                 expiration_date = whois_info["expiration_date"]
                 if isinstance(expiration_date, str):
