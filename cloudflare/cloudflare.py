@@ -1890,6 +1890,14 @@ class Cloudflare(commands.Cog):
             return
 
         attachment = ctx.message.attachments[0]
+
+        # Check file size (300 MB = 300 * 1024 * 1024 bytes)
+        max_size = 300 * 1024 * 1024
+        if attachment.size > max_size:
+            embed = discord.Embed(title="Upload Error", description="File size exceeds the 300 MB limit.", color=0xff4545)
+            await ctx.send(embed=embed)
+            return
+
         file_content = await attachment.read()
 
         api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
