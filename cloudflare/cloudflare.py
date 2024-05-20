@@ -2087,6 +2087,16 @@ class Cloudflare(commands.Cog):
                                 file_url = obj.get("url")
                                 async with self.session.get(file_url, headers=headers) as file_response:
                                     if file_response.status == 200:
+                                        file_size = int(file_response.headers.get("Content-Length", 0))
+                                        if file_size > 100 * 1024 * 1024:  # 100 MB
+                                            embed = discord.Embed(
+                                                title="File too large",
+                                                description="The file size exceeds the 100 MB limit.",
+                                                color=0xff4545
+                                            )
+                                            await ctx.send(embed=embed)
+                                            return
+
                                         file_content = await file_response.read()
                                         embed = discord.Embed(
                                             title="File fetched from bucket",
@@ -2113,6 +2123,16 @@ class Cloudflare(commands.Cog):
                         )
                         await ctx.send(embed=embed)
                         return
+
+                file_size = int(response.headers.get("Content-Length", 0))
+                if file_size > 100 * 1024 * 1024:  # 100 MB
+                    embed = discord.Embed(
+                        title="File too large",
+                        description="The file size exceeds the 100 MB limit.",
+                        color=0xff4545
+                    )
+                    await ctx.send(embed=embed)
+                    return
 
                 file_content = await response.read()
                 embed = discord.Embed(
