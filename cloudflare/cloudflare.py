@@ -1650,5 +1650,68 @@ class Cloudflare(commands.Cog):
 
             await ctx.send(embed=embed)
 
-    def cog_unload(self):
+    @commands.is_owner()
+    @commands.group()
+    async def r2(self, ctx):
+        """Cloudflare R2 Storage allows developers to store large amounts of unstructured data without the costly egress bandwidth fees associated with typical cloud storage services. Learn more at https://developers.cloudflare.com/r2/"""
+        if ctx.invoked_subcommand is None:
+            await ctx.send("Invalid Cloudflare command passed.")
+            
+    @commands.is_owner()
+    @r2.command(name="create")
+    async def create_bucket(self, ctx, name: str, location_hint: str):
+        """Create a new R2 bucket."""
+        valid_location_hints = {
+            "apac": "Asia-Pacific",
+            "eeur": "Eastern Europe",
+            "enam": "Eastern North America",
+            "weur": "Western Europe",
+            "wnam": "Western North America"
+        }
+        
+        if location_hint not in valid_location_hints:
+            embed = discord.Embed(title="Invalid Location Hint", color=discord.Color.red())
+            embed.add_field(name="Error", value=f"'{location_hint}' is not a valid location hint.", inline=False)
+            embed.add_field(name="Valid Location Hints", value="\n".join([f"{key}: {value}" for key, value in valid_location_hints.items()]), inline=False)
+            await ctx.send(embed=embed)
+            return
+
+        api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
+        api_key = api_tokens.get("api_key")
+        email = api_tokens.get("email")
+        bearer_token = api_tokens.get("bearer_token")
+        account_id = api_tokens.get("account_id")
+
+        if not all([api_key, email, bearer_token, account_id]):
+            await ctx.send("Missing one or more required API tokens. Please check your configuration.")
+            return
+
+        url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/r2/buckets"
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {bearer_token}",
+            "X-Auth-Email": email,
+            "X-Auth-Key": api_key,
+        }
+        payload = {
+            "name": name,
+            "locationHint": location_hint
+        }
+
+        async with self.session.post(url, headers=headers, json=payload) as response:
+            data = await response.json()
+            if response.status != 200 or not data.get("success", False):
+                errors = data.get("errors", [])
+                error_messages = "\n".join([error.get("message", "Unknown error") for error in errors])
+                await ctx.send(f"Failed to create bucket: {error_messages}")
+                return
+
+            result = data.get("result", {})
+            embed = discord.Embed(title="Bucket Created", color=discord.Color.green())
+            embed.add_field(name="Name", value=result.get("name"), inline=False)
+            embed.add_field(name="Location", value=result.get("location"), inline=False)
+            embed.add_field(name="Creation Date", value=result.get("creation_date"), inline=False)
+
+            await ctx.send(embed=embed)
+
         self.bot.loop.create_task(self.session.close())
