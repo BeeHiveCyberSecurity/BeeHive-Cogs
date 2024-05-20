@@ -1730,8 +1730,6 @@ class Cloudflare(commands.Cog):
 
         url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/r2/buckets"
         headers = {
-            "X-Auth-Email": email,
-            "X-Auth-Key": api_key,
             "Authorization": f"Bearer {bearer_token}",
             "Content-Type": "application/json"
         }
