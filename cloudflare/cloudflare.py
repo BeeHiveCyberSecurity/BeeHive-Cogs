@@ -2127,8 +2127,7 @@ class Cloudflare(commands.Cog):
                                         file_content = await file_response.read()
                                         embed = discord.Embed(
                                             title="File fetched from bucket",
-                                            color=discord.Color.green()
-                                        )
+                                            color=discord.Color.from_rgb(43, 189, 142))
                                         embed.add_field(
                                             name="File name",
                                             value=f"**`{file_name}`**",
@@ -2164,8 +2163,7 @@ class Cloudflare(commands.Cog):
                 file_content = await response.read()
                 embed = discord.Embed(
                     title="File fetched from bucket",
-                    color=discord.Color.green()
-                )
+                    color=discord.Color.from_rgb(43, 189, 142))
                 embed.add_field(
                     name="File name",
                     value=f"**`{file_name}`**",
