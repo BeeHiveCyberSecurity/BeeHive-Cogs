@@ -1880,7 +1880,8 @@ class Cloudflare(commands.Cog):
         except RuntimeError as e:
             await ctx.send(f"An error occurred: {str(e)}")
             return
-
+        
+    @commands.is_owner()
     @r2.command(name="upload", help="Upload a file to the specified R2 bucket")
     async def upload_to_bucket(self, ctx, bucket_name: str):
         if not ctx.message.attachments:
@@ -1932,5 +1933,72 @@ class Cloudflare(commands.Cog):
                 await ctx.send(embed=embed)
         except RuntimeError as e:
             embed = discord.Embed(title="Runtime Error", description=f"An error occurred: {str(e)}", color=0xff4545)
+            await ctx.send(embed=embed)
+            return
+        
+    @commands.is_owner()
+    @r2.command(name="delete")
+    async def delete_file(self, ctx, bucket_name: str, file_name: str):
+        api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
+        api_key = api_tokens.get("api_key")
+        email = api_tokens.get("email")
+        bearer_token = api_tokens.get("bearer_token")
+        account_id = api_tokens.get("account_id")
+
+        if not all([api_key, email, bearer_token, account_id]):
+            embed = discord.Embed(
+                title="Configuration Error",
+                description="Missing one or more required API tokens. Please check your configuration.",
+                color=0xff4545
+            )
+            await ctx.send(embed=embed)
+            return
+
+        url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/r2/buckets/{bucket_name}/objects/{file_name}"
+        headers = {
+            "Authorization": f"Bearer {bearer_token}",
+            "X-Auth-Email": email,
+            "X-Auth-Key": api_key,
+        }
+
+        try:
+            async with self.session.delete(url, headers=headers) as response:
+                data = await response.json()
+                if response.status != 200 or not data.get("success", False):
+                    errors = data.get("errors", [])
+                    error_messages = "\n".join([error.get("message", "Unknown error") for error in errors])
+                    embed = discord.Embed(
+                        title="Failed to delete file",
+                        color=0xff4545
+                    )
+                    embed.add_field(
+                        name="Errors",
+                        value=f"**`{error_messages}`**",
+                        inline=False
+                    )
+                    await ctx.send(embed=embed)
+                    return
+
+                embed = discord.Embed(
+                    title="File Deleted Successfully",
+                    color=discord.Color.green()
+                )
+                embed.add_field(
+                    name="File Name",
+                    value=f"**`{file_name}`**",
+                    inline=False
+                )
+                embed.add_field(
+                    name="Bucket Name",
+                    value=f"**`{bucket_name}`**",
+                    inline=False
+                )
+                await ctx.send(embed=embed)
+        except RuntimeError as e:
+            embed = discord.Embed(
+                title="Runtime Error",
+                description=f"An error occurred: {str(e)}",
+                color=0xff4545
+            )
             await ctx.send(embed=embed)
             return
