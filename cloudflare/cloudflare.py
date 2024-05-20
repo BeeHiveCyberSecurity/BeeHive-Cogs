@@ -1308,7 +1308,12 @@ class Cloudflare(commands.Cog):
         account_id = api_tokens.get("account_id")
 
         if not all([email, api_key, bearer_token, account_id]):
-            await ctx.send("Missing one or more required API tokens. Please check your configuration.")
+            embed = discord.Embed(
+                title="Authentication error",
+                description="Your bot is missing one or more authentication elements required to interact with your Cloudflare account securely. Please ensure you have set an `api_key`, `email`, `bearer_token`, and `account_id` for this command to function properly. If you're not sure what this error means, ask your systems admin, or a more tech-inclined friend.",
+                color=discord.Color.red()
+            )
+            await ctx.send(embed=embed)
             return
 
         headers = {
