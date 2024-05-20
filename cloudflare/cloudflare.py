@@ -1813,8 +1813,7 @@ class Cloudflare(commands.Cog):
                 await ctx.send("No information found for the specified bucket.")
                 return
 
-            embed = discord.Embed(title="Bucket Information", color=discord.Color.blue())
-            
+            embed = discord.Embed(title="Bucket Information", color=discord.Color.from_rgb(255, 145, 68))
             # Customize individual fields
             if "name" in bucket_info:
                 embed.add_field(name="Name", value=f"**`{bucket_info['name']}`**", inline=False)
