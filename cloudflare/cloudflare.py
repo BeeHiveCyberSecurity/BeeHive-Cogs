@@ -1717,64 +1717,34 @@ class Cloudflare(commands.Cog):
             await ctx.send(embed=embed)
         self.bot.loop.create_task(self.session.close())
 
-    @r2.command(name="list")
-    async def list_buckets(self, ctx):
-        """List all available R2 buckets."""
-        api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
-        api_key = api_tokens.get("api_key")
-        email = api_tokens.get("email")
-        bearer_token = api_tokens.get("bearer_token")
-        account_id = api_tokens.get("account_id")
+        @commands.is_owner()
+        @r2.command(name="delete")
+        async def deletebucket(self, ctx, bucket_name: str):
+            """Delete a bucket from Cloudflare R2."""
+            api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
+            api_key = api_tokens.get("api_key")
+            email = api_tokens.get("email")
+            bearer_token = api_tokens.get("bearer_token")
+            account_id = api_tokens.get("account_id")
 
-        if not all([api_key, email, bearer_token, account_id]):
-            await ctx.send("Missing one or more required API tokens. Please check your configuration.")
-            return
+            if not all([api_key, email, bearer_token, account_id]):
+                await ctx.send("Missing one or more required API tokens. Please check your configuration.")
+                return
 
+            url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/r2/buckets/{bucket_name}"
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {bearer_token}",
+                "X-Auth-Email": email,
+                "X-Auth-Key": api_key,
+            }
 
-        conn = http.client.HTTPSConnection("api.cloudflare.com")
+            async with self.session.delete(url, headers=headers) as response:
+                data = await response.json()
+                if response.status != 200 or not data.get("success", False):
+                    errors = data.get("errors", [])
+                    error_messages = "\n".join([error.get("message", "Unknown error") for error in errors])
+                    await ctx.send(f"Failed to delete bucket: {error_messages}")
+                    return
 
-        headers = {
-            'Content-Type': "application/json",
-            'Authorization': f"Bearer {bearer_token}"
-        }
-
-        conn.request("GET", f"/client/v4/accounts/{account_id}/r2/buckets", headers=headers)
-
-        res = conn.getresponse()
-        data = res.read()
-
-        data = data.decode("utf-8")
-        data = json.loads(data)
-
-        if res.status != 200 or not data.get("success", False):
-            errors = data.get("errors", [])
-            error_messages = "\n".join([error.get("message", "Unknown error") for error in errors])
-            await ctx.send(f"Failed to list buckets: {error_messages}")
-            return
-
-        buckets = data.get("result", [])
-        if isinstance(buckets, dict):
-            buckets = [buckets]
-        elif not isinstance(buckets, list):
-            await ctx.send("Unexpected response format.")
-            return
-
-        if not buckets:
-            await ctx.send("No buckets found.")
-            return
-
-        embed = discord.Embed(title="Available Buckets", color=discord.Color.blue())
-        for bucket in buckets:
-            if isinstance(bucket, dict):
-                name = bucket.get("name") or "Unknown"
-                location = bucket.get("location") or "Unknown"
-                creation_date = bucket.get("creation_date") or "Unknown"
-                embed.add_field(
-                    name=f"Bucket: {name}",
-                    value=(
-                        f"**Location:** `{location}`\n"
-                        f"**Creation Date:** `{creation_date}`"
-                    ),
-                    inline=False
-                )
-        await ctx.send(embed=embed)
+                await ctx.send(f"Bucket '{bucket_name}' has been successfully deleted.")
