@@ -1730,10 +1730,10 @@ class Cloudflare(commands.Cog):
 
         url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/r2/buckets"
         headers = {
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {bearer_token}",
             "X-Auth-Email": email,
             "X-Auth-Key": api_key,
+            "Authorization": f"Bearer {bearer_token}",
+            "Content-Type": "application/json",
         }
 
         async with self.session.get(url, headers=headers) as response:
