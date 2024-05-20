@@ -1819,7 +1819,7 @@ class Cloudflare(commands.Cog):
                 embed.add_field(name="Name", value=f"**`{bucket_info['name']}`**", inline=False)
             if "creation_date" in bucket_info:
                 embed.add_field(name="Creation Date", value=f"**`{bucket_info['creation_date']}`**", inline=False)
-            if "region" in bucket_info:
+            if "location" in bucket_info:
                 embed.add_field(name="Location", value=f"**`{bucket_info['location'].upper()}`**", inline=False)
             if "storage_class" in bucket_info:
                 embed.add_field(name="Storage Class", value=f"**`{bucket_info['storage_class']}`**", inline=False)
