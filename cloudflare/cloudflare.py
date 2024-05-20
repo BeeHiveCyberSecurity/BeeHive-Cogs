@@ -1717,34 +1717,34 @@ class Cloudflare(commands.Cog):
             await ctx.send(embed=embed)
         self.bot.loop.create_task(self.session.close())
 
-        @commands.is_owner()
-        @r2.command(name="delete")
-        async def deletebucket(self, ctx, bucket_name: str):
-            """Delete a bucket from Cloudflare R2."""
-            api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
-            api_key = api_tokens.get("api_key")
-            email = api_tokens.get("email")
-            bearer_token = api_tokens.get("bearer_token")
-            account_id = api_tokens.get("account_id")
+    @commands.is_owner()
+    @r2.command(name="delete")
+    async def deletebucket(self, ctx, bucket_name: str):
+        """Delete a bucket from Cloudflare R2."""
+        api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
+        api_key = api_tokens.get("api_key")
+        email = api_tokens.get("email")
+        bearer_token = api_tokens.get("bearer_token")
+        account_id = api_tokens.get("account_id")
 
-            if not all([api_key, email, bearer_token, account_id]):
-                await ctx.send("Missing one or more required API tokens. Please check your configuration.")
+        if not all([api_key, email, bearer_token, account_id]):
+            await ctx.send("Missing one or more required API tokens. Please check your configuration.")
+            return
+
+        url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/r2/buckets/{bucket_name}"
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {bearer_token}",
+            "X-Auth-Email": email,
+            "X-Auth-Key": api_key,
+        }
+
+        async with self.session.delete(url, headers=headers) as response:
+            data = await response.json()
+            if response.status != 200 or not data.get("success", False):
+                errors = data.get("errors", [])
+                error_messages = "\n".join([error.get("message", "Unknown error") for error in errors])
+                await ctx.send(f"Failed to delete bucket: {error_messages}")
                 return
 
-            url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/r2/buckets/{bucket_name}"
-            headers = {
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {bearer_token}",
-                "X-Auth-Email": email,
-                "X-Auth-Key": api_key,
-            }
-
-            async with self.session.delete(url, headers=headers) as response:
-                data = await response.json()
-                if response.status != 200 or not data.get("success", False):
-                    errors = data.get("errors", [])
-                    error_messages = "\n".join([error.get("message", "Unknown error") for error in errors])
-                    await ctx.send(f"Failed to delete bucket: {error_messages}")
-                    return
-
-                await ctx.send(f"Bucket '{bucket_name}' has been successfully deleted.")
+            await ctx.send(f"Bucket '{bucket_name}' has been successfully deleted.")
