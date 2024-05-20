@@ -1744,7 +1744,7 @@ class Cloudflare(commands.Cog):
                 await ctx.send(f"Failed to list buckets: {error_messages}")
                 return
 
-            buckets = data.get("result", [])
+            buckets = data.get("result")
             if not isinstance(buckets, list):
                 await ctx.send("Unexpected response format.")
                 return
