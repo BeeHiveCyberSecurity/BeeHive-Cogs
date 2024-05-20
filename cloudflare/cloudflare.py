@@ -1967,8 +1967,7 @@ class Cloudflare(commands.Cog):
             async with self.session.get(list_url, headers=headers) as list_response:
                 list_data = await list_response.json()
                 if list_response.status != 200:
-                    list_errors = list_data.get("errors", [])
-                    list_error_messages = "\n".join([error.get("message", "Unknown error") for error in list_errors])
+                    list_error_messages = "\n".join([error.get("message", "Unknown error") for error in list_data.get("errors", [])])
                     embed = discord.Embed(
                         title="Failed to list files in bucket",
                         color=0xff4545
@@ -2017,8 +2016,7 @@ class Cloudflare(commands.Cog):
                     async with self.session.delete(file_url, headers=headers) as delete_response:
                         delete_data = await delete_response.json()
                         if delete_response.status != 200 or not delete_data.get("success", False):
-                            delete_errors = delete_data.get("errors", [])
-                            delete_error_messages = "\n".join([error.get("message", "Unknown error") for error in delete_errors])
+                            delete_error_messages = "\n".join([error.get("message", "Unknown error") for error in delete_data.get("errors", [])])
                             embed = discord.Embed(
                                 title="Failed to delete file",
                                 color=0xff4545
