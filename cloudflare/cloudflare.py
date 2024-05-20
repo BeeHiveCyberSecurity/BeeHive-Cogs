@@ -101,7 +101,7 @@ class Cloudflare(commands.Cog):
                 except discord.Forbidden:
                     pass
 
-    @commands.group(name=intel, invoke_without_command=True)
+    @commands.group(invoke_without_command=True)
     async def intel(self, ctx):
         """Different utility tools provided by Cloudflare."""
 
