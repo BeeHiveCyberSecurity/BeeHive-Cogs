@@ -1381,5 +1381,68 @@ class Cloudflare(commands.Cog):
 
             await ctx.send(embed=embed)
 
+    @commands.is_owner()
+    @hyperdrive.command(name="create")
+    async def create_hyperdrive(self, ctx, name: str, password: str, database: str, host: str, port: str, scheme: str, user: str, caching_disabled: bool, max_age: int, stale_while_revalidate: int):
+        """Create a new Hyperdrive configuration."""
+        api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
+        bearer_token = api_tokens.get("bearer_token")
+        account_id = api_tokens.get("account_id")
+        api_key = api_tokens.get("api_key")
+        email = api_tokens.get("email")
+
+        if not all([email, api_key, bearer_token, account_id]):
+            await ctx.send("Bearer token or account ID not set.")
+            return
+
+        url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/hyperdrive/configs"
+        payload = {
+            "origin": {
+                "password": password,
+                "database": database,
+                "host": host,
+                "port": port,
+                "scheme": scheme,
+                "user": user
+            },
+            "caching": {
+                "disabled": caching_disabled,
+                "max_age": max_age,
+                "stale_while_revalidate": stale_while_revalidate
+            },
+            "name": name
+        }
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {bearer_token}",
+            "X-Auth-Email": email,
+            "X-Auth-Key": api_key,
+        }
+
+        async with self.session.post(url, json=payload, headers=headers) as response:
+            if response.status != 200:
+                await ctx.send(f"Failed to create Hyperdrive: {response.status}")
+                return
+
+            data = await response.json()
+            if not data.get("success", False):
+                await ctx.send("Failed to create Hyperdrive.")
+                return
+
+            result = data.get("result", {})
+            embed = discord.Embed(title="Hyperdrive Created", color=discord.Color.green())
+            embed.add_field(name="ID", value=result.get("id"), inline=False)
+            embed.add_field(name="Name", value=result.get("name"), inline=False)
+            embed.add_field(name="Database", value=result["origin"].get("database"), inline=False)
+            embed.add_field(name="Host", value=result["origin"].get("host"), inline=False)
+            embed.add_field(name="Port", value=result["origin"].get("port"), inline=False)
+            embed.add_field(name="Scheme", value=result["origin"].get("scheme"), inline=False)
+            embed.add_field(name="User", value=result["origin"].get("user"), inline=False)
+            embed.add_field(name="Caching Disabled", value=result["caching"].get("disabled"), inline=False)
+            embed.add_field(name="Max Age", value=result["caching"].get("max_age"), inline=False)
+            embed.add_field(name="Stale While Revalidate", value=result["caching"].get("stale_while_revalidate"), inline=False)
+
+            await ctx.send(embed=embed)
+            
     def cog_unload(self):
         self.bot.loop.create_task(self.session.close())
