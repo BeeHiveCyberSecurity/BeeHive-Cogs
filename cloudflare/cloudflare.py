@@ -1662,7 +1662,7 @@ class Cloudflare(commands.Cog):
     @commands.is_owner()
     @r2.command(name="create")
     async def create_bucket(self, ctx, name: str, location_hint: str):
-        """Create a new R2 bucket."""
+        """Create a new R2 bucket"""
         valid_location_hints = {
             "apac": "Asia-Pacific",
             "eeur": "Eastern Europe",
@@ -1814,8 +1814,17 @@ class Cloudflare(commands.Cog):
                 return
 
             embed = discord.Embed(title="Bucket Information", color=discord.Color.blue())
-            for key, value in bucket_info.items():
-                embed.add_field(name=key, value=f"**`{value}`**", inline=False)
+            
+            # Customize individual fields
+            if "name" in bucket_info:
+                embed.add_field(name="Name", value=f"**`{bucket_info['name']}`**", inline=False)
+            if "creation_date" in bucket_info:
+                embed.add_field(name="Creation Date", value=f"**`{bucket_info['creation_date']}`**", inline=False)
+            if "region" in bucket_info:
+                embed.add_field(name="Region", value=f"**`{bucket_info['region']}`**", inline=False)
+            if "storage_class" in bucket_info:
+                embed.add_field(name="Storage Class", value=f"**`{bucket_info['storage_class']}`**", inline=False)
+            
             await ctx.send(embed=embed)
 
 
