@@ -2128,7 +2128,7 @@ class Cloudflare(commands.Cog):
                 if file_size > 100 * 1024 * 1024:  # 100 MB
                     embed = discord.Embed(
                         title="File too large",
-                        description="The file size exceeds the 100 MB limit.",
+                        description="**`The file size exceeds the 100 MB limit`**",
                         color=0xff4545
                     )
                     await ctx.send(embed=embed)
