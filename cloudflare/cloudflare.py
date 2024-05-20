@@ -578,6 +578,52 @@ class Cloudflare(commands.Cog):
             else:
                 await ctx.send(f"Failed to query Cloudflare API. Status code: {response.status}")
 
+    @intel.command(name="domainhistory")
+    async def domainhistory(self, ctx, domain: str):
+        """
+        Fetch and display domain history from Cloudflare.
+        """
+        api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
+        email = api_tokens.get("email")
+        api_key = api_tokens.get("api_key")
+        bearer_token = api_tokens.get("bearer_token")
+        account_id = api_tokens.get("account_id")
+
+        # Check if any required token is missing
+        if not all([email, api_key, bearer_token, account_id]):
+            await ctx.send("Missing one or more required API tokens. Please check your configuration.")
+            return
+
+        url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/intel/domain-history"
+        headers = {
+            "Authorization": f"Bearer {bearer_token}",
+            "X-Auth-Email": email,
+            "X-Auth-Key": api_key,
+            "Content-Type": "application/json",
+        }
+        params = {"domain": domain}
+
+        async with self.session.get(url, headers=headers, params=params) as response:
+            if response.status == 200:
+                data = await response.json()
+                if data["success"]:
+                    result = data["result"]
+                    embed = discord.Embed(title=f"Domain History for {domain}", color=0xfffffe)
+                    
+                    if "domain" in result:
+                        embed.add_field(name="Domain", value=f"**`{result['domain']}`**", inline=False)
+                    if "history" in result:
+                        history = "\n".join([f"**`{entry}`**" for entry in result["history"]])
+                        embed.add_field(name="History", value=history, inline=False)
+                    
+                    await ctx.send(embed=embed)
+                else:
+                    await ctx.send(f"Error: {data['errors']}")
+            elif response.status == 400:
+                await ctx.send("Bad Request: The server could not understand the request due to invalid syntax.")
+            else:
+                await ctx.send(f"Failed to query Cloudflare API. Status code: {response.status}")
+
     @intel.command(name="asn")
     async def asnintel(self, ctx, asn: int):
         """
@@ -1776,8 +1822,8 @@ class Cloudflare(commands.Cog):
             embed.add_field(name="Bucket", value=f"**`{bucket_name}`**", inline=False)
             await ctx.send(embed=embed)
 
-
-    @r2.command(name="get")
+    @commands.is_owner()
+    @r2.command(name="info")
     async def getbucket(self, ctx, bucket_name: str):
         """Get info about an R2 bucket"""
 
