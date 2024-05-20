@@ -1430,7 +1430,7 @@ class Cloudflare(commands.Cog):
                 return
 
             result = data.get("result", {})
-            embed = discord.Embed(title="Hyperdrive Created", color=discord.Color.green())
+            embed = discord.Embed(title="Hyperdrive successfully created", color=discord.Color.green())
             embed.add_field(name="ID", value=result.get("id"), inline=False)
             embed.add_field(name="Name", value=result.get("name"), inline=False)
             embed.add_field(name="Database", value=result["origin"].get("database"), inline=False)
