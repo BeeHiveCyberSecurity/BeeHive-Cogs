@@ -1462,6 +1462,41 @@ class Cloudflare(commands.Cog):
             embed.add_field(name="Stale While Revalidate", value=result["caching"].get("stale_while_revalidate"), inline=False)
 
             await ctx.send(embed=embed)
-            
+
+    @commands.is_owner()
+    @hyperdrive.command(name="delete")
+    async def delete_hyperdrive(self, ctx, hyperdrive_id: str):
+        """Delete a Hyperdrive."""
+        api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
+        api_key = api_tokens.get("api_key")
+        email = api_tokens.get("email")
+        bearer_token = api_tokens.get("bearer_token")
+        account_id = api_tokens.get("account_id")
+
+        if not all([api_key, email, bearer_token, account_id]):
+            await ctx.send("Missing one or more required API tokens. Please check your configuration.")
+            return
+
+        url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/hyperdrive/configs/{hyperdrive_id}"
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {bearer_token}",
+            "X-Auth-Email": email,
+            "X-Auth-Key": api_key,
+        }
+
+        async with self.session.delete(url, headers=headers) as response:
+            if response.status != 200:
+                await ctx.send(f"Failed to delete Hyperdrive: {response.status}")
+                return
+
+            data = await response.json()
+            if not data.get("success", False):
+                await ctx.send("Failed to delete Hyperdrive.")
+                return
+
+            await ctx.send(f"Hyperdrive {hyperdrive_id} successfully deleted.")
+
+
     def cog_unload(self):
         self.bot.loop.create_task(self.session.close())
