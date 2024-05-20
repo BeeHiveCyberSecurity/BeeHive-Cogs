@@ -124,6 +124,9 @@ class URLScan(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
+        if message.guild is None:
+            return
+
         if not hasattr(self.bot, 'autoscan_enabled_guilds') or not self.bot.autoscan_enabled_guilds.get(message.guild.id, False):
             return
 
@@ -175,5 +178,4 @@ class URLScan(commands.Cog):
                                     )
                                     await message.channel.send(embed=embed)
                                 break
-
             
