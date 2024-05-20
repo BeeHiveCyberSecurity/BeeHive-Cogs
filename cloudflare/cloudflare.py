@@ -1721,6 +1721,26 @@ class Cloudflare(commands.Cog):
     @r2.command(name="delete")
     async def deletebucket(self, ctx, bucket_name: str):
         """Delete a bucket from Cloudflare R2."""
+        
+        def check(reaction, user):
+            return user == ctx.author and str(reaction.emoji) in ["✅", "❌"]
+
+        confirmation_message = await ctx.send(
+            f"Are you sure you want to delete the bucket **`{bucket_name}`**? This action cannot be undone. React with ✅ to confirm or ❌ to cancel."
+        )
+        await confirmation_message.add_reaction("✅")
+        await confirmation_message.add_reaction("❌")
+
+        try:
+            reaction, user = await self.bot.wait_for("reaction_add", timeout=60.0, check=check)
+        except asyncio.TimeoutError:
+            await ctx.send("Bucket deletion cancelled due to timeout.")
+            return
+
+        if str(reaction.emoji) == "❌":
+            await ctx.send("Bucket deletion cancelled.")
+            return
+
         api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
         api_key = api_tokens.get("api_key")
         email = api_tokens.get("email")
@@ -1744,7 +1764,11 @@ class Cloudflare(commands.Cog):
             if response.status != 200 or not data.get("success", False):
                 errors = data.get("errors", [])
                 error_messages = "\n".join([error.get("message", "Unknown error") for error in errors])
-                await ctx.send(f"Failed to delete bucket: {error_messages}")
+                embed = discord.Embed(title="Bucket deletion failed", color=0xff4545)
+                embed.add_field(name="Errors", value=f"**`{error_messages}`**", inline=False)
+                await ctx.send(embed=embed)
                 return
 
-            await ctx.send(f"Bucket '{bucket_name}' has been successfully deleted.")
+            embed = discord.Embed(title="Bucket deleted successfully", color=discord.Color.from_rgb(43, 189, 142))
+            embed.add_field(name="Bucket", value=f"**`{bucket_name}`**", inline=False)
+            await ctx.send(embed=embed)
