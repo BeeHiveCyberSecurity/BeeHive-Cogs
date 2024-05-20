@@ -1780,9 +1780,6 @@ class Cloudflare(commands.Cog):
     @r2.command(name="get")
     async def getbucket(self, ctx, bucket_name: str):
         """Get info about an R2 bucket"""
-        if self.session.closed:
-            await ctx.send("HTTP session is closed. Please try again later.")
-            return
 
         api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
         api_key = api_tokens.get("api_key")
@@ -1833,6 +1830,3 @@ class Cloudflare(commands.Cog):
         except RuntimeError as e:
             await ctx.send(f"An error occurred: {str(e)}")
             return
-
-
-        self.bot.loop.create_task(self.session.close())
