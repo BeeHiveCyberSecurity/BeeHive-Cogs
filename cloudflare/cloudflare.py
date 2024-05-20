@@ -1715,7 +1715,6 @@ class Cloudflare(commands.Cog):
             embed.add_field(name="Creation Date", value=f"**`{result.get('creation_date')}`**", inline=False)
 
             await ctx.send(embed=embed)
-        self.bot.loop.create_task(self.session.close())
 
     @commands.is_owner()
     @r2.command(name="delete")
@@ -1772,3 +1771,8 @@ class Cloudflare(commands.Cog):
             embed = discord.Embed(title="Bucket deleted successfully", color=discord.Color.from_rgb(43, 189, 142))
             embed.add_field(name="Bucket", value=f"**`{bucket_name}`**", inline=False)
             await ctx.send(embed=embed)
+
+
+
+
+        self.bot.loop.create_task(self.session.close())
