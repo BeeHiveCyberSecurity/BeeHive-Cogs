@@ -2002,5 +2002,72 @@ class Cloudflare(commands.Cog):
             )
             await ctx.send(embed=embed)
             return
+        
 
-    
+    @commands.is_owner()
+    @r2.command(name="fetch_file")
+    async def fetch_file(self, ctx, account_id: str, bucket_name: str, file_name: str):
+        api_info = await self.bot.get_shared_api_tokens("cloudflare")
+        bearer_token = api_info.get("bearer_token")
+        email = api_info.get("email")
+        api_key = api_info.get("api_key")
+        account_id = api_info.get("account_id")
+        if not all([bearer_token, email, api_key, account_id]):
+            embed = discord.Embed(
+                title="API Key Error",
+                description="Missing API keys. Please set them using the appropriate command.",
+                color=0xff4545
+            )
+            await ctx.send(embed=embed)
+            return
+
+        url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/r2/buckets/{bucket_name}/objects/{file_name}"
+        headers = {
+            "Authorization": f"Bearer {bearer_token}",
+            "X-Auth-Email": email,
+            "X-Auth-Key": api_key,
+        }
+
+        try:
+            async with self.session.get(url, headers=headers) as response:
+                if response.status != 200:
+                    data = await response.json()
+                    errors = data.get("errors", [])
+                    error_messages = "\n".join([error.get("message", "Unknown error") for error in errors])
+                    embed = discord.Embed(
+                        title="Failed to fetch file",
+                        color=0xff4545
+                    )
+                    embed.add_field(
+                        name="Errors",
+                        value=f"**`{error_messages}`**",
+                        inline=False
+                    )
+                    await ctx.send(embed=embed)
+                    return
+
+                file_content = await response.read()
+                embed = discord.Embed(
+                    title="File fetched from bucket",
+                    color=discord.Color.green()
+                )
+                embed.add_field(
+                    name="File name",
+                    value=f"**`{file_name}`**",
+                    inline=False
+                )
+                embed.add_field(
+                    name="Bucket targeted",
+                    value=f"**`{bucket_name}`**",
+                    inline=False
+                )
+                await ctx.send(embed=embed)
+                await ctx.send(file=discord.File(io.BytesIO(file_content), filename=file_name))
+        except Exception as e:
+            embed = discord.Embed(
+                title="Error",
+                description=f"An error occurred: {str(e)}",
+                color=0xff4545
+            )
+            await ctx.send(embed=embed)
+            return
