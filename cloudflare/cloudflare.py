@@ -1656,7 +1656,7 @@ class Cloudflare(commands.Cog):
         """Cloudflare R2 Storage allows developers to store large amounts of unstructured data without the costly egress bandwidth fees associated with typical cloud storage services. Learn more at https://developers.cloudflare.com/r2/"""
         if ctx.invoked_subcommand is None:
             await ctx.send("Invalid Cloudflare command passed.")
-            
+
     @commands.is_owner()
     @r2.command(name="create")
     async def create_bucket(self, ctx, name: str, location_hint: str):
@@ -1672,7 +1672,7 @@ class Cloudflare(commands.Cog):
         if location_hint not in valid_location_hints:
             embed = discord.Embed(title="Invalid Location Hint", color=discord.Color.red())
             embed.add_field(name="Error", value=f"'{location_hint}' is not a valid location hint.", inline=False)
-            embed.add_field(name="Valid Location Hints", value="\n".join([f"{key}: {value}" for key, value in valid_location_hints.items()]), inline=False)
+            embed.add_field(name="Valid Location Hints", value="\n".join([f"**`{key}`** for **{value}**" for key, value in valid_location_hints.items()]), inline=False)
             await ctx.send(embed=embed)
             return
 
