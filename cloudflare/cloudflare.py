@@ -2034,7 +2034,7 @@ class Cloudflare(commands.Cog):
 
                 list_data = await list_response.json()
                 objects = list_data.get("result", {}).get("objects", [])
-                matching_files = [obj for obj in objects if file_name in obj.get("key", "")]
+                matching_files = [obj for obj in objects if obj.get("key") == file_name]
 
                 if not matching_files:
                     embed = discord.Embed(
