@@ -5,6 +5,7 @@ from datetime import datetime
 from redbot.core import commands, Config #type: ignore
 import aiohttp #type: ignore
 import ipaddress
+import http.client
 
 class Cloudflare(commands.Cog):
     """A Red-Discordbot cog to interact with the Cloudflare API."""
@@ -1728,43 +1729,51 @@ class Cloudflare(commands.Cog):
             await ctx.send("Missing one or more required API tokens. Please check your configuration.")
             return
 
-        url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/r2/buckets"
+
+        conn = http.client.HTTPSConnection("api.cloudflare.com")
+
         headers = {
-            "Authorization": f"Bearer {bearer_token}",
-            "Content-Type": "application/json"
+            'Content-Type': "application/json",
+            'Authorization': f"Bearer {bearer_token}"
         }
 
-        async with self.session.get(url, headers=headers) as response:
-            data = await response.json()
-            if response.status != 200 or not data.get("success", False):
-                errors = data.get("errors", [])
-                error_messages = "\n".join([error.get("message", "Unknown error") for error in errors])
-                await ctx.send(f"Failed to list buckets: {error_messages}")
-                return
+        conn.request("GET", f"/client/v4/accounts/{account_id}/r2/buckets", headers=headers)
 
-            buckets = data.get("result", [])
-            if isinstance(buckets, dict):
-                buckets = [buckets]
-            elif not isinstance(buckets, list):
-                await ctx.send("Unexpected response format.")
-                return
+        res = conn.getresponse()
+        data = res.read()
 
-            if not buckets:
-                await ctx.send("No buckets found.")
-                return
+        data = data.decode("utf-8")
+        data = json.loads(data)
 
-            embed = discord.Embed(title="Available Buckets", color=discord.Color.blue())
-            for bucket in buckets:
-                if isinstance(bucket, dict):
-                    name = bucket.get("name") or "Unknown"
-                    location = bucket.get("location") or "Unknown"
-                    creation_date = bucket.get("creation_date") or "Unknown"
-                    embed.add_field(
-                        name=f"Bucket: {name}",
-                        value=(
-                            f"**Location:** `{location}`\n"
-                            f"**Creation Date:** `{creation_date}`"
-                        ),
-                        inline=False
-                    )
-            await ctx.send(embed=embed)
+        if res.status != 200 or not data.get("success", False):
+            errors = data.get("errors", [])
+            error_messages = "\n".join([error.get("message", "Unknown error") for error in errors])
+            await ctx.send(f"Failed to list buckets: {error_messages}")
+            return
+
+        buckets = data.get("result", [])
+        if isinstance(buckets, dict):
+            buckets = [buckets]
+        elif not isinstance(buckets, list):
+            await ctx.send("Unexpected response format.")
+            return
+
+        if not buckets:
+            await ctx.send("No buckets found.")
+            return
+
+        embed = discord.Embed(title="Available Buckets", color=discord.Color.blue())
+        for bucket in buckets:
+            if isinstance(bucket, dict):
+                name = bucket.get("name") or "Unknown"
+                location = bucket.get("location") or "Unknown"
+                creation_date = bucket.get("creation_date") or "Unknown"
+                embed.add_field(
+                    name=f"Bucket: {name}",
+                    value=(
+                        f"**Location:** `{location}`\n"
+                        f"**Creation Date:** `{creation_date}`"
+                    ),
+                    inline=False
+                )
+        await ctx.send(embed=embed)
