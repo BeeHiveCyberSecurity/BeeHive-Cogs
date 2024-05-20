@@ -1928,7 +1928,14 @@ class Cloudflare(commands.Cog):
                 embed = discord.Embed(title="File Uploaded Successfully", color=discord.Color.green())
                 embed.add_field(name="File Name", value=f"**`{attachment.filename}`**", inline=False)
                 embed.add_field(name="Bucket Name", value=f"**`{bucket_name}`**", inline=False)
-                embed.add_field(name="File Size", value=f"**`{attachment.size} bytes`**", inline=False)
+                def format_file_size(size):
+                    for unit in ['bytes', 'KB', 'MB', 'GB', 'TB']:
+                        if size < 1024.0:
+                            return f"**`{size:.2f} {unit}`**"
+                        size /= 1024.0
+                    return f"**`{size:.2f} PB`**"  # In case the file is extremely large
+
+                embed.add_field(name="File Size", value=format_file_size(attachment.size), inline=False)
                 embed.add_field(name="Upload Time", value=f"**`{upload_time:.2f} seconds`**", inline=False)
                 await ctx.send(embed=embed)
         except RuntimeError as e:
