@@ -1758,9 +1758,9 @@ class Cloudflare(commands.Cog):
             embed = discord.Embed(title="Available Buckets", color=discord.Color.blue())
             for bucket in buckets:
                 if isinstance(bucket, dict):
-                    name = bucket.get("name", "Unknown")
-                    location = bucket.get("location", "Unknown")
-                    creation_date = bucket.get("creation_date", "Unknown")
+                    name = bucket.get("name") or "Unknown"
+                    location = bucket.get("location") or "Unknown"
+                    creation_date = bucket.get("creation_date") or "Unknown"
                     embed.add_field(
                         name=name,
                         value=(
