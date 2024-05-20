@@ -1296,6 +1296,66 @@ class Cloudflare(commands.Cog):
         """Hyperdrive is a service that accelerates queries you make to existing databases, making it faster to access your data from across the globe, irrespective of your users’ location. Learn more at https://developers.cloudflare.com/hyperdrive/"""
         if ctx.invoked_subcommand is None:
             await ctx.send("Invalid Cloudflare command passed.")
-    
+            
+    @commands.is_owner()
+    @hyperdrive.command(name="list")
+    async def list_hyperdrives(self, ctx):
+        """List current Hyperdrives in the specified account"""
+        api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
+        email = api_tokens.get("email")
+        api_key = api_tokens.get("api_key")
+        bearer_token = api_tokens.get("bearer_token")
+        account_id = api_tokens.get("account_id")
+
+        if not all([email, api_key, bearer_token, account_id]):
+            await ctx.send("Missing one or more required API tokens. Please check your configuration.")
+            return
+
+        headers = {
+            "X-Auth-Email": email,
+            "X-Auth-Key": api_key,
+            "Authorization": f"Bearer {bearer_token}",
+            "Content-Type": "application/json"
+        }
+
+        url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/hyperdrive/configs"
+
+        async with self.session.get(url, headers=headers) as response:
+            if response.status != 200:
+                await ctx.send(f"Failed to fetch Hyperdrives: {response.status}")
+                return
+
+            data = await response.json()
+            if not data.get("success", False):
+                await ctx.send("Failed to fetch Hyperdrives.")
+                return
+
+            hyperdrives = data.get("result", [])
+            if not hyperdrives:
+                await ctx.send("No Hyperdrives found.")
+                return
+
+            embed = discord.Embed(title="Hyperdrives", color=discord.Color.from_rgb(255, 128, 0))
+            for hyperdrive in hyperdrives:
+                caching = hyperdrive["caching"]
+                origin = hyperdrive["origin"]
+                embed.add_field(
+                    name=f"Hyperdrive ID: {hyperdrive['id']}",
+                    value=(
+                        f"**Name:** {hyperdrive['name']}\n"
+                        f"**Caching Disabled:** {caching['disabled']}\n"
+                        f"**Max Age:** {caching['max_age']} seconds\n"
+                        f"**Stale While Revalidate:** {caching['stale_while_revalidate']} seconds\n"
+                        f"**Origin Database:** {origin['database']}\n"
+                        f"**Origin Host:** {origin['host']}\n"
+                        f"**Origin Port:** {origin['port']}\n"
+                        f"**Origin Scheme:** {origin['scheme']}\n"
+                        f"**Origin User:** {origin['user']}"
+                    ),
+                    inline=False
+                )
+
+            await ctx.send(embed=embed)
+
     def cog_unload(self):
         self.bot.loop.create_task(self.session.close())
