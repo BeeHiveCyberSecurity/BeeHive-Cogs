@@ -607,14 +607,18 @@ class Cloudflare(commands.Cog):
             if response.status == 200:
                 data = await response.json()
                 if data["success"]:
-                    result = data["result"]
+                    result = data["result"][0]
                     embed = discord.Embed(title=f"Domain History for {domain}", color=0xfffffe)
                     
                     if "domain" in result:
                         embed.add_field(name="Domain", value=f"**`{result['domain']}`**", inline=False)
-                    if "history" in result:
-                        history = "\n".join([f"**`{entry}`**" for entry in result["history"]])
-                        embed.add_field(name="History", value=history, inline=False)
+                    if "categorizations" in result:
+                        categorizations = result["categorizations"]
+                        for categorization in categorizations:
+                            categories = ", ".join([f"**`{category['name']}`**" for category in categorization["categories"]])
+                            embed.add_field(name="Categories", value=categories, inline=False)
+                            embed.add_field(name="Start", value=f"**`{categorization['start']}`**", inline=True)
+                            embed.add_field(name="End", value=f"**`{categorization['end']}`**", inline=True)
                     
                     await ctx.send(embed=embed)
                 else:
