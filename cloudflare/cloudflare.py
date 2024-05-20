@@ -1780,6 +1780,10 @@ class Cloudflare(commands.Cog):
     @r2.command(name="get")
     async def getbucket(self, ctx, bucket_name: str):
         """Get info about an R2 bucket"""
+        if self.session.closed:
+            await ctx.send("HTTP session is closed. Please try again later.")
+            return
+
         api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
         api_key = api_tokens.get("api_key")
         email = api_tokens.get("email")
@@ -1798,33 +1802,37 @@ class Cloudflare(commands.Cog):
             "X-Auth-Key": api_key,
         }
 
-        async with self.session.get(url, headers=headers) as response:
-            data = await response.json()
-            if response.status != 200 or not data.get("success", False):
-                errors = data.get("errors", [])
-                error_messages = "\n".join([error.get("message", "Unknown error") for error in errors])
-                embed = discord.Embed(title="Failed to fetch bucket info", color=0xff4545)
-                embed.add_field(name="Errors", value=f"**`{error_messages}`**", inline=False)
+        try:
+            async with self.session.get(url, headers=headers) as response:
+                data = await response.json()
+                if response.status != 200 or not data.get("success", False):
+                    errors = data.get("errors", [])
+                    error_messages = "\n".join([error.get("message", "Unknown error") for error in errors])
+                    embed = discord.Embed(title="Failed to fetch bucket info", color=0xff4545)
+                    embed.add_field(name="Errors", value=f"**`{error_messages}`**", inline=False)
+                    await ctx.send(embed=embed)
+                    return
+
+                bucket_info = data.get("result", {})
+                if not bucket_info:
+                    await ctx.send("No information found for the specified bucket.")
+                    return
+
+                embed = discord.Embed(title="Bucket Information", color=discord.Color.from_rgb(255, 145, 68))
+                # Customize individual fields
+                if "name" in bucket_info:
+                    embed.add_field(name="Name", value=f"**`{bucket_info['name']}`**", inline=False)
+                if "creation_date" in bucket_info:
+                    embed.add_field(name="Creation Date", value=f"**`{bucket_info['creation_date']}`**", inline=False)
+                if "location" in bucket_info:
+                    embed.add_field(name="Location", value=f"**`{bucket_info['location'].upper()}`**", inline=False)
+                if "storage_class" in bucket_info:
+                    embed.add_field(name="Storage Class", value=f"**`{bucket_info['storage_class']}`**", inline=False)
+                
                 await ctx.send(embed=embed)
-                return
-
-            bucket_info = data.get("result", {})
-            if not bucket_info:
-                await ctx.send("No information found for the specified bucket.")
-                return
-
-            embed = discord.Embed(title="Bucket Information", color=discord.Color.from_rgb(255, 145, 68))
-            # Customize individual fields
-            if "name" in bucket_info:
-                embed.add_field(name="Name", value=f"**`{bucket_info['name']}`**", inline=False)
-            if "creation_date" in bucket_info:
-                embed.add_field(name="Creation Date", value=f"**`{bucket_info['creation_date']}`**", inline=False)
-            if "location" in bucket_info:
-                embed.add_field(name="Location", value=f"**`{bucket_info['location'].upper()}`**", inline=False)
-            if "storage_class" in bucket_info:
-                embed.add_field(name="Storage Class", value=f"**`{bucket_info['storage_class']}`**", inline=False)
-            
-            await ctx.send(embed=embed)
+        except RuntimeError as e:
+            await ctx.send(f"An error occurred: {str(e)}")
+            return
 
 
         self.bot.loop.create_task(self.session.close())
