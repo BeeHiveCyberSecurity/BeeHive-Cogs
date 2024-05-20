@@ -5,7 +5,6 @@ from datetime import datetime
 from redbot.core import commands, Config #type: ignore
 import aiohttp #type: ignore
 import ipaddress
-import http.client
 import json
 
 class Cloudflare(commands.Cog):
@@ -878,7 +877,7 @@ class Cloudflare(commands.Cog):
                 data = await response.json()
                 if data["success"]:
                     result = data["result"]
-                    embed = discord.Embed(title="Destination address added", description="You or the owner of this inbox will need to click the link they were sent just now to enable their email as a destination within your Cloudflare account", color=discord.Color.green())
+                    embed = discord.Embed(title="Destination address added", description="You or the owner of this inbox will need to click the link they were sent just now to enable their email as a destination within your Cloudflare account", color=discord.Color.from_str("#2BBD8E"))
                     embed.add_field(name="Email", value=f"**`{result['email']}`**", inline=False)
                     embed.add_field(name="ID", value=f"**`{result['id']}`**", inline=False)
                     embed.add_field(name="Created", value=f"**`{result['created']}`**", inline=False)
@@ -918,7 +917,7 @@ class Cloudflare(commands.Cog):
                 embed = discord.Embed(
                     title="Error",
                     description=f"Failed to fetch email routing addresses. Status code: {response.status}",
-                    color=discord.Color.red()
+                    color=discord.Color.from_str("#ff4545")
                 )
                 await ctx.send(embed=embed)
                 return
@@ -928,7 +927,7 @@ class Cloudflare(commands.Cog):
                 embed = discord.Embed(
                     title="Error",
                     description="Failed to fetch email routing addresses.",
-                    color=discord.Color.red()
+                    color=discord.Color.from_str("#ff4545")
                 )
                 await ctx.send(embed=embed)
                 return
@@ -944,7 +943,7 @@ class Cloudflare(commands.Cog):
                 embed = discord.Embed(
                     title="Error",
                     description=f"No email routing address found for **`{email}`**.",
-                    color=discord.Color.red()
+                    color=discord.Color.from_str("#ff4545")
                 )
                 await ctx.send(embed=embed)
                 return
@@ -953,7 +952,7 @@ class Cloudflare(commands.Cog):
         embed = discord.Embed(
             title="Confirm destructive action",
             description=f"**Are you sure you want to remove this email routing address**\n**`{email}`**",
-            color=discord.Color.red()
+            color=discord.Color.from_str("#ff4545")
         )
         embed.set_footer(text="React to confirm or cancel this request")
         confirmation_message = await ctx.send(embed=embed)
@@ -979,28 +978,28 @@ class Cloudflare(commands.Cog):
                             embed = discord.Embed(
                                 title="Destination address removed",
                                 description=f"**Successfully removed email routing address**\n**`{email}`**",
-                                color=discord.Color.green()
+                                color=discord.Color.from_str("#2BBD8E")
                             )
                             await ctx.send(embed=embed)
                         else:
                             embed = discord.Embed(
                                 title="Error",
                                 description=f"**Error:** {data['errors']}",
-                                color=discord.Color.red()
+                                color=discord.Color.from_str("#ff4545")
                             )
                             await ctx.send(embed=embed)
                     else:
                         embed = discord.Embed(
                             title="Error",
                             description=f"Failed to remove email routing address. Status code: {response.status}",
-                            color=discord.Color.red()
+                            color=discord.Color.from_str("#ff4545")
                         )
                         await ctx.send(embed=embed)
         except asyncio.TimeoutError:
             embed = discord.Embed(
                 title="Timeout",
                 description="Confirmation timed out. Email routing address removal cancelled.",
-                color=discord.Color.red()
+                color=discord.Color.from_str("#ff4545")
             )
             await ctx.send(embed=embed)
 
