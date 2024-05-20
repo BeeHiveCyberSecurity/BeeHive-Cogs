@@ -1324,11 +1324,11 @@ class Cloudflare(commands.Cog):
             if response.status == 401:
                 embed = discord.Embed(
                     title="Upgrade required",
-                    description="Cloudflare Hyperdrive requires the attached Cloudflare account to be subscribed to the Workers Paid plan.",
+                    description="**Cloudflare Hyperdrive** requires the attached **Cloudflare account** to be subscribed to the **Workers Paid** plan.",
                     color=discord.Color.red()
                 )
                 button = discord.ui.Button(
-                    label="Get Started with Hyperdrive",
+                    label="Learn more",
                     url="https://developers.cloudflare.com/hyperdrive/get-started/#prerequisites"
                 )
                 view = discord.ui.View()
