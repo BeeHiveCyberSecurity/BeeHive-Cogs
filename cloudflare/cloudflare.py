@@ -1708,9 +1708,9 @@ class Cloudflare(commands.Cog):
 
             result = data.get("result", {})
             embed = discord.Embed(title="Bucket Created", color=discord.Color.green())
-            embed.add_field(name="Name", value=result.get("name"), inline=False)
-            embed.add_field(name="Location", value=result.get("location"), inline=False)
-            embed.add_field(name="Creation Date", value=result.get("creation_date"), inline=False)
+            embed.add_field(name="Name", value=f"**`{result.get('name')}`**", inline=False)
+            embed.add_field(name="Location", value=f"**`{result.get('location')}`**", inline=False)
+            embed.add_field(name="Creation Date", value=f"**`{result.get('creation_date')}`**", inline=False)
 
             await ctx.send(embed=embed)
 
