@@ -1733,7 +1733,7 @@ class Cloudflare(commands.Cog):
             "X-Auth-Email": email,
             "X-Auth-Key": api_key,
             "Authorization": f"Bearer {bearer_token}",
-            "Content-Type": "application/json",
+            "Content-Type": "application/json"
         }
 
         async with self.session.get(url, headers=headers) as response:
