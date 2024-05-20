@@ -1290,7 +1290,12 @@ class Cloudflare(commands.Cog):
 
             await ctx.send(embed=embed)
     
-    
+    @commands.is_owner()
+    @commands.group()
+    async def hyperdrive(self, ctx):
+        """Hyperdrive is a service that accelerates queries you make to existing databases, making it faster to access your data from across the globe, irrespective of your users’ location. Learn more at https://developers.cloudflare.com/hyperdrive/"""
+        if ctx.invoked_subcommand is None:
+            await ctx.send("Invalid Cloudflare command passed.")
     
     def cog_unload(self):
         self.bot.loop.create_task(self.session.close())
