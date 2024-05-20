@@ -105,7 +105,7 @@ class Cloudflare(commands.Cog):
     async def intel(self, ctx):
         """Different utility tools provided by Cloudflare."""
         if ctx.invoked_subcommand is None:
-            await ctx.send("Invalid Cloudflare command passed.")
+            pass
 
     @intel.command(name="whois")
     async def whois(self, ctx, domain: str):
