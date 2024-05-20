@@ -1745,18 +1745,23 @@ class Cloudflare(commands.Cog):
                 return
 
             buckets = data.get("result", [])
+            if not isinstance(buckets, list):
+                await ctx.send("Unexpected response format.")
+                return
+
             if not buckets:
                 await ctx.send("No buckets found.")
                 return
 
             embed = discord.Embed(title="Available Buckets", color=discord.Color.blue())
             for bucket in buckets:
-                embed.add_field(
-                    name=bucket.get("name"),
-                    value=(
-                        f"Location: **`{bucket.get('location')}`**\n"
-                        f"Creation Date: **`{bucket.get('creation_date')}`**"
-                    ),
-                    inline=False
-                )
+                if isinstance(bucket, dict):
+                    embed.add_field(
+                        name=bucket.get("name", "Unknown"),
+                        value=(
+                            f"Location: **`{bucket.get('location', 'Unknown')}`**\n"
+                            f"Creation Date: **`{bucket.get('creation_date', 'Unknown')}`**"
+                        ),
+                        inline=False
+                    )
             await ctx.send(embed=embed)
