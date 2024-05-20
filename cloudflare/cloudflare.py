@@ -101,11 +101,9 @@ class Cloudflare(commands.Cog):
                 except discord.Forbidden:
                     pass
 
-    @commands.group()
+    @commands.group(name=intel, invoke_without_command=True)
     async def intel(self, ctx):
         """Different utility tools provided by Cloudflare."""
-        if ctx.invoked_subcommand is None:
-            pass
 
     @intel.command(name="whois")
     async def whois(self, ctx, domain: str):
