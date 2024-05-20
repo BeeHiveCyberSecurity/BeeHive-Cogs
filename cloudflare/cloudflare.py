@@ -1884,7 +1884,8 @@ class Cloudflare(commands.Cog):
     @r2.command(name="upload", help="Upload a file to the specified R2 bucket")
     async def upload_to_bucket(self, ctx, bucket_name: str):
         if not ctx.message.attachments:
-            await ctx.send("Please attach a file to upload.")
+            embed = discord.Embed(title="Upload Error", description="Please attach a file to upload.", color=0xff4545)
+            await ctx.send(embed=embed)
             return
 
         attachment = ctx.message.attachments[0]
@@ -1897,7 +1898,8 @@ class Cloudflare(commands.Cog):
         account_id = api_tokens.get("account_id")
 
         if not all([api_key, email, bearer_token, account_id]):
-            await ctx.send("Missing one or more required API tokens. Please check your configuration.")
+            embed = discord.Embed(title="Configuration Error", description="Missing one or more required API tokens. Please check your configuration.", color=0xff4545)
+            await ctx.send(embed=embed)
             return
 
         url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/r2/buckets/{bucket_name}/objects/{attachment.filename}"
@@ -1909,7 +1911,9 @@ class Cloudflare(commands.Cog):
         }
 
         try:
+            start_time = time.monotonic()
             async with self.session.put(url, headers=headers, data=file_content) as response:
+                end_time = time.monotonic()
                 data = await response.json()
                 if response.status != 200 or not data.get("success", False):
                     errors = data.get("errors", [])
@@ -1919,7 +1923,14 @@ class Cloudflare(commands.Cog):
                     await ctx.send(embed=embed)
                     return
 
-                await ctx.send(f"File `{attachment.filename}` uploaded successfully to bucket `{bucket_name}`.")
+                upload_time = end_time - start_time
+                embed = discord.Embed(title="File Uploaded Successfully", color=discord.Color.green())
+                embed.add_field(name="File Name", value=f"**`{attachment.filename}`**", inline=False)
+                embed.add_field(name="Bucket Name", value=f"**`{bucket_name}`**", inline=False)
+                embed.add_field(name="File Size", value=f"**`{attachment.size} bytes`**", inline=False)
+                embed.add_field(name="Upload Time", value=f"**`{upload_time:.2f} seconds`**", inline=False)
+                await ctx.send(embed=embed)
         except RuntimeError as e:
-            await ctx.send(f"An error occurred: {str(e)}")
+            embed = discord.Embed(title="Runtime Error", description=f"An error occurred: {str(e)}", color=0xff4545)
+            await ctx.send(embed=embed)
             return
