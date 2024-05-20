@@ -2006,7 +2006,7 @@ class Cloudflare(commands.Cog):
 
     @commands.is_owner()
     @r2.command(name="fetch")
-    async def fetch_file(self, ctx, account_id: str, bucket_name: str, file_name: str):
+    async def fetch_file(self, ctx, bucket_name: str, file_name: str):
         """Fetch a file from an R2 bucket"""
         api_info = await self.bot.get_shared_api_tokens("cloudflare")
         bearer_token = api_info.get("bearer_token")
