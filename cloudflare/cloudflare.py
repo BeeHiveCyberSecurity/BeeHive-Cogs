@@ -1384,7 +1384,7 @@ class Cloudflare(commands.Cog):
     @commands.is_owner()
     @hyperdrive.command(name="create")
     async def create_hyperdrive(self, ctx, name: str, password: str, database: str, host: str, port: str, scheme: str, user: str, caching_disabled: bool, max_age: int, stale_while_revalidate: int):
-        """Create a new Hyperdrive configuration."""
+        """Create a new Hyperdrive configuration. View syntax at https://developers.cloudflare.com/api/operations/create-hyperdrive"""
         api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
         bearer_token = api_tokens.get("bearer_token")
         account_id = api_tokens.get("account_id")
