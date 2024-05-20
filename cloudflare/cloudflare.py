@@ -1965,8 +1965,8 @@ class Cloudflare(commands.Cog):
         list_url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/r2/buckets/{bucket_name}/objects"
         try:
             async with self.session.get(list_url, headers=headers) as list_response:
+                list_data = await list_response.json()
                 if list_response.status != 200:
-                    list_data = await list_response.json()
                     list_errors = list_data.get("errors", [])
                     list_error_messages = "\n".join([error.get("message", "Unknown error") for error in list_errors])
                     embed = discord.Embed(
@@ -1981,8 +1981,7 @@ class Cloudflare(commands.Cog):
                     await ctx.send(embed=embed)
                     return
 
-                list_data = await list_response.json()
-                if isinstance(list_data, list):
+                if not isinstance(list_data, dict):
                     embed = discord.Embed(
                         title="Unexpected Response Format",
                         description="The response from the server was not in the expected format.",
