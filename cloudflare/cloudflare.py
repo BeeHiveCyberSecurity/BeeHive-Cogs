@@ -1937,7 +1937,7 @@ class Cloudflare(commands.Cog):
             return
         
     @commands.is_owner()
-    @r2.command(name="delete")
+    @r2.command(name="recycle")
     async def delete_file(self, ctx, bucket_name: str, file_name: str):
         api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
         api_key = api_tokens.get("api_key")
