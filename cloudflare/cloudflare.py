@@ -1983,6 +1983,16 @@ class Cloudflare(commands.Cog):
 
                 list_data = await list_response.json()
                 objects = list_data.get("result", {}).get("objects", [])
+
+                if not objects:
+                    embed = discord.Embed(
+                        title="No files found",
+                        description=f"No files were found in the bucket `{bucket_name}`.",
+                        color=0xff4545
+                    )
+                    await ctx.send(embed=embed)
+                    return
+
                 matching_files = [obj for obj in objects if obj.get("key") == file_name]
 
                 if not matching_files:
