@@ -1756,13 +1756,15 @@ class Cloudflare(commands.Cog):
             embed = discord.Embed(title="Available Buckets", color=discord.Color.blue())
             for bucket in buckets:
                 if isinstance(bucket, dict):
+                    name = bucket.get("name", "Unknown")
+                    location = bucket.get("location", "Unknown")
+                    creation_date = bucket.get("creation_date", "Unknown")
                     embed.add_field(
-                        name=bucket.get("name", "Unknown"),
+                        name=name,
                         value=(
-                            f"Location: **`{bucket.get('location', 'Unknown')}`**\n"
-                            f"Creation Date: **`{bucket.get('creation_date', 'Unknown')}`**"
+                            f"**Location:** `{location}`\n"
+                            f"**Creation Date:** `{creation_date}`"
                         ),
                         inline=False
                     )
             await ctx.send(embed=embed)
-            await ctx.send("Buckets fetched successfully.")
