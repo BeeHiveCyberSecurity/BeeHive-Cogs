@@ -2046,6 +2046,15 @@ class Cloudflare(commands.Cog):
 
         try:
             async with self.session.get(url, headers=headers) as response:
+                if response.status == 413:
+                    embed = discord.Embed(
+                        title="Error",
+                        description="413 Payload Too Large (error code: 40005): Request entity too large",
+                        color=0xff4545
+                    )
+                    await ctx.send(embed=embed)
+                    return
+
                 if response.status != 200:
                     data = await response.json()
                     errors = data.get("errors", [])
@@ -2064,6 +2073,15 @@ class Cloudflare(commands.Cog):
                     # Additional logic to fetch by other attributes
                     list_url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/r2/buckets/{bucket_name}/objects"
                     async with self.session.get(list_url, headers=headers) as list_response:
+                        if list_response.status == 413:
+                            embed = discord.Embed(
+                                title="Error",
+                                description="413 Payload Too Large (error code: 40005): Request entity too large",
+                                color=0xff4545
+                            )
+                            await ctx.send(embed=embed)
+                            return
+
                         if list_response.status != 200:
                             list_data = await list_response.json()
                             list_errors = list_data.get("errors", [])
@@ -2086,6 +2104,15 @@ class Cloudflare(commands.Cog):
                             if obj.get("name") == file_name:
                                 file_url = obj.get("url")
                                 async with self.session.get(file_url, headers=headers) as file_response:
+                                    if file_response.status == 413:
+                                        embed = discord.Embed(
+                                            title="Error",
+                                            description="413 Payload Too Large (error code: 40005): Request entity too large",
+                                            color=0xff4545
+                                        )
+                                        await ctx.send(embed=embed)
+                                        return
+
                                     if file_response.status == 200:
                                         file_size = int(file_response.headers.get("Content-Length", 0))
                                         if file_size > 100 * 1024 * 1024:  # 100 MB
