@@ -1714,4 +1714,7 @@ class Cloudflare(commands.Cog):
 
             await ctx.send(embed=embed)
 
+
+
+
         self.bot.loop.create_task(self.session.close())
