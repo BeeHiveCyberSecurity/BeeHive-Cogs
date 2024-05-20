@@ -1497,6 +1497,52 @@ class Cloudflare(commands.Cog):
 
             await ctx.send(f"Hyperdrive {hyperdrive_id} successfully deleted.")
 
+    @commands.is_owner()
+    @hyperdrive.command(name="info")
+    async def get_hyperdrive_info(self, ctx, hyperdrive_id: str):
+        """Fetch information about a specified Hyperdrive by its ID."""
+        api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
+        api_key = api_tokens.get("api_key")
+        email = api_tokens.get("email")
+        bearer_token = api_tokens.get("bearer_token")
+        account_id = api_tokens.get("account_id")
+
+        if not all([api_key, email, bearer_token, account_id]):
+            await ctx.send("Missing one or more required API tokens. Please check your configuration.")
+            return
+
+        url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/hyperdrive/configs/{hyperdrive_id}"
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {bearer_token}",
+            "X-Auth-Email": email,
+            "X-Auth-Key": api_key,
+        }
+
+        async with self.session.get(url, headers=headers) as response:
+            if response.status != 200:
+                await ctx.send(f"Failed to fetch Hyperdrive info: {response.status}")
+                return
+
+            data = await response.json()
+            if not data.get("success", False):
+                await ctx.send("Failed to fetch Hyperdrive info.")
+                return
+
+            result = data.get("result", {})
+            embed = discord.Embed(title="Hyperdrive Information", color=discord.Color.blue())
+            embed.add_field(name="ID", value=result.get("id"), inline=False)
+            embed.add_field(name="Name", value=result.get("name"), inline=False)
+            embed.add_field(name="Database", value=result["origin"].get("database"), inline=False)
+            embed.add_field(name="Host", value=result["origin"].get("host"), inline=False)
+            embed.add_field(name="Port", value=result["origin"].get("port"), inline=False)
+            embed.add_field(name="Scheme", value=result["origin"].get("scheme"), inline=False)
+            embed.add_field(name="User", value=result["origin"].get("user"), inline=False)
+            embed.add_field(name="Caching Disabled", value=result["caching"].get("disabled"), inline=False)
+            embed.add_field(name="Max Age", value=result["caching"].get("max_age"), inline=False)
+            embed.add_field(name="Stale While Revalidate", value=result["caching"].get("stale_while_revalidate"), inline=False)
+
+            await ctx.send(embed=embed)
 
     def cog_unload(self):
         self.bot.loop.create_task(self.session.close())
