@@ -1329,15 +1329,20 @@ class Cloudflare(commands.Cog):
             if response.status == 401:
                 embed = discord.Embed(
                     title="Upgrade required",
-                    description="**Cloudflare Hyperdrive** requires the attached **Cloudflare account** to be subscribed to the **Workers Paid** plan.",
+                    description="**Cloudflare Hyperdrive** requires the attached **Cloudflare account** to be subscribed to a **Workers Paid** plan.",
                     color=discord.Color.red()
                 )
                 button = discord.ui.Button(
-                    label="Learn more",
+                    label="Hyperdrive prerequisites",
                     url="https://developers.cloudflare.com/hyperdrive/get-started/#prerequisites"
+                )
+                button2 = discord.ui.Button(
+                    label="Workers pricing",
+                    url="https://developers.cloudflare.com/workers/platform/pricing/#workers"
                 )
                 view = discord.ui.View()
                 view.add_item(button)
+                view.add_item(button2)
                 await ctx.send(embed=embed, view=view)
                 return
             elif response.status != 200:
