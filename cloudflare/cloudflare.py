@@ -1713,8 +1713,44 @@ class Cloudflare(commands.Cog):
             embed.add_field(name="Creation Date", value=f"**`{result.get('creation_date')}`**", inline=False)
 
             await ctx.send(embed=embed)
-
-
-
-
         self.bot.loop.create_task(self.session.close())
+
+        @r2.command(name="list")
+        async def list_buckets(self, ctx):
+            """List all available R2 buckets."""
+            api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
+            api_key = api_tokens.get("api_key")
+            email = api_tokens.get("email")
+            bearer_token = api_tokens.get("bearer_token")
+            account_id = api_tokens.get("account_id")
+
+            if not all([api_key, email, bearer_token, account_id]):
+                await ctx.send("Missing one or more required API tokens. Please check your configuration.")
+                return
+
+            url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/r2/buckets"
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {bearer_token}",
+                "X-Auth-Email": email,
+                "X-Auth-Key": api_key,
+            }
+
+            async with self.session.get(url, headers=headers) as response:
+                data = await response.json()
+                if response.status != 200 or not data.get("success", False):
+                    errors = data.get("errors", [])
+                    error_messages = "\n".join([error.get("message", "Unknown error") for error in errors])
+                    await ctx.send(f"Failed to list buckets: {error_messages}")
+                    return
+
+                buckets = data.get("result", [])
+                if not buckets:
+                    await ctx.send("No buckets found.")
+                    return
+
+                embed = discord.Embed(title="Available Buckets", color=discord.Color.blue())
+                for bucket in buckets:
+                    embed.add_field(name=bucket.get("name"), value=f"Location: **`{bucket.get('location')}`**\nCreation Date: **`{bucket.get('creation_date')}`**", inline=False)
+
+                await ctx.send(embed=embed)
