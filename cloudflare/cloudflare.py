@@ -770,11 +770,9 @@ class Cloudflare(commands.Cog):
                 await ctx.send(f"Failed to query Cloudflare API. Status code: {response.status}")
    
     @commands.is_owner()
-    @commands.group()
+    @commands.group(invoke_without_command=False)
     async def emailrouting(self, ctx):
         """Cloudflare Email Routing is designed to simplify the way you create and manage email addresses, without needing to keep an eye on additional mailboxes. Learn more at https://developers.cloudflare.com/email-routing/"""
-        if ctx.invoked_subcommand is None:
-            await ctx.send("Invalid Cloudflare command passed.")
 
     @commands.is_owner()
     @emailrouting.command(name="list")
@@ -1349,11 +1347,9 @@ class Cloudflare(commands.Cog):
             await ctx.send(embed=embed)
     
     @commands.is_owner()
-    @commands.group()
+    @commands.group(invoke_without_command=False)
     async def hyperdrive(self, ctx):
         """Hyperdrive is a service that accelerates queries you make to existing databases, making it faster to access your data from across the globe, irrespective of your users’ location. Learn more at https://developers.cloudflare.com/hyperdrive/"""
-        if ctx.invoked_subcommand is None:
-            await ctx.send("Invalid Cloudflare command passed.")
             
     @commands.is_owner()
     @hyperdrive.command(name="list")
@@ -1709,11 +1705,9 @@ class Cloudflare(commands.Cog):
             await ctx.send(embed=embed)
 
     @commands.is_owner()
-    @commands.group()
+    @commands.group(invoke_without_command=False)
     async def r2(self, ctx):
         """Cloudflare R2 Storage allows developers to store large amounts of unstructured data without the costly egress bandwidth fees associated with typical cloud storage services. Learn more at https://developers.cloudflare.com/r2/"""
-        if ctx.invoked_subcommand is None:
-            await ctx.send("Invalid Cloudflare command passed.")
 
     @commands.is_owner()
     @r2.command(name="create")
