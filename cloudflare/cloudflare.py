@@ -1745,7 +1745,9 @@ class Cloudflare(commands.Cog):
                 return
 
             buckets = data.get("result", [])
-            if not isinstance(buckets, list):
+            if isinstance(buckets, dict):
+                buckets = [buckets]
+            elif not isinstance(buckets, list):
                 await ctx.send("Unexpected response format.")
                 return
 
