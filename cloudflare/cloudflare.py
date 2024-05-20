@@ -1882,7 +1882,7 @@ class Cloudflare(commands.Cog):
             return
         
     @commands.is_owner()
-    @r2.command(name="upload", help="Upload a file to the specified R2 bucket")
+    @r2.command(name="stash", help="Upload a file to the specified R2 bucket")
     async def upload_to_bucket(self, ctx, bucket_name: str):
         if not ctx.message.attachments:
             embed = discord.Embed(title="Upload Error", description="Please attach a file to upload.", color=0xff4545)
