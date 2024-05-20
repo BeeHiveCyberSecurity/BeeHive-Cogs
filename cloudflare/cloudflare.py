@@ -1762,7 +1762,7 @@ class Cloudflare(commands.Cog):
                     location = bucket.get("location") or "Unknown"
                     creation_date = bucket.get("creation_date") or "Unknown"
                     embed.add_field(
-                        name=name,
+                        name=f"Bucket: {name}",
                         value=(
                             f"**Location:** `{location}`\n"
                             f"**Creation Date:** `{creation_date}`"
