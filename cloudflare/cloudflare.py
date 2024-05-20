@@ -2036,7 +2036,7 @@ class Cloudflare(commands.Cog):
                     errors = data.get("errors", [])
                     error_messages = "\n".join([error.get("message", "Unknown error") for error in errors])
                     embed = discord.Embed(
-                        title="Failed to fetch file",
+                        title="Failed to fetch file by name",
                         color=0xff4545
                     )
                     embed.add_field(
@@ -2045,7 +2045,59 @@ class Cloudflare(commands.Cog):
                         inline=False
                     )
                     await ctx.send(embed=embed)
-                    return
+
+                    # Additional logic to fetch by other attributes
+                    list_url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/r2/buckets/{bucket_name}/objects"
+                    async with self.session.get(list_url, headers=headers) as list_response:
+                        if list_response.status != 200:
+                            list_data = await list_response.json()
+                            list_errors = list_data.get("errors", [])
+                            list_error_messages = "\n".join([error.get("message", "Unknown error") for error in list_errors])
+                            embed = discord.Embed(
+                                title="Failed to list files in bucket",
+                                color=0xff4545
+                            )
+                            embed.add_field(
+                                name="Errors",
+                                value=f"**`{list_error_messages}`**",
+                                inline=False
+                            )
+                            await ctx.send(embed=embed)
+                            return
+
+                        list_data = await list_response.json()
+                        objects = list_data.get("result", {}).get("objects", [])
+                        for obj in objects:
+                            if obj.get("name") == file_name:
+                                file_url = obj.get("url")
+                                async with self.session.get(file_url, headers=headers) as file_response:
+                                    if file_response.status == 200:
+                                        file_content = await file_response.read()
+                                        embed = discord.Embed(
+                                            title="File fetched from bucket",
+                                            color=discord.Color.green()
+                                        )
+                                        embed.add_field(
+                                            name="File name",
+                                            value=f"**`{file_name}`**",
+                                            inline=False
+                                        )
+                                        embed.add_field(
+                                            name="Bucket targeted",
+                                            value=f"**`{bucket_name}`**",
+                                            inline=False
+                                        )
+                                        await ctx.send(embed=embed)
+                                        await ctx.send(file=discord.File(io.BytesIO(file_content), filename=file_name))
+                                        return
+
+                        embed = discord.Embed(
+                            title="File not found",
+                            description="The file could not be found by name or other attributes.",
+                            color=0xff4545
+                        )
+                        await ctx.send(embed=embed)
+                        return
 
                 file_content = await response.read()
                 embed = discord.Embed(
