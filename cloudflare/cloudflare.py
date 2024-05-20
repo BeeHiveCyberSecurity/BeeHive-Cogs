@@ -101,7 +101,7 @@ class Cloudflare(commands.Cog):
                 except discord.Forbidden:
                     pass
 
-    @commands.group(invoke_without_command=True)
+    @commands.group(invoke_without_command=False)
     async def intel(self, ctx):
         """Cloudforce One packages the vital aspects of modern threat intelligence and operations to make organizations smarter, more responsive, and more secure. Learn more at https://www.cloudflare.com/application-services/products/cloudforceone/"""
 
