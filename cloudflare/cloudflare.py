@@ -6,6 +6,7 @@ from redbot.core import commands, Config #type: ignore
 import aiohttp #type: ignore
 import ipaddress
 import http.client
+import json
 
 class Cloudflare(commands.Cog):
     """A Red-Discordbot cog to interact with the Cloudflare API."""
