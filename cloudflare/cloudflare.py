@@ -1980,16 +1980,16 @@ class Cloudflare(commands.Cog):
                     return
 
                 embed = discord.Embed(
-                    title="File Deleted Successfully",
+                    title="File deleted from bucket",
                     color=discord.Color.green()
                 )
                 embed.add_field(
-                    name="File Name",
+                    name="File name",
                     value=f"**`{file_name}`**",
                     inline=False
                 )
                 embed.add_field(
-                    name="Bucket Name",
+                    name="Bucket targeted",
                     value=f"**`{bucket_name}`**",
                     inline=False
                 )
