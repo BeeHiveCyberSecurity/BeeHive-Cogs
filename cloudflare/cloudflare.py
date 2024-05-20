@@ -1724,9 +1724,13 @@ class Cloudflare(commands.Cog):
         def check(reaction, user):
             return user == ctx.author and str(reaction.emoji) in ["✅", "❌"]
 
-        confirmation_message = await ctx.send(
-            f"Are you sure you want to delete the bucket **`{bucket_name}`**? This action cannot be undone. React with ✅ to confirm or ❌ to cancel."
+        embed = discord.Embed(
+            title="Confirm R2 bucket deletion",
+            description=f"Are you sure you want to delete the bucket **`{bucket_name}`**?\n\n:warning: **This action cannot be undone**.",
+            color=discord.Color.orange()
         )
+        embed.set_footer(text="React with ✅ to confirm or ❌ to cancel.")
+        confirmation_message = await ctx.send(embed=embed)
         await confirmation_message.add_reaction("✅")
         await confirmation_message.add_reaction("❌")
 
