@@ -30,7 +30,7 @@ class Cloudflare(commands.Cog):
             await ctx.send("Invalid Cloudflare command passed.")
         
     @commands.is_owner()
-    @cloudflare.command(name="get")
+    @zones.command(name="get")
     async def get(self, ctx):
         """Get the list of zones from Cloudflare."""
         api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
