@@ -1717,7 +1717,7 @@ class Cloudflare(commands.Cog):
 
     @r2.command(name="list")
     async def list_buckets(self, ctx):
-         """List all available R2 buckets."""
+        """List all available R2 buckets."""
         api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
         api_key = api_tokens.get("api_key")
         email = api_tokens.get("email")
