@@ -1321,7 +1321,21 @@ class Cloudflare(commands.Cog):
         url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/hyperdrive/configs"
 
         async with self.session.get(url, headers=headers) as response:
-            if response.status != 200:
+            if response.status == 401:
+                embed = discord.Embed(
+                    title="Upgrade required",
+                    description="Cloudflare Hyperdrive requires the attached Cloudflare account to be subscribed to the Workers Paid plan.",
+                    color=discord.Color.red()
+                )
+                button = discord.ui.Button(
+                    label="Get Started with Hyperdrive",
+                    url="https://developers.cloudflare.com/hyperdrive/get-started/#prerequisites"
+                )
+                view = discord.ui.View()
+                view.add_item(button)
+                await ctx.send(embed=embed, view=view)
+                return
+            elif response.status != 200:
                 await ctx.send(f"Failed to fetch Hyperdrives: {response.status}")
                 return
 
