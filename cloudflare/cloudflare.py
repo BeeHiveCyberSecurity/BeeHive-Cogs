@@ -1711,7 +1711,7 @@ class Cloudflare(commands.Cog):
 
     @commands.is_owner()
     @r2.command(name="create")
-    async def create_bucket(self, ctx, name: str, location_hint: str):
+    async def createbucket(self, ctx, name: str, location_hint: str):
         """Create a new R2 bucket"""
         valid_location_hints = {
             "apac": "Asia-Pacific",
@@ -1880,3 +1880,46 @@ class Cloudflare(commands.Cog):
         except RuntimeError as e:
             await ctx.send(f"An error occurred: {str(e)}")
             return
+
+            @r2.command(name="upload", help="Upload a file to the specified R2 bucket")
+            async def upload_to_bucket(self, ctx, bucket_name: str):
+                if not ctx.message.attachments:
+                    await ctx.send("Please attach a file to upload.")
+                    return
+
+                attachment = ctx.message.attachments[0]
+                file_content = await attachment.read()
+
+                api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
+                api_key = api_tokens.get("api_key")
+                email = api_tokens.get("email")
+                bearer_token = api_tokens.get("bearer_token")
+                account_id = api_tokens.get("account_id")
+
+                if not all([api_key, email, bearer_token, account_id]):
+                    await ctx.send("Missing one or more required API tokens. Please check your configuration.")
+                    return
+
+                url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/r2/buckets/{bucket_name}/objects/{attachment.filename}"
+                headers = {
+                    "Content-Type": "application/octet-stream",
+                    "Authorization": f"Bearer {bearer_token}",
+                    "X-Auth-Email": email,
+                    "X-Auth-Key": api_key,
+                }
+
+                try:
+                    async with self.session.put(url, headers=headers, data=file_content) as response:
+                        data = await response.json()
+                        if response.status != 200 or not data.get("success", False):
+                            errors = data.get("errors", [])
+                            error_messages = "\n".join([error.get("message", "Unknown error") for error in errors])
+                            embed = discord.Embed(title="Failed to upload file", color=0xff4545)
+                            embed.add_field(name="Errors", value=f"**`{error_messages}`**", inline=False)
+                            await ctx.send(embed=embed)
+                            return
+
+                        await ctx.send(f"File `{attachment.filename}` uploaded successfully to bucket `{bucket_name}`.")
+                except RuntimeError as e:
+                    await ctx.send(f"An error occurred: {str(e)}")
+                    return
