@@ -442,6 +442,7 @@ class Cloudflare(commands.Cog):
                 button = discord.ui.Button(label="Technical", url=whois_info["technical_referral_url"])
                 view.add_item(button)
 
+            pages.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/globe.png")
             message = await ctx.send(embed=pages[0], view=view)
 
             current_page = 0
@@ -476,7 +477,7 @@ class Cloudflare(commands.Cog):
                         break
 
     @intel.command(name="domain")
-    async def query_domain(self, ctx, domain: str):
+    async def querydomain(self, ctx, domain: str):
         """Query Cloudflare API for domain intelligence."""
         api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
         email = api_tokens.get("email")
@@ -515,7 +516,8 @@ class Cloudflare(commands.Cog):
                         embed.add_field(name="Content Categories", value=", ".join([f"**`{cat['name']}`**" for cat in result["content_categories"]]), inline=False)
                     if "resolves_to_refs" in result:
                         embed.add_field(name="Resolves To", value=", ".join([f"**`{ref['value']}`**" for ref in result["resolves_to_refs"]]), inline=False)
-                    
+
+                    embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/globe.png")
                     await ctx.send(embed=embed)
                 else:
                     await ctx.send(f"Error: {data['errors']}")
@@ -523,7 +525,7 @@ class Cloudflare(commands.Cog):
                 await ctx.send(f"Failed to query Cloudflare API. Status code: {response.status}")
 
     @intel.command(name="ip")
-    async def query_ip(self, ctx, ip: str):
+    async def queryip(self, ctx, ip: str):
         """Query Cloudflare API for IP intelligence."""
 
         api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
@@ -622,7 +624,7 @@ class Cloudflare(commands.Cog):
                             if "end" in categorization:
                                 end_timestamp = discord.utils.format_dt(discord.utils.parse_time(categorization['end']), style='R')
                                 embed.add_field(name="End", value=f"**{end_timestamp}**", inline=True)
-                    
+                    embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/globe.png")
                     await ctx.send(embed=embed)
                 else:
                     await ctx.send(f"Error: {data['errors']}")
@@ -673,6 +675,7 @@ class Cloudflare(commands.Cog):
                     if "risk_score" in result:
                         embed.add_field(name="Risk Score", value=f"**`{result['risk_score']}`**", inline=False)
                     
+                    embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/globe.png")
                     await ctx.send(embed=embed)
                 else:
                     await ctx.send(f"Error: {data['errors']}")
@@ -716,6 +719,7 @@ class Cloudflare(commands.Cog):
                         pages = [subnets[i:i + 10] for i in range(0, len(subnets), 10)]
                         current_page = 0
                         embed = discord.Embed(title=f"ASN subnets for {asn}", color=0xfffffe)
+                        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/globe.png")
                         for subnet in pages[current_page]:
                             embed.add_field(name="Subnet", value=f"**`{subnet}`**", inline=False)
                         message = await ctx.send(embed=embed)
@@ -757,6 +761,7 @@ class Cloudflare(commands.Cog):
                                     break
                     else:
                         embed = discord.Embed(title=f"ASN subnets for {asn}", color=0xfffffe)
+                        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/globe.png")
                         embed.add_field(name="Subnets", value="No subnets found for this ASN.", inline=False)
                         await ctx.send(embed=embed)
                 else:
