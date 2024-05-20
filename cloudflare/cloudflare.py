@@ -1765,3 +1765,4 @@ class Cloudflare(commands.Cog):
                         inline=False
                     )
             await ctx.send(embed=embed)
+            await ctx.send("Buckets fetched successfully.")
