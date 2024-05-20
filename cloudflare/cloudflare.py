@@ -1961,93 +1961,43 @@ class Cloudflare(commands.Cog):
             "X-Auth-Key": api_key,
         }
 
-        # Additional logic to check for file matches in the bucket
-        list_url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/r2/buckets/{bucket_name}/objects"
+        file_url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/r2/buckets/{bucket_name}/objects/{file_name}"
         try:
-            async with self.session.get(list_url, headers=headers) as list_response:
-                list_data = await list_response.json()
-                if list_response.status != 200:
-                    list_error_messages = "\n".join([error.get("message", "Unknown error") for error in list_data.get("errors", [])])
+            async with self.session.delete(file_url, headers=headers) as delete_response:
+                delete_data = await delete_response.json()
+                if delete_response.status != 200 or not delete_data.get("success", False):
+                    delete_error_messages = "\n".join([error.get("message", "Unknown error") for error in delete_data.get("errors", [])])
                     embed = discord.Embed(
-                        title="Failed to list files in bucket",
+                        title="Failed to delete file",
                         color=0xff4545
                     )
                     embed.add_field(
                         name="Errors",
-                        value=f"**`{list_error_messages}`**",
+                        value=f"**`{delete_error_messages}`**",
                         inline=False
                     )
                     await ctx.send(embed=embed)
                     return
 
-                if not isinstance(list_data, dict):
-                    embed = discord.Embed(
-                        title="Unexpected Response Format",
-                        description="The response from the server was not in the expected format.",
-                        color=0xff4545
-                    )
-                    await ctx.send(embed=embed)
-                    return
-
-                objects = list_data.get("result", {}).get("objects", [])
-
-                if not objects:
-                    embed = discord.Embed(
-                        title="No files found",
-                        description=f"No files were found in the bucket `{bucket_name}`.",
-                        color=0xff4545
-                    )
-                    await ctx.send(embed=embed)
-                    return
-
-                matching_files = [obj for obj in objects if obj.get("key") == file_name]
-
-                if not matching_files:
-                    embed = discord.Embed(
-                        title="No matching files found",
-                        description=f"No files matching `{file_name}` were found in the bucket `{bucket_name}`.",
-                        color=0xff4545
-                    )
-                    await ctx.send(embed=embed)
-                    return
-
-                for obj in matching_files:
-                    file_url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/r2/buckets/{bucket_name}/objects/{obj['key']}"
-                    async with self.session.delete(file_url, headers=headers) as delete_response:
-                        delete_data = await delete_response.json()
-                        if delete_response.status != 200 or not delete_data.get("success", False):
-                            delete_error_messages = "\n".join([error.get("message", "Unknown error") for error in delete_data.get("errors", [])])
-                            embed = discord.Embed(
-                                title="Failed to delete file",
-                                color=0xff4545
-                            )
-                            embed.add_field(
-                                name="Errors",
-                                value=f"**`{delete_error_messages}`**",
-                                inline=False
-                            )
-                            await ctx.send(embed=embed)
-                            return
-
-                        embed = discord.Embed(
-                            title="File deleted from bucket",
-                            color=discord.Color.green()
-                        )
-                        embed.add_field(
-                            name="File name",
-                            value=f"**`{obj['key']}`**",
-                            inline=False
-                        )
-                        embed.add_field(
-                            name="Bucket targeted",
-                            value=f"**`{bucket_name}`**",
-                            inline=False
-                        )
-                        await ctx.send(embed=embed)
+                embed = discord.Embed(
+                    title="File deleted from bucket",
+                    color=discord.Color.green()
+                )
+                embed.add_field(
+                    name="File name",
+                    value=f"**`{file_name}`**",
+                    inline=False
+                )
+                embed.add_field(
+                    name="Bucket targeted",
+                    value=f"**`{bucket_name}`**",
+                    inline=False
+                )
+                await ctx.send(embed=embed)
         except Exception as e:
             embed = discord.Embed(
                 title="Error",
-                description=f"An unexpected error occurred while listing files: {str(e)}",
+                description=f"An unexpected error occurred while deleting the file: {str(e)}",
                 color=0xff4545
             )
             await ctx.send(embed=embed)
