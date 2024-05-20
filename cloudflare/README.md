@@ -10,7 +10,7 @@ Before this cog will work correctly, you've got some setup to do...
 
 **Price** - **FREE** with respect to rate limits
 
-**Requirement** - You must set a `cloudflare` `api_key`, `email`, `account_id`, and `bearer_token` within your Red instance.
+**Requirement** - You must set a `cloudflare` `api_key`, `email`, `account_id`, `zone_id`, and `bearer_token` within your Red instance.
 
 **API in use** - [Cloudflare](https://developers.cloudflare.com/api/)
 
