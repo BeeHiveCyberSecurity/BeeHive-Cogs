@@ -618,7 +618,8 @@ class Cloudflare(commands.Cog):
                             categories = ", ".join([f"**`{category['name']}`**" for category in categorization["categories"]])
                             embed.add_field(name="Categories", value=categories, inline=False)
                             embed.add_field(name="Start", value=f"**`{categorization['start']}`**", inline=True)
-                            embed.add_field(name="End", value=f"**`{categorization['end']}`**", inline=True)
+                            if "end" in categorization:
+                                embed.add_field(name="End", value=f"**`{categorization['end']}`**", inline=True)
                     
                     await ctx.send(embed=embed)
                 else:
