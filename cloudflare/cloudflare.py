@@ -24,14 +24,14 @@ class Cloudflare(commands.Cog):
         self.session = aiohttp.ClientSession()
         
     @commands.group()
-    async def cloudflare(self, ctx):
+    async def zones(self, ctx):
         """Cloudflare command group."""
         if ctx.invoked_subcommand is None:
             await ctx.send("Invalid Cloudflare command passed.")
         
     @commands.is_owner()
-    @cloudflare.command()
-    async def getzones(self, ctx):
+    @cloudflare.command(name="get")
+    async def get(self, ctx):
         """Get the list of zones from Cloudflare."""
         api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
         api_key = api_tokens.get("api_key")
