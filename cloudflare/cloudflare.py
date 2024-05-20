@@ -1168,7 +1168,7 @@ class Cloudflare(commands.Cog):
     @commands.is_owner()
     @email_routing_rules.command(name="add")
     async def add_email_routing_rule(self, ctx, source: str, destination: str):
-        """Add a new Email Routing rule"""
+        """Add a rule to Email Routing"""
         api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
         email = api_tokens.get("email")
         api_key = api_tokens.get("api_key")
@@ -1204,11 +1204,10 @@ class Cloudflare(commands.Cog):
 
             await ctx.send(f"Email Routing rule added successfully: {source} -> {destination}")
 
-
     @commands.is_owner()
     @email_routing_rules.command(name="remove")
     async def remove_email_routing_rule(self, ctx, rule_id: str):
-        """Remove an existing Email Routing rule"""
+        """Remove a rule from Email Routing"""
         api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
         email = api_tokens.get("email")
         api_key = api_tokens.get("api_key")
@@ -1243,7 +1242,7 @@ class Cloudflare(commands.Cog):
     @commands.is_owner()
     @email_routing_rules.command(name="list")
     async def list_email_routing_rules(self, ctx):
-        """List all Email Routing rules"""
+        """Show current Email Routing rules"""
         api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
         email = api_tokens.get("email")
         api_key = api_tokens.get("api_key")
