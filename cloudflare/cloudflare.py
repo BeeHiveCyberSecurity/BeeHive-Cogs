@@ -2003,6 +2003,90 @@ class Cloudflare(commands.Cog):
             )
             await ctx.send(embed=embed)
             return
+        except Exception as e:
+            embed = discord.Embed(
+                title="Error",
+                description=f"An unexpected error occurred: {str(e)}",
+                color=0xff4545
+            )
+            await ctx.send(embed=embed)
+            return
+
+        # Additional logic to check for file matches in the bucket
+        list_url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/r2/buckets/{bucket_name}/objects"
+        try:
+            async with self.session.get(list_url, headers=headers) as list_response:
+                if list_response.status != 200:
+                    list_data = await list_response.json()
+                    list_errors = list_data.get("errors", [])
+                    list_error_messages = "\n".join([error.get("message", "Unknown error") for error in list_errors])
+                    embed = discord.Embed(
+                        title="Failed to list files in bucket",
+                        color=0xff4545
+                    )
+                    embed.add_field(
+                        name="Errors",
+                        value=f"**`{list_error_messages}`**",
+                        inline=False
+                    )
+                    await ctx.send(embed=embed)
+                    return
+
+                list_data = await list_response.json()
+                objects = list_data.get("result", {}).get("objects", [])
+                matching_files = [obj for obj in objects if file_name in obj.get("key", "")]
+
+                if not matching_files:
+                    embed = discord.Embed(
+                        title="No matching files found",
+                        description=f"No files matching `{file_name}` were found in the bucket `{bucket_name}`.",
+                        color=0xff4545
+                    )
+                    await ctx.send(embed=embed)
+                    return
+
+                for obj in matching_files:
+                    file_url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/r2/buckets/{bucket_name}/objects/{obj['key']}"
+                    async with self.session.delete(file_url, headers=headers) as delete_response:
+                        delete_data = await delete_response.json()
+                        if delete_response.status != 200 or not delete_data.get("success", False):
+                            delete_errors = delete_data.get("errors", [])
+                            delete_error_messages = "\n".join([error.get("message", "Unknown error") for error in delete_errors])
+                            embed = discord.Embed(
+                                title="Failed to delete file",
+                                color=0xff4545
+                            )
+                            embed.add_field(
+                                name="Errors",
+                                value=f"**`{delete_error_messages}`**",
+                                inline=False
+                            )
+                            await ctx.send(embed=embed)
+                            return
+
+                        embed = discord.Embed(
+                            title="File deleted from bucket",
+                            color=discord.Color.green()
+                        )
+                        embed.add_field(
+                            name="File name",
+                            value=f"**`{obj['key']}`**",
+                            inline=False
+                        )
+                        embed.add_field(
+                            name="Bucket targeted",
+                            value=f"**`{bucket_name}`**",
+                            inline=False
+                        )
+                        await ctx.send(embed=embed)
+        except Exception as e:
+            embed = discord.Embed(
+                title="Error",
+                description=f"An unexpected error occurred while listing files: {str(e)}",
+                color=0xff4545
+            )
+            await ctx.send(embed=embed)
+            return
         
 
     @commands.is_owner()
