@@ -1982,6 +1982,15 @@ class Cloudflare(commands.Cog):
                     return
 
                 list_data = await list_response.json()
+                if isinstance(list_data, list):
+                    embed = discord.Embed(
+                        title="Unexpected Response Format",
+                        description="The response from the server was not in the expected format.",
+                        color=0xff4545
+                    )
+                    await ctx.send(embed=embed)
+                    return
+
                 objects = list_data.get("result", {}).get("objects", [])
 
                 if not objects:
