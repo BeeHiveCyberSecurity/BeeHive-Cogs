@@ -1938,6 +1938,7 @@ class Cloudflare(commands.Cog):
     @commands.is_owner()
     @r2.command(name="recycle")
     async def delete_file(self, ctx, bucket_name: str, file_name: str):
+        """Delete a file by name from an R2 bucket"""
         api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
         api_key = api_tokens.get("api_key")
         email = api_tokens.get("email")
