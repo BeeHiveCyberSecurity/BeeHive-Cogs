@@ -135,7 +135,7 @@ class Cloudflare(commands.Cog):
     @commands.is_owner()
     @images.command(name="info")
     async def image_info(self, ctx, image_id: str):
-        """Get information about a specific image from Cloudflare Images by its ID."""
+        """Get information about a specific image."""
         api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
         account_id = api_tokens.get("account_id")
         bearer_token = api_tokens.get("bearer_token")
