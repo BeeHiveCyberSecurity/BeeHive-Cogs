@@ -188,6 +188,42 @@ class Cloudflare(commands.Cog):
                 embed.add_field(name="Auto Update Model", value=f"**`{format_value(bot_management_config.get('auto_update_model', 'Not set'))}`**", inline=False)
 
             await ctx.send(embed=embed)
+
+    @commands.is_owner()
+    @botmanagement.command(name="update")
+    async def update_bot_management_config(self, ctx, setting: str, value: str):
+        """Update a specific bot management setting."""
+        api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
+        api_key = api_tokens.get("api_key")
+        email = api_tokens.get("email")
+        zone_id = api_tokens.get("zone_id")
+        if not api_key or not email or not zone_id:
+            await ctx.send("API key, email, or zone ID not set.")
+            return
+
+        headers = {
+            "X-Auth-Email": email,
+            "X-Auth-Key": api_key,
+            "Content-Type": "application/json"
+        }
+
+        url = f"https://api.cloudflare.com/client/v4/zones/{zone_id}/bot_management"
+        payload = {
+            setting: value
+        }
+
+        async with self.session.put(url, headers=headers, json=payload) as response:
+            if response.status != 200:
+                await ctx.send(f"Failed to update bot management config: {response.status}")
+                return
+
+            data = await response.json()
+            if not data.get("success", False):
+                await ctx.send(f"Failed to update bot management config: {data.get('errors', 'Unknown error')}")
+                return
+
+            await ctx.send(f"Successfully updated bot management setting `{setting}` to `{value}`.")
+
     @commands.group()
     async def zones(self, ctx):
         """Cloudflare command group."""
