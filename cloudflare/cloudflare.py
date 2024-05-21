@@ -555,7 +555,8 @@ class Cloudflare(commands.Cog):
                 button = discord.ui.Button(label="Technical", url=whois_info["technical_referral_url"])
                 view.add_item(button)
 
-            pages.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/globe.png")
+            for page in pages:
+                page.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/globe.png")
             message = await ctx.send(embed=pages[0], view=view)
 
             current_page = 0
