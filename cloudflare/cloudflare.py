@@ -37,8 +37,8 @@ class Cloudflare(commands.Cog):
             return
 
         attachment = ctx.message.attachments[0]
-        if not attachment.filename.lower().endswith(('png', 'jpg', 'jpeg', 'gif')):
-            await ctx.send("Please upload a valid image file (png, jpg, jpeg, gif).")
+        if not attachment.filename.lower().endswith(('png', 'jpg', 'jpeg', 'gif', 'webp')):
+            await ctx.send("Please upload a valid image file (png, jpg, jpeg, gif, webp).")
             return
 
         api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
