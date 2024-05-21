@@ -182,6 +182,64 @@ class Cloudflare(commands.Cog):
         except Exception as e:
             await ctx.send(f"An error occurred: {str(e)}")
 
+    @commands.is_owner()
+    @images.command(name="list")
+    async def list_images(self, ctx):
+        """List available images."""
+        api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
+        account_id = api_tokens.get("account_id")
+        bearer_token = api_tokens.get("bearer_token")
+        if not account_id or not bearer_token:
+            await ctx.send("Account ID or bearer token not set.")
+            return
+
+        headers = {
+            "Authorization": f"Bearer {bearer_token}",
+            "Content-Type": "application/json"
+        }
+
+        url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/images/v2"
+
+        try:
+            async with self.session.get(url, headers=headers) as response:
+                data = await response.json()
+                if not data.get("success", False):
+                    error_message = data.get("errors", [{"message": "Unknown error"}])[0].get("message")
+                    embed = discord.Embed(
+                        title="Failed to Fetch Images",
+                        description=f"**Error:** {error_message}",
+                        color=discord.Color.red()
+                    )
+                    await ctx.send(embed=embed)
+                    return
+
+                images = data.get("result", {}).get("images", [])
+                if not images:
+                    await ctx.send("No images found.")
+                    return
+
+                embed = discord.Embed(
+                    title="Available Images",
+                    description="Here are the available images:",
+                    color=discord.Color.blue()
+                )
+
+                for image in images:
+                    filename = image.get("filename", "Unknown")
+                    image_id = image.get("id", "Unknown")
+                    upload_time = image.get("uploaded", "Unknown")
+                    variants = image.get("variants", [])
+
+                    embed.add_field(
+                        name=f"Image ID: {image_id}",
+                        value=f"**Filename:** `{filename}`\n**Uploaded:** `{upload_time}`\n**Variants:** {', '.join(variants)}",
+                        inline=False
+                    )
+
+                await ctx.send(embed=embed)
+        except Exception as e:
+            await ctx.send(f"An error occurred: {str(e)}")
+
 
     @commands.is_owner()
     @images.command(name="stats")
