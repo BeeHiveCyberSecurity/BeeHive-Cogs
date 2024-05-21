@@ -124,6 +124,52 @@ class Cloudflare(commands.Cog):
             await ctx.send(embed=embed)
 
     @commands.group()
+    async def botmanagement(self, ctx):
+        "Cloudflare bot  management subtext"
+
+    @commands.is_owner()
+    @botmanagement.command(name="get")
+    async def get_bot_management_config(self, ctx):
+        """Get the current bot management config from Cloudflare."""
+        api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
+        api_key = api_tokens.get("api_key")
+        email = api_tokens.get("email")
+        zone_id = api_tokens.get("zone_id")
+        
+        if not api_key or not email or not zone_id:
+            await ctx.send("API key, email, or zone ID not set.")
+            return
+
+        headers = {
+            "X-Auth-Email": email,
+            "X-Auth-Key": api_key,
+            "Content-Type": "application/json"
+        }
+
+        url = f"https://api.cloudflare.com/client/v4/zones/{zone_id}/bot_management"
+        
+        async with self.session.get(url, headers=headers) as response:
+            if response.status != 200:
+                await ctx.send(f"Failed to fetch bot management config: {response.status}")
+                return
+
+            data = await response.json()
+            bot_management_config = data.get("result", {})
+            if not bot_management_config:
+                await ctx.send("No bot management config found.")
+                return
+
+            embed = discord.Embed(
+                title="Bot Management Config",
+                description="Current bot management configuration from Cloudflare",
+                color=discord.Color.blue()
+            )
+
+            for key, value in bot_management_config.items():
+                embed.add_field(name=key, value=str(value), inline=False)
+
+            await ctx.send(embed=embed)
+    @commands.group()
     async def zones(self, ctx):
         """Cloudflare command group."""
         if ctx.invoked_subcommand is None:
