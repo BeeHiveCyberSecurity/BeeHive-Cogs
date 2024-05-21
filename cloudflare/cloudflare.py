@@ -216,11 +216,7 @@ class Cloudflare(commands.Cog):
             async with aiohttp.ClientSession() as session:
                 async with session.put(url, headers=headers, data=payload) as response:
                     data = await response.json()
-                    if response.status == 400:
-                        await ctx.send("Failed to update bot management config: Bad Request")
-                        await ctx.author.send(f"An error occurred: {str(e)}\n\nRequest URL: {url}\nHeaders: {headers}\nPayload: {payload}")
-                        return
-                    if response.status != 200 or not data.get("success", False):
+                    if response.status != 200:
                         error_message = data.get("errors", [{"message": "Unknown error"}])[0].get("message")
                         await ctx.send(f"Failed to update bot management config: {error_message}")
                         return
