@@ -25,6 +25,11 @@ class Cloudflare(commands.Cog):
     
     @commands.is_owner()
     @commands.group(invoke_without_command=True)
+    async def images(self, ctx):
+        """Cloudflare Images provides an end-to-end solution to build and maintain your image infrastructure from one API. Learn more at https://developers.cloudflare.com/images/"""
+
+    @commands.is_owner()
+    @commands.group(invoke_without_command=True)
     async def keystore(self, ctx):
         """Fetch keys in use for development purposes only"""
 
