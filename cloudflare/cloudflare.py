@@ -218,10 +218,20 @@ class Cloudflare(commands.Cog):
                     data = await response.json()
                     if response.status != 200:
                         error_message = data.get("errors", [{"message": "Unknown error"}])[0].get("message")
-                        await ctx.send(f"Failed to update bot management config: {error_message}")
+                        embed = discord.Embed(
+                            title="Failed to Update Bot Management Config",
+                            description=f"**Error:** {error_message}",
+                            color=discord.Color.red()
+                        )
+                        await ctx.send(embed=embed)
                         return
 
-                    await ctx.send(f"Successfully updated bot management setting `{setting}` to `{value}`.")
+                    embed = discord.Embed(
+                        title="Bot management changed",
+                        description=f"Successfully updated bot management setting **`{setting}`** to **`{value}`**.",
+                        color=discord.Color.green()
+                    )
+                    await ctx.send(embed=embed)
         except Exception as e:
             await ctx.author.send(f"An error occurred: {str(e)}\n\nRequest URL: {url}\nHeaders: {headers}\nPayload: {payload}")
 
