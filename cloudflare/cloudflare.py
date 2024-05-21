@@ -29,6 +29,54 @@ class Cloudflare(commands.Cog):
         """Cloudflare Images provides an end-to-end solution to build and maintain your image infrastructure from one API. Learn more at https://developers.cloudflare.com/images/"""
 
     @commands.is_owner()
+    @images.command(name="stats")
+    async def image_stats(self, ctx):
+        """Fetch Cloudflare Images usage statistics."""
+        api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
+        account_id = api_tokens.get("account_id")
+        bearer_token = api_tokens.get("bearer_token")
+        if not account_id or not bearer_token:
+            await ctx.send("Account ID or bearer token not set.")
+            return
+
+        headers = {
+            "Authorization": f"Bearer {bearer_token}",
+            "Content-Type": "application/json"
+        }
+
+        url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/images/v1/stats"
+
+        try:
+            async with self.session.get(url, headers=headers) as response:
+                data = await response.json()
+                if not data.get("success", False):
+                    error_message = data.get("errors", [{"message": "Unknown error"}])[0].get("message")
+                    embed = discord.Embed(
+                        title="Failed to Fetch Image Stats",
+                        description=f"**Error:** {error_message}",
+                        color=discord.Color.red()
+                    )
+                    await ctx.send(embed=embed)
+                    return
+
+                result = data.get("result", {})
+                count = result.get("count", {})
+                allowed = count.get("allowed", "Unknown")
+                current = count.get("current", "Unknown")
+
+                embed = discord.Embed(
+                    title="Cloudflare Images Usage Statistics",
+                    description="Here are your current usage statistics for Cloudflare Images:",
+                    color=discord.Color.blue()
+                )
+                embed.add_field(name="Allowed", value=f"**`{allowed}`**", inline=True)
+                embed.add_field(name="Current", value=f"**`{current}`**", inline=True)
+
+                await ctx.send(embed=embed)
+        except Exception as e:
+            await ctx.send(f"An error occurred: {str(e)}")
+
+    @commands.is_owner()
     @commands.group(invoke_without_command=True)
     async def keystore(self, ctx):
         """Fetch keys in use for development purposes only"""
