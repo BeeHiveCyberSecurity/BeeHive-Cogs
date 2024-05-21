@@ -125,7 +125,7 @@ class Cloudflare(commands.Cog):
 
     @commands.group()
     async def botmanagement(self, ctx):
-        "Cloudflare bot  management subtext"
+        """Cloudflare bot solutions identify and mitigate automated traffic to protect your domain from bad bots. Learn more at https://developers.cloudflare.com/bots/"""
 
     @commands.is_owner()
     @botmanagement.command(name="get")
