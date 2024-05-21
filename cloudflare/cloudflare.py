@@ -27,6 +27,61 @@ class Cloudflare(commands.Cog):
     @commands.group()
     async def images(self, ctx):
         """Cloudflare Images provides an end-to-end solution to build and maintain your image infrastructure from one API. Learn more at https://developers.cloudflare.com/images/"""
+    @commands.is_owner()
+    @images.command(name="upload")
+    async def upload_image(self, ctx, filename: str):
+        """Upload an image to Cloudflare Images."""
+        api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
+        account_id = api_tokens.get("account_id")
+        bearer_token = api_tokens.get("bearer_token")
+        if not account_id or not bearer_token:
+            await ctx.send("Account ID or bearer token not set.")
+            return
+
+        headers = {
+            "Authorization": f"Bearer {bearer_token}",
+            "Content-Type": "multipart/form-data"
+        }
+
+        url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/images/v1"
+
+        try:
+            with open(filename, 'rb') as file:
+                data = aiohttp.FormData()
+                data.add_field('file', file, filename=filename, content_type='image/png')
+
+                async with self.session.post(url, headers=headers, data=data) as response:
+                    data = await response.json()
+                    if not data.get("success", False):
+                        error_message = data.get("errors", [{"message": "Unknown error"}])[0].get("message")
+                        embed = discord.Embed(
+                            title="Failed to Upload Image",
+                            description=f"**Error:** {error_message}",
+                            color=discord.Color.red()
+                        )
+                        await ctx.send(embed=embed)
+                        return
+
+                    result = data.get("result", {})
+                    filename = result.get("filename", "Unknown")
+                    image_id = result.get("id", "Unknown")
+                    uploaded = result.get("uploaded", "Unknown")
+                    variants = result.get("variants", [])
+
+                    embed = discord.Embed(
+                        title="Image Uploaded Successfully",
+                        description=f"**Filename:** {filename}\n**ID:** {image_id}\n**Uploaded:** {uploaded}",
+                        color=discord.Color.green()
+                    )
+                    for variant in variants:
+                        embed.add_field(name="Variant", value=variant, inline=False)
+
+                    await ctx.send(embed=embed)
+        except FileNotFoundError:
+            await ctx.send(f"File `{filename}` not found.")
+        except Exception as e:
+            await ctx.send(f"An error occurred: {str(e)}")
+
 
     @commands.is_owner()
     @images.command(name="stats")
