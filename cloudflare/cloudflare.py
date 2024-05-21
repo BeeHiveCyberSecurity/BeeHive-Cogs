@@ -65,10 +65,9 @@ class Cloudflare(commands.Cog):
                 current = count.get("current", "Unknown")
 
                 embed = discord.Embed(
-                    title="Cloudflare Images Usage Statistics",
+                    title="Usage statistics",
                     description="Here are your current usage statistics for Cloudflare Images:",
-                    color=discord.Color.blue()
-                )
+                    color=discord.Color.from_rgb(255, 128, 0)
                 embed.add_field(name="Allowed", value=f"**`{allowed}`**", inline=True)
                 embed.add_field(name="Current", value=f"**`{current}`**", inline=True)
 
