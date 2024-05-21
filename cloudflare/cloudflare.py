@@ -159,7 +159,6 @@ class Cloudflare(commands.Cog):
                 color=discord.Color.from_str("#ff4545")
             ))
 
-
     @commands.is_owner()
     @images.command(name="info")
     async def image_info(self, ctx, image_id: str):
@@ -288,7 +287,6 @@ class Cloudflare(commands.Cog):
                 color=discord.Color.from_str("#ff4545")
             ))
 
-
     @commands.is_owner()
     @images.command(name="stats")
     async def image_stats(self, ctx):
@@ -343,6 +341,7 @@ class Cloudflare(commands.Cog):
                 description=f"An error occurred: {str(e)}",
                 color=discord.Color.from_str("#ff4545")
             ))
+
 
     @commands.is_owner()
     @commands.group(invoke_without_command=True)
@@ -443,6 +442,7 @@ class Cloudflare(commands.Cog):
         except discord.Forbidden:
             embed = discord.Embed(title="Error", description="I couldn't send you a DM. Please check your DM settings.", color=discord.Color.from_str("#ff4545"))
             await ctx.send(embed=embed)
+
 
     @commands.group()
     async def botmanagement(self, ctx):
@@ -582,6 +582,7 @@ class Cloudflare(commands.Cog):
             )
             await ctx.author.send(embed=embed)
 
+
     @commands.group()
     async def zones(self, ctx):
         """Cloudflare command group."""
@@ -678,6 +679,7 @@ class Cloudflare(commands.Cog):
                     await message.clear_reactions()
                 except discord.Forbidden:
                     pass
+
 
     @commands.group(invoke_without_command=False)
     async def intel(self, ctx):
@@ -1398,6 +1400,7 @@ class Cloudflare(commands.Cog):
                 embed = discord.Embed(title="Failed to query Cloudflare API", description=f"Status code: {response.status}", color=0xff4545)
                 await ctx.send(embed=embed)
    
+
     @commands.is_owner()
     @commands.group(invoke_without_command=False)
     async def emailrouting(self, ctx):
@@ -2158,6 +2161,7 @@ class Cloudflare(commands.Cog):
 
             await ctx.send(embed=embed)
     
+
     @commands.is_owner()
     @commands.group(invoke_without_command=False)
     async def hyperdrive(self, ctx):
@@ -2582,6 +2586,7 @@ class Cloudflare(commands.Cog):
             embed.add_field(name="Stale While Revalidate", value=result["caching"].get("stale_while_revalidate"), inline=False)
 
             await ctx.send(embed=embed)
+
 
     @commands.is_owner()
     @commands.group(invoke_without_command=False)
