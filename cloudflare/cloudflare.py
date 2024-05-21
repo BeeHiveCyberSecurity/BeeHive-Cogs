@@ -70,8 +70,7 @@ class Cloudflare(commands.Cog):
                         embed = discord.Embed(
                             title="Failed to Upload Image",
                             description=f"**Error:** {error_message}",
-                            color=discord.Color.red()
-                        )
+                            color=discord.Color.from_str("#ff4545"))
                         await ctx.send(embed=embed)
                         return
 
@@ -82,9 +81,8 @@ class Cloudflare(commands.Cog):
                     variants = result.get("variants", [])
 
                     embed = discord.Embed(
-                        title="Image Uploaded Successfully",
-                        color=discord.Color.green()
-                    )
+                        title="Uploaded successfully",
+                        color=discord.Color.from_rgb(43, 189, 142))
                     embed.add_field(name="Filename", value=f"**`{filename}`**", inline=False)
                     embed.add_field(name="Uploaded", value=f"**`{uploaded}`**", inline=False)
                     embed.add_field(name="ID", value=f"```{image_id}```", inline=False)
@@ -121,16 +119,14 @@ class Cloudflare(commands.Cog):
                     embed = discord.Embed(
                         title="Failed to Delete Image",
                         description=f"**Error:** {error_message}",
-                        color=discord.Color.red()
-                    )
+                        color=discord.Color.from_str("#ff4545"))
                     await ctx.send(embed=embed)
                     return
 
                 embed = discord.Embed(
-                    title="Image Deleted Successfully",
+                    title="Deleted successfully",
                     description=f"Image with ID `{image_id}` has been deleted.",
-                    color=discord.Color.green()
-                )
+                    color=discord.Color.from_str("#2BBD8E"))
                 await ctx.send(embed=embed)
         except Exception as e:
             await ctx.send(f"An error occurred: {str(e)}")
