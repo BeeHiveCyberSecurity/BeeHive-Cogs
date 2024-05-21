@@ -695,7 +695,8 @@ class Cloudflare(commands.Cog):
                         embed.add_field(name="Total Count", value=f"**`{result_info['total_count']}`**", inline=False)
                         embed.add_field(name="Page", value=f"**`{result_info['page']}`**", inline=False)
                         embed.add_field(name="Per Page", value=f"**`{result_info['per_page']}`**", inline=False)
-                    
+                        
+                    embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/globe.png")
                     await ctx.send(embed=embed)
                 else:
                     embed = discord.Embed(title="Error", description=f"Error: {data['errors']}", color=0xff0000)
