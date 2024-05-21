@@ -27,10 +27,20 @@ class Cloudflare(commands.Cog):
     @commands.group()
     async def images(self, ctx):
         """Cloudflare Images provides an end-to-end solution to build and maintain your image infrastructure from one API. Learn more at https://developers.cloudflare.com/images/"""
+        
     @commands.is_owner()
     @images.command(name="upload")
-    async def upload_image(self, ctx, filename: str):
+    async def upload_image(self, ctx):
         """Upload an image to Cloudflare Images."""
+        if not ctx.message.attachments:
+            await ctx.send("Please attach an image to upload.")
+            return
+
+        attachment = ctx.message.attachments[0]
+        if not attachment.filename.lower().endswith(('png', 'jpg', 'jpeg', 'gif')):
+            await ctx.send("Please upload a valid image file (png, jpg, jpeg, gif).")
+            return
+
         api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
         account_id = api_tokens.get("account_id")
         bearer_token = api_tokens.get("bearer_token")
@@ -46,9 +56,12 @@ class Cloudflare(commands.Cog):
         url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/images/v1"
 
         try:
-            with open(filename, 'rb') as file:
+            async with self.session.get(attachment.url) as resp:
+                if resp.status != 200:
+                    await ctx.send("Failed to download the image.")
+                    return
                 data = aiohttp.FormData()
-                data.add_field('file', file, filename=filename, content_type='image/png')
+                data.add_field('file', await resp.read(), filename=attachment.filename, content_type=attachment.content_type)
 
                 async with self.session.post(url, headers=headers, data=data) as response:
                     data = await response.json()
@@ -77,8 +90,6 @@ class Cloudflare(commands.Cog):
                         embed.add_field(name="Variant", value=variant, inline=False)
 
                     await ctx.send(embed=embed)
-        except FileNotFoundError:
-            await ctx.send(f"File `{filename}` not found.")
         except Exception as e:
             await ctx.send(f"An error occurred: {str(e)}")
 
