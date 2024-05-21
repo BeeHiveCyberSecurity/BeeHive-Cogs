@@ -203,25 +203,25 @@ class Cloudflare(commands.Cog):
             return
 
         headers = {
-            "X-Auth-Email": email,
-            "X-Auth-Key": api_key,
-            "Authorization": f"Bearer {bearer_token}",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {bearer_token}"
         }
 
         url = f"https://api.cloudflare.com/client/v4/zones/{zone_id}/bot_management"
-        payload = {
-            setting: value
-        }
+        payload = json.dumps({setting: value})
 
-        async with self.session.put(url, headers=headers, json=payload) as response:
-            data = await response.json()
-            if response.status != 200 or not data.get("success", False):
-                error_message = data.get("errors", [{"message": "Unknown error"}])[0].get("message")
-                await ctx.send(f"Failed to update bot management config: {error_message}")
-                return
+        async with aiohttp.ClientSession() as session:
+            async with session.put(url, headers=headers, data=payload) as response:
+                data = await response.json()
+                if response.status == 400:
+                    await ctx.send("Failed to update bot management config: Bad Request")
+                    return
+                if response.status != 200 or not data.get("success", False):
+                    error_message = data.get("errors", [{"message": "Unknown error"}])[0].get("message")
+                    await ctx.send(f"Failed to update bot management config: {error_message}")
+                    return
 
-            await ctx.send(f"Successfully updated bot management setting `{setting}` to `{value}`.")
+                await ctx.send(f"Successfully updated bot management setting `{setting}` to `{value}`.")
 
     @commands.group()
     async def zones(self, ctx):
