@@ -49,8 +49,7 @@ class Cloudflare(commands.Cog):
             return
 
         headers = {
-            "Authorization": f"Bearer {bearer_token}",
-            "Content-Type": "multipart/form-data"
+            "Authorization": f"Bearer {bearer_token}"
         }
 
         url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/images/v1"
@@ -63,6 +62,7 @@ class Cloudflare(commands.Cog):
                 data = aiohttp.FormData()
                 data.add_field('file', await resp.read(), filename=attachment.filename, content_type=attachment.content_type)
 
+                # aiohttp.FormData automatically sets the correct Content-Type with boundary
                 async with self.session.post(url, headers=headers, data=data) as response:
                     data = await response.json()
                     if not data.get("success", False):
