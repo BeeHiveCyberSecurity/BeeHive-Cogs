@@ -31,19 +31,97 @@ class Cloudflare(commands.Cog):
     @commands.is_owner()
     @keystore.command(name="email")
     async def email(self, ctx):
-        """Fetch the current Cloudflare email and send it to the user in a direct message."""
+        """Fetch the current Cloudflare email"""
         api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
         email = api_tokens.get("email")
         if not email:
-            await ctx.send("Email not set.")
+            embed = discord.Embed(title="Error", description="Email not set.", color=discord.Color.red())
+            await ctx.send(embed=embed)
             return
 
         try:
-            await ctx.author.send(f"Current Cloudflare email: {email}")
-            await ctx.send("The Cloudflare email has been sent to your DMs.")
+            await ctx.author.send(f"**Current Cloudflare email**\n\n```{email}```")
+            embed = discord.Embed(title="Success", description="The Cloudflare email has been sent to your DMs.", color=discord.Color.green())
+            await ctx.send(embed=embed)
         except discord.Forbidden:
-            await ctx.send("I couldn't send you a DM. Please check your DM settings.")
+            embed = discord.Embed(title="Error", description="I couldn't send you a DM. Please check your DM settings.", color=discord.Color.red())
+            await ctx.send(embed=embed)
 
+    @commands.is_owner()
+    @keystore.command(name="apikey")
+    async def api_key(self, ctx):
+        """Fetch the current Cloudflare API key"""
+        api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
+        api_key = api_tokens.get("api_key")
+        if not api_key:
+            embed = discord.Embed(title="Error", description="API key not set.", color=discord.Color.red())
+            await ctx.send(embed=embed)
+            return
+
+        try:
+            await ctx.author.send(f"**Current Cloudflare API key**\n\n```{api_key}```")
+            embed = discord.Embed(title="Success", description="The Cloudflare API key has been sent to your DMs.", color=discord.Color.green())
+            await ctx.send(embed=embed)
+        except discord.Forbidden:
+            embed = discord.Embed(title="Error", description="I couldn't send you a DM. Please check your DM settings.", color=discord.Color.red())
+            await ctx.send(embed=embed)
+
+    @commands.is_owner()
+    @keystore.command(name="bearertoken")
+    async def bearer_token(self, ctx):
+        """Fetch the current Cloudflare bearer token"""
+        api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
+        bearer_token = api_tokens.get("bearer_token")
+        if not bearer_token:
+            embed = discord.Embed(title="Error", description="Bearer token not set.", color=discord.Color.red())
+            await ctx.send(embed=embed)
+            return
+
+        try:
+            await ctx.author.send(f"**Current Cloudflare bearer token**\n\n```{bearer_token}```")
+            embed = discord.Embed(title="Success", description="The Cloudflare bearer token has been sent to your DMs.", color=discord.Color.green())
+            await ctx.send(embed=embed)
+        except discord.Forbidden:
+            embed = discord.Embed(title="Error", description="I couldn't send you a DM. Please check your DM settings.", color=discord.Color.red())
+            await ctx.send(embed=embed)
+
+    @commands.is_owner()
+    @keystore.command(name="accountid")
+    async def account_id(self, ctx):
+        """Fetch the current Cloudflare account ID"""
+        api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
+        account_id = api_tokens.get("account_id")
+        if not account_id:
+            embed = discord.Embed(title="Error", description="Account ID not set.", color=discord.Color.red())
+            await ctx.send(embed=embed)
+            return
+
+        try:
+            await ctx.author.send(f"**Current Cloudflare Account ID**\n\n```{account_id}```")
+            embed = discord.Embed(title="Success", description="The Cloudflare Account ID has been sent to your DMs.", color=discord.Color.green())
+            await ctx.send(embed=embed)
+        except discord.Forbidden:
+            embed = discord.Embed(title="Error", description="I couldn't send you a DM. Please check your DM settings.", color=discord.Color.red())
+            await ctx.send(embed=embed)
+
+    @commands.is_owner()
+    @keystore.command(name="zoneid")
+    async def zone_id(self, ctx):
+        """Fetch the current Cloudflare zone ID"""
+        api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
+        zone_id = api_tokens.get("zone_id")
+        if not zone_id:
+            embed = discord.Embed(title="Error", description="Zone ID not set.", color=discord.Color.red())
+            await ctx.send(embed=embed)
+            return
+
+        try:
+            await ctx.author.send(f"**Current Cloudflare Zone ID**\n\n```{zone_id}```")
+            embed = discord.Embed(title="Success", description="The Cloudflare Zone ID has been sent to your DMs.", color=discord.Color.green())
+            await ctx.send(embed=embed)
+        except discord.Forbidden:
+            embed = discord.Embed(title="Error", description="I couldn't send you a DM. Please check your DM settings.", color=discord.Color.red())
+            await ctx.send(embed=embed)
 
     @commands.group()
     async def zones(self, ctx):
