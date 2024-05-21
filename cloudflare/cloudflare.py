@@ -95,6 +95,46 @@ class Cloudflare(commands.Cog):
         except Exception as e:
             await ctx.send(f"An error occurred: {str(e)}")
 
+    @commands.is_owner()
+    @images.command(name="delete")
+    async def delete_image(self, ctx, image_id: str):
+        """Delete an image from Cloudflare Images by its ID."""
+        api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
+        account_id = api_tokens.get("account_id")
+        bearer_token = api_tokens.get("bearer_token")
+        if not account_id or not bearer_token:
+            await ctx.send("Account ID or bearer token not set.")
+            return
+
+        headers = {
+            "Authorization": f"Bearer {bearer_token}",
+            "Content-Type": "application/json"
+        }
+
+        url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/images/v1/{image_id}"
+
+        try:
+            async with self.session.delete(url, headers=headers) as response:
+                data = await response.json()
+                if not data.get("success", False):
+                    error_message = data.get("errors", [{"message": "Unknown error"}])[0].get("message")
+                    embed = discord.Embed(
+                        title="Failed to Delete Image",
+                        description=f"**Error:** {error_message}",
+                        color=discord.Color.red()
+                    )
+                    await ctx.send(embed=embed)
+                    return
+
+                embed = discord.Embed(
+                    title="Image Deleted Successfully",
+                    description=f"Image with ID `{image_id}` has been deleted.",
+                    color=discord.Color.green()
+                )
+                await ctx.send(embed=embed)
+        except Exception as e:
+            await ctx.send(f"An error occurred: {str(e)}")
+
 
     @commands.is_owner()
     @images.command(name="stats")
