@@ -785,7 +785,8 @@ class Cloudflare(commands.Cog):
         account_id = api_tokens.get("account_id")
 
         if not all([email, api_key, bearer_token, account_id]):
-            await ctx.send("Missing one or more required API tokens. Please check your configuration.")
+            embed = discord.Embed(title="Configuration Error", description="Missing one or more required API tokens. Please check your configuration.", color=0xff4545)
+            await ctx.send(embed=embed)
             return
 
         headers = {
@@ -797,7 +798,8 @@ class Cloudflare(commands.Cog):
 
         async with self.session.get(f"https://api.cloudflare.com/client/v4/accounts/{account_id}/email/routing/addresses", headers=headers) as response:
             if response.status != 200:
-                await ctx.send(f"Failed to fetch Email Routing addresses: {response.status}")
+                embed = discord.Embed(title="Error", description=f"Failed to fetch Email Routing addresses: {response.status}", color=0xff4545)
+                await ctx.send(embed=embed)
                 return
 
             data = await response.json()
