@@ -804,12 +804,14 @@ class Cloudflare(commands.Cog):
 
             data = await response.json()
             if not data.get("success", False):
-                await ctx.send("Failed to fetch Email Routing addresses.")
+                embed = discord.Embed(title="Error", description="Failed to fetch Email Routing addresses.", color=0xff4545)
+                await ctx.send(embed=embed)
                 return
 
             addresses = data.get("result", [])
             if not addresses:
-                await ctx.send("No Email Routing addresses found.")
+                embed = discord.Embed(title="Email Routing Addresses", description="No Email Routing addresses found.", color=0xff4545)
+                await ctx.send(embed=embed)
                 return
 
             pages = [addresses[i:i + 10] for i in range(0, len(addresses), 10)]
