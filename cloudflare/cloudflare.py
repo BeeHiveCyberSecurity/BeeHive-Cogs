@@ -684,9 +684,9 @@ class Cloudflare(commands.Cog):
                             embed.add_field(name="Country", value=f"**`{belongs_to['country']}`**", inline=False)
                         if "type" in belongs_to:
                             embed.add_field(name="Type", value=f"**`{belongs_to['type'].upper()}`**", inline=False)
-                    if "risk_types" in result:
-                        risk_types = ", ".join([f"**`{risk['name']}`**" for risk in result["risk_types"]])
-                        embed.add_field(name="Risk Types", value=risk_types, inline=False)
+                    if "ptr_lookup" in result and "ptr_domains" in result["ptr_lookup"]:
+                        ptr_domains = ", ".join([f"**`{domain}`**" for domain in result["ptr_lookup"]["ptr_domains"]])
+                        embed.add_field(name="PTR Domains", value=ptr_domains, inline=False)
                     
                     await ctx.send(embed=embed)
                 else:
