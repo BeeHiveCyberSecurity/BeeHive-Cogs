@@ -203,6 +203,8 @@ class Cloudflare(commands.Cog):
             return
 
         headers = {
+            "X-Auth-Email": email,
+            "X-Auth-Key": api_key
             "Content-Type": "application/json",
             "Authorization": f"Bearer {bearer_token}"
         }
