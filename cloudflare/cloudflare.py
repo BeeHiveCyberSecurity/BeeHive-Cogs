@@ -24,7 +24,7 @@ class Cloudflare(commands.Cog):
         self.session = aiohttp.ClientSession()
     
     @commands.is_owner()
-    @commands.group(invoke_without_command=True)
+    @commands.group()
     async def images(self, ctx):
         """Cloudflare Images provides an end-to-end solution to build and maintain your image infrastructure from one API. Learn more at https://developers.cloudflare.com/images/"""
 
