@@ -33,19 +33,31 @@ class Cloudflare(commands.Cog):
     async def upload_image(self, ctx):
         """Upload an image to Cloudflare Images."""
         if not ctx.message.attachments:
-            await ctx.send("Please attach an image to upload.")
+            await ctx.send(embed=discord.Embed(
+                title="Error",
+                description="Please attach an image to upload.",
+                color=discord.Color.from_str("#ff4545")
+            ))
             return
 
         attachment = ctx.message.attachments[0]
         if not attachment.filename.lower().endswith(('png', 'jpg', 'jpeg', 'gif', 'webp')):
-            await ctx.send("Please upload a valid image file (png, jpg, jpeg, gif, webp).")
+            await ctx.send(embed=discord.Embed(
+                title="Error",
+                description="Please upload a valid image file (png, jpg, jpeg, gif, webp).",
+                color=discord.Color.from_str("#ff4545")
+            ))
             return
 
         api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
         account_id = api_tokens.get("account_id")
         bearer_token = api_tokens.get("bearer_token")
         if not account_id or not bearer_token:
-            await ctx.send("Account ID or bearer token not set.")
+            await ctx.send(embed=discord.Embed(
+                title="Error",
+                description="Account ID or bearer token not set.",
+                color=discord.Color.from_str("#ff4545")
+            ))
             return
 
         headers = {
@@ -57,7 +69,11 @@ class Cloudflare(commands.Cog):
         try:
             async with self.session.get(attachment.url) as resp:
                 if resp.status != 200:
-                    await ctx.send("Failed to download the image.")
+                    await ctx.send(embed=discord.Embed(
+                        title="Error",
+                        description="Failed to download the image.",
+                        color=discord.Color.from_str("#ff4545")
+                    ))
                     return
                 data = aiohttp.FormData()
                 data.add_field('file', await resp.read(), filename=attachment.filename, content_type=attachment.content_type)
@@ -82,7 +98,7 @@ class Cloudflare(commands.Cog):
 
                     embed = discord.Embed(
                         title="Uploaded successfully",
-                        color=discord.Color.from_rgb(43, 189, 142))
+                        color=discord.Color.from_str("#2BBD8E"))
                     embed.add_field(name="Filename", value=f"**`{filename}`**", inline=False)
                     embed.add_field(name="Uploaded", value=f"**`{uploaded}`**", inline=False)
                     embed.add_field(name="ID", value=f"```{image_id}```", inline=False)
@@ -91,7 +107,11 @@ class Cloudflare(commands.Cog):
 
                     await ctx.send(embed=embed)
         except Exception as e:
-            await ctx.send(f"An error occurred: {str(e)}")
+            await ctx.send(embed=discord.Embed(
+                title="Error",
+                description=f"An error occurred: {str(e)}",
+                color=discord.Color.from_str("#ff4545")
+            ))
 
     @commands.is_owner()
     @images.command(name="delete")
@@ -101,7 +121,11 @@ class Cloudflare(commands.Cog):
         account_id = api_tokens.get("account_id")
         bearer_token = api_tokens.get("bearer_token")
         if not account_id or not bearer_token:
-            await ctx.send("Account ID or bearer token not set.")
+            await ctx.send(embed=discord.Embed(
+                title="Error",
+                description="Account ID or bearer token not set.",
+                color=discord.Color.from_str("#ff4545")
+            ))
             return
 
         headers = {
@@ -129,7 +153,11 @@ class Cloudflare(commands.Cog):
                     color=discord.Color.from_str("#2BBD8E"))
                 await ctx.send(embed=embed)
         except Exception as e:
-            await ctx.send(f"An error occurred: {str(e)}")
+            await ctx.send(embed=discord.Embed(
+                title="Error",
+                description=f"An error occurred: {str(e)}",
+                color=discord.Color.from_str("#ff4545")
+            ))
 
 
     @commands.is_owner()
@@ -140,7 +168,11 @@ class Cloudflare(commands.Cog):
         account_id = api_tokens.get("account_id")
         bearer_token = api_tokens.get("bearer_token")
         if not account_id or not bearer_token:
-            await ctx.send("Account ID or bearer token not set.")
+            await ctx.send(embed=discord.Embed(
+                title="Error",
+                description="Account ID or bearer token not set.",
+                color=discord.Color.from_str("#ff4545")
+            ))
             return
 
         headers = {
@@ -158,7 +190,7 @@ class Cloudflare(commands.Cog):
                     embed = discord.Embed(
                         title="Failed to Fetch Image Info",
                         description=f"**Error:** {error_message}",
-                        color=discord.Color.red()
+                        color=discord.Color.from_str("#ff4545")
                     )
                     await ctx.send(embed=embed)
                     return
@@ -171,7 +203,7 @@ class Cloudflare(commands.Cog):
                 embed = discord.Embed(
                     title="Image Information",
                     description=f"Information for image ID `{image_id}`:",
-                    color=discord.Color.blue()
+                    color=discord.Color.from_str("#2BBD8E")
                 )
                 embed.add_field(name="Filename", value=f"**`{filename}`**", inline=False)
                 embed.add_field(name="Uploaded", value=f"**`{upload_time}`**", inline=False)
@@ -180,7 +212,11 @@ class Cloudflare(commands.Cog):
 
                 await ctx.send(embed=embed)
         except Exception as e:
-            await ctx.send(f"An error occurred: {str(e)}")
+            await ctx.send(embed=discord.Embed(
+                title="Error",
+                description=f"An error occurred: {str(e)}",
+                color=discord.Color.from_str("#ff4545")
+            ))
 
     @commands.is_owner()
     @images.command(name="list")
@@ -190,7 +226,11 @@ class Cloudflare(commands.Cog):
         account_id = api_tokens.get("account_id")
         bearer_token = api_tokens.get("bearer_token")
         if not account_id or not bearer_token:
-            await ctx.send("Account ID or bearer token not set.")
+            await ctx.send(embed=discord.Embed(
+                title="Error",
+                description="Account ID or bearer token not set.",
+                color=discord.Color.from_str("#ff4545")
+            ))
             return
 
         headers = {
@@ -208,20 +248,24 @@ class Cloudflare(commands.Cog):
                     embed = discord.Embed(
                         title="Failed to Fetch Images",
                         description=f"**Error:** {error_message}",
-                        color=discord.Color.red()
+                        color=discord.Color.from_str("#ff4545")
                     )
                     await ctx.send(embed=embed)
                     return
 
                 images = data.get("result", {}).get("images", [])
                 if not images:
-                    await ctx.send("No images found.")
+                    await ctx.send(embed=discord.Embed(
+                        title="No Images Found",
+                        description="No images found.",
+                        color=discord.Color.from_str("#ff4545")
+                    ))
                     return
 
                 embed = discord.Embed(
                     title="Available Images",
                     description="Here are the available images:",
-                    color=discord.Color.blue()
+                    color=discord.Color.from_str("#2BBD8E")
                 )
 
                 for image in images:
@@ -238,7 +282,11 @@ class Cloudflare(commands.Cog):
 
                 await ctx.send(embed=embed)
         except Exception as e:
-            await ctx.send(f"An error occurred: {str(e)}")
+            await ctx.send(embed=discord.Embed(
+                title="Error",
+                description=f"An error occurred: {str(e)}",
+                color=discord.Color.from_str("#ff4545")
+            ))
 
 
     @commands.is_owner()
@@ -249,7 +297,11 @@ class Cloudflare(commands.Cog):
         account_id = api_tokens.get("account_id")
         bearer_token = api_tokens.get("bearer_token")
         if not account_id or not bearer_token:
-            await ctx.send("Account ID or bearer token not set.")
+            await ctx.send(embed=discord.Embed(
+                title="Error",
+                description="Account ID or bearer token not set.",
+                color=discord.Color.from_str("#ff4545")
+            ))
             return
 
         headers = {
@@ -267,7 +319,7 @@ class Cloudflare(commands.Cog):
                     embed = discord.Embed(
                         title="Failed to Fetch Image Stats",
                         description=f"**Error:** {error_message}",
-                        color=discord.Color.red()
+                        color=discord.Color.from_str("#ff4545")
                     )
                     await ctx.send(embed=embed)
                     return
@@ -280,13 +332,17 @@ class Cloudflare(commands.Cog):
                 embed = discord.Embed(
                     title="Usage statistics",
                     description="Here are your current usage statistics for Cloudflare Images:",
-                    color=discord.Color.from_rgb(255, 128, 0))
+                    color=discord.Color.from_str("#2BBD8E"))
                 embed.add_field(name="Allowed", value=f"**`{allowed}`**", inline=True)
                 embed.add_field(name="Current", value=f"**`{current}`**", inline=True)
 
                 await ctx.send(embed=embed)
         except Exception as e:
-            await ctx.send(f"An error occurred: {str(e)}")
+            await ctx.send(embed=discord.Embed(
+                title="Error",
+                description=f"An error occurred: {str(e)}",
+                color=discord.Color.from_str("#ff4545")
+            ))
 
     @commands.is_owner()
     @commands.group(invoke_without_command=True)
@@ -300,16 +356,16 @@ class Cloudflare(commands.Cog):
         api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
         email = api_tokens.get("email")
         if not email:
-            embed = discord.Embed(title="Error", description="Email not set.", color=discord.Color.red())
+            embed = discord.Embed(title="Error", description="Email not set.", color=discord.Color.from_str("#ff4545"))
             await ctx.send(embed=embed)
             return
 
         try:
             await ctx.author.send(f"**Current Cloudflare email**\n\n```{email}```")
-            embed = discord.Embed(title="Success", description="The Cloudflare email has been sent to your DMs.", color=discord.Color.green())
+            embed = discord.Embed(title="Success", description="The Cloudflare email has been sent to your DMs.", color=discord.Color.from_str("#2BBD8E"))
             await ctx.send(embed=embed)
         except discord.Forbidden:
-            embed = discord.Embed(title="Error", description="I couldn't send you a DM. Please check your DM settings.", color=discord.Color.red())
+            embed = discord.Embed(title="Error", description="I couldn't send you a DM. Please check your DM settings.", color=discord.Color.from_str("#ff4545"))
             await ctx.send(embed=embed)
 
     @commands.is_owner()
@@ -319,16 +375,16 @@ class Cloudflare(commands.Cog):
         api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
         api_key = api_tokens.get("api_key")
         if not api_key:
-            embed = discord.Embed(title="Error", description="API key not set.", color=discord.Color.red())
+            embed = discord.Embed(title="Error", description="API key not set.", color=discord.Color.from_str("#ff4545"))
             await ctx.send(embed=embed)
             return
 
         try:
             await ctx.author.send(f"**Current Cloudflare API key**\n\n```{api_key}```")
-            embed = discord.Embed(title="Success", description="The Cloudflare API key has been sent to your DMs.", color=discord.Color.green())
+            embed = discord.Embed(title="Success", description="The Cloudflare API key has been sent to your DMs.", color=discord.Color.from_str("#2BBD8E"))
             await ctx.send(embed=embed)
         except discord.Forbidden:
-            embed = discord.Embed(title="Error", description="I couldn't send you a DM. Please check your DM settings.", color=discord.Color.red())
+            embed = discord.Embed(title="Error", description="I couldn't send you a DM. Please check your DM settings.", color=discord.Color.from_str("#ff4545"))
             await ctx.send(embed=embed)
 
     @commands.is_owner()
@@ -338,16 +394,16 @@ class Cloudflare(commands.Cog):
         api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
         bearer_token = api_tokens.get("bearer_token")
         if not bearer_token:
-            embed = discord.Embed(title="Error", description="Bearer token not set.", color=discord.Color.red())
+            embed = discord.Embed(title="Error", description="Bearer token not set.", color=discord.Color.from_str("#ff4545"))
             await ctx.send(embed=embed)
             return
 
         try:
             await ctx.author.send(f"**Current Cloudflare bearer token**\n\n```{bearer_token}```")
-            embed = discord.Embed(title="Success", description="The Cloudflare bearer token has been sent to your DMs.", color=discord.Color.green())
+            embed = discord.Embed(title="Success", description="The Cloudflare bearer token has been sent to your DMs.", color=discord.Color.from_str("#2BBD8E"))
             await ctx.send(embed=embed)
         except discord.Forbidden:
-            embed = discord.Embed(title="Error", description="I couldn't send you a DM. Please check your DM settings.", color=discord.Color.red())
+            embed = discord.Embed(title="Error", description="I couldn't send you a DM. Please check your DM settings.", color=discord.Color.from_str("#ff4545"))
             await ctx.send(embed=embed)
 
     @commands.is_owner()
@@ -357,16 +413,16 @@ class Cloudflare(commands.Cog):
         api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
         account_id = api_tokens.get("account_id")
         if not account_id:
-            embed = discord.Embed(title="Error", description="Account ID not set.", color=discord.Color.red())
+            embed = discord.Embed(title="Error", description="Account ID not set.", color=discord.Color.from_str("#ff4545"))
             await ctx.send(embed=embed)
             return
 
         try:
             await ctx.author.send(f"**Current Cloudflare Account ID**\n\n```{account_id}```")
-            embed = discord.Embed(title="Success", description="The Cloudflare Account ID has been sent to your DMs.", color=discord.Color.green())
+            embed = discord.Embed(title="Success", description="The Cloudflare Account ID has been sent to your DMs.", color=discord.Color.from_str("#2BBD8E"))
             await ctx.send(embed=embed)
         except discord.Forbidden:
-            embed = discord.Embed(title="Error", description="I couldn't send you a DM. Please check your DM settings.", color=discord.Color.red())
+            embed = discord.Embed(title="Error", description="I couldn't send you a DM. Please check your DM settings.", color=discord.Color.from_str("#ff4545"))
             await ctx.send(embed=embed)
 
     @commands.is_owner()
@@ -376,16 +432,16 @@ class Cloudflare(commands.Cog):
         api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
         zone_id = api_tokens.get("zone_id")
         if not zone_id:
-            embed = discord.Embed(title="Error", description="Zone ID not set.", color=discord.Color.red())
+            embed = discord.Embed(title="Error", description="Zone ID not set.", color=discord.Color.from_str("#ff4545"))
             await ctx.send(embed=embed)
             return
 
         try:
             await ctx.author.send(f"**Current Cloudflare Zone ID**\n\n```{zone_id}```")
-            embed = discord.Embed(title="Success", description="The Cloudflare Zone ID has been sent to your DMs.", color=discord.Color.green())
+            embed = discord.Embed(title="Success", description="The Cloudflare Zone ID has been sent to your DMs.", color=discord.Color.from_str("#2BBD8E"))
             await ctx.send(embed=embed)
         except discord.Forbidden:
-            embed = discord.Embed(title="Error", description="I couldn't send you a DM. Please check your DM settings.", color=discord.Color.red())
+            embed = discord.Embed(title="Error", description="I couldn't send you a DM. Please check your DM settings.", color=discord.Color.from_str("#ff4545"))
             await ctx.send(embed=embed)
 
     @commands.group()
@@ -402,7 +458,12 @@ class Cloudflare(commands.Cog):
         zone_id = api_tokens.get("zone_id")
         
         if not api_key or not email or not zone_id:
-            await ctx.send("API key, email, or zone ID not set.")
+            embed = discord.Embed(
+                title="Error",
+                description="API key, email, or zone ID not set.",
+                color=discord.Color.from_str("#ff4545")
+            )
+            await ctx.send(embed=embed)
             return
 
         headers = {
@@ -415,19 +476,30 @@ class Cloudflare(commands.Cog):
         
         async with self.session.get(url, headers=headers) as response:
             if response.status != 200:
-                await ctx.send(f"Failed to fetch bot management config: {response.status}")
+                embed = discord.Embed(
+                    title="Error",
+                    description=f"Failed to fetch bot management config: {response.status}",
+                    color=discord.Color.from_str("#ff4545")
+                )
+                await ctx.send(embed=embed)
                 return
 
             data = await response.json()
             bot_management_config = data.get("result", {})
             if not bot_management_config:
-                await ctx.send("No bot management config found.")
+                embed = discord.Embed(
+                    title="Error",
+                    description="No bot management config found.",
+                    color=discord.Color.from_str("#ff4545")
+                )
+                await ctx.send(embed=embed)
                 return
 
             embed = discord.Embed(
                 title="Bot Management",
                 description="Your current **Cloudflare Bot Management** settings are as follows:",
-                color=discord.Color.from_str("#F38020"))
+                color=discord.Color.from_str("#2BBD8E")
+            )
 
             def format_value(value):
                 return value.upper() if isinstance(value, str) else str(value).upper()
@@ -464,7 +536,12 @@ class Cloudflare(commands.Cog):
         zone_id = api_tokens.get("zone_id")
         bearer_token = api_tokens.get("bearer_token")
         if not api_key or not email or not zone_id:
-            await ctx.send("API key, email, or zone ID not set.")
+            embed = discord.Embed(
+                title="Error",
+                description="API key, email, or zone ID not set.",
+                color=discord.Color.from_str("#ff4545")
+            )
+            await ctx.send(embed=embed)
             return
 
         headers = {
@@ -486,7 +563,7 @@ class Cloudflare(commands.Cog):
                         embed = discord.Embed(
                             title="Failed to Update Bot Management Config",
                             description=f"**Error:** {error_message}",
-                            color=discord.Color.red()
+                            color=discord.Color.from_str("#ff4545")
                         )
                         await ctx.send(embed=embed)
                         return
@@ -494,11 +571,16 @@ class Cloudflare(commands.Cog):
                     embed = discord.Embed(
                         title="Bot management changed",
                         description=f"Successfully updated bot management setting **`{setting}`** to **`{value}`**.",
-                        color=discord.Color.green()
+                        color=discord.Color.from_str("#2BBD8E")
                     )
                     await ctx.send(embed=embed)
         except Exception as e:
-            await ctx.author.send(f"An error occurred: {str(e)}\n\nRequest URL: {url}\nHeaders: {headers}\nPayload: {payload}")
+            embed = discord.Embed(
+                title="Error",
+                description=f"An error occurred: {str(e)}\n\nRequest URL: {url}\nHeaders: {headers}\nPayload: {payload}",
+                color=discord.Color.from_str("#ff4545")
+            )
+            await ctx.author.send(embed=embed)
 
     @commands.group()
     async def zones(self, ctx):
@@ -514,7 +596,12 @@ class Cloudflare(commands.Cog):
         api_key = api_tokens.get("api_key")
         email = api_tokens.get("email")
         if not api_key or not email:
-            await ctx.send("API key or email not set.")
+            embed = discord.Embed(
+                title="Error",
+                description="API key or email not set.",
+                color=discord.Color.from_str("#ff4545")
+            )
+            await ctx.send(embed=embed)
             return
 
         headers = {
@@ -525,20 +612,34 @@ class Cloudflare(commands.Cog):
 
         async with self.session.get("https://api.cloudflare.com/client/v4/zones", headers=headers) as response:
             if response.status != 200:
-                await ctx.send(f"Failed to fetch zones: {response.status}")
+                embed = discord.Embed(
+                    title="Error",
+                    description=f"Failed to fetch zones: {response.status}",
+                    color=discord.Color.from_str("#ff4545")
+                )
+                await ctx.send(embed=embed)
                 return
 
             data = await response.json()
             zones = data.get("result", [])
             if not zones:
-                await ctx.send("No zones found.")
+                embed = discord.Embed(
+                    title="Error",
+                    description="No zones found.",
+                    color=discord.Color.from_str("#ff4545")
+                )
+                await ctx.send(embed=embed)
                 return
 
             zone_names = [zone["name"] for zone in zones]
             pages = [zone_names[i:i + 10] for i in range(0, len(zone_names), 10)]
 
             current_page = 0
-            embed = discord.Embed(title="Zones in Cloudflare account", description="\n".join(pages[current_page]), color=discord.Color.orange())
+            embed = discord.Embed(
+                title="Zones in Cloudflare account",
+                description="\n".join(pages[current_page]),
+                color=discord.Color.from_str("#2BBD8E")
+            )
             message = await ctx.send(embed=embed)
 
             if len(pages) > 1:
@@ -598,7 +699,7 @@ class Cloudflare(commands.Cog):
             embed = discord.Embed(
                 title="Configuration Error",
                 description="Missing one or more required API tokens. Please check your configuration.",
-                color=discord.Color.red()
+                color=discord.Color.from_str("#ff4545")
             )
             await ctx.send(embed=embed)
             return
@@ -615,7 +716,7 @@ class Cloudflare(commands.Cog):
                 embed = discord.Embed(
                     title="Error",
                     description=f"Failed to fetch WHOIS information: {response.status}",
-                    color=discord.Color.red()
+                    color=discord.Color.from_str("#ff4545")
                 )
                 await ctx.send(embed=embed)
                 return
@@ -625,7 +726,7 @@ class Cloudflare(commands.Cog):
                 embed = discord.Embed(
                     title="Error",
                     description="Failed to fetch WHOIS information.",
-                    color=discord.Color.red()
+                    color=discord.Color.from_str("#ff4545")
                 )
                 await ctx.send(embed=embed)
                 return
@@ -633,7 +734,7 @@ class Cloudflare(commands.Cog):
             whois_info = data.get("result", {})
 
             pages = []
-            page = discord.Embed(title=f"WHOIS Information for {domain}", color=0xfffffe)
+            page = discord.Embed(title=f"WHOIS Information for {domain}", color=discord.Color.from_str("#2BBD8E"))
             field_count = 0
 
             def add_field_to_page(page, name, value):
@@ -642,7 +743,7 @@ class Cloudflare(commands.Cog):
                 field_count += 1
                 if field_count == 10:
                     pages.append(page)
-                    page = discord.Embed(title=f"WHOIS Information for {domain}", color=0xfffffe)
+                    page = discord.Embed(title=f"WHOIS Information for {domain}", color=discord.Color.from_str("#2BBD8E"))
                     field_count = 0
                 return page
 
@@ -991,7 +1092,7 @@ class Cloudflare(commands.Cog):
                 data = await response.json()
                 if data["success"]:
                     result = data["result"]
-                    embed = discord.Embed(title=f"Domain intelligence for {result.get('domain', 'N/A')}", color=0xfffffe)
+                    embed = discord.Embed(title=f"Domain intelligence for {result.get('domain', 'N/A')}", color=0xff9144)
                     
                     if "domain" in result:
                         embed.add_field(name="Domain", value=f"**`{result['domain']}`**", inline=False)
@@ -1019,10 +1120,10 @@ class Cloudflare(commands.Cog):
                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/globe.png")
                     await ctx.send(embed=embed)
                 else:
-                    error_embed = discord.Embed(title="Error", description=f"Error: {data['errors']}", color=0xff0000)
+                    error_embed = discord.Embed(title="Error", description=f"Error: {data['errors']}", color=0xff4545)
                     await ctx.send(embed=error_embed)
             else:
-                error_embed = discord.Embed(title="Failed to query Cloudflare API", description=f"Status code: {response.status}", color=0xff0000)
+                error_embed = discord.Embed(title="Failed to query Cloudflare API", description=f"Status code: {response.status}", color=0xff4545)
                 await ctx.send(embed=error_embed)
 
     @intel.command(name="ip")
@@ -1049,7 +1150,7 @@ class Cloudflare(commands.Cog):
             elif ip_obj.version == 6:
                 params["ipv6"] = ip
         except ValueError:
-            embed = discord.Embed(title="Error", description="Invalid IP address format.", color=0xff0000)
+            embed = discord.Embed(title="Error", description="Invalid IP address format.", color=0xff4545)
             await ctx.send(embed=embed)
             return
 
@@ -1058,7 +1159,7 @@ class Cloudflare(commands.Cog):
                 data = await response.json()
                 if data["success"]:
                     result = data["result"][0]
-                    embed = discord.Embed(title=f"IP intelligence for {result['ip']}", color=0xfffffe)
+                    embed = discord.Embed(title=f"IP intelligence for {result['ip']}", color=0xff9144)
                     
                     if "ip" in result:
                         embed.add_field(name="IP", value=f"**`{result['ip']}`**", inline=False)
@@ -1085,13 +1186,13 @@ class Cloudflare(commands.Cog):
                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/globe.png")
                     await ctx.send(embed=embed)
                 else:
-                    embed = discord.Embed(title="Error", description=f"Error: {data['errors']}", color=0xff0000)
+                    embed = discord.Embed(title="Error", description=f"Error: {data['errors']}", color=0xff4545)
                     await ctx.send(embed=embed)
             elif response.status == 400:
-                embed = discord.Embed(title="Bad Request", description="The server could not understand the request due to invalid syntax.", color=0xff0000)
+                embed = discord.Embed(title="Bad Request", description="The server could not understand the request due to invalid syntax.", color=0xff4545)
                 await ctx.send(embed=embed)
             else:
-                embed = discord.Embed(title="Failed to query Cloudflare API", description=f"Status code: {response.status}", color=0xff0000)
+                embed = discord.Embed(title="Failed to query Cloudflare API", description=f"Status code: {response.status}", color=0xff4545)
                 await ctx.send(embed=embed)
 
     @intel.command(name="domainhistory")
@@ -1125,7 +1226,7 @@ class Cloudflare(commands.Cog):
                 data = await response.json()
                 if data["success"]:
                     result = data["result"][0]
-                    embed = discord.Embed(title=f"Domain history for {domain}", color=0xfffffe)
+                    embed = discord.Embed(title=f"Domain history for {domain}", color=0xff9144)
                     
                     if "domain" in result:
                         embed.add_field(name="Domain", value=f"**`{result['domain']}`**", inline=False)
@@ -1164,7 +1265,8 @@ class Cloudflare(commands.Cog):
 
         # Check if any required token is missing
         if not all([email, api_key, bearer_token, account_id]):
-            await ctx.send("Missing one or more required API tokens. Please check your configuration.")
+            embed = discord.Embed(title="Configuration Error", description="Missing one or more required API tokens. Please check your configuration.", color=0xff4545)
+            await ctx.send(embed=embed)
             return
 
         url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/intel/asn/{asn}"
@@ -1180,7 +1282,7 @@ class Cloudflare(commands.Cog):
                 data = await response.json()
                 if data["success"]:
                     result = data["result"]
-                    embed = discord.Embed(title=f"ASN intelligence for {asn}", color=0xfffffe)
+                    embed = discord.Embed(title=f"ASN intelligence for {asn}", color=0xff9144)
                     
                     if "asn" in result:
                         embed.add_field(name="ASN", value=f"**`{result['asn']}`**", inline=False)
@@ -1196,11 +1298,14 @@ class Cloudflare(commands.Cog):
                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/globe.png")
                     await ctx.send(embed=embed)
                 else:
-                    await ctx.send(f"Error: {data['errors']}")
+                    embed = discord.Embed(title="Error", description=f"Error: {data['errors']}", color=0xff4545)
+                    await ctx.send(embed=embed)
             elif response.status == 400:
-                await ctx.send("Bad Request: The server could not understand the request due to invalid syntax.")
+                embed = discord.Embed(title="Bad Request", description="The server could not understand the request due to invalid syntax.", color=0xff4545)
+                await ctx.send(embed=embed)
             else:
-                await ctx.send(f"Failed to query Cloudflare API. Status code: {response.status}")
+                embed = discord.Embed(title="Failed to query Cloudflare API", description=f"Status code: {response.status}", color=0xff4545)
+                await ctx.send(embed=embed)
 
     @intel.command(name="subnets")
     async def asnsubnets(self, ctx, asn: int):
@@ -1215,7 +1320,8 @@ class Cloudflare(commands.Cog):
 
         # Check if any required token is missing
         if not all([email, api_key, bearer_token, account_id]):
-            await ctx.send("Missing one or more required API tokens. Please check your configuration.")
+            embed = discord.Embed(title="Configuration Error", description="Missing one or more required API tokens. Please check your configuration.", color=0xff4545)
+            await ctx.send(embed=embed)
             return
 
         url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/intel/asn/{asn}/subnets"
@@ -1236,7 +1342,7 @@ class Cloudflare(commands.Cog):
                     if subnets:
                         pages = [subnets[i:i + 10] for i in range(0, len(subnets), 10)]
                         current_page = 0
-                        embed = discord.Embed(title=f"ASN subnets for {asn}", color=0xfffffe)
+                        embed = discord.Embed(title=f"ASN subnets for {asn}", color=0x2BBD8E)
                         embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/globe.png")
                         for subnet in pages[current_page]:
                             embed.add_field(name="Subnet", value=f"**`{subnet}`**", inline=False)
@@ -1278,16 +1384,19 @@ class Cloudflare(commands.Cog):
                                     await message.clear_reactions()
                                     break
                     else:
-                        embed = discord.Embed(title=f"ASN subnets for {asn}", color=0xfffffe)
+                        embed = discord.Embed(title=f"ASN subnets for {asn}", color=0x2BBD8E)
                         embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/globe.png")
                         embed.add_field(name="Subnets", value="No subnets found for this ASN.", inline=False)
                         await ctx.send(embed=embed)
                 else:
-                    await ctx.send(f"Error: {data['errors']}")
+                    embed = discord.Embed(title="Error", description=f"Error: {data['errors']}", color=0xff4545)
+                    await ctx.send(embed=embed)
             elif response.status == 400:
-                await ctx.send("Bad Request: The server could not understand the request due to invalid syntax.")
+                embed = discord.Embed(title="Bad Request", description="The server could not understand the request due to invalid syntax.", color=0xff4545)
+                await ctx.send(embed=embed)
             else:
-                await ctx.send(f"Failed to query Cloudflare API. Status code: {response.status}")
+                embed = discord.Embed(title="Failed to query Cloudflare API", description=f"Status code: {response.status}", color=0xff4545)
+                await ctx.send(embed=embed)
    
     @commands.is_owner()
     @commands.group(invoke_without_command=False)
@@ -1337,7 +1446,7 @@ class Cloudflare(commands.Cog):
             pages = [addresses[i:i + 10] for i in range(0, len(addresses), 10)]
             current_page = 0
 
-            embed = discord.Embed(title="Email Routing address list", description="\n".join([f"**`{addr['email']}`**" for addr in pages[current_page]]), color=discord.Color.from_rgb(255, 128, 0))
+            embed = discord.Embed(title="Email Routing address list", description="\n".join([f"**`{addr['email']}`**" for addr in pages[current_page]]), color=0xff9144)
             message = await ctx.send(embed=embed)
 
             if len(pages) > 1:
@@ -1383,7 +1492,8 @@ class Cloudflare(commands.Cog):
         account_id = api_tokens.get("account_id")
 
         if not all([email_token, api_key, bearer_token, account_id]):
-            await ctx.send("Missing one or more required API tokens. Please check your configuration.")
+            embed = discord.Embed(title="Error", description="Missing one or more required API tokens. Please check your configuration.", color=discord.Color.from_str("#ff4545"))
+            await ctx.send(embed=embed)
             return
 
         url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/email/routing/addresses"
@@ -1410,9 +1520,11 @@ class Cloudflare(commands.Cog):
                     embed.add_field(name="Verified", value=f"**`{result['verified']}`**", inline=False)
                     await ctx.send(embed=embed)
                 else:
-                    await ctx.send(f"Error: {data['errors']}")
+                    embed = discord.Embed(title="Error", description=f"Error: {data['errors']}", color=discord.Color.from_str("#ff4545"))
+                    await ctx.send(embed=embed)
             else:
-                await ctx.send(f"Failed to create email routing address. Status code: {response.status}")
+                embed = discord.Embed(title="Error", description=f"Failed to create email routing address. Status code: {response.status}", color=discord.Color.from_str("#ff4545"))
+                await ctx.send(embed=embed)
 
     @commands.is_owner()
     @emailrouting.command(name="remove")
@@ -1569,7 +1681,7 @@ class Cloudflare(commands.Cog):
             embed = discord.Embed(
                 title="Current settings for Email Routing",
                 description=f"**Settings for zone `{zone_identifier.upper()}`**\n\n*Change your zone using `[p]set api cloudflare zone_id`*",
-                color=discord.Color.from_rgb(255, 128, 0))  # Cloudflare orange
+                color=discord.Color.from_str("#ff9144"))  # Default color
             created_timestamp = settings.get('created', 'N/A')
             if created_timestamp != 'N/A':
                 created_timestamp = f"<t:{int(datetime.fromisoformat(created_timestamp).timestamp())}:F>"
@@ -1599,25 +1711,45 @@ class Cloudflare(commands.Cog):
         zone_identifier = api_tokens.get("zone_id")
 
         if not all([email, api_key, bearer_token, zone_identifier]):
-            await ctx.send("Missing one or more required API tokens. Please check your configuration.")
+            embed = discord.Embed(
+                title="Error",
+                description="Missing one or more required API tokens. Please check your configuration.",
+                color=discord.Color.from_str("#ff4545")  # Red color for error
+            )
+            await ctx.send(embed=embed)
             return
 
         def check(m):
             return m.author == ctx.author and m.channel == ctx.channel
 
-        await ctx.send(
-            "Enabling Email Routing will allow Cloudflare to proxy your emails for the selected zone. "
-            "This might affect how your emails are delivered. Type `yes` to confirm or `no` to cancel."
+        embed = discord.Embed(
+            title="Enable Email Routing",
+            description=(
+                "Enabling Email Routing will allow Cloudflare to proxy your emails for the selected zone. "
+                "This might affect how your emails are delivered. Type `yes` to confirm or `no` to cancel."
+            ),
+            color=discord.Color.from_str("#ff9144")  # Default color
         )
+        await ctx.send(embed=embed)
 
         try:
             confirmation = await self.bot.wait_for('message', check=check, timeout=30.0)
         except asyncio.TimeoutError:
-            await ctx.send("Confirmation timed out. Email Routing enable operation cancelled.")
+            embed = discord.Embed(
+                title="Error",
+                description="Confirmation timed out. Email Routing enable operation cancelled.",
+                color=discord.Color.from_str("#ff4545")  # Red color for error
+            )
+            await ctx.send(embed=embed)
             return
 
         if confirmation.content.lower() != 'yes':
-            await ctx.send("Email Routing enable operation cancelled.")
+            embed = discord.Embed(
+                title="Cancelled",
+                description="Email Routing enable operation cancelled.",
+                color=discord.Color.from_str("#ff9144")  # Default color for cancellation
+            )
+            await ctx.send(embed=embed)
             return
 
         headers = {
@@ -1630,15 +1762,30 @@ class Cloudflare(commands.Cog):
         url = f"https://api.cloudflare.com/client/v4/zones/{zone_identifier}/email/routing/enable"
         async with self.session.post(url, headers=headers) as response:
             if response.status != 200:
-                await ctx.send(f"Failed to enable Email Routing: {response.status}")
+                embed = discord.Embed(
+                    title="Error",
+                    description=f"Failed to enable Email Routing: {response.status}",
+                    color=discord.Color.from_str("#ff4545")  # Red color for error
+                )
+                await ctx.send(embed=embed)
                 return
 
             data = await response.json()
             if not data.get("success", False):
-                await ctx.send("Failed to enable Email Routing.")
+                embed = discord.Embed(
+                    title="Error",
+                    description="Failed to enable Email Routing.",
+                    color=discord.Color.from_str("#ff4545")  # Red color for error
+                )
+                await ctx.send(embed=embed)
                 return
 
-            await ctx.send(f"Email Routing has been successfully enabled for zone `{zone_identifier.upper()}`.")
+            embed = discord.Embed(
+                title="Success",
+                description=f"Email Routing has been successfully enabled for zone `{zone_identifier.upper()}`.",
+                color=discord.Color.from_str("#2BBD8E")  # Green color for success
+            )
+            await ctx.send(embed=embed)
     
     @commands.is_owner()
     @emailrouting.command(name="disable")
@@ -1651,7 +1798,12 @@ class Cloudflare(commands.Cog):
         zone_identifier = api_tokens.get("zone_id")
 
         if not all([email, api_key, bearer_token, zone_identifier]):
-            await ctx.send("Missing one or more required API tokens. Please check your configuration.")
+            embed = discord.Embed(
+                title="Error",
+                description="Missing one or more required API tokens. Please check your configuration.",
+                color=discord.Color.from_str("#ff4545")  # Red color for error
+            )
+            await ctx.send(embed=embed)
             return
 
         def check(m):
@@ -1665,11 +1817,21 @@ class Cloudflare(commands.Cog):
         try:
             confirmation = await self.bot.wait_for('message', check=check, timeout=30.0)
         except asyncio.TimeoutError:
-            await ctx.send("Confirmation timed out. Email Routing disable operation cancelled.")
+            embed = discord.Embed(
+                title="Timeout",
+                description="Confirmation timed out. Email Routing disable operation cancelled.",
+                color=discord.Color.from_str("#ff4545")  # Red color for error
+            )
+            await ctx.send(embed=embed)
             return
 
         if confirmation.content.lower() != 'yes':
-            await ctx.send("Email Routing disable operation cancelled.")
+            embed = discord.Embed(
+                title="Cancelled",
+                description="Email Routing disable operation cancelled.",
+                color=discord.Color.from_str("#ff9144")  # Default color for cancellation
+            )
+            await ctx.send(embed=embed)
             return
 
         headers = {
@@ -1682,15 +1844,30 @@ class Cloudflare(commands.Cog):
         url = f"https://api.cloudflare.com/client/v4/zones/{zone_identifier}/email/routing/disable"
         async with self.session.post(url, headers=headers) as response:
             if response.status != 200:
-                await ctx.send(f"Failed to disable Email Routing: {response.status}")
+                embed = discord.Embed(
+                    title="Error",
+                    description=f"Failed to disable Email Routing: {response.status}",
+                    color=discord.Color.from_str("#ff4545")  # Red color for error
+                )
+                await ctx.send(embed=embed)
                 return
 
             data = await response.json()
             if not data.get("success", False):
-                await ctx.send("Failed to disable Email Routing.")
+                embed = discord.Embed(
+                    title="Error",
+                    description="Failed to disable Email Routing.",
+                    color=discord.Color.from_str("#ff4545")  # Red color for error
+                )
+                await ctx.send(embed=embed)
                 return
 
-            await ctx.send(f"Email Routing has been successfully disabled for zone `{zone_identifier.upper()}`.")
+            embed = discord.Embed(
+                title="Success",
+                description=f"Email Routing has been successfully disabled for zone `{zone_identifier.upper()}`.",
+                color=discord.Color.from_str("#2BBD8E")  # Green color for success
+            )
+            await ctx.send(embed=embed)
     
     @commands.is_owner()
     @emailrouting.command(name="records")
@@ -1703,7 +1880,12 @@ class Cloudflare(commands.Cog):
         zone_identifier = api_tokens.get("zone_id")
 
         if not all([email, api_key, bearer_token, zone_identifier]):
-            await ctx.send("Missing one or more required API tokens. Please check your configuration.")
+            embed = discord.Embed(
+                title="Error",
+                description="Missing one or more required API tokens. Please check your configuration.",
+                color=discord.Color.from_str("#ff4545")  # Red color for error
+            )
+            await ctx.send(embed=embed)
             return
 
         headers = {
@@ -1716,20 +1898,35 @@ class Cloudflare(commands.Cog):
         url = f"https://api.cloudflare.com/client/v4/zones/{zone_identifier}/email/routing/dns"
         async with self.session.get(url, headers=headers) as response:
             if response.status != 200:
-                await ctx.send(f"Failed to fetch DNS records for Email Routing: {response.status}")
+                embed = discord.Embed(
+                    title="Error",
+                    description=f"Failed to fetch DNS records for Email Routing: {response.status}",
+                    color=discord.Color.from_str("#ff4545")  # Red color for error
+                )
+                await ctx.send(embed=embed)
                 return
 
             data = await response.json()
             if not data.get("success", False):
-                await ctx.send("Failed to fetch DNS records for Email Routing.")
+                embed = discord.Embed(
+                    title="Error",
+                    description="Failed to fetch DNS records for Email Routing.",
+                    color=discord.Color.from_str("#ff4545")  # Red color for error
+                )
+                await ctx.send(embed=embed)
                 return
 
             records = data.get("result", [])
             if not records:
-                await ctx.send("No DNS records found for Email Routing.")
+                embed = discord.Embed(
+                    title="No Records",
+                    description="No DNS records found for Email Routing.",
+                    color=discord.Color.from_str("#ff9144")  # Default color for no records
+                )
+                await ctx.send(embed=embed)
                 return
 
-            embed = discord.Embed(title="Email Routing DNS Records", color=discord.Color.from_rgb(255, 128, 0))
+            embed = discord.Embed(title="Email Routing DNS Records", color=discord.Color.from_str("#ff9144"))  # Default color for records
             for record in records:
                 embed.add_field(
                     name=f"{record['type']} Record",
@@ -1756,7 +1953,12 @@ class Cloudflare(commands.Cog):
         zone_identifier = api_tokens.get("zone_id")
 
         if not all([email, api_key, bearer_token, zone_identifier]):
-            await ctx.send("Missing one or more required API tokens. Please check your configuration.")
+            embed = discord.Embed(
+                title="Error",
+                description="Missing one or more required API tokens. Please check your configuration.",
+                color=discord.Color.from_str("#ff4545")  # Red color for error
+            )
+            await ctx.send(embed=embed)
             return
 
         headers = {
@@ -1774,15 +1976,30 @@ class Cloudflare(commands.Cog):
 
         async with self.session.post(url, headers=headers, json=payload) as response:
             if response.status != 200:
-                await ctx.send(f"Failed to add Email Routing rule: {response.status}")
+                embed = discord.Embed(
+                    title="Error",
+                    description=f"Failed to add Email Routing rule: {response.status}",
+                    color=discord.Color.from_str("#ff4545")  # Red color for error
+                )
+                await ctx.send(embed=embed)
                 return
 
             data = await response.json()
             if not data.get("success", False):
-                await ctx.send("Failed to add Email Routing rule.")
+                embed = discord.Embed(
+                    title="Error",
+                    description="Failed to add Email Routing rule.",
+                    color=discord.Color.from_str("#ff4545")  # Red color for error
+                )
+                await ctx.send(embed=embed)
                 return
 
-            await ctx.send(f"Email Routing rule added successfully: {source} -> {destination}")
+            embed = discord.Embed(
+                title="Success",
+                description=f"Email Routing rule added successfully: {source} -> {destination}",
+                color=discord.Color.from_str("#2BBD8E")  # Green color for success
+            )
+            await ctx.send(embed=embed)
 
     @commands.is_owner()
     @email_routing_rules.command(name="remove")
@@ -1795,7 +2012,12 @@ class Cloudflare(commands.Cog):
         zone_identifier = api_tokens.get("zone_id")
 
         if not all([email, api_key, bearer_token, zone_identifier]):
-            await ctx.send("Missing one or more required API tokens. Please check your configuration.")
+            embed = discord.Embed(
+                title="Error",
+                description="Missing one or more required API tokens. Please check your configuration.",
+                color=discord.Color.from_str("#ff9144")  # Default color for embeds
+            )
+            await ctx.send(embed=embed)
             return
 
         headers = {
@@ -1809,15 +2031,30 @@ class Cloudflare(commands.Cog):
 
         async with self.session.delete(url, headers=headers) as response:
             if response.status != 200:
-                await ctx.send(f"Failed to remove Email Routing rule: {response.status}")
+                embed = discord.Embed(
+                    title="Error",
+                    description=f"Failed to remove Email Routing rule: {response.status}",
+                    color=discord.Color.from_str("#ff9144")  # Default color for embeds
+                )
+                await ctx.send(embed=embed)
                 return
 
             data = await response.json()
             if not data.get("success", False):
-                await ctx.send("Failed to remove Email Routing rule.")
+                embed = discord.Embed(
+                    title="Error",
+                    description="Failed to remove Email Routing rule.",
+                    color=discord.Color.from_str("#ff9144")  # Default color for embeds
+                )
+                await ctx.send(embed=embed)
                 return
 
-            await ctx.send(f"Email Routing rule removed successfully: {rule_id}")
+            embed = discord.Embed(
+                title="Success",
+                description=f"Email Routing rule removed successfully: {rule_id}",
+                color=discord.Color.from_str("#2BBD8E")  # Green color for success
+            )
+            await ctx.send(embed=embed)
 
     @commands.is_owner()
     @email_routing_rules.command(name="list")
