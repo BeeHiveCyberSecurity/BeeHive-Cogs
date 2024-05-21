@@ -165,13 +165,13 @@ class Cloudflare(commands.Cog):
                 color=discord.Color.blue()
             )
 
-            embed.add_field(name="Enable JS", value=f"**`{bot_management_config.get('enable_js', 'Not set')}`**", inline=False)
-            embed.add_field(name="Optimize Wordpress", value=f"**`{bot_management_config.get('optimize_wordpress', 'Not set')}`**", inline=False)
-            embed.add_field(name="Suppress Session Score", value=f"**`{bot_management_config.get('suppress_session_score', 'Not set')}`**", inline=False)
-            embed.add_field(name="Super Bot Fight Mode", value="", inline=False)
             def format_value(value):
                 return value.upper() if isinstance(value, str) else str(value).upper()
 
+            embed.add_field(name="Enable JS", value=f"**`{format_value(bot_management_config.get('enable_js', 'Not set'))}`**", inline=False)
+            embed.add_field(name="Optimize Wordpress", value=f"**`{format_value(bot_management_config.get('optimize_wordpress', 'Not set'))}`**", inline=False)
+            embed.add_field(name="Suppress Session Score", value=f"**`{format_value(bot_management_config.get('suppress_session_score', 'Not set'))}`**", inline=False)
+            embed.add_field(name="Super Bot Fight Mode", value="", inline=False)
             embed.add_field(name="Definitely automated", value=f"**`{format_value(bot_management_config.get('sbfm_definitely_automated', 'Not set'))}`**", inline=True)
             embed.add_field(name="Verified bots", value=f"**`{format_value(bot_management_config.get('sbfm_verified_bots', 'Not set'))}`**", inline=True)
             embed.add_field(name="Static resource protection", value=f"**`{format_value(bot_management_config.get('sbfm_static_resource_protection', 'Not set'))}`**", inline=True)
