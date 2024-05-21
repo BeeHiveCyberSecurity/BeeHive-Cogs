@@ -167,14 +167,32 @@ class Cloudflare(commands.Cog):
             def format_value(value):
                 return value.upper() if isinstance(value, str) else str(value).upper()
 
-            embed.add_field(name="Enable JS", value=f"**`{format_value(bot_management_config.get('enable_js', 'Not set'))}`**", inline=False)
-            embed.add_field(name="Optimize Wordpress", value=f"**`{format_value(bot_management_config.get('optimize_wordpress', 'Not set'))}`**", inline=False)
-            embed.add_field(name="Suppress Session Score", value=f"**`{format_value(bot_management_config.get('suppress_session_score', 'Not set'))}`**", inline=False)
-            embed.add_field(name="Super Bot Fight Mode", value="", inline=False)
-            embed.add_field(name="Definitely automated", value=f"**`{format_value(bot_management_config.get('sbfm_definitely_automated', 'Not set'))}`**", inline=True)
-            embed.add_field(name="Verified bots", value=f"**`{format_value(bot_management_config.get('sbfm_verified_bots', 'Not set'))}`**", inline=True)
-            embed.add_field(name="Static resource protection", value=f"**`{format_value(bot_management_config.get('sbfm_static_resource_protection', 'Not set'))}`**", inline=True)
-            embed.add_field(name="Using latest model", value=f"**`{format_value(bot_management_config.get('using_latest_model', 'Not set'))}`**", inline=False)
+            # Determine the Cloudflare account tier based on available config keys
+            config_keys = bot_management_config.keys()
+
+            if all(key in config_keys for key in ['fight_mode', 'using_latest_model', 'enable_js']) and \
+               not any(key in config_keys for key in ['optimize_wordpress', 'sbfm_definitely_automated', 'sbfm_static_resource_protection', 'sbfm_verified_bots', 'auto_update_model', 'suppress_session_score']):
+                # Free tier
+                embed.add_field(name="Super Bot Fight Mode", value=f"**`{format_value(bot_management_config.get('fight_mode', 'Not set'))}`**", inline=False)
+                embed.add_field(name="Enable JS", value=f"**`{format_value(bot_management_config.get('enable_js', 'Not set'))}`**", inline=False)
+                embed.add_field(name="Using latest model", value=f"**`{format_value(bot_management_config.get('using_latest_model', 'Not set'))}`**", inline=False)
+            elif all(key in config_keys for key in ['optimize_wordpress', 'sbfm_definitely_automated', 'sbfm_static_resource_protection', 'sbfm_verified_bots']) and \
+                 not any(key in config_keys for key in ['auto_update_model', 'suppress_session_score']):
+                # Pro or Business tier
+                embed.add_field(name="Enable JS", value=f"**`{format_value(bot_management_config.get('enable_js', 'Not set'))}`**", inline=False)
+                embed.add_field(name="Optimize Wordpress", value=f"**`{format_value(bot_management_config.get('optimize_wordpress', 'Not set'))}`**", inline=False)
+                embed.add_field(name="Super Bot Fight Mode", value=f"**`{format_value(bot_management_config.get('fight_mode', 'Not set'))}`**", inline=False)
+                embed.add_field(name="Definitely automated", value=f"**`{format_value(bot_management_config.get('sbfm_definitely_automated', 'Not set'))}`**", inline=True)
+                embed.add_field(name="Verified bots", value=f"**`{format_value(bot_management_config.get('sbfm_verified_bots', 'Not set'))}`**", inline=True)
+                embed.add_field(name="Static resource protection", value=f"**`{format_value(bot_management_config.get('sbfm_static_resource_protection', 'Not set'))}`**", inline=True)
+                embed.add_field(name="Using latest model", value=f"**`{format_value(bot_management_config.get('using_latest_model', 'Not set'))}`**", inline=False)
+            elif all(key in config_keys for key in ['auto_update_model', 'suppress_session_score']) and \
+                 not any(key in config_keys for key in ['optimize_wordpress', 'sbfm_definitely_automated', 'sbfm_static_resource_protection', 'sbfm_verified_bots']):
+                # Enterprise tier
+                embed.add_field(name="Enable JS", value=f"**`{format_value(bot_management_config.get('enable_js', 'Not set'))}`**", inline=False)
+                embed.add_field(name="Suppress Session Score", value=f"**`{format_value(bot_management_config.get('suppress_session_score', 'Not set'))}`**", inline=False)
+                embed.add_field(name="Using latest model", value=f"**`{format_value(bot_management_config.get('using_latest_model', 'Not set'))}`**", inline=False)
+                embed.add_field(name="Auto Update Model", value=f"**`{format_value(bot_management_config.get('auto_update_model', 'Not set'))}`**", inline=False)
 
             await ctx.send(embed=embed)
     @commands.group()
