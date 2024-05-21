@@ -210,7 +210,7 @@ class Cloudflare(commands.Cog):
         }
 
         url = f"https://api.cloudflare.com/client/v4/zones/{zone_id}/bot_management"
-        payload = json.dumps({setting:value})
+        payload = json.dumps({setting: value.lower() == 'true'})
 
         try:
             async with aiohttp.ClientSession() as session:
