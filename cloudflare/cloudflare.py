@@ -118,7 +118,12 @@ class Cloudflare(commands.Cog):
 
         # Check if any required token is missing
         if not all([email, api_key, bearer_token, account_id]):
-            await ctx.send("Missing one or more required API tokens. Please check your configuration.")
+            embed = discord.Embed(
+                title="Configuration Error",
+                description="Missing one or more required API tokens. Please check your configuration.",
+                color=discord.Color.red()
+            )
+            await ctx.send(embed=embed)
             return
 
         headers = {
@@ -130,12 +135,22 @@ class Cloudflare(commands.Cog):
 
         async with self.session.get(f"https://api.cloudflare.com/client/v4/accounts/{account_id}/intel/whois?domain={domain}", headers=headers) as response:
             if response.status != 200:
-                await ctx.send(f"Failed to fetch WHOIS information: {response.status}")
+                embed = discord.Embed(
+                    title="Error",
+                    description=f"Failed to fetch WHOIS information: {response.status}",
+                    color=discord.Color.red()
+                )
+                await ctx.send(embed=embed)
                 return
 
             data = await response.json()
             if not data.get("success", False):
-                await ctx.send("Failed to fetch WHOIS information.")
+                embed = discord.Embed(
+                    title="Error",
+                    description="Failed to fetch WHOIS information.",
+                    color=discord.Color.red()
+                )
+                await ctx.send(embed=embed)
                 return
 
             whois_info = data.get("result", {})
@@ -518,9 +533,11 @@ class Cloudflare(commands.Cog):
                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/globe.png")
                     await ctx.send(embed=embed)
                 else:
-                    await ctx.send(f"Error: {data['errors']}")
+                    error_embed = discord.Embed(title="Error", description=f"Error: {data['errors']}", color=0xff0000)
+                    await ctx.send(embed=error_embed)
             else:
-                await ctx.send(f"Failed to query Cloudflare API. Status code: {response.status}")
+                error_embed = discord.Embed(title="Failed to query Cloudflare API", description=f"Status code: {response.status}", color=0xff0000)
+                await ctx.send(embed=error_embed)
 
     @intel.command(name="ip")
     async def queryip(self, ctx, ip: str):
@@ -546,7 +563,8 @@ class Cloudflare(commands.Cog):
             elif ip_obj.version == 6:
                 params["ipv6"] = ip
         except ValueError:
-            await ctx.send("Invalid IP address format.")
+            embed = discord.Embed(title="Error", description="Invalid IP address format.", color=0xff0000)
+            await ctx.send(embed=embed)
             return
 
         async with self.session.get(url, headers=headers, params=params) as response:
@@ -572,11 +590,14 @@ class Cloudflare(commands.Cog):
                     
                     await ctx.send(embed=embed)
                 else:
-                    await ctx.send(f"Error: {data['errors']}")
+                    embed = discord.Embed(title="Error", description=f"Error: {data['errors']}", color=0xff0000)
+                    await ctx.send(embed=embed)
             elif response.status == 400:
-                await ctx.send("Bad Request: The server could not understand the request due to invalid syntax.")
+                embed = discord.Embed(title="Bad Request", description="The server could not understand the request due to invalid syntax.", color=0xff0000)
+                await ctx.send(embed=embed)
             else:
-                await ctx.send(f"Failed to query Cloudflare API. Status code: {response.status}")
+                embed = discord.Embed(title="Failed to query Cloudflare API", description=f"Status code: {response.status}", color=0xff0000)
+                await ctx.send(embed=embed)
 
     @intel.command(name="domainhistory")
     async def domainhistory(self, ctx, domain: str):
@@ -591,7 +612,8 @@ class Cloudflare(commands.Cog):
 
         # Check if any required token is missing
         if not all([email, api_key, bearer_token, account_id]):
-            await ctx.send("Missing one or more required API tokens. Please check your configuration.")
+            embed = discord.Embed(title="Configuration Error", description="Missing one or more required API tokens. Please check your configuration.", color=0xff4545)
+            await ctx.send(embed=embed)
             return
 
         url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/intel/domain-history"
@@ -608,7 +630,7 @@ class Cloudflare(commands.Cog):
                 data = await response.json()
                 if data["success"]:
                     result = data["result"][0]
-                    embed = discord.Embed(title=f"Domain History for {domain}", color=0xfffffe)
+                    embed = discord.Embed(title=f"Domain history for {domain}", color=0xfffffe)
                     
                     if "domain" in result:
                         embed.add_field(name="Domain", value=f"**`{result['domain']}`**", inline=False)
@@ -625,11 +647,14 @@ class Cloudflare(commands.Cog):
                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/globe.png")
                     await ctx.send(embed=embed)
                 else:
-                    await ctx.send(f"Error: {data['errors']}")
+                    embed = discord.Embed(title="Error", description=f"Error: {data['errors']}", color=0xff4545)
+                    await ctx.send(embed=embed)
             elif response.status == 400:
-                await ctx.send("Bad Request: The server could not understand the request due to invalid syntax.")
+                embed = discord.Embed(title="Bad Request", description="The server could not understand the request due to invalid syntax.", color=0xff4545)
+                await ctx.send(embed=embed)
             else:
-                await ctx.send(f"Failed to query Cloudflare API. Status code: {response.status}")
+                embed = discord.Embed(title="Failed to query Cloudflare API", description=f"Status code: {response.status}", color=0xff4545)
+                await ctx.send(embed=embed)
 
     @intel.command(name="asn")
     async def asnintel(self, ctx, asn: int):
@@ -1173,7 +1198,7 @@ class Cloudflare(commands.Cog):
             await ctx.send(f"Email Routing has been successfully disabled for zone `{zone_identifier.upper()}`.")
     
     @commands.is_owner()
-    @emailrouting.command(name="reqrecords")
+    @emailrouting.command(name="records")
     async def get_email_routing_dns_records(self, ctx):
         """Get the required DNS records to setup Email Routing"""
         api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
