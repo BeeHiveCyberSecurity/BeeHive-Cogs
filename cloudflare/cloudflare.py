@@ -614,7 +614,7 @@ class Cloudflare(commands.Cog):
                 data = await response.json()
                 if data["success"]:
                     result = data["result"]
-                    embed = discord.Embed(title=f"Domain intelligence for {result['domain']}", color=0xfffffe)
+                    embed = discord.Embed(title=f"Domain intelligence for {result.get('domain', 'N/A')}", color=0xfffffe)
                     
                     if "domain" in result:
                         embed.add_field(name="Domain", value=f"**`{result['domain']}`**", inline=False)
@@ -630,6 +630,14 @@ class Cloudflare(commands.Cog):
                         embed.add_field(name="Content Categories", value=", ".join([f"**`{cat['name']}`**" for cat in result["content_categories"]]), inline=False)
                     if "resolves_to_refs" in result:
                         embed.add_field(name="Resolves To", value=", ".join([f"**`{ref['value']}`**" for ref in result["resolves_to_refs"]]), inline=False)
+                    if "inherited_content_categories" in result:
+                        embed.add_field(name="Inherited Content Categories", value=", ".join([f"**`{cat['name']}`**" for cat in result["inherited_content_categories"]]), inline=False)
+                    if "inherited_from" in result:
+                        embed.add_field(name="Inherited From", value=f"**`{result['inherited_from']}`**", inline=False)
+                    if "inherited_risk_types" in result:
+                        embed.add_field(name="Inherited Risk Types", value=", ".join([f"**`{risk}`**" for risk in result["inherited_risk_types"]]), inline=False)
+                    if "risk_types" in result:
+                        embed.add_field(name="Risk Types", value=", ".join([f"**`{risk}`**" for risk in result["risk_types"]]), inline=False)
 
                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/globe.png")
                     await ctx.send(embed=embed)
