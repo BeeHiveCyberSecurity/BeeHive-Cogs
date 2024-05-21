@@ -687,6 +687,14 @@ class Cloudflare(commands.Cog):
                     if "ptr_lookup" in result and "ptr_domains" in result["ptr_lookup"]:
                         ptr_domains = ", ".join([f"**`{domain}`**" for domain in result["ptr_lookup"]["ptr_domains"]])
                         embed.add_field(name="PTR Domains", value=ptr_domains, inline=False)
+                    if "risk_types" in result:
+                        risk_types = ", ".join([f"**`{risk['name']}`**" for risk in result["risk_types"]])
+                        embed.add_field(name="Risk Types", value=risk_types, inline=False)
+                    if "result_info" in data:
+                        result_info = data["result_info"]
+                        embed.add_field(name="Total Count", value=f"**`{result_info['total_count']}`**", inline=False)
+                        embed.add_field(name="Page", value=f"**`{result_info['page']}`**", inline=False)
+                        embed.add_field(name="Per Page", value=f"**`{result_info['per_page']}`**", inline=False)
                     
                     await ctx.send(embed=embed)
                 else:
