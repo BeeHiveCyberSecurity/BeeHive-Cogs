@@ -83,9 +83,11 @@ class Cloudflare(commands.Cog):
 
                     embed = discord.Embed(
                         title="Image Uploaded Successfully",
-                        description=f"**Filename:** {filename}\n**ID:** {image_id}\n**Uploaded:** {uploaded}",
                         color=discord.Color.green()
                     )
+                    embed.add_field(name="Filename", value=f"{filename}", inline=False)
+                    embed.add_field(name="ID", value=f"{image_id}", inline=False)
+                    embed.add_field(name="Uploaded", value=f"{uploaded}", inline=False)
                     for variant in variants:
                         embed.add_field(name="Variant", value=variant, inline=False)
 
