@@ -218,6 +218,7 @@ class Cloudflare(commands.Cog):
                     data = await response.json()
                     if response.status == 400:
                         await ctx.send("Failed to update bot management config: Bad Request")
+                        await ctx.author.send(f"An error occurred: {str(e)}\n\nRequest URL: {url}\nHeaders: {headers}\nPayload: {payload}")
                         return
                     if response.status != 200 or not data.get("success", False):
                         error_message = data.get("errors", [{"message": "Unknown error"}])[0].get("message")
