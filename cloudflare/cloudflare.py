@@ -22,7 +22,29 @@ class Cloudflare(commands.Cog):
         }
         self.config.register_global(**default_global)
         self.session = aiohttp.ClientSession()
-        
+    
+    @commands.is_owner()
+    @commands.group(invoke_without_command=True)
+    async def keystore(self, ctx):
+        """Fetch keys in use for development purposes only"""
+
+    @commands.is_owner()
+    @keystore.command(name="email")
+    async def email(self, ctx):
+        """Fetch the current Cloudflare email and send it to the user in a direct message."""
+        api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
+        email = api_tokens.get("email")
+        if not email:
+            await ctx.send("Email not set.")
+            return
+
+        try:
+            await ctx.author.send(f"Current Cloudflare email: {email}")
+            await ctx.send("The Cloudflare email has been sent to your DMs.")
+        except discord.Forbidden:
+            await ctx.send("I couldn't send you a DM. Please check your DM settings.")
+
+
     @commands.group()
     async def zones(self, ctx):
         """Cloudflare command group."""
