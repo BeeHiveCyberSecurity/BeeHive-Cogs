@@ -197,6 +197,7 @@ class Cloudflare(commands.Cog):
         api_key = api_tokens.get("api_key")
         email = api_tokens.get("email")
         zone_id = api_tokens.get("zone_id")
+        bearer_token = api_tokens.get("bearer_token")
         if not api_key or not email or not zone_id:
             await ctx.send("API key, email, or zone ID not set.")
             return
@@ -204,6 +205,7 @@ class Cloudflare(commands.Cog):
         headers = {
             "X-Auth-Email": email,
             "X-Auth-Key": api_key,
+            "Authorization": f"Bearer {bearer_token}",
             "Content-Type": "application/json"
         }
 
