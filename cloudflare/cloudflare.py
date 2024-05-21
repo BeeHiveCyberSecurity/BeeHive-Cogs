@@ -165,8 +165,14 @@ class Cloudflare(commands.Cog):
                 color=discord.Color.blue()
             )
 
-            for key, value in bot_management_config.items():
-                embed.add_field(name=key, value=str(value), inline=False)
+            embed.add_field(name="Enable JS", value=f"`{bot_management_config.get('enable_js', 'Not set')}`", inline=False)
+            embed.add_field(name="Optimize Wordpress", value=f"`{bot_management_config.get('optimize_wordpress', 'Not set')}`", inline=False)
+            embed.add_field(name="Suppress Session Score", value=f"`{bot_management_config.get('suppress_session_score', 'Not set')}`", inline=False)
+            embed.add_field(name="Super Bot Fight Mode", value="", inline=True)
+            embed.add_field(name="Definitely Automated", value=f"`{bot_management_config.get('sbfm_definitely_automated', 'Not set')}`", inline=True)
+            embed.add_field(name="Verified Bots", value=f"`{bot_management_config.get('sbfm_verified_bots', 'Not set')}`", inline=True)
+            embed.add_field(name="Static Resource Protection", value=f"`{bot_management_config.get('sbfm_static_resource_protection', 'Not set')}`", inline=True)
+            embed.add_field(name="Using Latest Model", value=f"`{bot_management_config.get('using_latest_model', 'Not set')}`", inline=False)
 
             await ctx.send(embed=embed)
     @commands.group()
