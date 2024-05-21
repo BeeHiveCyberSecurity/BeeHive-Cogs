@@ -215,13 +215,10 @@ class Cloudflare(commands.Cog):
         }
 
         async with self.session.put(url, headers=headers, json=payload) as response:
-            if response.status != 200:
-                await ctx.send(f"Failed to update bot management config: {response.status}")
-                return
-
             data = await response.json()
-            if not data.get("success", False):
-                await ctx.send(f"Failed to update bot management config: {data.get('errors', 'Unknown error')}")
+            if response.status != 200 or not data.get("success", False):
+                error_message = data.get("errors", [{"message": "Unknown error"}])[0].get("message")
+                await ctx.send(f"Failed to update bot management config: {error_message}")
                 return
 
             await ctx.send(f"Successfully updated bot management setting `{setting}` to `{value}`.")
