@@ -160,8 +160,8 @@ class Cloudflare(commands.Cog):
                 return
 
             embed = discord.Embed(
-                title="Bot Management Config",
-                description="Current bot management configuration from Cloudflare",
+                title="Bot management",
+                description="Your current **Cloudflare Bot Management** settings are as follow",
                 color=discord.Color.from_str("#F38020")
 
             def format_value(value):
