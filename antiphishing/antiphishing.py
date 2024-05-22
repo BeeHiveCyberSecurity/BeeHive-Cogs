@@ -275,12 +275,11 @@ class AntiPhishing(commands.Cog):
 
     @commands.group(aliases=["antiphish"])
     @commands.guild_only()
-    @commands.admin_or_permissions(manage_guild=True)
     async def antiphishing(self, ctx: Context):
         """
         Settings to configure link safety in this server.
         """
-
+    @commands.admin_or_permissions(manage_guild=True)
     @antiphishing.command()
     async def action(self, ctx: Context, action: str):
         """
@@ -307,7 +306,7 @@ class AntiPhishing(commands.Cog):
     @antiphishing.command()
     async def stats(self, ctx: Context):
         """
-        Shows the current stats for the anti-phishing integration.
+        Check protection statistics for this server
         """
         caught = await self.config.guild(ctx.guild).caught()
         s = "s" if caught != 1 else ""
