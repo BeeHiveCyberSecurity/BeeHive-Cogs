@@ -15,7 +15,7 @@ from discord.ext import tasks, commands #type: ignore
 from redbot.core import commands, Config #type: ignore
 from reportlab.lib.pagesizes import letter, landscape, A4 #type: ignore
 from reportlab.pdfgen import canvas #type: ignore 
-from reportlab.lib import colors#type: ignore
+from reportlab.lib import colors #type: ignore
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle #type: ignore
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak, Table, TableStyle #type: ignore
 from .icao_codes import law_enforcement_icao_set, military_icao_set, medical_icao_set, suspicious_icao_set, newsagency_icao_set, balloons_icao_set, global_prior_known_accident_set, ukr_conflict_set, agri_utility_set
@@ -1006,6 +1006,27 @@ class Skysearch(commands.Cog):
             except Exception as e:
                 embed = discord.Embed(description=f"Error clearing alert channel: {e}", color=0xff4545)
                 await ctx.send(embed=embed)
+    
+    @commands.guild_only()
+    @aircraft_group.command(name='alertrole', help='Set or clear a role to mention when new emergency squawks occur. Clear with no role.')
+    async def set_alert_role(self, ctx, role: discord.Role = None):
+        if role:
+            try:
+                await self.config.guild(ctx.guild).alert_role.set(role.id)
+                embed = discord.Embed(description=f"Alert role set to {role.mention}", color=0xfffffe)
+                await ctx.send(embed=embed)
+            except Exception as e:
+                embed = discord.Embed(description=f"Error setting alert role: {e}", color=0xff4545)
+                await ctx.send(embed=embed)
+        else:
+            try:
+                await self.config.guild(ctx.guild).alert_role.clear()
+                embed = discord.Embed(description="Alert role cleared. No more role mentions will be made.", color=0xfffffe)
+                await ctx.send(embed=embed)
+            except Exception as e:
+                embed = discord.Embed(description=f"Error clearing alert role: {e}", color=0xff4545)
+                await ctx.send(embed=embed)
+
 
     @commands.guild_only()
     @commands.has_permissions(manage_guild=True)
@@ -1597,7 +1618,13 @@ class Skysearch(commands.Cog):
                             if alert_channel_id:
                                 alert_channel = self.bot.get_channel(alert_channel_id)
                                 if alert_channel:
-                                    # Send the new alert
+                                    # Get the alert role
+                                    alert_role_id = await self.config.guild(guild).alert_role()
+                                    alert_role_mention = f"<@&{alert_role_id}>" if alert_role_id else ""
+                                    
+                                    # Send the new alert with role mention if available
+                                    if alert_role_mention:
+                                        await alert_channel.send(alert_role_mention)
                                     await self._send_aircraft_info(alert_channel, {'ac': [aircraft_info]})
                                 else:
                                     print(f"Error: Alert channel not found for guild {guild.name}")
