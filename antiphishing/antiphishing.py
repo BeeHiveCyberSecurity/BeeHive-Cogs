@@ -43,7 +43,6 @@ class AntiPhishing(commands.Cog):
 
     async def register_casetypes(self) -> None:
         with contextlib.suppress(RuntimeError):
-            # notify setting
             await modlog.register_casetype(
                 name="phish_found",
                 default_setting=True,
