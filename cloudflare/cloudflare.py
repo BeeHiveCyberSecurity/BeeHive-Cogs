@@ -2596,7 +2596,16 @@ class Cloudflare(commands.Cog):
     @commands.is_owner()
     @r2.command(name="create")
     async def createbucket(self, ctx, name: str, location_hint: str):
-        """Create a new R2 bucket"""
+        """Create a new R2 bucket
+        
+        **Valid location hints**
+        `apac` - Asia-Pacific
+        `eeur` - Eastern Europe
+        `enam` - Eastern North America
+        `weur` - Western Europe
+        `wnam` - Western North America
+        
+        """
         valid_location_hints = {
             "apac": "Asia-Pacific",
             "eeur": "Eastern Europe",
