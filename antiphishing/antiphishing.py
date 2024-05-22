@@ -320,14 +320,15 @@ class AntiPhishing(commands.Cog):
             "ban": "Malicious links will be **deleted** and the sender will be **banned** when detected."
         }
         colours = {
-            "ignore": 16711680,  # Red
-            "notify": 16776960,  # Yellow
-            "delete": 16711680,  # Red
-            "kick": 16711680,  # Red
-            "ban": 16711680  # Red
+            "ignore": 0xffd966,  # Red
+            "notify": 0xffd966,  # Yellow
+            "delete": 0xff4545,  # Red
+            "kick": 0xff4545,  # Red
+            "ban": 0xff4545  # Red
         }
+        
         thumbnail_urls = {
-            "ignore": "https://www.beehive.systems/hubfs/Icon%20Packs/Red/close.png",
+            "ignore": "https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/close.png",
             "notify": "https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/notifications.png",
             "delete": "https://www.beehive.systems/hubfs/Icon%20Packs/Red/trash.png",
             "kick": "https://www.beehive.systems/hubfs/Icon%20Packs/Red/footsteps.png",
