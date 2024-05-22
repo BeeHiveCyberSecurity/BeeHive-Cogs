@@ -48,28 +48,28 @@ class AntiPhishing(commands.Cog):
                 name="phish_found",
                 default_setting=True,
                 image="🎣",
-                case_str="Malicious Link Detected",
+                case_str="Malicious link detected",
             )
             # delete setting
             await modlog.register_casetype(
                 name="phish_deleted",
                 default_setting=True,
                 image="🎣",
-                case_str="Malicious Link Detected - Auto-Deleted",
+                case_str="Malicious link actioned",
             )
             # kick setting
             await modlog.register_casetype(
                 name="phish_kicked",
                 default_setting=True,
                 image="🎣",
-                case_str="Malicious Link Detected - Auto-Kicked",
+                case_str="Malicious link actioned",
             )
             # ban setting
             await modlog.register_casetype(
                 name="phish_banned",
                 default_setting=True,
                 image="🎣",
-                case_str="Malicious Link Detected - Auto-Banned",
+                case_str="Malicious link actioned",
             )
 
     @tasks.loop(minutes=10)
