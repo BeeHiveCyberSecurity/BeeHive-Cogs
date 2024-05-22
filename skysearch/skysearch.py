@@ -1624,7 +1624,7 @@ class Skysearch(commands.Cog):
                                     
                                     # Send the new alert with role mention if available
                                     if alert_role_mention:
-                                        await alert_channel.send(alert_role_mention)
+                                        await alert_channel.send(alert_role_mention, allowed_mentions=discord.AllowedMentions(roles=True))
                                     await self._send_aircraft_info(alert_channel, {'ac': [aircraft_info]})
                                 else:
                                     print(f"Error: Alert channel not found for guild {guild.name}")
