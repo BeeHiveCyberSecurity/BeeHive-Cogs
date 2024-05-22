@@ -1625,7 +1625,7 @@ class Skysearch(commands.Cog):
                                     # Send the new alert with role mention if available
                                     if alert_role_mention:
                                         await alert_channel.send(alert_role_mention, allowed_mentions=discord.AllowedMentions(roles=True))
-                                    await self._send_aircraft_info(alert_channel, {'ac': [aircraft_info]}, role_mention=alert_role_mention)
+                                    await self._send_aircraft_info(alert_channel, {'ac': [aircraft_info]})
                                 else:
                                     print(f"Error: Alert channel not found for guild {guild.name}")
                             else:
@@ -1633,12 +1633,6 @@ class Skysearch(commands.Cog):
                 await asyncio.sleep(2)  # Add a delay to respect API rate limit
         except Exception as e:
             print(f"Error checking emergency squawks: {e}")
-
-    async def _send_aircraft_info(self, channel, aircraft_info, role_mention=""):
-        # Assuming this method sends the aircraft info to the channel
-        # Modify the method to include the role mention in the message content
-        message_content = f"{role_mention} Aircraft Info: {aircraft_info}"
-        await channel.send(message_content)
 
     @check_emergency_squawks.before_loop
     async def before_check_emergency_squawks(self):
