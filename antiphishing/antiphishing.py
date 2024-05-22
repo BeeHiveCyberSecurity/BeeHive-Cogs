@@ -279,7 +279,7 @@ class AntiPhishing(commands.Cog):
         """
         Settings to configure link safety in this server.
         """
-    @commands.admin_or_permissions(manage_guild=True)
+    @commands.has_permissions(administrator=True)
     @antiphishing.command()
     async def action(self, ctx: Context, action: str):
         """
@@ -292,34 +292,52 @@ class AntiPhishing(commands.Cog):
         `kick` - Delete message and kick sender
         `ban` - Delete message and ban sender (recommended)
         """
-        if action not in ["ignore", "notify", "delete", "kick", "ban"]:
-            embed = discord.Embed(title='Error: Invalid action', description=f"You provided an invalid action. You are able to choose any of the following actions to occur when a malicious link is detected...\n\n`ignore` - Disables phishing protection\n`notify` - Alerts in channel when malicious links detected (default)\n`delete` - Deletes the message\n`kick` - Delete message and kick sender\n`ban` - Delete message and ban sender (recommended)\n\nRetry that command with one of the above options.", colour=16729413,)
+        valid_actions = ["ignore", "notify", "delete", "kick", "ban"]
+        if action not in valid_actions:
+            embed = discord.Embed(
+                title='Error: Invalid action',
+                description=(
+                    "You provided an invalid action. You are able to choose any of the following actions to occur when a malicious link is detected...\n\n"
+                    "`ignore` - Disables phishing protection\n"
+                    "`notify` - Alerts in channel when malicious links detected (default)\n"
+                    "`delete` - Deletes the message\n"
+                    "`kick` - Delete message and kick sender\n"
+                    "`ban` - Delete message and ban sender (recommended)\n\n"
+                    "Retry that command with one of the above options."
+                ),
+                colour=16729413,
+            )
             embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle.png")
             await ctx.send(embed=embed)
             return
 
         await self.config.guild(ctx.guild).action.set(action)
-        if action == "ignore":
-            description = "Phishing protection is now **disabled**. Malicious links will not trigger any actions."
-            colour = 16711680  # Red
-            thumbnail_url = "https://www.beehive.systems/hubfs/Icon%20Packs/Red/close.png"
-        elif action == "notify":
-            description = "Malicious links will now trigger a **notification** in the channel when detected."
-            colour = 16776960  # Yellow
-            thumbnail_url = "https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/notifications.png"
-        elif action == "delete":
-            description = "Malicious links will now be **deleted** when detected."
-            colour = 16711680  # Red
-            thumbnail_url = "https://www.beehive.systems/hubfs/Icon%20Packs/Red/trash.png"
-        elif action == "kick":
-            description = "Malicious links will be **deleted** and the sender will be **kicked** when detected."
-            colour = 16711680  # Red
-            thumbnail_url = "https://www.beehive.systems/hubfs/Icon%20Packs/Red/footsteps.png"
-        elif action == "ban":
-            description = "Malicious links will be **deleted** and the sender will be **banned** when detected."
-            colour = 16711680  # Red
-            thumbnail_url = "https://www.beehive.systems/hubfs/Icon%20Packs/Red/ban.png"
-        
+        descriptions = {
+            "ignore": "Phishing protection is now **disabled**. Malicious links will not trigger any actions.",
+            "notify": "Malicious links will now trigger a **notification** in the channel when detected.",
+            "delete": "Malicious links will now be **deleted** when detected.",
+            "kick": "Malicious links will be **deleted** and the sender will be **kicked** when detected.",
+            "ban": "Malicious links will be **deleted** and the sender will be **banned** when detected."
+        }
+        colours = {
+            "ignore": 16711680,  # Red
+            "notify": 16776960,  # Yellow
+            "delete": 16711680,  # Red
+            "kick": 16711680,  # Red
+            "ban": 16711680  # Red
+        }
+        thumbnail_urls = {
+            "ignore": "https://www.beehive.systems/hubfs/Icon%20Packs/Red/close.png",
+            "notify": "https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/notifications.png",
+            "delete": "https://www.beehive.systems/hubfs/Icon%20Packs/Red/trash.png",
+            "kick": "https://www.beehive.systems/hubfs/Icon%20Packs/Red/footsteps.png",
+            "ban": "https://www.beehive.systems/hubfs/Icon%20Packs/Red/ban.png"
+        }
+
+        description = descriptions[action]
+        colour = colours[action]
+        thumbnail_url = thumbnail_urls[action]
+
         embed = discord.Embed(title='Settings changed', description=description, colour=colour)
         embed.set_thumbnail(url=thumbnail_url)
         await ctx.send(embed=embed)
