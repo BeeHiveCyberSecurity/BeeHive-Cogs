@@ -135,7 +135,7 @@ class AntiPhishing(commands.Cog):
                         description=f"This message contains a malicious website or URL.\n\nThis URL could be anything from a fraudulent online seller, to an IP logger, to a page delivering malware intended to steal Discord accounts.\n\n**Don't click any links in this message, and notify server moderators ASAP**",
                         color=16729413,
                     )
-                    embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/warning-outline.png")
+                    embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/warning.png")
                     embed.timestamp = datetime.datetime.utcnow()
                     embed.set_footer(text="Link scanning powered by BeeHive",icon_url="")
                     await message.reply(embed=embed)
@@ -257,7 +257,7 @@ class AntiPhishing(commands.Cog):
         urls = self.extract_urls(url)
         if not urls:
             embed = discord.Embed(title='Error: Invalid URL', description=f"You provided an invalid URL.\n\nCheck the formatting of any links and try again...", colour=16729413,)
-            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle-outline.png")
+            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle.png")
             await ctx.send(embed=embed)
             return
 
@@ -266,11 +266,11 @@ class AntiPhishing(commands.Cog):
 
         if domain in self.domains:
             embed = discord.Embed(title="Link query: Detected!", description=f"**This is a known dangerous website!**\n\nThis website is blocklisted for malicious behavior or content.", colour=16729413,)
-            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle-outline.png")
+            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle.png")
             await ctx.send(embed=embed)
         else:
             embed = discord.Embed(title="Link query: No detections", description=f"**This link looks clean.**\n\nYou should be able to proceed safely. Apply caution to your best judgement while browsing this site, and leave the site if at any time your sense of trust is impaired.", colour=2866574,)
-            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/checkmark-circle-outline.png")
+            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/checkmark-circle.png")
             await ctx.send(embed=embed)
 
     @commands.group(aliases=["antiphish"])
@@ -294,13 +294,13 @@ class AntiPhishing(commands.Cog):
         """
         if action not in ["ignore", "notify", "delete", "kick", "ban"]:
             embed = discord.Embed(title='Error: Invalid action', description=f"You provided an invalid action. You are able to choose any of the following actions to occur when a malicious link is detected...\n\n`ignore` - Disables phishing protection\n`notify` - Alerts in channel when malicious links detected (default)\n`delete` - Deletes the message\n`kick` - Delete message and kick sender\n`ban` - Delete message and ban sender (recommended)\n\nRetry that command with one of the above options.", colour=16729413,)
-            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle-outline.png")
+            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle.png")
             await ctx.send(embed=embed)
             return
 
         await self.config.guild(ctx.guild).action.set(action)
         embed = discord.Embed(title='Settings changed', description=f"Malicious links will now trigger a **`{action}`** event when detected in chat.\n\nYou can make changes to this setting at any time.", colour=2866574,)
-        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/checkmark-circle-outline.png")
+        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/checkmark-circle.png")
         await ctx.send(embed=embed)
 
     @antiphishing.command()
