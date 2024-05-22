@@ -87,7 +87,7 @@ class URLScan(commands.Cog):
                                 res2 = await r2.json()
                                 view = discord.ui.View()
 
-                                embed = discord.Embed(url=report_url)
+                                embed = discord.Embed()
                                 if 'verdicts' in res2 and 'overall' in res2['verdicts'] and 'score' in res2['verdicts']['overall']:
                                     threat_level = res2['verdicts']['overall']['score']
                                     if threat_level != 0:
