@@ -315,7 +315,7 @@ class AntiPhishing(commands.Cog):
         descriptions = {
             "ignore": "Phishing protection is now **disabled**. Malicious links will not trigger any actions.",
             "notify": "Malicious links will now trigger a **notification** in the channel when detected.",
-            "delete": "Malicious links will now be **deleted** when detected.",
+            "delete": "Malicious links will now be **deleted** from conversation when detected.",
             "kick": "Malicious links will be **deleted** and the sender will be **kicked** when detected.",
             "ban": "Malicious links will be **deleted** and the sender will be **banned** when detected."
         }
