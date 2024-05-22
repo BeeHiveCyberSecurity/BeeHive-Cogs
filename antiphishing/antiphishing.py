@@ -143,7 +143,7 @@ class AntiPhishing(commands.Cog):
                 await modlog.create_case(
                     guild=message.guild,
                     bot=self.bot,
-                    created_at=datetime.utcnow(),
+                    created_at=datetime.datetime.utcnow(),
                     action_type="phish_found",
                     user=message.author,
                     moderator=message.guild.me,
@@ -157,7 +157,7 @@ class AntiPhishing(commands.Cog):
                 await modlog.create_case(
                     guild=message.guild,
                     bot=self.bot,
-                    created_at=datetime.utcnow(),
+                    created_at=datetime.datetime.utcnow(),
                     action_type="phish_deleted",
                     user=message.author,
                     moderator=message.guild.me,
@@ -181,7 +181,7 @@ class AntiPhishing(commands.Cog):
                 await modlog.create_case(
                     guild=message.guild,
                     bot=self.bot,
-                    created_at=datetime.utcnow(),
+                    created_at=datetime.datetime.utcnow(),
                     action_type="phish_kicked",
                     user=message.author,
                     moderator=message.guild.me,
@@ -205,13 +205,12 @@ class AntiPhishing(commands.Cog):
                 await modlog.create_case(
                     guild=message.guild,
                     bot=self.bot,
-                    created_at=datetime.utcnow(),
+                    created_at=datetime.datetime.utcnow(),
                     action_type="phish_banned",
                     user=message.author,
                     moderator=message.guild.me,
                     reason=f"Sent a phishing link: {domain}",
                 )
-
     @commands.Cog.listener()
     async def on_message_without_command(self, message: discord.Message):
         """
