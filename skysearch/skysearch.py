@@ -77,11 +77,11 @@ class Skysearch(commands.Cog):
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Orange/alert-circle-outline.png")
             elif squawk_code == '7700':
                 embed = discord.Embed(title='Aircraft found', description=f"# {aircraft_data.get('desc', 'N/A')}", color=discord.Colour(0xFF9145))
-                emergency_status = ":large_orange_diamond: **Aircraft has declared an emergency**"
+                emergency_status = ":warning: **Aircraft has declared an emergency**"
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Orange/alert-circle-outline.png")
             else:
                 embed = discord.Embed(title='Aircraft found', description=f"# {aircraft_data.get('desc', 'N/A')}", color=discord.Colour(0xfffffe))
-                emergency_status = ":ballot_box_with_check: **Aircraft reports normal conditions**"
+                emergency_status = ":white_check_mark: **Aircraft reports normal conditions**"
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/airplane.png")
             callsign = aircraft_data.get('flight', 'N/A').strip()
             if not callsign or callsign == 'N/A':
