@@ -299,8 +299,29 @@ class AntiPhishing(commands.Cog):
             return
 
         await self.config.guild(ctx.guild).action.set(action)
-        embed = discord.Embed(title='Settings changed', description=f"Malicious links will now trigger a **`{action}`** event when detected in chat.\n\nYou can make changes to this setting at any time.", colour=2866574,)
-        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/checkmark-circle.png")
+        if action == "ignore":
+            description = "Phishing protection is now **disabled**. Malicious links will not trigger any actions."
+            colour = 16711680  # Red
+            thumbnail_url = "https://www.beehive.systems/hubfs/Icon%20Packs/Red/close.png"
+        elif action == "notify":
+            description = "Malicious links will now trigger a **notification** in the channel when detected."
+            colour = 16776960  # Yellow
+            thumbnail_url = "https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/notifications.png"
+        elif action == "delete":
+            description = "Malicious links will now be **deleted** when detected."
+            colour = 16711680  # Red
+            thumbnail_url = "https://www.beehive.systems/hubfs/Icon%20Packs/Red/trash.png"
+        elif action == "kick":
+            description = "Malicious links will be **deleted** and the sender will be **kicked** when detected."
+            colour = 16711680  # Red
+            thumbnail_url = "https://www.beehive.systems/hubfs/Icon%20Packs/Red/footsteps.png"
+        elif action == "ban":
+            description = "Malicious links will be **deleted** and the sender will be **banned** when detected."
+            colour = 16711680  # Red
+            thumbnail_url = "https://www.beehive.systems/hubfs/Icon%20Packs/Red/ban.png"
+        
+        embed = discord.Embed(title='Settings changed', description=description, colour=colour)
+        embed.set_thumbnail(url=thumbnail_url)
         await ctx.send(embed=embed)
 
     @antiphishing.command()
