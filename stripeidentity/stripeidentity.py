@@ -139,15 +139,16 @@ class StripeIdentity(commands.Cog):
                 title="Age verification requested",
                 description=(
                     f"Hello {user.mention},\n\n"
-                    "**Enhancing user safety bilaterally on Discord is a priority within our services and communities.**\n\n"
-                    "As part of our ongoing safety and security operations, your account has been selected to verify your age due to recent activity in one or more servers. "
-                    "\n\n"
-                    "You have 15 minutes to complete this process. If you do not complete verification, you will be removed from the server for safety. "
-                    "If you choose to decline the verification, you will be accepting a ban from the server."
+                    f"To enhance safety and security within our community, **{ctx.guild.name}** requires you to verify your age, and link it to your Discord account. \n\n"
+                    "> This procedure involves the confirmation of your name and age using a government-issued ID and biometric verification.\n"
+                    "### Please ensure you have one of the following documents:\n- **State ID**\n- **Driver's License**\n- **Driver's Permit**\n- **Passport**\n"
+                    "### You will also need to:\n- **Provide a valid email address**\n- **Take a series of selfies in a well-lit area**\n- **Submit the identity document mentioned above for biometric matching and analysis**\n\n"
+                    "Upon completing the verification, your personal information will be handled according to the following legal agreements:\n- **[BeeHive Terms of Service](<https://www.beehive.systems/tos>)**\n- **[BeeHive Privacy Policy](https://www.beehive.systems/privacy)**\n- **[Stripe Privacy Policy](https://stripe.com/privacy)**\n- **[Stripe Consumer Terms of Service](https://stripe.com/legal/consumer)**\n\n"
+                    "Should you choose not to provide your personal information, you can opt out of the verification process by selecting the option below. This action will result in your immediate removal from the server. If no action is taken within **15 minutes**, you will be automatically removed from the server."
                 ),
                 color=discord.Color(0xff4545)
             )
-            dm_embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/id-card-sharp.png")
+            dm_embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/id-card.png")
             view = discord.ui.View()
             view.add_item(discord.ui.Button(label="Start verification", url=f"{verification_session.url}", style=discord.ButtonStyle.link, emoji="<:globe:1196807971674533968>"))
             
@@ -267,7 +268,7 @@ class StripeIdentity(commands.Cog):
                 ),
                 color=discord.Color(0xff4545)
             )
-            dm_embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/id-card-sharp.png")
+            dm_embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/id-card.png")
             view = discord.ui.View()
             view.add_item(discord.ui.Button(label="Start verification", url=f"{verification_session.url}", style=discord.ButtonStyle.link, emoji="<:globe:1196807971674533968>"))
             # Decline button with action to ban the user and clear the verification request
