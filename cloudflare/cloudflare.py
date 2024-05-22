@@ -2599,11 +2599,12 @@ class Cloudflare(commands.Cog):
         """Create a new R2 bucket
         
         **Valid location hints**
-        `apac` - Asia-Pacific
-        `eeur` - Eastern Europe
-        `enam` - Eastern North America
-        `weur` - Western Europe
-        `wnam` - Western North America
+        
+        **`apac`** - Asia-Pacific
+        **`eeur`** - Eastern Europe
+        **`enam`** - Eastern North America
+        **`weur`** - Western Europe
+        **`wnam`** - Western North America
         
         """
         valid_location_hints = {
