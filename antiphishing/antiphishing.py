@@ -147,7 +147,7 @@ class AntiPhishing(commands.Cog):
                     action_type="phish_found",
                     user=message.author,
                     moderator=message.guild.me,
-                    reason=f"Sent a malicious URL {domain} in the server",
+                    reason=f"Sent a malicious URL **`{domain}`** in the server",
                 )
         elif action == "delete":
             if message.channel.permissions_for(message.guild.me).manage_messages:
@@ -161,7 +161,7 @@ class AntiPhishing(commands.Cog):
                     action_type="phish_deleted",
                     user=message.author,
                     moderator=message.guild.me,
-                    reason=f"Sent a malicious URL {domain} in the server",
+                    reason=f"Sent a malicious URL **`{domain}`** in the server",
                 )
         elif action == "kick":
             if (
@@ -185,7 +185,7 @@ class AntiPhishing(commands.Cog):
                     action_type="phish_kicked",
                     user=message.author,
                     moderator=message.guild.me,
-                    reason=f"Sent a malicious URL {domain} in the server",
+                    reason=f"Sent a malicious URL **`{domain}`** in the server",
                 )
         elif action == "ban":
             if (
@@ -209,7 +209,7 @@ class AntiPhishing(commands.Cog):
                     action_type="phish_banned",
                     user=message.author,
                     moderator=message.guild.me,
-                    reason=f"Sent a malicious URL {domain} in the server",
+                    reason=f"Sent a malicious URL **`{domain}`** in the server",
                 )
     @commands.Cog.listener()
     async def on_message_without_command(self, message: discord.Message):
