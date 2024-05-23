@@ -405,7 +405,7 @@ class Cloudflare(commands.Cog):
                     except ValueError:
                         pass
                 embed.add_field(name="Modified On", value=f"**{modified_on}**", inline=True)
-                embed.add_field(name="Status", value=f"**`{result.get('status', 'Unknown')}`**", inline=True)
+                embed.add_field(name="Status", value=f"**`{result.get('status', 'Unknown').upper()}`**", inline=True)
                 embed.add_field(name="DS", value=f"```{result.get('ds', 'Unknown')}```", inline=False)
                 embed.add_field(name="Public Key", value=f"```{result.get('public_key', 'Unknown')}```", inline=False)
                 embed.add_field(name="Digest", value=f"```{result.get('digest', 'Unknown')}```", inline=False)
