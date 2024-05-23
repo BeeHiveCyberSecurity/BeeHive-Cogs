@@ -2034,6 +2034,8 @@ class Cloudflare(commands.Cog):
         api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
         account_id = api_tokens.get("account_id")
         bearer_token = api_tokens.get("bearer_token")
+        api_key = api_tokens.get("api_key")
+        email = api_tokens.get("email")
 
         if not all([account_id, bearer_token]):
             embed = discord.Embed(
@@ -2046,6 +2048,8 @@ class Cloudflare(commands.Cog):
 
         headers = {
             "Authorization": f"Bearer {bearer_token}",
+            "X-Auth-Email": email,
+            "X-Auth-Key": api_key,
             "Content-Type": "application/json"
         }
 
