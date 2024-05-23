@@ -2196,8 +2196,8 @@ class Cloudflare(commands.Cog):
                     if not data.get("success", False):
                         error_message = data.get("errors", [{"message": "Unknown error"}])[0].get("message")
                         embed = discord.Embed(
-                            title="Failed to Retrieve Screenshot",
-                            description=f"**Error:** {error_message}",
+                            title="Failed to retrieve screenshot",
+                            description=f"**`{error_message}`**",
                             color=0xff4545
                         )
                         await ctx.send(embed=embed)
