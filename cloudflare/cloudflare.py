@@ -405,7 +405,20 @@ class Cloudflare(commands.Cog):
                     except ValueError:
                         pass
                 embed.add_field(name="Modified On", value=f"**{modified_on}**", inline=True)
-                embed.add_field(name="Status", value=f"**`{result.get('status', 'Unknown').upper()}`**", inline=True)
+                status = result.get('status', 'Unknown').lower()
+                if status == 'active':
+                    status_display = "**`ACTIVE`**"
+                elif status == 'pending':
+                    status_display = "**`PENDING ACTIVATION`**"
+                elif status == 'disabled':
+                    status_display = "**`DISABLED`**"
+                elif status == 'pending-disabled':
+                    status_display = "**`PENDING DEACTIVATION`**"
+                elif status == 'error':
+                    status_display = "**`ERROR`**"
+                else:
+                    status_display = "**`UNKNOWN`**"
+                embed.add_field(name="Status", value=status_display, inline=True)
                 embed.add_field(name="DS", value=f"```{result.get('ds', 'Unknown')}```", inline=False)
                 embed.add_field(name="Public Key", value=f"```{result.get('public_key', 'Unknown')}```", inline=False)
                 embed.add_field(name="Digest", value=f"```{result.get('digest', 'Unknown')}```", inline=False)
