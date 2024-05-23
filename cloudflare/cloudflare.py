@@ -2,6 +2,7 @@ import discord #type: ignore
 import asyncio
 import time
 from datetime import datetime
+from PIL import Image #type: ignore
 from redbot.core import commands, Config #type: ignore
 import aiohttp #type: ignore
 import ipaddress
@@ -2189,6 +2190,14 @@ class Cloudflare(commands.Cog):
                         description=f"### Screenshot for scan ID\n```{scan_id}```",
                         color=0x2BBD8E
                     )
+                    screenshot_size = len(screenshot_data)
+                    embed.add_field(name="File Size", value=f"{screenshot_size} bytes", inline=False)
+
+                    # Assuming the resolution can be derived from the image data
+
+                    image = Image.open(io.BytesIO(screenshot_data))
+                    resolution = f"{image.width}x{image.height}"
+                    embed.add_field(name="Resolution", value=resolution, inline=False)
                     embed.set_image(url=f"attachment://{scan_id}_screenshot.png")
                     await ctx.send(embed=embed, file=screenshot_file)
                 else:
