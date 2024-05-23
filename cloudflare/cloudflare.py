@@ -352,7 +352,7 @@ class Cloudflare(commands.Cog):
         """Get the current DNSSEC status and config for a specific zone."""
         api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
         bearer_token = api_tokens.get("bearer_token")
-        zone_id = api_tokens.get("zone_identifier")
+        zone_id = api_tokens.get("zone_id")
         if not bearer_token or not zone_id:
             embed = discord.Embed(
                 title="Error",
