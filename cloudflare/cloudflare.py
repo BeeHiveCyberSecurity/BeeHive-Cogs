@@ -1989,10 +1989,10 @@ class Cloudflare(commands.Cog):
             "url": url
         }
 
-        url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/urlscanner/scan"
+        api_url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/urlscanner/scan"
 
         try:
-            async with self.session.post(url, headers=headers, json=payload) as response:
+            async with self.session.post(api_url, headers=headers, json=payload) as response:
                 data = await response.json()
                 if not data.get("success", False):
                     error_message = data.get("errors", [{"message": "Unknown error"}])[0].get("message")
