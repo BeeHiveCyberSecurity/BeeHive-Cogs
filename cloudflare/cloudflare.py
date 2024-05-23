@@ -2153,6 +2153,8 @@ class Cloudflare(commands.Cog):
                     for field, value in geo.items():
                         if isinstance(value, list):
                             value = ', '.join(value)
+                        if len(value) > 1024:
+                            value = value[:1021] + '...'
                         geo_embed.add_field(name=field.replace('_', ' ').title(), value=f"**`{value}`**", inline=True)
                     pages.append(geo_embed)
 
