@@ -348,6 +348,88 @@ class Cloudflare(commands.Cog):
         """Cloudflare Load Balancing distributes traffic across your servers, which reduces server strain and latency and improves the experience for end users. Learn more at https://developers.cloudflare.com/load-balancing/"""
 
     @commands.is_owner()
+    @loadbalancing.command(name="create")
+    async def loadbalancing_create(self, ctx, name: str, description: str, default_pools: str, country_pools: str, pop_pools: str, region_pools: str, proxied: bool, ttl: int, adaptive_routing: bool, failover_across_pools: bool, fallback_pool: str, location_strategy_mode: str, location_strategy_prefer_ecs: str, random_steering_default_weight: float, random_steering_pool_weights: str, steering_policy: str, session_affinity: str, session_affinity_ttl: int):
+        """Create a new load balancer for a specific zone."""
+        api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
+        bearer_token = api_tokens.get("bearer_token")
+        zone_id = api_tokens.get("zone_id")
+        if not bearer_token or not zone_id:
+            embed = discord.Embed(
+                title="Error",
+                description="Bearer token or zone identifier not set.",
+                color=discord.Color.from_str("#ff4545")
+            )
+            await ctx.send(embed=embed)
+            return
+
+        headers = {
+            "Authorization": f"Bearer {bearer_token}",
+            "Content-Type": "application/json"
+        }
+
+        url = f"https://api.cloudflare.com/client/v4/zones/{zone_id}/load_balancers"
+
+        payload = {
+            "name": name,
+            "description": description,
+            "default_pools": default_pools.split(","),
+            "country_pools": {k: v.split(",") for k, v in (item.split(":") for item in country_pools.split(";"))},
+            "pop_pools": {k: v.split(",") for k, v in (item.split(":") for item in pop_pools.split(";"))},
+            "region_pools": {k: v.split(",") for k, v in (item.split(":") for item in region_pools.split(";"))},
+            "proxied": proxied,
+            "ttl": ttl,
+            "adaptive_routing": {"enabled": adaptive_routing},
+            "failover_across_pools": failover_across_pools,
+            "fallback_pool": fallback_pool,
+            "location_strategy": {
+                "mode": location_strategy_mode,
+                "prefer_ecs": location_strategy_prefer_ecs
+            },
+            "random_steering": {
+                "default_weight": random_steering_default_weight,
+                "pool_weights": {k: float(v) for k, v in (item.split(":") for item in random_steering_pool_weights.split(";"))}
+            },
+            "steering_policy": steering_policy,
+            "session_affinity": session_affinity,
+            "session_affinity_attributes": {
+                "session_affinity_ttl": session_affinity_ttl
+            }
+        }
+
+        try:
+            async with self.session.post(url, headers=headers, json=payload) as response:
+                data = await response.json()
+                if not data.get("success", False):
+                    error_message = data.get("errors", [{"message": "Unknown error"}])[0].get("message")
+                    embed = discord.Embed(
+                        title="Failed to Create Load Balancer",
+                        description=f"**Error:** {error_message}",
+                        color=discord.Color.from_str("#ff4545")
+                    )
+                    await ctx.send(embed=embed)
+                    return
+
+                result = data.get("result", {})
+                lb_id = result.get("id", "Unknown")
+                lb_name = result.get("name", "Unknown")
+                lb_created_on = result.get("created_on", "Unknown")
+
+                embed = discord.Embed(
+                    title="Load Balancer Created",
+                    description=f"Load balancer **{lb_name}** has been successfully created.\n\n**ID:** {lb_id}\n**Created On:** {lb_created_on}",
+                    color=discord.Color.from_str("#2BBD8E")
+                )
+                await ctx.send(embed=embed)
+        except Exception as e:
+            await ctx.send(embed=discord.Embed(
+                title="Error",
+                description=f"An error occurred: {str(e)}",
+                color=discord.Color.from_str("#ff4545")
+            ))
+
+
+    @commands.is_owner()
     @loadbalancing.command(name="list")
     async def loadbalancing_list(self, ctx):
         """Get a list of load balancers for a specific zone."""
