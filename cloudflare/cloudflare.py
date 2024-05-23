@@ -2034,8 +2034,6 @@ class Cloudflare(commands.Cog):
         api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
         account_id = api_tokens.get("account_id")
         bearer_token = api_tokens.get("bearer_token")
-        api_key = api_tokens.get("api_key")
-        email = api_tokens.get("email")
 
         if not all([account_id, bearer_token]):
             embed = discord.Embed(
@@ -2048,8 +2046,6 @@ class Cloudflare(commands.Cog):
 
         headers = {
             "Authorization": f"Bearer {bearer_token}",
-            "X-Auth-Email": email,
-            "X-Auth-Key": api_key,
             "Content-Type": "application/json"
         }
 
@@ -2069,167 +2065,7 @@ class Cloudflare(commands.Cog):
                     return
 
                 result = data.get("result", {}).get("scan", {})
-                pages = []
-
-                # Task details
-                task = result.get('task', {})
-                if task and isinstance(task, dict):
-                    task_embed = discord.Embed(
-                        title="URL Scan Result - Task Details",
-                        description=f"Scan result for ID: **`{scan_id}`**",
-                        color=0x2BBD8E
-                    )
-                    for field, value in task.items():
-                        task_embed.add_field(name=field.replace('_', ' ').title(), value=f"**`{value}`**", inline=True)
-                    pages.append(task_embed)
-
-                # Verdicts
-                verdicts = result.get('verdicts', {}).get('overall', {})
-                if verdicts and isinstance(verdicts, dict):
-                    verdicts_embed = discord.Embed(
-                        title="URL Scan Result - Verdicts",
-                        description=f"Scan result for ID: **`{scan_id}`**",
-                        color=0x2BBD8E
-                    )
-                    for field, value in verdicts.items():
-                        if isinstance(value, list):
-                            value = ', '.join(value)
-                        verdicts_embed.add_field(name=field.replace('_', ' ').title(), value=f"**`{value}`**", inline=True)
-                    pages.append(verdicts_embed)
-
-                # ASN details
-                asns = result.get('asns', {}).get('asn', {})
-                if asns and isinstance(asns, dict):
-                    asns_embed = discord.Embed(
-                        title="URL Scan Result - ASN Details",
-                        description=f"Scan result for ID: **`{scan_id}`**",
-                        color=0x2BBD8E
-                    )
-                    for field, value in asns.items():
-                        asns_embed.add_field(name=field.replace('_', ' ').title(), value=f"**`{value}`**", inline=True)
-                    pages.append(asns_embed)
-
-                # Certificates
-                certificates = result.get('certificates', [])
-                if certificates:
-                    for cert in certificates:
-                        if isinstance(cert, dict):
-                            cert_embed = discord.Embed(
-                                title="URL Scan Result - Certificate Details",
-                                description=f"Scan result for ID: **`{scan_id}`**",
-                                color=0x2BBD8E
-                            )
-                            for field, value in cert.items():
-                                cert_embed.add_field(name=field.replace('_', ' ').title(), value=f"**`{value}`**", inline=True)
-                            pages.append(cert_embed)
-
-                # Domains
-                domains = result.get('domains', {})
-                if domains:
-                    for domain_name, domain_info in domains.items():
-                        if isinstance(domain_info, dict):
-                            domain_embed = discord.Embed(
-                                title="URL Scan Result - Domain Details",
-                                description=f"Scan result for ID: **`{scan_id}`**",
-                                color=0x2BBD8E
-                            )
-                            domain_embed.add_field(name="Domain Name", value=f"**`{domain_name}`**", inline=True)
-                            for field, value in domain_info.items():
-                                if isinstance(value, dict):
-                                    for sub_field, sub_value in value.items():
-                                        if isinstance(sub_value, list):
-                                            sub_value = ', '.join([item.get('name', 'Unknown') for item in sub_value])
-                                        sub_value = (sub_value[:1021] + '...') if len(sub_value) > 1024 else sub_value
-                                        domain_embed.add_field(name=f"{field.replace('_', ' ').title()} {sub_field.replace('_', ' ').title()}", value=f"**`{sub_value}`**", inline=True)
-                                else:
-                                    value = (value[:1021] + '...') if len(value) > 1024 else value
-                                    domain_embed.add_field(name=field.replace('_', ' ').title(), value=f"**`{value}`**", inline=True)
-                            pages.append(domain_embed)
-
-                # Geo details
-                geo = result.get('geo', {})
-                if geo and isinstance(geo, dict):
-                    geo_embed = discord.Embed(
-                        title="URL Scan Result - Geo Details",
-                        description=f"Scan result for ID: **`{scan_id}`**",
-                        color=0x2BBD8E
-                    )
-                    for field, value in geo.items():
-                        if isinstance(value, list):
-                            value = ', '.join(value)
-                        if value and len(value) > 1024:
-                            value = value[:1021] + '...'
-                        geo_embed.add_field(name=field.replace('_', ' ').title(), value=f"**`{value}`**", inline=True)
-                    pages.append(geo_embed)
-
-                # IP details
-                ips = result.get('ips', {}).get('ip', {})
-                if ips and isinstance(ips, dict):
-                    ips_embed = discord.Embed(
-                        title="URL Scan Result - IP Details",
-                        description=f"Scan result for ID: **`{scan_id}`**",
-                        color=0x2BBD8E
-                    )
-                    for field, value in ips.items():
-                        ips_embed.add_field(name=field.replace('_', ' ').title(), value=f"**`{value}`**", inline=True)
-                    pages.append(ips_embed)
-
-                # Links
-                links = result.get('links', {}).get('link', {})
-                if links and isinstance(links, dict):
-                    links_embed = discord.Embed(
-                        title="URL Scan Result - Links",
-                        description=f"Scan result for ID: **`{scan_id}`**",
-                        color=0x2BBD8E
-                    )
-                    for field, value in links.items():
-                        links_embed.add_field(name=field.replace('_', ' ').title(), value=f"**`{value}`**", inline=True)
-                    pages.append(links_embed)
-
-                # Meta
-                meta = result.get('meta', {}).get('processors', {})
-                if meta:
-                    for processor_type, processor_info in meta.items():
-                        if processor_info and isinstance(processor_info, dict):
-                            meta_embed = discord.Embed(
-                                title=f"URL Scan Result - Meta {processor_type.capitalize()}",
-                                description=f"Scan result for ID: **`{scan_id}`**",
-                                color=0x2BBD8E
-                            )
-                            for category_type, categories in processor_info.items():
-                                if isinstance(categories, list):
-                                    meta_embed.add_field(name=f"{category_type.capitalize()}", value=f"**`{', '.join([cat.get('name', 'Unknown') for cat in categories])}`**", inline=True)
-                                else:
-                                    meta_embed.add_field(name=f"{category_type.capitalize()}", value=f"**`{categories}`**", inline=True)
-                            pages.append(meta_embed)
-
-                # Page details
-                page = result.get('page', {})
-                if page and isinstance(page, dict):
-                    page_embed = discord.Embed(
-                        title="URL Scan Result - Page Details",
-                        description=f"Scan result for ID: **`{scan_id}`**",
-                        color=0x2BBD8E
-                    )
-                    for field, value in page.items():
-                        page_embed.add_field(name=field.replace('_', ' ').title(), value=f"**`{value}`**", inline=True)
-                    pages.append(page_embed)
-
-                # Performance details
-                performance = result.get('performance', [])
-                if performance:
-                    for perf in performance:
-                        if isinstance(perf, dict):
-                            perf_embed = discord.Embed(
-                                title="URL Scan Result - Performance Details",
-                                description=f"Scan result for ID: **`{scan_id}`**",
-                                color=0x2BBD8E
-                            )
-                            for field, value in perf.items():
-                                perf_embed.add_field(name=field.replace('_', ' ').title(), value=f"**`{value}`**", inline=True)
-                            pages.append(perf_embed)
-
-                if not pages:
+                if not result:
                     await ctx.send(embed=discord.Embed(
                         title="No Data",
                         description="No relevant data found in the scan result.",
@@ -2237,30 +2073,14 @@ class Cloudflare(commands.Cog):
                     ))
                     return
 
-                message = await ctx.send(embed=pages[0])
-                await message.add_reaction("⬅️")
-                await message.add_reaction("➡️")
-
-                def check(reaction, user):
-                    return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️"] and reaction.message.id == message.id
-
-                i = 0
-                while True:
-                    try:
-                        reaction, user = await self.bot.wait_for("reaction_add", timeout=60.0, check=check)
-                        if str(reaction.emoji) == "➡️":
-                            i += 1
-                            if i >= len(pages):
-                                i = 0
-                            await message.edit(embed=pages[i])
-                        elif str(reaction.emoji) == "⬅️":
-                            i -= 1
-                            if i < 0:
-                                i = len(pages) - 1
-                            await message.edit(embed=pages[i])
-                        await message.remove_reaction(reaction, user)
-                    except asyncio.TimeoutError:
-                        break
+                embed = discord.Embed(
+                    title="URL Scan Result",
+                    description=f"Scan result for ID: **`{scan_id}`**",
+                    color=0x2BBD8E
+                )
+                embed.add_field(name="Task", value=f"**`{result.get('task', 'Unknown')}`**", inline=True)
+                embed.add_field(name="Verdicts", value=f"**`{result.get('verdicts', {}).get('overall', 'Unknown')}`**", inline=True)
+                await ctx.send(embed=embed)
         except Exception as e:
             await ctx.send(embed=discord.Embed(
                 title="Error",
