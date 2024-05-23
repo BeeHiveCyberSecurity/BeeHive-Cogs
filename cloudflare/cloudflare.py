@@ -2188,8 +2188,10 @@ class Cloudflare(commands.Cog):
                             color=0x2BBD8E
                         )
                         for category_type, categories in processor_info.items():
-                            if categories:
+                            if isinstance(categories, list):
                                 meta_embed.add_field(name=f"{category_type.capitalize()}", value=f"**`{', '.join([cat.get('name', 'Unknown') for cat in categories])}`**", inline=True)
+                            else:
+                                meta_embed.add_field(name=f"{category_type.capitalize()}", value=f"**`{categories}`**", inline=True)
                         pages.append(meta_embed)
 
                 # Page details
