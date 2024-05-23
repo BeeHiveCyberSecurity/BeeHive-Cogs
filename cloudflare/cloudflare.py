@@ -2085,7 +2085,8 @@ class Cloudflare(commands.Cog):
                 embed.add_field(name="Effective URL", value=f"```{task.get('effectiveUrl', 'Unknown')}```", inline=False)
                 embed.add_field(name="Status", value=f"**`{task.get('status', 'Unknown')}`**", inline=True)
                 embed.add_field(name="Visibility", value=f"**`{task.get('visibility', 'Unknown')}`**", inline=True)
-                embed.add_field(name="Malicious", value=f"**`{verdicts.get('malicious', 'Unknown')}`**", inline=True)
+                malicious_result = verdicts.get('overall', {}).get('malicious', 'Unknown')
+                embed.add_field(name="Malicious", value=f"**`{malicious_result}`**", inline=True)
                 embed.add_field(name="Categories", value=f"**`{', '.join(verdicts.get('categories', ['Unknown']))}`**", inline=True)
                 await ctx.send(embed=embed)
         except Exception as e:
