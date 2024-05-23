@@ -2091,7 +2091,7 @@ class Cloudflare(commands.Cog):
                 meta = result.get('meta', {})
                 processors = meta.get('processors', {})
                 page_bucket = processors.get('bucket', 'Unknown')
-                embed.add_field(name="Page Bucket", value=f"**`{page_bucket}`**", inline=True)
+                embed.add_field(name="Ranking", value=f"**`{page_bucket}`**", inline=True)
                 await ctx.send(embed=embed)
         except Exception as e:
             await ctx.send(embed=discord.Embed(
