@@ -2137,8 +2137,10 @@ class Cloudflare(commands.Cog):
                                 for sub_field, sub_value in value.items():
                                     if isinstance(sub_value, list):
                                         sub_value = ', '.join([item.get('name', 'Unknown') for item in sub_value])
+                                    sub_value = (sub_value[:1021] + '...') if len(sub_value) > 1024 else sub_value
                                     domain_embed.add_field(name=f"{field.replace('_', ' ').title()} {sub_field.replace('_', ' ').title()}", value=f"**`{sub_value}`**", inline=True)
                             else:
+                                value = (value[:1021] + '...') if len(value) > 1024 else value
                                 domain_embed.add_field(name=field.replace('_', ' ').title(), value=f"**`{value}`**", inline=True)
                         pages.append(domain_embed)
 
