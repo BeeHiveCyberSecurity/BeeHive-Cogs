@@ -2073,13 +2073,21 @@ class Cloudflare(commands.Cog):
                     ))
                     return
 
+                task = result.get('task', {})
+                verdicts = result.get('verdicts', {})
+
                 embed = discord.Embed(
                     title="URL Scan Result",
                     description=f"Scan result for ID: **`{scan_id}`**",
                     color=0x2BBD8E
                 )
-                embed.add_field(name="Task", value=f"**`{result.get('task', 'Unknown')}`**", inline=True)
-                embed.add_field(name="Verdicts", value=f"**`{result.get('verdicts', {}).get('overall', 'Unknown')}`**", inline=True)
+                embed.add_field(name="UUID", value=f"**`{task.get('uuid', 'Unknown')}`**", inline=True)
+                embed.add_field(name="URL", value=f"**`{task.get('url', 'Unknown')}`**", inline=True)
+                embed.add_field(name="Effective URL", value=f"**`{task.get('effectiveUrl', 'Unknown')}`**", inline=True)
+                embed.add_field(name="Status", value=f"**`{task.get('status', 'Unknown')}`**", inline=True)
+                embed.add_field(name="Visibility", value=f"**`{task.get('visibility', 'Unknown')}`**", inline=True)
+                embed.add_field(name="Malicious", value=f"**`{verdicts.get('malicious', 'Unknown')}`**", inline=True)
+                embed.add_field(name="Categories", value=f"**`{', '.join(verdicts.get('categories', ['Unknown']))}`**", inline=True)
                 await ctx.send(embed=embed)
         except Exception as e:
             await ctx.send(embed=discord.Embed(
