@@ -393,12 +393,12 @@ class Cloudflare(commands.Cog):
                 embed.add_field(name="Digest Type", value=f"**`{result.get('digest_type', 'Unknown')}`**", inline=True)
                 embed.add_field(name="DNSSEC Multi Signer", value=f"**`{str(result.get('dnssec_multi_signer', 'Unknown'))}`**", inline=True)
                 embed.add_field(name="DNSSEC Presigned", value=f"**`{str(result.get('dnssec_presigned', 'Unknown'))}`**", inline=True)
-                embed.add_field(name="DS", value=f"**`{result.get('ds', 'Unknown')}`**", inline=True)
                 embed.add_field(name="Flags", value=f"**`{result.get('flags', 'Unknown')}`**", inline=True)
                 embed.add_field(name="Key Tag", value=f"**`{result.get('key_tag', 'Unknown')}`**", inline=True)
                 embed.add_field(name="Key Type", value=f"**`{result.get('key_type', 'Unknown')}`**", inline=True)
                 embed.add_field(name="Modified On", value=f"**`{result.get('modified_on', 'Unknown')}`**", inline=True)
                 embed.add_field(name="Status", value=f"**`{result.get('status', 'Unknown')}`**", inline=True)
+                embed.add_field(name="DS", value=f"```{result.get('ds', 'Unknown')}```", inline=False)
                 embed.add_field(name="Public Key", value=f"```{result.get('public_key', 'Unknown')}```", inline=False)
                 embed.add_field(name="Digest", value=f"```{result.get('digest', 'Unknown')}```", inline=False)
 
