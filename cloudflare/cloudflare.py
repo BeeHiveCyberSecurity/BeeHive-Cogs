@@ -398,8 +398,8 @@ class Cloudflare(commands.Cog):
                 embed.add_field(name="Key Tag", value=f"**`{result.get('key_tag', 'Unknown')}`**", inline=True)
                 embed.add_field(name="Key Type", value=f"**`{result.get('key_type', 'Unknown')}`**", inline=True)
                 embed.add_field(name="Modified On", value=f"**`{result.get('modified_on', 'Unknown')}`**", inline=True)
-                embed.add_field(name="Public Key", value=f"**`{result.get('public_key', 'Unknown')}`**", inline=True)
                 embed.add_field(name="Status", value=f"**`{result.get('status', 'Unknown')}`**", inline=True)
+                embed.add_field(name="Public Key", value=f"```{result.get('public_key', 'Unknown')}```", inline=True)
                 embed.add_field(name="Digest", value=f"```{result.get('digest', 'Unknown')}```", inline=True)
 
                 await ctx.send(embed=embed)
