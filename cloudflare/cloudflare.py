@@ -23,6 +23,8 @@ class Cloudflare(commands.Cog):
         self.config.register_global(**default_global)
         self.session = aiohttp.ClientSession()
     
+
+
     @commands.is_owner()
     @commands.group()
     async def images(self, ctx):
@@ -1835,6 +1837,81 @@ class Cloudflare(commands.Cog):
                 embed = discord.Embed(title="Failed to query Cloudflare API", description=f"Status code: {response.status}", color=0xff4545)
                 await ctx.send(embed=embed)
    
+    @commands.group()
+    async def urlscanner(self, ctx):
+        """Use Cloudflare to scan a domain or URL"""
+    @urlscanner.command(name="search")
+    async def search_url_scan(self, ctx, query: str):
+        """Search for URL scans by date and webpage requests."""
+        api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
+        account_id = api_tokens.get("account_id")
+        bearer_token = api_tokens.get("bearer_token")
+
+        if not account_id or not bearer_token:
+            embed = discord.Embed(
+                title="Configuration Error",
+                description="Missing account ID or bearer token. Please check your configuration.",
+                color=0xff4545
+            )
+            await ctx.send(embed=embed)
+            return
+
+        headers = {
+            "Authorization": f"Bearer {bearer_token}",
+            "Content-Type": "application/json"
+        }
+
+        url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/urlscanner/scan"
+        params = {"query": query}
+
+        try:
+            async with self.session.get(url, headers=headers, params=params) as response:
+                data = await response.json()
+                if not data.get("success", False):
+                    error_message = data.get("errors", [{"message": "Unknown error"}])[0].get("message")
+                    embed = discord.Embed(
+                        title="Failed to Search URL Scans",
+                        description=f"**Error:** {error_message}",
+                        color=0xff4545
+                    )
+                    await ctx.send(embed=embed)
+                    return
+
+                results = data.get("result", {}).get("tasks", [])
+                if not results:
+                    embed = discord.Embed(
+                        title="No Results",
+                        description="No URL scans found for the given query.",
+                        color=0xff4545
+                    )
+                    await ctx.send(embed=embed)
+                    return
+
+                embed = discord.Embed(
+                    title="URL Scan Results",
+                    description=f"Search results for query: **`{query}`**",
+                    color=0x2BBD8E
+                )
+                for result in results:
+                    embed.add_field(
+                        name=result.get("url", "Unknown URL"),
+                        value=(
+                            f"**Country:** {result.get('country', 'Unknown')}\n"
+                            f"**Success:** {result.get('success', False)}\n"
+                            f"**Time:** {result.get('time', 'Unknown')}\n"
+                            f"**UUID:** {result.get('uuid', 'Unknown')}\n"
+                            f"**Visibility:** {result.get('visibility', 'Unknown')}"
+                        ),
+                        inline=False
+                    )
+                await ctx.send(embed=embed)
+        except Exception as e:
+            await ctx.send(embed=discord.Embed(
+                title="Error",
+                description=f"An error occurred: {str(e)}",
+                color=0xff4545
+            ))
+
 
     @commands.is_owner()
     @commands.group(invoke_without_command=False)
