@@ -542,6 +542,64 @@ class Cloudflare(commands.Cog):
                 color=discord.Color.from_str("#ff4545")
             ))
 
+    @commands.is_owner()
+    @loadbalancing.command(name="info")
+    async def get_load_balancer_info(self, ctx, load_balancer_id: str):
+        """Get information about a specific load balancer by its ID."""
+        api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
+        bearer_token = api_tokens.get("bearer_token")
+        zone_id = api_tokens.get("zone_id")
+        if not bearer_token or not zone_id:
+            embed = discord.Embed(
+                title="Error",
+                description="Bearer token or zone identifier not set.",
+                color=discord.Color.from_str("#ff4545")
+            )
+            await ctx.send(embed=embed)
+            return
+
+        headers = {
+            "Authorization": f"Bearer {bearer_token}",
+            "Content-Type": "application/json"
+        }
+
+        url = f"https://api.cloudflare.com/client/v4/zones/{zone_id}/load_balancers/{load_balancer_id}"
+
+        try:
+            async with self.session.get(url, headers=headers) as response:
+                data = await response.json()
+                if not data.get("success", False):
+                    error_message = data.get("errors", [{"message": "Unknown error"}])[0].get("message")
+                    embed = discord.Embed(
+                        title="Failed to Fetch Load Balancer Info",
+                        description=f"**Error:** {error_message}",
+                        color=discord.Color.from_str("#ff4545")
+                    )
+                    await ctx.send(embed=embed)
+                    return
+
+                result = data.get("result", {})
+                embed = discord.Embed(
+                    title="Load Balancer Information",
+                    description=f"Information for Load Balancer with ID `{load_balancer_id}`",
+                    color=discord.Color.from_str("#2BBD8E")
+                )
+                embed.add_field(name="Name", value=f"**`{result.get('name', 'Unknown')}`**", inline=True)
+                embed.add_field(name="Description", value=f"**`{result.get('description', 'None')}`**", inline=True)
+                embed.add_field(name="Enabled", value=f"**`{result.get('enabled', 'Unknown')}`**", inline=True)
+                embed.add_field(name="Created On", value=f"**`{result.get('created_on', 'Unknown')}`**", inline=True)
+                embed.add_field(name="Modified On", value=f"**`{result.get('modified_on', 'Unknown')}`**", inline=True)
+                embed.add_field(name="Proxied", value=f"**`{result.get('proxied', 'Unknown')}`**", inline=True)
+                embed.add_field(name="Session Affinity", value=f"**`{result.get('session_affinity', 'None')}`**", inline=True)
+                embed.add_field(name="Steering Policy", value=f"**`{result.get('steering_policy', 'None')}`**", inline=True)
+                await ctx.send(embed=embed)
+        except Exception as e:
+            await ctx.send(embed=discord.Embed(
+                title="Error",
+                description=f"An error occurred: {str(e)}",
+                color=discord.Color.from_str("#ff4545")
+            ))
+
 
     @commands.group()
     async def dnssec(self, ctx):
