@@ -3411,6 +3411,7 @@ class Cloudflare(commands.Cog):
     @commands.group(invoke_without_command=False)
     async def r2(self, ctx):
         """Cloudflare R2 Storage allows developers to store large amounts of unstructured data without the costly egress bandwidth fees associated with typical cloud storage services. 
+        
         Learn more at https://developers.cloudflare.com/r2/
         """
 
