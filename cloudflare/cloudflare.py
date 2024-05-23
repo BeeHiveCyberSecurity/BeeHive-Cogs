@@ -2185,8 +2185,8 @@ class Cloudflare(commands.Cog):
                     screenshot_data = await response.read()
                     screenshot_file = discord.File(io.BytesIO(screenshot_data), filename=f"{scan_id}_screenshot.png")
                     embed = discord.Embed(
-                        title="Scan Screenshot",
-                        description=f"Screenshot for scan ID: {scan_id}",
+                        title="Screenshot fetched from scan",
+                        description=f"### Screenshot for scan ID\n```{scan_id}```",
                         color=0x2BBD8E
                     )
                     embed.set_image(url=f"attachment://{scan_id}_screenshot.png")
