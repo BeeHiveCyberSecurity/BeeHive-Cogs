@@ -2088,8 +2088,11 @@ class Cloudflare(commands.Cog):
                 malicious_result = verdicts.get('overall', {}).get('malicious', 'Unknown')
                 embed.add_field(name="Malicious", value=f"**`{malicious_result}`**", inline=True)
                 embed.add_field(name="Categories", value=f"**`{', '.join(verdicts.get('categories', ['Unknown']))}`**", inline=True)
-                page_rank = result.get('meta', {}).get('processors', {}).get('rank', 'Unknown')
-                embed.add_field(name="Page Rank", value=f"**`{page_rank}`**", inline=True)
+                meta_processors = result.get('meta', {}).get('processors', {})
+                page_rank = meta_processors.get('rank')
+                page_bucket = meta_processors.get('bucket', 'Unknown')
+                page_rank_or_bucket = page_rank if page_rank is not None else page_bucket
+                embed.add_field(name="Page Rank", value=f"**`{page_rank_or_bucket}`**", inline=True)
                 await ctx.send(embed=embed)
         except Exception as e:
             await ctx.send(embed=discord.Embed(
