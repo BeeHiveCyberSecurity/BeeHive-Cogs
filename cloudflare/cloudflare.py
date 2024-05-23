@@ -2275,7 +2275,11 @@ class Cloudflare(commands.Cog):
             await asyncio.sleep(10)
             try:
                 async with self.session.get(status_url, headers=headers) as response:
-                    if response.status != 200:
+                    if response.status == 202:
+                        embed = discord.Embed(title="Scan In Progress", description=f"Scan ID: **`{scan_id}`** is still in progress.", color=0x2BBD8E)
+                        await ctx.send(embed=embed)
+                        continue
+                    elif response.status != 200:
                         embed = discord.Embed(title="Error", description=f"Failed to check scan status: {response.status}", color=0xff4545)
                         await ctx.send(embed=embed)
                         return
