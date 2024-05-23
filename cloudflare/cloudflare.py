@@ -1839,7 +1839,7 @@ class Cloudflare(commands.Cog):
    
     @commands.group()
     async def urlscanner(self, ctx):
-        """To better understand Internet usage around the world, use Cloudflare’s URL Scanner. With Cloudflare’s URL Scanner, you have the ability to investigate the details of a domain, IP, URL, or ASN. Cloudflare’s URL Scanner is available in the Security Center of the Cloudflare dashboard, Cloudflare Radar and the Cloudflare API. Learn more at https://developers.cloudflare.com/radar/investigate/url-scanner/"""
+        """With Cloudflare’s URL Scanner, you have the ability to investigate the details of a domain, IP, URL, or ASN. Cloudflare’s URL Scanner is available in the Security Center of the Cloudflare dashboard, Cloudflare Radar and the Cloudflare API. Learn more at https://developers.cloudflare.com/radar/investigate/url-scanner/"""
         
     @urlscanner.command(name="search")
     async def search_url_scan(self, ctx, query: str):
