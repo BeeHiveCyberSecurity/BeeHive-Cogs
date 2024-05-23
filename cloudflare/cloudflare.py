@@ -1894,25 +1894,30 @@ class Cloudflare(commands.Cog):
                     description=f"Search results for query: **`{query}`**",
                     color=0x2BBD8E
                 )
+                total_size = len(current_page.description)
                 for result in results:
-                    if len(current_page.fields) == 25:
+                    field_value = (
+                        f"**Country:** {result.get('country', 'Unknown')}\n"
+                        f"**Success:** {result.get('success', False)}\n"
+                        f"**Time:** {result.get('time', 'Unknown')}\n"
+                        f"**UUID:** {result.get('uuid', 'Unknown')}\n"
+                        f"**Visibility:** {result.get('visibility', 'Unknown')}"
+                    )
+                    field_size = len(result.get("url", "Unknown URL")) + len(field_value)
+                    if len(current_page.fields) == 25 or (total_size + field_size) > 6000:
                         pages.append(current_page)
                         current_page = discord.Embed(
                             title="URL Scan Results",
                             description=f"Search results for query: **`{query}`** (cont.)",
                             color=0x2BBD8E
                         )
+                        total_size = len(current_page.description)
                     current_page.add_field(
                         name=result.get("url", "Unknown URL"),
-                        value=(
-                            f"**Country:** {result.get('country', 'Unknown')}\n"
-                            f"**Success:** {result.get('success', False)}\n"
-                            f"**Time:** {result.get('time', 'Unknown')}\n"
-                            f"**UUID:** {result.get('uuid', 'Unknown')}\n"
-                            f"**Visibility:** {result.get('visibility', 'Unknown')}"
-                        ),
+                        value=field_value,
                         inline=False
                     )
+                    total_size += field_size
                 pages.append(current_page)
 
                 message = await ctx.send(embed=pages[0])
