@@ -433,6 +433,41 @@ class Cloudflare(commands.Cog):
             await ctx.send(embed=embed)
 
     @commands.is_owner()
+    @dnssec.command(name="delete")
+    async def delete_dnssec(self, ctx):
+        """Delete DNSSEC on the currently set Cloudflare zone"""
+        api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
+        zone_id = api_tokens.get("zone_id")
+        if not zone_id:
+            embed = discord.Embed(title="Error", description="Zone ID not set.", color=discord.Color.from_str("#ff4545"))
+            await ctx.send(embed=embed)
+            return
+
+        headers = {
+            "Authorization": f"Bearer {api_tokens.get('bearer_token')}",
+            "Content-Type": "application/json"
+        }
+
+        url = f"https://api.cloudflare.com/client/v4/zones/{zone_id}/dnssec"
+        async with aiohttp.ClientSession() as session:
+            async with session.delete(url, headers=headers) as response:
+                data = await response.json()
+                if data.get("success"):
+                    embed = discord.Embed(
+                        title="Success",
+                        description="DNSSEC has been successfully deleted for the set zone.",
+                        color=discord.Color.from_str("#2BBD8E")
+                    )
+                else:
+                    error_messages = "\n".join([error.get("message", "Unknown error") for error in data.get("errors", [])])
+                    embed = discord.Embed(
+                        title="Error",
+                        description=f"Failed to delete DNSSEC: {error_messages}",
+                        color=discord.Color.from_str("#ff4545")
+                    )
+                await ctx.send(embed=embed)
+
+    @commands.is_owner()
     @commands.group(invoke_without_command=True)
     async def keystore(self, ctx):
         """Fetch keys in use for development purposes only"""
