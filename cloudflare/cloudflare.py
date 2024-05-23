@@ -2077,7 +2077,7 @@ class Cloudflare(commands.Cog):
                 verdicts = result.get('verdicts', {})
 
                 embed = discord.Embed(
-                    title="URL Scan Result",
+                    title="Scan results",
                     description=f"### Scan result for ID\n```{scan_id}```",
                     color=0x2BBD8E
                 )
