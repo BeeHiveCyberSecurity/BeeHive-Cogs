@@ -342,6 +342,77 @@ class Cloudflare(commands.Cog):
                 color=discord.Color.from_str("#ff4545")
             ))
 
+
+    @commands.group()
+    async def loadbalancing(self, ctx):
+        """"Load balancing under construction"""
+
+    @commands.is_owner()
+    @loadbalancing.command(name="list")
+    async def loadbalancing_list(self, ctx):
+        """Get a list of load balancers for a specific zone."""
+        api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
+        bearer_token = api_tokens.get("bearer_token")
+        zone_id = api_tokens.get("zone_id")
+        if not bearer_token or not zone_id:
+            embed = discord.Embed(
+                title="Error",
+                description="Bearer token or zone identifier not set.",
+                color=discord.Color.from_str("#ff4545")
+            )
+            await ctx.send(embed=embed)
+            return
+
+        headers = {
+            "Authorization": f"Bearer {bearer_token}",
+            "Content-Type": "application/json"
+        }
+
+        url = f"https://api.cloudflare.com/client/v4/zones/{zone_id}/load_balancers"
+
+        try:
+            async with self.session.get(url, headers=headers) as response:
+                data = await response.json()
+                if not data.get("success", False):
+                    error_message = data.get("errors", [{"message": "Unknown error"}])[0].get("message")
+                    embed = discord.Embed(
+                        title="Failed to Fetch Load Balancers",
+                        description=f"**Error:** {error_message}",
+                        color=discord.Color.from_str("#ff4545")
+                    )
+                    await ctx.send(embed=embed)
+                    return
+
+                result = data.get("result", [])
+                if not result:
+                    embed = discord.Embed(
+                        title="No Load Balancers Found",
+                        description="There are no load balancers configured for this zone.",
+                        color=discord.Color.from_str("#2BBD8E")
+                    )
+                    await ctx.send(embed=embed)
+                    return
+
+                embed = discord.Embed(
+                    title="Load Balancers",
+                    description="Here is a list of load balancers for your Cloudflare zone:",
+                    color=discord.Color.from_str("#2BBD8E")
+                )
+                for lb in result:
+                    lb_name = lb.get("name", "Unknown")
+                    lb_id = lb.get("id", "Unknown")
+                    lb_status = "Enabled" if lb.get("enabled", False) else "Disabled"
+                    embed.add_field(name=lb_name, value=f"ID: `{lb_id}`\nStatus: `{lb_status}`", inline=False)
+
+                await ctx.send(embed=embed)
+        except Exception as e:
+            await ctx.send(embed=discord.Embed(
+                title="Error",
+                description=f"An error occurred: {str(e)}",
+                color=discord.Color.from_str("#ff4545")
+            ))
+
+
     @commands.group()
     async def dnssec(self, ctx):
         """DNSSEC info"""
