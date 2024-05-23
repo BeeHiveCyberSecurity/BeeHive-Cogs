@@ -1840,6 +1840,7 @@ class Cloudflare(commands.Cog):
     @commands.group()
     async def urlscanner(self, ctx):
         """Use Cloudflare to scan a domain or URL"""
+        
     @urlscanner.command(name="search")
     async def search_url_scan(self, ctx, query: str):
         """Search for URL scans by date and webpage requests."""
@@ -1887,13 +1888,21 @@ class Cloudflare(commands.Cog):
                     await ctx.send(embed=embed)
                     return
 
-                embed = discord.Embed(
+                pages = []
+                current_page = discord.Embed(
                     title="URL Scan Results",
                     description=f"Search results for query: **`{query}`**",
                     color=0x2BBD8E
                 )
                 for result in results:
-                    embed.add_field(
+                    if len(current_page.fields) == 25:
+                        pages.append(current_page)
+                        current_page = discord.Embed(
+                            title="URL Scan Results",
+                            description=f"Search results for query: **`{query}`** (cont.)",
+                            color=0x2BBD8E
+                        )
+                    current_page.add_field(
                         name=result.get("url", "Unknown URL"),
                         value=(
                             f"**Country:** {result.get('country', 'Unknown')}\n"
@@ -1904,7 +1913,39 @@ class Cloudflare(commands.Cog):
                         ),
                         inline=False
                     )
-                await ctx.send(embed=embed)
+                pages.append(current_page)
+
+                message = await ctx.send(embed=pages[0])
+                if len(pages) > 1:
+                    await message.add_reaction("◀️")
+                    await message.add_reaction("❌")
+                    await message.add_reaction("▶️")
+
+                    def check(reaction, user):
+                        return user == ctx.author and str(reaction.emoji) in ["◀️", "❌", "▶️"] and reaction.message.id == message.id
+
+                    current_page_index = 0
+                    while True:
+                        try:
+                            reaction, user = await self.bot.wait_for("reaction_add", timeout=30.0, check=check)
+
+                            if str(reaction.emoji) == "▶️" and current_page_index < len(pages) - 1:
+                                current_page_index += 1
+                                await message.edit(embed=pages[current_page_index])
+                                await message.remove_reaction(reaction, user)
+
+                            elif str(reaction.emoji) == "◀️" and current_page_index > 0:
+                                current_page_index -= 1
+                                await message.edit(embed=pages[current_page_index])
+                                await message.remove_reaction(reaction, user)
+
+                            elif str(reaction.emoji) == "❌":
+                                await message.delete()
+                                break
+
+                        except asyncio.TimeoutError:
+                            await message.clear_reactions()
+                            break
         except Exception as e:
             await ctx.send(embed=discord.Embed(
                 title="Error",
