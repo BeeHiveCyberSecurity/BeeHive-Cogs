@@ -276,7 +276,7 @@ class AntiPhishing(commands.Cog):
     @commands.guild_only()
     async def antiphishing(self, ctx: Context):
         """
-        Settings to configure link safety in this server.
+        Settings to configure phishing protection in this server.
         """
     @commands.has_permissions(administrator=True)
     @antiphishing.command()
@@ -285,11 +285,11 @@ class AntiPhishing(commands.Cog):
         Choose the action that occurs when a user sends a phishing scam.
 
         Options:
-        `ignore` - Disables phishing protection
-        `notify` - Alerts in channel when malicious links detected (default)
-        `delete` - Deletes the message
-        `kick` - Delete message and kick sender
-        `ban` - Delete message and ban sender (recommended)
+        **`ignore`** - Disables phishing protection
+        **`notify`** - Alerts in channel when malicious links detected (default)
+        **`delete`** - Deletes the message
+        **`kick`** - Delete message and kick sender
+        **`ban`** - Delete message and ban sender (recommended)
         """
         valid_actions = ["ignore", "notify", "delete", "kick", "ban"]
         if action not in valid_actions:
