@@ -1961,6 +1961,63 @@ class Cloudflare(commands.Cog):
                 color=0xff4545
             ))
 
+    @urlscanner.command(name="create")
+    async def scan_url(self, ctx, url: str):
+        """Start a new scan for the provided URL."""
+        api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
+        account_id = api_tokens.get("account_id")
+        bearer_token = api_tokens.get("bearer_token")
+
+        if not account_id or not bearer_token:
+            embed = discord.Embed(
+                title="Configuration Error",
+                description="Missing account ID or bearer token. Please check your configuration.",
+                color=0xff4545
+            )
+            await ctx.send(embed=embed)
+            return
+
+        headers = {
+            "Authorization": f"Bearer {bearer_token}",
+            "Content-Type": "application/json"
+        }
+
+        payload = {
+            "url": url
+        }
+
+        url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/urlscanner/scan"
+
+        try:
+            async with self.session.post(url, headers=headers, json=payload) as response:
+                data = await response.json()
+                if not data.get("success", False):
+                    error_message = data.get("errors", [{"message": "Unknown error"}])[0].get("message")
+                    embed = discord.Embed(
+                        title="Failed to Start URL Scan",
+                        description=f"**Error:** {error_message}",
+                        color=0xff4545
+                    )
+                    await ctx.send(embed=embed)
+                    return
+
+                result = data.get("result", {})
+                embed = discord.Embed(
+                    title="URL Scan Started",
+                    description=f"Scan for URL `{url}` has been started successfully.",
+                    color=0x2BBD8E
+                )
+                embed.add_field(name="UUID", value=f"**`{result.get('uuid', 'Unknown')}`**", inline=True)
+                embed.add_field(name="Visibility", value=f"**`{result.get('visibility', 'Unknown')}`**", inline=True)
+                embed.add_field(name="Time", value=f"**`{result.get('time', 'Unknown')}`**", inline=True)
+                await ctx.send(embed=embed)
+        except Exception as e:
+            await ctx.send(embed=discord.Embed(
+                title="Error",
+                description=f"An error occurred: {str(e)}",
+                color=0xff4545
+            ))
+
 
     @commands.is_owner()
     @commands.group(invoke_without_command=False)
