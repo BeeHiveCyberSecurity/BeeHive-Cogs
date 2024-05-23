@@ -389,7 +389,6 @@ class Cloudflare(commands.Cog):
                     color=discord.Color.from_str("#2BBD8E")
                 )
                 embed.add_field(name="Algorithm", value=f"**`{result.get('algorithm', 'Unknown')}`**", inline=True)
-                embed.add_field(name="Digest", value=f"**`{result.get('digest', 'Unknown')}`**", inline=True)
                 embed.add_field(name="Digest Algorithm", value=f"**`{result.get('digest_algorithm', 'Unknown')}`**", inline=True)
                 embed.add_field(name="Digest Type", value=f"**`{result.get('digest_type', 'Unknown')}`**", inline=True)
                 embed.add_field(name="DNSSEC Multi Signer", value=f"**`{str(result.get('dnssec_multi_signer', 'Unknown'))}`**", inline=True)
@@ -401,6 +400,7 @@ class Cloudflare(commands.Cog):
                 embed.add_field(name="Modified On", value=f"**`{result.get('modified_on', 'Unknown')}`**", inline=True)
                 embed.add_field(name="Public Key", value=f"**`{result.get('public_key', 'Unknown')}`**", inline=True)
                 embed.add_field(name="Status", value=f"**`{result.get('status', 'Unknown')}`**", inline=True)
+                embed.add_field(name="Digest", value=f"```{result.get('digest', 'Unknown')}```", inline=True)
 
                 await ctx.send(embed=embed)
         except Exception as e:
