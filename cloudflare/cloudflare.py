@@ -2090,10 +2090,8 @@ class Cloudflare(commands.Cog):
                 embed.add_field(name="Categories", value=f"**`{', '.join(verdicts.get('categories', ['Unknown']))}`**", inline=True)
                 meta = result.get('meta', {})
                 processors = meta.get('processors', {})
-                page_rank = processors.get('rank')
                 page_bucket = processors.get('bucket', 'Unknown')
-                page_rank_or_bucket = page_rank if page_rank is not None else page_bucket
-                embed.add_field(name="Page Rank or Bucket", value=f"**`{page_rank_or_bucket}`**", inline=True)
+                embed.add_field(name="Page Bucket", value=f"**`{page_bucket}`**", inline=True)
                 await ctx.send(embed=embed)
         except Exception as e:
             await ctx.send(embed=discord.Embed(
