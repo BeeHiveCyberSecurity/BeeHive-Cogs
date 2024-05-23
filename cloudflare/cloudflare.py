@@ -2085,7 +2085,7 @@ class Cloudflare(commands.Cog):
                 embed.add_field(name="URL", value=f"**`{task.get('url', 'Unknown')}`**", inline=True)
                 embed.add_field(name="Effective URL", value=f"**`{task.get('effectiveUrl', 'Unknown')}`**", inline=True)
 
-                with open('colos.json', 'r') as f:
+                with open('cogs/cloudflare/colos.json', 'r') as f:
                     self.colos = json.load(f)
 
                 colo_code = result.get('scannedFrom', {}).get('colo', 'Unknown')
