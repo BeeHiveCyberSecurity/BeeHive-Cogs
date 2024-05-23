@@ -2293,8 +2293,7 @@ class Cloudflare(commands.Cog):
                         await ctx.send(embed=embed)
                         return
 
-                    scan_status = data["result"]["status"]
-                    if scan_status == "finished":
+                    if response.status == 200:
                         scan_result = data["result"]["scan"]
                         verdict = scan_result["verdicts"]["overall"]
                         malicious = verdict["malicious"]
@@ -2306,10 +2305,6 @@ class Cloudflare(commands.Cog):
                             description=f"Scan ID: **`{scan_id}`**\nMalicious: **`{malicious}`**\nCategories: **`{categories}`**\nPhishing: **`{phishing}`**",
                             color=0x2BBD8E
                         )
-                        await ctx.send(embed=embed)
-                        return
-                    elif scan_status == "failed":
-                        embed = discord.Embed(title="Scan Failed", description=f"Scan ID: **`{scan_id}`**", color=0xff4545)
                         await ctx.send(embed=embed)
                         return
 
