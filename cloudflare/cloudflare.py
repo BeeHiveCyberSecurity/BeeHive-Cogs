@@ -2007,12 +2007,18 @@ class Cloudflare(commands.Cog):
                 result = data.get("result", {})
                 embed = discord.Embed(
                     title="URL Scan Started",
-                    description=f"Scan for URL `{url}` has been started successfully.",
+                    description=f"Scan started successfully.",
                     color=0x2BBD8E
                 )
                 embed.add_field(name="UUID", value=f"**`{result.get('uuid', 'Unknown')}`**", inline=True)
                 embed.add_field(name="Visibility", value=f"**`{result.get('visibility', 'Unknown')}`**", inline=True)
-                embed.add_field(name="Time", value=f"**`{result.get('time', 'Unknown')}`**", inline=True)
+                embed.add_field(name="Target", value=f"**`{url}`**", inline=True)
+                time_value = result.get('time', 'Unknown')
+                if time_value != 'Unknown':
+                    from datetime import datetime
+                    dt = datetime.fromisoformat(time_value.replace('Z', '+00:00'))
+                    time_value = f"<t:{int(dt.timestamp())}:F>"
+                embed.add_field(name="Time", value=f"**`{time_value}`**", inline=True)
                 await ctx.send(embed=embed)
         except Exception as e:
             await ctx.send(embed=discord.Embed(
