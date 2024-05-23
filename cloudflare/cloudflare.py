@@ -2184,7 +2184,6 @@ class Cloudflare(commands.Cog):
                 if response.content_type == "image/png":
                     screenshot_data = await response.read()
                     screenshot_file = discord.File(io.BytesIO(screenshot_data), filename=f"{scan_id}_screenshot.png")
-                    await ctx.send(file=screenshot_file)
                 else:
                     data = await response.json()
                     if not data.get("success", False):
@@ -2211,7 +2210,7 @@ class Cloudflare(commands.Cog):
                         description=f"Screenshot for scan ID: {scan_id}",
                         color=0x2BBD8E
                     )
-                    embed.set_image(url=screenshot_url)
+                    embed.set_image(url=screenshot_file, file=screenshot_file)
                     await ctx.send(embed=embed)
 
         except Exception as e:
