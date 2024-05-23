@@ -2218,6 +2218,7 @@ class Cloudflare(commands.Cog):
                 color=0xff4545
             ))
 
+
     @urlscanner.command(name="scan")
     async def scan_url(self, ctx, url: str):
         """Scan a URL using Cloudflare URL Scanner and return the verdict."""
