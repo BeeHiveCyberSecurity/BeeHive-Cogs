@@ -2181,33 +2181,38 @@ class Cloudflare(commands.Cog):
 
         try:
             async with self.session.get(api_url, headers=headers) as response:
-                data = await response.json()
-                if not data.get("success", False):
-                    error_message = data.get("errors", [{"message": "Unknown error"}])[0].get("message")
+                if response.content_type == "image/png":
+                    screenshot_data = await response.read()
+                    screenshot_file = discord.File(io.BytesIO(screenshot_data), filename=f"{scan_id}_screenshot.png")
+                    await ctx.send(file=screenshot_file)
+                else:
+                    data = await response.json()
+                    if not data.get("success", False):
+                        error_message = data.get("errors", [{"message": "Unknown error"}])[0].get("message")
+                        embed = discord.Embed(
+                            title="Failed to Retrieve Screenshot",
+                            description=f"**Error:** {error_message}",
+                            color=0xff4545
+                        )
+                        await ctx.send(embed=embed)
+                        return
+
+                    screenshot_url = data.get("result", {}).get("screenshot", "")
+                    if not screenshot_url:
+                        await ctx.send(embed=discord.Embed(
+                            title="No Data",
+                            description="No screenshot found for the given scan ID.",
+                            color=0xff4545
+                        ))
+                        return
+
                     embed = discord.Embed(
-                        title="Failed to Retrieve Screenshot",
-                        description=f"**Error:** {error_message}",
-                        color=0xff4545
+                        title="Scan Screenshot",
+                        description=f"Screenshot for scan ID: {scan_id}",
+                        color=0x2BBD8E
                     )
+                    embed.set_image(url=screenshot_url)
                     await ctx.send(embed=embed)
-                    return
-
-                screenshot_url = data.get("result", {}).get("screenshot", "")
-                if not screenshot_url:
-                    await ctx.send(embed=discord.Embed(
-                        title="No Data",
-                        description="No screenshot found for the given scan ID.",
-                        color=0xff4545
-                    ))
-                    return
-
-                embed = discord.Embed(
-                    title="Scan Screenshot",
-                    description=f"Screenshot for scan ID: {scan_id}",
-                    color=0x2BBD8E
-                )
-                embed.set_image(url=screenshot_url)
-                await ctx.send(embed=embed)
 
         except Exception as e:
             await ctx.send(embed=discord.Embed(
