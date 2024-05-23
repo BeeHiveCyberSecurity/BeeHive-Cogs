@@ -1903,7 +1903,10 @@ class Cloudflare(commands.Cog):
                         f"**UUID:** {result.get('uuid', 'Unknown')}\n"
                         f"**Visibility:** {result.get('visibility', 'Unknown')}"
                     )
-                    field_size = len(result.get("url", "Unknown URL")) + len(field_value)
+                    field_name = result.get("url", "Unknown URL")
+                    if len(field_name) > 256:
+                        field_name = field_name[:253] + "..."
+                    field_size = len(field_name) + len(field_value)
                     if len(current_page.fields) == 25 or (total_size + field_size) > 6000:
                         pages.append(current_page)
                         current_page = discord.Embed(
@@ -1913,7 +1916,7 @@ class Cloudflare(commands.Cog):
                         )
                         total_size = len(current_page.description)
                     current_page.add_field(
-                        name=result.get("url", "Unknown URL"),
+                        name=field_name,
                         value=field_value,
                         inline=False
                     )
