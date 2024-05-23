@@ -2295,10 +2295,15 @@ class Cloudflare(commands.Cog):
 
                     scan_status = data["result"]["status"]
                     if scan_status == "finished":
-                        verdict = data["result"]["verdict"]
+                        scan_result = data["result"]["scan"]
+                        verdict = scan_result["verdicts"]["overall"]
+                        malicious = verdict["malicious"]
+                        categories = ", ".join([cat["name"] for cat in verdict["categories"]])
+                        phishing = ", ".join(verdict.get("phishing", []))
+
                         embed = discord.Embed(
                             title="URL Scan Completed",
-                            description=f"Scan ID: **`{scan_id}`**\nVerdict: **`{verdict}`**",
+                            description=f"Scan ID: **`{scan_id}`**\nMalicious: **`{malicious}`**\nCategories: **`{categories}`**\nPhishing: **`{phishing}`**",
                             color=0x2BBD8E
                         )
                         await ctx.send(embed=embed)
