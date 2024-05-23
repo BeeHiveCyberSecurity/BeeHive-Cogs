@@ -2174,7 +2174,7 @@ class Cloudflare(commands.Cog):
             "X-Auth-Email": email,
             "X-Auth-Key": api_key,
             "Authorization": f"Bearer {bearer_token}",
-            "Content-Type": "image/png"
+            "Content-Type": "application/json"
         }
 
         api_url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/urlscanner/scan/{scan_id}/screenshot"
