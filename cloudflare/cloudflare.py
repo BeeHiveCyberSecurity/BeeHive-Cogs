@@ -2028,6 +2028,238 @@ class Cloudflare(commands.Cog):
             ))
 
 
+    @urlscanner.command(name="result")
+    async def get_scan_result(self, ctx, scan_id: str):
+        """Get the result of a URL scan by its ID."""
+        api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
+        account_id = api_tokens.get("account_id")
+        bearer_token = api_tokens.get("bearer_token")
+
+        if not all([account_id, bearer_token]):
+            embed = discord.Embed(
+                title="Configuration Error",
+                description="Missing one or more required API tokens. Please check your configuration.",
+                color=0xff4545
+            )
+            await ctx.send(embed=embed)
+            return
+
+        headers = {
+            "Authorization": f"Bearer {bearer_token}",
+            "Content-Type": "application/json"
+        }
+
+        api_url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/urlscanner/scan/{scan_id}"
+
+        try:
+            async with self.session.get(api_url, headers=headers) as response:
+                data = await response.json()
+                if not data.get("success", False):
+                    error_message = data.get("errors", [{"message": "Unknown error"}])[0].get("message")
+                    embed = discord.Embed(
+                        title="Failed to Retrieve URL Scan Result",
+                        description=f"**Error:** {error_message}",
+                        color=0xff4545
+                    )
+                    await ctx.send(embed=embed)
+                    return
+
+                result = data.get("result", {}).get("scan", {})
+                pages = []
+
+                # Task details
+                task = result.get('task', {})
+                task_embed = discord.Embed(
+                    title="URL Scan Result - Task Details",
+                    description=f"Scan result for ID: **`{scan_id}`**",
+                    color=0x2BBD8E
+                )
+                task_embed.add_field(name="UUID", value=f"**`{task.get('uuid', 'Unknown')}`**", inline=True)
+                task_embed.add_field(name="Visibility", value=f"**`{task.get('visibility', 'Unknown')}`**", inline=True)
+                task_embed.add_field(name="Status", value=f"**`{task.get('status', 'Unknown')}`**", inline=True)
+                task_embed.add_field(name="URL", value=f"**`{task.get('url', 'Unknown')}`**", inline=True)
+                task_embed.add_field(name="Client Location", value=f"**`{task.get('clientLocation', 'Unknown')}`**", inline=True)
+                task_embed.add_field(name="Client Type", value=f"**`{task.get('clientType', 'Unknown')}`**", inline=True)
+                task_embed.add_field(name="Effective URL", value=f"**`{task.get('effectiveUrl', 'Unknown')}`**", inline=True)
+                task_embed.add_field(name="Scanned From", value=f"**`{task.get('scannedFrom', {}).get('colo', 'Unknown')}`**", inline=True)
+                task_embed.add_field(name="Time", value=f"**`{task.get('time', 'Unknown')}`**", inline=True)
+                task_embed.add_field(name="Time End", value=f"**`{task.get('timeEnd', 'Unknown')}`**", inline=True)
+                pages.append(task_embed)
+
+                # Verdicts
+                verdicts = result.get('verdicts', {}).get('overall', {})
+                verdicts_embed = discord.Embed(
+                    title="URL Scan Result - Verdicts",
+                    description=f"Scan result for ID: **`{scan_id}`**",
+                    color=0x2BBD8E
+                )
+                verdicts_embed.add_field(name="Malicious", value=f"**`{verdicts.get('malicious', 'Unknown')}`**", inline=True)
+                verdicts_embed.add_field(name="Phishing", value=f"**`{', '.join(verdicts.get('phishing', []))}`**", inline=True)
+                verdicts_embed.add_field(name="Categories", value=f"**`{', '.join([cat.get('name', 'Unknown') for cat in verdicts.get('categories', [])])}`**", inline=True)
+                pages.append(verdicts_embed)
+
+                # ASN details
+                asns = result.get('asns', {}).get('asn', {})
+                asns_embed = discord.Embed(
+                    title="URL Scan Result - ASN Details",
+                    description=f"Scan result for ID: **`{scan_id}`**",
+                    color=0x2BBD8E
+                )
+                asns_embed.add_field(name="ASN", value=f"**`{asns.get('asn', 'Unknown')}`**", inline=True)
+                asns_embed.add_field(name="ASN Description", value=f"**`{asns.get('description', 'Unknown')}`**", inline=True)
+                asns_embed.add_field(name="ASN Location", value=f"**`{asns.get('location_alpha2', 'Unknown')}`**", inline=True)
+                asns_embed.add_field(name="ASN Name", value=f"**`{asns.get('name', 'Unknown')}`**", inline=True)
+                asns_embed.add_field(name="ASN Org Name", value=f"**`{asns.get('org_name', 'Unknown')}`**", inline=True)
+                pages.append(asns_embed)
+
+                # Certificates
+                certificates = result.get('certificates', [])
+                for cert in certificates:
+                    cert_embed = discord.Embed(
+                        title="URL Scan Result - Certificate Details",
+                        description=f"Scan result for ID: **`{scan_id}`**",
+                        color=0x2BBD8E
+                    )
+                    cert_embed.add_field(name="Certificate Issuer", value=f"**`{cert.get('issuer', 'Unknown')}`**", inline=True)
+                    cert_embed.add_field(name="Certificate Subject Name", value=f"**`{cert.get('subjectName', 'Unknown')}`**", inline=True)
+                    cert_embed.add_field(name="Certificate Valid From", value=f"**`{cert.get('validFrom', 'Unknown')}`**", inline=True)
+                    cert_embed.add_field(name="Certificate Valid To", value=f"**`{cert.get('validTo', 'Unknown')}`**", inline=True)
+                    pages.append(cert_embed)
+
+                # Domains
+                domains = result.get('domains', {})
+                for domain_name, domain_info in domains.items():
+                    domain_embed = discord.Embed(
+                        title="URL Scan Result - Domain Details",
+                        description=f"Scan result for ID: **`{scan_id}`**",
+                        color=0x2BBD8E
+                    )
+                    domain_embed.add_field(name="Domain Name", value=f"**`{domain_name}`**", inline=True)
+                    domain_embed.add_field(name="Domain Type", value=f"**`{domain_info.get('type', 'Unknown')}`**", inline=True)
+                    domain_embed.add_field(name="Domain Rank", value=f"**`{domain_info.get('rank', {}).get('rank', 'Unknown')}`**", inline=True)
+                    domain_embed.add_field(name="Domain Categories", value=f"**`{', '.join([cat.get('name', 'Unknown') for cat in domain_info.get('categories', {}).get('content', [])])}`**", inline=True)
+                    domain_embed.add_field(name="Domain Risks", value=f"**`{', '.join([risk.get('name', 'Unknown') for risk in domain_info.get('categories', {}).get('risks', [])])}`**", inline=True)
+                    domain_embed.add_field(name="Domain DNS", value=f"**`{', '.join([dns.get('address', 'Unknown') for dns in domain_info.get('dns', [])])}`**", inline=True)
+                    pages.append(domain_embed)
+
+                # Geo details
+                geo = result.get('geo', {})
+                geo_embed = discord.Embed(
+                    title="URL Scan Result - Geo Details",
+                    description=f"Scan result for ID: **`{scan_id}`**",
+                    color=0x2BBD8E
+                )
+                geo_embed.add_field(name="Continents", value=f"**`{', '.join(geo.get('continents', []))}`**", inline=True)
+                geo_embed.add_field(name="Locations", value=f"**`{', '.join(geo.get('locations', []))}`**", inline=True)
+                pages.append(geo_embed)
+
+                # IP details
+                ips = result.get('ips', {}).get('ip', {})
+                ips_embed = discord.Embed(
+                    title="URL Scan Result - IP Details",
+                    description=f"Scan result for ID: **`{scan_id}`**",
+                    color=0x2BBD8E
+                )
+                ips_embed.add_field(name="IP", value=f"**`{ips.get('ip', 'Unknown')}`**", inline=True)
+                ips_embed.add_field(name="IP Version", value=f"**`{ips.get('ipVersion', 'Unknown')}`**", inline=True)
+                ips_embed.add_field(name="IP ASN", value=f"**`{ips.get('asn', 'Unknown')}`**", inline=True)
+                ips_embed.add_field(name="IP ASN Description", value=f"**`{ips.get('asnDescription', 'Unknown')}`**", inline=True)
+                ips_embed.add_field(name="IP ASN Location", value=f"**`{ips.get('asnLocationAlpha2', 'Unknown')}`**", inline=True)
+                ips_embed.add_field(name="IP ASN Name", value=f"**`{ips.get('asnName', 'Unknown')}`**", inline=True)
+                ips_embed.add_field(name="IP ASN Org Name", value=f"**`{ips.get('asnOrgName', 'Unknown')}`**", inline=True)
+                ips_embed.add_field(name="IP Continent", value=f"**`{ips.get('continent', 'Unknown')}`**", inline=True)
+                ips_embed.add_field(name="IP Location Name", value=f"**`{ips.get('locationName', 'Unknown')}`**", inline=True)
+                ips_embed.add_field(name="IP Latitude", value=f"**`{ips.get('latitude', 'Unknown')}`**", inline=True)
+                ips_embed.add_field(name="IP Longitude", value=f"**`{ips.get('longitude', 'Unknown')}`**", inline=True)
+                pages.append(ips_embed)
+
+                # Links
+                links = result.get('links', {}).get('link', {})
+                links_embed = discord.Embed(
+                    title="URL Scan Result - Links",
+                    description=f"Scan result for ID: **`{scan_id}`**",
+                    color=0x2BBD8E
+                )
+                links_embed.add_field(name="Link Href", value=f"**`{links.get('href', 'Unknown')}`**", inline=True)
+                links_embed.add_field(name="Link Text", value=f"**`{links.get('text', 'Unknown')}`**", inline=True)
+                pages.append(links_embed)
+
+                # Meta
+                meta = result.get('meta', {}).get('processors', {})
+                for processor_type, processor_info in meta.items():
+                    meta_embed = discord.Embed(
+                        title=f"URL Scan Result - Meta {processor_type.capitalize()}",
+                        description=f"Scan result for ID: **`{scan_id}`**",
+                        color=0x2BBD8E
+                    )
+                    for category_type, categories in processor_info.items():
+                        meta_embed.add_field(name=f"{category_type.capitalize()}", value=f"**`{', '.join([cat.get('name', 'Unknown') for cat in categories])}`**", inline=True)
+                    pages.append(meta_embed)
+
+                # Page details
+                page = result.get('page', {})
+                page_embed = discord.Embed(
+                    title="URL Scan Result - Page Details",
+                    description=f"Scan result for ID: **`{scan_id}`**",
+                    color=0x2BBD8E
+                )
+                page_embed.add_field(name="Page ASN", value=f"**`{page.get('asn', 'Unknown')}`**", inline=True)
+                page_embed.add_field(name="Page ASN Location", value=f"**`{page.get('asnLocationAlpha2', 'Unknown')}`**", inline=True)
+                page_embed.add_field(name="Page Country", value=f"**`{page.get('country', 'Unknown')}`**", inline=True)
+                page_embed.add_field(name="Page Domain", value=f"**`{page.get('domain', 'Unknown')}`**", inline=True)
+                page_embed.add_field(name="Page IP", value=f"**`{page.get('ip', 'Unknown')}`**", inline=True)
+                page_embed.add_field(name="Page URL", value=f"**`{page.get('url', 'Unknown')}`**", inline=True)
+                page_embed.add_field(name="Page Status", value=f"**`{page.get('status', 'Unknown')}`**", inline=True)
+                pages.append(page_embed)
+
+                # Performance details
+                performance = result.get('performance', [])
+                for perf in performance:
+                    perf_embed = discord.Embed(
+                        title="URL Scan Result - Performance Details",
+                        description=f"Scan result for ID: **`{scan_id}`**",
+                        color=0x2BBD8E
+                    )
+                    perf_embed.add_field(name="Performance Entry Type", value=f"**`{perf.get('entryType', 'Unknown')}`**", inline=True)
+                    perf_embed.add_field(name="Performance Duration", value=f"**`{perf.get('duration', 'Unknown')}`**", inline=True)
+                    perf_embed.add_field(name="Performance Start Time", value=f"**`{perf.get('startTime', 'Unknown')}`**", inline=True)
+                    perf_embed.add_field(name="Performance Name", value=f"**`{perf.get('name', 'Unknown')}`**", inline=True)
+                    pages.append(perf_embed)
+
+                message = await ctx.send(embed=pages[0])
+                await message.add_reaction("⬅️")
+                await message.add_reaction("➡️")
+
+                def check(reaction, user):
+                    return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️"] and reaction.message.id == message.id
+
+                i = 0
+                while True:
+                    try:
+                        reaction, user = await self.bot.wait_for("reaction_add", timeout=60.0, check=check)
+                        if str(reaction.emoji) == "➡️":
+                            i += 1
+                            if i >= len(pages):
+                                i = 0
+                            await message.edit(embed=pages[i])
+                        elif str(reaction.emoji) == "⬅️":
+                            i -= 1
+                            if i < 0:
+                                i = len(pages) - 1
+                            await message.edit(embed=pages[i])
+                        await message.remove_reaction(reaction, user)
+                    except asyncio.TimeoutError:
+                        break
+        except Exception as e:
+            await ctx.send(embed=discord.Embed(
+                title="Error",
+                description=f"An error occurred: {str(e)}",
+                color=0xff4545
+            ))
+
+
+
+
     @commands.is_owner()
     @commands.group(invoke_without_command=False)
     async def emailrouting(self, ctx):
