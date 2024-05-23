@@ -428,7 +428,6 @@ class Cloudflare(commands.Cog):
                 color=discord.Color.from_str("#ff4545")
             ))
 
-
     @commands.is_owner()
     @loadbalancing.command(name="list")
     async def loadbalancing_list(self, ctx):
@@ -486,6 +485,55 @@ class Cloudflare(commands.Cog):
                     lb_status = "Enabled" if lb.get("enabled", False) else "Disabled"
                     embed.add_field(name=lb_name, value=f"ID: `{lb_id}`\nStatus: `{lb_status}`", inline=False)
 
+                await ctx.send(embed=embed)
+        except Exception as e:
+            await ctx.send(embed=discord.Embed(
+                title="Error",
+                description=f"An error occurred: {str(e)}",
+                color=discord.Color.from_str("#ff4545")
+            ))
+
+    @commands.is_owner()
+    @loadbalancing.command(name="delete")
+    async def delete_load_balancer(self, ctx, load_balancer_id: str):
+        """Delete a load balancer by its ID."""
+        api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
+        bearer_token = api_tokens.get("bearer_token")
+        zone_id = api_tokens.get("zone_id")
+        if not bearer_token or not zone_id:
+            embed = discord.Embed(
+                title="Error",
+                description="Bearer token or zone identifier not set.",
+                color=discord.Color.from_str("#ff4545")
+            )
+            await ctx.send(embed=embed)
+            return
+
+        headers = {
+            "Authorization": f"Bearer {bearer_token}",
+            "Content-Type": "application/json"
+        }
+
+        url = f"https://api.cloudflare.com/client/v4/zones/{zone_id}/load_balancers/{load_balancer_id}"
+
+        try:
+            async with self.session.delete(url, headers=headers) as response:
+                data = await response.json()
+                if not data.get("success", False):
+                    error_message = data.get("errors", [{"message": "Unknown error"}])[0].get("message")
+                    embed = discord.Embed(
+                        title="Failed to Delete Load Balancer",
+                        description=f"**Error:** {error_message}",
+                        color=discord.Color.from_str("#ff4545")
+                    )
+                    await ctx.send(embed=embed)
+                    return
+
+                embed = discord.Embed(
+                    title="Load Balancer Deleted",
+                    description=f"Load balancer with ID `{load_balancer_id}` has been successfully deleted.",
+                    color=discord.Color.from_str("#2BBD8E")
+                )
                 await ctx.send(embed=embed)
         except Exception as e:
             await ctx.send(embed=discord.Embed(
