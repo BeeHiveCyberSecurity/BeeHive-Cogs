@@ -2262,7 +2262,7 @@ class Cloudflare(commands.Cog):
                     return
 
                 scan_id = data["result"]["uuid"]
-                embed = discord.Embed(title="URL submitted", description=f"Your scan ID is\n```{scan_id}```\n\nThe scan may take a few moments to complete, please wait...", color=0x2BBD8E)
+                embed = discord.Embed(title="URL submitted", description=f"### Your scan ID is\n```{scan_id}```\nThe scan may take a few moments to complete, please wait...", color=0x2BBD8E)
                 await ctx.send(embed=embed)
                 await ctx.typing()
 
