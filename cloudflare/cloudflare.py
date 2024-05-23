@@ -2081,8 +2081,8 @@ class Cloudflare(commands.Cog):
                     description=f"Scan result for ID ```{scan_id}```",
                     color=0x2BBD8E
                 )
-                embed.add_field(name="Target URL", value=f"**`{task.get('url', 'Unknown')}`**", inline=False)
-                embed.add_field(name="Effective URL", value=f"**`{task.get('effectiveUrl', 'Unknown')}`**", inline=False)
+                embed.add_field(name="Target URL", value=f"```{task.get('url', 'Unknown')}```", inline=False)
+                embed.add_field(name="Effective URL", value=f"```{task.get('effectiveUrl', 'Unknown')}```", inline=False)
                 embed.add_field(name="Status", value=f"**`{task.get('status', 'Unknown')}`**", inline=True)
                 embed.add_field(name="Visibility", value=f"**`{task.get('visibility', 'Unknown')}`**", inline=True)
                 embed.add_field(name="Malicious", value=f"**`{verdicts.get('malicious', 'Unknown')}`**", inline=True)
