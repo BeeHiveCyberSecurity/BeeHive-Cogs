@@ -342,6 +342,74 @@ class Cloudflare(commands.Cog):
                 color=discord.Color.from_str("#ff4545")
             ))
 
+    @commands.group()
+    async def dnssec(self, ctx):
+        """DNSSEC info"""
+
+    @commands.is_owner()
+    @dnssec.command(name="status")
+    async def dnssec_status(self, ctx):
+        """Get the current DNSSEC status and config for a specific zone."""
+        api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
+        bearer_token = api_tokens.get("bearer_token")
+        zone_id = api_tokens.get("zone_identifier")
+        if not bearer_token or not zone_id:
+            embed = discord.Embed(
+                title="Error",
+                description="Bearer token or zone identifier not set.",
+                color=discord.Color.from_str("#ff4545")
+            )
+            await ctx.send(embed=embed)
+            return
+
+        headers = {
+            "Authorization": f"Bearer {bearer_token}",
+            "Content-Type": "application/json"
+        }
+
+        url = f"https://api.cloudflare.com/client/v4/zones/{zone_id}/dnssec"
+
+        try:
+            async with self.session.get(url, headers=headers) as response:
+                data = await response.json()
+                if not data.get("success", False):
+                    error_message = data.get("errors", [{"message": "Unknown error"}])[0].get("message")
+                    embed = discord.Embed(
+                        title="Failed to Fetch DNSSEC Status",
+                        description=f"**Error:** {error_message}",
+                        color=discord.Color.from_str("#ff4545")
+                    )
+                    await ctx.send(embed=embed)
+                    return
+
+                result = data.get("result", {})
+                embed = discord.Embed(
+                    title="DNSSEC Status",
+                    description="Here is the current DNSSEC status and configuration:",
+                    color=discord.Color.from_str("#2BBD8E")
+                )
+                embed.add_field(name="Algorithm", value=result.get("algorithm", "Unknown"), inline=True)
+                embed.add_field(name="Digest", value=result.get("digest", "Unknown"), inline=True)
+                embed.add_field(name="Digest Algorithm", value=result.get("digest_algorithm", "Unknown"), inline=True)
+                embed.add_field(name="Digest Type", value=result.get("digest_type", "Unknown"), inline=True)
+                embed.add_field(name="DNSSEC Multi Signer", value=str(result.get("dnssec_multi_signer", "Unknown")), inline=True)
+                embed.add_field(name="DNSSEC Presigned", value=str(result.get("dnssec_presigned", "Unknown")), inline=True)
+                embed.add_field(name="DS", value=result.get("ds", "Unknown"), inline=True)
+                embed.add_field(name="Flags", value=result.get("flags", "Unknown"), inline=True)
+                embed.add_field(name="Key Tag", value=result.get("key_tag", "Unknown"), inline=True)
+                embed.add_field(name="Key Type", value=result.get("key_type", "Unknown"), inline=True)
+                embed.add_field(name="Modified On", value=result.get("modified_on", "Unknown"), inline=True)
+                embed.add_field(name="Public Key", value=result.get("public_key", "Unknown"), inline=True)
+                embed.add_field(name="Status", value=result.get("status", "Unknown"), inline=True)
+
+                await ctx.send(embed=embed)
+        except Exception as e:
+            embed = discord.Embed(
+                title="Error",
+                description=f"An error occurred: {str(e)}",
+                color=discord.Color.from_str("#ff4545")
+            )
+            await ctx.send(embed=embed)
 
     @commands.is_owner()
     @commands.group(invoke_without_command=True)
@@ -2599,7 +2667,7 @@ class Cloudflare(commands.Cog):
         """Create a new R2 bucket
         
         **Valid location hints**
-        
+
         **`apac`** - Asia-Pacific
         **`eeur`** - Eastern Europe
         **`enam`** - Eastern North America
