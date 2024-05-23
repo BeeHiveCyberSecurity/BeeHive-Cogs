@@ -2078,20 +2078,11 @@ class Cloudflare(commands.Cog):
 
                 embed = discord.Embed(
                     title="URL Scan Result",
-                    description=f"Scan result for ID: **`{scan_id}`**",
+                    description=f"Scan result for ID ```{scan_id}```",
                     color=0x2BBD8E
                 )
-                embed.add_field(name="UUID", value=f"**`{task.get('uuid', 'Unknown')}`**", inline=True)
-                embed.add_field(name="URL", value=f"**`{task.get('url', 'Unknown')}`**", inline=True)
+                embed.add_field(name="Target URL", value=f"**`{task.get('url', 'Unknown')}`**", inline=True)
                 embed.add_field(name="Effective URL", value=f"**`{task.get('effectiveUrl', 'Unknown')}`**", inline=True)
-
-                with open('cogs/cloudflare/colos.json', 'r') as f:
-                    self.colos = json.load(f)
-
-                colo_code = result.get('scannedFrom', {}).get('colo', 'Unknown')
-                colo_info = self.colos.get(colo_code, {})
-                colo_name = colo_info.get('name', 'Unknown')
-                embed.add_field(name="Scanned From", value=f"**`{colo_name}`**", inline=True)
                 embed.add_field(name="Status", value=f"**`{task.get('status', 'Unknown')}`**", inline=True)
                 embed.add_field(name="Visibility", value=f"**`{task.get('visibility', 'Unknown')}`**", inline=True)
                 embed.add_field(name="Malicious", value=f"**`{verdicts.get('malicious', 'Unknown')}`**", inline=True)
