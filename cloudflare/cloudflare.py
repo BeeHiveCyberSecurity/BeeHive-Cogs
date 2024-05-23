@@ -2280,7 +2280,7 @@ class Cloudflare(commands.Cog):
             try:
                 async with self.session.get(status_url, headers=headers) as response:
                     if response.status == 202:
-                        ctx.typing()
+                        await ctx.typing()
                         continue
                     elif response.status != 200:
                         embed = discord.Embed(title="Error", description=f"Failed to check scan status: {response.status}", color=0xff4545)
