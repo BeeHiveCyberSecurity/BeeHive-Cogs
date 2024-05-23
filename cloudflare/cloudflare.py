@@ -2276,12 +2276,11 @@ class Cloudflare(commands.Cog):
         # Check the scan status every 10-15 seconds
         status_url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/urlscanner/scan/{scan_id}"
         while True:
-            await asyncio.sleep(10)
+            await asyncio.sleep(15)
             try:
                 async with self.session.get(status_url, headers=headers) as response:
                     if response.status == 202:
-                        embed = discord.Embed(title="Scan In Progress", description=f"Scan ID: **`{scan_id}`** is still in progress.", color=0x2BBD8E)
-                        await ctx.send(embed=embed)
+                        ctx.typing()
                         continue
                     elif response.status != 200:
                         embed = discord.Embed(title="Error", description=f"Failed to check scan status: {response.status}", color=0xff4545)
