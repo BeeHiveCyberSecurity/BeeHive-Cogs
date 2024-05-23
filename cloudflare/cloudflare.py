@@ -385,7 +385,7 @@ class Cloudflare(commands.Cog):
                 result = data.get("result", {})
                 embed = discord.Embed(
                     title="DNSSEC Status",
-                    description="Here is the current DNSSEC status and configuration:",
+                    description=f"Here is the current DNSSEC status and configuration for Cloudflare Zone **`{zone_id}`**",
                     color=discord.Color.from_str("#2BBD8E")
                 )
                 embed.add_field(name="Algorithm", value=f"**`{result.get('algorithm', 'Unknown')}`**", inline=True)
