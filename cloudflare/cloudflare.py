@@ -2178,16 +2178,15 @@ class Cloudflare(commands.Cog):
                 pages.append(ips_embed)
 
                 # Links
-                links = result.get('links', {}).get('link', [])
-                for link in links:
-                    links_embed = discord.Embed(
-                        title="URL Scan Result - Links",
-                        description=f"Scan result for ID: **`{scan_id}`**",
-                        color=0x2BBD8E
-                    )
-                    links_embed.add_field(name="Link Href", value=f"**`{link.get('href', 'Unknown')}`**", inline=True)
-                    links_embed.add_field(name="Link Text", value=f"**`{link.get('text', 'Unknown')}`**", inline=True)
-                    pages.append(links_embed)
+                links = result.get('links', {}).get('link', {})
+                links_embed = discord.Embed(
+                    title="URL Scan Result - Links",
+                    description=f"Scan result for ID: **`{scan_id}`**",
+                    color=0x2BBD8E
+                )
+                links_embed.add_field(name="Link Href", value=f"**`{links.get('href', 'Unknown')}`**", inline=True)
+                links_embed.add_field(name="Link Text", value=f"**`{links.get('text', 'Unknown')}`**", inline=True)
+                pages.append(links_embed)
 
                 # Meta
                 meta = result.get('meta', {}).get('processors', {})
