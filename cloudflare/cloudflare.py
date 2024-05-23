@@ -601,8 +601,8 @@ class Cloudflare(commands.Cog):
             ))
 
     @commands.is_owner()
-    @loadbalancer.command(name="patch")
-    async def loadbalancer_update(self, ctx, load_balancer_id: str, key: str, value: str):
+    @loadbalancing.command(name="patch")
+    async def patch_load_balancer(self, ctx, load_balancer_id: str, key: str, value: str):
         """Update the settings of a specific load balancer."""
         api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
         bearer_token = api_tokens.get("bearer_token")
