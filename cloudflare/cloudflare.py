@@ -2302,9 +2302,14 @@ class Cloudflare(commands.Cog):
 
                         embed = discord.Embed(
                             title="URL Scan Completed",
-                            description=f"Scan ID: **`{scan_id}`**\nMalicious: **`{malicious}`**\nCategories: **`{categories}`**\nPhishing: **`{phishing}`**",
                             color=0x2BBD8E
                         )
+                        embed.add_field(name="Scan ID", value=f"**`{scan_id}`**", inline=False)
+                        embed.add_field(name="Malicious", value=f"**`{malicious}`**", inline=False)
+                        if categories:
+                            embed.add_field(name="Categories", value=f"**`{categories}`**", inline=False)
+                        if phishing:
+                            embed.add_field(name="Phishing", value=f"**`{phishing}`**", inline=False)
                         await ctx.send(embed=embed)
                         return
 
