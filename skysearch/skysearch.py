@@ -68,19 +68,19 @@ class Skysearch(commands.Cog):
 #                emergency_status = ":warning: **UAV has lost radio contact**"
 #                embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Orange/alert-circle-outline.png")
             if squawk_code == '7500':
-                embed = discord.Embed(title='Aircraft found', description=f"# {aircraft_data.get('desc', 'N/A')}", color=discord.Colour(0xff4545))
+                embed = discord.Embed(title='Aircraft alert', description=f"# {aircraft_data.get('desc', 'N/A')}", color=discord.Colour(0xff4545))
                 emergency_status = ":rotating_light: **Aircraft has been hijacked**"
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/alert-circle.png")
             elif squawk_code == '7600':
-                embed = discord.Embed(title='Aircraft found', description=f"# {aircraft_data.get('desc', 'N/A')}", color=discord.Colour(0xff4545))
+                embed = discord.Embed(title='Aircraft alert', description=f"# {aircraft_data.get('desc', 'N/A')}", color=discord.Colour(0xff4545))
                 emergency_status = ":signal_strength: **Aircraft has lost radio contact**"
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/alert-circle.png")
             elif squawk_code == '7700':
-                embed = discord.Embed(title='Aircraft found', description=f"# {aircraft_data.get('desc', 'N/A')}", color=discord.Colour(0xff4545))
+                embed = discord.Embed(title='Aircraft alert', description=f"# {aircraft_data.get('desc', 'N/A')}", color=discord.Colour(0xff4545))
                 emergency_status = ":warning: **Aircraft has declared an emergency**"
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/alert-circle.png")
             else:
-                embed = discord.Embed(title='Aircraft found', description=f"# {aircraft_data.get('desc', 'N/A')}", color=discord.Colour(0xfffffe))
+                embed = discord.Embed(title='Aircraft information', description=f"# {aircraft_data.get('desc', 'N/A')}", color=discord.Colour(0xfffffe))
                 emergency_status = ":white_check_mark: **Aircraft reports normal conditions**"
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/airplane.png")
             callsign = aircraft_data.get('flight', 'N/A').strip()

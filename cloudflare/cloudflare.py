@@ -2262,8 +2262,9 @@ class Cloudflare(commands.Cog):
                     return
 
                 scan_id = data["result"]["uuid"]
-                embed = discord.Embed(title="URL Submitted for Scanning", description=f"Scan ID: **`{scan_id}`**", color=0x2BBD8E)
+                embed = discord.Embed(title="URL submitted", description=f"Your scan ID is\n```{scan_id}```\n\nThe scan may take a few moments to complete, please wait...", color=0x2BBD8E)
                 await ctx.send(embed=embed)
+                await ctx.typing()
 
         except Exception as e:
             await ctx.send(embed=discord.Embed(
@@ -2301,7 +2302,7 @@ class Cloudflare(commands.Cog):
                         phishing = ", ".join(verdict.get("phishing", []))
 
                         embed = discord.Embed(
-                            title="URL Scan Completed",
+                            title="Scan completed",
                             color=0x2BBD8E
                         )
                         embed.add_field(name="Scan ID", value=f"**`{scan_id}`**", inline=False)
