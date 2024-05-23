@@ -2246,7 +2246,11 @@ class Cloudflare(commands.Cog):
 
         try:
             async with self.session.post(submit_url, headers=headers, json=payload) as response:
-                if response.status != 200:
+                if response.status == 409:
+                    embed = discord.Embed(title="Domain on cooldown", description="The domain was too recently scanned. Please try again in a few minutes.", color=0xff4545)
+                    await ctx.send(embed=embed)
+                    return
+                elif response.status != 200:
                     embed = discord.Embed(title="Error", description=f"Failed to submit URL for scanning: {response.status}", color=0xff4545)
                     await ctx.send(embed=embed)
                     return
