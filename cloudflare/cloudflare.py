@@ -345,7 +345,7 @@ class Cloudflare(commands.Cog):
 
     @commands.group()
     async def loadbalancing(self, ctx):
-        """"Load balancing under construction"""
+        """Cloudflare Load Balancing distributes traffic across your servers, which reduces server strain and latency and improves the experience for end users. Learn more at https://developers.cloudflare.com/load-balancing/"""
 
     @commands.is_owner()
     @loadbalancing.command(name="list")
