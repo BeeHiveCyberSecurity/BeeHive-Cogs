@@ -2027,7 +2027,6 @@ class Cloudflare(commands.Cog):
                 color=0xff4545
             ))
 
-
     @urlscanner.command(name="results")
     async def get_scan_result(self, ctx, scan_id: str):
         """Get the result of a URL scan by its ID."""
@@ -2100,6 +2099,62 @@ class Cloudflare(commands.Cog):
                 color=0xff4545
             ))
 
+    @urlscanner.command(name="har")
+    async def fetch_har(self, ctx, scan_id: str):
+        """Fetch the HAR of a scan by the scan ID"""
+        api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
+        email = api_tokens.get("email")
+        api_key = api_tokens.get("api_key")
+        bearer_token = api_tokens.get("bearer_token")
+        account_id = api_tokens.get("account_id")
+
+        if not all([email, api_key, bearer_token, account_id]):
+            embed = discord.Embed(title="Configuration Error", description="Missing one or more required API tokens. Please check your configuration.", color=0xff4545)
+            await ctx.send(embed=embed)
+            return
+
+        headers = {
+            "X-Auth-Email": email,
+            "X-Auth-Key": api_key,
+            "Authorization": f"Bearer {bearer_token}",
+            "Content-Type": "application/json"
+        }
+
+        api_url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/urlscanner/scan/{scan_id}/har"
+
+        try:
+            async with self.session.get(api_url, headers=headers) as response:
+                data = await response.json()
+                if not data.get("success", False):
+                    error_message = data.get("errors", [{"message": "Unknown error"}])[0].get("message")
+                    embed = discord.Embed(
+                        title="Failed to Retrieve HAR",
+                        description=f"**Error:** {error_message}",
+                        color=0xff4545
+                    )
+                    await ctx.send(embed=embed)
+                    return
+
+                har_data = data.get("result", {}).get("har", {})
+                if not har_data:
+                    await ctx.send(embed=discord.Embed(
+                        title="No Data",
+                        description="No HAR data found for the given scan ID.",
+                        color=0xff4545
+                    ))
+                    return
+
+                # Send HAR data as a file
+                har_json = json.dumps(har_data, indent=4)
+                har_file = discord.File(io.StringIO(har_json), filename=f"{scan_id}_har.json")
+                await ctx.send(file=har_file)
+
+        except Exception as e:
+            await ctx.send(embed=discord.Embed(
+                title="Error",
+                description=f"An error occurred: {str(e)}",
+                color=0xff4545
+            ))
 
 
 
