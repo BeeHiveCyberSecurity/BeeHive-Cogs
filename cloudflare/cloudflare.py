@@ -391,12 +391,20 @@ class Cloudflare(commands.Cog):
                 embed.add_field(name="Algorithm", value=f"**`{result.get('algorithm', 'Unknown')}`**", inline=True)
                 embed.add_field(name="Digest Algorithm", value=f"**`{result.get('digest_algorithm', 'Unknown')}`**", inline=True)
                 embed.add_field(name="Digest Type", value=f"**`{result.get('digest_type', 'Unknown')}`**", inline=True)
-                embed.add_field(name="DNSSEC Multi Signer", value=f"**`{str(result.get('dnssec_multi_signer', 'Unknown'))}`**", inline=True)
-                embed.add_field(name="DNSSEC Presigned", value=f"**`{str(result.get('dnssec_presigned', 'Unknown'))}`**", inline=True)
+                embed.add_field(name="Multi Signer", value=f"**`{str(result.get('dnssec_multi_signer', 'Unknown'))}`**", inline=True)
+                embed.add_field(name="Presigned", value=f"**`{str(result.get('dnssec_presigned', 'Unknown'))}`**", inline=True)
                 embed.add_field(name="Flags", value=f"**`{result.get('flags', 'Unknown')}`**", inline=True)
                 embed.add_field(name="Key Tag", value=f"**`{result.get('key_tag', 'Unknown')}`**", inline=True)
                 embed.add_field(name="Key Type", value=f"**`{result.get('key_type', 'Unknown')}`**", inline=True)
-                embed.add_field(name="Modified On", value=f"**`{result.get('modified_on', 'Unknown')}`**", inline=True)
+                modified_on = result.get('modified_on', 'Unknown')
+                if modified_on != 'Unknown':
+                    try:
+                        from datetime import datetime
+                        modified_on_dt = datetime.fromisoformat(modified_on.replace('Z', '+00:00'))
+                        modified_on = f"<t:{int(modified_on_dt.timestamp())}:R>"
+                    except ValueError:
+                        pass
+                embed.add_field(name="Modified On", value=f"**{modified_on}**", inline=True)
                 embed.add_field(name="Status", value=f"**`{result.get('status', 'Unknown')}`**", inline=True)
                 embed.add_field(name="DS", value=f"```{result.get('ds', 'Unknown')}```", inline=False)
                 embed.add_field(name="Public Key", value=f"```{result.get('public_key', 'Unknown')}```", inline=False)
