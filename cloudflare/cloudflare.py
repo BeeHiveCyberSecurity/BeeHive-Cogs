@@ -2257,7 +2257,7 @@ class Cloudflare(commands.Cog):
                     await ctx.send(embed=embed)
                     return
 
-                scan_id = data["result"]["id"]
+                scan_id = data["result"]["uuid"]
                 embed = discord.Embed(title="URL Submitted for Scanning", description=f"Scan ID: **`{scan_id}`**", color=0x2BBD8E)
                 await ctx.send(embed=embed)
 
