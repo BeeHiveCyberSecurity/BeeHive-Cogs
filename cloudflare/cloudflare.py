@@ -2078,7 +2078,7 @@ class Cloudflare(commands.Cog):
 
                 embed = discord.Embed(
                     title="URL Scan Result",
-                    description=f"Scan result for ID ```{scan_id}```",
+                    description=f"### Scan result for ID\n```{scan_id}```",
                     color=0x2BBD8E
                 )
                 embed.add_field(name="Target URL", value=f"```{task.get('url', 'Unknown')}```", inline=False)
@@ -2088,6 +2088,8 @@ class Cloudflare(commands.Cog):
                 malicious_result = verdicts.get('overall', {}).get('malicious', 'Unknown')
                 embed.add_field(name="Malicious", value=f"**`{malicious_result}`**", inline=True)
                 embed.add_field(name="Categories", value=f"**`{', '.join(verdicts.get('categories', ['Unknown']))}`**", inline=True)
+                page_rank = result.get('meta', {}).get('processors', {}).get('rank', 'Unknown')
+                embed.add_field(name="Page Rank", value=f"**`{page_rank}`**", inline=True)
                 await ctx.send(embed=embed)
         except Exception as e:
             await ctx.send(embed=discord.Embed(
