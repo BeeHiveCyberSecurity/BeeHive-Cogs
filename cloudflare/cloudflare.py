@@ -2202,24 +2202,6 @@ class Cloudflare(commands.Cog):
                         )
                         await ctx.send(embed=embed)
                         return
-
-                    screenshot_url = data.get("result", {}).get("screenshot", "")
-                    if not screenshot_url:
-                        await ctx.send(embed=discord.Embed(
-                            title="No Data",
-                            description="No screenshot found for the given scan ID.",
-                            color=0xff4545
-                        ))
-                        return
-
-                    embed = discord.Embed(
-                        title="Scan Screenshot",
-                        description=f"Screenshot for scan ID: {scan_id}",
-                        color=0x2BBD8E
-                    )
-                    embed.set_image(url=screenshot_url)
-                    await ctx.send(embed=embed)
-
         except Exception as e:
             await ctx.send(embed=discord.Embed(
                 title="Error",
