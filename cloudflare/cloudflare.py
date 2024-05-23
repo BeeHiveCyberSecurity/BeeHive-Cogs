@@ -2218,6 +2218,95 @@ class Cloudflare(commands.Cog):
                 color=0xff4545
             ))
 
+    @urlscanner.command(name="scan")
+    async def scan_url(self, ctx, url: str):
+        """Scan a URL using Cloudflare URL Scanner and return the verdict."""
+        api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
+        email = api_tokens.get("email")
+        api_key = api_tokens.get("api_key")
+        bearer_token = api_tokens.get("bearer_token")
+        account_id = api_tokens.get("account_id")
+
+        if not all([email, api_key, bearer_token, account_id]):
+            embed = discord.Embed(title="Configuration Error", description="Missing one or more required API tokens. Please check your configuration.", color=0xff4545)
+            await ctx.send(embed=embed)
+            return
+
+        headers = {
+            "X-Auth-Email": email,
+            "X-Auth-Key": api_key,
+            "Authorization": f"Bearer {bearer_token}",
+            "Content-Type": "application/json"
+        }
+
+        # Submit the URL for scanning
+        submit_url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/urlscanner/scan"
+        payload = {"url": url}
+
+        try:
+            async with self.session.post(submit_url, headers=headers, json=payload) as response:
+                if response.status != 200:
+                    embed = discord.Embed(title="Error", description=f"Failed to submit URL for scanning: {response.status}", color=0xff4545)
+                    await ctx.send(embed=embed)
+                    return
+
+                data = await response.json()
+                if not data.get("success", False):
+                    embed = discord.Embed(title="Error", description="Failed to submit URL for scanning.", color=0xff4545)
+                    await ctx.send(embed=embed)
+                    return
+
+                scan_id = data["result"]["id"]
+                embed = discord.Embed(title="URL Submitted for Scanning", description=f"Scan ID: **`{scan_id}`**", color=0x2BBD8E)
+                await ctx.send(embed=embed)
+
+        except Exception as e:
+            await ctx.send(embed=discord.Embed(
+                title="Error",
+                description=f"An error occurred while submitting the URL: {str(e)}",
+                color=0xff4545
+            ))
+            return
+
+        # Check the scan status every 10-15 seconds
+        status_url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/urlscanner/scan/{scan_id}"
+        while True:
+            await asyncio.sleep(10)
+            try:
+                async with self.session.get(status_url, headers=headers) as response:
+                    if response.status != 200:
+                        embed = discord.Embed(title="Error", description=f"Failed to check scan status: {response.status}", color=0xff4545)
+                        await ctx.send(embed=embed)
+                        return
+
+                    data = await response.json()
+                    if not data.get("success", False):
+                        embed = discord.Embed(title="Error", description="Failed to check scan status.", color=0xff4545)
+                        await ctx.send(embed=embed)
+                        return
+
+                    scan_status = data["result"]["status"]
+                    if scan_status == "finished":
+                        verdict = data["result"]["verdict"]
+                        embed = discord.Embed(
+                            title="URL Scan Completed",
+                            description=f"Scan ID: **`{scan_id}`**\nVerdict: **`{verdict}`**",
+                            color=0x2BBD8E
+                        )
+                        await ctx.send(embed=embed)
+                        return
+                    elif scan_status == "failed":
+                        embed = discord.Embed(title="Scan Failed", description=f"Scan ID: **`{scan_id}`**", color=0xff4545)
+                        await ctx.send(embed=embed)
+                        return
+
+            except Exception as e:
+                await ctx.send(embed=discord.Embed(
+                    title="Error",
+                    description=f"An error occurred while checking the scan status: {str(e)}",
+                    color=0xff4545
+                ))
+                return
 
 
     @commands.is_owner()
