@@ -2262,7 +2262,7 @@ class Cloudflare(commands.Cog):
                     return
 
                 scan_id = data["result"]["uuid"]
-                embed = discord.Embed(title="URL submitted", description=f"### Your scan ID is\n```{scan_id}```\nThe scan may take a few moments to complete, please wait...", color=0x2BBD8E)
+                embed = discord.Embed(title="Scanning URL", description=f"### Your scan ID is\n```{scan_id}```\nThe scan may take a few moments to complete, please wait...", color=0x2BBD8E)
                 await ctx.send(embed=embed)
                 await ctx.typing()
 
@@ -2301,12 +2301,23 @@ class Cloudflare(commands.Cog):
                         categories = ", ".join([cat["name"] for cat in verdict["categories"]])
                         phishing = ", ".join(verdict.get("phishing", []))
 
-                        embed = discord.Embed(
-                            title="Scan completed",
-                            color=0x2BBD8E
-                        )
-                        embed.add_field(name="Scan ID", value=f"**`{scan_id}`**", inline=False)
-                        embed.add_field(name="Malicious", value=f"**`{malicious}`**", inline=False)
+                        if malicious:
+                            embed = discord.Embed(
+                                title="Scan completed",
+                                description=f"A URL safety scan finished for Scan ID\n```{scan_id}```",
+                                color=0xff4545
+                            )
+                            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/bug.png")
+                        else:
+                            embed = discord.Embed(
+                                title="Scan completed",
+                                description=f"A URL safety scan finished for Scan ID\n```{scan_id}```",
+                                color=0x2BBD8E
+                            )
+                            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/shield-checkmark.png")
+
+                        verdict = "Malicious" if malicious else "Safe"
+                        embed.add_field(name="Verdict", value=f"**`{verdict}`**", inline=False)
                         if categories:
                             embed.add_field(name="Categories", value=f"**`{categories}`**", inline=False)
                         if phishing:
