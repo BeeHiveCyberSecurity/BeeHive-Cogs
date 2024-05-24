@@ -145,7 +145,7 @@ class Products(commands.Cog):
         """
         embed = discord.Embed(
             title="Download the BeeHive Service Agent",
-            description="Before we can assist you remotely, you'll need to download and install our Service Agent.\n### We use this agent to...\n- **Remotely connect and control your device on request**\n- **Read diagnostic information about your device**\n- **Remotely orchestrate repairs and security operations**\n**and more...**\n\nWhile our software is installed on your system, information about you and your device, including any telemetry we collect, will be guarded subject to our [Terms of Service](https://www.beehive.systems/tos), and [Privacy Policy](https://www.beehive.systems/privacy).",
+            description="Before we can assist you remotely, you'll need to download and install our **Service Agent**.\n### We use this agent to...\n- **Remotely connect and control your device on request**\n- **Read diagnostic information about your device**\n- **Remotely orchestrate repairs and security operations**\n**and more...**\n\nWhile our software is installed on your system, information about you and your device, including any telemetry we collect, will be guarded subject to our **[Terms of Service](https://www.beehive.systems/tos)**, and **[Privacy Policy](https://www.beehive.systems/privacy)**.\n\nTo learn more about how we secure your private information, please visit our **[Trust Center](https://trust.beehive.systems)**",
             colour=16767334
         )
         embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/shield-checkmark.png")
