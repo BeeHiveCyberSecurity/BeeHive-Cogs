@@ -152,7 +152,7 @@ class Products(commands.Cog):
         embed.set_image(url="https://asset.brandfetch.io/idGpYEfxfH/id0xj4J1xg.png")
         embed.add_field(
             name="Instructions",
-            value="**1.** Download the latest version using the button below\n**2.** Run the downloaded file as administrator.\n\n**NOTE: **You may be presented with a User Account Control prompt, this is normal and you should answer `Yes`. The Service Agent will install silently and automatically. Once complete, you'll see a green globe in your taskbar, indicating a successful connection",
+            value="**1.** Download the latest version using the button below that corresponds to your operating system\n**2.** Run the downloaded file as administrator.\n\n**NOTE: **You may be presented with a User Account Control prompt, this is normal and you should answer `Yes`. The Service Agent will install silently and automatically. Once complete, you'll see a green globe in your taskbar, indicating a successful connection",
             inline=False
         )
         view = discord.ui.View()
