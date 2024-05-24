@@ -145,7 +145,7 @@ class Products(commands.Cog):
         """
         embed = discord.Embed(
             title="Download the BeeHive Service Agent",
-            description="Before we can assist you remotely, you'll need to download and install our Service Agent.\n### We use this agent to...\n- **Remotely connect and control your device on request**\n- **Read diagnostic information about your device**\n- **Remotely orchestrate repairs and security operations**\nand more\n\nWhile our software is installed on your system, information about you and your device, including any telemetry we collect, will be guarded subject to our [Terms of Service](https://www.beehive.systems/tos), and [Privacy Policy](https://www.beehive.systems/privacy).",
+            description="Before we can assist you remotely, you'll need to download and install our Service Agent.\n### We use this agent to...\n- **Remotely connect and control your device on request**\n- **Read diagnostic information about your device**\n- **Remotely orchestrate repairs and security operations**\n**and more...**\n\nWhile our software is installed on your system, information about you and your device, including any telemetry we collect, will be guarded subject to our [Terms of Service](https://www.beehive.systems/tos), and [Privacy Policy](https://www.beehive.systems/privacy).",
             colour=16767334
         )
         embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/shield-checkmark.png")
@@ -156,6 +156,6 @@ class Products(commands.Cog):
             inline=False
         )
         view = discord.ui.View()
-        view.add_item(discord.ui.Button(label="Get the Service Agent", url="https://go.beehive.systems/serviceagent", style=discord.ButtonStyle.link, emoji="<:info:1199305085738553385>"))
-        view.add_item(discord.ui.Button(label="Join our Discord", url="https://discord.gg/ADz7YSegPT", style=discord.ButtonStyle.link))
+        view.add_item(discord.ui.Button(label="For Windows", url="https://go.beehive.systems/serviceagent", style=discord.ButtonStyle.link, emoji="<:info:1199305085738553385>"))
+        view.add_item(discord.ui.Button(label="Discord", url="https://discord.gg/ADz7YSegPT", style=discord.ButtonStyle.link))
         await ctx.send(embed=embed, view=view)
