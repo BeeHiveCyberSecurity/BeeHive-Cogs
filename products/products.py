@@ -145,7 +145,7 @@ class Products(commands.Cog):
         """
         embed = discord.Embed(
             title="Download the BeeHive Service Agent",
-            description="Before we can assist you remotely, you'll need to download and install our Service Agent.\n\nWe use this agent to...\n- Remotely connect and control your device on request\n- Read diagnostic information about your device\n- Remotely orchestrate repairs and security operations",
+            description="Before we can assist you remotely, you'll need to download and install our Service Agent.\n\n### We use this agent to...\n- Remotely connect and control your device on request\n- Read diagnostic information about your device\n- Remotely orchestrate repairs and security operations",
             colour=16767334
         )
         embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/shield-checkmark.png")
