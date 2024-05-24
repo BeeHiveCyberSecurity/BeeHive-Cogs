@@ -2079,7 +2079,7 @@ class Cloudflare(commands.Cog):
                 processors = meta.get('processors', {})
                 tech = processors.get('tech', [])
                 dns_records = meta.get('dns_records', [])
-                categories = meta.get('categories', [])
+                categories = result.get('domains', {}).get(task.get('url', ''), {}).get('categories', {}).get('content', [])
 
                 embed = discord.Embed(
                     title="Scan results",
@@ -2093,8 +2093,7 @@ class Cloudflare(commands.Cog):
                 malicious_result = verdicts.get('overall', {}).get('malicious', 'Unknown')
                 embed.add_field(name="Malicious", value=f"**`{malicious_result}`**", inline=True)
                 embed.add_field(name="Tech", value=f"**`{', '.join([tech_item['name'] for tech_item in tech])}`**", inline=True)
-                embed.add_field(name="DNS", value=f"**`{', '.join([dns_record['name'] for dns_record in dns_records])}`**", inline=True)
-                embed.add_field(name="Categories", value=f"**`{', '.join(categories)}`**", inline=True)
+                embed.add_field(name="Categories", value=f"**`{', '.join([category['name'] for category in categories])}`**", inline=True)
                 await ctx.send(embed=embed)
         except Exception as e:
             await ctx.send(embed=discord.Embed(
