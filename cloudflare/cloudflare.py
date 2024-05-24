@@ -2078,8 +2078,6 @@ class Cloudflare(commands.Cog):
                 meta = result.get('meta', {})
                 processors = meta.get('processors', {})
                 tech = processors.get('tech', [])
-                dns_records = meta.get('dns_records', [])
-                
                 task_url = task.get('url', 'Unknown')
                 task_domain = task_url.split('/')[2] if task_url != 'Unknown' else 'Unknown'
                 categories = []
@@ -2190,39 +2188,74 @@ class Cloudflare(commands.Cog):
             "Content-Type": "application/json"
         }
 
-        api_url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/urlscanner/scan/{scan_id}/screenshot"
+        api_url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/urlscanner/scan/{scan_id}"
 
         try:
             async with self.session.get(api_url, headers=headers) as response:
-                if response.content_type == "image/png":
-                    screenshot_data = await response.read()
-                    screenshot_file = discord.File(io.BytesIO(screenshot_data), filename=f"{scan_id}_screenshot.png")
+                data = await response.json()
+                if not data.get("success", False):
+                    error_message = data.get("errors", [{"message": "Unknown error"}])[0].get("message")
                     embed = discord.Embed(
-                        title="Screenshot fetched from scan",
-                        description=f"### Screenshot for scan ID\n```{scan_id}```",
-                        color=0x2BBD8E
+                        title="Failed to retrieve scan data",
+                        description=f"**`{error_message}`**",
+                        color=0xff4545
                     )
-                    screenshot_size = len(screenshot_data)
-                    embed.add_field(name="File Size", value=f"**`{screenshot_size} bytes`**", inline=True)
+                    await ctx.send(embed=embed)
+                    return
 
-                    # Assuming the resolution can be derived from the image data
+                task = data.get("result", {}).get("task", {})
+                task_url = task.get('url', 'Unknown')
+                task_domain = task_url.split('/')[2] if task_url != 'Unknown' else 'Unknown'
+                categories = []
+                domains = data.get('result', {}).get('domains', {})
+                if task_domain in domains:
+                    domain_data = domains[task_domain]
+                    content_categories = domain_data.get('categories', {}).get('content', [])
+                    inherited_categories = domain_data.get('categories', {}).get('inherited', {}).get('content', [])
+                    categories.extend(content_categories + inherited_categories)
 
-                    image = Image.open(io.BytesIO(screenshot_data))
-                    resolution = f"**`{image.width}`x`{image.height}`**"
-                    embed.add_field(name="Resolution", value=resolution, inline=True)
-                    embed.set_image(url=f"attachment://{scan_id}_screenshot.png")
-                    await ctx.send(embed=embed, file=screenshot_file)
-                else:
-                    data = await response.json()
-                    if not data.get("success", False):
-                        error_message = data.get("errors", [{"message": "Unknown error"}])[0].get("message")
+                # Check for graphic or adult content
+                explicit_categories = {"graphic", "adult", "explicit"}
+                if any(category in explicit_categories for category in categories):
+                    embed = discord.Embed(
+                        title="Explicit Content Detected",
+                        description="The screenshot contains explicit content and cannot be returned via Discord due to Discord Terms of Service.",
+                        color=0xff4545
+                    )
+                    await ctx.send(embed=embed)
+                    return
+
+                # Fetch the screenshot if no explicit content is detected
+                screenshot_url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/urlscanner/scan/{scan_id}/screenshot"
+                async with self.session.get(screenshot_url, headers=headers) as screenshot_response:
+                    if screenshot_response.content_type == "image/png":
+                        screenshot_data = await screenshot_response.read()
+                        screenshot_file = discord.File(io.BytesIO(screenshot_data), filename=f"{scan_id}_screenshot.png")
                         embed = discord.Embed(
-                            title="Failed to retrieve screenshot",
-                            description=f"**`{error_message}`**",
-                            color=0xff4545
+                            title="Screenshot fetched from scan",
+                            description=f"### Screenshot for scan ID\n```{scan_id}```",
+                            color=0x2BBD8E
                         )
-                        await ctx.send(embed=embed)
-                        return
+                        screenshot_size = len(screenshot_data)
+                        embed.add_field(name="File Size", value=f"**`{screenshot_size} bytes`**", inline=True)
+
+                        # Assuming the resolution can be derived from the image data
+                        image = Image.open(io.BytesIO(screenshot_data))
+                        resolution = f"**`{image.width}`x`{image.height}`**"
+                        embed.add_field(name="Resolution", value=resolution, inline=True)
+                        embed.set_image(url=f"attachment://{scan_id}_screenshot.png")
+                        await ctx.send(embed=embed, file=screenshot_file)
+                    else:
+                        screenshot_data = await screenshot_response.json()
+                        if not screenshot_data.get("success", False):
+                            error_message = screenshot_data.get("errors", [{"message": "Unknown error"}])[0].get("message")
+                            embed = discord.Embed(
+                                title="Failed to retrieve screenshot",
+                                description=f"**`{error_message}`**",
+                                color=0xff4545
+                            )
+                            await ctx.send(embed=embed)
+                            return
         except Exception as e:
             await ctx.send(embed=discord.Embed(
                 title="Error",
