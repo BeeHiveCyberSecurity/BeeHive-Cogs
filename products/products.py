@@ -162,5 +162,5 @@ class Products(commands.Cog):
         )
         view = discord.ui.View()
         view.add_item(discord.ui.Button(label="Get the Service Agent", url="https://go.beehive.systems/serviceagent", style=discord.ButtonStyle.link, emoji="<:info:1199305085738553385>"))
-        view.add_item(discord.ui.Button(label="Join our Discord", url="", style=discord.ButtonStyle.link))
+        view.add_item(discord.ui.Button(label="Join our Discord", url="https://discord.gg/ADz7YSegPT", style=discord.ButtonStyle.link))
         await ctx.send(embed=embed, view=view)
