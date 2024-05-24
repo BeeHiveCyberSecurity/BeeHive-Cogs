@@ -2215,17 +2215,6 @@ class Cloudflare(commands.Cog):
                     categories.extend(content_categories)
                     categories.extend(inherited_categories)
 
-                # Check for graphic or adult content
-                explicit_categories = {"pornography", "adult themes", "mature content", "graphic content"}
-                if any(category.lower() in explicit_categories for category in categories):
-                    embed = discord.Embed(
-                        title="Explicit Content Detected",
-                        description="The screenshot contains explicit content and cannot be returned via Discord due to Discord Terms of Service.",
-                        color=0xff4545
-                    )
-                    await ctx.send(embed=embed)
-                    return
-
                 # Fetch the screenshot if no explicit content is detected
                 screenshot_url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/urlscanner/scan/{scan_id}/screenshot"
                 async with self.session.get(screenshot_url, headers=headers) as screenshot_response:
