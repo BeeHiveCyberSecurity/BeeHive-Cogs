@@ -2075,6 +2075,7 @@ class Cloudflare(commands.Cog):
 
                 task = result.get('task', {})
                 verdicts = result.get('verdicts', {})
+                categories = result.get('categories', {}).get('inherited', {}).get('content', [])
 
                 embed = discord.Embed(
                     title="Scan results",
@@ -2087,7 +2088,7 @@ class Cloudflare(commands.Cog):
                 embed.add_field(name="Visibility", value=f"**`{task.get('visibility', 'Unknown')}`**", inline=True)
                 malicious_result = verdicts.get('overall', {}).get('malicious', 'Unknown')
                 embed.add_field(name="Malicious", value=f"**`{malicious_result}`**", inline=True)
-                embed.add_field(name="Categories", value=f"**`{', '.join(verdicts.get('categories', ['Unknown']))}`**", inline=True)
+                embed.add_field(name="Categories", value=f"**`{', '.join([category['name'] for category in categories])}`**", inline=True)
                 meta = result.get('meta', {})
                 processors = meta.get('processors', {})
                 page_bucket = processors.get('bucket', 'Unknown')
@@ -2157,6 +2158,7 @@ class Cloudflare(commands.Cog):
                 color=0xff4545
             ))
 
+
     @urlscanner.command(name="screenshot")
     async def get_scan_screenshot(self, ctx, scan_id: str):
         """Get the screenshot of a scan by its scan ID"""
@@ -2217,7 +2219,6 @@ class Cloudflare(commands.Cog):
                 description=f"An error occurred: {str(e)}",
                 color=0xff4545
             ))
-
 
     @urlscanner.command(name="scan")
     async def scan_url(self, ctx, url: str):
