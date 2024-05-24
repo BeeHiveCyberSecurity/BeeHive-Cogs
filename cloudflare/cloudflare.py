@@ -2263,6 +2263,7 @@ class Cloudflare(commands.Cog):
 
                 scan_id = data["result"]["uuid"]
                 embed = discord.Embed(title="Scanning URL", description=f"### Your scan ID is\n```{scan_id}```\nThe scan may take a few moments to complete, please wait...", color=0x2BBD8E)
+                embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/link.png")
                 await ctx.send(embed=embed)
                 await ctx.typing()
 
