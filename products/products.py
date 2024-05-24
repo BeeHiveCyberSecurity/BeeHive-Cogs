@@ -138,7 +138,7 @@ class Products(commands.Cog):
 
     @commands.is_owner()
     @commands.bot_has_permissions(embed_links=True)
-    @commands.group(name="serviceagent", description="Instructions to download and install the service agent")
+    @commands.group(name="serviceagent", description="Instructions to download and install the service agent", invoke_without_command=True)
     async def serviceagent(self, ctx: commands.Context):
         """
         Show an embed containing instructions to download and install the service agent for remote assistance
