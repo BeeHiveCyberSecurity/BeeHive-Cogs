@@ -2216,7 +2216,7 @@ class Cloudflare(commands.Cog):
                     categories.extend(inherited_categories)
 
                 # Check for graphic or adult content
-                explicit_categories = {"pornography", "adult themes"}
+                explicit_categories = {"pornography", "adult themes", "mature content", "graphic content"}
                 if any(category.lower() in explicit_categories for category in categories):
                     embed = discord.Embed(
                         title="Explicit Content Detected",
