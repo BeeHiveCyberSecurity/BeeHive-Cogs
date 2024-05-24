@@ -2080,9 +2080,12 @@ class Cloudflare(commands.Cog):
                 tech = processors.get('tech', [])
                 dns_records = meta.get('dns_records', [])
                 
-                domains = result.get('domains', {})
+                task_url = task.get('url', 'Unknown')
+                task_domain = task_url.split('/')[2] if task_url != 'Unknown' else 'Unknown'
                 categories = []
-                for domain, domain_data in domains.items():
+                domains = result.get('domains', {})
+                if task_domain in domains:
+                    domain_data = domains[task_domain]
                     content_categories = domain_data.get('categories', {}).get('content', [])
                     inherited_categories = domain_data.get('categories', {}).get('inherited', {}).get('content', [])
                     categories.extend(content_categories + inherited_categories)
@@ -2092,7 +2095,7 @@ class Cloudflare(commands.Cog):
                     description=f"### Scan result for ID\n```{scan_id}```",
                     color=0x2BBD8E
                 )
-                embed.add_field(name="Target URL", value=f"```{task.get('url', 'Unknown')}```", inline=False)
+                embed.add_field(name="Target URL", value=f"```{task_url}```", inline=False)
                 embed.add_field(name="Effective URL", value=f"```{task.get('effectiveUrl', 'Unknown')}```", inline=False)
                 embed.add_field(name="Status", value=f"**`{task.get('status', 'Unknown')}`**", inline=True)
                 embed.add_field(name="Visibility", value=f"**`{task.get('visibility', 'Unknown')}`**", inline=True)
