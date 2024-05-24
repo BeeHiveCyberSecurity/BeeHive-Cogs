@@ -2079,7 +2079,13 @@ class Cloudflare(commands.Cog):
                 processors = meta.get('processors', {})
                 tech = processors.get('tech', [])
                 dns_records = meta.get('dns_records', [])
-                categories = result.get('domains', {}).get(task.get('url', ''), {}).get('categories', {}).get('content', [])
+                
+                domains = result.get('domains', {})
+                categories = []
+                for domain, domain_data in domains.items():
+                    content_categories = domain_data.get('categories', {}).get('content', [])
+                    inherited_categories = domain_data.get('categories', {}).get('inherited', {}).get('content', [])
+                    categories.extend(content_categories + inherited_categories)
 
                 embed = discord.Embed(
                     title="Scan results",
