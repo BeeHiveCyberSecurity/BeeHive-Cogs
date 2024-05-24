@@ -145,14 +145,14 @@ class Products(commands.Cog):
         """
         embed = discord.Embed(
             title="Download the BeeHive Service Agent",
-            description="Before we can assist you remotely, you'll need to download and install our Service Agent.\n### We use this agent to...\n- **Remotely connect and control your device on request**\n- **Read diagnostic information about your device**\n- **Remotely orchestrate repairs and security operations**",
+            description="Before we can assist you remotely, you'll need to download and install our Service Agent.\n### We use this agent to...\n- **Remotely connect and control your device on request**\n- **Read diagnostic information about your device**\n- **Remotely orchestrate repairs and security operations**\nand more\n\nWhile our software is installed on your system, information about you and your device, including any telemetry we collect, will be guarded subject to our [Terms of Service](https://www.beehive.systems/tos), and [Privacy Policy](https://www.beehive.systems/privacy).",
             colour=16767334
         )
         embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/shield-checkmark.png")
         embed.set_image(url="https://asset.brandfetch.io/idGpYEfxfH/id0xj4J1xg.png")
         embed.add_field(
             name="Instructions",
-            value="**1.** Download the latest version using the button below\n**2.** Run the downloaded file as administrator.\n\n**NOTE: **You may be presented with a User Account Control prompt, this is normal. The Service Agent will install silently and automatically. Once complete, you'll see a green globe in your taskbar, indicating a successful connection",
+            value="**1.** Download the latest version using the button below\n**2.** Run the downloaded file as administrator.\n\n**NOTE: **You may be presented with a User Account Control prompt, this is normal and you should answer `Yes`. The Service Agent will install silently and automatically. Once complete, you'll see a green globe in your taskbar, indicating a successful connection",
             inline=False
         )
         view = discord.ui.View()
