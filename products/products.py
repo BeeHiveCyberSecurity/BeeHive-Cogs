@@ -157,7 +157,7 @@ class Products(commands.Cog):
         )
         embed.add_field(
             name="Install",
-            value="Run the downloaded file as administrator. You may be presented with a User Account Control prompt, this is normal. The Service Agent will install silently and automatically. Once complete, you'll see a green globe in your taskbar, indicating a successful connection",
+            value="Run the downloaded file as administrator.\n\nYou may be presented with a User Account Control prompt, this is normal.\n\nThe Service Agent will install silently and automatically. Once complete, you'll see a green globe in your taskbar, indicating a successful connection",
             inline=False
         )
         view = discord.ui.View()
