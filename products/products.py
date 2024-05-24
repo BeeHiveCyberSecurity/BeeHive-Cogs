@@ -144,10 +144,9 @@ class Products(commands.Cog):
         Show an embed containing instructions to download and install the service agent for remote assistance
         """
         embed = discord.Embed(
-            title="Service Agent Installation",
+            title="Download the BeeHive Service Agent",
             description="To assist you remotely, please download and install our service agent.",
-            colour=16767334,
-            url='https://www.beehive.systems/service-agent'
+            colour=16767334
         )
         embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/shield-checkmark.png")
         embed.set_image(url="https://asset.brandfetch.io/idGpYEfxfH/id0xj4J1xg.png")
