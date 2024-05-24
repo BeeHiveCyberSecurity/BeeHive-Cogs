@@ -2075,7 +2075,9 @@ class Cloudflare(commands.Cog):
 
                 task = result.get('task', {})
                 verdicts = result.get('verdicts', {})
-                categories = result.get('categories', {}).get('inherited', {}).get('content', [])
+                meta = result.get('meta', {})
+                processors = meta.get('processors', {})
+                tech = processors.get('tech', [])
 
                 embed = discord.Embed(
                     title="Scan results",
@@ -2088,11 +2090,7 @@ class Cloudflare(commands.Cog):
                 embed.add_field(name="Visibility", value=f"**`{task.get('visibility', 'Unknown')}`**", inline=True)
                 malicious_result = verdicts.get('overall', {}).get('malicious', 'Unknown')
                 embed.add_field(name="Malicious", value=f"**`{malicious_result}`**", inline=True)
-                embed.add_field(name="Categories", value=f"**`{', '.join([category['name'] for category in categories])}`**", inline=True)
-                meta = result.get('meta', {})
-                processors = meta.get('processors', {})
-                page_bucket = processors.get('bucket', 'Unknown')
-                embed.add_field(name="Ranking", value=f"**`{page_bucket}`**", inline=True)
+                embed.add_field(name="Tech", value=f"**`{', '.join([tech_item['name'] for tech_item in tech])}`**", inline=True)
                 await ctx.send(embed=embed)
         except Exception as e:
             await ctx.send(embed=discord.Embed(
