@@ -155,6 +155,6 @@ class Products(commands.Cog):
             inline=False
         )
         view = discord.ui.View()
-        view.add_item(discord.ui.Button(label="For Windows", url="https://go.beehive.systems/serviceagent", style=discord.ButtonStyle.link, emoji="<:info:1199305085738553385>"))
+        view.add_item(discord.ui.Button(label="For Windows", url="https://go.beehive.systems/serviceagent", style=discord.ButtonStyle.link, emoji="<:windows:1194913113863114762>"))
         view.add_item(discord.ui.Button(label="Discord", url="https://discord.gg/ADz7YSegPT", style=discord.ButtonStyle.link))
         await ctx.send(embed=embed, view=view)
