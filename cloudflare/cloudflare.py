@@ -2215,7 +2215,7 @@ class Cloudflare(commands.Cog):
                     categories.extend(content_categories)
                     categories.extend(inherited_categories)
 
-                # Fetch the screenshot if no explicit content is detected
+                # Fetch the screenshot
                 screenshot_url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/urlscanner/scan/{scan_id}/screenshot"
                 async with self.session.get(screenshot_url, headers=headers) as screenshot_response:
                     if screenshot_response.content_type == "image/png":
