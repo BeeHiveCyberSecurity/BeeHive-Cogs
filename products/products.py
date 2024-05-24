@@ -151,13 +151,8 @@ class Products(commands.Cog):
         embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/shield-checkmark.png")
         embed.set_image(url="https://asset.brandfetch.io/idGpYEfxfH/id0xj4J1xg.png")
         embed.add_field(
-            name="Download",
-            value="Use the button below to download the latest version of the BeeHive Service Agent",
-            inline=False
-        )
-        embed.add_field(
-            name="Install",
-            value="Run the downloaded file as administrator.\n\nYou may be presented with a User Account Control prompt, this is normal.\n\nThe Service Agent will install silently and automatically. Once complete, you'll see a green globe in your taskbar, indicating a successful connection",
+            name="Instructions",
+            value="**1.** Download the latest version using the button below\n**2.** Run the downloaded file as administrator.\n**NOTE:**You may be presented with a User Account Control prompt, this is normal. The Service Agent will install silently and automatically. Once complete, you'll see a green globe in your taskbar, indicating a successful connection",
             inline=False
         )
         view = discord.ui.View()
