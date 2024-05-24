@@ -135,3 +135,32 @@ class Products(commands.Cog):
         view = discord.ui.View()
         view.add_item(discord.ui.Button(label="Learn more on our website", url="https://www.beehive.systems/pc-optimization", style=discord.ButtonStyle.link, emoji="<:info:1199305085738553385>"))
         await ctx.send(embed=embed, view=view)
+
+    @commands.is_owner()
+    @commands.bot_has_permissions(embed_links=True)
+    @commands.group(name="serviceagent", description="Instructions to download and install the service agent")
+    async def serviceagent(self, ctx: commands.Context):
+        """
+        Show an embed containing instructions to download and install the service agent for remote assistance
+        """
+        embed = discord.Embed(
+            title="Service Agent Installation",
+            description="To assist you remotely, please download and install our service agent.",
+            colour=16767334,
+            url='https://www.beehive.systems/service-agent'
+        )
+        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/shield-checkmark.png")
+        embed.set_image(url="https://asset.brandfetch.io/idGpYEfxfH/id0xj4J1xg.png")
+        embed.add_field(
+            name="Download",
+            value="Use the button below to download the latest version of the BeeHive Service Agent",
+            inline=False
+        )
+        embed.add_field(
+            name="Install",
+            value="Run the downloaded file as administrator. You may be presented with a User Account Control prompt, this is normal. The Service Agent will install silently and automatically. Once complete, you'll see a green globe in your taskbar, indicating a successful connection",
+            inline=False
+        )
+        view = discord.ui.View()
+        view.add_item(discord.ui.Button(label="Download the Service Agent", url="https://go.beehive.systems/serviceagent", style=discord.ButtonStyle.link, emoji="<:info:1199305085738553385>"))
+        await ctx.send(embed=embed, view=view)
