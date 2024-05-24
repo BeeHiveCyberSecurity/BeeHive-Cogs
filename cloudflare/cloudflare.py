@@ -2212,11 +2212,12 @@ class Cloudflare(commands.Cog):
                     domain_data = domains[task_domain]
                     content_categories = domain_data.get('categories', {}).get('content', [])
                     inherited_categories = domain_data.get('categories', {}).get('inherited', {}).get('content', [])
-                    categories.extend(content_categories + inherited_categories)
+                    categories.extend(content_categories)
+                    categories.extend(inherited_categories)
 
                 # Check for graphic or adult content
-                explicit_categories = {"Pornography", "Adult Themes"}
-                if any(category in explicit_categories for category in categories):
+                explicit_categories = {"pornography", "adult themes"}
+                if any(category.lower() in explicit_categories for category in categories):
                     embed = discord.Embed(
                         title="Explicit Content Detected",
                         description="The screenshot contains explicit content and cannot be returned via Discord due to Discord Terms of Service.",
