@@ -169,7 +169,7 @@ class Products(commands.Cog):
         Choose one of the options below:
         """
         embed = discord.Embed(
-            title="Leave a review",
+            title="Got a second? Let us know how we're doing...",
             description="We're working hard to provide high-quality CyberSecurity software and services to those who require it.\n\nIf you feel that your experience with us has been remarkable, please leave a review to help other customers discover us!",
             colour=16767334
         )
