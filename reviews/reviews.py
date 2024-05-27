@@ -1,16 +1,16 @@
 import csv
 import os
-import discord  #type: ignore
-import asyncio  #type: ignore
+import discord  # type: ignore
+import asyncio  # type: ignore
 import tempfile
 import datetime
-from reportlab.lib.pagesizes import letter #type: ignore
-from reportlab.pdfgen import canvas #type: ignore 
-from reportlab.lib import colors#type: ignore
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle #type: ignore
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak, Table, TableStyle #type: ignore
-from redbot.core import commands, Config #type: ignore
-from discord.ui import Button, View #type: ignore
+from reportlab.lib.pagesizes import letter  # type: ignore
+from reportlab.pdfgen import canvas  # type: ignore
+from reportlab.lib import colors  # type: ignore
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle  # type: ignore
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak, Table, TableStyle  # type: ignore
+from redbot.core import commands, Config  # type: ignore
+from discord.ui import Button, View  # type: ignore
 
 class ReviewButton(discord.ui.Button):
     def __init__(self, label, review_id, style=discord.ButtonStyle.primary):
@@ -29,7 +29,7 @@ class ReviewsCog(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.config = Config.get_conf(self, identifier=1234567890)
+        self.config = Config.get_conf(self, identifier=1234567890, force_registration=True)
         default_guild = {
             "reviews": {},
             "review_channel": None,
@@ -133,7 +133,7 @@ class ReviewsCog(commands.Cog):
         else:
             embed = discord.Embed(description="Review rating was not received. Please try submitting again.", color=discord.Color(0xff4545))
             await message.edit(embed=embed, view=None)
-            
+
     @review.command(name="approve")
     @commands.has_permissions(manage_guild=True)
     async def review_approve(self, ctx, review_id: int):
@@ -159,7 +159,7 @@ class ReviewsCog(commands.Cog):
                             embed.set_author(name=str(user), icon_url=user.display_avatar.url)
                         else:
                             embed.set_author(name="User not found")
-                        embed.set_footer(text=f"User ID: {ctx.author.id}")
+                        embed.set_footer(text=f"User ID: {review['author']}")
                         embed.set_thumbnail(url=ctx.guild.icon.url if ctx.guild.icon else discord.Embed.Empty)
                         embed.timestamp = datetime.datetime.utcnow()
                         await review_channel.send(embed=embed)
@@ -207,11 +207,10 @@ class ReviewsCog(commands.Cog):
                         writer.writerow([review_id, review["author"], review["content"], review["status"], review.get("rating", "Not rated")])
                 await ctx.send(file=discord.File(file_path))
             elif file_format.lower() == "pdf":
-
                 doc = SimpleDocTemplate(file_path, pagesize=letter)
                 styles = getSampleStyleSheet()
                 # Ensure the font name is a standard font available in ReportLab, such as 'Helvetica'
-                styles.add(ParagraphStyle(name='Normal-Bold', fontName='Helvetica-Bold', fontSize=12, leading=14, alignment=LEFT))
+                styles.add(ParagraphStyle(name='Normal-Bold', fontName='Helvetica-Bold', fontSize=12, leading=14))
                 flowables = []
 
                 flowables.append(Paragraph("Guild Reviews", styles['Normal-Bold']))
@@ -235,7 +234,7 @@ class ReviewsCog(commands.Cog):
 
                 doc.build(flowables)
                 await ctx.send(file=discord.File(file_path))
-        except PermissionError as e:
+        except PermissionError:
             await ctx.send("I do not have permission to write to the file system.")
         finally:
             if os.path.exists(file_path):
@@ -268,6 +267,7 @@ class ReviewsCog(commands.Cog):
             rating = review.get('rating', 'Not rated')
             embed.add_field(name="Rating", value=rating, inline=False)
             await ctx.send(embed=embed)
+
 def setup(bot):
     bot.add_cog(ReviewsCog(bot))
 
