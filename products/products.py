@@ -170,7 +170,7 @@ class Products(commands.Cog):
         """
         embed = discord.Embed(
             title="Got a second? Let us know how we're doing...",
-            description="We're working hard to provide high-quality CyberSecurity software and services to those who require it.\n\nIf you feel that your experience with BeeHive has been remarkable, please leave a review to help other customers discover us!",
+            description="### We're working hard to provide high-quality CyberSecurity software and services to those who require it.\n\nIf you feel that your experience with BeeHive has been remarkable, please leave a review to help other customers discover us!",
             colour=16767334
         )
         embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/star-half.png")
