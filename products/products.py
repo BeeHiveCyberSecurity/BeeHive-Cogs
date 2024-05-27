@@ -170,7 +170,7 @@ class Products(commands.Cog):
         """
         embed = discord.Embed(
             title="Got a second? Let us know how we're doing...",
-            description="We're working hard to provide high-quality CyberSecurity software and services to those who require it.\n\nIf you feel that your experience with us has been remarkable, please leave a review to help other customers discover us!",
+            description="We're working hard to provide high-quality CyberSecurity software and services to those who require it.\n\nIf you feel that your experience with BeeHive has been remarkable, please leave a review to help other customers discover us!",
             colour=16767334
         )
         embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/star-half.png")
@@ -181,7 +181,7 @@ class Products(commands.Cog):
                 inline=False
             )
         view = discord.ui.View()
-        view.add_item(discord.ui.Button(label="Review us on TrustPilot", url="https://www.trustpilot.com/review/beehive.systems", style=discord.ButtonStyle.link, emoji="⭐"))
+        view.add_item(discord.ui.Button(label="Review us on TrustPilot", url="https://www.trustpilot.com/review/beehive.systems", style=discord.ButtonStyle.link, emoji="🔗"))
 #        view.add_item(discord.ui.Button(label="Google Reviews", url="https://www.google.com/search?q=BeeHive+Systems+reviews", style=discord.ButtonStyle.link, emoji="⭐"))
 #        view.add_item(discord.ui.Button(label="Yelp", url="https://www.yelp.com/biz/beehive-systems", style=discord.ButtonStyle.link, emoji="⭐"))
         await ctx.send(embed=embed, view=view)
