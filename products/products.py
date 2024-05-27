@@ -177,7 +177,7 @@ class Products(commands.Cog):
         if ctx.guild and ctx.guild.id == 1147002526156206170:
             embed.add_field(
                 name="In-Server Review",
-                value="Use the `!review` command to leave a review directly in our server",
+                value="Use the `!review` command to leave a review directly in our server. This doesn't require an account and can be done in less than 10 seconds",
                 inline=False
             )
         view = discord.ui.View()
