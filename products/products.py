@@ -159,29 +159,29 @@ class Products(commands.Cog):
         view.add_item(discord.ui.Button(label="Discord", url="https://discord.gg/ADz7YSegPT", style=discord.ButtonStyle.link))
         await ctx.send(embed=embed, view=view)
 
-        @commands.bot_has_permissions(embed_links=True)
-        @commands.command(name="reviewprompt", description="Prompt the user to leave a review about their experience", aliases=["reviewp"])
-        async def reviewprompt(self, ctx: commands.Context):
-            """
-            Prompt the user to leave a review about their experience with BeeHive's services.
+    @commands.bot_has_permissions(embed_links=True)
+    @commands.command(name="reviewprompt", description="Prompt the user to leave a review about their experience", aliases=["reviewp"])
+    async def reviewprompt(self, ctx: commands.Context):
+        """
+        Prompt the user to leave a review about their experience with BeeHive's services.
             
-            Prefer to leave a review online?
-            Choose one of the options below:
-            """
-            embed = discord.Embed(
-                title="Leave a review",
-                description="We're working hard to provide high-quality CyberSecurity software and services to those who require it.\n\nIf you feel that your experience with us has been remarkable, please leave a review to help other customers discover us!",
-                colour=16767334
+        Prefer to leave a review online?
+        Choose one of the options below:
+        """
+        embed = discord.Embed(
+            title="Leave a review",
+            description="We're working hard to provide high-quality CyberSecurity software and services to those who require it.\n\nIf you feel that your experience with us has been remarkable, please leave a review to help other customers discover us!",
+            colour=16767334
+        )
+        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/star-half.png")
+        if ctx.guild and ctx.guild.id == 1147002526156206170:
+            embed.add_field(
+                name="In-Server Review",
+                value="Use the `!review` command to leave a review directly in our server",
+                inline=False
             )
-            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/star-half.png")
-            if ctx.guild and ctx.guild.id == 1147002526156206170:
-                embed.add_field(
-                    name="In-Server Review",
-                    value="Use the `!review` command to leave a review directly in our server",
-                    inline=False
-                )
-            view = discord.ui.View()
-            view.add_item(discord.ui.Button(label="TrustPilot", url="https://www.trustpilot.com/review/beehive.systems", style=discord.ButtonStyle.link, emoji="⭐"))
-            view.add_item(discord.ui.Button(label="Google Reviews", url="https://www.google.com/search?q=BeeHive+Systems+reviews", style=discord.ButtonStyle.link, emoji="⭐"))
-            view.add_item(discord.ui.Button(label="Yelp", url="https://www.yelp.com/biz/beehive-systems", style=discord.ButtonStyle.link, emoji="⭐"))
-            await ctx.send(embed=embed, view=view)
+        view = discord.ui.View()
+        view.add_item(discord.ui.Button(label="TrustPilot", url="https://www.trustpilot.com/review/beehive.systems", style=discord.ButtonStyle.link, emoji="⭐"))
+        view.add_item(discord.ui.Button(label="Google Reviews", url="https://www.google.com/search?q=BeeHive+Systems+reviews", style=discord.ButtonStyle.link, emoji="⭐"))
+        view.add_item(discord.ui.Button(label="Yelp", url="https://www.yelp.com/biz/beehive-systems", style=discord.ButtonStyle.link, emoji="⭐"))
+        await ctx.send(embed=embed, view=view)
