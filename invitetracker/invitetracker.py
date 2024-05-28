@@ -207,7 +207,7 @@ class InviteTracker(commands.Cog):
         # Summarize the data by day
         summarized_growth = {}
         for entry in growth:
-            date = entry[0].split(" ")[0]  # Extract the date part only
+            date = entry[0].split("T")[0]  # Extract the date part only
             member_count = entry[1]
             if date in summarized_growth:
                 summarized_growth[date] += member_count
