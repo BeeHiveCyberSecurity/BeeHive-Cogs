@@ -1,5 +1,7 @@
 import discord
 from redbot.core import commands, Config, checks
+import matplotlib.pyplot as plt
+import io
 
 class InviteTracker(commands.Cog):
     """Tracks user invites with customizable announcements, rewards, and perks."""
@@ -13,6 +15,7 @@ class InviteTracker(commands.Cog):
             "invites": {},
             "rewards": {},
             "announcement_channel": None,
+            "member_growth": []
         }
         self.config.register_guild(**default_guild)
         self.invites = {}
@@ -45,6 +48,11 @@ class InviteTracker(commands.Cog):
                     await self.check_rewards(guild, inviter)
                     await self.check_milestones(guild, inviter)
                     break
+
+            # Update member growth
+            async with self.config.guild(guild).member_growth() as growth:
+                growth.append((member.joined_at.isoformat(), guild.member_count))
+
         except KeyError:
             print(f"No invites tracked for guild {guild.id}")
         except Exception as e:
@@ -188,6 +196,32 @@ class InviteTracker(commands.Cog):
                 color=discord.Color.from_str("#ff4545")
             )
             await ctx.send(embed=embed)
+
+    @invitetracker.command()
+    async def membergrowth(self, ctx):
+        """Show the overall member growth of the server as a graph."""
+        growth = await self.config.guild(ctx.guild).member_growth()
+        if not growth:
+            await ctx.send("No member growth data available.")
+            return
+
+        dates = [entry[0] for entry in growth]
+        member_counts = [entry[1] for entry in growth]
+
+        plt.figure(figsize=(10, 5))
+        plt.plot(dates, member_counts, marker='o')
+        plt.title('Server Member Growth')
+        plt.xlabel('Date')
+        plt.ylabel('Member Count')
+        plt.xticks(rotation=45)
+        plt.tight_layout()
+
+        buf = io.BytesIO()
+        plt.savefig(buf, format='png')
+        buf.seek(0)
+        file = discord.File(buf, filename='member_growth.png')
+
+        await ctx.send(file=file)
 
 def setup(bot):
     bot.add_cog(InviteTracker(bot))
