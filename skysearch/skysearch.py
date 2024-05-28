@@ -285,7 +285,7 @@ class Skysearch(commands.Cog):
         if ctx.invoked_subcommand is None:
             embed = discord.Embed(
                 title="Search aircraft",
-                description="**You can search active aircraft by `callsign`, `ICAO`, `registration`, `squawk`, and `model`. You can also search within a specific `radius`, view `mil`itary aircraft, view `LADD`-restricted aircraft, view aircraft using private ICAO addresses, and more...**",
+                description="**You can search active aircraft by `callsign`, `ICAO`, `registration`, `squawk`, and `model`. You can also search within a specific `radius`, view `military` aircraft, view `LADD`-restricted aircraft, view aircraft using private ICAO addresses, and more...**",
                 color=discord.Color.from_str("#fffffe")
             )
             embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/airplane.png")
