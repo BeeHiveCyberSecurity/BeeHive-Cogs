@@ -1624,7 +1624,7 @@ class Cloudflare(commands.Cog):
                         if "country" in belongs_to:
                             embed.add_field(name="Country", value=f"**`{belongs_to['country']}`**", inline=False)
                         if "type" in belongs_to:
-                            embed.add_field(name="Type", value=f"**`{belongs_to['type'].upper()}`**", inline=False)
+                            embed.add_field(name="Type", value=f"**`{belongs_to['type'].upper()}`**", inline=True)
                     if "ptr_lookup" in result and result["ptr_lookup"] and "ptr_domains" in result["ptr_lookup"] and result["ptr_lookup"]["ptr_domains"]:
                         ptr_domains = ", ".join([f"**`{domain}`**" for domain in result["ptr_lookup"]["ptr_domains"]])
                         embed.add_field(name="PTR Domains", value=ptr_domains, inline=False)
