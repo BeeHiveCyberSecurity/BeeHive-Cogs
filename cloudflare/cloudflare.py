@@ -1511,6 +1511,16 @@ class Cloudflare(commands.Cog):
     @intel.command(name="domain")
     async def querydomain(self, ctx, domain: str):
         """Query Cloudflare API for domain intelligence."""
+        
+        # Check if the input is an IP address
+        try:
+            ip_obj = ipaddress.ip_address(domain)
+            embed = discord.Embed(title="Error", description="The input appears to be an IP address. Please use the `ip` subcommand for IP address queries.", color=0xff4545)
+            await ctx.send(embed=embed)
+            return
+        except ValueError:
+            pass  # Not an IP address, continue with domain query
+
         api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
         email = api_tokens.get("email")
         api_key = api_tokens.get("api_key")
@@ -1557,7 +1567,7 @@ class Cloudflare(commands.Cog):
                     if "risk_types" in result:
                         embed.add_field(name="Risk Types", value=", ".join([f"**`{risk}`**" for risk in result["risk_types"]]), inline=False)
 
-                    embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/globe.png")
+                    embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/globe.png")
                     await ctx.send(embed=embed)
                 else:
                     error_embed = discord.Embed(title="Error", description=f"Error: {data['errors']}", color=0xff4545)
