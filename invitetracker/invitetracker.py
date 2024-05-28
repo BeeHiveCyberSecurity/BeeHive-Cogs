@@ -238,11 +238,11 @@ class InviteTracker(commands.Cog):
         
         # Display fewer date labels to reduce cramping
         max_labels = 10
-        if len(formatted_dates) > max_labels:
-            step = len(formatted_dates) // max_labels
-            plt.xticks([datetime.strptime(date, "%Y-%m-%d") for date in formatted_dates[::step]], formatted_dates[::step], rotation=45, ha='right')
+        if len(dates) > max_labels:
+            step = len(dates) // max_labels
+            plt.xticks([datetime.strptime(date, "%Y-%m-%d") for date in dates[::step]], formatted_dates[::step], rotation=45, ha='right')
         else:
-            plt.xticks([datetime.strptime(date, "%Y-%m-%d") for date in formatted_dates], formatted_dates, rotation=45, ha='right')
+            plt.xticks([datetime.strptime(date, "%Y-%m-%d") for date in dates], formatted_dates, rotation=45, ha='right')
         
         plt.tight_layout()
 
