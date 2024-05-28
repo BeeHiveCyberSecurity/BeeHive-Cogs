@@ -221,5 +221,26 @@ class InviteTracker(commands.Cog):
 
         await ctx.send(file=file)
 
+    @invitetracker.command()
+    async def invitestats(self, ctx):
+        """Fetch and show invite stats for the server."""
+        invites = await ctx.guild.invites()
+        if not invites:
+            await ctx.send("No invite stats available.")
+            return
+
+        stats = []
+        for invite in invites:
+            inviter = invite.inviter
+            uses = invite.uses
+            stats.append(f"Invite Code: {invite.code} | Inviter: {inviter.mention} | Uses: {uses}")
+
+        embed = discord.Embed(
+            title="Invite Stats",
+            description="\n".join(stats),
+            color=discord.Color.from_str("#2bbd8e")
+        )
+        await ctx.send(embed=embed)
+
 def setup(bot):
     bot.add_cog(InviteTracker(bot))
