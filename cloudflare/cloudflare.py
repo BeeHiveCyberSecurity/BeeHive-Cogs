@@ -1568,7 +1568,7 @@ class Cloudflare(commands.Cog):
 
     @intel.command(name="ip")
     async def queryip(self, ctx, ip: str):
-        """Query Cloudflare API for IP intelligence."""
+        """Query intelligence on a public IP address."""
 
         api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
         email = api_tokens.get("email")
@@ -1642,7 +1642,7 @@ class Cloudflare(commands.Cog):
     @intel.command(name="domainhistory")
     async def domainhistory(self, ctx, domain: str):
         """
-        Fetch and display domain history from Cloudflare.
+        Fetch and display category and domain history.
         """
         api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
         email = api_tokens.get("email")
