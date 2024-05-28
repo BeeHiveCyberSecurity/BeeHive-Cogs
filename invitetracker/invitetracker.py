@@ -14,6 +14,7 @@ class InviteTracker(commands.Cog):
         }
         self.config.register_guild(**default_guild)
         self.invites = {}
+        self.milestones = [1, 2, 3, 4, 5, 10, 15, 20]
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -37,6 +38,7 @@ class InviteTracker(commands.Cog):
                     await self.update_invites(guild, inviter)
                     await self.announce_invite(guild, member, inviter)
                     await self.check_rewards(guild, inviter)
+                    await self.check_milestones(guild, inviter)
                     break
         except KeyError:
             print(f"No invites tracked for guild {guild.id}")
@@ -61,7 +63,12 @@ class InviteTracker(commands.Cog):
             if channel_id:
                 channel = guild.get_channel(channel_id)
                 if channel:
-                    await channel.send(f"{member.mention} joined using {inviter.mention}'s invite!")
+                    embed = discord.Embed(
+                        title="New Member Joined",
+                        description=f"{member.mention} joined using {inviter.mention}'s invite!",
+                        color=discord.Color.from_str("#2bbd8e")
+                    )
+                    await channel.send(embed=embed)
         except Exception as e:
             print(f"Failed to announce invite in guild {guild.id}: {e}")
 
@@ -76,9 +83,29 @@ class InviteTracker(commands.Cog):
                     role = guild.get_role(reward)
                     if role:
                         await inviter.add_roles(role)
-                        await inviter.send(f"Congratulations! You've been awarded the {role.name} role for inviting {count} members!")
+                        embed = discord.Embed(
+                            title="Reward Earned",
+                            description=f"Congratulations! You've been awarded the {role.name} role for inviting {count} members!",
+                            color=discord.Color.from_str("#2bbd8e")
+                        )
+                        await inviter.send(embed=embed)
         except Exception as e:
             print(f"Failed to check rewards for inviter {inviter.id} in guild {guild.id}: {e}")
+
+    async def check_milestones(self, guild, inviter):
+        try:
+            invites = await self.config.guild(guild).invites()
+            invite_count = invites.get(str(inviter.id), 0)
+
+            if invite_count in self.milestones:
+                embed = discord.Embed(
+                    title="Milestone Reached",
+                    description=f"Congratulations! You've reached {invite_count} invites!",
+                    color=discord.Color.from_str("#2bbd8e")
+                )
+                await inviter.send(embed=embed)
+        except Exception as e:
+            print(f"Failed to check milestones for inviter {inviter.id} in guild {guild.id}: {e}")
 
     @commands.guild_only()
     @commands.admin()
@@ -91,14 +118,24 @@ class InviteTracker(commands.Cog):
     async def announcechannel(self, ctx, channel: discord.TextChannel):
         """Set the announcement channel for invites."""
         await self.config.guild(ctx.guild).announcement_channel.set(channel.id)
-        await ctx.send(f"Announcement channel set to {channel.mention}")
+        embed = discord.Embed(
+            title="Announcement Channel Set",
+            description=f"Announcement channel set to {channel.mention}",
+            color=discord.Color.from_str("#2bbd8e")
+        )
+        await ctx.send(embed=embed)
 
     @invitetracker.command()
     async def addreward(self, ctx, invite_count: int, role: discord.Role):
         """Add a reward for a specific number of invites."""
         async with self.config.guild(ctx.guild).rewards() as rewards:
             rewards[str(invite_count)] = role.id
-        await ctx.send(f"Reward set: {role.name} for {invite_count} invites")
+        embed = discord.Embed(
+            title="Reward Added",
+            description=f"Reward set: {role.name} for {invite_count} invites",
+            color=discord.Color.from_str("#2bbd8e")
+        )
+        await ctx.send(embed=embed)
 
     @invitetracker.command()
     async def removereward(self, ctx, invite_count: int):
@@ -106,9 +143,46 @@ class InviteTracker(commands.Cog):
         async with self.config.guild(ctx.guild).rewards() as rewards:
             if str(invite_count) in rewards:
                 del rewards[str(invite_count)]
-                await ctx.send(f"Reward for {invite_count} invites removed")
+                embed = discord.Embed(
+                    title="Reward Removed",
+                    description=f"Reward for {invite_count} invites removed",
+                    color=discord.Color.from_str("#ff4545")
+                )
+                await ctx.send(embed=embed)
             else:
-                await ctx.send(f"No reward found for {invite_count} invites")
+                embed = discord.Embed(
+                    title="No Reward Found",
+                    description=f"No reward found for {invite_count} invites",
+                    color=discord.Color.from_str("#ff4545")
+                )
+                await ctx.send(embed=embed)
+
+    @invitetracker.command()
+    async def leaderboard(self, ctx):
+        """Show the leaderboard of top inviting users."""
+        invites = await self.config.guild(ctx.guild).invites()
+        sorted_invites = sorted(invites.items(), key=lambda item: item[1], reverse=True)
+        leaderboard = []
+
+        for inviter_id, count in sorted_invites[:10]:  # Top 10 inviters
+            inviter = ctx.guild.get_member(int(inviter_id))
+            if inviter:
+                leaderboard.append(f"{inviter.mention}: {count} invites")
+
+        if leaderboard:
+            embed = discord.Embed(
+                title="Top Inviters",
+                description="\n".join(leaderboard),
+                color=discord.Color.from_str("#2bbd8e")
+            )
+            await ctx.send(embed=embed)
+        else:
+            embed = discord.Embed(
+                title="No Invites Tracked",
+                description="No invites tracked yet.",
+                color=discord.Color.from_str("#ff4545")
+            )
+            await ctx.send(embed=embed)
 
 def setup(bot):
     bot.add_cog(InviteTracker(bot))
