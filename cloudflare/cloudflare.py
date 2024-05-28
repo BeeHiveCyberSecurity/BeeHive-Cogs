@@ -1519,7 +1519,7 @@ class Cloudflare(commands.Cog):
             await ctx.send(embed=embed)
             return
         except ValueError:
-            pass  # Not an IP address, continue with domain query
+            pass  # Not an IP address, continue with query
 
         api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
         email = api_tokens.get("email")
@@ -1654,6 +1654,15 @@ class Cloudflare(commands.Cog):
         """
         Fetch and display category and domain history.
         """
+        # Check if the input is an IP address
+        try:
+            ip_obj = ipaddress.ip_address(domain)
+            embed = discord.Embed(title="Error", description="The input appears to be an IP address. Please use the `ip` subcommand for IP address queries.", color=0xff4545)
+            await ctx.send(embed=embed)
+            return
+        except ValueError:
+            pass  # Not an IP address, continue with query
+
         api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
         email = api_tokens.get("email")
         api_key = api_tokens.get("api_key")
