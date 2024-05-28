@@ -204,8 +204,18 @@ class InviteTracker(commands.Cog):
             await ctx.send("No member growth data available.")
             return
 
-        dates = [entry[0] for entry in growth]
-        member_counts = [entry[1] for entry in growth]
+        # Summarize the data by day
+        summarized_growth = {}
+        for entry in growth:
+            date = entry[0].split(" ")[0]  # Extract the date part only
+            member_count = entry[1]
+            if date in summarized_growth:
+                summarized_growth[date] += member_count
+            else:
+                summarized_growth[date] = member_count
+
+        dates = list(summarized_growth.keys())
+        member_counts = list(summarized_growth.values())
 
         plt.figure(figsize=(10, 5))
         plt.plot(dates, member_counts, marker='o')
