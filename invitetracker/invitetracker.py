@@ -209,9 +209,7 @@ class InviteTracker(commands.Cog):
         for entry in growth:
             date = entry[0].split("T")[0]  # Extract the date part only
             member_count = entry[1]
-            if date in summarized_growth:
-                summarized_growth[date] += member_count
-            else:
+            if date not in summarized_growth:
                 summarized_growth[date] = member_count
 
         dates = list(summarized_growth.keys())
@@ -233,7 +231,7 @@ class InviteTracker(commands.Cog):
         formatted_dates = [format_date(date) for date in dates]
 
         plt.figure(figsize=(10, 5))
-        plt.plot(formatted_dates, member_counts, marker='o')
+        plt.plot_date(dates, member_counts, marker='o', linestyle='-')
         plt.title('Server Member Growth')
         plt.xlabel('Date')
         plt.ylabel('Member Count')
