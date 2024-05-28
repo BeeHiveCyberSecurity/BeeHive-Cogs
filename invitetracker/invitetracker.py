@@ -231,7 +231,7 @@ class InviteTracker(commands.Cog):
         formatted_dates = [format_date(date) for date in dates]
 
         plt.figure(figsize=(10, 5))
-        plt.plot_date(dates, member_counts, marker='o', linestyle='-')
+        plt.plot_date([datetime.strptime(date, "%Y-%m-%d") for date in dates], member_counts, marker='o', linestyle='-')
         plt.title('Server Member Growth')
         plt.xlabel('Date')
         plt.ylabel('Member Count')
@@ -240,9 +240,9 @@ class InviteTracker(commands.Cog):
         max_labels = 10
         if len(formatted_dates) > max_labels:
             step = len(formatted_dates) // max_labels
-            plt.xticks(formatted_dates[::step], rotation=45, ha='right')
+            plt.xticks([datetime.strptime(date, "%Y-%m-%d") for date in formatted_dates[::step]], formatted_dates[::step], rotation=45, ha='right')
         else:
-            plt.xticks(formatted_dates, rotation=45, ha='right')
+            plt.xticks([datetime.strptime(date, "%Y-%m-%d") for date in formatted_dates], formatted_dates, rotation=45, ha='right')
         
         plt.tight_layout()
 
