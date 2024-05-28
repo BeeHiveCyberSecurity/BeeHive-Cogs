@@ -4,6 +4,8 @@ from redbot.core import commands, Config, checks
 class InviteTracker(commands.Cog):
     """Tracks user invites with customizable announcements, rewards, and perks."""
 
+    DISBOARD_BOT_ID = 302050872383242240
+
     def __init__(self, bot):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=1234567890)
@@ -35,6 +37,9 @@ class InviteTracker(commands.Cog):
             for invite in invites_before:
                 if invite.uses < self.get_invite_uses(invites_after, invite.code):
                     inviter = invite.inviter
+                    if inviter.id == self.DISBOARD_BOT_ID:
+                        print(f"Invite by Disboard bot ignored for guild {guild.id}")
+                        return
                     await self.update_invites(guild, inviter)
                     await self.announce_invite(guild, member, inviter)
                     await self.check_rewards(guild, inviter)
