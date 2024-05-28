@@ -1585,6 +1585,10 @@ class Cloudflare(commands.Cog):
         params = {}
         try:
             ip_obj = ipaddress.ip_address(ip)
+            if ip_obj.is_private:
+                embed = discord.Embed(title="Local IP Address", description="The IP address you entered is a local IP address and cannot be queried.", color=0xff4545)
+                await ctx.send(embed=embed)
+                return
             if ip_obj.version == 4:
                 params["ipv4"] = ip
             elif ip_obj.version == 6:
@@ -1623,7 +1627,7 @@ class Cloudflare(commands.Cog):
                         embed.add_field(name="Page", value=f"**`{result_info['page']}`**", inline=False)
                         embed.add_field(name="Per Page", value=f"**`{result_info['per_page']}`**", inline=False)
                         
-                    embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/globe.png")
+                    embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/globe.png")
                     await ctx.send(embed=embed)
                 else:
                     embed = discord.Embed(title="Error", description=f"Error: {data['errors']}", color=0xff4545)
