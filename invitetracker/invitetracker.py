@@ -236,9 +236,11 @@ class InviteTracker(commands.Cog):
             uses = invite.uses
             embed = discord.Embed(
                 title="Invite Stats",
-                description=f"Invite Code: {invite.code}\nInviter: {inviter.mention}\nUses: {uses}",
                 color=discord.Color.from_str("#2bbd8e")
             )
+            embed.add_field(name="Invite Code", value=f"**`{invite.code}`**", inline=True)
+            embed.add_field(name="Inviter", value=f"{inviter.mention}", inline=True)
+            embed.add_field(name="Uses", value=f"**`{uses}`**", inline=True)
             pages.append(embed)
 
         if not pages:
@@ -248,10 +250,11 @@ class InviteTracker(commands.Cog):
         message = await ctx.send(embed=pages[0])
 
         await message.add_reaction("⬅️")
+        await message.add_reaction("❌")
         await message.add_reaction("➡️")
 
         def check(reaction, user):
-            return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️"]
+            return user == ctx.author and str(reaction.emoji) in ["⬅️", "❌", "➡️"]
 
         i = 0
         while True:
@@ -262,6 +265,9 @@ class InviteTracker(commands.Cog):
                     i += 1
                 elif str(reaction.emoji) == "⬅️":
                     i -= 1
+                elif str(reaction.emoji) == "❌":
+                    await message.delete()
+                    break
 
                 i = i % len(pages)
 
