@@ -222,7 +222,15 @@ class InviteTracker(commands.Cog):
         plt.title('Server Member Growth')
         plt.xlabel('Date')
         plt.ylabel('Member Count')
-        plt.xticks(rotation=45)
+        
+        # Display fewer date labels to reduce cramping
+        max_labels = 10
+        if len(dates) > max_labels:
+            step = len(dates) // max_labels
+            plt.xticks(dates[::step], rotation=45, ha='right')
+        else:
+            plt.xticks(dates, rotation=45, ha='right')
+        
         plt.tight_layout()
 
         buf = io.BytesIO()
