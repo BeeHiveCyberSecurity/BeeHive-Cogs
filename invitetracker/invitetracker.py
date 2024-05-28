@@ -217,19 +217,34 @@ class InviteTracker(commands.Cog):
         dates = list(summarized_growth.keys())
         member_counts = list(summarized_growth.values())
 
+        # Convert dates to "X days ago" or "X hours ago"
+        from datetime import datetime, timedelta
+
+        def format_date(date_str):
+            date_obj = datetime.strptime(date_str, "%Y-%m-%d")
+            now = datetime.now()
+            delta = now - date_obj
+            if delta.days > 0:
+                return f"{delta.days} days ago"
+            else:
+                hours = delta.seconds // 3600
+                return f"{hours} hours ago"
+
+        formatted_dates = [format_date(date) for date in dates]
+
         plt.figure(figsize=(10, 5))
-        plt.plot(dates, member_counts, marker='o')
+        plt.plot(formatted_dates, member_counts, marker='o')
         plt.title('Server Member Growth')
         plt.xlabel('Date')
         plt.ylabel('Member Count')
         
         # Display fewer date labels to reduce cramping
         max_labels = 10
-        if len(dates) > max_labels:
-            step = len(dates) // max_labels
-            plt.xticks(dates[::step], rotation=45, ha='right')
+        if len(formatted_dates) > max_labels:
+            step = len(formatted_dates) // max_labels
+            plt.xticks(formatted_dates[::step], rotation=45, ha='right')
         else:
-            plt.xticks(dates, rotation=45, ha='right')
+            plt.xticks(formatted_dates, rotation=45, ha='right')
         
         plt.tight_layout()
 
