@@ -2,6 +2,7 @@ import discord
 from redbot.core import commands, Config, checks
 import matplotlib.pyplot as plt
 import io
+import asyncio
 
 class InviteTracker(commands.Cog):
     """Tracks user invites with customizable announcements, rewards, and perks."""
@@ -229,18 +230,45 @@ class InviteTracker(commands.Cog):
             await ctx.send("No invite stats available.")
             return
 
-        stats = []
+        pages = []
         for invite in invites:
             inviter = invite.inviter
             uses = invite.uses
-            stats.append(f"Invite Code: {invite.code} | Inviter: {inviter.mention} | Uses: {uses}")
+            embed = discord.Embed(
+                title="Invite Stats",
+                description=f"Invite Code: {invite.code}\nInviter: {inviter.mention}\nUses: {uses}",
+                color=discord.Color.from_str("#2bbd8e")
+            )
+            pages.append(embed)
 
-        embed = discord.Embed(
-            title="Invite Stats",
-            description="\n".join(stats),
-            color=discord.Color.from_str("#2bbd8e")
-        )
-        await ctx.send(embed=embed)
+        if not pages:
+            await ctx.send("No invite stats available.")
+            return
+
+        message = await ctx.send(embed=pages[0])
+
+        await message.add_reaction("⬅️")
+        await message.add_reaction("➡️")
+
+        def check(reaction, user):
+            return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️"]
+
+        i = 0
+        while True:
+            try:
+                reaction, user = await self.bot.wait_for("reaction_add", timeout=60.0, check=check)
+
+                if str(reaction.emoji) == "➡️":
+                    i += 1
+                elif str(reaction.emoji) == "⬅️":
+                    i -= 1
+
+                i = i % len(pages)
+
+                await message.edit(embed=pages[i])
+                await message.remove_reaction(reaction, user)
+            except asyncio.TimeoutError:
+                break
 
 def setup(bot):
     bot.add_cog(InviteTracker(bot))
