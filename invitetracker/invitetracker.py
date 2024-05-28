@@ -235,7 +235,7 @@ class InviteTracker(commands.Cog):
             inviter = invite.inviter
             uses = invite.uses
             embed = discord.Embed(
-                title="Invite Stats",
+                title="Invite stats",
                 color=discord.Color.from_str("#2bbd8e")
             )
             embed.add_field(name="Invite Code", value=f"**`{invite.code}`**", inline=True)
