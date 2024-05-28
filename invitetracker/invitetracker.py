@@ -33,7 +33,7 @@ class InviteTracker(commands.Cog):
     async def on_member_join(self, member):
         guild = member.guild
         try:
-            invites_before = self.invites[guild.id]
+            invites_before = self.invites.get(guild.id, [])
             invites_after = await guild.invites()
             self.invites[guild.id] = invites_after
 
@@ -53,8 +53,6 @@ class InviteTracker(commands.Cog):
             async with self.config.guild(guild).member_growth() as growth:
                 growth.append((member.joined_at.isoformat(), guild.member_count))
 
-        except KeyError:
-            print(f"No invites tracked for guild {guild.id}")
         except Exception as e:
             print(f"Error processing member join for guild {guild.id}: {e}")
 
