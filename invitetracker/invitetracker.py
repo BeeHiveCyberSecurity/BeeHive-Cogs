@@ -69,24 +69,24 @@ class InviteTracker(commands.Cog):
     @commands.guild_only()
     @commands.admin()
     @commands.group()
-    async def inviteset(self, ctx):
+    async def invitetracker(self, ctx):
         """Settings for the invite tracker."""
         pass
 
-    @inviteset.command()
+    @invitetracker.command()
     async def announcechannel(self, ctx, channel: discord.TextChannel):
         """Set the announcement channel for invites."""
         await self.config.guild(ctx.guild).announcement_channel.set(channel.id)
         await ctx.send(f"Announcement channel set to {channel.mention}")
 
-    @inviteset.command()
+    @invitetracker.command()
     async def addreward(self, ctx, invite_count: int, role: discord.Role):
         """Add a reward for a specific number of invites."""
         async with self.config.guild(ctx.guild).rewards() as rewards:
             rewards[str(invite_count)] = role.id
         await ctx.send(f"Reward set: {role.name} for {invite_count} invites")
 
-    @inviteset.command()
+    @invitetracker.command()
     async def removereward(self, ctx, invite_count: int):
         """Remove a reward for a specific number of invites."""
         async with self.config.guild(ctx.guild).rewards() as rewards:
