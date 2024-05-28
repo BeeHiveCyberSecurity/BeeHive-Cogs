@@ -18,22 +18,30 @@ class InviteTracker(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         for guild in self.bot.guilds:
-            self.invites[guild.id] = await guild.invites()
+            try:
+                self.invites[guild.id] = await guild.invites()
+            except Exception as e:
+                print(f"Failed to fetch invites for guild {guild.id}: {e}")
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
         guild = member.guild
-        invites_before = self.invites[guild.id]
-        invites_after = await guild.invites()
-        self.invites[guild.id] = invites_after
+        try:
+            invites_before = self.invites[guild.id]
+            invites_after = await guild.invites()
+            self.invites[guild.id] = invites_after
 
-        for invite in invites_before:
-            if invite.uses < self.get_invite_uses(invites_after, invite.code):
-                inviter = invite.inviter
-                await self.update_invites(guild, inviter)
-                await self.announce_invite(guild, member, inviter)
-                await self.check_rewards(guild, inviter)
-                break
+            for invite in invites_before:
+                if invite.uses < self.get_invite_uses(invites_after, invite.code):
+                    inviter = invite.inviter
+                    await self.update_invites(guild, inviter)
+                    await self.announce_invite(guild, member, inviter)
+                    await self.check_rewards(guild, inviter)
+                    break
+        except KeyError:
+            print(f"No invites tracked for guild {guild.id}")
+        except Exception as e:
+            print(f"Error processing member join for guild {guild.id}: {e}")
 
     def get_invite_uses(self, invites, code):
         for invite in invites:
@@ -48,23 +56,29 @@ class InviteTracker(commands.Cog):
             invites[str(inviter.id)] += 1
 
     async def announce_invite(self, guild, member, inviter):
-        channel_id = await self.config.guild(guild).announcement_channel()
-        if channel_id:
-            channel = guild.get_channel(channel_id)
-            if channel:
-                await channel.send(f"{member.mention} joined using {inviter.mention}'s invite!")
+        try:
+            channel_id = await self.config.guild(guild).announcement_channel()
+            if channel_id:
+                channel = guild.get_channel(channel_id)
+                if channel:
+                    await channel.send(f"{member.mention} joined using {inviter.mention}'s invite!")
+        except Exception as e:
+            print(f"Failed to announce invite in guild {guild.id}: {e}")
 
     async def check_rewards(self, guild, inviter):
-        invites = await self.config.guild(guild).invites()
-        rewards = await self.config.guild(guild).rewards()
-        invite_count = invites.get(str(inviter.id), 0)
+        try:
+            invites = await self.config.guild(guild).invites()
+            rewards = await self.config.guild(guild).rewards()
+            invite_count = invites.get(str(inviter.id), 0)
 
-        for count, reward in rewards.items():
-            if invite_count == int(count):
-                role = guild.get_role(reward)
-                if role:
-                    await inviter.add_roles(role)
-                    await inviter.send(f"Congratulations! You've been awarded the {role.name} role for inviting {count} members!")
+            for count, reward in rewards.items():
+                if invite_count == int(count):
+                    role = guild.get_role(reward)
+                    if role:
+                        await inviter.add_roles(role)
+                        await inviter.send(f"Congratulations! You've been awarded the {role.name} role for inviting {count} members!")
+        except Exception as e:
+            print(f"Failed to check rewards for inviter {inviter.id} in guild {guild.id}: {e}")
 
     @commands.guild_only()
     @commands.admin()
