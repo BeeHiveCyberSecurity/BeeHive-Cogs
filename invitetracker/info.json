@@ -4,7 +4,7 @@
     ],
     "description": "Tracks user invites with customizable announcements, rewards, and perks.",
     "install_msg": "## :white_check_mark: Successfully installed InviteTracker.\n**Questions?** [We're listening](<https://www.beehive.systems/contact-us>)\n**Interested in CyberSecurity and CyberSafety?** Join our Discord! https://discord.gg/ckdzsm7mTs",
-    "name": "Invites",
+    "name": "InviteTracker",
     "hidden": false,
     "disabled": false,
     "requirements": [
