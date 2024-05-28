@@ -191,8 +191,8 @@ class InviteTracker(commands.Cog):
             await ctx.send(embed=embed)
         else:
             embed = discord.Embed(
-                title="No Invites Tracked",
-                description="No invites tracked yet.",
+                title="No invites recorded",
+                description="No invites tracked yet. Invites can only be tracked from the point the module is loaded and the bot is present in the server, moving forward.",
                 color=discord.Color.from_str("#ff4545")
             )
             await ctx.send(embed=embed)
