@@ -27,6 +27,10 @@ class InviteTracker(commands.Cog):
         for guild in self.bot.guilds:
             try:
                 self.invites[guild.id] = await guild.invites()
+                # Load announcement channel from config on bot ready
+                channel_id = await self.config.guild(guild).announcement_channel()
+                if channel_id:
+                    self.announcement_channel = guild.get_channel(channel_id)
             except Exception as e:
                 print(f"Failed to fetch invites for guild {guild.id}: {e}")
 
@@ -71,16 +75,13 @@ class InviteTracker(commands.Cog):
 
     async def announce_invite(self, guild, member, inviter):
         try:
-            channel_id = await self.config.guild(guild).announcement_channel()
-            if channel_id:
-                channel = guild.get_channel(channel_id)
-                if channel:
-                    embed = discord.Embed(
-                        title="New Member Joined",
-                        description=f"{member.mention} joined using {inviter.mention}'s invite!",
-                        color=discord.Color.from_str("#2bbd8e")
-                    )
-                    await channel.send(embed=embed)
+            if self.announcement_channel:
+                embed = discord.Embed(
+                    title="New Member Joined",
+                    description=f"{member.mention} joined using {inviter.mention}'s invite!",
+                    color=discord.Color.from_str("#2bbd8e")
+                )
+                await self.announcement_channel.send(embed=embed)
         except Exception as e:
             print(f"Failed to announce invite in guild {guild.id}: {e}")
 
@@ -130,6 +131,7 @@ class InviteTracker(commands.Cog):
     async def announcechannel(self, ctx, channel: discord.TextChannel):
         """Set the announcement channel for invites."""
         await self.config.guild(ctx.guild).announcement_channel.set(channel.id)
+        self.announcement_channel = channel  # Update the announcement channel immediately
         embed = discord.Embed(
             title="Announcement Channel Set",
             description=f"Announcement channel set to {channel.mention}",
