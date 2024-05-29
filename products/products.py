@@ -181,7 +181,7 @@ class Products(commands.Cog):
                 inline=False
             )
         view = discord.ui.View()
-        view.add_item(discord.ui.Button(label="Review us on TrustPilot", url="https://www.trustpilot.com/review/beehive.systems", style=discord.ButtonStyle.link, emoji="🔗"))
-#        view.add_item(discord.ui.Button(label="Google Reviews", url="https://www.google.com/search?q=BeeHive+Systems+reviews", style=discord.ButtonStyle.link, emoji="⭐"))
+        view.add_item(discord.ui.Button(label="via TrustPilot", url="https://www.trustpilot.com/review/beehive.systems", style=discord.ButtonStyle.link, emoji="🔗"))
+        view.add_item(discord.ui.Button(label="via HubSpot", url="https://ecosystem.hubspot.com/marketplace/solutions/beehive", style=discord.ButtonStyle.link, emoji="🔗"))
 #        view.add_item(discord.ui.Button(label="Yelp", url="https://www.yelp.com/biz/beehive-systems", style=discord.ButtonStyle.link, emoji="⭐"))
         await ctx.send(embed=embed, view=view)
