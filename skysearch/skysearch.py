@@ -1626,6 +1626,11 @@ class Skysearch(commands.Cog):
                                     if alert_role_mention:
                                         await alert_channel.send(alert_role_mention, allowed_mentions=discord.AllowedMentions(roles=True))
                                     await self._send_aircraft_info(alert_channel, {'ac': [aircraft_info]})
+                                    
+                                    # Check if aircraft has landed
+                                    if aircraft_info.get('altitude') is not None and aircraft_info.get('altitude') < 25:
+                                        embed = discord.Embed(title="Aircraft landed", description=f"Aircraft {aircraft_info.get('icao')} has landed while squawking {squawk_code}.", color=0x00ff00)
+                                        await alert_channel.send(embed=embed)
                                 else:
                                     print(f"Error: Alert channel not found for guild {guild.name}")
                             else:
