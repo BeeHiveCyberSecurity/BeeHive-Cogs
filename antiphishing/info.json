@@ -1,8 +1,0 @@
-{
-    "author": ["movelaterally"],
-    "description": "Screen for malicious links in your server",
-    "install_msg": "## :white_check_mark: Successfully installed AntiPhishing.\n**Questions?** [We're listening](<https://www.beehive.systems/contact-us>)\n**Interested in CyberSecurity and CyberSafety?** Join our Discord! https://discord.gg/ckdzsm7mTs",
-    "name": "antiphishing",
-    "short": "Screen for malicious links in your server",
-    "min_bot_version": "3.5.0"
-}
