@@ -1,9 +1,0 @@
-{
-    "author": ["movelaterally"],
-    "description": "Manage and post user reviews within your server",
-    "install_msg": "## :white_check_mark: Successfully installed Reviews.\n**Need help or have suggestions?** [Contact us](<https://www.beehive.systems/contact-us>)\n**Want to manage user feedback efficiently?** Join our Discord! https://discord.gg/ckdzsm7mTs",
-    "name": "reviews",
-    "short": "Manage user reviews",
-    "min_bot_version": "3.5.0",
-    "requirements": ["reportlab"]
-}
