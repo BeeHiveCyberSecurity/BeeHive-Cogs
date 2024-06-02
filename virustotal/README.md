@@ -1,7 +1,7 @@
 # VirusTotal 
 File upload and analysis via Discord
 
-> [!NOTE]
+> [!IMPORTANT]
 > Before this cog will work correctly, you'll need to set your `virustotal` `api_key`.
 > To do so, use the command `[p]set api virustotal api_key YOURKEYHERE`
 
