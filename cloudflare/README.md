@@ -21,8 +21,12 @@ This is a cog for Red-Discordbot that makes it easy to interact with services an
 
 
 > [!CAUTION]
-> **Take the security and safety of your Cloudflare profile seriously, and consider your own threat models before using this cog. We recommend that regardless of if you are self-hosting your Red instance, or using a VPS, you should install and test paid endpoint protection software. If a threat actor gains access to your Discord account, they will have access to the values set here. If a threat actor gains access to the machine running your bot, they may be able to access and abuse your keys. If you host multiple domains thru your Cloudflare, a threat actor could use these stolen credentials to do serious damage to these domains, up-to-and-including disconnecting email and DNS services.**
+> **Take the security and safety of your Cloudflare profile, and Discord account, seriously - and consider your own threat models before using this cog. We recommend that regardless of if you are self-hosting your Red instance, or using a VPS, you should install and test paid endpoint protection software. If a threat actor gains access to your Discord account, they will have access to the values set here. If a threat actor gains access to the machine running your bot, they may be able to access and abuse your keys. If you host multiple domains thru your Cloudflare, a threat actor could use these stolen credentials to do serious damage to these domains, up-to-and-including disconnecting email and DNS services.**
 
+>[!WARNING]
+> Cloudflare's permission controls are extremely granular and customizable. If you're new to the Cloudflare ecosystem, or only wishing to use Intelligence and URL Scanning features, you can use the template "Read Cloudflare Radar data" safely. However, other features of the cog (like R2, Images, and Email Routing) won't work whatsoever - this may be exactly what you want, for your own security's sake.
+>
+> **EXERCISE EXTREME CARE WHEN CREATING AN API KEY WITH DANGEROUS PERMISSION LEVELS**
 
 ### Cloudflare  integration
 
