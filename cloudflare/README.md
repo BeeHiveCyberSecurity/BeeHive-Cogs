@@ -18,6 +18,12 @@ This is a cog for Red-Discordbot that makes it easy to interact with services an
 > `bearer_token` is your **Cloudflare User API Key** you'll create by going [here](https://dash.cloudflare.com/profile/api-tokens). This needs it's own disclaimer.
 >
 > The command to set these individual values is `[p]set api cloudflare KEYTYPE YOURKEYHERE`
+
+
+> [!CAUTION]
+> **Take the security and safety of your Cloudflare profile seriously, and consider your own threat models before using this cog. We recommend that regardless of if you are self-hosting your Red instance, or using a VPS, you should install and test paid endpoint protection software. If a threat actor gains access to your Discord account, they will have access to the values set here. If a threat actor gains access to the machine running your bot, they may be able to access and abuse your keys. If you host multiple domains thru your Cloudflare, a threat actor could use these stolen credentials to do serious damage to these domains, up-to-and-including disconnecting email and DNS services.**
+
+
 ### Cloudflare  integration
 
 **Price** - **FREE** with respect to rate limits
