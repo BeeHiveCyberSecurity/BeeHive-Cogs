@@ -128,7 +128,7 @@ class StripeIdentity(commands.Cog):
                 options={
                     'document': {
                         'allowed_types': ['driving_license', 'passport', 'id_card'],
-                        'require_id_number': True,
+                        'require_id_number': False,
                         'require_live_capture': True,
                         'require_matching_selfie': True,
                     },
@@ -248,7 +248,7 @@ class StripeIdentity(commands.Cog):
                 options={
                     'document': {
                         'allowed_types': ['driving_license', 'passport', 'id_card'],
-                        'require_id_number': True,
+                        'require_id_number': False,
                         'require_live_capture': True,
                         'require_matching_selfie': True,
                     },
