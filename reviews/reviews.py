@@ -147,7 +147,7 @@ class ReviewsCog(commands.Cog):
             await message.edit(embed=embed, view=None)
 
             # Check if the bot has a testimonialto API key set
-            api_key = await self.config.testimonialto_api_key()
+            api_key = await self.bot.get_shared_api_tokens("testimonialto")
             if api_key:
                 # Prepare the data to be sent
                 data = {
