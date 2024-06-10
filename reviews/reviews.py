@@ -1,7 +1,8 @@
 import csv
 import os
-import discord  # type: ignore
-import asyncio  # type: ignore
+import discord  #type: ignore
+import asyncio  #type: ignore
+import aiohttp #type: ignore
 import tempfile
 import datetime
 from reportlab.lib.pagesizes import letter  # type: ignore
