@@ -156,7 +156,6 @@ class ReviewsCog(commands.Cog):
                     "name": str(ctx.author),
                     "title": "Member of " + ctx.guild.name,
                     "email": email,
-                    "socialLink": ctx.author.display_avatar.url,
                     "avatarURL": ctx.author.display_avatar.url,
                     "attachedImageURL": ctx.guild.icon.url if ctx.guild.icon else "",
                     "confirm": True,
