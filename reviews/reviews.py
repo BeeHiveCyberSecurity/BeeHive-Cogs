@@ -110,6 +110,21 @@ class ReviewsCog(commands.Cog):
 
         content = msg.content
 
+        embed = discord.Embed(title="Please provide your email", description="Reply in chat with your email address or type **`cancel`** to abandon the process.", color=discord.Color.from_str("#fffffe"))
+        await ctx.send(embed=embed)
+        try:
+            email_msg = await self.bot.wait_for('message', check=check, timeout=120.0)
+            if email_msg.content.lower() == 'cancel':
+                embed = discord.Embed(description=":x: **Review process has been canceled**", color=discord.Color(0xff4545))
+                await ctx.send(embed=embed)
+                return
+        except asyncio.TimeoutError:
+            embed = discord.Embed(description=":x: **Timed out, you took too long to reply**", color=discord.Color(0xff4545))
+            await ctx.send(embed=embed)
+            return
+
+        email = email_msg.content
+
         review_id = await self.config.guild(ctx.guild).next_id()
         async with self.config.guild(ctx.guild).reviews() as reviews:
             reviews[str(review_id)] = {"author": ctx.author.id, "content": content, "status": "pending", "rating": None}
@@ -123,13 +138,45 @@ class ReviewsCog(commands.Cog):
             view.add_item(button)
         view.cog = self  # Assign the cog reference to the view for callback access
 
-        embed = discord.Embed(description="Please rate your experience from 1 to 5 stars, where...\n\n- **1 star** indicates **poor** customer service, product quality, or overall experience\n\nand\n\n- **5 stars** indicates an **excellent** experience, **high** product quality, or **extremely helpful** customer service.", color=discord.Color.from_str("#fffffe"))
+        embed = discord.Embed(description="Please rate your experience from 1 to 5 stars, where...\n\n- **1 star** indicates **poor** customer service, product quality, or overall experience\nand\n- **5 stars** indicates an **excellent** experience, **high** product quality, or **extremely helpful** customer service.", color=discord.Color.from_str("#fffffe"))
         message = await ctx.send(embed=embed, view=view)
         await view.wait()  # Wait for the interaction to be completed
 
         if not view.children:  # If the view has no children, the interaction was completed
             embed = discord.Embed(description="Thank you for submitting your review!", color=discord.Color.from_str("#2bbd8e"))
             await message.edit(embed=embed, view=None)
+
+            # Check if the bot has a testimonialto API key set
+            api_key = await self.config.testimonialto_api_key()
+            if api_key:
+                # Prepare the data to be sent
+                data = {
+                    "testimonial": content,
+                    "rating": view.selected_rating,  # Assuming the rating is stored in view.selected_rating
+                    "name": str(ctx.author),
+                    "title": "Member of " + ctx.guild.name,
+                    "email": email,
+                    "socialLink": ctx.author.display_avatar.url,
+                    "avatarURL": ctx.author.display_avatar.url,
+                    "attachedImageURL": ctx.guild.icon.url if ctx.guild.icon else "",
+                    "confirm": True,
+                    "isLiked": True
+                }
+
+                # Send the data to the testimonialto API
+                async with aiohttp.ClientSession() as session:
+                    async with session.post(
+                        'https://api.testimonial.to/v1/submit/text',
+                        headers={
+                            'Authorization': f'Bearer {api_key}',
+                            'Content-Type': 'application/json'
+                        },
+                        json=data
+                    ) as response:
+                        if response.status == 200:
+                            print("Review submitted to testimonialto API successfully.")
+                        else:
+                            print(f"Failed to submit review to testimonialto API. Status code: {response.status}")
         else:
             embed = discord.Embed(description="Review rating was not received. Please try submitting again.", color=discord.Color(0xff4545))
             await message.edit(embed=embed, view=None)
