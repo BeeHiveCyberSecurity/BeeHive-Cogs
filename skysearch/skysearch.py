@@ -1178,7 +1178,7 @@ class Skysearch(commands.Cog):
             await message.edit(view=None)
 
     @commands.guild_only()
-    @airport_group.command(name='about')
+    @airport_group.command(name='info')
     async def airportinfo(self, ctx, code: str = None):
         """Query airport information by ICAO or IATA code."""
         if code is None:
