@@ -1061,7 +1061,7 @@ class Skysearch(commands.Cog):
                 color=discord.Color.from_str("#fffffe")
             )
             embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/airplane.png")
-            view = discord.ui.View(timeout=180)  # Set a timeout for the view
+            view = discord.ui.View(timeout=30)  # Set a timeout for the view
 
             # Create buttons with click actions
             search_airport = discord.ui.Button(label="Get airport info", style=discord.ButtonStyle.green, row=1)
@@ -1204,15 +1204,6 @@ class Skysearch(commands.Cog):
             
             embed = discord.Embed(title=f"Airport information for {code.upper()}", description=f"# {data1.get('name', 'Unknown Airport')}", color=0xfffffe)
             embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/location.png")
-            fields = {
-                'icao': 'ICAO',
-                'iata': 'IATA',
-                'location': 'Location',
-                'country': 'Country',
-                'country_code': 'Country Code',
-                'longitude': 'Longitude',
-                'latitude': 'Latitude'
-            }
 
             googlemaps_tokens = await self.bot.get_shared_api_tokens("googlemaps")
             google_street_view_api_key = googlemaps_tokens.get("api_key", "YOUR_API_KEY")  # Use the API key from the shared tokens, default to "YOUR_API_KEY" if not found
@@ -1246,10 +1237,20 @@ class Skysearch(commands.Cog):
             elif not data1 or 'name' not in data1:
                 embed.add_field(name="Error", value="No airport found with the provided code.", inline=False)
             else:
-                for field, name in fields.items():
-                    if field in data1 and field != 'link':
-                        value = f"**`{data1[field]}`**"
-                        embed.add_field(name=name, value=value, inline=False)
+                if 'icao' in data1:
+                    embed.add_field(name='ICAO', value=f"**`{data1['icao']}`**", inline=True)
+                if 'iata' in data1:
+                    embed.add_field(name='IATA', value=f"**`{data1['iata']}`**", inline=True)
+                if 'country_code' in data1:
+                    embed.add_field(name='Country Code', value=f"**`{data1['country_code']}`**", inline=True)
+                if 'location' in data1:
+                    embed.add_field(name='Location', value=f"**`{data1['location']}`**", inline=False)
+                if 'country' in data1:
+                    embed.add_field(name='Country', value=f"**`{data1['country']}`**", inline=False)
+                if 'longitude' in data1:
+                    embed.add_field(name='Longitude', value=f"**`{data1['longitude']}`**", inline=False)
+                if 'latitude' in data1:
+                    embed.add_field(name='Latitude', value=f"**`{data1['latitude']}`**", inline=False)
                 
                 # Check if 'link' is in data1 and add it to the view
                 if 'link' in data1:
