@@ -1244,13 +1244,13 @@ class Skysearch(commands.Cog):
                 if 'country_code' in data1:
                     embed.add_field(name='Country Code', value=f"**`{data1['country_code']}`**", inline=True)
                 if 'location' in data1:
-                    embed.add_field(name='Location', value=f"**`{data1['location']}`**", inline=False)
+                    embed.add_field(name='Location', value=f"**`{data1['location']}`**", inline=True)
                 if 'country' in data1:
-                    embed.add_field(name='Country', value=f"**`{data1['country']}`**", inline=False)
+                    embed.add_field(name='Country', value=f"**`{data1['country']}`**", inline=True)
                 if 'longitude' in data1:
-                    embed.add_field(name='Longitude', value=f"**`{data1['longitude']}`**", inline=False)
+                    embed.add_field(name='Longitude', value=f"**```{data1['longitude']}```**", inline=False)
                 if 'latitude' in data1:
-                    embed.add_field(name='Latitude', value=f"**`{data1['latitude']}`**", inline=False)
+                    embed.add_field(name='Latitude', value=f"**```{data1['latitude']}```**", inline=False)
                 
                 # Check if 'link' is in data1 and add it to the view
                 if 'link' in data1:
@@ -1258,7 +1258,7 @@ class Skysearch(commands.Cog):
                     if not (link.startswith('http://') or link.startswith('https://')):
                         link = 'https://www.airport-data.com' + link
                     # URL button
-                    view_airport = discord.ui.Button(label="View airport on airport-data.com", url=link, style=discord.ButtonStyle.link)
+                    view_airport = discord.ui.Button(label=f"More info about {data1['icao']}", url=link, style=discord.ButtonStyle.link)
                     view.add_item(view_airport)
 
             # Send the message with the embed, view, and file (if available)
