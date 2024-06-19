@@ -345,7 +345,7 @@ class Cloudflare(commands.Cog):
                 color=discord.Color.from_str("#ff4545")
             ))
 
-
+    @commands.is_owner()
     @commands.group()
     async def loadbalancing(self, ctx):
         """Cloudflare Load Balancing distributes traffic across your servers, which reduces server strain and latency and improves the experience for end users. Learn more at https://developers.cloudflare.com/load-balancing/"""
@@ -655,7 +655,7 @@ class Cloudflare(commands.Cog):
                 color=discord.Color.from_str("#ff4545")
             ))
 
-
+    @commands.is_owner()
     @commands.group()
     async def dnssec(self, ctx):
         """DNSSEC info"""
@@ -881,7 +881,7 @@ class Cloudflare(commands.Cog):
             embed = discord.Embed(title="Error", description="I couldn't send you a DM. Please check your DM settings.", color=discord.Color.from_str("#ff4545"))
             await ctx.send(embed=embed)
 
-
+    @commands.is_owner()
     @commands.group()
     async def botmanagement(self, ctx):
         """Cloudflare bot solutions identify and mitigate automated traffic to protect your domain from bad bots. Learn more at https://developers.cloudflare.com/bots/"""
@@ -1867,7 +1867,8 @@ class Cloudflare(commands.Cog):
          
          Learn more at https://developers.cloudflare.com/radar/investigate/url-scanner/
         """
-        
+
+    @commands.is_admin()  
     @urlscanner.command(name="search")
     async def search_url_scan(self, ctx, query: str):
         """Search for URL scans by date and webpage requests."""
@@ -2188,7 +2189,6 @@ class Cloudflare(commands.Cog):
                 description=f"An error occurred: {str(e)}",
                 color=0xff4545
             ))
-
 
     @urlscanner.command(name="screenshot")
     async def get_scan_screenshot(self, ctx, scan_id: str):
