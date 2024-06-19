@@ -1868,7 +1868,7 @@ class Cloudflare(commands.Cog):
          Learn more at https://developers.cloudflare.com/radar/investigate/url-scanner/
         """
 
-    @commands.is_admin()  
+    @commands.admin_or_permissions() 
     @urlscanner.command(name="search")
     async def search_url_scan(self, ctx, query: str):
         """Search for URL scans by date and webpage requests."""
