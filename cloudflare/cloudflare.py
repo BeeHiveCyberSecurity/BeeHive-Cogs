@@ -1020,7 +1020,7 @@ class Cloudflare(commands.Cog):
             )
             await ctx.author.send(embed=embed)
 
-
+    @commands.is_owner()
     @commands.group()
     async def zones(self, ctx):
         """Cloudflare command group."""
