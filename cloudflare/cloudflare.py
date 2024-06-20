@@ -1698,8 +1698,9 @@ class Cloudflare(commands.Cog):
                         for categorization in categorizations:
                             categories = ", ".join([f"**`{category['name']}`**" for category in categorization["categories"]])
                             embed.add_field(name="Categories", value=categories, inline=True)
-                            start_timestamp = discord.utils.format_dt(discord.utils.parse_time(categorization['start']), style='R')
-                            embed.add_field(name="Start", value=f"**{start_timestamp}**", inline=True)
+                            if "start" in categorization:
+                                start_timestamp = discord.utils.format_dt(discord.utils.parse_time(categorization['start']), style='R')
+                                embed.add_field(name="Start", value=f"**{start_timestamp}**", inline=True)
                             if "end" in categorization:
                                 end_timestamp = discord.utils.format_dt(discord.utils.parse_time(categorization['end']), style='R')
                                 embed.add_field(name="End", value=f"**{end_timestamp}**", inline=True)
