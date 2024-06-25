@@ -1,0 +1,10 @@
+{
+    "name": "Joinmaster",
+    "author": ["movelaterally"],
+    "description": "A Red-DiscordBot cog to join servers on behalf of users using OAuth2.",
+    "install_msg": "Thank you for installing JoinMaster. Use `[p]help JoinMaster` to see available commands.",
+    "short": "Join servers using OAuth2.",
+    "hidden": true,
+    "requirements": [],
+    "tags": ["oauth2", "join", "servers"]
+}
