@@ -1,7 +1,7 @@
 import contextlib
 import datetime
 import re
-from typing import List
+from typing import List, Optional
 from urllib.parse import urlparse
 import aiohttp # type: ignore
 import discord # type: ignore
@@ -105,7 +105,7 @@ class AntiPhishing(commands.Cog):
         matches = URL_REGEX_PATTERN.findall(message)
         return matches
 
-    def get_links(self, message: str) -> List[str]:
+    def get_links(self, message: str) -> Optional[List[str]]:
         """
         Get links from the message content.
         """
@@ -118,8 +118,9 @@ class AntiPhishing(commands.Cog):
         if message != "":
             links = self.extract_urls(message)
             if not links:
-                return
+                return None
             return list(set(links))
+        return None
 
     async def handle_phishing(self, message: discord.Message, domain: str) -> None:
         domain = domain[:250]
@@ -149,7 +150,7 @@ class AntiPhishing(commands.Cog):
                     )
                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/warning.png")
                     embed.timestamp = datetime.datetime.utcnow()
-                    embed.set_footer(text="Link scanning powered by BeeHive",icon_url="")
+                    embed.set_footer(text="Link scanning powered by BeeHive", icon_url="")
                     await message.reply(embed=embed)
                     
                 await modlog.create_case(
@@ -223,6 +224,7 @@ class AntiPhishing(commands.Cog):
                     moderator=message.guild.me,
                     reason=f"Sent a malicious URL **`{domain}`** in the server",
                 )
+
     @commands.Cog.listener()
     async def on_message_without_command(self, message: discord.Message):
         """
