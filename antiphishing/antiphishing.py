@@ -1,6 +1,7 @@
 import contextlib
 import datetime
 import re
+import json
 from typing import List, Optional
 from urllib.parse import urlparse
 import aiohttp # type: ignore
@@ -75,24 +76,10 @@ class AntiPhishing(commands.Cog):
     async def get_phishing_domains(self) -> None:
         domains = []
 
-        headers = {
-            "X-Identity": f"BeeHive AntiPhishing v{self.__version__} (https://www.beehive.systems/sentri)",
-        }
-
-        async with self.session.get(
-            "https://phish.sinking.yachts/v2/all", headers=headers
-        ) as request:
-            if request.status == 200:
-                data = await request.json()
-                domains.extend(data)
-
-        async with self.session.get(
-            "https://www.beehive.systems/hubfs/blocklist/blocklist.json", headers=headers
-        ) as request:
-            if request.status == 200:
-                data = await request.json()
-                for domain, reason in data.items():
-                    domains.append(f"{domain} ({reason})")
+        with open("blocklist.json", "r") as file:
+            data = json.load(file)
+            for domain, reason in data.items():
+                domains.append(f"{domain} ({reason})")
 
         deduped = list(set(domains))
         self.domains = deduped
