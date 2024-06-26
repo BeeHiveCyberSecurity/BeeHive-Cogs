@@ -91,7 +91,8 @@ class AntiPhishing(commands.Cog):
         ) as request:
             if request.status == 200:
                 data = await request.json()
-                domains.extend(data)
+                for domain, reason in data.items():
+                    domains.append(f"{domain} ({reason})")
 
         deduped = list(set(domains))
         self.domains = deduped
@@ -129,9 +130,21 @@ class AntiPhishing(commands.Cog):
         if action == "notify":
             if message.channel.permissions_for(message.guild.me).send_messages:
                 with contextlib.suppress(discord.NotFound):
+                    reason = None
+                    for d in self.domains:
+                        if domain in d:
+                            reason = d.split('(', 1)[-1].rstrip(')')
+                            break
+                    description = (
+                        f"This message contains a malicious website or URL.\n\n"
+                        f"This URL could be anything from a fraudulent online seller, to an IP logger, to a page delivering malware intended to steal Discord accounts.\n\n"
+                        f"**Don't click any links in this message, and notify server moderators ASAP**"
+                    )
+                    if reason:
+                        description += f"\n\n**Analyst notes:** {reason}"
                     embed = discord.Embed(
                         title="Dangerous link detected!",
-                        description=f"This message contains a malicious website or URL.\n\nThis URL could be anything from a fraudulent online seller, to an IP logger, to a page delivering malware intended to steal Discord accounts.\n\n**Don't click any links in this message, and notify server moderators ASAP**",
+                        description=description,
                         color=16729413,
                     )
                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/warning.png")
