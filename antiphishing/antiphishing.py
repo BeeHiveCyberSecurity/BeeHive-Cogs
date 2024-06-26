@@ -29,11 +29,12 @@ class AntiPhishing(commands.Cog):
         self.config.register_guild(action="notify", caught=0)
         self.session = aiohttp.ClientSession()
         self.bot.loop.create_task(self.register_casetypes())
-        self.bot.loop.create_task(self.get_phishing_domains())
         self.domains = []
+        self.get_phishing_domains.start()
 
     def cog_unload(self):
         self.bot.loop.create_task(self.session.close())
+        self.get_phishing_domains.cancel()
 
     async def red_delete_data_for_user(self, **kwargs):
         return
@@ -76,10 +77,13 @@ class AntiPhishing(commands.Cog):
     async def get_phishing_domains(self) -> None:
         domains = []
 
-        with open("blocklist.json", "r") as file:
-            data = json.load(file)
-            for domain, reason in data.items():
-                domains.append(f"{domain} ({reason})")
+        try:
+            with open("blocklist.json", "r") as file:
+                data = json.load(file)
+                for domain, reason in data.items():
+                    domains.append(f"{domain} ({reason})")
+        except FileNotFoundError:
+            pass
 
         deduped = list(set(domains))
         self.domains = deduped
