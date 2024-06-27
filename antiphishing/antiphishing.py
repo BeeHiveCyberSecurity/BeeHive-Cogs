@@ -1,8 +1,7 @@
 import contextlib
 import datetime
 import re
-import json
-from typing import List, Optional
+from typing import List
 from urllib.parse import urlparse
 import aiohttp # type: ignore
 import discord # type: ignore
@@ -29,12 +28,11 @@ class AntiPhishing(commands.Cog):
         self.config.register_guild(action="notify", caught=0)
         self.session = aiohttp.ClientSession()
         self.bot.loop.create_task(self.register_casetypes())
+        self.bot.loop.create_task(self.get_phishing_domains())
         self.domains = []
-        self.get_phishing_domains.start()
 
     def cog_unload(self):
         self.bot.loop.create_task(self.session.close())
-        self.get_phishing_domains.cancel()
 
     async def red_delete_data_for_user(self, **kwargs):
         return
@@ -77,13 +75,24 @@ class AntiPhishing(commands.Cog):
     async def get_phishing_domains(self) -> None:
         domains = []
 
-        try:
-            with open("blocklist.json", "r") as file:
-                data = json.load(file)
+        headers = {
+            "X-Identity": f"BeeHive AntiPhishing v{self.__version__} (https://www.beehive.systems/sentri)",
+        }
+
+        async with self.session.get(
+            "https://phish.sinking.yachts/v2/all", headers=headers
+        ) as request:
+            if request.status == 200:
+                data = await request.json()
+                domains.extend(data)
+
+        async with self.session.get(
+            "https://www.beehive.systems/hubfs/blocklist/blocklist.json", headers=headers
+        ) as request:
+            if request.status == 200:
+                data = await request.json()
                 for domain, reason in data.items():
                     domains.append(f"{domain} ({reason})")
-        except FileNotFoundError:
-            pass
 
         deduped = list(set(domains))
         self.domains = deduped
@@ -96,7 +105,7 @@ class AntiPhishing(commands.Cog):
         matches = URL_REGEX_PATTERN.findall(message)
         return matches
 
-    def get_links(self, message: str) -> Optional[List[str]]:
+    def get_links(self, message: str) -> List[str]:
         """
         Get links from the message content.
         """
@@ -109,9 +118,8 @@ class AntiPhishing(commands.Cog):
         if message != "":
             links = self.extract_urls(message)
             if not links:
-                return None
+                return
             return list(set(links))
-        return None
 
     async def handle_phishing(self, message: discord.Message, domain: str) -> None:
         domain = domain[:250]
@@ -122,26 +130,14 @@ class AntiPhishing(commands.Cog):
         if action == "notify":
             if message.channel.permissions_for(message.guild.me).send_messages:
                 with contextlib.suppress(discord.NotFound):
-                    reason = None
-                    for d in self.domains:
-                        if domain in d:
-                            reason = d.split('(', 1)[-1].rstrip(')')
-                            break
-                    description = (
-                        f"This message contains a malicious website or URL.\n\n"
-                        f"This URL could be anything from a fraudulent online seller, to an IP logger, to a page delivering malware intended to steal Discord accounts.\n\n"
-                        f"**Don't click any links in this message, and notify server moderators ASAP**"
-                    )
-                    if reason:
-                        description += f"\n\n**Analyst notes:** {reason}"
                     embed = discord.Embed(
                         title="Dangerous link detected!",
-                        description=description,
+                        description=f"This message contains a malicious website or URL.\n\nThis URL could be anything from a fraudulent online seller, to an IP logger, to a page delivering malware intended to steal Discord accounts.\n\n**Don't click any links in this message, and notify server moderators ASAP**",
                         color=16729413,
                     )
                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/warning.png")
                     embed.timestamp = datetime.datetime.utcnow()
-                    embed.set_footer(text="Link scanning powered by BeeHive", icon_url="")
+                    embed.set_footer(text="Link scanning powered by BeeHive",icon_url="")
                     await message.reply(embed=embed)
                     
                 await modlog.create_case(
@@ -215,7 +211,6 @@ class AntiPhishing(commands.Cog):
                     moderator=message.guild.me,
                     reason=f"Sent a malicious URL **`{domain}`** in the server",
                 )
-
     @commands.Cog.listener()
     async def on_message_without_command(self, message: discord.Message):
         """
