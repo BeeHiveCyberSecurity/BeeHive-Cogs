@@ -91,8 +91,7 @@ class AntiPhishing(commands.Cog):
         ) as request:
             if request.status == 200:
                 data = await request.json()
-                for domain, reason in data.items():
-                    domains.append(f"{domain} ({reason})")
+                domains.extend(data)
 
         deduped = list(set(domains))
         self.domains = deduped
