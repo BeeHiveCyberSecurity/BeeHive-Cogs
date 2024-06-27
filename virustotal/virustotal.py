@@ -127,7 +127,7 @@ class VirusTotal(commands.Cog):
                         ax.set_title('Vendor ratings summary', color='white')
                         ax.set_xticks(range(len(labels)))
                         ax.set_xticklabels(labels, color='white')
-                        ax.legend()
+                        ax.legend(facecolor='white', edgecolor='white', framealpha=1, labelcolor='white')
 
                         # Attach a text label above each bar in *rects*, displaying its height.
                         for rect in ax.patches:
