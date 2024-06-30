@@ -1521,9 +1521,6 @@ class Skysearch(commands.Cog):
                 timeemoji = "☀️" if period.get('isDaytime') else "🌙"
                 description = f" # {timeemoji} {period['name']}"
                 embed = discord.Embed(title=f"Weather forecast for {code.upper()}", description=description, color=0xfffffe)
-                icon_url = period.get('icon')
-                if icon_url:
-                    embed.set_thumbnail(url=icon_url)
 
                 temperature = period['temperature']
                 temperature_unit = period['temperatureUnit']
