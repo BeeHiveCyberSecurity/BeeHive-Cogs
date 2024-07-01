@@ -179,7 +179,7 @@ class Products(commands.Cog):
         )
         embed.add_field(
             name="What should you do?",
-            value="Consider upgrading to Windows 11 or another supported operating system to ensure your device remains secure and operating at it's best capability.",
+            value="Consider upgrading to Windows 11 to ensure your device remains secure and operating at it's best capability. If your device isn't compatible with Windows 11, it might be time to upgrade your hardware to continue gaming for years to come.",
             inline=False
         )
         view = discord.ui.View()
