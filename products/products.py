@@ -170,7 +170,7 @@ class Products(commands.Cog):
             description="Microsoft has announced the end of support for Windows 10. It's important to upgrade to a newer version to continue receiving security updates and support.",
             colour=0xf8f9fb
         )
-        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/warning.png")
+        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/white/warning.png")
         embed.set_image(url="https://www.beehive.systems/hubfs/linkedmedia/timetoupgrade.png")
         embed.add_field(
             name="What does this mean?",
