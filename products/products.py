@@ -174,7 +174,7 @@ class Products(commands.Cog):
         embed.set_image(url="https://www.beehive.systems/hubfs/linkedmedia/timetoupgrade.png")
         embed.add_field(
             name="What does this mean?",
-            value=f"After the end of support date (<t:1760400000:R>), Windows 10 will no longer receive security updates, leaving your system vulnerable to threats.",
+            value=f"When Windows 10 reaches it's **End of Life** (<t:1760400000:R>), all consumer Windows 10 versions will no longer receive security updates, leaving your system vulnerable to threats. Once support for Windows 10 itself is dropped, software and hardware manufacturers will gradually drop update support for systems still running Windows 10, which could lead to slowdowns, crashes, and missing features.",
             inline=False
         )
         embed.add_field(
