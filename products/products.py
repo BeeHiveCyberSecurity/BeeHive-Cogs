@@ -167,14 +167,14 @@ class Products(commands.Cog):
         """
         embed = discord.Embed(
             title="It's time to upgrade",
-            description="Microsoft has announced the end of support for Windows 10. It's important to upgrade to a newer version to continue receiving security updates and support.",
+            description="**Microsoft has announced the end of support for Windows 10.**\nIt's important to upgrade to a newer version to continue receiving security updates and support.",
             colour=0xf8f9fb
         )
-        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/white/warning.png")
+        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/warning.png")
         embed.set_image(url="https://www.beehive.systems/hubfs/linkedmedia/timetoupgrade.png")
         embed.add_field(
             name="What does this mean?",
-            value="After the end of support date, Windows 10 will no longer receive security updates, leaving your system vulnerable to threats.",
+            value=f"After the end of support date (<t:1760400000:D>), Windows 10 will no longer receive security updates, leaving your system vulnerable to threats.",
             inline=False
         )
         embed.add_field(
