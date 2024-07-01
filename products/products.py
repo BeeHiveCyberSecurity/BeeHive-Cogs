@@ -168,7 +168,7 @@ class Products(commands.Cog):
         embed = discord.Embed(
             title="It's time to upgrade",
             description="Microsoft has announced the end of support for Windows 10. It's important to upgrade to a newer version to continue receiving security updates and support.",
-            colour=16711680
+            colour=0xf8f9fb
         )
         embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/warning.png")
         embed.set_image(url="https://www.beehive.systems/hubfs/linkedmedia/timetoupgrade.png")
