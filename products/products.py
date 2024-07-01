@@ -183,7 +183,7 @@ class Products(commands.Cog):
             inline=False
         )
         view = discord.ui.View()
-        view.add_item(discord.ui.Button(label="Learn more", url="https://www.microsoft.com/windows/windows-10-end-of-support", style=discord.ButtonStyle.link, emoji="🔗"))
+        view.add_item(discord.ui.Button(label="Learn more", url="https://learn.microsoft.com/en-us/lifecycle/products/windows-10-home-and-pro", style=discord.ButtonStyle.link, emoji="🔗"))
         await ctx.send(embed=embed, view=view)
 
     @commands.bot_has_permissions(embed_links=True)
