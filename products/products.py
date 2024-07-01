@@ -160,6 +160,32 @@ class Products(commands.Cog):
         await ctx.send(embed=embed, view=view)
 
     @commands.bot_has_permissions(embed_links=True)
+    @commands.command(name="win10", description="Show an embed warning the user about the incoming Windows 10 retirement", invoke_without_command=True)
+    async def windows10alert(self, ctx: commands.Context):
+        """
+        Show an embed warning the user about the incoming Windows 10 retirement.
+        """
+        embed = discord.Embed(
+            title="It's time to upgrade",
+            description="Microsoft has announced the end of support for Windows 10. It's important to upgrade to a newer version to continue receiving security updates and support.",
+            colour=16711680
+        )
+        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/warning.png")
+        embed.add_field(
+            name="What does this mean?",
+            value="After the end of support date, Windows 10 will no longer receive security updates, leaving your system vulnerable to threats.",
+            inline=False
+        )
+        embed.add_field(
+            name="What should you do?",
+            value="Consider upgrading to Windows 11 or another supported operating system to ensure your device remains secure.",
+            inline=False
+        )
+        view = discord.ui.View()
+        view.add_item(discord.ui.Button(label="Learn more", url="https://www.microsoft.com/windows/windows-10-end-of-support", style=discord.ButtonStyle.link, emoji="🔗"))
+        await ctx.send(embed=embed, view=view)
+
+    @commands.bot_has_permissions(embed_links=True)
     @commands.command(name="reviewprompt", description="Prompt the user to leave a review about their experience", aliases=["reviewp"])
     async def reviewprompt(self, ctx: commands.Context):
         """
