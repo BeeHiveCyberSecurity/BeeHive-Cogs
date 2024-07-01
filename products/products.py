@@ -171,6 +171,7 @@ class Products(commands.Cog):
             colour=16711680
         )
         embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/warning.png")
+        embed.set_image(url="https://www.beehive.systems/hubfs/linkedmedia/timetoupgrade.png")
         embed.add_field(
             name="What does this mean?",
             value="After the end of support date, Windows 10 will no longer receive security updates, leaving your system vulnerable to threats.",
