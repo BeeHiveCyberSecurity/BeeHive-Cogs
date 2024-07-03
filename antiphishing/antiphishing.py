@@ -255,10 +255,15 @@ class AntiPhishing(commands.Cog):
         url = url.strip("<>")
         urls = self.extract_urls(url)
         if not urls:
-            embed = discord.Embed(title='Error: Invalid URL', description=f"You provided an invalid URL.\n\nCheck the formatting of any links and try again...", colour=16729413,)
-            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle.png")
-            await ctx.send(embed=embed)
-            return
+            # Assume the user meant "https://<url>" if only a domain is provided
+            if '.' in url and ' ' not in url:
+                url = f"https://{url}"
+                urls = self.extract_urls(url)
+            if not urls:
+                embed = discord.Embed(title='Error: Invalid URL', description=f"You provided an invalid URL.\n\nCheck the formatting of any links and try again...", colour=16729413,)
+                embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle.png")
+                await ctx.send(embed=embed)
+                return
 
         real_url = urls[0]
         domain = urlparse(real_url).netloc
