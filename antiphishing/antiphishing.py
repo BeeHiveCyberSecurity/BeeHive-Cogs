@@ -20,7 +20,7 @@ class AntiPhishing(commands.Cog):
     Guard users from malicious links and phishing attempts with customizable protection options.
     """
 
-    __version__ = "1.0.2"
+    __version__ = "1.0.3"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -129,6 +129,8 @@ class AntiPhishing(commands.Cog):
         if action == "notify":
             if message.channel.permissions_for(message.guild.me).send_messages:
                 with contextlib.suppress(discord.NotFound):
+                    mod_roles = await self.bot.get_mod_roles(message.guild)
+                    mod_mentions = " ".join(role.mention for role in mod_roles) if mod_roles else ""
                     embed = discord.Embed(
                         title="Dangerous link detected!",
                         description=f"This message contains a malicious website or URL.\n\nThis URL could be anything from a fraudulent online seller, to an IP logger, to a page delivering malware intended to steal Discord accounts.\n\n**Don't click any links in this message, and notify server moderators ASAP**",
@@ -137,7 +139,7 @@ class AntiPhishing(commands.Cog):
                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/warning.png")
                     embed.timestamp = datetime.datetime.utcnow()
                     embed.set_footer(text="Link scanning powered by BeeHive",icon_url="")
-                    await message.reply(embed=embed)
+                    await message.reply(content=mod_mentions, embed=embed, allowed_mentions=discord.AllowedMentions(roles=True))
                     
                 await modlog.create_case(
                     guild=message.guild,
