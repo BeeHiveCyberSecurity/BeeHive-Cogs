@@ -20,7 +20,7 @@ class AntiPhishing(commands.Cog):
     Guard users from malicious links and phishing attempts with customizable protection options.
     """
 
-    __version__ = "1.0.0"
+    __version__ = "1.0.1"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -394,7 +394,7 @@ class AntiPhishing(commands.Cog):
                 f"- We've removed **`{deletions}`** messages to protect the community\n"
                 f"- We've removed a user from the server **`{kicks}`** times\n"
                 f"- We've delivered **`{bans}`** permanent bans for sharing dangerous links\n\n"
-                f"Version **`{self.__version__}`**"
+                f"**Version** **`{self.__version__}`**"
             ), 
             colour=16767334,
         )
