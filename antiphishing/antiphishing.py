@@ -392,7 +392,7 @@ class AntiPhishing(commands.Cog):
                 f"- We've detected **`{caught}`** malicious link{s} shared in chats\n"
                 f"- We've warned you of danger **`{notifications}`** times\n"
                 f"- We've removed **`{deletions}`** messages to protect the community\n"
-                f"- We've removed a user from the server **`{kicks}**` times\n"
+                f"- We've removed a user from the server **`{kicks}`** times\n"
                 f"- We've delivered **`{bans}`** permanent bans for sharing dangerous links"
             ), 
             colour=16767334,
