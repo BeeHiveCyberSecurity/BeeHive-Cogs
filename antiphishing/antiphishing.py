@@ -25,7 +25,7 @@ class AntiPhishing(commands.Cog):
     def __init__(self, bot: Red):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=73835)
-        self.config.register_guild(action="notify", caught=0)
+        self.config.register_guild(action="notify", caught=0, notifications=0, deletions=0, kicks=0, bans=0)
         self.session = aiohttp.ClientSession()
         self.bot.loop.create_task(self.register_casetypes())
         self.bot.loop.create_task(self.get_phishing_domains())
@@ -148,6 +148,8 @@ class AntiPhishing(commands.Cog):
                     moderator=message.guild.me,
                     reason=f"Sent a malicious URL **`{domain}`** in the server",
                 )
+                notifications = await self.config.guild(message.guild).notifications()
+                await self.config.guild(message.guild).notifications.set(notifications + 1)
         elif action == "delete":
             if message.channel.permissions_for(message.guild.me).manage_messages:
                 with contextlib.suppress(discord.NotFound):
@@ -162,6 +164,8 @@ class AntiPhishing(commands.Cog):
                     moderator=message.guild.me,
                     reason=f"Sent a malicious URL **`{domain}`** in the server",
                 )
+                deletions = await self.config.guild(message.guild).deletions()
+                await self.config.guild(message.guild).deletions.set(deletions + 1)
         elif action == "kick":
             if (
                 message.channel.permissions_for(message.guild.me).kick_members
@@ -186,6 +190,8 @@ class AntiPhishing(commands.Cog):
                     moderator=message.guild.me,
                     reason=f"Sent a malicious URL **`{domain}`** in the server",
                 )
+                kicks = await self.config.guild(message.guild).kicks()
+                await self.config.guild(message.guild).kicks.set(kicks + 1)
         elif action == "ban":
             if (
                 message.channel.permissions_for(message.guild.me).ban_members
@@ -210,6 +216,9 @@ class AntiPhishing(commands.Cog):
                     moderator=message.guild.me,
                     reason=f"Sent a malicious URL **`{domain}`** in the server",
                 )
+                bans = await self.config.guild(message.guild).bans()
+                await self.config.guild(message.guild).bans.set(bans + 1)
+
     @commands.Cog.listener()
     async def on_message_without_command(self, message: discord.Message):
         """
@@ -370,8 +379,24 @@ class AntiPhishing(commands.Cog):
         Check protection statistics for this server
         """
         caught = await self.config.guild(ctx.guild).caught()
+        notifications = await self.config.guild(ctx.guild).notifications()
+        deletions = await self.config.guild(ctx.guild).deletions()
+        kicks = await self.config.guild(ctx.guild).kicks()
+        bans = await self.config.guild(ctx.guild).bans()
+        
         s = "s" if caught != 1 else ""
-        embed = discord.Embed(title='Phishing protection', description=f"# **`{caught}`** malicious link{s} detected\n### since being added to {ctx.guild.name}\n\nKeep me around to continue defending your community with protection powered by BeeHive", colour=16767334,)
+        embed = discord.Embed(
+            title='Protection statistics', 
+            description=(
+                f"Since being activated in {ctx.guild.name}, we've been hard at work.\n\n"
+                f"- We've detected **`{caught}`** malicious link{s} shared in chats\n"
+                f"- We've warned you of danger **`{notifications}`** times\n"
+                f"- We've removed **`{deletions}`** messages to protect the community\n"
+                f"- We've removed a user from the server **`{kicks}**` times\n"
+                f"- We've delivered **`{bans}`** permanent bans for sharing dangerous links"
+            ), 
+            colour=16767334,
+        )
         embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/shield-checkmark.png")
         view = discord.ui.View()
         button = discord.ui.Button(label="Learn More", url="https://www.beehive.systems")
