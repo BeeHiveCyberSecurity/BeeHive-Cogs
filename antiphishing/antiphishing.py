@@ -20,7 +20,7 @@ class AntiPhishing(commands.Cog):
     Guard users from malicious links and phishing attempts with customizable protection options.
     """
 
-    __version__ = "1.0.1"
+    __version__ = "1.0.2"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -384,16 +384,21 @@ class AntiPhishing(commands.Cog):
         kicks = await self.config.guild(ctx.guild).kicks()
         bans = await self.config.guild(ctx.guild).bans()
         
-        s = "s" if caught != 1 else ""
+        s_caught = "s" if caught != 1 else ""
+        s_notifications = "s" if notifications != 1 else ""
+        s_deletions = "s" if deletions != 1 else ""
+        s_kicks = "s" if kicks != 1 else ""
+        s_bans = "s" if bans != 1 else ""
+        
         embed = discord.Embed(
             title='Protection statistics', 
             description=(
                 f"Since being activated in {ctx.guild.name}, we've been hard at work.\n\n"
-                f"- We've detected **`{caught}`** malicious link{s} shared in chats\n"
-                f"- We've warned you of danger **`{notifications}`** times\n"
-                f"- We've removed **`{deletions}`** messages to protect the community\n"
-                f"- We've removed a user from the server **`{kicks}`** times\n"
-                f"- We've delivered **`{bans}`** permanent bans for sharing dangerous links\n\n"
+                f"- We've detected **`{caught}`** malicious link{s_caught} shared in chats\n"
+                f"- We've warned you of danger **`{notifications}`** time{s_notifications}\n"
+                f"- We've removed **`{deletions}`** message{s_deletions} to protect the community\n"
+                f"- We've removed a user from the server **`{kicks}`** time{s_kicks}\n"
+                f"- We've delivered **`{bans}`** permanent ban{s_bans} for sharing dangerous links\n\n"
                 f"**Version** **`{self.__version__}`**"
             ), 
             colour=16767334,
