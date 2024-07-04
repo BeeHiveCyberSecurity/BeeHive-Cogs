@@ -130,7 +130,7 @@ class AntiPhishing(commands.Cog):
             if message.channel.permissions_for(message.guild.me).send_messages:
                 with contextlib.suppress(discord.NotFound):
                     mod_roles = await self.bot.get_mod_roles(message.guild)
-                    mod_mentions = " ".join(role.mention for role in mod_roles) if mod_roles
+                    mod_mentions = " ".join(role.mention for role in mod_roles) if mod_roles else ""
                     embed = discord.Embed(
                         title="Dangerous link detected!",
                         description=f"This message contains a malicious website or URL.\n\nThis URL could be anything from a fraudulent online seller, to an IP logger, to a page delivering malware intended to steal Discord accounts.\n\n**Don't click any links in this message, and notify server moderators ASAP**",
