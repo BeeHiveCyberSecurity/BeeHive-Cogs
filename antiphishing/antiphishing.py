@@ -39,7 +39,7 @@ class AntiPhishing(commands.Cog):
 
     def format_help_for_context(self, ctx: Context) -> str:
         pre_processed = super().format_help_for_context(ctx)
-        return f"{pre_processed}\n\nCog Version: {self.__version__}"
+        return f"{pre_processed}\n\nVersion {self.__version__}"
 
     async def register_casetypes(self) -> None:
         with contextlib.suppress(RuntimeError):
