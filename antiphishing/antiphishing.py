@@ -25,7 +25,7 @@ class AntiPhishing(commands.Cog):
     def __init__(self, bot: Red):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=73835)
-        self.config.register_guild(action="notify", caught=0, notifications=0, deletions=0, kicks=0, bans=0, max_links=3)
+        self.config.register_guild(action="notify", caught=0, notifications=0, deletions=0, kicks=0, bans=0, max_links=3, last_updated=None)
         self.config.register_member(caught=0)
         self.session = aiohttp.ClientSession()
         self.bot.loop.create_task(self.register_casetypes())
@@ -93,6 +93,10 @@ class AntiPhishing(commands.Cog):
             if request.status == 200:
                 data = await request.json()
                 domains.extend(data)
+                last_modified = request.headers.get("Last-Modified")
+                if last_modified:
+                    last_updated = datetime.datetime.strptime(last_modified, "%a, %d %b %Y %H:%M:%S %Z")
+                    await self.config.guild(ctx.guild).last_updated.set(last_updated.isoformat())
 
         deduped = list(set(domains))
         self.domains = deduped
@@ -393,12 +397,15 @@ class AntiPhishing(commands.Cog):
         deletions = await self.config.guild(ctx.guild).deletions()
         kicks = await self.config.guild(ctx.guild).kicks()
         bans = await self.config.guild(ctx.guild).bans()
+        last_updated = await self.config.guild(ctx.guild).last_updated()
         
         s_caught = "s" if caught != 1 else ""
         s_notifications = "s" if notifications != 1 else ""
         s_deletions = "s" if deletions != 1 else ""
         s_kicks = "s" if kicks != 1 else ""
         s_bans = "s" if bans != 1 else ""
+        
+        last_updated_str = f"Definitions last updated: **`{last_updated}`**" if last_updated else "Definitions last updated: **`Unknown`**"
         
         embed = discord.Embed(
             title='Protection statistics', 
@@ -409,6 +416,7 @@ class AntiPhishing(commands.Cog):
                 f"- We've removed **`{deletions}`** message{s_deletions} to protect the community\n"
                 f"- We've removed a user from the server **`{kicks}`** time{s_kicks}\n"
                 f"- We've delivered **`{bans}`** permanent ban{s_bans} for sharing dangerous links\n\n"
+                f"{last_updated_str}\n\n"
                 f"**Version** **`{self.__version__}`**"
             ), 
             colour=16767334,
