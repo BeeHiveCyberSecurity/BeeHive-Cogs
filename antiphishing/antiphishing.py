@@ -399,7 +399,7 @@ class AntiPhishing(commands.Cog):
         deletions = await self.config.guild(ctx.guild).deletions()
         kicks = await self.config.guild(ctx.guild).kicks()
         bans = await self.config.guild(ctx.guild).bans()
-        last_updated = await self.config.guild(ctx.guild).last_updated()
+        last_updated = self.__last_updated__
         
         s_caught = "s" if caught != 1 else ""
         s_notifications = "s" if notifications != 1 else ""
