@@ -92,14 +92,19 @@ class AntiPhishing(commands.Cog):
             "https://www.beehive.systems/hubfs/blocklist/blocklist.json", headers=headers
         ) as request:
             if request.status == 200:
-                data = await request.json()
-                domains.extend(data)
-                last_modified = request.headers.get("Last-Modified")
-                if last_modified:
-                    last_updated = datetime.datetime.strptime(last_modified, "%a, %d %b %Y %H:%M:%S %Z")
-                    await self.config.guild(ctx.guild).last_updated.set(last_updated.isoformat())
-                    self.__last_updated__ = last_updated.isoformat()
-
+                try:
+                    data = await request.json()
+                    if isinstance(data, list):
+                        domains.extend(data)
+                    else:
+                        # Log or handle unexpected data format
+                        print("Unexpected data format received from blocklist.")
+                except Exception as e:
+                    # Log or handle JSON parsing error
+                    print(f"Error parsing JSON from blocklist: {e}")
+            else:
+                # Log or handle non-200 status code
+                print(f"Failed to fetch blocklist, status code: {request.status}")
         deduped = list(set(domains))
         self.domains = deduped
 
