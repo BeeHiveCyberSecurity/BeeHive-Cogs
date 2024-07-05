@@ -407,7 +407,7 @@ class AntiPhishing(commands.Cog):
         s_kicks = "s" if kicks != 1 else ""
         s_bans = "s" if bans != 1 else ""
         
-        last_updated_str = f"Definitions last updated: **`{last_updated}`**" if last_updated else f"Definitions last updated: **`{self.__last_updated__}`**"
+        last_updated_str = f"**Last updated** **`{last_updated}`**"
         
         embed = discord.Embed(
             title='Protection statistics', 
@@ -418,7 +418,7 @@ class AntiPhishing(commands.Cog):
                 f"- We've removed **`{deletions}`** message{s_deletions} to protect the community\n"
                 f"- We've removed a user from the server **`{kicks}`** time{s_kicks}\n"
                 f"- We've delivered **`{bans}`** permanent ban{s_bans} for sharing dangerous links\n\n"
-                f"{last_updated_str}\n\n"
+                f"{last_updated_str}\n"
                 f"**Version** **`{self.__version__}`**"
             ), 
             colour=16767334,
