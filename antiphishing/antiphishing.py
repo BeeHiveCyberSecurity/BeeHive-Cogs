@@ -20,7 +20,8 @@ class AntiPhishing(commands.Cog):
     Guard users from malicious links and phishing attempts with customizable protection options.
     """
 
-    __version__ = "1.1.0"
+    __version__ = "1.1.2"
+    __last_updated__ = "Jul 5 2024"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -97,6 +98,7 @@ class AntiPhishing(commands.Cog):
                 if last_modified:
                     last_updated = datetime.datetime.strptime(last_modified, "%a, %d %b %Y %H:%M:%S %Z")
                     await self.config.guild(ctx.guild).last_updated.set(last_updated.isoformat())
+                    self.__last_updated__ = last_updated.isoformat()
 
         deduped = list(set(domains))
         self.domains = deduped
@@ -405,7 +407,7 @@ class AntiPhishing(commands.Cog):
         s_kicks = "s" if kicks != 1 else ""
         s_bans = "s" if bans != 1 else ""
         
-        last_updated_str = f"Definitions last updated: **`{last_updated}`**" if last_updated else "Definitions last updated: **`Unknown`**"
+        last_updated_str = f"Definitions last updated: **`{last_updated}`**" if last_updated else f"Definitions last updated: **`{self.__last_updated__}`**"
         
         embed = discord.Embed(
             title='Protection statistics', 
