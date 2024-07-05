@@ -20,12 +20,13 @@ class AntiPhishing(commands.Cog):
     Guard users from malicious links and phishing attempts with customizable protection options.
     """
 
-    __version__ = "1.0.3"
+    __version__ = "1.1.0"
 
     def __init__(self, bot: Red):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=73835)
-        self.config.register_guild(action="notify", caught=0, notifications=0, deletions=0, kicks=0, bans=0)
+        self.config.register_guild(action="notify", caught=0, notifications=0, deletions=0, kicks=0, bans=0, max_links=3)
+        self.config.register_member(caught=0)
         self.session = aiohttp.ClientSession()
         self.bot.loop.create_task(self.register_casetypes())
         self.bot.loop.create_task(self.get_phishing_domains())
@@ -126,6 +127,11 @@ class AntiPhishing(commands.Cog):
         if not action == "ignore":
             count = await self.config.guild(message.guild).caught()
             await self.config.guild(message.guild).caught.set(count + 1)
+        member_count = await self.config.member(message.author).caught()
+        max_links = await self.config.guild(message.guild).max_links()
+        if member_count + 1 >= max_links:
+            action = "ban"
+        await self.config.member(message.author).caught.set(member_count + 1)
         if action == "notify":
             if message.channel.permissions_for(message.guild.me).send_messages:
                 with contextlib.suppress(discord.NotFound):
@@ -412,3 +418,28 @@ class AntiPhishing(commands.Cog):
         button = discord.ui.Button(label="Learn More", url="https://www.beehive.systems")
         view.add_item(button)
         await ctx.send(embed=embed, view=view)
+
+    @antiphishing.command()
+    @commands.has_permissions(administrator=True)
+    async def maxlinks(self, ctx: Context, max_links: int):
+        """
+        Set the maximum number of malicious links a user can share before being banned.
+        """
+        if max_links < 1:
+            embed = discord.Embed(
+                title='Error: Invalid number',
+                description="The maximum number of malicious links must be at least 1.",
+                colour=16729413,
+            )
+            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle.png")
+            await ctx.send(embed=embed)
+            return
+
+        await self.config.guild(ctx.guild).max_links.set(max_links)
+        embed = discord.Embed(
+            title='Settings changed',
+            description=f"The maximum number of malicious links a user can share before being banned is now set to **{max_links}**.",
+            colour=0xffd966,
+        )
+        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/notifications.png")
+        await ctx.send(embed=embed)
