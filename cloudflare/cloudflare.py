@@ -1700,10 +1700,10 @@ class Cloudflare(commands.Cog):
                             embed.add_field(name="Categories", value=categories, inline=True)
                             if "start" in categorization:
                                 start_timestamp = discord.utils.format_dt(discord.utils.parse_time(categorization['start']), style='R')
-                                embed.add_field(name="Start", value=f"**{start_timestamp}**", inline=True)
+                                embed.add_field(name="Beginning", value=f"**{start_timestamp}**", inline=True)
                             if "end" in categorization:
                                 end_timestamp = discord.utils.format_dt(discord.utils.parse_time(categorization['end']), style='R')
-                                embed.add_field(name="End", value=f"**{end_timestamp}**", inline=True)
+                                embed.add_field(name="Ending", value=f"**{end_timestamp}**", inline=True)
                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/globe.png")
                     await ctx.send(embed=embed)
                 else:
