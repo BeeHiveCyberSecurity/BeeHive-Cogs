@@ -156,10 +156,9 @@ class StripeIdentity(commands.Cog):
             decline_button = discord.ui.Button(label="Decline verification", style=discord.ButtonStyle.danger)
             async def decline_verification(interaction: discord.Interaction):
                 if interaction.user.id == user.id:
-                    stripe.identity.VerificationSession.cancel(verification_session.id)
-                    await self.config.pending_verification_sessions.clear_raw(str(user.id))
                     await interaction.response.send_message(f"You have declined the verification and have been banned from {ctx.guild.name}.", ephemeral=True)
                     await ctx.guild.ban(user, reason="User declined age verification")
+                    await self.config.pending_verification_sessions.clear_raw(str(user.id))
             decline_button.callback = decline_verification
             view.add_item(decline_button)
             try:
@@ -218,7 +217,7 @@ class StripeIdentity(commands.Cog):
                         result_embed.add_field(name="User", value=f"{user} ({user.id})", inline=False)
                         result_embed.add_field(name="Age", value=str(age), inline=False)
                         await verification_channel.send(embed=result_embed)
-            await self.config.pending_verification_sessions.set_raw(user.id, value=None)
+            await self.config.pending_verification_sessions.clear_raw(user.id)
         except stripe.error.StripeError as e:
             embed = discord.Embed(description=f":x: **Failed to create a verification session**\n`{e.user_message}`", color=discord.Color(0xff4545))
             await ctx.send(embed=embed)
