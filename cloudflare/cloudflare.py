@@ -1707,7 +1707,7 @@ class Cloudflare(commands.Cog):
                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/globe.png")
                     await ctx.send(embed=embed)
                 else:
-                    embed = discord.Embed(title="Error", description=f"Error: {data['errors']}", color=0xff4545)
+                    embed = discord.Embed(title="No data available", description="There is no domain history available for this domain. Please try this query again later, as results are subject to update.", color=0xff4545)
                     await ctx.send(embed=embed)
             elif response.status == 400:
                 embed = discord.Embed(title="Bad Request", description="The server could not understand the request due to invalid syntax.", color=0xff4545)
