@@ -1704,7 +1704,7 @@ class Cloudflare(commands.Cog):
                             if "end" in categorization:
                                 end_timestamp = discord.utils.format_dt(discord.utils.parse_time(categorization['end']), style='R')
                                 embed.add_field(name="End", value=f"**{end_timestamp}**", inline=True)
-                    embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/globe.png")
+                    embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/globe.png")
                     await ctx.send(embed=embed)
                 else:
                     embed = discord.Embed(title="Error", description=f"Error: {data['errors']}", color=0xff4545)
