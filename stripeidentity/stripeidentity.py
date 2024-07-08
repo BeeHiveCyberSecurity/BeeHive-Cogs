@@ -217,6 +217,11 @@ class StripeIdentity(commands.Cog):
                         result_embed.add_field(name="User", value=f"{user} ({user.id})", inline=False)
                         result_embed.add_field(name="Age", value=str(age), inline=False)
                         await verification_channel.send(embed=result_embed)
+                else:
+                    result_embed = discord.Embed(title="Age Verification Result", color=discord.Color(0x2BBD8E))
+                    result_embed.add_field(name="User", value=f"{user} ({user.id})", inline=False)
+                    result_embed.add_field(name="Age", value=str(age), inline=False)
+                    await ctx.send(embed=result_embed)
             await self.config.pending_verification_sessions.clear_raw(str(user.id))
         except stripe.error.StripeError as e:
             embed = discord.Embed(description=f":x: **Failed to create a verification session**\n`{e.user_message}`", color=discord.Color(0xff4545))
