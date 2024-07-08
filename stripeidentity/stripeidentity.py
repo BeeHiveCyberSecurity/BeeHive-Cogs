@@ -134,7 +134,7 @@ class StripeIdentity(commands.Cog):
                     },
                 }
             )
-            await self.config.pending_verification_sessions.set_raw(user.id, value=verification_session.id)
+            await self.config.pending_verification_sessions.set_raw(str(user.id), value=verification_session.id)
             dm_embed = discord.Embed(
                 title="Age verification requested",
                 description=(
@@ -217,7 +217,7 @@ class StripeIdentity(commands.Cog):
                         result_embed.add_field(name="User", value=f"{user} ({user.id})", inline=False)
                         result_embed.add_field(name="Age", value=str(age), inline=False)
                         await verification_channel.send(embed=result_embed)
-            await self.config.pending_verification_sessions.clear_raw(user.id)
+            await self.config.pending_verification_sessions.clear_raw(str(user.id))
         except stripe.error.StripeError as e:
             embed = discord.Embed(description=f":x: **Failed to create a verification session**\n`{e.user_message}`", color=discord.Color(0xff4545))
             await ctx.send(embed=embed)
@@ -253,7 +253,7 @@ class StripeIdentity(commands.Cog):
                     },
                 }
             )
-            await self.config.pending_verification_sessions.set_raw(user.id, value=verification_session.id)
+            await self.config.pending_verification_sessions.set_raw(str(user.id), value=verification_session.id)
             dm_embed = discord.Embed(
                 title="Identity verification required",
                 description=(
@@ -291,7 +291,7 @@ class StripeIdentity(commands.Cog):
 
             async def check_verification_status(session_id):
                 # Check if the session has been cancelled before proceeding
-                if await self.config.pending_verification_sessions.get_raw(user.id, default=None) != session_id:
+                if await self.config.pending_verification_sessions.get_raw(str(user.id), default=None) != session_id:
                     return 'cancelled', None
                 session = stripe.identity.VerificationSession.retrieve(session_id)
                 if session.status == 'requires_input':
