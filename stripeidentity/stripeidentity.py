@@ -234,7 +234,7 @@ class StripeIdentity(commands.Cog):
         Perform a biometric verification of a Discord user's identity.
         """
         await ctx.message.delete()
-        embed = discord.Embed(description="**Attempting to create verification session, please wait...**", color=discord.Color(0x2BBD8E))
+        embed = discord.Embed(description="**Opening session, please wait...**", color=discord.Color(0x2BBD8E))
         await ctx.send(embed=embed)
         try:
             verification_session = stripe.identity.VerificationSession.create(
@@ -287,7 +287,7 @@ class StripeIdentity(commands.Cog):
                 await ctx.send(embed=embed)
                 return
 
-            embed = discord.Embed(description=f":white_check_mark: **`IDENTITY` verification session created for {user.mention}. They've been sent instructions on how to continue.**", color=discord.Color(0x2BBD8E))
+            embed = discord.Embed(title="Ready to verify ID document", description=f"A verification session is now open. I've sent {user.mention} a message with details on how to continue.\n\nIf they don't verify, I'll ban them within 15 minutes.**", color=discord.Color(0x2BBD8E))
             await ctx.send(embed=embed)
 
             async def check_verification_status(session_id):
