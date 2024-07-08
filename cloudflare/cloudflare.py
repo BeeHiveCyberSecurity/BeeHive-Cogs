@@ -1687,7 +1687,7 @@ class Cloudflare(commands.Cog):
         async with self.session.get(url, headers=headers, params=params) as response:
             if response.status == 200:
                 data = await response.json()
-                if data["success"]:
+                if data["success"] and data["result"]:
                     result = data["result"][0]
                     embed = discord.Embed(title=f"Domain history for {domain}", color=0x2BBD8E)
                     
