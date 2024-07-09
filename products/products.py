@@ -1,4 +1,5 @@
 import asyncio
+import BeautifulSoup
 import aiohttp
 import time
 import json
