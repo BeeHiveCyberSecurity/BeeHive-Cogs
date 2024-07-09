@@ -105,9 +105,9 @@ class Products(commands.Cog):
                             f"**% of active devices on known good state:** {active_devices_known_good}\n"
                             f"**% of active devices that had malicious activity:** {active_devices_malicious_activity}\n"
                             f"**% of Infection/Breach:** {infection_breach}\n"
-                            f"**% of the unknown that turn out to be Clean:** {unknowns_clean}\n"
-                            f"**% of the unknown that turn out to be PUA:** {unknowns_pua}\n"
-                            f"**% of the unknown that turn out to be Malware:** {unknowns_malware}"
+                            f"**% of the unknowns that turn out to be Clean:** {unknowns_clean}\n"
+                            f"**% of the unknowns that turn out to be PUA:** {unknowns_pua}\n"
+                            f"**% of the unknowns that turn out to be Malware:** {unknowns_malware}"
                         ), inline=False)
                 
                 await ctx.send(embed=embed)
