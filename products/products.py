@@ -75,7 +75,7 @@ class Products(commands.Cog):
                 
                 # Parse the page content to extract the statistics table
                 soup = BeautifulSoup(page_content, 'html.parser')
-                table = soup.find('table')  # Changed to find 'table' instead of 'scrollable-table'
+                table = soup.select_one("body > div.section.labs-statistics > div > div:nth-child(2) > div > div.scrollable-table > table")
                 
                 if not table:
                     await ctx.send("Failed to find the statistics table.")
