@@ -1,5 +1,5 @@
 import asyncio
-import BeautifulSoup
+from bs4 import BeautifulSoup
 import aiohttp
 import time
 import json
