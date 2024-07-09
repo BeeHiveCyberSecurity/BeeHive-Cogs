@@ -23,7 +23,7 @@ class Products(commands.Cog):
 
 
     @commands.bot_has_permissions(embed_links=True)
-    @commands.hybrid_command(name="antivirus", description="Learn more about BeeHive's AntiVirus", aliases=["av"])
+    @commands.group(name="antivirus", description="Learn more about BeeHive's AntiVirus", aliases=["av"], invoke_without_command=True)
     async def antivirus(self, ctx: commands.Context):
         """
         Show an embed containing product details about BeeHive's AntiViral/AntiMalware software
@@ -56,6 +56,60 @@ class Products(commands.Cog):
             embed2.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/bag-add.png")
             embed2.add_field(name="Offer Details", value=f"Trial our Security Client for **15 days free**, then pay **only** **`$7.00`** per month until coupon expires.\n\n`Offer valid for first-time customers only, billing continues automatically unless cancelled.`", inline=False)
             await ctx.send(embed=embed2, view=view2)
+
+    @commands.bot_has_permissions(embed_links=True)
+    @antivirus.command(name="stats", description="Show weekly protection statistics")
+    async def antivirusstats(self, ctx: commands.Context):
+        """
+        Fetch and display weekly protection statistics.
+        """
+        url = "https://www.xcitium.com/labs-statistics/"
+        
+        async with self.bot.session.get(url) as response:
+            if response.status != 200:
+                await ctx.send("Failed to fetch statistics from Threat Lab.")
+                return
+            
+            page_content = await response.text()
+            
+            # Parse the page content to extract the statistics table
+            soup = BeautifulSoup(page_content, 'html.parser')
+            table = soup.find('table')
+            
+            if not table:
+                await ctx.send("Failed to find the statistics table.")
+                return
+            
+            rows = table.find_all('tr')
+            if not rows:
+                await ctx.send("No data found in the statistics table.")
+                return
+            
+            embed = discord.Embed(title="Weekly protection statistics", description="Review weekly proof of BeeHive's proactive, detection-less protection on all endpoints.", color=0x2BBD8E, url=url)
+            
+            for row in rows[1:6]:  # Limit to the first 5 rows for brevity
+                columns = row.find_all('td')
+                if len(columns) >= 8:
+                    week = columns[0].text.strip()
+                    active_devices_potential_malicious = columns[1].text.strip()
+                    active_devices_known_good = columns[2].text.strip()
+                    active_devices_malicious_activity = columns[3].text.strip()
+                    infection_breach = columns[4].text.strip()
+                    unknowns_clean = columns[5].text.strip()
+                    unknowns_pua = columns[6].text.strip()
+                    unknowns_malware = columns[7].text.strip()
+                    
+                    embed.add_field(name=f"Week: {week}", value=(
+                        f"**% of active devices with potential malicious activity:** {active_devices_potential_malicious}\n"
+                        f"**% of active devices on known good state:** {active_devices_known_good}\n"
+                        f"**% of active devices that had malicious activity:** {active_devices_malicious_activity}\n"
+                        f"**% of Infection/Breach:** {infection_breach}\n"
+                        f"**% of the unknown that turn out to be Clean:** {unknowns_clean}\n"
+                        f"**% of the unknown that turn out to be PUA:** {unknowns_pua}\n"
+                        f"**% of the unknown that turn out to be Malware:** {unknowns_malware}"
+                    ), inline=False)
+            
+            await ctx.send(embed=embed)
     
     @commands.bot_has_permissions(embed_links=True)
     @commands.hybrid_command(name="vulnerabilityscanning", description="Learn more about Vulnerability Scanning")
