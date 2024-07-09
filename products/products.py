@@ -73,23 +73,23 @@ class Products(commands.Cog):
                 
                 page_content = await response.text()
                 
-                # Parse the page content to extract the statistics table
+                # Parse the page content to extract the statistics data
                 soup = BeautifulSoup(page_content, 'html.parser')
-                table = soup.find("table", {"class": "scrollable-table"})
+                stats_section = soup.find("section", {"id": "statistics"})
                 
-                if not table:
-                    await ctx.send("Failed to find the statistics table.")
+                if not stats_section:
+                    await ctx.send("Failed to find the statistics section.")
                     return
                 
-                rows = table.find_all('tr')
+                rows = stats_section.find_all('div', {"class": "stat-row"})
                 if not rows:
-                    await ctx.send("No data found in the statistics table.")
+                    await ctx.send("No data found in the statistics section.")
                     return
                 
                 embed = discord.Embed(title="Weekly protection statistics", description="Review weekly proof of BeeHive's proactive, detection-less protection on all endpoints.", color=0x2BBD8E, url=url)
                 
-                for row in rows[1:6]:  # Limit to the first 5 rows for brevity
-                    columns = row.find_all('td')
+                for row in rows[:5]:  # Limit to the first 5 rows for brevity
+                    columns = row.find_all('div', {"class": "stat-column"})
                     if len(columns) >= 8:
                         week = columns[0].get_text(strip=True)
                         active_devices_potential_malicious = columns[1].get_text(strip=True)
