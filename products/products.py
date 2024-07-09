@@ -91,14 +91,14 @@ class Products(commands.Cog):
                 for row in rows[1:6]:  # Limit to the first 5 rows for brevity
                     columns = row.find_all('td')
                     if len(columns) >= 8:
-                        week = columns[0].text.strip()
-                        active_devices_potential_malicious = columns[1].text.strip()
-                        active_devices_known_good = columns[2].text.strip()
-                        active_devices_malicious_activity = columns[3].text.strip()
-                        infection_breach = columns[4].text.strip()
-                        unknowns_clean = columns[5].text.strip()
-                        unknowns_pua = columns[6].text.strip()
-                        unknowns_malware = columns[7].text.strip()
+                        week = columns[0].get_text(strip=True)
+                        active_devices_potential_malicious = columns[1].get_text(strip=True)
+                        active_devices_known_good = columns[2].get_text(strip=True)
+                        active_devices_malicious_activity = columns[3].get_text(strip=True)
+                        infection_breach = columns[4].get_text(strip=True)
+                        unknowns_clean = columns[5].get_text(strip=True)
+                        unknowns_pua = columns[6].get_text(strip=True)
+                        unknowns_malware = columns[7].get_text(strip=True)
                         
                         embed.add_field(name=f"Week: {week}", value=(
                             f"**% of active devices with potential malicious activity:** {active_devices_potential_malicious}\n"
