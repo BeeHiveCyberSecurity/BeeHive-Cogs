@@ -90,13 +90,13 @@ class Products(commands.Cog):
                         
                         embed = discord.Embed(title="Weekly protection statistics", color=0x2BBD8E)
                         embed.add_field(name=week, value="Week", inline=False)
-                        embed.add_field(name=active_devices_potential_malicious, value="% of active devices with potential malicious activity", inline=False)
-                        embed.add_field(name=active_devices_known_good, value="% of active devices on known good state", inline=False)
-                        embed.add_field(name=active_devices_malicious_activity, value="% of active devices that had malicious activity", inline=False)
-                        embed.add_field(name=infection_breach, value="% of Infection/Breach", inline=False)
-                        embed.add_field(name=unknowns_clean, value="% of the unknowns that turn out to be Clean", inline=False)
-                        embed.add_field(name=unknowns_pua, value="% of the unknowns that turn out to be PUA", inline=False)
-                        embed.add_field(name=unknowns_malware, value="% of the unknowns that turn out to be Malware", inline=False)
+                        embed.add_field(name=active_devices_potential_malicious, value="% of active devices with potential malicious activity", inline=True)
+                        embed.add_field(name=active_devices_known_good, value="% of active devices on known good state", inline=True)
+                        embed.add_field(name=active_devices_malicious_activity, value="% of active devices that had malicious activity", inline=True)
+                        embed.add_field(name=infection_breach, value="% of Infection/Breach", inline=True)
+                        embed.add_field(name=unknowns_clean, value="% of the unknowns that turn out to be Clean", inline=True)
+                        embed.add_field(name=unknowns_pua, value="% of the unknowns that turn out to be PUA", inline=True)
+                        embed.add_field(name=unknowns_malware, value="% of the unknowns that turn out to be Malware", inline=True)
                         
                         pages.append(embed)
                 
