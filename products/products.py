@@ -90,13 +90,13 @@ class Products(commands.Cog):
                         
                         embed = discord.Embed(title="Weekly protection statistics", color=0x2BBD8E)
                         embed.add_field(name=week, value="Week", inline=False)
-                        embed.add_field(name=f"{active_devices_potential_malicious}%", value="% of active devices with potential malicious activity", inline=True)
-                        embed.add_field(name=f"{active_devices_known_good}%", value="% of active devices on known good state", inline=True)
-                        embed.add_field(name=f"{active_devices_malicious_activity}%", value="% of active devices that had malicious activity", inline=True)
-                        embed.add_field(name=f"{infection_breach}%", value="% of Infection/Breach", inline=True)
-                        embed.add_field(name=f"{unknowns_clean}%", value="% of the unknowns that turn out to be Clean", inline=True)
-                        embed.add_field(name=f"{unknowns_pua}%", value="% of the unknowns that turn out to be PUA", inline=True)
-                        embed.add_field(name=f"{unknowns_malware}%", value="% of the unknowns that turn out to be Malware", inline=True)
+                        embed.add_field(name=f"{active_devices_potential_malicious}%", value="of clients had potentially malicious activity contained", inline=True)
+                        embed.add_field(name=f"{active_devices_known_good}%", value="of clients stayed incident and alert free", inline=True)
+                        embed.add_field(name=f"{active_devices_malicious_activity}%", value="of clients had malicious activity confirmed by an analyst", inline=True)
+                        embed.add_field(name=f"{infection_breach}%", value="of clients suffered a breach or infection", inline=True)
+                        embed.add_field(name=f"{unknowns_clean}%", value="of the files we analyzed turned out to be clean", inline=True)
+                        embed.add_field(name=f"{unknowns_pua}%", value="of the files we analyzed were potentially unwanted applications", inline=True)
+                        embed.add_field(name=f"{unknowns_malware}%", value="of the files we analyzed were confirmed by an analyst as malware", inline=True)
                         
                         pages.append(embed)
                 
