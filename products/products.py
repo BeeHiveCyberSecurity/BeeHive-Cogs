@@ -63,7 +63,7 @@ class Products(commands.Cog):
         """
         Fetch and display weekly protection statistics from a local file.
         """
-        file_path = "BeeHive-Cogs/products/data/weekly_stats.txt"
+        file_path = "/data/weekly_stats.txt"
         
         try:
             with open(file_path, "r") as file:
@@ -100,7 +100,7 @@ class Products(commands.Cog):
                 await ctx.send(embed=embed)
         
         except FileNotFoundError:
-            await ctx.send("Statistics file not found.")
+            await ctx.send("Statistics file not found in the data folder.")
         except Exception as e:
             await ctx.send(f"An error occurred while reading the statistics file: {e}")
     
