@@ -75,7 +75,7 @@ class Products(commands.Cog):
                 
                 # Parse the page content to extract the statistics data
                 soup = BeautifulSoup(page_content, 'html.parser')
-                stats_section = soup.find("tbody", {"valign": "middle"})
+                stats_section = soup.find("table", {"class": "tablepress"})
                 
                 if not stats_section:
                     await ctx.send("Failed to find the statistics section.")
@@ -88,7 +88,7 @@ class Products(commands.Cog):
                 
                 embed = discord.Embed(title="Weekly protection statistics", description="Review weekly proof of BeeHive's proactive, detection-less protection on all endpoints.", color=0x2BBD8E, url=url)
                 
-                for row in rows[:5]:  # Limit to the first 5 rows for brevity
+                for row in rows[1:6]:  # Skip the header row and limit to the next 5 rows for brevity
                     columns = row.find_all('td')
                     if len(columns) >= 8:
                         week = columns[0].get_text(strip=True)
