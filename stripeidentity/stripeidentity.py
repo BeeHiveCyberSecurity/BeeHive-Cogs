@@ -180,6 +180,9 @@ class StripeIdentity(commands.Cog):
                 if isinstance(status, str) and status in ['consent_declined', 'device_unsupported', 'under_supported_age', 'phone_otp_declined', 'email_verification_declined']:
                     await self.send_embed(ctx, f":x: **Verification failed due to `{status.replace('_', ' ')}`**", discord.Color(0xff4545))
                     break
+                elif status == 'abandoned':
+                    await self.send_embed(ctx, f":x: **Verification session for {user.display_name} has been abandoned.**", discord.Color(0xff4545))
+                    break
                 elif status == 'verified':
                     verification_channel = self.bot.get_channel(self.verification_channel_id)
                     if verification_channel:
@@ -303,6 +306,9 @@ class StripeIdentity(commands.Cog):
                     break
                 elif status in ['consent_declined', 'device_unsupported', 'under_supported_age', 'phone_otp_declined', 'email_verification_declined']:
                     await self.send_embed(ctx, f"Identity verification failed due to {status.replace('_', ' ')}.", discord.Color(0xff4545))
+                    break
+                elif status == 'abandoned':
+                    await self.send_embed(ctx, f":x: **Verification session for {user.display_name} has been abandoned.**", discord.Color(0xff4545))
                     break
                 elif status == 'verified':
                     id_verified_role = ctx.guild.get_role(self.id_verified_role_id)
