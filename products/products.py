@@ -4,6 +4,7 @@ import aiohttp
 import time
 import json
 import io
+import os
 import discord # type: ignore
 from redbot.core import commands # type: ignore
 
@@ -63,7 +64,7 @@ class Products(commands.Cog):
         """
         Fetch and display weekly protection statistics from a local file.
         """
-        file_path = "/data/weekly_stats.txt"
+        file_path = os.path.join(os.path.dirname(__file__), "data", "weekly_stats.txt")
         
         try:
             with open(file_path, "r") as file:
