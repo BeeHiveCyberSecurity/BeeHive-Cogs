@@ -88,18 +88,16 @@ class Products(commands.Cog):
                         unknowns_pua = columns[6]
                         unknowns_malware = columns[7]
                         
-                        page_content = (
-                            f"**Week: {week}**\n"
-                            f"**% of active devices with potential malicious activity:** {active_devices_potential_malicious}\n"
-                            f"**% of active devices on known good state:** {active_devices_known_good}\n"
-                            f"**% of active devices that had malicious activity:** {active_devices_malicious_activity}\n"
-                            f"**% of Infection/Breach:** {infection_breach}\n"
-                            f"**% of the unknowns that turn out to be Clean:** {unknowns_clean}\n"
-                            f"**% of the unknowns that turn out to be PUA:** {unknowns_pua}\n"
-                            f"**% of the unknowns that turn out to be Malware:** {unknowns_malware}"
-                        )
+                        embed = discord.Embed(title="Weekly protection statistics", color=0x2BBD8E)
+                        embed.add_field(name="Week", value=week, inline=False)
+                        embed.add_field(name="% of active devices with potential malicious activity", value=active_devices_potential_malicious, inline=False)
+                        embed.add_field(name="% of active devices on known good state", value=active_devices_known_good, inline=False)
+                        embed.add_field(name="% of active devices that had malicious activity", value=active_devices_malicious_activity, inline=False)
+                        embed.add_field(name="% of Infection/Breach", value=infection_breach, inline=False)
+                        embed.add_field(name="% of the unknowns that turn out to be Clean", value=unknowns_clean, inline=False)
+                        embed.add_field(name="% of the unknowns that turn out to be PUA", value=unknowns_pua, inline=False)
+                        embed.add_field(name="% of the unknowns that turn out to be Malware", value=unknowns_malware, inline=False)
                         
-                        embed = discord.Embed(title="Weekly protection statistics", description=page_content, color=0x2BBD8E)
                         pages.append(embed)
                 
                 if not pages:
