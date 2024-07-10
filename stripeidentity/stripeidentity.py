@@ -275,7 +275,7 @@ class StripeIdentity(commands.Cog):
                 await self.send_embed(ctx, f":x: **Failed to send DM to {user.display_name}**. They might have DMs disabled.", discord.Color(0xff4545))
                 return
 
-            await self.send_embed(ctx, f"A verification session is now open. I've sent {user.mention} a message with details on how to continue.\n\nIf they don't verify, I'll ban them within 15 minutes.**", discord.Color(0x2BBD8E))
+            await self.send_embed(ctx, f"A verification session is now open. I've sent {user.mention} a message with details on how to continue.\n**If they don't verify, I'll ban them within 15 minutes.**", discord.Color(0x2BBD8E))
 
             async def check_verification_status(session_id):
                 if await self.config.pending_verification_sessions.get_raw(str(user.id), default=None) != session_id:
