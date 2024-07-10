@@ -61,44 +61,31 @@ class Products(commands.Cog):
     @antivirus.command(name="stats", description="Show weekly protection statistics")
     async def antivirusstats(self, ctx: commands.Context):
         """
-        Fetch and display weekly protection statistics.
+        Fetch and display weekly protection statistics from a local file.
         """
-        url = "https://www.xcitium.com/labs-statistics/"
+        file_path = "BeeHive-Cogs/products/data/weekly_stats.txt"
         
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url) as response:
-                if response.status != 200:
-                    await ctx.send("Failed to fetch statistics from Threat Lab.")
+        try:
+            with open(file_path, "r") as file:
+                lines = file.readlines()
+                
+                if not lines:
+                    await ctx.send("No data found in the statistics file.")
                     return
                 
-                page_content = await response.text()
+                embed = discord.Embed(title="Weekly protection statistics", description="Review weekly proof of BeeHive's proactive, detection-less protection on all endpoints.", color=0x2BBD8E)
                 
-                # Parse the page content to extract the statistics data
-                soup = BeautifulSoup(page_content, 'html.parser')
-                stats_section = soup.find("table", {"class": "tablepress"})
-                
-                if not stats_section:
-                    await ctx.send("Failed to find the statistics section.")
-                    return
-                
-                rows = stats_section.find_all('tr')
-                if not rows:
-                    await ctx.send("No data found in the statistics section.")
-                    return
-                
-                embed = discord.Embed(title="Weekly protection statistics", description="Review weekly proof of BeeHive's proactive, detection-less protection on all endpoints.", color=0x2BBD8E, url=url)
-                
-                for row in rows[1:6]:  # Skip the header row and limit to the next 5 rows for brevity
-                    columns = row.find_all('td')
+                for line in lines[:5]:  # Limit to the first 5 lines for brevity
+                    columns = line.strip().split(',')
                     if len(columns) >= 8:
-                        week = columns[0].get_text(strip=True)
-                        active_devices_potential_malicious = columns[1].get_text(strip=True)
-                        active_devices_known_good = columns[2].get_text(strip=True)
-                        active_devices_malicious_activity = columns[3].get_text(strip=True)
-                        infection_breach = columns[4].get_text(strip=True)
-                        unknowns_clean = columns[5].get_text(strip=True)
-                        unknowns_pua = columns[6].get_text(strip=True)
-                        unknowns_malware = columns[7].get_text(strip=True)
+                        week = columns[0]
+                        active_devices_potential_malicious = columns[1]
+                        active_devices_known_good = columns[2]
+                        active_devices_malicious_activity = columns[3]
+                        infection_breach = columns[4]
+                        unknowns_clean = columns[5]
+                        unknowns_pua = columns[6]
+                        unknowns_malware = columns[7]
                         
                         embed.add_field(name=f"Week: {week}", value=(
                             f"**% of active devices with potential malicious activity:** {active_devices_potential_malicious}\n"
@@ -111,6 +98,11 @@ class Products(commands.Cog):
                         ), inline=False)
                 
                 await ctx.send(embed=embed)
+        
+        except FileNotFoundError:
+            await ctx.send("Statistics file not found.")
+        except Exception as e:
+            await ctx.send(f"An error occurred while reading the statistics file: {e}")
     
     @commands.bot_has_permissions(embed_links=True)
     @commands.hybrid_command(name="vulnerabilityscanning", description="Learn more about Vulnerability Scanning")
