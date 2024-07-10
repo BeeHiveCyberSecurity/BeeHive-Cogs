@@ -74,7 +74,7 @@ class Products(commands.Cog):
                     await ctx.send("No data found in the statistics file.")
                     return
                 
-                embed = discord.Embed(title="Weekly protection statistics", description="Review weekly proof of BeeHive's proactive, detection-less protection on all endpoints.", color=0x2BBD8E)
+                pages = []
                 
                 for line in lines[:5]:  # Limit to the first 5 lines for brevity
                     columns = line.strip().split(',')
@@ -88,7 +88,8 @@ class Products(commands.Cog):
                         unknowns_pua = columns[6]
                         unknowns_malware = columns[7]
                         
-                        embed.add_field(name=f"Week: {week}", value=(
+                        page_content = (
+                            f"**Week: {week}**\n"
                             f"**% of active devices with potential malicious activity:** {active_devices_potential_malicious}\n"
                             f"**% of active devices on known good state:** {active_devices_known_good}\n"
                             f"**% of active devices that had malicious activity:** {active_devices_malicious_activity}\n"
@@ -96,9 +97,45 @@ class Products(commands.Cog):
                             f"**% of the unknowns that turn out to be Clean:** {unknowns_clean}\n"
                             f"**% of the unknowns that turn out to be PUA:** {unknowns_pua}\n"
                             f"**% of the unknowns that turn out to be Malware:** {unknowns_malware}"
-                        ), inline=False)
+                        )
+                        
+                        embed = discord.Embed(title="Weekly protection statistics", description=page_content, color=0x2BBD8E)
+                        pages.append(embed)
                 
-                await ctx.send(embed=embed)
+                if not pages:
+                    await ctx.send("No valid data found in the statistics file.")
+                    return
+                
+                message = await ctx.send(embed=pages[0])
+                
+                if len(pages) > 1:
+                    await message.add_reaction("⬅️")
+                    await message.add_reaction("➡️")
+                    
+                    def check(reaction, user):
+                        return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️"] and reaction.message.id == message.id
+                    
+                    i = 0
+                    while True:
+                        try:
+                            reaction, user = await self.bot.wait_for("reaction_add", timeout=60.0, check=check)
+                            
+                            if str(reaction.emoji) == "➡️":
+                                i += 1
+                                if i >= len(pages):
+                                    i = 0
+                                await message.edit(embed=pages[i])
+                                await message.remove_reaction(reaction, user)
+                            
+                            elif str(reaction.emoji) == "⬅️":
+                                i -= 1
+                                if i < 0:
+                                    i = len(pages) - 1
+                                await message.edit(embed=pages[i])
+                                await message.remove_reaction(reaction, user)
+                        
+                        except asyncio.TimeoutError:
+                            break
         
         except FileNotFoundError:
             await ctx.send("Statistics file not found in the data folder.")
