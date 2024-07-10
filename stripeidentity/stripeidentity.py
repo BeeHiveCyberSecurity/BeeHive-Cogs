@@ -98,9 +98,6 @@ class StripeIdentity(commands.Cog):
         if id_verified_role:
             await user.add_roles(id_verified_role)
 
-        # Ensure the user is not kicked from the server
-        await self.config.kicked_users.clear_raw(str(user.id))
-
         # Cancel the verification countdown
         if hasattr(self, 'verification_tasks') and str(user.id) in self.verification_tasks:
             self.verification_tasks[str(user.id)].cancel()
