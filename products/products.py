@@ -80,23 +80,23 @@ class Products(commands.Cog):
                     columns = line.strip().split(',')
                     if len(columns) >= 8:
                         week = columns[0]
-                        active_devices_potential_malicious = columns[1]
-                        active_devices_known_good = columns[2]
-                        active_devices_malicious_activity = columns[3]
-                        infection_breach = columns[4]
-                        unknowns_clean = columns[5]
-                        unknowns_pua = columns[6]
-                        unknowns_malware = columns[7]
+                        active_devices_potential_malicious = columns[1].rstrip('0').rstrip('.') if columns[1] != '0' else '0'
+                        active_devices_known_good = columns[2].rstrip('0').rstrip('.') if columns[2] != '0' else '0'
+                        active_devices_malicious_activity = columns[3].rstrip('0').rstrip('.') if columns[3] != '0' else '0'
+                        infection_breach = columns[4].rstrip('0').rstrip('.') if columns[4] != '0' else '0'
+                        unknowns_clean = columns[5].rstrip('0').rstrip('.') if columns[5] != '0' else '0'
+                        unknowns_pua = columns[6].rstrip('0').rstrip('.') if columns[6] != '0' else '0'
+                        unknowns_malware = columns[7].rstrip('0').rstrip('.') if columns[7] != '0' else '0'
                         
                         embed = discord.Embed(title="Weekly protection statistics", color=0x2BBD8E)
                         embed.add_field(name=week, value="Week", inline=False)
-                        embed.add_field(name=active_devices_potential_malicious, value="% of active devices with potential malicious activity", inline=True)
-                        embed.add_field(name=active_devices_known_good, value="% of active devices on known good state", inline=True)
-                        embed.add_field(name=active_devices_malicious_activity, value="% of active devices that had malicious activity", inline=True)
-                        embed.add_field(name=infection_breach, value="% of Infection/Breach", inline=True)
-                        embed.add_field(name=unknowns_clean, value="% of the unknowns that turn out to be Clean", inline=True)
-                        embed.add_field(name=unknowns_pua, value="% of the unknowns that turn out to be PUA", inline=True)
-                        embed.add_field(name=unknowns_malware, value="% of the unknowns that turn out to be Malware", inline=True)
+                        embed.add_field(name=f"{active_devices_potential_malicious}%", value="% of active devices with potential malicious activity", inline=True)
+                        embed.add_field(name=f"{active_devices_known_good}%", value="% of active devices on known good state", inline=True)
+                        embed.add_field(name=f"{active_devices_malicious_activity}%", value="% of active devices that had malicious activity", inline=True)
+                        embed.add_field(name=f"{infection_breach}%", value="% of Infection/Breach", inline=True)
+                        embed.add_field(name=f"{unknowns_clean}%", value="% of the unknowns that turn out to be Clean", inline=True)
+                        embed.add_field(name=f"{unknowns_pua}%", value="% of the unknowns that turn out to be PUA", inline=True)
+                        embed.add_field(name=f"{unknowns_malware}%", value="% of the unknowns that turn out to be Malware", inline=True)
                         
                         pages.append(embed)
                 
