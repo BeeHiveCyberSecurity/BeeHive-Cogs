@@ -174,11 +174,44 @@ class StripeIdentity(commands.Cog):
                             return event.code, session
                 return session.status == 'verified', session
 
-            await asyncio.sleep(900)  # Wait for 15 minutes
-            status, session = await check_verification_status(verification_session.id)
-            if isinstance(status, str) and status in ['consent_declined', 'device_unsupported', 'under_supported_age', 'phone_otp_declined', 'email_verification_declined']:
-                await self.send_embed(ctx, f":x: **Verification failed due to `{status.replace('_', ' ')}`**", discord.Color(0xff4545))
-            elif not status:
+            for _ in range(15):  # Check every minute for 15 minutes
+                await asyncio.sleep(60)
+                status, session = await check_verification_status(verification_session.id)
+                if isinstance(status, str) and status in ['consent_declined', 'device_unsupported', 'under_supported_age', 'phone_otp_declined', 'email_verification_declined']:
+                    await self.send_embed(ctx, f":x: **Verification failed due to `{status.replace('_', ' ')}`**", discord.Color(0xff4545))
+                    break
+                elif status == 'verified':
+                    verification_channel = self.bot.get_channel(self.verification_channel_id)
+                    if verification_channel:
+                        dob = datetime.fromisoformat(session.last_verification_report.document.dob)
+                        age = (datetime.utcnow() - dob).days // 365
+                        if age < 18:
+                            dm_embed = discord.Embed(
+                                title="Underage user detected",
+                                description=(
+                                    "You have been banned from the server because you are under 18.\n\n"
+                                    "You may return once you are 18 years of age or older...\n\n"
+                                    "**If you have any questions, please contact a staff member.**"
+                                ),
+                                color=discord.Color(0xff4545)
+                            )
+                            await user.send(embed=dm_embed)
+                            await ctx.guild.ban(user, reason="User is underage - ID Validated by BeeHive")
+                        else:
+                            age_verified_role = ctx.guild.get_role(self.age_verified_role_id)
+                            if age_verified_role:
+                                await user.add_roles(age_verified_role, reason="Age verified as 18+")
+                            result_embed = discord.Embed(title="Age Verification Result", color=discord.Color(0x2BBD8E))
+                            result_embed.add_field(name="User", value=f"{user} ({user.id})", inline=False)
+                            result_embed.add_field(name="Age", value=str(age), inline=False)
+                            await verification_channel.send(embed=result_embed)
+                    else:
+                        result_embed = discord.Embed(title="Age Verification Result", color=discord.Color(0x2BBD8E))
+                        result_embed.add_field(name="User", value=f"{user} ({user.id})", inline=False)
+                        result_embed.add_field(name="Age", value=str(age), inline=False)
+                        await ctx.send(embed=result_embed)
+                    break
+            else:
                 dm_embed = discord.Embed(
                     title="Verification failure",
                     description=f"Verification was not completed in time. You have been removed from the server {ctx.guild.name}.",
@@ -186,36 +219,6 @@ class StripeIdentity(commands.Cog):
                 )
                 await user.send(embed=dm_embed)
                 await ctx.guild.kick(user, reason="Did not verify age")
-            else:
-                verification_channel = self.bot.get_channel(self.verification_channel_id)
-                if verification_channel:
-                    dob = datetime.fromisoformat(session.last_verification_report.document.dob)
-                    age = (datetime.utcnow() - dob).days // 365
-                    if age < 18:
-                        dm_embed = discord.Embed(
-                            title="Underage user detected",
-                            description=(
-                                "You have been banned from the server because you are under 18.\n\n"
-                                "You may return once you are 18 years of age or older...\n\n"
-                                "**If you have any questions, please contact a staff member.**"
-                            ),
-                            color=discord.Color(0xff4545)
-                        )
-                        await user.send(embed=dm_embed)
-                        await ctx.guild.ban(user, reason="User is underage - ID Validated by BeeHive")
-                    else:
-                        age_verified_role = ctx.guild.get_role(self.age_verified_role_id)
-                        if age_verified_role:
-                            await user.add_roles(age_verified_role, reason="Age verified as 18+")
-                        result_embed = discord.Embed(title="Age Verification Result", color=discord.Color(0x2BBD8E))
-                        result_embed.add_field(name="User", value=f"{user} ({user.id})", inline=False)
-                        result_embed.add_field(name="Age", value=str(age), inline=False)
-                        await verification_channel.send(embed=result_embed)
-                else:
-                    result_embed = discord.Embed(title="Age Verification Result", color=discord.Color(0x2BBD8E))
-                    result_embed.add_field(name="User", value=f"{user} ({user.id})", inline=False)
-                    result_embed.add_field(name="Age", value=str(age), inline=False)
-                    await ctx.send(embed=result_embed)
             await self.config.pending_verification_sessions.clear_raw(str(user.id))
         except stripe.error.StripeError as e:
             await self.send_embed(ctx, f":x: **Failed to create a verification session**\n`{e.user_message}`", discord.Color(0xff4545))
@@ -292,6 +295,24 @@ class StripeIdentity(commands.Cog):
                             return event.code, session
                 return session.status, session
 
+            for _ in range(15):  # Check every minute for 15 minutes
+                await asyncio.sleep(60)
+                status, session = await check_verification_status(verification_session.id)
+                if status == 'cancelled':
+                    await self.send_embed(ctx, f"Identity verification for {user.display_name} has been cancelled.", discord.Color.orange())
+                    break
+                elif status in ['consent_declined', 'device_unsupported', 'under_supported_age', 'phone_otp_declined', 'email_verification_declined']:
+                    await self.send_embed(ctx, f"Identity verification failed due to {status.replace('_', ' ')}.", discord.Color(0xff4545))
+                    break
+                elif status == 'verified':
+                    id_verified_role = ctx.guild.get_role(self.id_verified_role_id)
+                    if id_verified_role:
+                        await user.add_roles(id_verified_role, reason="Identity verified")
+                    verification_channel = self.bot.get_channel(self.verification_channel_id)
+                    if verification_channel:
+                        result_embed = discord.Embed(title="Identity Verification Result", color=discord.Color.blue())
+                        result_embed.add_field(name="User", value=f"{user} ({user.id})", inline=False)
+                        result_embed.add_field(name="Document Status", value=session.last_verification_report.document.status, inline=False)
             await asyncio.sleep(900)  # Wait for 15 minutes
             status, session = await check_verification_status(verification_session.id)
             if status == 'cancelled':
