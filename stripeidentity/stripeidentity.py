@@ -98,6 +98,14 @@ class StripeIdentity(commands.Cog):
         if id_verified_role:
             await user.add_roles(id_verified_role)
 
+        # Ensure the user is not kicked from the server
+        await self.config.kicked_users.clear_raw(str(user.id))
+
+        # Cancel the verification countdown
+        if hasattr(self, 'verification_tasks') and str(user.id) in self.verification_tasks:
+            self.verification_tasks[str(user.id)].cancel()
+            del self.verification_tasks[str(user.id)]
+
         await self.send_embed(ctx, f"{user.display_name}'s verification has been bypassed.", discord.Color(0x2BBD8E))
 
     @commands.command(name="agecheck")
@@ -179,7 +187,7 @@ class StripeIdentity(commands.Cog):
                     description=f"Verification was not completed in time. You have been removed from the server {ctx.guild.name}.",
                     color=discord.Color(0xff4545)
                 )
-                await dm_message.edit(embed=dm_embed)
+                await user.send(embed=dm_embed)
                 await ctx.guild.kick(user, reason="Did not verify age")
             else:
                 verification_channel = self.bot.get_channel(self.verification_channel_id)
@@ -196,7 +204,7 @@ class StripeIdentity(commands.Cog):
                             ),
                             color=discord.Color(0xff4545)
                         )
-                        await dm_message.edit(embed=dm_embed)
+                        await user.send(embed=dm_embed)
                         await ctx.guild.ban(user, reason="User is underage - ID Validated by BeeHive")
                     else:
                         age_verified_role = ctx.guild.get_role(self.age_verified_role_id)
