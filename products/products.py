@@ -138,6 +138,7 @@ class Products(commands.Cog):
                                 break
                         
                         except asyncio.TimeoutError:
+                            await message.clear_reactions()
                             break
         
         except FileNotFoundError:
