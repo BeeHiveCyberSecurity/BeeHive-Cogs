@@ -52,6 +52,7 @@ class Products(commands.Cog):
 
         async def button_callback(interaction: discord.Interaction):
             if interaction.user == ctx.author:
+                await interaction.response.defer()
                 await self.antivirusstats(ctx)
             else:
                 await interaction.response.send_message("You are not authorized to use this button.", ephemeral=True)
