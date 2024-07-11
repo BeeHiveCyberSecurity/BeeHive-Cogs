@@ -92,7 +92,7 @@ class Products(commands.Cog):
                         embed.add_field(name="Period of", value=week, inline=True)
                         embed.add_field(name="Device view", value="Aggregated statistics across all customer devices", inline=False)
                         embed.add_field(name=f"{active_devices_potential_malicious}%", value="of devices had potentially malicious activity inside **Containment**", inline=True)
-                        embed.add_field(name=f"{active_devices_known_good}%", value="of devices had zero unknown objects, files, or programs detected", inline=True)
+                        embed.add_field(name=f"{active_devices_known_good}%", value="of devices had no unknown objects, files, or programs detected", inline=True)
                         embed.add_field(name="", value="", inline=False)
                         embed.add_field(name=f"{active_devices_malicious_activity}%", value="of devices had malicious activity filtered by **Virtualization**", inline=True)
                         embed.add_field(name=f"{infection_breach}%", value="of clients suffered a data breach or device infection", inline=True)
