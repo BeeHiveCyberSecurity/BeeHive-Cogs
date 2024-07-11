@@ -88,15 +88,15 @@ class Products(commands.Cog):
                         unknowns_pua = columns[6].rstrip('0').rstrip('.') if columns[6] != '0' else '0'
                         unknowns_malware = columns[7].rstrip('0').rstrip('.') if columns[7] != '0' else '0'
                         
-                        embed = discord.Embed(title="Weekly protection statistics", color=0x2BBD8E)
-                        embed.add_field(name=week, value="Week", inline=False)
+                        embed = discord.Embed(title="Weekly protection statistics", color=0xffd966)
+                        embed.add_field(name="Period of", value=week, inline=True)
                         embed.add_field(name=f"{active_devices_potential_malicious}%", value="of clients had potentially malicious activity contained", inline=True)
                         embed.add_field(name=f"{active_devices_known_good}%", value="of clients stayed incident and alert free", inline=True)
                         embed.add_field(name=f"{active_devices_malicious_activity}%", value="of clients had malicious activity virtualized to protect their device", inline=True)
                         embed.add_field(name=f"{infection_breach}%", value="of clients suffered a breach or infection", inline=True)
                         embed.add_field(name=f"{unknowns_clean}%", value="of the files we analyzed turned out to be clean", inline=True)
-                        embed.add_field(name=f"{unknowns_pua}%", value="of the files we analyzed were potentially unwanted applications", inline=True)
-                        embed.add_field(name=f"{unknowns_malware}%", value="of the files we analyzed were confirmed by an analyst as malware", inline=True)
+                        embed.add_field(name=f"{unknowns_pua}%", value="of the files we analyzed were **[potentially unwanted applications](https://www.trendmicro.com/vinfo/us/security/definition/potentially-unwanted-app)**", inline=True)
+                        embed.add_field(name=f"{unknowns_malware}%", value="of the files we analyzed were confirmed by an analyst as **[malware](https://csrc.nist.gov/glossary/term/malware)**", inline=True)
                         
                         pages.append(embed)
                 
