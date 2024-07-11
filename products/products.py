@@ -97,7 +97,7 @@ class Products(commands.Cog):
                         embed.add_field(name=f"{infection_breach}%", value="of clients suffered a data breach or device infection", inline=True)
                         embed.add_field(name="File view", value="", inline=False)
                         embed.add_field(name=f"{unknowns_clean}%", value="of the objects we analyzed turned out to be clean", inline=True)
-                        embed.add_field(name=f"{unknowns_pua}%", value="of the objects we analyzed were **[potentially unwanted applications](https://www.trendmicro.com/vinfo/us/security/definition/potentially-unwanted-app)**", inline=True)
+                        embed.add_field(name=f"{unknowns_pua}%", value="of the objects we analyzed were **[potentially unwanted](https://www.trendmicro.com/vinfo/us/security/definition/potentially-unwanted-app)**", inline=True)
                         embed.add_field(name=f"{unknowns_malware}%", value="of the objects we analyzed were confirmed by a human expert analyst as **[malware](https://csrc.nist.gov/glossary/term/malware)**", inline=True)
                         
                         pages.append(embed)
