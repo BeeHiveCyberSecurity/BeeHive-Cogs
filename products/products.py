@@ -97,7 +97,7 @@ class Products(commands.Cog):
                         embed.add_field(name=f"{active_devices_malicious_activity}%", value="of devices had malicious activity filtered by **Virtualization**", inline=True)
                         embed.add_field(name=f"{infection_breach}%", value="of clients suffered a data breach or device infection", inline=True)
                         embed.add_field(name="File view", value="Aggregated statistics for all objects processed for analysis", inline=False)
-                        embed.add_field(name=f"{unknowns_clean}%", value="of objects analyzed were **Clean**", inline=True)
+                        embed.add_field(name=f"{unknowns_clean}%", value="of objects analyzed were **[clean](https://thecyberwire.com/glossary/benign)**", inline=True)
                         embed.add_field(name=f"{unknowns_pua}%", value="of objects analyzed were **[potentially unwanted](https://www.trendmicro.com/vinfo/us/security/definition/potentially-unwanted-app)**", inline=True)
                         embed.add_field(name=f"{unknowns_malware}%", value="of objects analyzed were **[malware](https://csrc.nist.gov/glossary/term/malware)**", inline=True)
                         
