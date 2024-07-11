@@ -92,11 +92,11 @@ class Products(commands.Cog):
                         embed.add_field(name="Period of", value=week, inline=True)
                         embed.add_field(name=f"{active_devices_potential_malicious}%", value="of clients had potentially malicious activity contained", inline=True)
                         embed.add_field(name=f"{active_devices_known_good}%", value="of clients stayed incident and alert free", inline=True)
-                        embed.add_field(name=f"{active_devices_malicious_activity}%", value="of clients had malicious activity virtualized to protect their device", inline=True)
+                        embed.add_field(name=f"{active_devices_malicious_activity}%", value="of clients who were protected from confirmed malicious activity by API Virtualization", inline=True)
                         embed.add_field(name=f"{infection_breach}%", value="of clients suffered a breach or infection", inline=True)
-                        embed.add_field(name=f"{unknowns_clean}%", value="of the files we analyzed turned out to be clean", inline=True)
-                        embed.add_field(name=f"{unknowns_pua}%", value="of the files we analyzed were **[potentially unwanted applications](https://www.trendmicro.com/vinfo/us/security/definition/potentially-unwanted-app)**", inline=True)
-                        embed.add_field(name=f"{unknowns_malware}%", value="of the files we analyzed were confirmed by an analyst as **[malware](https://csrc.nist.gov/glossary/term/malware)**", inline=True)
+                        embed.add_field(name=f"{unknowns_clean}%", value="of the objects we analyzed turned out to be clean", inline=True)
+                        embed.add_field(name=f"{unknowns_pua}%", value="of the objects we analyzed were **[potentially unwanted applications](https://www.trendmicro.com/vinfo/us/security/definition/potentially-unwanted-app)**", inline=True)
+                        embed.add_field(name=f"{unknowns_malware}%", value="of the objects we analyzed were confirmed by a human expert analyst as **[malware](https://csrc.nist.gov/glossary/term/malware)**", inline=True)
                         
                         pages.append(embed)
                 
