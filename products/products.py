@@ -108,10 +108,11 @@ class Products(commands.Cog):
                 
                 if len(pages) > 1:
                     await message.add_reaction("⬅️")
+                    await message.add_reaction("❌")
                     await message.add_reaction("➡️")
                     
                     def check(reaction, user):
-                        return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️"] and reaction.message.id == message.id
+                        return user == ctx.author and str(reaction.emoji) in ["⬅️", "❌", "➡️"] and reaction.message.id == message.id
                     
                     i = 0
                     while True:
@@ -131,6 +132,10 @@ class Products(commands.Cog):
                                     i = len(pages) - 1
                                 await message.edit(embed=pages[i])
                                 await message.remove_reaction(reaction, user)
+                            
+                            elif str(reaction.emoji) == "❌":
+                                await message.delete()
+                                break
                         
                         except asyncio.TimeoutError:
                             break
