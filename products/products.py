@@ -48,6 +48,16 @@ class Products(commands.Cog):
         view = discord.ui.View()
         view.add_item(discord.ui.Button(label="Start a 15 day free trial", url="https://buy.stripe.com/5kA8y62kIg06dLqdRc", style=discord.ButtonStyle.link, emoji="<:shield:1194906995036262420>"))
         view.add_item(discord.ui.Button(label="Learn more on our website", url="https://www.beehive.systems/antivirus", style=discord.ButtonStyle.link, emoji="<:info:1199305085738553385>"))
+        view.add_item(discord.ui.Button(label="Show protection statistics", custom_id="show_stats", style=discord.ButtonStyle.primary, emoji="📊"))
+
+        async def button_callback(interaction: discord.Interaction):
+            if interaction.user == ctx.author:
+                await self.antivirusstats(ctx)
+            else:
+                await interaction.response.send_message("You are not authorized to use this button.", ephemeral=True)
+
+        view.children[-1].callback = button_callback
+
         await ctx.send(embed=embed, view=view)
         if discount_link:
             await ctx.typing()
