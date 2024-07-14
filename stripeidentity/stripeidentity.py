@@ -35,6 +35,10 @@ class StripeIdentity(commands.Cog):
         """
         Set the channel where verification results will be sent.
         """
+        if not channel:
+            await self.send_embed(ctx, ":x: **Invalid channel provided.** Please mention a valid text channel.", discord.Color.red())
+            return
+        
         await self.config.verification_channel.set(channel.id)
         await self.send_embed(ctx, f"Verification results will now be sent to {channel.mention}.", discord.Color(0x2BBD8E))
 
@@ -45,6 +49,10 @@ class StripeIdentity(commands.Cog):
         """
         Set the role to give to users who are verified as 18 or older.
         """
+        if not role:
+            await self.send_embed(ctx, ":x: **Invalid role provided.** Please mention a valid role.", discord.Color.red())
+            return
+        
         await self.config.age_verified_role.set(role.id)
         await self.send_embed(ctx, f"Role for age verified users set to {role.name}.", discord.Color(0x2BBD8E))
 
@@ -55,6 +63,10 @@ class StripeIdentity(commands.Cog):
         """
         Set the role to give to users who have been completely ID verified.
         """
+        if not role:
+            await self.send_embed(ctx, ":x: **Invalid role provided.** Please mention a valid role.", discord.Color.red())
+            return
+        
         await self.config.id_verified_role.set(role.id)
         await self.send_embed(ctx, f"Role for ID verified users set to {role.name}.", discord.Color(0x2BBD8E))
 
@@ -77,6 +89,8 @@ class StripeIdentity(commands.Cog):
                     await self.send_embed(ctx, f"Verification session for {user.display_name} cannot be canceled as it is already {verification_session.status}.", discord.Color.orange())
             except stripe.error.StripeError as e:
                 await self.send_embed(ctx, f"Failed to cancel the verification session: {e.user_message}", discord.Color.red())
+            except Exception as e:
+                await self.send_embed(ctx, f"An unexpected error occurred: {str(e)}", discord.Color.red())
         else:
             await self.send_embed(ctx, f"No pending verification session found for {user.display_name}.", discord.Color.orange())
 
@@ -91,12 +105,15 @@ class StripeIdentity(commands.Cog):
         
         age_verified_role_id = await self.config.age_verified_role()
         id_verified_role_id = await self.config.id_verified_role()
-        age_verified_role = ctx.guild.get_role(age_verified_role_id)
-        id_verified_role = ctx.guild.get_role(id_verified_role_id)
+        
+        # Check if the roles exist before attempting to add them
+        age_verified_role = ctx.guild.get_role(age_verified_role_id) if age_verified_role_id else None
+        id_verified_role = ctx.guild.get_role(id_verified_role_id) if id_verified_role_id else None
+        
         if age_verified_role:
-            await user.add_roles(age_verified_role)
+            await user.add_roles(age_verified_role, reason="Bypassed verification")
         if id_verified_role:
-            await user.add_roles(id_verified_role)
+            await user.add_roles(id_verified_role, reason="Bypassed verification")
 
         # Cancel the verification countdown
         if hasattr(self, 'verification_tasks') and str(user.id) in self.verification_tasks:
@@ -376,11 +393,13 @@ class StripeIdentity(commands.Cog):
         embed = discord.Embed(title="Pending Verification Sessions", color=discord.Color.blue())
         for user_id, session_info in pending_guild_sessions.items():
             member = ctx.guild.get_member(int(user_id))
+            if member is None:
+                continue  # Skip if the member is not found in the guild
             if session_info is not None:
                 # Assuming session_info is a timestamp string, parse it into a datetime object
                 try:
                     start_time = datetime.fromisoformat(session_info)
-                    time_remaining = discord.utils.format_dt(start_time + datetime.timedelta(minutes=15), style='R')
+                    time_remaining = discord.utils.format_dt(start_time + timedelta(minutes=15), style='R')
                     embed.add_field(name=f"User: {member.display_name} (ID: {user_id})", value=f"Time remaining: {time_remaining}", inline=False)
                 except ValueError:
                     embed.add_field(name=f"User: {member.display_name} (ID: {user_id})", value="Invalid session start time.", inline=False)
