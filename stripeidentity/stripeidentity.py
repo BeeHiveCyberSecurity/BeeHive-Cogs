@@ -294,8 +294,8 @@ class StripeIdentity(commands.Cog):
                 session = stripe.identity.VerificationSession.retrieve(session_id)
                 if session.status == 'requires_input' and session.last_error:
                     for event in session.last_error:
-                        if event.code in ['consent_declined', 'device_unsupported', 'under_supported_age', 'phone_otp_declined', 'email_verification_declined']:
-                            return event.code, session
+                        if event['code'] in ['consent_declined', 'device_unsupported', 'under_supported_age', 'phone_otp_declined', 'email_verification_declined']:
+                            return event['code'], session
                 return session.status, session
 
             for _ in range(15):  # Check every minute for 15 minutes
@@ -319,36 +319,39 @@ class StripeIdentity(commands.Cog):
                         result_embed = discord.Embed(title="Identity Verification Result", color=discord.Color.blue())
                         result_embed.add_field(name="User", value=f"{user} ({user.id})", inline=False)
                         result_embed.add_field(name="Document Status", value=session.last_verification_report.document.status, inline=False)
-            await asyncio.sleep(900)  # Wait for 15 minutes
-            status, session = await check_verification_status(verification_session.id)
-            if status == 'cancelled':
-                await self.send_embed(ctx, f"Identity verification for {user.display_name} has been cancelled.", discord.Color.orange())
-            elif status in ['consent_declined', 'device_unsupported', 'under_supported_age', 'phone_otp_declined', 'email_verification_declined']:
-                await self.send_embed(ctx, f"Identity verification failed due to {status.replace('_', ' ')}.", discord.Color(0xff4545))
-            elif status != 'verified':
-                dm_embed = discord.Embed(
-                    title="Verification Incomplete",
-                    description=f"Identity verification was not completed in time. You have been removed from the server {ctx.guild.name}.",
-                    color=discord.Color(0xff4545)
-                )
-                await dm_message.edit(embed=dm_embed)
-                await ctx.guild.ban(user, reason="Did not verify identity in time")
+                        await verification_channel.send(embed=result_embed)
+                    break
             else:
-                id_verified_role = ctx.guild.get_role(self.id_verified_role_id)
-                if id_verified_role:
-                    await user.add_roles(id_verified_role, reason="Identity verified")
-                verification_channel = self.bot.get_channel(self.verification_channel_id)
-                if verification_channel:
-                    result_embed = discord.Embed(title="Identity Verification Result", color=discord.Color.blue())
-                    result_embed.add_field(name="User", value=f"{user} ({user.id})", inline=False)
-                    result_embed.add_field(name="Document Status", value=session.last_verification_report.document.status, inline=False)
-                    result_embed.add_field(name="Name", value=session.last_verification_report.document.name, inline=False)
-                    result_embed.add_field(name="DOB", value=session.last_verification_report.document.dob, inline=False)
-                    result_embed.add_field(name="Address", value=session.last_verification_report.document.address, inline=False)
-                    if hasattr(session, 'risk_insights'):
-                        result_embed.add_field(name="Risk Insights", value=str(session.risk_insights), inline=False)
-                    await verification_channel.send(embed=result_embed)
-            await self.config.pending_verification_sessions.set_raw(user.id, value=None)
+                await asyncio.sleep(900)  # Wait for 15 minutes
+                status, session = await check_verification_status(verification_session.id)
+                if status == 'cancelled':
+                    await self.send_embed(ctx, f"Identity verification for {user.display_name} has been cancelled.", discord.Color.orange())
+                elif status in ['consent_declined', 'device_unsupported', 'under_supported_age', 'phone_otp_declined', 'email_verification_declined']:
+                    await self.send_embed(ctx, f"Identity verification failed due to {status.replace('_', ' ')}.", discord.Color(0xff4545))
+                elif status != 'verified':
+                    dm_embed = discord.Embed(
+                        title="Verification Incomplete",
+                        description=f"Identity verification was not completed in time. You have been removed from the server {ctx.guild.name}.",
+                        color=discord.Color(0xff4545)
+                    )
+                    await dm_message.edit(embed=dm_embed)
+                    await ctx.guild.ban(user, reason="Did not verify identity in time")
+                else:
+                    id_verified_role = ctx.guild.get_role(self.id_verified_role_id)
+                    if id_verified_role:
+                        await user.add_roles(id_verified_role, reason="Identity verified")
+                    verification_channel = self.bot.get_channel(self.verification_channel_id)
+                    if verification_channel:
+                        result_embed = discord.Embed(title="Identity Verification Result", color=discord.Color.blue())
+                        result_embed.add_field(name="User", value=f"{user} ({user.id})", inline=False)
+                        result_embed.add_field(name="Document Status", value=session.last_verification_report.document.status, inline=False)
+                        result_embed.add_field(name="Name", value=session.last_verification_report.document.name, inline=False)
+                        result_embed.add_field(name="DOB", value=session.last_verification_report.document.dob, inline=False)
+                        result_embed.add_field(name="Address", value=session.last_verification_report.document.address, inline=False)
+                        if hasattr(session, 'risk_insights'):
+                            result_embed.add_field(name="Risk Insights", value=str(session.risk_insights), inline=False)
+                        await verification_channel.send(embed=result_embed)
+            await self.config.pending_verification_sessions.set_raw(str(user.id), value=None)
         except stripe.error.StripeError as e:
             embed = discord.Embed(description=f"Failed to create an identity verification session: {e.user_message}", color=discord.Color(0xff4545))
             await ctx.send(embed=embed)
