@@ -51,6 +51,7 @@ class VirusTotal(commands.Cog):
                             if response.status != 200:
                                 raise aiohttp.ClientResponseError(response.request_info, response.history, status=response.status, message=f"HTTP error {response.status}", headers=response.headers)
                             file_content = await response.read()
+                            file_name = attachment.filename  # Get the file name from the attachment
                             embed = discord.Embed(title="File uploaded successfully", description="**Starting analysis...**\nThis could take a few minutes, the bot will mention you when your analysis is complete and results are available", colour=discord.Colour(0x2BBD8E))
                             await ctx.send(embed=embed)
                             async with session.post("https://www.virustotal.com/api/v3/files", headers={"x-apikey": vt_key["api_key"]}, data={"file": file_content}) as response:
@@ -59,7 +60,7 @@ class VirusTotal(commands.Cog):
                                 data = await response.json()
                                 analysis_id = data.get("data", {}).get("id")
                                 if analysis_id:
-                                    await self.check_results(ctx, analysis_id, ctx.author.id, attachment.url)
+                                    await self.check_results(ctx, analysis_id, ctx.author.id, attachment.url, file_name)
                                     # Delete the attachment message from the channel
                                     await ctx.message.delete()
                                 else:
@@ -77,7 +78,7 @@ class VirusTotal(commands.Cog):
                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close.png")
                     await ctx.send(embed=embed)
 
-    async def check_results(self, ctx, analysis_id, presid, file_url):
+    async def check_results(self, ctx, analysis_id, presid, file_url, file_name):
         vt_key = await self.bot.get_shared_api_tokens("virustotal")
         headers = {"x-apikey": vt_key["api_key"]}
 
@@ -107,7 +108,6 @@ class VirusTotal(commands.Cog):
                     sha256 = meta.get("sha256")
                     sha1 = meta.get("sha1")
                     md5 = meta.get("md5")
-                    file_name = meta.get("name", "Unknown")
 
                     total_count = malicious_count + suspicious_count + undetected_count + harmless_count + failure_count + unsupported_count
                     noanswer_count = failure_count + unsupported_count
