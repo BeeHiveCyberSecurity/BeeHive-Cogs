@@ -1,8 +1,4 @@
 import aiohttp #type: ignore
-import io
-import os
-import tempfile
-import math
 import asyncio
 import discord #type: ignore
 import matplotlib.pyplot as plt #type: ignore
@@ -13,6 +9,7 @@ class VirusTotal(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        self.submission_history = {}
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.command(name="virustotal", description="Submit a file for analysis via VirusTotal", aliases=["vt"])
@@ -42,6 +39,7 @@ class VirusTotal(commands.Cog):
                             if permalink:
                                 await ctx.send(f"Permalink: https://www.virustotal.com/gui/url/{permalink}")
                                 await self.check_results(ctx, permalink, ctx.author.id)
+                                self.log_submission(ctx.author.id, file_url)
                             else:
                                 raise ValueError("No permalink found in the response.")
                     elif attachments:
@@ -63,6 +61,7 @@ class VirusTotal(commands.Cog):
                                 analysis_id = data.get("data", {}).get("id")
                                 if analysis_id:
                                     await self.check_results(ctx, analysis_id, ctx.author.id)
+                                    self.log_submission(ctx.author.id, attachment.url)
                                     # Delete the attachment message from the channel
                                     await ctx.message.delete()
                                 else:
@@ -154,5 +153,20 @@ class VirusTotal(commands.Cog):
                 embed = discord.Embed(title='Request timed out', description="The bot was unable to complete the request due to a timeout.", colour=discord.Colour.red())
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle-outline.png")
                 await ctx.send(embed=embed)
+
+    def log_submission(self, user_id, file_url):
+        if user_id not in self.submission_history:
+            self.submission_history[user_id] = []
+        self.submission_history[user_id].append(file_url)
+
+    @commands.command(name="submissionhistory", description="View your submission history", aliases=["sh"])
+    async def submission_history(self, ctx):
+        user_id = ctx.author.id
+        if user_id in self.submission_history and self.submission_history[user_id]:
+            history = "\n".join(self.submission_history[user_id])
+            embed = discord.Embed(title="Your Submission History", description=history, colour=discord.Colour(0x2BBD8E))
+        else:
+            embed = discord.Embed(title="No Submission History", description="You have not submitted any files for analysis yet.", colour=discord.Colour(0xff4545))
+        await ctx.send(embed=embed)
 
 
