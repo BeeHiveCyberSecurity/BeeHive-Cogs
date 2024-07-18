@@ -114,9 +114,9 @@ class VirusTotal(commands.Cog):
                     if sha256 and sha1 and md5:
                         embed = discord.Embed()
                         content = f"||<@{presid}>||"
-                        labels = ['Malicious', 'Suspicious', 'No Verdict', 'Harmless', 'Failed', 'Unsupported']
+                        labels = ['Malicious', 'Suspicious', 'Clean', 'Harmless', 'Failed', 'Unsupported']
                         sizes = [malicious_count, suspicious_count, undetected_count, harmless_count, failure_count, unsupported_count]
-                        colors = ['#ff4545', '#ff9144', '#444444', '#2BBD8E', '#ffcccb', '#666666']
+                        colors = ['#ff4545', '#ff9144', '#2bbd8e', '#2bbd8e', '#ffcccb', '#666666']
 
                         plt.figure(figsize=(8, 6))
                         ax = plt.subplot(111, facecolor='#323338')
@@ -161,22 +161,24 @@ class VirusTotal(commands.Cog):
                             embed.description = f"# {int(percent)}% of security vendors rated this file dangerous!\nYou should avoid this file completely, and delete it from your systems to ensure security."
                             embed.color = discord.Colour(0xff4545)
                             embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/warning-outline.png")
+                            embed.set_footer(text=f"SHA1 | {sha1}")
                         elif 1 < malicious_count < 11:
                             embed.title = "Suspicious file found"
                             embed.description = f"# {int(percent)}% of security vendors rated this file dangerous!\nWhile there are malicious ratings available for this file, there aren't many, so this could be a false positive. **You should investigate further.**"
                             embed.color = discord.Colour(0xff9144)
                             embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Orange/alert-circle-outline.png")
+                            embed.set_footer(text=f"SHA1 | {sha1}")
                         else:
                             embed.title = "No threat found"
                             embed.color = discord.Colour(0x2BBD8E)
                             embed.description = "# No security vendors currently flag this file as malicious\nYou should be safe to run and use it. Check back on the results later to see if vendors change their minds - it happens"
                             embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/checkmark-circle-outline.png")
+                            embed.set_footer(text=f"SHA1 | {sha1}")
 
-                        embed.add_field(name="MD5", value=f"**`{md5}`**", inline=False)
-                        embed.add_field(name="SHA-1", value=f"**`{sha1}`**", inline=False)
-                        embed.add_field(name="SHA-256", value=f"**`{sha256}`**", inline=False)
+#                        embed.add_field(name="MD5", value=f"**`{md5}`**", inline=False)
+#                        embed.add_field(name="SHA-1", value=f"**`{sha1}`**", inline=False)
+#                        embed.add_field(name="SHA-256", value=f"**`{sha256}`**", inline=False)
 
-                        # Create the button for the virustotal results link
                         button = discord.ui.Button(label="View results on VirusTotal", url=f"https://www.virustotal.com/gui/file/{sha256}", emoji="🌐", style=discord.ButtonStyle.url)
                         button2 = discord.ui.Button(label="Get a second opinion", url="https://discord.gg/6PbaH6AfvF", style=discord.ButtonStyle.url)
                         view = discord.ui.View()
