@@ -114,48 +114,6 @@ class VirusTotal(commands.Cog):
                     if sha256 and sha1 and md5:
                         embed = discord.Embed()
                         content = f"||<@{presid}>||"
-                        labels = ['Malicious', 'Suspicious', 'Clean', 'Harmless', 'Failed', 'Unsupported']
-                        sizes = [malicious_count, suspicious_count, undetected_count, harmless_count, failure_count, unsupported_count]
-                        colors = ['#ff4545', '#ff9144', '#2bbd8e', '#2bbd8e', '#ffcccb', '#666666']
-
-                        plt.figure(figsize=(8, 6))
-                        ax = plt.subplot(111, facecolor='#323338')
-                        ax.bar(labels, sizes, color=colors)
-
-                        # Add some text for labels, title and custom x-axis tick labels, etc.
-                        ax.set_ylabel('Verdicts', color='white')
-                        ax.set_title('Vendor ratings summary', color='white')
-                        ax.set_xticks(range(len(labels)))
-                        ax.set_xticklabels(labels, color='white')
-                        ax.legend(facecolor='white', edgecolor='white', framealpha=1, labelcolor='white')
-
-                        # Attach a text label above each bar in *rects*, displaying its height.
-                        for rect in ax.patches:
-                            height = rect.get_height()
-                            ax.annotate('{}'.format(height),
-                                        xy=(rect.get_x() + rect.get_width() / 2, height),
-                                        xytext=(0, 3),  # 3 points vertical offset
-                                        textcoords="offset points",
-                                        ha='center', va='bottom',
-                                        color='white')
-
-                        # Set the background color of the figure
-                        plt.gcf().set_facecolor('#323338')
-
-                        # Save the bar chart as a PNG image in memory.
-                        bar_chart_buffer = io.BytesIO()
-                        plt.savefig(bar_chart_buffer, format='png', facecolor='#323338')
-                        bar_chart_buffer.seek(0)  # rewind the buffer to the beginning so we can read its content
-
-                        # Set the bar chart image as the embed image
-                        embed.set_image(url="attachment://bar_chart.png")
-
-                        # Clear the matplotlib figure
-                        plt.clf()
-                        plt.close('all')
-
-                        # Create a discord file from the image in memory
-                        bar_chart_file = discord.File(bar_chart_buffer, filename='bar_chart.png')
                         if malicious_count >= 11:
                             embed.title = "Malicious file found"
                             embed.description = f"**{int(percent)}% of security vendors rated this file dangerous!**\nYou should avoid this file completely, and delete it from your systems to ensure security."
