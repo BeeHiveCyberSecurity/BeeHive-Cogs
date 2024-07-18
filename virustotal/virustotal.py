@@ -142,7 +142,7 @@ class VirusTotal(commands.Cog):
                         view = discord.ui.View()
                         view.add_item(button)
                         view.add_item(button2)
-                        await ctx.send(content=content, file=bar_chart_file, embed=embed, view=view)
+                        await ctx.send(content=content, embed=embed, view=view)
                     else:
                         raise ValueError("Required hash values not found in the analysis response.")
             except (aiohttp.ClientResponseError, ValueError) as e:
