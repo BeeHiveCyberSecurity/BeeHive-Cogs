@@ -50,7 +50,7 @@ class VirusTotal(commands.Cog):
                             if response.status != 200:
                                 raise aiohttp.ClientResponseError(response.request_info, response.history, status=response.status, message=f"HTTP error {response.status}", headers=response.headers)
                             file_content = await response.read()
-                            embed = discord.Embed(title="File Loaded", description="Starting analysis. This could take a few minutes, the bot will type to indicate analysis is still ongoing.", colour=discord.Colour(0x2BBD8E))
+                            embed = discord.Embed(title="File uploaded successfully", description="**Starting analysis...**\nThis could take a few minutes, the bot will mention you when your analysis is complete and results are available", colour=discord.Colour(0x2BBD8E))
                             await ctx.send(embed=embed)
                             async with session.post("https://www.virustotal.com/api/v3/files", headers={"x-apikey": vt_key["api_key"]}, data={"file": file_content}) as response:
                                 if response.status != 200:
