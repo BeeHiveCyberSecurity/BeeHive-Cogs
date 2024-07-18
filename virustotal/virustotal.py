@@ -137,7 +137,7 @@ class VirusTotal(commands.Cog):
                         view.add_item(button)
                         view.add_item(button2)
                         await ctx.send(content=content, embed=embed, view=view)
-                        self.log_submission(ctx.author.id, f"{file_name} - {malicious_count}/{total_count} - [View results](https://www.virustotal.com/gui/file/{sha256})")
+                        self.log_submission(ctx.author.id, f"`{file_name}` - **{malicious_count}/{total_count}** - [View results](https://www.virustotal.com/gui/file/{sha256})")
                     else:
                         raise ValueError("Required hash values not found in the analysis response.")
             except (aiohttp.ClientResponseError, ValueError) as e:
