@@ -46,6 +46,10 @@ class VirusTotal(commands.Cog):
                                 raise ValueError("No permalink found in the response.")
                     elif attachments:
                         attachment = attachments[0]
+                        if attachment.size > 30 * 1024 * 1024:  # 30 MB limit
+                            embed = discord.Embed(title='Error: File too large', description="The file you provided exceeds the 30MB size limit for analysis.", colour=discord.Colour(0xff4545))
+                            await ctx.send(embed=embed)
+                            return
                         async with session.get(attachment.url) as response:
                             if response.status != 200:
                                 raise aiohttp.ClientResponseError(response.request_info, response.history, status=response.status, message=f"HTTP error {response.status}", headers=response.headers)
@@ -64,7 +68,7 @@ class VirusTotal(commands.Cog):
                                 else:
                                     raise ValueError("No analysis ID found in the response.")
                     else:
-                        embed = discord.Embed(title='Error: No file provided', description="The bot was unable to find content to submit for analysis!\nPlease provide one of the following when using this command:\n- URL file can be downloaded from\n- Drag-and-drop a file less than 25mb in size\n- Reply to a message containing a file", colour=discord.Colour(0xff4545))
+                        embed = discord.Embed(title='Error: No file provided', description="The bot was unable to find content to submit for analysis!\nPlease provide one of the following when using this command:\n- URL file can be downloaded from\n- Drag-and-drop a file less than 30mb in size\n- Reply to a message containing a file", colour=discord.Colour(0xff4545))
                         embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close.png")
                         await ctx.send(embed=embed)
                 except (aiohttp.ClientResponseError, ValueError) as e:
