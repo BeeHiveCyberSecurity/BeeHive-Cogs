@@ -38,8 +38,7 @@ class VirusTotal(commands.Cog):
                             permalink = data.get("data", {}).get("id")
                             if permalink:
                                 await ctx.send(f"Permalink: https://www.virustotal.com/gui/url/{permalink}")
-                                await self.check_results(ctx, permalink, ctx.author.id)
-                                self.log_submission(ctx.author.id, file_url)
+                                await self.check_results(ctx, permalink, ctx.author.id, file_url)
                             else:
                                 raise ValueError("No permalink found in the response.")
                     elif attachments:
@@ -60,8 +59,7 @@ class VirusTotal(commands.Cog):
                                 data = await response.json()
                                 analysis_id = data.get("data", {}).get("id")
                                 if analysis_id:
-                                    await self.check_results(ctx, analysis_id, ctx.author.id)
-                                    self.log_submission(ctx.author.id, attachment.url)
+                                    await self.check_results(ctx, analysis_id, ctx.author.id, attachment.url)
                                     # Delete the attachment message from the channel
                                     await ctx.message.delete()
                                 else:
@@ -79,7 +77,7 @@ class VirusTotal(commands.Cog):
                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close.png")
                     await ctx.send(embed=embed)
 
-    async def check_results(self, ctx, analysis_id, presid):
+    async def check_results(self, ctx, analysis_id, presid, file_url):
         vt_key = await self.bot.get_shared_api_tokens("virustotal")
         headers = {"x-apikey": vt_key["api_key"]}
 
@@ -109,6 +107,7 @@ class VirusTotal(commands.Cog):
                     sha256 = meta.get("sha256")
                     sha1 = meta.get("sha1")
                     md5 = meta.get("md5")
+                    file_name = meta.get("name", "Unknown")
 
                     total_count = malicious_count + suspicious_count + undetected_count + harmless_count + failure_count + unsupported_count
                     noanswer_count = failure_count + unsupported_count
@@ -132,17 +131,13 @@ class VirusTotal(commands.Cog):
                             embed.color = discord.Colour(0x2BBD8E)
                             embed.description = "**No security vendors currently flag this file as malicious**\n\nYou should be safe to run and use it.\nCheck back on the results later to see if vendors change their minds - it happens"
                             embed.set_footer(text=f"{sha1}")
-
-#                        embed.add_field(name="MD5", value=f"**`{md5}`**", inline=False)
-#                        embed.add_field(name="SHA-1", value=f"**`{sha1}`**", inline=False)
-#                        embed.add_field(name="SHA-256", value=f"**`{sha256}`**", inline=False)
-
                         button = discord.ui.Button(label="View results", url=f"https://www.virustotal.com/gui/file/{sha256}", style=discord.ButtonStyle.url)
                         button2 = discord.ui.Button(label="Get a second opinion", url="https://discord.gg/6PbaH6AfvF", style=discord.ButtonStyle.url)
                         view = discord.ui.View()
                         view.add_item(button)
                         view.add_item(button2)
                         await ctx.send(content=content, embed=embed, view=view)
+                        self.log_submission(ctx.author.id, f"{file_name} - {malicious_count}/{total_count} - [View results](https://www.virustotal.com/gui/file/{sha256})")
                     else:
                         raise ValueError("Required hash values not found in the analysis response.")
             except (aiohttp.ClientResponseError, ValueError) as e:
@@ -154,10 +149,10 @@ class VirusTotal(commands.Cog):
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle-outline.png")
                 await ctx.send(embed=embed)
 
-    def log_submission(self, user_id, file_url):
+    def log_submission(self, user_id, summary):
         if user_id not in self.submission_history:
             self.submission_history[user_id] = []
-        self.submission_history[user_id].append(file_url)
+        self.submission_history[user_id].append(summary)
 
     @commands.command(name="submissionhistory", description="View your submission history", aliases=["sh"])
     async def submission_history(self, ctx):
