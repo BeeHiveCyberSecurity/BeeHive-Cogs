@@ -134,7 +134,7 @@ class VirusTotal(commands.Cog):
 #                        embed.add_field(name="SHA-1", value=f"**`{sha1}`**", inline=False)
 #                        embed.add_field(name="SHA-256", value=f"**`{sha256}`**", inline=False)
 
-                        button = discord.ui.Button(label="View results on VirusTotal", url=f"https://www.virustotal.com/gui/file/{sha256}", emoji="🌐", style=discord.ButtonStyle.url)
+                        button = discord.ui.Button(label="View results", url=f"https://www.virustotal.com/gui/file/{sha256}", style=discord.ButtonStyle.url)
                         button2 = discord.ui.Button(label="Get a second opinion", url="https://discord.gg/6PbaH6AfvF", style=discord.ButtonStyle.url)
                         view = discord.ui.View()
                         view.add_item(button)
