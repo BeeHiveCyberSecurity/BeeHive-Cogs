@@ -30,6 +30,10 @@ class Sesh(commands.Cog):
                             f"**Participants:** {len(current_session['participants'])}",
                 color=discord.Color.green()
             )
+            if 'voice_channel_id' in current_session:
+                voice_channel = ctx.guild.get_channel(current_session['voice_channel_id'])
+                if voice_channel:
+                    embed.add_field(name="Voice Channel", value=f"[Join Voice Channel]({voice_channel.jump_url})", inline=False)
             await ctx.send(embed=embed)
         else:
             await ctx.send_help(ctx.command)
@@ -186,9 +190,9 @@ class Sesh(commands.Cog):
     async def join(self, ctx):
         """Join the currently active smoking session."""
         async with self.config.guild(ctx.guild).sessions() as sessions:
-            current_time = datetime.datetime.utcnow().strftime("%H:%M")
+            current_time = datetime.datetime.utcnow()
             for session in sessions:
-                if session["time"].strftime("%H:%M") <= current_time < session["end_time"].strftime("%H:%M"):
+                if session["time"] <= current_time < session["end_time"]:
                     if not any(p["id"] == ctx.author.id for p in session["participants"]):
                         await ctx.send("What type of marijuana are you consuming? (e.g., flower, concentrate, distillate, edibles, etc.)", 
                                        components=[
