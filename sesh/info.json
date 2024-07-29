@@ -1,5 +1,5 @@
 {
-    "author": ["movelaterally"],
+    "author": ["movelaterally", "escalateprivs"],
     "description": "Coordinate smoking sessions with your friends",
     "install_msg": "## :white_check_mark: Successfully installed Sesh.\nHave fun, stonie.\n\nJoin our Discord! https://discord.gg/ckdzsm7mTs",
     "name": "sesh",
