@@ -7,13 +7,9 @@ class Ping(commands.Cog):  # Use Red's Cog class
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.hybrid_command(name="ping", description="Displays the bot's latency and additional diagnostic information.")
+    @commands.command(name="ping", description="Displays the bot's latency and additional diagnostic information.")
     async def ping(self, ctx: red_commands.Context):  # Use Red's Context class
-        interaction = ctx.interaction if hasattr(ctx, 'interaction') else None
-        if interaction:
-            await interaction.response.defer()
-        else:
-            await ctx.defer()
+        await ctx.defer()
 
         latency = self.bot.latency
         heartbeat_latency = round(latency * 1000, 2)
@@ -48,10 +44,7 @@ class Ping(commands.Cog):  # Use Red's Cog class
         embed.add_field(name="Upload speed", value=f"{upload_speed} Mbps", inline=True)
         embed.add_field(name="Backbone ping", value=f"{ping} ms", inline=True)
 
-        if interaction:
-            await interaction.followup.send(embed=embed)
-        else:
-            await ctx.send(embed=embed)
+        await ctx.send(embed=embed)
 
 async def setup(bot):
     await bot.add_cog(Ping(bot))
