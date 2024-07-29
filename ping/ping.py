@@ -28,6 +28,20 @@ class Ping(commands.Cog):  # Use Red's Cog class
             upload_speed = round(st.upload() / 1_000_000, 2)
             ping = st.results.ping
 
+            # Retry logic for high latency
+            retries = 0
+            max_retries = 3
+            while ping > 250 and retries < max_retries:  # Adjust threshold as needed
+                st.get_best_server()
+                download_speed = round(st.download() / 1_000_000, 2)
+                upload_speed = round(st.upload() / 1_000_000, 2)
+                ping = st.results.ping
+                retries += 1
+
+            if ping > 250:  # If still high after retries
+                await ctx.send("Network conditions are currently fluctuating too much to measure conditions accurately. Please try again later.")
+                return
+
         if avg_latency > 100:  # Adjust thresholds as needed
             embed_color = discord.Color(0xff4545)
             embed_title = "Connection impacted"
