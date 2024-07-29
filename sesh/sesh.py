@@ -79,6 +79,13 @@ class Sesh(commands.Cog):
             voice_channel = ctx.author.voice.channel
             invite = await voice_channel.create_invite(max_age=session_duration * 60)
             embed.add_field(name="Voice Channel", value=f"[Join Voice Channel]({invite.url})", inline=False)
+        else:
+            # Create a new voice channel named after the session ID
+            voice_channel = await ctx.guild.create_voice_channel(name=f"Sesh-{session_id}")
+            # Make the bot join the new voice channel
+            await voice_channel.connect()
+            invite = await voice_channel.create_invite(max_age=session_duration * 60)
+            embed.add_field(name="Voice Channel", value=f"[Join Voice Channel]({invite.url})", inline=False)
 
         await ctx.send(embed=embed)
 
