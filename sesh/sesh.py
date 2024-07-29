@@ -3,6 +3,7 @@ import discord
 import datetime
 import asyncio  # Ensure asyncio is imported
 import uuid  # Import uuid for generating unique session IDs
+import speech_recognition as sr  # Import speech recognition library
 
 class Sesh(commands.Cog):
     """Coordinate smoking sessions with your friends."""
@@ -70,6 +71,29 @@ class Sesh(commands.Cog):
                 await voice_channel.edit(name=new_name)
                 await asyncio.sleep(60)  # Update every minute
 
+        async def listen_for_cheers(voice_channel, text_channel):
+            recognizer = sr.Recognizer()
+            mic = sr.Microphone()
+
+            while True:
+                if not voice_channel.members:
+                    break
+
+                with mic as source:
+                    recognizer.adjust_for_ambient_noise(source)
+                    audio = recognizer.listen(source)
+
+                try:
+                    speech_text = recognizer.recognize_google(audio)
+                    if "cheers" in speech_text.lower():
+                        await text_channel.send("Cheers! It's time to take a hit!")
+                except sr.UnknownValueError:
+                    pass  # Ignore unrecognized speech
+                except sr.RequestError as e:
+                    print(f"Could not request results from Google Speech Recognition service; {e}")
+
+                await asyncio.sleep(5)  # Prevent spamming, wait a bit before listening again
+
         if duration.startswith("in "):
             try:
                 delay = int(duration.split(" ")[1])
@@ -127,6 +151,7 @@ class Sesh(commands.Cog):
                         await ctx.send(embed=embed)
 
                     self.bot.loop.create_task(update_channel_status(voice_channel, session))
+                    self.bot.loop.create_task(listen_for_cheers(voice_channel, ctx.channel))
                 
                 select.callback = select_callback
                 view = discord.ui.View()
@@ -180,6 +205,7 @@ class Sesh(commands.Cog):
                     await ctx.send(embed=embed)
 
                 self.bot.loop.create_task(update_channel_status(voice_channel, session))
+                self.bot.loop.create_task(listen_for_cheers(voice_channel, ctx.channel))
                 
             except ValueError:
                 await ctx.send("Invalid duration. Please provide the duration in minutes.")
