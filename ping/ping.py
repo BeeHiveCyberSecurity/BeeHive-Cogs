@@ -9,7 +9,8 @@ class Ping(commands.Cog):
 
     @app_commands.command(description="Displays the bot's latency and additional diagnostic information.")
     @commands.hybrid_command(name="ping", description="Displays the bot's latency and additional diagnostic information.")
-    async def ping(self, ctx: commands.Context, interaction: discord.Interaction = None):
+    async def ping(self, ctx: commands.Context):
+        interaction = ctx.interaction if hasattr(ctx, 'interaction') else None
         if interaction:
             await interaction.response.defer()
         else:
