@@ -195,10 +195,8 @@ class Sesh(commands.Cog):
 
             self.bot.loop.create_task(update_channel_status(voice_channel, session))
 
-            # Disable the select menu to prevent further interaction
-            for item in view.children:
-                item.disabled = True
-            await interaction.message.edit(view=view)
+        async def select_callback(interaction):
+            await interaction.response.defer()
 
         select.callback = select_callback
         view = discord.ui.View()
