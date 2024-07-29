@@ -315,5 +315,20 @@ class Sesh(commands.Cog):
                     return
             await ctx.send("No session found with that ID or you are not the creator of the session.")
 
+    @commands.guild_only()
+    @sesh.command()
+    async def end(self, ctx, session_id: str):
+        """Manually end a smoking session.
+        
+        Provide the session ID to end the session.
+        """
+        async with self.config.guild(ctx.guild).sessions() as sessions:
+            for session in sessions:
+                if session["id"] == session_id:
+                    sessions.remove(session)
+                    await ctx.send(f"Smoking session with ID {session_id} has been manually ended.")
+                    return
+            await ctx.send("No session found with that ID.")
+
 async def setup(bot):
     await bot.add_cog(Sesh(bot))
