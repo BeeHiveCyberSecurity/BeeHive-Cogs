@@ -150,8 +150,8 @@ class AntiPhishing(commands.Cog):
                     mod_mentions = " ".join(role.mention for role in mod_roles) if mod_roles else ""
                     embed = discord.Embed(
                         title="Dangerous link detected!",
-                        description=f"This message contains a malicious website or URL.\n\nThis URL could be anything from a fraudulent online seller, to an IP logger, to a page delivering malware intended to steal Discord accounts.\n\n**Don't click any links in this message, and notify server moderators ASAP**",
-                        color=16729413,
+                        description=f"Don't click any links in this message, and ask a staff member to remove this message for community safety",
+                        color=0xff4545,
                     )
                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/warning.png")
                     embed.timestamp = datetime.datetime.utcnow()
