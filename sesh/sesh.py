@@ -20,7 +20,19 @@ class Sesh(commands.Cog):
     @commands.group()
     async def sesh(self, ctx):
         """Group command for managing smoking sessions."""
-        pass
+        sessions = await self.config.guild(ctx.guild).sessions()
+        if sessions:
+            current_session = sessions[-1]  # Assuming the last session is the active one
+            embed = discord.Embed(
+                title="We're blazing up!",
+                description=f"**Description:** {current_session['description']}\n"
+                            f"**Ends at:** {current_session['end_time']}\n"
+                            f"**Participants:** {len(current_session['participants'])}",
+                color=discord.Color.green()
+            )
+            await ctx.send(embed=embed)
+        else:
+            await ctx.send_help(ctx.command)
 
     @commands.guild_only()
     @sesh.command()
