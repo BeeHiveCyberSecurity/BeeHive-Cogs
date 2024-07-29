@@ -7,7 +7,7 @@ class Ping(commands.Cog):  # Use Red's Cog class
         self.bot = bot
 
     @commands.command(name="ping", description="Displays the bot's latency and additional diagnostic information.")
-    async def ping(self, ctx: commands.Context):  # Use Red's Context class
+    async def ping(self, ctx: commands.Context):
         await ctx.defer()
 
         latency = self.bot.latency
