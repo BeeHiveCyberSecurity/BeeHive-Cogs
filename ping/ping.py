@@ -1,14 +1,14 @@
 import discord  # type: ignore
 import speedtest  # type: ignore
-from discord import app_commands  # type: ignore
 from discord.ext import commands  # type: ignore
+from redbot.core import commands as red_commands  # Import Red's commands
 
-class Ping(commands.Cog):
+class Ping(commands.Cog):  # Use Red's Cog class
     def __init__(self, bot):
         self.bot = bot
 
     @commands.hybrid_command(name="ping", description="Displays the bot's latency and additional diagnostic information.")
-    async def ping(self, ctx: commands.Context):
+    async def ping(self, ctx: red_commands.Context):  # Use Red's Context class
         interaction = ctx.interaction if hasattr(ctx, 'interaction') else None
         if interaction:
             await interaction.response.defer()
