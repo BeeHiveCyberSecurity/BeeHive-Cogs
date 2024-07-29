@@ -7,7 +7,6 @@ class Ping(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @app_commands.command(description="Displays the bot's latency and additional diagnostic information.")
     @commands.hybrid_command(name="ping", description="Displays the bot's latency and additional diagnostic information.")
     async def ping(self, ctx: commands.Context):
         interaction = ctx.interaction if hasattr(ctx, 'interaction') else None
