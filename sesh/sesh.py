@@ -80,6 +80,11 @@ class Sesh(commands.Cog):
                 await voice_channel.edit(name=new_name)
                 await asyncio.sleep(60)  # Update every minute
 
+        def serialize_datetime(obj):
+            if isinstance(obj, datetime.datetime):
+                return obj.isoformat()
+            raise TypeError("Type not serializable")
+
         if duration.startswith("in "):
             try:
                 delay = int(duration.split(" ")[1])
@@ -102,8 +107,8 @@ class Sesh(commands.Cog):
                     session_id = str(uuid.uuid4())  # Generate a unique session ID
                     session = {
                         "id": session_id,
-                        "time": session_time,
-                        "end_time": session_end_time,
+                        "time": session_time.isoformat(),
+                        "end_time": session_end_time.isoformat(),
                         "description": description,
                         "creator": ctx.author.id,
                         "participants": [{"id": ctx.author.id, "type": "N/A", "strain": "N/A"}]
@@ -155,8 +160,8 @@ class Sesh(commands.Cog):
                 session_id = str(uuid.uuid4())  # Generate a unique session ID
                 session = {
                     "id": session_id,
-                    "time": session_time,
-                    "end_time": session_end_time,
+                    "time": session_time.isoformat(),
+                    "end_time": session_end_time.isoformat(),
                     "description": description,
                     "creator": ctx.author.id,
                     "participants": [{"id": ctx.author.id, "type": "N/A", "strain": "N/A"}]
@@ -202,7 +207,9 @@ class Sesh(commands.Cog):
         async with self.config.guild(ctx.guild).sessions() as sessions:
             current_time = datetime.datetime.utcnow()
             for session in sessions:
-                if session["time"] <= current_time < session["end_time"]:
+                session_time = datetime.datetime.fromisoformat(session["time"])
+                session_end_time = datetime.datetime.fromisoformat(session["end_time"])
+                if session_time <= current_time < session_end_time:
                     if not any(p["id"] == ctx.author.id for p in session["participants"]):
                         await ctx.send("What type of marijuana are you consuming? (e.g., flower, concentrate, distillate, edibles, etc.)", 
                                        components=[
@@ -241,7 +248,7 @@ class Sesh(commands.Cog):
                             "type": marijuana_type,
                             "strain": strain_type
                         })
-                        await ctx.send(f"You have joined the smoking session at {session['time'].strftime('%H:%M')} with {marijuana_type} ({strain_type}).")
+                        await ctx.send(f"You have joined the smoking session at {session_time.strftime('%H:%M')} with {marijuana_type} ({strain_type}).")
                     else:
                         await ctx.send("You are already in this session.")
                     return
@@ -255,8 +262,9 @@ class Sesh(commands.Cog):
             for session in sessions:
                 for participant in session["participants"]:
                     if participant["id"] == ctx.author.id:
+                        session_time = datetime.datetime.fromisoformat(session["time"])
                         session["participants"].remove(participant)
-                        await ctx.send(f"You have left the smoking session at {session['time'].strftime('%H:%M')}.")
+                        await ctx.send(f"You have left the smoking session at {session_time.strftime('%H:%M')}.")
                         return
             await ctx.send("You are not currently in any smoking session.")
 
@@ -274,9 +282,10 @@ class Sesh(commands.Cog):
             creator = self.bot.get_user(session["creator"])
             participants = [self.bot.get_user(p["id"]) for p in session["participants"]]
             participant_details = ", ".join([f"{p.name} ({p['type']}, {p['strain']})" for p in session["participants"] if p])
+            session_time = datetime.datetime.fromisoformat(session["time"])
             embed.add_field(
                 name=f"Session ID: {session['id']}",
-                value=f"Time: {session['time'].strftime('%H:%M')}\nDescription: {session['description']}\nCreator: {creator.name if creator else 'Unknown'}\nParticipants: {participant_details}",
+                value=f"Time: {session_time.strftime('%H:%M')}\nDescription: {session['description']}\nCreator: {creator.name if creator else 'Unknown'}\nParticipants: {participant_details}",
                 inline=False
             )
 
