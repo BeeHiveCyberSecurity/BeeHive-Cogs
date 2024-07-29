@@ -3,7 +3,6 @@ import discord #type: ignore
 import datetime
 import asyncio
 import uuid
-import pyaudio
 import speech_recognition as sr  # Import speech recognition library
 
 class Sesh(commands.Cog):
