@@ -120,6 +120,39 @@ class Sesh(commands.Cog):
             session_time = datetime.datetime.utcnow()
             session_end_time = session_time + datetime.timedelta(minutes=session_duration)
 
+            # Step 3: Ask for marijuana type
+            await ctx.send("What type of marijuana are you consuming? (e.g., flower, concentrate, distillate, edibles, etc.)", 
+                           components=[
+                               discord.ui.Button(label="Flower", style=discord.ButtonStyle.primary, custom_id="flower"),
+                               discord.ui.Button(label="Concentrate", style=discord.ButtonStyle.primary, custom_id="concentrate"),
+                               discord.ui.Button(label="Distillate", style=discord.ButtonStyle.primary, custom_id="distillate"),
+                               discord.ui.Button(label="Edibles", style=discord.ButtonStyle.primary, custom_id="edibles")
+                           ])
+
+            def check_type(interaction):
+                return interaction.user == ctx.author and interaction.message.channel == ctx.channel
+
+            try:
+                type_interaction = await self.bot.wait_for('interaction', check=check_type, timeout=60.0)
+                marijuana_type = type_interaction.data['custom_id']
+                await type_interaction.response.send_message(f"You selected {marijuana_type}. Now, is it indica, sativa, or a hybrid?", 
+                                                             components=[
+                                                                 discord.ui.Button(label="Indica", style=discord.ButtonStyle.primary, custom_id="indica"),
+                                                                 discord.ui.Button(label="Sativa", style=discord.ButtonStyle.primary, custom_id="sativa"),
+                                                                 discord.ui.Button(label="Hybrid", style=discord.ButtonStyle.primary, custom_id="hybrid")
+                                                             ])
+            except asyncio.TimeoutError:
+                await ctx.send("You took too long to respond. Please try starting the session again.")
+                return
+
+            try:
+                strain_interaction = await self.bot.wait_for('interaction', check=check_type, timeout=60.0)
+                strain_type = strain_interaction.data['custom_id']
+                await strain_interaction.response.send_message(f"You selected {strain_type}. The session is now starting.")
+            except asyncio.TimeoutError:
+                await ctx.send("You took too long to respond. Please try starting the session again.")
+                return
+
             session_id = str(uuid.uuid4())  # Generate a unique session ID
             session = {
                 "id": session_id,
@@ -127,7 +160,7 @@ class Sesh(commands.Cog):
                 "end_time": session_end_time.isoformat(),
                 "description": description,
                 "creator": ctx.author.id,
-                "participants": [{"id": ctx.author.id, "type": "N/A", "strain": "N/A"}]
+                "participants": [{"id": ctx.author.id, "type": marijuana_type, "strain": strain_type}]
             }
 
             async with self.config.guild(ctx.guild).sessions() as sessions:
