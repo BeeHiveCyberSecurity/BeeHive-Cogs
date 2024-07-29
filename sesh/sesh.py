@@ -63,11 +63,8 @@ class Sesh(commands.Cog):
 
     @commands.guild_only()
     @sesh.command()
-    async def start(self, ctx, duration: str, *, description: str):
-        """Start a new smoking session.
-        
-        Duration can be in minutes or in the format 'in X minutes'.
-        """
+    async def start(self, ctx):
+        """Start a new smoking session using interactive components."""
         mention_role_id = await self.config.guild(ctx.guild).mention_role()
         mention_role = ctx.guild.get_role(mention_role_id) if mention_role_id else None
         announcement_channel_id = await self.config.guild(ctx.guild).announcement_channel()
@@ -95,120 +92,77 @@ class Sesh(commands.Cog):
                 return obj.isoformat()
             raise TypeError("Type not serializable")
 
-        if duration.startswith("in "):
-            try:
-                delay = int(duration.split(" ")[1])
-                await ctx.send(f"Session scheduled to start in {delay} minutes. Please select the session duration from the dropdown below.")
-                
-                options = [
-                    discord.SelectOption(label="15 minutes", value="15"),
-                    discord.SelectOption(label="30 minutes", value="30"),
-                    discord.SelectOption(label="45 minutes", value="45"),
-                    discord.SelectOption(label="1 hour", value="60")
-                ]
-                
-                select = discord.ui.Select(placeholder="Select session duration", options=options)
-                
-                async def select_callback(interaction):
-                    session_duration = int(interaction.data['values'][0])
-                    session_time = datetime.datetime.utcnow() + datetime.timedelta(minutes=delay)
-                    session_end_time = session_time + datetime.timedelta(minutes=session_duration)
-                    
-                    session_id = str(uuid.uuid4())  # Generate a unique session ID
-                    session = {
-                        "id": session_id,
-                        "time": session_time.isoformat(),
-                        "end_time": session_end_time.isoformat(),
-                        "description": description,
-                        "creator": ctx.author.id,
-                        "participants": [{"id": ctx.author.id, "type": "N/A", "strain": "N/A"}]
-                    }
+        # Step 1: Ask for session description
+        await ctx.send("Please provide a description for the session:")
 
-                    async with self.config.guild(ctx.guild).sessions() as sessions:
-                        sessions.append(session)
+        def check_message(m):
+            return m.author == ctx.author and m.channel == ctx.channel
 
-                    embed = discord.Embed(
-                        title="Smoking Session Started",
-                        description=f"A new smoking session has started and will last for {session_duration} minutes.\n\n**Description:** {description}\n**Session ID:** {session_id}",
-                        color=discord.Color.green()
-                    )
-                    embed.set_footer(text=f"Started by {ctx.author.display_name}")
+        try:
+            description_msg = await self.bot.wait_for('message', check=check_message, timeout=60.0)
+            description = description_msg.content
+        except asyncio.TimeoutError:
+            await ctx.send("You took too long to respond. Please try starting the session again.")
+            return
 
-                    if ctx.author.voice:
-                        voice_channel = ctx.author.voice.channel
-                        invite = await voice_channel.create_invite(max_age=session_duration * 60)
-                        embed.add_field(name="Voice Channel", value=f"[Join Voice Channel]({invite.url})", inline=False)
-                    else:
-                        # Create a new voice channel named after the session ID
-                        voice_channel = await ctx.guild.create_voice_channel(name=f"Sesh-{session_id}", category=voice_channel_category)
-                        # Store the voice channel ID in the session data
-                        session["voice_channel_id"] = voice_channel.id
-                        invite = await voice_channel.create_invite(max_age=session_duration * 60)
-                        embed.add_field(name="Voice Channel", value=f"[Join Voice Channel]({invite.url})", inline=False)
+        # Step 2: Ask for session duration
+        options = [
+            discord.SelectOption(label="15 minutes", value="15"),
+            discord.SelectOption(label="30 minutes", value="30"),
+            discord.SelectOption(label="45 minutes", value="45"),
+            discord.SelectOption(label="1 hour", value="60")
+        ]
 
-                    if mention_role:
-                        await announcement_channel.send(f"{mention_role.mention}", embed=embed)
-                    else:
-                        await announcement_channel.send(embed=embed)
+        select = discord.ui.Select(placeholder="Select session duration", options=options)
 
-                    self.bot.loop.create_task(update_channel_status(voice_channel, session))
-                
-                select.callback = select_callback
-                view = discord.ui.View()
-                view.add_item(select)
-                await ctx.send("Select the session duration:", view=view)
-                
-            except (ValueError, IndexError):
-                await ctx.send("Invalid format. Please use 'in X minutes' or just provide the duration in minutes.")
-                return
-        else:
-            try:
-                session_duration = int(duration)
-                session_time = datetime.datetime.utcnow()
-                session_end_time = session_time + datetime.timedelta(minutes=session_duration)
-                
-                session_id = str(uuid.uuid4())  # Generate a unique session ID
-                session = {
-                    "id": session_id,
-                    "time": session_time.isoformat(),
-                    "end_time": session_end_time.isoformat(),
-                    "description": description,
-                    "creator": ctx.author.id,
-                    "participants": [{"id": ctx.author.id, "type": "N/A", "strain": "N/A"}]
-                }
+        async def select_callback(interaction):
+            session_duration = int(interaction.data['values'][0])
+            session_time = datetime.datetime.utcnow()
+            session_end_time = session_time + datetime.timedelta(minutes=session_duration)
 
-                async with self.config.guild(ctx.guild).sessions() as sessions:
-                    sessions.append(session)
+            session_id = str(uuid.uuid4())  # Generate a unique session ID
+            session = {
+                "id": session_id,
+                "time": session_time.isoformat(),
+                "end_time": session_end_time.isoformat(),
+                "description": description,
+                "creator": ctx.author.id,
+                "participants": [{"id": ctx.author.id, "type": "N/A", "strain": "N/A"}]
+            }
 
-                embed = discord.Embed(
-                    title="It's sesh time!",
-                    description=f"A new smoking session has started and will last for {session_duration} minutes.\n\n**Description:** {description}\n**Session ID:** {session_id}",
-                    color=discord.Color.green()
-                )
-                embed.set_footer(text=f"Started by {ctx.author.display_name}")
+            async with self.config.guild(ctx.guild).sessions() as sessions:
+                sessions.append(session)
 
-                if ctx.author.voice:
-                    voice_channel = ctx.author.voice.channel
-                    invite = await voice_channel.create_invite(max_age=session_duration * 60)
-                    embed.add_field(name="Voice Channel", value=f"[Join Voice Channel]({invite.url})", inline=False)
-                else:
-                    # Create a new voice channel named after the session ID
-                    voice_channel = await ctx.guild.create_voice_channel(name=f"Sesh-{session_id}", category=voice_channel_category)
-                    # Store the voice channel ID in the session data
-                    session["voice_channel_id"] = voice_channel.id
-                    invite = await voice_channel.create_invite(max_age=session_duration * 60)
-                    embed.add_field(name="Voice Channel", value=f"[Join Voice Channel]({invite.url})", inline=False)
+            embed = discord.Embed(
+                title="It's sesh time!",
+                description=f"A new smoking session has started and will last for {session_duration} minutes.\n\n**Description:** {description}\n**Session ID:** {session_id}",
+                color=discord.Color.green()
+            )
+            embed.set_footer(text=f"Started by {ctx.author.display_name}")
 
-                if mention_role:
-                    await announcement_channel.send(f"{mention_role.mention}", embed=embed)
-                else:
-                    await announcement_channel.send(embed=embed)
+            if ctx.author.voice:
+                voice_channel = ctx.author.voice.channel
+                invite = await voice_channel.create_invite(max_age=session_duration * 60)
+                embed.add_field(name="Voice Channel", value=f"[Join Voice Channel]({invite.url})", inline=False)
+            else:
+                # Create a new voice channel named after the session ID
+                voice_channel = await ctx.guild.create_voice_channel(name=f"Sesh-{session_id}", category=voice_channel_category)
+                # Store the voice channel ID in the session data
+                session["voice_channel_id"] = voice_channel.id
+                invite = await voice_channel.create_invite(max_age=session_duration * 60)
+                embed.add_field(name="Voice Channel", value=f"[Join Voice Channel]({invite.url})", inline=False)
 
-                self.bot.loop.create_task(update_channel_status(voice_channel, session))
-                
-            except ValueError:
-                await ctx.send("Invalid duration. Please provide the duration in minutes.")
-                return
+            if mention_role:
+                await announcement_channel.send(f"{mention_role.mention}", embed=embed)
+            else:
+                await announcement_channel.send(embed=embed)
+
+            self.bot.loop.create_task(update_channel_status(voice_channel, session))
+
+        select.callback = select_callback
+        view = discord.ui.View()
+        view.add_item(select)
+        await ctx.send("Select the session duration:", view=view)
 
     @commands.guild_only()
     @sesh.command()
