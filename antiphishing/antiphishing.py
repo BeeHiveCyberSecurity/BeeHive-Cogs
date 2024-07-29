@@ -155,7 +155,6 @@ class AntiPhishing(commands.Cog):
                     )
                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/warning.png")
                     embed.timestamp = datetime.datetime.utcnow()
-                    embed.set_footer(text="Link scanning powered by BeeHive",icon_url="")
                     if mod_mentions:
                         await message.channel.send(content=mod_mentions, allowed_mentions=discord.AllowedMentions(roles=True))
                     await message.reply(embed=embed)
