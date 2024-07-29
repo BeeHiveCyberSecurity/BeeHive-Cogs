@@ -5,5 +5,5 @@
     "name": "sesh",
     "short": "Coordinate smoking sessions",
     "min_bot_version": "3.5.0",
-    "requirements": ["speechrecognition"]
+    "requirements": ["speechrecognition", "pyaudio"]
 }

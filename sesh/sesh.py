@@ -1,8 +1,9 @@
-from redbot.core import commands, Config
-import discord
+from redbot.core import commands, Config #type: ignore
+import discord #type: ignore
 import datetime
-import asyncio  # Ensure asyncio is imported
-import uuid  # Import uuid for generating unique session IDs
+import asyncio
+import uuid
+import pyaudio
 import speech_recognition as sr  # Import speech recognition library
 
 class Sesh(commands.Cog):
