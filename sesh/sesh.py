@@ -95,106 +95,69 @@ class Sesh(commands.Cog):
                 return obj.isoformat()
             raise TypeError("Type not serializable")
 
-        # Step 1: Ask for session description
-        await ctx.send("Please provide a description for the session:")
+        class SeshModal(discord.ui.Modal):
+            def __init__(self):
+                super().__init__(title="Start a New Sesh")
 
-        def check_message(m):
-            return m.author == ctx.author and m.channel == ctx.channel
+                self.add_item(discord.ui.InputText(label="Session Description", placeholder="Enter the session description here..."))
+                self.add_item(discord.ui.InputText(label="Session Duration (minutes)", placeholder="Enter duration (15, 30, 45, 60)", min_length=2, max_length=2))
+                self.add_item(discord.ui.InputText(label="Marijuana Type", placeholder="Enter type (flower, concentrate, distillate, edibles)"))
+                self.add_item(discord.ui.InputText(label="Strain Type", placeholder="Enter strain (indica, sativa, hybrid)"))
 
-        try:
-            description_msg = await self.bot.wait_for('message', check=check_message, timeout=60.0)
-            description = description_msg.content
-        except asyncio.TimeoutError:
-            await ctx.send("You took too long to respond. Please try starting the session again.")
-            return
+            async def callback(self, interaction: discord.Interaction):
+                description = self.children[0].value
+                duration = int(self.children[1].value)
+                marijuana_type = self.children[2].value.lower()
+                strain_type = self.children[3].value.lower()
 
-        # Step 2: Ask for session duration
-        await ctx.send("Please select the session duration:\n1. 15 minutes\n2. 30 minutes\n3. 45 minutes\n4. 1 hour")
+                session_time = datetime.datetime.utcnow()
+                session_end_time = session_time + datetime.timedelta(minutes=duration)
 
-        def check_duration(m):
-            return m.author == ctx.author and m.channel == ctx.channel and m.content.isdigit() and 1 <= int(m.content) <= 4
+                session_id = str(uuid.uuid4())  # Generate a unique session ID
+                session = {
+                    "id": session_id,
+                    "time": session_time.isoformat(),
+                    "end_time": session_end_time.isoformat(),
+                    "description": description,
+                    "creator": interaction.user.id,
+                    "participants": [{"id": interaction.user.id, "type": marijuana_type, "strain": strain_type}]
+                }
 
-        try:
-            duration_msg = await self.bot.wait_for('message', check=check_duration, timeout=60.0)
-            duration_options = {1: 15, 2: 30, 3: 45, 4: 60}
-            session_duration = duration_options[int(duration_msg.content)]
-            session_time = datetime.datetime.utcnow()
-            session_end_time = session_time + datetime.timedelta(minutes=session_duration)
-        except asyncio.TimeoutError:
-            await ctx.send("You took too long to respond. Please try starting the session again.")
-            return
+                async with self.config.guild(interaction.guild).sessions() as sessions:
+                    sessions.append(session)
 
-        # Step 3: Ask for marijuana type
-        await ctx.send("What type of marijuana are you consuming? (e.g., flower, concentrate, distillate, edibles, etc.)", 
-                       components=[
-                           discord.ui.Button(label="Flower", style=discord.ButtonStyle.primary, custom_id="flower"),
-                           discord.ui.Button(label="Concentrate", style=discord.ButtonStyle.primary, custom_id="concentrate"),
-                           discord.ui.Button(label="Distillate", style=discord.ButtonStyle.primary, custom_id="distillate"),
-                           discord.ui.Button(label="Edibles", style=discord.ButtonStyle.primary, custom_id="edibles")
-                       ])
+                embed = discord.Embed(
+                    title="It's sesh time!",
+                    description=f"A new smoking session has started and will last for {duration} minutes.\n\n**Description:** {description}\n**Session ID:** {session_id}",
+                    color=discord.Color.green()
+                )
+                embed.set_footer(text=f"Started by {interaction.user.display_name}")
 
-        def check_type(interaction):
-            return interaction.user == ctx.author and interaction.message.channel == ctx.channel
+                if interaction.user.voice:
+                    voice_channel = interaction.user.voice.channel
+                    invite = await voice_channel.create_invite(max_age=duration * 60)
+                    embed.add_field(name="Voice Channel", value=f"[Join Voice Channel]({invite.url})", inline=False)
+                else:
+                    # Create a new voice channel named after the session ID
+                    voice_channel = await interaction.guild.create_voice_channel(name=f"Sesh-{session_id}", category=voice_channel_category)
+                    # Store the voice channel ID in the session data
+                    session["voice_channel_id"] = voice_channel.id
+                    invite = await voice_channel.create_invite(max_age=duration * 60)
+                    embed.add_field(name="Voice Channel", value=f"[Join Voice Channel]({invite.url})", inline=False)
 
-        try:
-            type_interaction = await self.bot.wait_for('interaction', check=check_type, timeout=60.0)
-            marijuana_type = type_interaction.data['custom_id']
-            await type_interaction.response.send_message(f"You selected {marijuana_type}. Now, is it indica, sativa, or a hybrid?", 
-                                                         components=[
-                                                             discord.ui.Button(label="Indica", style=discord.ButtonStyle.primary, custom_id="indica"),
-                                                             discord.ui.Button(label="Sativa", style=discord.ButtonStyle.primary, custom_id="sativa"),
-                                                             discord.ui.Button(label="Hybrid", style=discord.ButtonStyle.primary, custom_id="hybrid")
-                                                         ])
-        except asyncio.TimeoutError:
-            await ctx.send("You took too long to respond. Please try starting the session again.")
-            return
+                if mention_role:
+                    await announcement_channel.send(f"{mention_role.mention}", embed=embed)
+                else:
+                    await announcement_channel.send(embed=embed)
 
-        try:
-            strain_interaction = await self.bot.wait_for('interaction', check=check_type, timeout=60.0)
-            strain_type = strain_interaction.data['custom_id']
-            await strain_interaction.response.send_message(f"You selected {strain_type}. The session is now starting.")
-        except asyncio.TimeoutError:
-            await ctx.send("You took too long to respond. Please try starting the session again.")
-            return
+                self.bot.loop.create_task(update_channel_status(voice_channel, session))
 
-        session_id = str(uuid.uuid4())  # Generate a unique session ID
-        session = {
-            "id": session_id,
-            "time": session_time.isoformat(),
-            "end_time": session_end_time.isoformat(),
-            "description": description,
-            "creator": ctx.author.id,
-            "participants": [{"id": ctx.author.id, "type": marijuana_type, "strain": strain_type}]
-        }
+        await ctx.send("Starting a new sesh...", view=discord.ui.View().add_item(discord.ui.Button(label="Start Sesh", style=discord.ButtonStyle.primary, custom_id="start_sesh")))
 
-        async with self.config.guild(ctx.guild).sessions() as sessions:
-            sessions.append(session)
-
-        embed = discord.Embed(
-            title="It's sesh time!",
-            description=f"A new smoking session has started and will last for {session_duration} minutes.\n\n**Description:** {description}\n**Session ID:** {session_id}",
-            color=discord.Color.green()
-        )
-        embed.set_footer(text=f"Started by {ctx.author.display_name}")
-
-        if ctx.author.voice:
-            voice_channel = ctx.author.voice.channel
-            invite = await voice_channel.create_invite(max_age=session_duration * 60)
-            embed.add_field(name="Voice Channel", value=f"[Join Voice Channel]({invite.url})", inline=False)
-        else:
-            # Create a new voice channel named after the session ID
-            voice_channel = await ctx.guild.create_voice_channel(name=f"Sesh-{session_id}", category=voice_channel_category)
-            # Store the voice channel ID in the session data
-            session["voice_channel_id"] = voice_channel.id
-            invite = await voice_channel.create_invite(max_age=session_duration * 60)
-            embed.add_field(name="Voice Channel", value=f"[Join Voice Channel]({invite.url})", inline=False)
-
-        if mention_role:
-            await announcement_channel.send(f"{mention_role.mention}", embed=embed)
-        else:
-            await announcement_channel.send(embed=embed)
-
-        self.bot.loop.create_task(update_channel_status(voice_channel, session))
+        @self.bot.event
+        async def on_button_click(interaction: discord.Interaction):
+            if interaction.custom_id == "start_sesh":
+                await interaction.response.send_modal(SeshModal())
 
     @commands.guild_only()
     @sesh.command()
