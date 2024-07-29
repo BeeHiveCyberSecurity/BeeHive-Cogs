@@ -14,12 +14,14 @@ class Sesh(commands.Cog):
             "sessions": []
         }
         self.config.register_guild(**default_guild)
-
+        
+    @commands.guild_only()
     @commands.group()
     async def sesh(self, ctx):
         """Group command for managing smoking sessions."""
         pass
 
+    @commands.guild_only()
     @sesh.command()
     async def start(self, ctx, duration: str, *, description: str):
         """Start a new smoking session.
@@ -89,6 +91,7 @@ class Sesh(commands.Cog):
 
         await ctx.send(embed=embed)
 
+    @commands.guild_only()
     @sesh.command()
     async def join(self, ctx):
         """Join the currently active smoking session."""
@@ -140,6 +143,7 @@ class Sesh(commands.Cog):
                     return
             await ctx.send("No active session found at this time.")
 
+    @commands.guild_only()
     @sesh.command()
     async def leave(self, ctx):
         """Leave the current smoking session."""
@@ -152,6 +156,7 @@ class Sesh(commands.Cog):
                         return
             await ctx.send("You are not currently in any smoking session.")
 
+    @commands.guild_only()
     @sesh.command()
     async def list(self, ctx):
         """List all upcoming smoking sessions."""
@@ -173,6 +178,7 @@ class Sesh(commands.Cog):
 
         await ctx.send(embed=embed)
 
+    @commands.guild_only()
     @sesh.command()
     async def cancel(self, ctx, session_id: str):
         """Cancel a smoking session you created.
