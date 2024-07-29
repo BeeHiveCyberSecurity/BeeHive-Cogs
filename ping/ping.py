@@ -8,7 +8,13 @@ class Ping(commands.Cog):
         self.bot = bot
 
     @app_commands.command(description="Displays the bot's latency and additional diagnostic information.")
-    async def ping(self, interaction: discord.Interaction):
+    @commands.hybrid_command(name="ping", description="Displays the bot's latency and additional diagnostic information.")
+    async def ping(self, ctx: commands.Context, interaction: discord.Interaction = None):
+        if interaction:
+            await interaction.response.defer()
+        else:
+            await ctx.defer()
+
         latency = self.bot.latency
         heartbeat_latency = round(latency * 1000, 2)
         ws_latency = round(self.bot.latency * 1000, 2)
@@ -19,7 +25,7 @@ class Ping(commands.Cog):
         if len(self.latency_history) > 5:
             self.latency_history.pop(0)
         avg_latency = round(sum(self.latency_history) / len(self.latency_history), 2)
-        await interaction.response.defer()
+
         st = speedtest.Speedtest(secure=True)
         st.get_best_server()
         download_speed = round(st.download() / 1_000_000, 2)
@@ -42,7 +48,10 @@ class Ping(commands.Cog):
         embed.add_field(name="Upload speed", value=f"{upload_speed} Mbps", inline=True)
         embed.add_field(name="Backbone ping", value=f"{ping} ms", inline=True)
 
-        await interaction.followup.send(embed=embed)
+        if interaction:
+            await interaction.followup.send(embed=embed)
+        else:
+            await ctx.send(embed=embed)
 
 async def setup(bot):
     await bot.add_cog(Ping(bot))
