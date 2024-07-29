@@ -21,11 +21,12 @@ class Ping(commands.Cog):  # Use Red's Cog class
             self.latency_history.pop(0)
         avg_latency = round(sum(self.latency_history) / len(self.latency_history), 2)
 
-        st = speedtest.Speedtest(secure=True)
-        st.get_best_server()
-        download_speed = round(st.download() / 1_000_000, 2)
-        upload_speed = round(st.upload() / 1_000_000, 2)
-        ping = st.results.ping
+        async with ctx.typing():
+            st = speedtest.Speedtest(secure=True)
+            st.get_best_server()
+            download_speed = round(st.download() / 1_000_000, 2)
+            upload_speed = round(st.upload() / 1_000_000, 2)
+            ping = st.results.ping
 
         if avg_latency > 100:  # Adjust thresholds as needed
             embed_color = discord.Color(0xff4545)
