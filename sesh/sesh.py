@@ -187,5 +187,5 @@ class Sesh(commands.Cog):
                     return
             await ctx.send("No session found with that ID or you are not the creator of the session.")
 
-def setup(bot):
-    bot.add_cog(Sesh(bot))
+async def setup(bot):
+    await bot.add_cog(Sesh(bot))
