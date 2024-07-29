@@ -13,7 +13,8 @@ class Sesh(commands.Cog):
         default_guild = {
             "sessions": [],
             "mention_role": None,  # Add default for mention role
-            "announcement_channel": None  # Add default for announcement channel
+            "announcement_channel": None,  # Add default for announcement channel
+            "voice_channel_category": None  # Add default for voice channel category
         }
         self.config.register_guild(**default_guild)
         
@@ -55,6 +56,13 @@ class Sesh(commands.Cog):
 
     @commands.guild_only()
     @sesh.command()
+    async def setcategory(self, ctx, category: discord.CategoryChannel):
+        """Set the category where sesh voice channels will be created."""
+        await self.config.guild(ctx.guild).voice_channel_category.set(category.id)
+        await ctx.send(f"Sesh voice channels will now be created under the category {category.name}.")
+
+    @commands.guild_only()
+    @sesh.command()
     async def start(self, ctx, duration: str, *, description: str):
         """Start a new smoking session.
         
@@ -64,6 +72,8 @@ class Sesh(commands.Cog):
         mention_role = ctx.guild.get_role(mention_role_id) if mention_role_id else None
         announcement_channel_id = await self.config.guild(ctx.guild).announcement_channel()
         announcement_channel = ctx.guild.get_channel(announcement_channel_id) if announcement_channel_id else ctx.channel
+        voice_channel_category_id = await self.config.guild(ctx.guild).voice_channel_category()
+        voice_channel_category = ctx.guild.get_channel(voice_channel_category_id) if voice_channel_category_id else None
 
         async def update_channel_status(voice_channel, session):
             while True:
@@ -130,7 +140,7 @@ class Sesh(commands.Cog):
                         embed.add_field(name="Voice Channel", value=f"[Join Voice Channel]({invite.url})", inline=False)
                     else:
                         # Create a new voice channel named after the session ID
-                        voice_channel = await ctx.guild.create_voice_channel(name=f"Sesh-{session_id}")
+                        voice_channel = await ctx.guild.create_voice_channel(name=f"Sesh-{session_id}", category=voice_channel_category)
                         # Store the voice channel ID in the session data
                         session["voice_channel_id"] = voice_channel.id
                         invite = await voice_channel.create_invite(max_age=session_duration * 60)
@@ -183,7 +193,7 @@ class Sesh(commands.Cog):
                     embed.add_field(name="Voice Channel", value=f"[Join Voice Channel]({invite.url})", inline=False)
                 else:
                     # Create a new voice channel named after the session ID
-                    voice_channel = await ctx.guild.create_voice_channel(name=f"Sesh-{session_id}")
+                    voice_channel = await ctx.guild.create_voice_channel(name=f"Sesh-{session_id}", category=voice_channel_category)
                     # Store the voice channel ID in the session data
                     session["voice_channel_id"] = voice_channel.id
                     invite = await voice_channel.create_invite(max_age=session_duration * 60)
