@@ -39,6 +39,21 @@ class Sesh(commands.Cog):
         mention_role_id = await self.config.guild(ctx.guild).mention_role()
         mention_role = ctx.guild.get_role(mention_role_id) if mention_role_id else None
 
+        async def update_channel_status(voice_channel, session):
+            while True:
+                current_time = datetime.datetime.utcnow()
+                remaining_time = session["end_time"] - current_time
+                if remaining_time.total_seconds() <= 0:
+                    break
+
+                participant_types = [p["type"] for p in session["participants"]]
+                most_popular_type = max(set(participant_types), key=participant_types.count)
+                participant_count = len(session["participants"])
+
+                new_name = f"Sesh-{session['id']} | Ends in {remaining_time.seconds // 60}m | {most_popular_type} | {participant_count} participants"
+                await voice_channel.edit(name=new_name)
+                await asyncio.sleep(60)  # Update every minute
+
         if duration.startswith("in "):
             try:
                 delay = int(duration.split(" ")[1])
@@ -61,8 +76,8 @@ class Sesh(commands.Cog):
                     session_id = str(uuid.uuid4())  # Generate a unique session ID
                     session = {
                         "id": session_id,
-                        "time": session_time.strftime("%H:%M"),
-                        "end_time": session_end_time.strftime("%H:%M"),
+                        "time": session_time,
+                        "end_time": session_end_time,
                         "description": description,
                         "creator": ctx.author.id,
                         "participants": [{"id": ctx.author.id, "type": "N/A", "strain": "N/A"}]
@@ -94,6 +109,8 @@ class Sesh(commands.Cog):
                         await ctx.send(f"{mention_role.mention}", embed=embed)
                     else:
                         await ctx.send(embed=embed)
+
+                    self.bot.loop.create_task(update_channel_status(voice_channel, session))
                 
                 select.callback = select_callback
                 view = discord.ui.View()
@@ -112,8 +129,8 @@ class Sesh(commands.Cog):
                 session_id = str(uuid.uuid4())  # Generate a unique session ID
                 session = {
                     "id": session_id,
-                    "time": session_time.strftime("%H:%M"),
-                    "end_time": session_end_time.strftime("%H:%M"),
+                    "time": session_time,
+                    "end_time": session_end_time,
                     "description": description,
                     "creator": ctx.author.id,
                     "participants": [{"id": ctx.author.id, "type": "N/A", "strain": "N/A"}]
@@ -145,6 +162,8 @@ class Sesh(commands.Cog):
                     await ctx.send(f"{mention_role.mention}", embed=embed)
                 else:
                     await ctx.send(embed=embed)
+
+                self.bot.loop.create_task(update_channel_status(voice_channel, session))
                 
             except ValueError:
                 await ctx.send("Invalid duration. Please provide the duration in minutes.")
@@ -157,7 +176,7 @@ class Sesh(commands.Cog):
         async with self.config.guild(ctx.guild).sessions() as sessions:
             current_time = datetime.datetime.utcnow().strftime("%H:%M")
             for session in sessions:
-                if session["time"] <= current_time < session["end_time"]:
+                if session["time"].strftime("%H:%M") <= current_time < session["end_time"].strftime("%H:%M"):
                     if not any(p["id"] == ctx.author.id for p in session["participants"]):
                         await ctx.send("What type of marijuana are you consuming? (e.g., flower, concentrate, distillate, edibles, etc.)", 
                                        components=[
@@ -196,7 +215,7 @@ class Sesh(commands.Cog):
                             "type": marijuana_type,
                             "strain": strain_type
                         })
-                        await ctx.send(f"You have joined the smoking session at {session['time']} with {marijuana_type} ({strain_type}).")
+                        await ctx.send(f"You have joined the smoking session at {session['time'].strftime('%H:%M')} with {marijuana_type} ({strain_type}).")
                     else:
                         await ctx.send("You are already in this session.")
                     return
@@ -211,7 +230,7 @@ class Sesh(commands.Cog):
                 for participant in session["participants"]:
                     if participant["id"] == ctx.author.id:
                         session["participants"].remove(participant)
-                        await ctx.send(f"You have left the smoking session at {session['time']}.")
+                        await ctx.send(f"You have left the smoking session at {session['time'].strftime('%H:%M')}.")
                         return
             await ctx.send("You are not currently in any smoking session.")
 
@@ -231,7 +250,7 @@ class Sesh(commands.Cog):
             participant_details = ", ".join([f"{p.name} ({p['type']}, {p['strain']})" for p in session["participants"] if p])
             embed.add_field(
                 name=f"Session ID: {session['id']}",
-                value=f"Time: {session['time']}\nDescription: {session['description']}\nCreator: {creator.name if creator else 'Unknown'}\nParticipants: {participant_details}",
+                value=f"Time: {session['time'].strftime('%H:%M')}\nDescription: {session['description']}\nCreator: {creator.name if creator else 'Unknown'}\nParticipants: {participant_details}",
                 inline=False
             )
 
