@@ -290,8 +290,7 @@ class Sesh(commands.Cog):
         embed = discord.Embed(title="Upcoming Smoking Sessions", color=discord.Color.green())
         for session in sessions:
             creator = self.bot.get_user(session["creator"])
-            participants = [self.bot.get_user(p["id"]) for p in session["participants"]]
-            participant_details = ", ".join([f"{p.name} ({p['type']}, {p['strain']})" for p in session["participants"] if p])
+            participant_details = ", ".join([f"{self.bot.get_user(p['id']).name} ({p['type']}, {p['strain']})" for p in session["participants"] if self.bot.get_user(p['id'])])
             session_time = datetime.datetime.fromisoformat(session["time"])
             embed.add_field(
                 name=f"Session ID: {session['id']}",
