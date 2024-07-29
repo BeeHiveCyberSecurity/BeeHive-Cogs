@@ -1,14 +1,13 @@
 import discord  # type: ignore
 import speedtest  # type: ignore
-from discord.ext import commands  # type: ignore
-from redbot.core import commands as red_commands  # Import Red's commands
+from redbot.core import commands  # Import Red's commands
 
 class Ping(commands.Cog):  # Use Red's Cog class
     def __init__(self, bot):
         self.bot = bot
 
     @commands.command(name="ping", description="Displays the bot's latency and additional diagnostic information.")
-    async def ping(self, ctx: red_commands.Context):  # Use Red's Context class
+    async def ping(self, ctx: commands.Context):  # Use Red's Context class
         await ctx.defer()
 
         latency = self.bot.latency
