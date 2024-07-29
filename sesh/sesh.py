@@ -17,7 +17,7 @@ class Sesh(commands.Cog):
         self.config.register_guild(**default_guild)
         
     @commands.guild_only()
-    @commands.group()
+    @commands.group(invoke_without_command=True)
     async def sesh(self, ctx):
         """Group command for managing smoking sessions."""
         sessions = await self.config.guild(ctx.guild).sessions()
