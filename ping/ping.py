@@ -45,10 +45,3 @@ class Ping(commands.Cog):  # Use Red's Cog class
         embed.add_field(name="Backbone ping", value=f"{ping} ms", inline=True)
 
         await ctx.send(embed=embed)
-
-async def setup(bot):
-    global old_ping
-    old_ping = bot.get_command("ping")
-    if old_ping:
-        bot.remove_command(old_ping.name)
-    await bot.add_cog(Ping(bot))
