@@ -13,7 +13,8 @@ class Sesh(commands.Cog):
         self.config = Config.get_conf(self, identifier=1234567890)
         default_guild = {
             "sessions": [],
-            "mention_role": None  # Add default for mention role
+            "mention_role": None,  # Add default for mention role
+            "announcement_channel": None  # Add default for announcement channel
         }
         self.config.register_guild(**default_guild)
         
@@ -48,6 +49,13 @@ class Sesh(commands.Cog):
 
     @commands.guild_only()
     @sesh.command()
+    async def setchannel(self, ctx, channel: discord.TextChannel):
+        """Set the channel where sesh announcements will be made."""
+        await self.config.guild(ctx.guild).announcement_channel.set(channel.id)
+        await ctx.send(f"Sesh announcements will now be made in {channel.mention}.")
+
+    @commands.guild_only()
+    @sesh.command()
     async def start(self, ctx, duration: str, *, description: str):
         """Start a new smoking session.
         
@@ -55,6 +63,8 @@ class Sesh(commands.Cog):
         """
         mention_role_id = await self.config.guild(ctx.guild).mention_role()
         mention_role = ctx.guild.get_role(mention_role_id) if mention_role_id else None
+        announcement_channel_id = await self.config.guild(ctx.guild).announcement_channel()
+        announcement_channel = ctx.guild.get_channel(announcement_channel_id) if announcement_channel_id else ctx.channel
 
         async def update_channel_status(voice_channel, session):
             while True:
@@ -146,9 +156,9 @@ class Sesh(commands.Cog):
                         embed.add_field(name="Voice Channel", value=f"[Join Voice Channel]({invite.url})", inline=False)
 
                     if mention_role:
-                        await ctx.send(f"{mention_role.mention}", embed=embed)
+                        await announcement_channel.send(f"{mention_role.mention}", embed=embed)
                     else:
-                        await ctx.send(embed=embed)
+                        await announcement_channel.send(embed=embed)
 
                     self.bot.loop.create_task(update_channel_status(voice_channel, session))
                     self.bot.loop.create_task(listen_for_cheers(voice_channel, ctx.channel))
@@ -200,9 +210,9 @@ class Sesh(commands.Cog):
                     embed.add_field(name="Voice Channel", value=f"[Join Voice Channel]({invite.url})", inline=False)
 
                 if mention_role:
-                    await ctx.send(f"{mention_role.mention}", embed=embed)
+                    await announcement_channel.send(f"{mention_role.mention}", embed=embed)
                 else:
-                    await ctx.send(embed=embed)
+                    await announcement_channel.send(embed=embed)
 
                 self.bot.loop.create_task(update_channel_status(voice_channel, session))
                 self.bot.loop.create_task(listen_for_cheers(voice_channel, ctx.channel))
