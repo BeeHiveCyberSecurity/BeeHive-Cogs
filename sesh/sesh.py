@@ -195,9 +195,6 @@ class Sesh(commands.Cog):
 
             self.bot.loop.create_task(update_channel_status(voice_channel, session))
 
-        async def select_callback(interaction):
-            await interaction.response.defer()
-
         select.callback = select_callback
         view = discord.ui.View()
         view.add_item(select)
