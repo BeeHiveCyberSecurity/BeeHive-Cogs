@@ -1,9 +1,4 @@
 from .ping import Ping
-from redbot.core import commands
-
-class Ping(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
 
 async def setup(bot):
     global old_ping
