@@ -256,7 +256,7 @@ class Sesh(commands.Cog):
             session_time = datetime.datetime.fromisoformat(session["time"])
             embed.add_field(
                 name=f"Session ID: {session['id']}",
-                value=f"Time: {session_time.strftime('%H:%M')}\nDescription: {session['description']}\nCreator: {creator.name if creator else 'Unknown'}\nParticipants: {participant_details}",
+                value=f"Time: {session_time.strftime('%H:%M')}\nCreator: {creator.name if creator else 'Unknown'}\nParticipants: {participant_details}",
                 inline=False
             )
 
