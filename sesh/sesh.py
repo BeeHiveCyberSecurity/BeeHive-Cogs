@@ -87,6 +87,9 @@ class Sesh(commands.Cog):
                 await voice_channel.edit(name=new_name)
                 await asyncio.sleep(60)  # Update every minute
 
+            # Delete the voice channel when the session ends
+            await voice_channel.delete()
+
         def serialize_datetime(obj):
             if isinstance(obj, datetime.datetime):
                 return obj.isoformat()
@@ -302,6 +305,10 @@ class Sesh(commands.Cog):
         async with self.config.guild(ctx.guild).sessions() as sessions:
             for session in sessions:
                 if session["id"] == session_id and session["creator"] == ctx.author.id:
+                    if 'voice_channel_id' in session:
+                        voice_channel = ctx.guild.get_channel(session['voice_channel_id'])
+                        if voice_channel:
+                            await voice_channel.delete()
                     sessions.remove(session)
                     await ctx.send(f"Smoking session with ID {session_id} has been cancelled.")
                     return
@@ -317,6 +324,10 @@ class Sesh(commands.Cog):
         async with self.config.guild(ctx.guild).sessions() as sessions:
             for session in sessions:
                 if session["id"] == session_id:
+                    if 'voice_channel_id' in session:
+                        voice_channel = ctx.guild.get_channel(session['voice_channel_id'])
+                        if voice_channel:
+                            await voice_channel.delete()
                     sessions.remove(session)
                     await ctx.send(f"Smoking session with ID {session_id} has been manually ended.")
                     return
