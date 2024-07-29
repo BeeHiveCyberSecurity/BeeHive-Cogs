@@ -11,7 +11,8 @@ class Sesh(commands.Cog):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=1234567890)
         default_guild = {
-            "sessions": []
+            "sessions": [],
+            "mention_role": None  # Add default for mention role
         }
         self.config.register_guild(**default_guild)
         
@@ -23,11 +24,21 @@ class Sesh(commands.Cog):
 
     @commands.guild_only()
     @sesh.command()
+    async def setrole(self, ctx, role: discord.Role):
+        """Set a role to be mentioned when a sesh is announced or starts."""
+        await self.config.guild(ctx.guild).mention_role.set(role.id)
+        await ctx.send(f"The role {role.name} will now be mentioned for sesh announcements.")
+
+    @commands.guild_only()
+    @sesh.command()
     async def start(self, ctx, duration: str, *, description: str):
         """Start a new smoking session.
         
         Duration can be in minutes or in the format 'in X minutes'.
         """
+        mention_role_id = await self.config.guild(ctx.guild).mention_role()
+        mention_role = ctx.guild.get_role(mention_role_id) if mention_role_id else None
+
         if duration.startswith("in "):
             try:
                 delay = int(duration.split(" ")[1])
@@ -79,7 +90,10 @@ class Sesh(commands.Cog):
                         invite = await voice_channel.create_invite(max_age=session_duration * 60)
                         embed.add_field(name="Voice Channel", value=f"[Join Voice Channel]({invite.url})", inline=False)
 
-                    await ctx.send(embed=embed)
+                    if mention_role:
+                        await ctx.send(f"{mention_role.mention}", embed=embed)
+                    else:
+                        await ctx.send(embed=embed)
                 
                 select.callback = select_callback
                 view = discord.ui.View()
@@ -109,7 +123,7 @@ class Sesh(commands.Cog):
                     sessions.append(session)
 
                 embed = discord.Embed(
-                    title="Smoking Session Started",
+                    title="It's sesh time!",
                     description=f"A new smoking session has started and will last for {session_duration} minutes.\n\n**Description:** {description}\n**Session ID:** {session_id}",
                     color=discord.Color.green()
                 )
@@ -127,7 +141,10 @@ class Sesh(commands.Cog):
                     invite = await voice_channel.create_invite(max_age=session_duration * 60)
                     embed.add_field(name="Voice Channel", value=f"[Join Voice Channel]({invite.url})", inline=False)
 
-                await ctx.send(embed=embed)
+                if mention_role:
+                    await ctx.send(f"{mention_role.mention}", embed=embed)
+                else:
+                    await ctx.send(embed=embed)
                 
             except ValueError:
                 await ctx.send("Invalid duration. Please provide the duration in minutes.")
