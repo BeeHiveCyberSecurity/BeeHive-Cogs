@@ -37,11 +37,10 @@ class Ping(commands.Cog):  # Use Red's Cog class
 
         # Create an embed for a more detailed response
         embed = discord.Embed(title=embed_title, color=embed_color)
-        embed.add_field(name="Heartbeat latency", value=f"{heartbeat_latency}ms", inline=True)
-        embed.add_field(name="WebSocket latency", value=f"{ws_latency}ms", inline=True)
         embed.add_field(name="Averaged latency", value=f"{avg_latency}ms", inline=True)
+        embed.add_field(name="Backbone latency", value=f"{ping} ms", inline=True)
+        embed.add_field(name="", value="\u200b", inline=False)
         embed.add_field(name="Download speed", value=f"{download_speed} Mbps", inline=True)
         embed.add_field(name="Upload speed", value=f"{upload_speed} Mbps", inline=True)
-        embed.add_field(name="Backbone ping", value=f"{ping} ms", inline=True)
 
         await ctx.send(embed=embed)
