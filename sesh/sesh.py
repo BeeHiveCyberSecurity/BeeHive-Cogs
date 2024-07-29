@@ -2,7 +2,8 @@ from redbot.core import commands, Config #type: ignore
 import discord #type: ignore
 import datetime
 import asyncio
-import uuid
+import random
+import string
 
 class Sesh(commands.Cog):
     """Coordinate smoking sessions with your friends."""
@@ -115,10 +116,6 @@ class Sesh(commands.Cog):
                 await ctx.send("You took too long to respond. Please try starting the session again.")
                 return None
 
-        description = await ask_question(ctx, "Enter the session description here...", ["✏️"])
-        if not description:
-            return
-
         duration = await ask_question(ctx, "Enter duration (15, 30, 45, 60)", ["1️⃣", "2️⃣", "3️⃣", "4️⃣"])
         if not duration:
             return
@@ -137,12 +134,11 @@ class Sesh(commands.Cog):
         session_time = datetime.datetime.utcnow()
         session_end_time = session_time + datetime.timedelta(minutes=duration)
 
-        session_id = str(uuid.uuid4())  # Generate a unique session ID
+        session_id = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))  # Generate a unique 4-character session ID
         session = {
             "id": session_id,
             "time": session_time.isoformat(),
             "end_time": session_end_time.isoformat(),
-            "description": description,
             "creator": ctx.author.id,
             "participants": [{"id": ctx.author.id, "type": marijuana_type, "strain": strain_type}]
         }
@@ -152,7 +148,7 @@ class Sesh(commands.Cog):
 
         embed = discord.Embed(
             title="It's sesh time!",
-            description=f"A new smoking session has started and will last for {duration} minutes.\n\n**Description:** {description}\n**Session ID:** {session_id}",
+            description=f"A new smoking session has started and will last for {duration} minutes.\n\n**Session ID:** {session_id}",
             color=discord.Color.green()
         )
         embed.set_footer(text=f"Started by {ctx.author.display_name}")
