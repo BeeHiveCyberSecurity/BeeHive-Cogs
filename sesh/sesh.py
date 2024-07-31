@@ -86,6 +86,12 @@ class Sesh(commands.Cog):
 
                 new_name = f"Sesh-{session['id']} | Ends in {remaining_time.seconds // 60}m | {most_popular_type} | {participant_count} participants"
                 await voice_channel.edit(name=new_name)
+                
+                # Check if all users have left the voice channel
+                if len(voice_channel.members) == 0:
+                    await voice_channel.delete()
+                    return
+                
                 await asyncio.sleep(60)  # Update every minute
 
             # Delete the voice channel when the session ends
