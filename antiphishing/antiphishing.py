@@ -20,8 +20,8 @@ class AntiPhishing(commands.Cog):
     Guard users from malicious links and phishing attempts with customizable protection options.
     """
 
-    __version__ = "1.1.2"
-    __last_updated__ = "Jul 5 2024"
+    __version__ = "1.2.0"
+    __last_updated__ = "Jul 31 2024"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -259,6 +259,121 @@ class AntiPhishing(commands.Cog):
             if domain in self.domains:
                 await self.handle_phishing(message, domain)
                 return
+
+    @commands.Cog.listener()
+    async def on_member_update(self, before: discord.Member, after: discord.Member):
+        """
+        Handles the logic for checking URLs in user profiles, names, and statuses.
+        """
+        if before.display_name != after.display_name:
+            links = self.get_links(after.display_name)
+            if links:
+                for url in links:
+                    domain = urlparse(url).netloc
+                    if domain in self.domains:
+                        await self.handle_phishing_profile(after, domain)
+                        return
+
+        if before.activity != after.activity and after.activity:
+            links = self.get_links(after.activity.name)
+            if links:
+                for url in links:
+                    domain = urlparse(url).netloc
+                    if domain in self.domains:
+                        await self.handle_phishing_profile(after, domain)
+                        return
+
+    async def handle_phishing_profile(self, member: discord.Member, domain: str) -> None:
+        domain = domain[:250]
+        action = await self.config.guild(member.guild).action()
+        if not action == "ignore":
+            count = await self.config.guild(member.guild).caught()
+            await self.config.guild(member.guild).caught.set(count + 1)
+        member_count = await self.config.member(member).caught()
+        max_links = await self.config.guild(member.guild).max_links()
+        if member_count + 1 >= max_links:
+            action = "ban"
+        await self.config.member(member).caught.set(member_count + 1)
+        if action == "notify":
+            mod_roles = await self.bot.get_mod_roles(member.guild)
+            mod_mentions = " ".join(role.mention for role in mod_roles) if mod_roles else ""
+            embed = discord.Embed(
+                title="Dangerous link detected in profile!",
+                description=f"User {member.mention} has a dangerous link in their profile. Please review and take necessary action.",
+                color=0xff4545,
+            )
+            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/warning.png")
+            embed.timestamp = datetime.datetime.utcnow()
+            if mod_mentions:
+                await member.guild.system_channel.send(content=mod_mentions, allowed_mentions=discord.AllowedMentions(roles=True))
+            await member.guild.system_channel.send(embed=embed)
+            
+            await modlog.create_case(
+                guild=member.guild,
+                bot=self.bot,
+                created_at=datetime.datetime.utcnow(),
+                action_type="phish_found",
+                user=member,
+                moderator=member.guild.me,
+                reason=f"Malicious URL **`{domain}`** found in user profile",
+            )
+            notifications = await self.config.guild(member.guild).notifications()
+            await self.config.guild(member.guild).notifications.set(notifications + 1)
+        elif action == "delete":
+            # No direct message to delete in profile, so just log the case
+            await modlog.create_case(
+                guild=member.guild,
+                bot=self.bot,
+                created_at=datetime.datetime.utcnow(),
+                action_type="phish_deleted",
+                user=member,
+                moderator=member.guild.me,
+                reason=f"Malicious URL **`{domain}`** found in user profile",
+            )
+            deletions = await self.config.guild(member.guild).deletions()
+            await self.config.guild(member.guild).deletions.set(deletions + 1)
+        elif action == "kick":
+            if member.guild.me.guild_permissions.kick_members:
+                if (
+                    member.top_role >= member.guild.me.top_role
+                    or member == member.guild.owner
+                ):
+                    return
+
+                await member.kick()
+
+                await modlog.create_case(
+                    guild=member.guild,
+                    bot=self.bot,
+                    created_at=datetime.datetime.utcnow(),
+                    action_type="phish_kicked",
+                    user=member,
+                    moderator=member.guild.me,
+                    reason=f"Malicious URL **`{domain}`** found in user profile",
+                )
+                kicks = await self.config.guild(member.guild).kicks()
+                await self.config.guild(member.guild).kicks.set(kicks + 1)
+        elif action == "ban":
+            if member.guild.me.guild_permissions.ban_members:
+                if (
+                    member.top_role >= member.guild.me.top_role
+                    or member == member.guild.owner
+                ):
+                    return
+
+                await member.ban()
+
+                await modlog.create_case(
+                    guild=member.guild,
+                    bot=self.bot,
+                    created_at=datetime.datetime.utcnow(),
+                    action_type="phish_banned",
+                    user=member,
+                    moderator=member.guild.me,
+                    reason=f"Malicious URL **`{domain}`** found in user profile",
+                )
+                bans = await self.config.guild(member.guild).bans()
+                await self.config.guild(member.guild).bans.set(bans + 1)
 
     @commands.command(
         aliases=["checkforphish", "checkscam", "checkforscam", "checkphishing"]
