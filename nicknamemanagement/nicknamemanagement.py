@@ -75,6 +75,35 @@ class NicknameManagement(commands.Cog):
         status = "enabled" if enable else "disabled"
         await ctx.send(f"Auto-purification has been {status}.")
 
+    @nickname.command()
+    async def cleanup(self, ctx):
+        """Clean up all pre-existing nicknames in the server slowly to prevent rate limits."""
+        await ctx.send("Starting nickname cleanup. This may take a while...")
+        guild_settings = await self.config.guild(ctx.guild).all()
+        allowed_characters = guild_settings["allowed_characters"]
+        max_length = guild_settings["max_length"]
+
+        total_members = len(ctx.guild.members)
+        processed_members = 0
+
+        for member in ctx.guild.members:
+            purified_nickname = ''.join(c for c in member.display_name if c in allowed_characters)
+            purified_nickname = purified_nickname[:max_length]
+            if member.display_name != purified_nickname:
+                try:
+                    await member.edit(nick=purified_nickname)
+                    await asyncio.sleep(1)  # Sleep to prevent hitting rate limits
+                except discord.Forbidden:
+                    await ctx.send(f"Cannot change nickname for {member.mention} due to lack of permissions.")
+                except discord.HTTPException as e:
+                    await ctx.send(f"An error occurred while changing nickname for {member.mention}: {e}")
+
+            processed_members += 1
+            if processed_members % 10 == 0:
+                await ctx.send(f"Processed {processed_members}/{total_members} members...")
+
+        await ctx.send("Nickname cleanup completed.")
+
     async def on_member_update(self, before, after):
         if before.display_name != after.display_name:
             guild_settings = await self.config.guild(after.guild).all()
