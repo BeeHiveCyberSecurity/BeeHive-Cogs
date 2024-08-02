@@ -1,5 +1,6 @@
 import discord
 from redbot.core import commands, Config, checks
+import asyncio
 
 class NicknameManagement(commands.Cog):
     """Cog for managing and normalizing user nicknames."""
@@ -14,6 +15,7 @@ class NicknameManagement(commands.Cog):
         }
         self.config.register_guild(**default_guild)
         self.bot.add_listener(self.on_member_update, "on_member_update")
+        self.bot.loop.create_task(self.cleanup_nicknames())
 
     @commands.guild_only()
     @commands.admin()
@@ -87,5 +89,22 @@ class NicknameManagement(commands.Cog):
                 except discord.HTTPException:
                     pass
 
-def setup(bot):
-    bot.add_cog(NicknameManagement(bot))
+    async def cleanup_nicknames(self):
+        await self.bot.wait_until_ready()
+        while not self.bot.is_closed():
+            for guild in self.bot.guilds:
+                guild_settings = await self.config.guild(guild).all()
+                if guild_settings["auto_purify"]:
+                    allowed_characters = guild_settings["allowed_characters"]
+                    max_length = guild_settings["max_length"]
+                    for member in guild.members:
+                        purified_nickname = ''.join(c for c in member.display_name if c in allowed_characters)
+                        purified_nickname = purified_nickname[:max_length]
+                        if member.display_name != purified_nickname:
+                            try:
+                                await member.edit(nick=purified_nickname)
+                            except discord.Forbidden:
+                                pass
+                            except discord.HTTPException:
+                                pass
+            await asyncio.sleep(3600)  # Run the cleanup task every hour
