@@ -57,19 +57,19 @@ class NicknameManagement(commands.Cog):
             await ctx.send(f"An error occurred: {e}")
 
     @nickname.command()
-    async def set_allowed_characters(self, ctx, *, characters: str):
+    async def allowedchars(self, ctx, *, characters: str):
         """Set the allowed characters for nicknames."""
         await self.config.guild(ctx.guild).allowed_characters.set(characters)
         await ctx.send(f"Allowed characters set to: {characters}")
 
     @nickname.command()
-    async def set_max_length(self, ctx, length: int):
+    async def maxlength(self, ctx, length: int):
         """Set the maximum length for nicknames."""
         await self.config.guild(ctx.guild).max_length.set(length)
         await ctx.send(f"Maximum nickname length set to: {length}")
 
     @nickname.command()
-    async def set_auto_purify(self, ctx, enable: bool):
+    async def autopurify(self, ctx, enable: bool):
         """Enable or disable auto-purification of nicknames."""
         await self.config.guild(ctx.guild).auto_purify.set(enable)
         status = "enabled" if enable else "disabled"
