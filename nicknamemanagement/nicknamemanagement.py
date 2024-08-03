@@ -32,6 +32,10 @@ class NicknameManagement(commands.Cog):
         purified_nickname = ''.join(c for c in member.display_name if c in allowed_characters)
         purified_nickname = purified_nickname[:guild_settings["max_length"]]
 
+        if not purified_nickname:
+            purified_nickname = ''.join(c for c in member.name if c in allowed_characters)
+            purified_nickname = purified_nickname[:guild_settings["max_length"]]
+
         try:
             await member.edit(nick=purified_nickname)
             await ctx.send(f"{member.mention}'s nickname has been purified to: {purified_nickname}")
@@ -47,6 +51,10 @@ class NicknameManagement(commands.Cog):
         allowed_characters = guild_settings["allowed_characters"]
         normalized_nickname = ''.join(c for c in member.display_name if c in allowed_characters).title()
         normalized_nickname = normalized_nickname[:guild_settings["max_length"]]
+
+        if not normalized_nickname:
+            normalized_nickname = ''.join(c for c in member.name if c in allowed_characters).title()
+            normalized_nickname = normalized_nickname[:guild_settings["max_length"]]
 
         try:
             await member.edit(nick=normalized_nickname)
@@ -89,6 +97,9 @@ class NicknameManagement(commands.Cog):
         for member in ctx.guild.members:
             purified_nickname = ''.join(c for c in member.display_name if c in allowed_characters)
             purified_nickname = purified_nickname[:max_length]
+            if not purified_nickname:
+                purified_nickname = ''.join(c for c in member.name if c in allowed_characters)
+                purified_nickname = purified_nickname[:max_length]
             if member.display_name != purified_nickname:
                 try:
                     await member.edit(nick=purified_nickname)
@@ -99,7 +110,7 @@ class NicknameManagement(commands.Cog):
                     await ctx.send(f"An error occurred while changing nickname for {member.mention}: {e}")
 
             processed_members += 1
-            if processed_members % 10 == 0:
+            if processed_members % 100 == 0:
                 await ctx.send(f"Processed {processed_members}/{total_members} members...")
 
         await ctx.send("Nickname cleanup completed.")
@@ -111,6 +122,9 @@ class NicknameManagement(commands.Cog):
                 allowed_characters = guild_settings["allowed_characters"]
                 purified_nickname = ''.join(c for c in after.display_name if c in allowed_characters)
                 purified_nickname = purified_nickname[:guild_settings["max_length"]]
+                if not purified_nickname:
+                    purified_nickname = ''.join(c for c in after.name if c in allowed_characters)
+                    purified_nickname = purified_nickname[:guild_settings["max_length"]]
                 try:
                     await after.edit(nick=purified_nickname)
                 except discord.Forbidden:
@@ -129,6 +143,9 @@ class NicknameManagement(commands.Cog):
                     for member in guild.members:
                         purified_nickname = ''.join(c for c in member.display_name if c in allowed_characters)
                         purified_nickname = purified_nickname[:max_length]
+                        if not purified_nickname:
+                            purified_nickname = ''.join(c for c in member.name if c in allowed_characters)
+                            purified_nickname = purified_nickname[:max_length]
                         if member.display_name != purified_nickname:
                             try:
                                 await member.edit(nick=purified_nickname)
