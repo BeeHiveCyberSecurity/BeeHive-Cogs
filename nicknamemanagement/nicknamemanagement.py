@@ -38,7 +38,7 @@ class NicknameManagement(commands.Cog):
             purified_nickname = purified_nickname[:guild_settings["max_length"]]
 
         try:
-            await member.edit(nick=purified_nickname)
+            await member.edit(nick=purified_nickname, reason="Nickname purified to allowed characters")
             await ctx.send(f"{member.mention}'s nickname has been purified to: {purified_nickname}")
         except discord.Forbidden:
             await ctx.send("I do not have permission to change that member's nickname.")
@@ -58,7 +58,7 @@ class NicknameManagement(commands.Cog):
             normalized_nickname = normalized_nickname[:guild_settings["max_length"]]
 
         try:
-            await member.edit(nick=normalized_nickname)
+            await member.edit(nick=normalized_nickname, reason="Nickname normalized to standard format")
             await ctx.send(f"{member.mention}'s nickname has been normalized to: {normalized_nickname}")
         except discord.Forbidden:
             await ctx.send("I do not have permission to change that member's nickname.")
@@ -122,7 +122,7 @@ class NicknameManagement(commands.Cog):
 
             if original_nickname != purified_nickname:
                 try:
-                    await member.edit(nick=purified_nickname)
+                    await member.edit(nick=purified_nickname, reason="Nickname purified during cleanup")
                     changed_nicknames += 1
                     await asyncio.sleep(1)  # Sleep to prevent hitting rate limits
                 except discord.Forbidden:
@@ -159,7 +159,7 @@ class NicknameManagement(commands.Cog):
                     purified_nickname = ''.join(c for c in after.name if c in allowed_characters)
                     purified_nickname = purified_nickname[:guild_settings["max_length"]]
                 try:
-                    await after.edit(nick=purified_nickname)
+                    await after.edit(nick=purified_nickname, reason="Nickname auto-purified on update")
                 except discord.Forbidden:
                     pass
                 except discord.HTTPException:
@@ -175,7 +175,7 @@ class NicknameManagement(commands.Cog):
                 purified_nickname = ''.join(c for c in member.name if c in allowed_characters)
                 purified_nickname = purified_nickname[:guild_settings["max_length"]]
             try:
-                await member.edit(nick=purified_nickname)
+                await member.edit(nick=purified_nickname, reason="Nickname auto-purified on join")
             except discord.Forbidden:
                 pass
             except discord.HTTPException:
@@ -197,7 +197,7 @@ class NicknameManagement(commands.Cog):
                             purified_nickname = purified_nickname[:max_length]
                         if member.display_name != purified_nickname:
                             try:
-                                await member.edit(nick=purified_nickname)
+                                await member.edit(nick=purified_nickname, reason="Nickname auto-purified during cleanup")
                             except discord.Forbidden:
                                 pass
                             except discord.HTTPException:
