@@ -94,27 +94,59 @@ class NicknameManagement(commands.Cog):
 
         total_members = len(ctx.guild.members)
         processed_members = 0
+        changed_nicknames = 0
+        failed_changes = 0
+        character_removal_count = {}
+
+        embed = discord.Embed(title="Nickname Cleanup Progress", color=discord.Color.blue())
+        embed.add_field(name="Total Members", value=total_members, inline=True)
+        embed.add_field(name="Processed Members", value=processed_members, inline=True)
+        embed.add_field(name="Changed Nicknames", value=changed_nicknames, inline=True)
+        embed.add_field(name="Failed Changes", value=failed_changes, inline=True)
+        progress_message = await ctx.send(embed=embed)
 
         for member in ctx.guild.members:
-            purified_nickname = ''.join(c for c in member.display_name if c in allowed_characters)
+            original_nickname = member.display_name
+            purified_nickname = ''.join(c for c in original_nickname if c in allowed_characters)
             purified_nickname = purified_nickname[:max_length]
             if not purified_nickname:
                 purified_nickname = ''.join(c for c in member.name if c in allowed_characters)
                 purified_nickname = purified_nickname[:max_length]
-            if member.display_name != purified_nickname:
+
+            removed_characters = set(original_nickname) - set(purified_nickname)
+            for char in removed_characters:
+                if char in character_removal_count:
+                    character_removal_count[char] += 1
+                else:
+                    character_removal_count[char] = 1
+
+            if original_nickname != purified_nickname:
                 try:
                     await member.edit(nick=purified_nickname)
+                    changed_nicknames += 1
                     await asyncio.sleep(1)  # Sleep to prevent hitting rate limits
                 except discord.Forbidden:
-                    await ctx.send(f"Cannot change nickname for {member.mention} due to lack of permissions.")
-                except discord.HTTPException as e:
-                    await ctx.send(f"An error occurred while changing nickname for {member.mention}: {e}")
+                    failed_changes += 1
+                except discord.HTTPException:
+                    failed_changes += 1
 
             processed_members += 1
             if processed_members % 100 == 0:
-                await ctx.send(f"Processed {processed_members}/{total_members} members...")
+                embed.set_field_at(1, name="Processed Members", value=processed_members, inline=True)
+                embed.set_field_at(2, name="Changed Nicknames", value=changed_nicknames, inline=True)
+                embed.set_field_at(3, name="Failed Changes", value=failed_changes, inline=True)
+                await progress_message.edit(embed=embed)
 
-        await ctx.send("Nickname cleanup completed.")
+        most_removed_characters = sorted(character_removal_count.items(), key=lambda item: item[1], reverse=True)[:5]
+        most_removed_characters_str = ', '.join([f"{char}: {count}" for char, count in most_removed_characters])
+
+        embed = discord.Embed(title="Nickname Cleanup Completed", color=discord.Color.green())
+        embed.add_field(name="Total Members", value=total_members, inline=True)
+        embed.add_field(name="Processed Members", value=processed_members, inline=True)
+        embed.add_field(name="Changed Nicknames", value=changed_nicknames, inline=True)
+        embed.add_field(name="Failed Changes", value=failed_changes, inline=True)
+        embed.add_field(name="Most Removed Characters", value=most_removed_characters_str, inline=False)
+        await progress_message.edit(embed=embed)
 
     async def on_member_update(self, before, after):
         if before.display_name != after.display_name:
