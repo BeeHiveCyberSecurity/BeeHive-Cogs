@@ -106,29 +106,39 @@ class NicknameManagement(commands.Cog):
         progress_message = await ctx.send(embed=embed)
 
         for member in ctx.guild.members:
-            original_nickname = member.display_name
-            purified_nickname = ''.join(c for c in original_nickname if c in allowed_characters)
-            purified_nickname = purified_nickname[:max_length]
-            if not purified_nickname:
-                purified_nickname = ''.join(c for c in member.name if c in allowed_characters)
-                purified_nickname = purified_nickname[:max_length]
-
-            removed_characters = set(original_nickname) - set(purified_nickname)
-            for char in removed_characters:
-                if char in character_removal_count:
-                    character_removal_count[char] += 1
-                else:
-                    character_removal_count[char] = 1
-
-            if original_nickname != purified_nickname:
+            if member.bot:
                 try:
-                    await member.edit(nick=purified_nickname, reason="Nickname purified during cleanup")
+                    await member.edit(nick=None, reason="Clearing bot nickname to restore original name")
                     changed_nicknames += 1
                     await asyncio.sleep(1)  # Sleep to prevent hitting rate limits
                 except discord.Forbidden:
                     failed_changes += 1
                 except discord.HTTPException:
                     failed_changes += 1
+            else:
+                original_nickname = member.display_name
+                purified_nickname = ''.join(c for c in original_nickname if c in allowed_characters)
+                purified_nickname = purified_nickname[:max_length]
+                if not purified_nickname:
+                    purified_nickname = ''.join(c for c in member.name if c in allowed_characters)
+                    purified_nickname = purified_nickname[:max_length]
+
+                removed_characters = set(original_nickname) - set(purified_nickname)
+                for char in removed_characters:
+                    if char in character_removal_count:
+                        character_removal_count[char] += 1
+                    else:
+                        character_removal_count[char] = 1
+
+                if original_nickname != purified_nickname:
+                    try:
+                        await member.edit(nick=purified_nickname, reason="Nickname purified during cleanup")
+                        changed_nicknames += 1
+                        await asyncio.sleep(1)  # Sleep to prevent hitting rate limits
+                    except discord.Forbidden:
+                        failed_changes += 1
+                    except discord.HTTPException:
+                        failed_changes += 1
 
             processed_members += 1
             if processed_members % 100 == 0:
