@@ -98,11 +98,11 @@ class NicknameManagement(commands.Cog):
         failed_changes = 0
         character_removal_count = {}
 
-        embed = discord.Embed(title="Nickname Cleanup Progress", color=discord.Color.blue())
-        embed.add_field(name="Total Members", value=total_members, inline=True)
-        embed.add_field(name="Processed Members", value=processed_members, inline=True)
-        embed.add_field(name="Changed Nicknames", value=changed_nicknames, inline=True)
-        embed.add_field(name="Failed Changes", value=failed_changes, inline=True)
+        embed = discord.Embed(title="Nickname cleanup in progress", color=discord.Color.blue())
+        embed.add_field(name="Total members", value=total_members, inline=True)
+        embed.add_field(name="Processed members", value=processed_members, inline=True)
+        embed.add_field(name="Changed nicknames", value=changed_nicknames, inline=True)
+        embed.add_field(name="Failed changes", value=failed_changes, inline=True)
         progress_message = await ctx.send(embed=embed)
 
         for member in ctx.guild.members:
@@ -132,20 +132,20 @@ class NicknameManagement(commands.Cog):
 
             processed_members += 1
             if processed_members % 100 == 0:
-                embed.set_field_at(1, name="Processed Members", value=processed_members, inline=True)
-                embed.set_field_at(2, name="Changed Nicknames", value=changed_nicknames, inline=True)
-                embed.set_field_at(3, name="Failed Changes", value=failed_changes, inline=True)
+                embed.set_field_at(1, name="Processed members", value=processed_members, inline=True)
+                embed.set_field_at(2, name="Changed nicknames", value=changed_nicknames, inline=True)
+                embed.set_field_at(3, name="Failed changes", value=failed_changes, inline=True)
                 await progress_message.edit(embed=embed)
 
         most_removed_characters = sorted(character_removal_count.items(), key=lambda item: item[1], reverse=True)[:5]
         most_removed_characters_str = ', '.join([f"{char}: {count}" for char, count in most_removed_characters])
 
-        embed = discord.Embed(title="Nickname Cleanup Completed", color=discord.Color.green())
-        embed.add_field(name="Total Members", value=total_members, inline=True)
-        embed.add_field(name="Processed Members", value=processed_members, inline=True)
-        embed.add_field(name="Changed Nicknames", value=changed_nicknames, inline=True)
-        embed.add_field(name="Failed Changes", value=failed_changes, inline=True)
-        embed.add_field(name="Most Removed Characters", value=most_removed_characters_str, inline=False)
+        embed = discord.Embed(title="Nickname cleanup finished", color=discord.Color.green())
+        embed.add_field(name="Total members", value=total_members, inline=True)
+        embed.add_field(name="Processed members", value=processed_members, inline=True)
+        embed.add_field(name="Changed nicknames", value=changed_nicknames, inline=True)
+        embed.add_field(name="Failed changes", value=failed_changes, inline=True)
+        embed.add_field(name="Most removed characters", value=most_removed_characters_str, inline=False)
         await progress_message.edit(embed=embed)
 
     async def on_member_update(self, before, after):
