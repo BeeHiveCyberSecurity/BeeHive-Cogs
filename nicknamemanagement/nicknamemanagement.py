@@ -98,7 +98,7 @@ class NicknameManagement(commands.Cog):
         failed_changes = 0
         character_removal_count = {}
 
-        embed = discord.Embed(title="Nickname cleanup in progress", color=discord.Color.blue())
+        embed = discord.Embed(title="Nickname cleanup in progress", color=0xfffffe)
         embed.add_field(name="Total members", value=total_members, inline=True)
         embed.add_field(name="Processed members", value=processed_members, inline=True)
         embed.add_field(name="Changed nicknames", value=changed_nicknames, inline=True)
