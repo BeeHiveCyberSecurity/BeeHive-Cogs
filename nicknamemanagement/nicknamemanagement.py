@@ -15,6 +15,7 @@ class NicknameManagement(commands.Cog):
         }
         self.config.register_guild(**default_guild)
         self.bot.add_listener(self.on_member_update, "on_member_update")
+        self.bot.add_listener(self.on_member_join, "on_member_join")
         self.bot.loop.create_task(self.cleanup_nicknames())
 
     @commands.guild_only()
@@ -131,6 +132,22 @@ class NicknameManagement(commands.Cog):
                     pass
                 except discord.HTTPException:
                     pass
+
+    async def on_member_join(self, member):
+        guild_settings = await self.config.guild(member.guild).all()
+        if guild_settings["auto_purify"]:
+            allowed_characters = guild_settings["allowed_characters"]
+            purified_nickname = ''.join(c for c in member.display_name if c in allowed_characters)
+            purified_nickname = purified_nickname[:guild_settings["max_length"]]
+            if not purified_nickname:
+                purified_nickname = ''.join(c for c in member.name if c in allowed_characters)
+                purified_nickname = purified_nickname[:guild_settings["max_length"]]
+            try:
+                await member.edit(nick=purified_nickname)
+            except discord.Forbidden:
+                pass
+            except discord.HTTPException:
+                pass
 
     async def cleanup_nicknames(self):
         await self.bot.wait_until_ready()
