@@ -123,6 +123,11 @@ class NicknameManagement(commands.Cog):
                     purified_nickname = ''.join(c for c in member.name if c in allowed_characters)
                     purified_nickname = purified_nickname[:max_length]
 
+                # Ensure the nickname is alphanumeric
+                if not purified_nickname.isalnum():
+                    purified_nickname = ''.join(c for c in purified_nickname if c.isalnum())
+                    purified_nickname = purified_nickname[:max_length]
+
                 removed_characters = set(original_nickname) - set(purified_nickname)
                 for char in removed_characters:
                     if char in character_removal_count:
