@@ -110,7 +110,7 @@ class NicknameManagement(commands.Cog):
                 try:
                     await member.edit(nick=None, reason="Clearing bot nickname to restore original name")
                     changed_nicknames += 1
-                    await asyncio.sleep(1)  # Sleep to prevent hitting rate limits
+                    await asyncio.sleep(1)
                 except discord.Forbidden:
                     failed_changes += 1
                 except discord.HTTPException:
@@ -123,7 +123,6 @@ class NicknameManagement(commands.Cog):
                     purified_nickname = ''.join(c for c in member.name if c in allowed_characters)
                     purified_nickname = purified_nickname[:max_length]
 
-                # Ensure the nickname is alphanumeric
                 if not purified_nickname.isalnum():
                     purified_nickname = ''.join(c for c in purified_nickname if c.isalnum())
                     purified_nickname = purified_nickname[:max_length]
@@ -139,7 +138,7 @@ class NicknameManagement(commands.Cog):
                     try:
                         await member.edit(nick=purified_nickname, reason="Nickname purified during cleanup")
                         changed_nicknames += 1
-                        await asyncio.sleep(1)  # Sleep to prevent hitting rate limits
+                        await asyncio.sleep(1)
                     except discord.Forbidden:
                         failed_changes += 1
                     except discord.HTTPException:
