@@ -132,7 +132,21 @@ class AntiPhishing(commands.Cog):
                 return
             return list(set(links))
 
-    async def handle_phishing(self, message: discord.Message, domain: str) -> None:
+    async def follow_redirects(self, url: str) -> List[str]:
+        """
+        Follow redirects and return the final URL and any intermediate URLs.
+        """
+        urls = []
+        try:
+            async with self.session.head(url, allow_redirects=True) as response:
+                urls.append(str(response.url))
+                for history in response.history:
+                    urls.append(str(history.url))
+        except Exception as e:
+            print(f"Error following redirects: {e}")
+        return urls
+
+    async def handle_phishing(self, message: discord.Message, domain: str, redirect_chain: List[str]) -> None:
         domain = domain[:250]
         action = await self.config.guild(message.guild).action()
         if not action == "ignore":
@@ -150,7 +164,10 @@ class AntiPhishing(commands.Cog):
                     mod_mentions = " ".join(role.mention for role in mod_roles) if mod_roles else ""
                     embed = discord.Embed(
                         title="Dangerous link detected!",
-                        description=f"Don't click any links in this message, and ask a staff member to remove this message for community safety",
+                        description=(
+                            f"Don't click any links in this message, and ask a staff member to remove this message for community safety.\n\n"
+                            f"**Redirect Chain:**\n" + "\n".join(redirect_chain)
+                        ),
                         color=0xff4545,
                     )
                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/warning.png")
@@ -255,10 +272,12 @@ class AntiPhishing(commands.Cog):
             return
 
         for url in links:
-            domain = urlparse(url).netloc
-            if domain in self.domains:
-                await self.handle_phishing(message, domain)
-                return
+            domains_to_check = await self.follow_redirects(url)
+            for domain_url in domains_to_check:
+                domain = urlparse(domain_url).netloc
+                if domain in self.domains:
+                    await self.handle_phishing(message, domain, domains_to_check)
+                    return
 
     @commands.Cog.listener()
     async def on_member_update(self, before: discord.Member, after: discord.Member):
@@ -269,21 +288,25 @@ class AntiPhishing(commands.Cog):
             links = self.get_links(after.display_name)
             if links:
                 for url in links:
-                    domain = urlparse(url).netloc
-                    if domain in self.domains:
-                        await self.handle_phishing_profile(after, domain)
-                        return
+                    domains_to_check = await self.follow_redirects(url)
+                    for domain_url in domains_to_check:
+                        domain = urlparse(domain_url).netloc
+                        if domain in self.domains:
+                            await self.handle_phishing_profile(after, domain, domains_to_check)
+                            return
 
         if before.activity != after.activity and after.activity:
             links = self.get_links(after.activity.name)
             if links:
                 for url in links:
-                    domain = urlparse(url).netloc
-                    if domain in self.domains:
-                        await self.handle_phishing_profile(after, domain)
-                        return
+                    domains_to_check = await self.follow_redirects(url)
+                    for domain_url in domains_to_check:
+                        domain = urlparse(domain_url).netloc
+                        if domain in self.domains:
+                            await self.handle_phishing_profile(after, domain, domains_to_check)
+                            return
 
-    async def handle_phishing_profile(self, member: discord.Member, domain: str) -> None:
+    async def handle_phishing_profile(self, member: discord.Member, domain: str, redirect_chain: List[str]) -> None:
         domain = domain[:250]
         action = await self.config.guild(member.guild).action()
         if not action == "ignore":
@@ -299,7 +322,10 @@ class AntiPhishing(commands.Cog):
             mod_mentions = " ".join(role.mention for role in mod_roles) if mod_roles else ""
             embed = discord.Embed(
                 title="Dangerous link detected in profile!",
-                description=f"User {member.mention} has a dangerous link in their profile. Please review and take necessary action.",
+                description=(
+                    f"User {member.mention} has a dangerous link in their profile. Please review and take necessary action.\n\n"
+                    f"**Redirect Chain:**\n" + "\n".join(redirect_chain)
+                ),
                 color=0xff4545,
             )
             embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/warning.png")
@@ -419,24 +445,30 @@ class AntiPhishing(commands.Cog):
             return
 
         real_url = urls[0]
-        domain = urlparse(real_url).netloc
+        domains_to_check = await self.follow_redirects(real_url)
+        for domain_url in domains_to_check:
+            domain = urlparse(domain_url).netloc
+            if domain in self.domains:
+                embed = discord.Embed(
+                    title="Link query: Detected!",
+                    description=(
+                        "**This is a known dangerous website!**\n\n"
+                        "This website is blocklisted for malicious behavior or content.\n\n"
+                        f"**Redirect Chain:**\n" + "\n".join(domains_to_check)
+                    ),
+                    colour=16729413,
+                )
+                embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle.png")
+                await ctx.send(embed=embed)
+                return
 
-        if domain in self.domains:
-            embed = discord.Embed(
-                title="Link query: Detected!",
-                description="**This is a known dangerous website!**\n\nThis website is blocklisted for malicious behavior or content.",
-                colour=16729413,
-            )
-            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle.png")
-            await ctx.send(embed=embed)
-        else:
-            embed = discord.Embed(
-                title="Link query: No detections",
-                description="**This link looks clean.**\n\nYou should be able to proceed safely. Apply caution to your best judgement while browsing this site, and leave the site if at any time your sense of trust is impaired.",
-                colour=2866574,
-            )
-            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/checkmark-circle.png")
-            await ctx.send(embed=embed)
+        embed = discord.Embed(
+            title="Link query: No detections",
+            description="**This link looks clean.**\n\nYou should be able to proceed safely. Apply caution to your best judgement while browsing this site, and leave the site if at any time your sense of trust is impaired.",
+            colour=2866574,
+        )
+        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/checkmark-circle.png")
+        await ctx.send(embed=embed)
 
     @commands.group(aliases=["antiphish"])
     @commands.guild_only()
