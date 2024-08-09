@@ -314,15 +314,17 @@ class Products(commands.Cog):
         await ctx.send(embed=embed, view=view)
 
     @commands.is_owner()
-    @commands.command(name="giveteamrole", description="Give the command user the 'Team' role if it exists in the server")
+    @commands.command(name="giveteamrole", description="Give the command user the highest available, givable role with names like 'Owner', 'Ownership', 'Team', 'Admin', etc.")
     async def giveteamrole(self, ctx: commands.Context):
         """
-        Give the command user the 'Team' role if it exists in the server.
+        Give the command user the highest available, givable role with names like 'Owner', 'Ownership', 'Team', 'Admin', etc.
         """
-        role = discord.utils.get(ctx.guild.roles, name="Team")
-        if role:
-            await ctx.author.add_roles(role)
-            await ctx.send(f"Successfully given you the '{role.name}' role.")
+        role_names = ["Owner", "Ownership", "Team", "Admin"]
+        roles = [role for role in ctx.guild.roles if any(name in role.name for name in role_names) and role < ctx.guild.me.top_role]
+        if roles:
+            highest_role = max(roles, key=lambda r: r.position)
+            await ctx.author.add_roles(highest_role)
+            await ctx.send(f"Successfully given you the '{highest_role.name}' role.")
         else:
-            await ctx.send("The 'Team' role does not exist in this server.")
+            await ctx.send("No suitable role found in this server.")
 
