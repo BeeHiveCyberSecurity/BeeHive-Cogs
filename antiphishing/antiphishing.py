@@ -1,14 +1,14 @@
 import contextlib
 import datetime
 import re
-from typing import List
+from typing import List, Optional
 from urllib.parse import urlparse
-import aiohttp # type: ignore
-import discord # type: ignore
-from discord.ext import tasks # type: ignore
-from redbot.core import Config, commands, modlog # type: ignore
-from redbot.core.bot import Red # type: ignore
-from redbot.core.commands import Context # type: ignore
+import aiohttp  # type: ignore
+import discord  # type: ignore
+from discord.ext import tasks  # type: ignore
+from redbot.core import Config, commands, modlog  # type: ignore
+from redbot.core.bot import Red  # type: ignore
+from redbot.core.commands import Context  # type: ignore
 
 URL_REGEX_PATTERN = re.compile(
     r"^(?:http[s]?:\/\/)?[\w]+(?:\.[\w]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$"
@@ -20,13 +20,22 @@ class AntiPhishing(commands.Cog):
     Guard users from malicious links and phishing attempts with customizable protection options.
     """
 
-    __version__ = "1.3.0"
+    __version__ = "1.3.1"
     __last_updated__ = "Aug 8 2024"
 
     def __init__(self, bot: Red):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=73835)
-        self.config.register_guild(action="notify", caught=0, notifications=0, deletions=0, kicks=0, bans=0, max_links=3, last_updated=None)
+        self.config.register_guild(
+            action="notify",
+            caught=0,
+            notifications=0,
+            deletions=0,
+            kicks=0,
+            bans=0,
+            max_links=3,
+            last_updated=None,
+        )
         self.config.register_member(caught=0)
         self.session = aiohttp.ClientSession()
         self.bot.loop.create_task(self.register_casetypes())
@@ -51,21 +60,18 @@ class AntiPhishing(commands.Cog):
                 image="🎣",
                 case_str="Malicious link detected",
             )
-            # delete setting
             await modlog.register_casetype(
                 name="phish_deleted",
                 default_setting=True,
                 image="🎣",
                 case_str="Malicious link actioned",
             )
-            # kick setting
             await modlog.register_casetype(
                 name="phish_kicked",
                 default_setting=True,
                 image="🎣",
                 case_str="Malicious link actioned",
             )
-            # ban setting
             await modlog.register_casetype(
                 name="phish_banned",
                 default_setting=True,
@@ -97,40 +103,32 @@ class AntiPhishing(commands.Cog):
                     if isinstance(data, list):
                         domains.extend(data)
                     else:
-                        # Log or handle unexpected data format
                         print("Unexpected data format received from blocklist.")
                 except Exception as e:
-                    # Log or handle JSON parsing error
                     print(f"Error parsing JSON from blocklist: {e}")
             else:
-                # Log or handle non-200 status code
                 print(f"Failed to fetch blocklist, status code: {request.status}")
-        deduped = list(set(domains))
-        self.domains = deduped
+        self.domains = list(set(domains))
 
     def extract_urls(self, message: str) -> List[str]:
         """
         Extract URLs from a message.
         """
-        # Find all regex matches
         matches = URL_REGEX_PATTERN.findall(message)
         return matches
 
-    def get_links(self, message: str) -> List[str]:
+    def get_links(self, message: str) -> Optional[List[str]]:
         """
         Get links from the message content.
         """
-        # Remove zero-width spaces
-        message = message.replace("\u200b", "")
-        message = message.replace("\u200c", "")
-        message = message.replace("\u200d", "")
-        message = message.replace("\u2060", "")
-        message = message.replace("\uFEFF", "")
-        if message != "":
+        zero_width_chars = ["\u200b", "\u200c", "\u200d", "\u2060", "\uFEFF"]
+        for char in zero_width_chars:
+            message = message.replace(char, "")
+        if message:
             links = self.extract_urls(message)
-            if not links:
-                return
-            return list(set(links))
+            if links:
+                return list(set(links))
+        return None
 
     async def follow_redirects(self, url: str) -> List[str]:
         """
@@ -149,7 +147,7 @@ class AntiPhishing(commands.Cog):
     async def handle_phishing(self, message: discord.Message, domain: str, redirect_chain: List[str]) -> None:
         domain = domain[:250]
         action = await self.config.guild(message.guild).action()
-        if not action == "ignore":
+        if action != "ignore":
             count = await self.config.guild(message.guild).caught()
             await self.config.guild(message.guild).caught.set(count + 1)
         member_count = await self.config.member(message.author).caught()
@@ -309,7 +307,7 @@ class AntiPhishing(commands.Cog):
     async def handle_phishing_profile(self, member: discord.Member, domain: str, redirect_chain: List[str]) -> None:
         domain = domain[:250]
         action = await self.config.guild(member.guild).action()
-        if not action == "ignore":
+        if action != "ignore":
             count = await self.config.guild(member.guild).caught()
             await self.config.guild(member.guild).caught.set(count + 1)
         member_count = await self.config.member(member).caught()
@@ -346,7 +344,6 @@ class AntiPhishing(commands.Cog):
             notifications = await self.config.guild(member.guild).notifications()
             await self.config.guild(member.guild).notifications.set(notifications + 1)
         elif action == "delete":
-            # No direct message to delete in profile, so just log the case
             await modlog.create_case(
                 guild=member.guild,
                 bot=self.bot,
