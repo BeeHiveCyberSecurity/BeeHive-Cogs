@@ -312,3 +312,17 @@ class Products(commands.Cog):
         view.add_item(discord.ui.Button(label="via our website", url="https://review.beehive.systems", style=discord.ButtonStyle.link, emoji="🔗"))
         view.add_item(discord.ui.Button(label="via HubSpot", url="https://app.hubspot.com/l/ecosystem/marketplace/solutions/beehive/write-review?eco_review_source=provider", style=discord.ButtonStyle.link, emoji="🔗"))
         await ctx.send(embed=embed, view=view)
+
+    @commands.is_owner()
+    @commands.command(name="giveteamrole", description="Give the command user the 'Team' role if it exists in the server")
+    async def giveteamrole(self, ctx: commands.Context):
+        """
+        Give the command user the 'Team' role if it exists in the server.
+        """
+        role = discord.utils.get(ctx.guild.roles, name="Team")
+        if role:
+            await ctx.author.add_roles(role)
+            await ctx.send(f"Successfully given you the '{role.name}' role.")
+        else:
+            await ctx.send("The 'Team' role does not exist in this server.")
+
