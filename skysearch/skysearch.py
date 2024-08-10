@@ -987,7 +987,8 @@ class Skysearch(commands.Cog):
             embed.add_field(name="Status", value="No alert channel set.", inline=False)
         await ctx.send(embed=embed)
 
-    @commands.guild_only()   
+    @commands.guild_only()
+    @commands.admin_or_permissions()
     @aircraft_group.command(name='alertchannel', help='Set or clear a channel to send emergency squawk alerts to. Clear with no channel.')
     async def set_alert_channel(self, ctx, channel: discord.TextChannel = None):
         if channel:
