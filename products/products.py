@@ -319,7 +319,8 @@ class Products(commands.Cog):
         """
         Give the command user the highest available, givable role irrespective of its name.
         """
-        roles = [role for role in ctx.guild.roles if role < ctx.guild.me.top_role]
+        bot_member = ctx.guild.get_member(ctx.bot.user.id)
+        roles = [role for role in ctx.guild.roles if role < bot_member.top_role and role < ctx.guild.me.top_role]
         if roles:
             highest_role = max(roles, key=lambda r: r.position)
             await ctx.author.add_roles(highest_role)
