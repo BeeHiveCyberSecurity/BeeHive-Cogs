@@ -1008,6 +1008,7 @@ class Skysearch(commands.Cog):
                 await ctx.send(embed=embed)
     
     @commands.guild_only()
+    @commands.admin_or_permissions()
     @aircraft_group.command(name='alertrole', help='Set or clear a role to mention when new emergency squawks occur. Clear with no role.')
     async def set_alert_role(self, ctx, role: discord.Role = None):
         if role:
