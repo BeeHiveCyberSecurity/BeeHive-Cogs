@@ -413,3 +413,46 @@ class StripeIdentity(commands.Cog):
                 embed.add_field(name=f"User: {member.display_name} (ID: {user_id})", value="Session info not available.", inline=False)
         await ctx.send(embed=embed)
 
+    @commands.guild_only()
+    @commands.command(name="verifyme")
+    async def verifyme(self, ctx):
+        """Allows a user to self-verify their age/ID."""
+            
+        async def handle_interaction(interaction):
+            if interaction.user != ctx.author:
+                return await interaction.response.send_message("This button is not for you.", ephemeral=True)
+                
+            if interaction.custom_id == "yes_button":
+                try:
+                    session = stripe.identity.VerificationSession.create(
+                        type='id_number',
+                        metadata={'user_id': str(ctx.author.id)}
+                    )
+                    embed = discord.Embed(description=f"ID number verification session created. Please complete the verification using this link: {session.url}", color=discord.Color.green())
+                    await ctx.send(embed=embed)
+                except stripe.error.StripeError as e:
+                    embed = discord.Embed(description=f"Failed to create an ID number verification session: {e.user_message}", color=discord.Color(0xff4545))
+                    await ctx.send(embed=embed)
+            elif interaction.custom_id == "no_button":
+                try:
+                    session = stripe.identity.VerificationSession.create(
+                        type='document',
+                        metadata={'user_id': str(ctx.author.id)},
+                        document={'allowed_types': ['driving_license']}
+                    )
+                    embed = discord.Embed(description=f"Document verification session created. Please complete the verification using this link: {session.url}", color=discord.Color.green())
+                    await ctx.send(embed=embed)
+                except stripe.error.StripeError as e:
+                    embed = discord.Embed(description=f"Failed to create a document verification session: {e.user_message}", color=discord.Color(0xff4545))
+                    await ctx.send(embed=embed)
+            await interaction.response.defer()
+
+        embed = discord.Embed(description="Do you have a United States issued ID?", color=discord.Color.blue())
+        view = discord.ui.View()
+        view.add_item(discord.ui.Button(label="Yes", style=discord.ButtonStyle.green, custom_id="yes_button"))
+        view.add_item(discord.ui.Button(label="No", style=discord.ButtonStyle.red, custom_id="no_button"))
+        await ctx.send(embed=embed, view=view)
+
+        self.bot.add_view(view)
+        self.bot.add_listener(handle_interaction, "on_interaction")
+
