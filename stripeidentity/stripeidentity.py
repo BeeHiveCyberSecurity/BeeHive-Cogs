@@ -239,6 +239,7 @@ class StripeIdentity(commands.Cog):
                 )
                 await user.send(embed=dm_embed)
                 await self.send_embed(ctx, f":x: **Verification for {user.display_name} was not completed in time.**", discord.Color(0xff4545))
+                stripe.identity.VerificationSession.cancel(verification_session.id)  # Cancel the session if not completed
             await self.config.pending_verification_sessions.clear_raw(str(user.id))
         except stripe.error.StripeError as e:
             await self.send_embed(ctx, f":x: **Failed to create a verification session**\n`{e.user_message}`", discord.Color(0xff4545))
