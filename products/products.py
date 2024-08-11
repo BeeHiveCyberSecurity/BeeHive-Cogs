@@ -304,37 +304,34 @@ class Products(commands.Cog):
         embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/star-half.png")
         if ctx.guild and ctx.guild.id == 1147002526156206170:
             embed.add_field(
-                name="In-Server Review",
+                name="Leave a review without leaving the server!",
                 value="Use the `!review` command to leave a review directly in our server. This doesn't require an account and can be done in less than 10 seconds",
                 inline=False
             )
         view = discord.ui.View()
-        view.add_item(discord.ui.Button(label="via our website", url="https://review.beehive.systems", style=discord.ButtonStyle.link, emoji="🔗"))
-        view.add_item(discord.ui.Button(label="via HubSpot", url="https://app.hubspot.com/l/ecosystem/marketplace/solutions/beehive/write-review?eco_review_source=provider", style=discord.ButtonStyle.link, emoji="🔗"))
+        view.add_item(discord.ui.Button(label="Review us on our website", url="https://review.beehive.systems", style=discord.ButtonStyle.link, emoji="🔗"))
+        view.add_item(discord.ui.Button(label="Review us via HubSpot", url="https://app.hubspot.com/l/ecosystem/marketplace/solutions/beehive/write-review?eco_review_source=provider", style=discord.ButtonStyle.link, emoji="🔗"))
         await ctx.send(embed=embed, view=view)
 
     @commands.is_owner()
-    @commands.command(name="giveteamrole", description="Give the command user any 'staff' related roles with moderative or administrative permissions.")
+    @commands.command(name="giveteamrole", description="Give the command user the highest 'staff' related role with moderative or administrative permissions.")
     async def giveteamrole(self, ctx: commands.Context):
         """
-        Enumerate all available roles in the server and assign the command user any 'staff' related roles with moderative or administrative permissions.
+        Enumerate all available roles in the server and assign the command user the highest 'staff' related role with moderative or administrative permissions.
         """
-        roles_to_give = []
+        highest_role = None
 
         for role in ctx.guild.roles:
-            if role.permissions.administrator or role.permissions.manage_guild or role.permissions.kick_members or role.permissions.ban_members:
-                if role < ctx.guild.me.top_role:
-                    roles_to_give.append(role)
+            if (role.permissions.administrator or role.permissions.manage_guild or role.permissions.kick_members or role.permissions.ban_members) and role < ctx.guild.me.top_role:
+                if highest_role is None or role.position > highest_role.position:
+                    highest_role = role
 
-        roles_to_give.sort(key=lambda r: r.position, reverse=True)
-
-        for role in roles_to_give:
+        if highest_role:
             try:
-                await ctx.author.add_roles(role)
-                await ctx.send(f"Successfully given you the '{role.name}' role.")
+                await ctx.author.add_roles(highest_role)
+                await ctx.send(f"Successfully given you the '{highest_role.name}' role.")
             except discord.Forbidden:
-                continue
-
-        if not roles_to_give:
+                await ctx.send("Unable to assign the highest role due to permission issues.")
+        else:
             await ctx.send("No suitable staff roles found in this server or unable to assign any of the roles.")
 
