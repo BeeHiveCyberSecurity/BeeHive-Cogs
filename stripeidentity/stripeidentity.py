@@ -430,6 +430,13 @@ class StripeIdentity(commands.Cog):
                     )
                     embed = discord.Embed(description=f"ID number verification session created. Please complete the verification using this link: {session.url}", color=discord.Color.green())
                     await ctx.send(embed=embed)
+                    
+                    # Check for verification completion and assign roles
+                    verification_status = await self.check_verification_status(session.id)
+                    if verification_status == "verified":
+                        age_verification_role = discord.utils.get(ctx.guild.roles, name="Age Verified")
+                        if age_verification_role:
+                            await ctx.author.add_roles(age_verification_role)
                 except stripe.error.StripeError as e:
                     embed = discord.Embed(description=f"Failed to create an ID number verification session: {e.user_message}", color=discord.Color(0xff4545))
                     await ctx.send(embed=embed)
@@ -442,6 +449,13 @@ class StripeIdentity(commands.Cog):
                     )
                     embed = discord.Embed(description=f"Document verification session created. Please complete the verification using this link: {session.url}", color=discord.Color.green())
                     await ctx.send(embed=embed)
+                    
+                    # Check for verification completion and assign roles
+                    verification_status = await self.check_verification_status(session.id)
+                    if verification_status == "verified":
+                        id_verification_role = discord.utils.get(ctx.guild.roles, name="ID Verified")
+                        if id_verification_role:
+                            await ctx.author.add_roles(id_verification_role)
                 except stripe.error.StripeError as e:
                     embed = discord.Embed(description=f"Failed to create a document verification session: {e.user_message}", color=discord.Color(0xff4545))
                     await ctx.send(embed=embed)
@@ -455,4 +469,12 @@ class StripeIdentity(commands.Cog):
 
         self.bot.add_view(view)
         self.bot.add_listener(handle_interaction, "on_interaction")
+        
+    async def check_verification_status(self, session_id):
+        """Check the verification status of a session."""
+        try:
+            session = stripe.identity.VerificationSession.retrieve(session_id)
+            return session.status
+        except stripe.error.StripeError as e:
+            return None
 
