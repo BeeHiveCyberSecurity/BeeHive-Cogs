@@ -170,8 +170,7 @@ class StripeIdentity(commands.Cog):
             decline_button = discord.ui.Button(label="Decline verification", style=discord.ButtonStyle.danger)
             async def decline_verification(interaction: discord.Interaction):
                 if interaction.user.id == user.id:
-                    await interaction.response.send_message(f"You have declined the verification and have been banned from {ctx.guild.name}.", ephemeral=True)
-                    await ctx.guild.ban(user, reason="User declined age verification")
+                    await interaction.response.send_message(f"You have declined the verification.", ephemeral=True)
                     await self.config.pending_verification_sessions.clear_raw(str(user.id))
             decline_button.callback = decline_verification
             view.add_item(decline_button)
@@ -196,9 +195,11 @@ class StripeIdentity(commands.Cog):
                 status, session = await check_verification_status(verification_session.id)
                 if isinstance(status, str) and status in ['consent_declined', 'device_unsupported', 'under_supported_age', 'phone_otp_declined', 'email_verification_declined']:
                     await self.send_embed(ctx, f":x: **Verification failed due to `{status.replace('_', ' ')}`**", discord.Color(0xff4545))
+                    await user.send(f":x: **Verification failed due to `{status.replace('_', ' ')}`**")
                     break
                 elif status == 'abandoned':
                     await self.send_embed(ctx, f":x: **Verification session for {user.display_name} has been abandoned.**", discord.Color(0xff4545))
+                    await user.send(f":x: **Verification session for {user.display_name} has been abandoned.**")
                     break
                 elif status == 'verified':
                     verification_channel = self.bot.get_channel(self.verification_channel_id)
@@ -209,14 +210,13 @@ class StripeIdentity(commands.Cog):
                             dm_embed = discord.Embed(
                                 title="Underage user detected",
                                 description=(
-                                    "You have been banned from the server because you are under 18.\n\n"
+                                    "You are under 18 and cannot be verified.\n\n"
                                     "You may return once you are 18 years of age or older...\n\n"
                                     "**If you have any questions, please contact a staff member.**"
                                 ),
                                 color=discord.Color(0xff4545)
                             )
                             await user.send(embed=dm_embed)
-                            await ctx.guild.ban(user, reason="User is underage - ID Validated by BeeHive")
                         else:
                             age_verified_role = ctx.guild.get_role(self.age_verified_role_id)
                             if age_verified_role:
@@ -234,16 +234,18 @@ class StripeIdentity(commands.Cog):
             else:
                 dm_embed = discord.Embed(
                     title="Verification failure",
-                    description=f"Verification was not completed in time. You have been removed from the server {ctx.guild.name}.",
+                    description=f"Verification was not completed in time. Please try again.",
                     color=discord.Color(0xff4545)
                 )
                 await user.send(embed=dm_embed)
-                await ctx.guild.kick(user, reason="Did not verify age")
+                await self.send_embed(ctx, f":x: **Verification for {user.display_name} was not completed in time.**", discord.Color(0xff4545))
             await self.config.pending_verification_sessions.clear_raw(str(user.id))
         except stripe.error.StripeError as e:
             await self.send_embed(ctx, f":x: **Failed to create a verification session**\n`{e.user_message}`", discord.Color(0xff4545))
         except discord.HTTPException as e:
             await self.send_embed(ctx, f":x: **Failed to send DM to {user.display_name}**\n`{e.text}`", discord.Color(0xff4545))
+        except Exception as e:
+            await self.send_embed(ctx, f":x: **An unexpected error occurred**\n`{str(e)}`", discord.Color(0xff4545))
 
     @commands.command(name="identitycheck")
     @commands.guild_only()
