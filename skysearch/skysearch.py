@@ -597,7 +597,7 @@ class Skysearch(commands.Cog):
                         embed.set_footer(text=f"Photo by {photographer}")
 
                     view = discord.ui.View()
-                    view.add_item(discord.ui.Button(label=f"Track {aircraft_hex} live", url=f"https://globe.airplanes.live/{aircraft_hex}"))
+                    view.add_item(discord.ui.Button(label=f"Track {aircraft_hex} live", url=f"https://globe.airplanes.live/?icao={aircraft_hex}"))
 
                     return embed, view
 
