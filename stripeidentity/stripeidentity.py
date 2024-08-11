@@ -339,7 +339,6 @@ class StripeIdentity(commands.Cog):
                         await verification_channel.send(embed=result_embed)
                     break
             else:
-                await asyncio.sleep(900)  # Wait for 15 minutes
                 status, session = await check_verification_status(verification_session.id)
                 if status == 'cancelled':
                     await self.send_embed(ctx, f"Identity verification for {user.display_name} has been cancelled.", discord.Color.orange())
@@ -347,12 +346,12 @@ class StripeIdentity(commands.Cog):
                     await self.send_embed(ctx, f"Identity verification failed due to {status.replace('_', ' ')}.", discord.Color(0xff4545))
                 elif status != 'verified':
                     dm_embed = discord.Embed(
-                        title="Verification Incomplete",
-                        description=f"Identity verification was not completed in time. You have been removed from the server {ctx.guild.name}.",
+                        title="Verification failed",
+                        description=f"Identity verification for {ctx.guild.name} was not completed in time.",
                         color=discord.Color(0xff4545)
                     )
                     await dm_message.edit(embed=dm_embed)
-                    await ctx.guild.ban(user, reason="Did not verify identity in time")
+                    await stripe.identity.VerificationSession.cancel(verification_session.id)
                 else:
                     id_verified_role = ctx.guild.get_role(self.id_verified_role_id)
                     if id_verified_role:
