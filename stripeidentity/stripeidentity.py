@@ -356,7 +356,7 @@ class StripeIdentity(commands.Cog):
                         color=discord.Color(0xff4545)
                     )
                     await dm_message.edit(embed=dm_embed)
-                    await stripe.identity.VerificationSession.cancel(verification_session.id)
+                    stripe.identity.VerificationSession.cancel(verification_session.id)
                 else:
                     id_verified_role = ctx.guild.get_role(self.id_verified_role_id)
                     if id_verified_role:
