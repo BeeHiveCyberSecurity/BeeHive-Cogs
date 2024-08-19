@@ -20,8 +20,8 @@ class AntiPhishing(commands.Cog):
     Guard users from malicious links and phishing attempts with customizable protection options.
     """
 
-    __version__ = "1.3.1"
-    __last_updated__ = "Aug 8 2024"
+    __version__ = "1.3.2"
+    __last_updated__ = "Aug 19 2024"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -84,7 +84,7 @@ class AntiPhishing(commands.Cog):
         domains = []
 
         headers = {
-            "X-Identity": f"BeeHive AntiPhishing v{self.__version__} (https://www.beehive.systems/sentri)",
+            "X-Identity": f"BeeHive CrowdSense User v{self.__version__} (https://www.beehive.systems/)",
         }
 
         async with self.session.get(
@@ -135,8 +135,11 @@ class AntiPhishing(commands.Cog):
         Follow redirects and return the final URL and any intermediate URLs.
         """
         urls = []
+        headers = {
+            "User-Agent": "BeeHive CrowdSense (https://www.beehive.systems)"
+        }
         try:
-            async with self.session.head(url, allow_redirects=True) as response:
+            async with self.session.head(url, allow_redirects=True, headers=headers) as response:
                 urls.append(str(response.url))
                 for history in response.history:
                     urls.append(str(history.url))
@@ -160,11 +163,12 @@ class AntiPhishing(commands.Cog):
                 with contextlib.suppress(discord.NotFound):
                     mod_roles = await self.bot.get_mod_roles(message.guild)
                     mod_mentions = " ".join(role.mention for role in mod_roles) if mod_roles else ""
+                    redirect_chain_str = " redirects to ".join(redirect_chain)
                     embed = discord.Embed(
                         title="Dangerous link detected!",
                         description=(
                             f"Don't click any links in this message, and ask a staff member to remove this message for community safety.\n\n"
-                            f"**Redirect Chain:**\n" + "\n".join(redirect_chain)
+                            f"**Link trajectory**\n{redirect_chain_str}"
                         ),
                         color=0xff4545,
                     )
