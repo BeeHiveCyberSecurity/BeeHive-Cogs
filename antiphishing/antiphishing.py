@@ -20,7 +20,7 @@ class AntiPhishing(commands.Cog):
     Guard users from malicious links and phishing attempts with customizable protection options.
     """
 
-    __version__ = "1.3.2"
+    __version__ = "1.3.2.1"
     __last_updated__ = "Aug 19 2024"
 
     def __init__(self, bot: Red):
@@ -163,7 +163,7 @@ class AntiPhishing(commands.Cog):
                 with contextlib.suppress(discord.NotFound):
                     mod_roles = await self.bot.get_mod_roles(message.guild)
                     mod_mentions = " ".join(role.mention for role in mod_roles) if mod_roles else ""
-                    redirect_chain_str = " redirects to ".join(redirect_chain)
+                    redirect_chain_str = " from ".join(redirect_chain)
                     embed = discord.Embed(
                         title="Dangerous link detected!",
                         description=(
