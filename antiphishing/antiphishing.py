@@ -35,6 +35,7 @@ class AntiPhishing(commands.Cog):
             bans=0,
             max_links=3,
             last_updated=None,
+            safe_emoji=True,  # Add safe_emoji setting
         )
         self.config.register_member(caught=0)
         self.session = aiohttp.ClientSession()
@@ -290,11 +291,13 @@ class AntiPhishing(commands.Cog):
                     await self.handle_phishing(message, domain, domains_to_check)
                     return
 
-        # If the link is clean, add the reaction
-        try:
-            await message.add_reaction("<:safe:1275420145254269052>")
-        except discord.Forbidden:
-            pass
+        # If the link is clean and safe_emoji is enabled, add the reaction
+        safe_emoji = await self.config.guild(message.guild).safe_emoji()
+        if safe_emoji:
+            try:
+                await message.add_reaction("<:safe:1275420145254269052>")
+            except discord.Forbidden:
+                pass
 
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction: discord.Reaction, user: discord.User):
@@ -633,6 +636,22 @@ class AntiPhishing(commands.Cog):
         embed = discord.Embed(
             title='Settings changed',
             description=f"The maximum number of malicious links a user can share before being banned is now set to **{max_links}**.",
+            colour=0xffd966,
+        )
+        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/notifications.png")
+        await ctx.send(embed=embed)
+
+    @antiphishing.command()
+    @commands.has_permissions(administrator=True)
+    async def safeemoji(self, ctx: Context, safe_emoji: bool):
+        """
+        Toggle the safe emoji functionality.
+        """
+        await self.config.guild(ctx.guild).safe_emoji.set(safe_emoji)
+        status = "enabled" if safe_emoji else "disabled"
+        embed = discord.Embed(
+            title='Settings changed',
+            description=f"Safe emoji functionality has been **{status}**.",
             colour=0xffd966,
         )
         embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/notifications.png")
