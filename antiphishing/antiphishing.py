@@ -20,7 +20,7 @@ class AntiPhishing(commands.Cog):
     Guard users from malicious links and phishing attempts with customizable protection options.
     """
 
-    __version__ = "1.3.5.1"
+    __version__ = "1.3.5.2"
     __last_updated__ = "Aug 20 2024"
 
     def __init__(self, bot: Red):
@@ -290,10 +290,11 @@ class AntiPhishing(commands.Cog):
                     await self.handle_phishing(after, domain, domains_to_check)
                     return
 
-        # If the link is clean and safe_emoji is enabled, add the reaction
+        # If the link is clean and safe_emoji is enabled, remove all reactions and add the reaction again
         safe_emoji = await self.config.guild(after.guild).safe_emoji()
         if safe_emoji:
             try:
+                await after.clear_reactions()
                 if self.bot.user.id == 1152805502116429929:
                     emoji = discord.utils.get(self.bot.emojis, id=1275431139666034857)
                     if emoji:
