@@ -320,7 +320,7 @@ class AntiPhishing(commands.Cog):
                     description="The link you clicked on was checked against the BeeHive blocklist and no threats were found. Stay safe!",
                     colour=0x2bbd8e,
                 )
-                embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/check-circle.png")
+                embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/shield-checkmark.png")
                 await user.send(embed=embed)
             except discord.Forbidden:
                 pass
