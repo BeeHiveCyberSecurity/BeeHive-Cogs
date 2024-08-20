@@ -20,7 +20,7 @@ class AntiPhishing(commands.Cog):
     Guard users from malicious links and phishing attempts with customizable protection options.
     """
 
-    __version__ = "1.3.2.2"
+    __version__ = "1.3.2.3"
     __last_updated__ = "Aug 19 2024"
 
     def __init__(self, bot: Red):
@@ -84,7 +84,7 @@ class AntiPhishing(commands.Cog):
         domains = []
 
         headers = {
-            "X-Identity": f"BeeHive CrowdSense User v{self.__version__} (https://www.beehive.systems/)",
+            "X-Identity": f"BeeHive AntiPhishing v{self.__version__} (https://www.beehive.systems/)",
         }
 
         async with self.session.get(
@@ -136,7 +136,7 @@ class AntiPhishing(commands.Cog):
         """
         urls = []
         headers = {
-            "User-Agent": "BeeHive CrowdSense (https://www.beehive.systems)"
+            "User-Agent": "BeeHive Security Intelligence (https://www.beehive.systems)"
         }
         try:
             async with self.session.head(url, allow_redirects=True, headers=headers) as response:
