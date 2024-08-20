@@ -1,7 +1,7 @@
 {
     "author": [
-        "movelaterally",
-        "Sorted"
+        "adminescalation",
+        "wldvr"
     ],
     "description": "Analyze files via VirusTotal thru Red-DiscordBot using the VirusTotal API",
     "install_msg": "## :white_check_mark: Successfully installed VirusTotal.\n**Questions?** [We're listening](<https://www.beehive.systems/contact-us>)\n**Interested in CyberSecurity and CyberSafety?** [Join our Discord](https://discord.gg/ckdzsm7mTs).\n\n**IMPORTANT** - Before you can use this cog, you'll need to sign up for a VirusTotal account, then add your API Key to your Red instance.",

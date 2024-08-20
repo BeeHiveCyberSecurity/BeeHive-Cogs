@@ -1,7 +1,7 @@
 {
     "author": [
-        "movelaterally",
-        "Sorted"
+        "adminescalation",
+        "wldvr"
     ],
     "description": "Analyze domains and URL's via URLScan, with support for automated analysis and removal",
     "install_msg": "## :white_check_mark: Successfully installed URLScan.\n**Questions?** [We're listening](<https://www.beehive.systems/contact-us>)\n**Interested in CyberSecurity and CyberSafety?** Join our Discord! https://discord.gg/ckdzsm7mTs\n\n**IMPORTANT** - Before you can use this cog, you'll need to sign up for a URLScan account, then add your API Key to your Red instance.\nLearn more and sign up for URLScan [**here**](<https://go.beehive.systems/URLScan>)",
