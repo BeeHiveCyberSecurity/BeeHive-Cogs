@@ -311,9 +311,13 @@ class AntiPhishing(commands.Cog):
                 return
 
             try:
-                await user.send(
-                    "The link you clicked on was checked against the BeeHive blocklist and no threats were found. Stay safe!"
+                embed = discord.Embed(
+                    title="Link Checked",
+                    description="The link you clicked on was checked against the BeeHive blocklist and no threats were found. Stay safe!",
+                    colour=0x00ff00,
                 )
+                embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/check-circle.png")
+                await user.send(embed=embed)
             except discord.Forbidden:
                 pass
 
