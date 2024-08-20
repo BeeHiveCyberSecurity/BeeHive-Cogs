@@ -312,9 +312,9 @@ class AntiPhishing(commands.Cog):
         Handles the logic for sending a DM when the safe reaction is clicked.
         """
         safe_emoji_id = 1275431139666034857
-        safe_emoji_unicode = ":white_check_mark:"
+        safe_emoji_unicode = "✅"
         
-        if (reaction.emoji.id == safe_emoji_id or reaction.emoji == safe_emoji_unicode) and not user.bot:
+        if (getattr(reaction.emoji, 'id', None) == safe_emoji_id or reaction.emoji == safe_emoji_unicode) and not user.bot:
             message = reaction.message
             if message.author == self.bot.user:
                 return
