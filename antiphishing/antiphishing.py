@@ -20,7 +20,7 @@ class AntiPhishing(commands.Cog):
     Guard users from malicious links and phishing attempts with customizable protection options.
     """
 
-    __version__ = "1.3.4.4"
+    __version__ = "1.3.5.0"
     __last_updated__ = "Aug 20 2024"
 
     def __init__(self, bot: Red):
@@ -267,6 +267,43 @@ class AntiPhishing(commands.Cog):
                 )
                 bans = await self.config.guild(message.guild).bans()
                 await self.config.guild(message.guild).bans.set(bans + 1)
+
+    @commands.Cog.listener()
+    async def on_message_edit(self, before: discord.Message, after: discord.Message):
+        """
+        Handles the logic for checking URLs when a message is edited.
+        """
+        if not after.guild or after.author.bot:
+            return
+        if await self.bot.cog_disabled_in_guild(self, after.guild):
+            return
+
+        links = self.get_links(after.content)
+        if not links:
+            return
+
+        for url in links:
+            domains_to_check = await self.follow_redirects(url)
+            for domain_url in domains_to_check:
+                domain = urlparse(domain_url).netloc
+                if domain in self.domains:
+                    await self.handle_phishing(after, domain, domains_to_check)
+                    return
+
+        # If the link is clean and safe_emoji is enabled, add the reaction
+        safe_emoji = await self.config.guild(after.guild).safe_emoji()
+        if safe_emoji:
+            try:
+                if self.bot.user.id == 1152805502116429929:
+                    emoji = discord.utils.get(self.bot.emojis, id=1275431139666034857)
+                    if emoji:
+                        await after.add_reaction(emoji)
+                    else:
+                        await after.add_reaction("<:safe:1275431139666034857>")
+                else:
+                    await after.add_reaction("✅")
+            except discord.Forbidden:
+                pass
 
     @commands.Cog.listener()
     async def on_message_without_command(self, message: discord.Message):
