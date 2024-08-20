@@ -295,7 +295,11 @@ class AntiPhishing(commands.Cog):
         safe_emoji = await self.config.guild(message.guild).safe_emoji()
         if safe_emoji:
             try:
-                await message.add_reaction("<:safe:1275420145254269052>")
+                emoji = discord.utils.get(self.bot.emojis, id=1275431139666034857)
+                if emoji:
+                    await message.add_reaction(emoji)
+                else:
+                    await message.add_reaction("<:safe:1275431139666034857>")
             except discord.Forbidden:
                 pass
 
@@ -304,7 +308,7 @@ class AntiPhishing(commands.Cog):
         """
         Handles the logic for sending a DM when the safe reaction is clicked.
         """
-        safe_emoji_id = 1275420145254269052
+        safe_emoji_id = 1275431139666034857
         if reaction.emoji.id == safe_emoji_id and not user.bot:
             message = reaction.message
             if message.author == self.bot.user:
