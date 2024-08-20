@@ -20,8 +20,8 @@ class AntiPhishing(commands.Cog):
     Guard users from malicious links and phishing attempts with customizable protection options.
     """
 
-    __version__ = "1.3.2.3"
-    __last_updated__ = "Aug 19 2024"
+    __version__ = "1.3.3.0"
+    __last_updated__ = "Aug 20 2024"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -289,6 +289,29 @@ class AntiPhishing(commands.Cog):
                 if domain in self.domains:
                     await self.handle_phishing(message, domain, domains_to_check)
                     return
+
+        # If the link is clean, add the reaction
+        try:
+            await message.add_reaction("<:safe:1275420145254269052>")
+        except discord.Forbidden:
+            pass
+
+    @commands.Cog.listener()
+    async def on_reaction_add(self, reaction: discord.Reaction, user: discord.User):
+        """
+        Handles the logic for sending a DM when the safe reaction is clicked.
+        """
+        if reaction.emoji == "<:safe:1275420145254269052>" and not user.bot:
+            message = reaction.message
+            if message.author == self.bot.user:
+                return
+
+            try:
+                await user.send(
+                    "The link you clicked on was checked against the BeeHive blocklist and no threats were found. Stay safe!"
+                )
+            except discord.Forbidden:
+                pass
 
     @commands.Cog.listener()
     async def on_member_update(self, before: discord.Member, after: discord.Member):
