@@ -328,7 +328,7 @@ class AntiPhishing(commands.Cog):
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/shield-checkmark.png")
                 await user.send(embed=embed)
             except discord.Forbidden:
-                pass
+                await reaction.message.channel.send(f"{user.mention}, I couldn't send you a DM, but no known threats were detected attached to this link. If in doubt, investigate further. Stay safe!")
 
     @commands.Cog.listener()
     async def on_member_update(self, before: discord.Member, after: discord.Member):
