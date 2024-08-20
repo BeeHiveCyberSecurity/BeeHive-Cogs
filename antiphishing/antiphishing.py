@@ -35,7 +35,7 @@ class AntiPhishing(commands.Cog):
             bans=0,
             max_links=3,
             last_updated=None,
-            safe_emoji=True,  # Add safe_emoji setting
+            safe_emoji=True,
         )
         self.config.register_member(caught=0)
         self.session = aiohttp.ClientSession()
