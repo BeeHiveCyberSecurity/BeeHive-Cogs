@@ -314,7 +314,7 @@ class AntiPhishing(commands.Cog):
                 embed = discord.Embed(
                     title="Link Checked",
                     description="The link you clicked on was checked against the BeeHive blocklist and no threats were found. Stay safe!",
-                    colour=0x00ff00,
+                    colour=0x2bbd8e,
                 )
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/check-circle.png")
                 await user.send(embed=embed)

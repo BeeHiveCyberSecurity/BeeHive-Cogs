@@ -2366,6 +2366,107 @@ class Cloudflare(commands.Cog):
                 ))
                 return
 
+    @urlscanner.command(name="autoscan")
+    @commands.has_permissions(administrator=True)
+    async def set_autoscan(self, ctx: commands.Context, enabled: bool):
+        """
+        Enable or disable automatic URL scans.
+        """
+        await self.config.guild(ctx.guild).auto_scan.set(enabled)
+        status = "enabled" if enabled else "disabled"
+        embed = discord.Embed(
+            title='Settings changed',
+            description=f"Automatic URL scans utilizing Cloudflare threat intelligence have been **{status}**.",
+            colour=0xffd966,
+        )
+        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/notifications.png")
+        await ctx.send(embed=embed)
+        
+    @commands.Cog.listener()
+    async def on_message(self, message: discord.Message):
+        """
+        Handles the logic for checking URLs and scanning them with Cloudflare.
+        """
+        if not message.guild or message.author.bot:
+            return
+        if await self.bot.cog_disabled_in_guild(self, message.guild):
+            return
+
+        # Check if automatic scans are enabled
+        auto_scan = await self.config.guild(message.guild).auto_scan()
+        if not auto_scan:
+            return
+
+        links = self.get_links(message.content)
+        if not links:
+            return
+
+        for url in links:
+            # Scan the URL with Cloudflare
+            api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
+            email = api_tokens.get("email")
+            api_key = api_tokens.get("api_key")
+            bearer_token = api_tokens.get("bearer_token")
+            account_id = api_tokens.get("account_id")
+
+            if not all([email, api_key, bearer_token, account_id]):
+                return
+
+            headers = {
+                "X-Auth-Email": email,
+                "X-Auth-Key": api_key,
+                "Authorization": f"Bearer {bearer_token}",
+                "Content-Type": "application/json"
+            }
+
+            payload = {
+                "url": url
+            }
+
+            async with self.session.post(f"https://api.cloudflare.com/client/v4/accounts/{account_id}/security/scan", headers=headers, json=payload) as response:
+                if response.status != 200:
+                    return
+
+                data = await response.json()
+                if not data.get("success", False):
+                    return
+
+                scan_id = data["result"]["id"]
+
+            # Check the scan result after a delay
+            await asyncio.sleep(10)  # Wait for 10 seconds before checking the scan result
+
+            async with self.session.get(f"https://api.cloudflare.com/client/v4/accounts/{account_id}/security/scan/{scan_id}", headers=headers) as response:
+                if response.status != 200:
+                    return
+
+                data = await response.json()
+                if not data.get("success", False):
+                    return
+
+                scan_result = data["result"]["scan"]
+                verdict = scan_result["verdicts"]["overall"]
+                malicious = verdict["malicious"]
+                categories = ", ".join([cat["name"] for cat in verdict["categories"]])
+                phishing = ", ".join(verdict.get("phishing", []))
+
+                if malicious:
+                    embed = discord.Embed(
+                        title="Malicious Link Detected",
+                        description=f"A URL safety scan finished for the URL\n```{url}```",
+                        color=0xff4545
+                    )
+                    embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/bug.png")
+                    verdict = "Malicious"
+                    embed.add_field(name="Verdict", value=f"**`{verdict}`**", inline=False)
+                    if categories:
+                        embed.add_field(name="Categories", value=f"**`{categories}`**", inline=False)
+                    if phishing:
+                        embed.add_field(name="Phishing", value=f"**`{phishing}`**", inline=False)
+                    await message.channel.send(embed=embed)
+
+
+
 
     @commands.is_owner()
     @commands.group(invoke_without_command=False)
