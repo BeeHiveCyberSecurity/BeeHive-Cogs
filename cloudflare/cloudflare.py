@@ -1474,7 +1474,7 @@ class Cloudflare(commands.Cog):
                 view.add_item(button)
 
             for page in pages:
-                page.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/globe.png")
+                page.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/globe.png")
             message = await ctx.send(embed=pages[0], view=view)
 
             current_page = 0
