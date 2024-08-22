@@ -489,9 +489,7 @@ class AntiPhishing(commands.Cog):
                 bans = await self.config.guild(member.guild).bans()
                 await self.config.guild(member.guild).bans.set(bans + 1)
 
-    @commands.command(
-        aliases=["checkforphish", "checkscam", "checkforscam", "checkphishing"]
-    )
+    @commands.command(aliases=["checkforphish", "checkscam", "checkforscam", "checkphishing"])
     @commands.bot_has_permissions(embed_links=True)
     async def checkphish(self, ctx: Context, url: str = None):
         """
