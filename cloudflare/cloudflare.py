@@ -7,6 +7,7 @@ from redbot.core import commands, Config #type: ignore
 import aiohttp #type: ignore
 import ipaddress
 import json
+import re
 import io
 
 class Cloudflare(commands.Cog):
@@ -2397,7 +2398,8 @@ class Cloudflare(commands.Cog):
         if not auto_scan:
             return
 
-        links = self.get_links(message.content)
+        # Extract links from the message content
+        links = re.findall(r'(https?://\S+)', message.content)
         if not links:
             return
 
