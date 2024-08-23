@@ -2408,7 +2408,7 @@ class Cloudflare(commands.Cog):
             try:
                 scan_id = await self.scan_url(ctx=message.channel, url=url)
                 if not scan_id:
-                    return
+                    continue
 
                 # Check the scan result after a delay
                 await asyncio.sleep(30)  # Wait for 30 seconds before checking the scan result
@@ -2423,7 +2423,7 @@ class Cloudflare(commands.Cog):
                         description="Missing account ID or bearer token. Please check your configuration.",
                         color=0xff4545
                     ))
-                    return
+                    continue
 
                 headers = {
                     "Authorization": f"Bearer {bearer_token}",
@@ -2442,7 +2442,7 @@ class Cloudflare(commands.Cog):
                             color=0xff4545
                         )
                         await message.channel.send(embed=embed)
-                        return
+                        continue
 
                     result = data.get("result", {}).get("scan", {})
                     if not result:
@@ -2451,7 +2451,7 @@ class Cloudflare(commands.Cog):
                             description="No relevant data found in the scan result.",
                             color=0xff4545
                         ))
-                        return
+                        continue
 
                     task = result.get('task', {})
                     verdicts = result.get('verdicts', {})
@@ -2488,6 +2488,7 @@ class Cloudflare(commands.Cog):
                     description=f"An error occurred: {str(e)}",
                     color=0xff4545
                 ))
+                continue
 
 
 
