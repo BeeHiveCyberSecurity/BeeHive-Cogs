@@ -2423,7 +2423,7 @@ class Cloudflare(commands.Cog):
                     if not scan_id:
                         continue
 
-                    await asyncio.sleep(30)
+                    await asyncio.sleep(60)
 
                     scan_result_url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/urlscanner/scan/{scan_id}"
                     async with self.session.get(scan_result_url, headers=headers) as scan_response:
