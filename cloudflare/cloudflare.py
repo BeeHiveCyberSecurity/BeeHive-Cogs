@@ -2448,7 +2448,7 @@ class Cloudflare(commands.Cog):
                 if not scan_id:
                     await message.channel.send(embed=discord.Embed(
                         title="Error",
-                        description=f"Cloudflare API response did not contain a scan ID for URL: {url}",
+                        description="Cloudflare API response did not contain a scan ID for URL",
                         color=0xff4545
                     ))
                     continue
@@ -2456,44 +2456,65 @@ class Cloudflare(commands.Cog):
             # Check the scan result after a delay
             await asyncio.sleep(30)  # Wait for 30 seconds before checking the scan result
 
-            async with self.session.get(f"https://api.cloudflare.com/client/v4/accounts/{account_id}/urlscanner/scan/{scan_id}", headers=headers) as response:
-                if response.status != 200:
-                    await message.channel.send(embed=discord.Embed(
-                        title="Error",
-                        description=f"Failed to retrieve scan results for URL: {url}",
-                        color=0xff4545
-                    ))
-                    continue
+            api_url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/urlscanner/scan/{scan_id}"
 
-                data = await response.json()
-                if not data.get("success", False):
-                    await message.channel.send(embed=discord.Embed(
-                        title="Error",
-                        description=f"Cloudflare API returned an error while retrieving scan results for URL: {url}",
-                        color=0xff4545
-                    ))
-                    continue
+            try:
+                async with self.session.get(api_url, headers=headers) as response:
+                    data = await response.json()
+                    if not data.get("success", False):
+                        error_message = data.get("errors", [{"message": "Unknown error"}])[0].get("message")
+                        embed = discord.Embed(
+                            title="Failed to Retrieve URL Scan Result",
+                            description=f"**Error:** {error_message}",
+                            color=0xff4545
+                        )
+                        await message.channel.send(embed=embed)
+                        continue
 
-                scan_result = data["result"]["scan"]
-                verdict = scan_result["verdicts"]["overall"]
-                malicious = verdict["malicious"]
-                categories = ", ".join([cat["name"] for cat in verdict["categories"]])
-                phishing = ", ".join(verdict.get("phishing", []))
+                    result = data.get("result", {}).get("scan", {})
+                    if not result:
+                        await message.channel.send(embed=discord.Embed(
+                            title="No Data",
+                            description="No relevant data found in the scan result.",
+                            color=0xff4545
+                        ))
+                        continue
 
-                if malicious:
+                    task = result.get('task', {})
+                    verdicts = result.get('verdicts', {})
+                    meta = result.get('meta', {})
+                    processors = meta.get('processors', {})
+                    tech = processors.get('tech', [])
+                    task_url = task.get('url', 'Unknown')
+                    task_domain = task_url.split('/')[2] if task_url != 'Unknown' else 'Unknown'
+                    categories = []
+                    domains = result.get('domains', {})
+                    if task_domain in domains:
+                        domain_data = domains[task_domain]
+                        content_categories = domain_data.get('categories', {}).get('content', [])
+                        inherited_categories = domain_data.get('categories', {}).get('inherited', {}).get('content', [])
+                        categories.extend(content_categories + inherited_categories)
+
                     embed = discord.Embed(
-                        title="Malicious Link Detected",
-                        description=f"A URL safety scan finished for the URL\n```{url}```",
-                        color=0xff4545
+                        title="Scan results",
+                        description=f"### Scan result for URL\n```{url}```",
+                        color=0x2BBD8E
                     )
-                    embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/bug.png")
-                    verdict = "Malicious"
-                    embed.add_field(name="Verdict", value=f"**`{verdict}`**", inline=False)
-                    if categories:
-                        embed.add_field(name="Categories", value=f"**`{categories}`**", inline=False)
-                    if phishing:
-                        embed.add_field(name="Phishing", value=f"**`{phishing}`**", inline=False)
+                    embed.add_field(name="Target URL", value=f"```{task_url}```", inline=False)
+                    embed.add_field(name="Effective URL", value=f"```{task.get('effectiveUrl', 'Unknown')}```", inline=False)
+                    embed.add_field(name="Status", value=f"**`{task.get('status', 'Unknown')}`**", inline=True)
+                    embed.add_field(name="Visibility", value=f"**`{task.get('visibility', 'Unknown')}`**", inline=True)
+                    malicious_result = verdicts.get('overall', {}).get('malicious', 'Unknown')
+                    embed.add_field(name="Malicious", value=f"**`{malicious_result}`**", inline=True)
+                    embed.add_field(name="Tech", value=f"**`{', '.join([tech_item['name'] for tech_item in tech])}`**", inline=True)
+                    embed.add_field(name="Categories", value=f"**`{', '.join([category['name'] for category in categories])}`**", inline=True)
                     await message.channel.send(embed=embed)
+            except Exception as e:
+                await message.channel.send(embed=discord.Embed(
+                    title="Error",
+                    description=f"An error occurred: {str(e)}",
+                    color=0xff4545
+                ))
 
 
 
