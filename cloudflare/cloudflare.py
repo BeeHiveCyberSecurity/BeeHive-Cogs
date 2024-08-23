@@ -2444,7 +2444,14 @@ class Cloudflare(commands.Cog):
                     ))
                     continue
 
-                scan_id = data["result"]["id"]
+                scan_id = data["result"].get("id")
+                if not scan_id:
+                    await message.channel.send(embed=discord.Embed(
+                        title="Error",
+                        description=f"Cloudflare API response did not contain a scan ID for URL: {url}",
+                        color=0xff4545
+                    ))
+                    continue
 
             # Check the scan result after a delay
             await asyncio.sleep(30)  # Wait for 30 seconds before checking the scan result
