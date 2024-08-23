@@ -2409,7 +2409,7 @@ class Cloudflare(commands.Cog):
             account_id = api_tokens.get("account_id")
             bearer_token = api_tokens.get("bearer_token")
 
-            if not all([account_id, bearer_token]):
+            if not account_id or not bearer_token:
                 await message.channel.send(embed=discord.Embed(
                     title="Configuration Error",
                     description="Missing account ID or bearer token. Please check your configuration.",
@@ -2426,32 +2426,30 @@ class Cloudflare(commands.Cog):
                 "url": url
             }
 
-            async with self.session.post(f"https://api.cloudflare.com/client/v4/accounts/{account_id}/urlscanner/scan", headers=headers, json=payload) as response:
-                if response.status != 200:
-                    await message.channel.send(embed=discord.Embed(
-                        title="Error",
-                        description=f"Failed to initiate scan for URL: {url}",
-                        color=0xff4545
-                    ))
-                    continue
+            api_url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/urlscanner/scan"
 
-                data = await response.json()
-                if not data.get("success", False):
-                    await message.channel.send(embed=discord.Embed(
-                        title="Error",
-                        description=f"Cloudflare API returned an error for URL: {url}",
-                        color=0xff4545
-                    ))
-                    continue
+            try:
+                async with self.session.post(api_url, headers=headers, json=payload) as response:
+                    data = await response.json()
+                    if not data.get("success", False):
+                        error_message = data.get("errors", [{"message": "Unknown error"}])[0].get("message")
+                        embed = discord.Embed(
+                            title="Failed to Start URL Scan",
+                            description=f"**Error:** {error_message}",
+                            color=0xff4545
+                        )
+                        await message.channel.send(embed=embed)
+                        continue
 
-                scan_id = data.get("result", {}).get("id")
-                if not scan_id:
-                    await message.channel.send(embed=discord.Embed(
-                        title="Error",
-                        description="Cloudflare API response did not contain a scan ID for URL",
-                        color=0xff4545
-                    ))
-                    continue
+                    result = data.get("result", {})
+                    scan_id = result.get('id')
+                    if not scan_id:
+                        await message.channel.send(embed=discord.Embed(
+                            title="Error",
+                            description="Cloudflare API response did not contain a scan ID for URL",
+                            color=0xff4545
+                        ))
+                        continue
 
             # Check the scan result after a delay
             await asyncio.sleep(30)  # Wait for 30 seconds before checking the scan result
