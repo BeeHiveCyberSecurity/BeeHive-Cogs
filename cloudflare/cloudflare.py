@@ -2425,24 +2425,44 @@ class Cloudflare(commands.Cog):
 
             async with self.session.post(f"https://api.cloudflare.com/client/v4/accounts/{account_id}/security/scan", headers=headers, json=payload) as response:
                 if response.status != 200:
-                    return
+                    await message.channel.send(embed=discord.Embed(
+                        title="Error",
+                        description=f"Failed to initiate scan for URL: {url}",
+                        color=0xff4545
+                    ))
+                    continue
 
                 data = await response.json()
                 if not data.get("success", False):
-                    return
+                    await message.channel.send(embed=discord.Embed(
+                        title="Error",
+                        description=f"Cloudflare API returned an error for URL: {url}",
+                        color=0xff4545
+                    ))
+                    continue
 
                 scan_id = data["result"]["id"]
 
             # Check the scan result after a delay
-            await asyncio.sleep(10)  # Wait for 10 seconds before checking the scan result
+            await asyncio.sleep(30)  # Wait for 30 seconds before checking the scan result
 
             async with self.session.get(f"https://api.cloudflare.com/client/v4/accounts/{account_id}/security/scan/{scan_id}", headers=headers) as response:
                 if response.status != 200:
-                    return
+                    await message.channel.send(embed=discord.Embed(
+                        title="Error",
+                        description=f"Failed to retrieve scan results for URL: {url}",
+                        color=0xff4545
+                    ))
+                    continue
 
                 data = await response.json()
                 if not data.get("success", False):
-                    return
+                    await message.channel.send(embed=discord.Embed(
+                        title="Error",
+                        description=f"Cloudflare API returned an error while retrieving scan results for URL: {url}",
+                        color=0xff4545
+                    ))
+                    continue
 
                 scan_result = data["result"]["scan"]
                 verdict = scan_result["verdicts"]["overall"]
