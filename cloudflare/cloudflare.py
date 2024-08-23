@@ -2385,110 +2385,68 @@ class Cloudflare(commands.Cog):
         
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
-        """
-        Handles the logic for checking URLs and scanning them with Cloudflare.
-        """
-        if not message.guild or message.author.bot:
-            return
-        if await self.bot.cog_disabled_in_guild(self, message.guild):
+        if message.author.bot:
             return
 
-        # Check if automatic scans are enabled
-        auto_scan = await self.config.guild(message.guild).auto_scan()
-        if not auto_scan:
+        urls = [word for word in message.content.split() if word.startswith("http://") or word.startswith("https://")]
+        if not urls:
             return
 
-        # Extract links from the message content
-        links = re.findall(r'(https?://\S+)', message.content)
-        if not links:
+        api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
+        account_id = api_tokens.get("account_id")
+        bearer_token = api_tokens.get("bearer_token")
+
+        if not account_id or not bearer_token:
             return
 
-        for url in links:
-            # Scan the URL with Cloudflare
+        headers = {
+            "Authorization": f"Bearer {bearer_token}",
+            "Content-Type": "application/json"
+        }
+
+        for url in urls:
+            payload = {"url": url}
+            api_url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/urlscanner/scan"
+
             try:
-                scan_id = await self.scan_url(ctx=message.channel, url=url)
-                if not scan_id:
-                    continue
-
-                # Check the scan result after a delay
-                await asyncio.sleep(30)  # Wait for 30 seconds before checking the scan result
-
-                api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
-                account_id = api_tokens.get("account_id")
-                bearer_token = api_tokens.get("bearer_token")
-
-                if not account_id or not bearer_token:
-                    await message.channel.send(embed=discord.Embed(
-                        title="Configuration Error",
-                        description="Missing account ID or bearer token. Please check your configuration.",
-                        color=0xff4545
-                    ))
-                    continue
-
-                headers = {
-                    "Authorization": f"Bearer {bearer_token}",
-                    "Content-Type": "application/json"
-                }
-
-                api_url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/urlscanner/scan/{scan_id}"
-
-                async with self.session.get(api_url, headers=headers) as response:
+                async with self.session.post(api_url, headers=headers, json=payload) as response:
                     data = await response.json()
                     if not data.get("success", False):
-                        error_message = data.get("errors", [{"message": "Unknown error"}])[0].get("message")
-                        embed = discord.Embed(
-                            title="Failed to Retrieve URL Scan Result",
-                            description=f"**Error:** {error_message}",
-                            color=0xff4545
-                        )
-                        await message.channel.send(embed=embed)
                         continue
 
-                    result = data.get("result", {}).get("scan", {})
-                    if not result:
-                        await message.channel.send(embed=discord.Embed(
-                            title="No Data",
-                            description="No relevant data found in the scan result.",
-                            color=0xff4545
-                        ))
+                    scan_id = data.get("result", {}).get("uuid")
+                    if not scan_id:
                         continue
 
-                    task = result.get('task', {})
-                    verdicts = result.get('verdicts', {})
-                    meta = result.get('meta', {})
-                    processors = meta.get('processors', {})
-                    tech = processors.get('tech', [])
-                    task_url = task.get('url', 'Unknown')
-                    task_domain = task_url.split('/')[2] if task_url != 'Unknown' else 'Unknown'
-                    categories = []
-                    domains = result.get('domains', {})
-                    if task_domain in domains:
-                        domain_data = domains[task_domain]
-                        content_categories = domain_data.get('categories', {}).get('content', [])
-                        inherited_categories = domain_data.get('categories', {}).get('inherited', {}).get('content', [])
-                        categories.extend(content_categories + inherited_categories)
+                    await asyncio.sleep(30)
 
-                    embed = discord.Embed(
-                        title="Scan results",
-                        description=f"### Scan result for URL\n```{url}```",
-                        color=0x2BBD8E
-                    )
-                    embed.add_field(name="Target URL", value=f"```{task_url}```", inline=False)
-                    embed.add_field(name="Effective URL", value=f"```{task.get('effectiveUrl', 'Unknown')}```", inline=False)
-                    embed.add_field(name="Status", value=f"**`{task.get('status', 'Unknown')}`**", inline=True)
-                    embed.add_field(name="Visibility", value=f"**`{task.get('visibility', 'Unknown')}`**", inline=True)
-                    malicious_result = verdicts.get('overall', {}).get('malicious', 'Unknown')
-                    embed.add_field(name="Malicious", value=f"**`{malicious_result}`**", inline=True)
-                    embed.add_field(name="Tech", value=f"**`{', '.join([tech_item['name'] for tech_item in tech])}`**", inline=True)
-                    embed.add_field(name="Categories", value=f"**`{', '.join([category['name'] for category in categories])}`**", inline=True)
-                    await message.channel.send(embed=embed)
+                    scan_result_url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/urlscanner/scan/{scan_id}"
+                    async with self.session.get(scan_result_url, headers=headers) as scan_response:
+                        scan_data = await scan_response.json()
+                        if not scan_data.get("success", False):
+                            continue
+
+                        result = scan_data.get("result", {}).get("scan", {})
+                        verdicts = result.get("verdicts", {})
+                        malicious = verdicts.get("overall", {}).get("malicious", False)
+
+                        if malicious:
+                            await message.delete()
+                            embed = discord.Embed(
+                                title="Malicious URL Detected",
+                                description=f"A message containing a malicious URL was removed.",
+                                color=0xff4545
+                            )
+                            await message.channel.send(embed=embed)
+                            return
+
             except Exception as e:
                 await message.channel.send(embed=discord.Embed(
                     title="Error",
-                    description=f"An error occurred: {str(e)}",
+                    description=f"An error occurred while processing the URL scan: {str(e)}",
                     color=0xff4545
                 ))
-                continue
+
 
 
 
