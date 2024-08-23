@@ -38,7 +38,7 @@ class VirusTotal(commands.Cog):
                             permalink = data.get("data", {}).get("id")
                             if permalink:
                                 await ctx.send(f"Permalink: https://www.virustotal.com/gui/url/{permalink}")
-                                await self.check_results(ctx, permalink, ctx.author.id, file_url)
+                                await self.check_results(ctx, permalink, ctx.author.id, file_url, None)
                             else:
                                 raise ValueError("No permalink found in the response.")
                     elif attachments:
