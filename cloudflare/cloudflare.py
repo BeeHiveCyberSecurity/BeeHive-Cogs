@@ -2404,17 +2404,18 @@ class Cloudflare(commands.Cog):
         for url in links:
             # Scan the URL with Cloudflare
             api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
-            email = api_tokens.get("email")
-            api_key = api_tokens.get("api_key")
-            bearer_token = api_tokens.get("bearer_token")
             account_id = api_tokens.get("account_id")
+            bearer_token = api_tokens.get("bearer_token")
 
-            if not all([email, api_key, bearer_token, account_id]):
+            if not all([account_id, bearer_token]):
+                await message.channel.send(embed=discord.Embed(
+                    title="Configuration Error",
+                    description="Missing account ID or bearer token. Please check your configuration.",
+                    color=0xff4545
+                ))
                 return
 
             headers = {
-                "X-Auth-Email": email,
-                "X-Auth-Key": api_key,
                 "Authorization": f"Bearer {bearer_token}",
                 "Content-Type": "application/json"
             }
@@ -2423,7 +2424,7 @@ class Cloudflare(commands.Cog):
                 "url": url
             }
 
-            async with self.session.post(f"https://api.cloudflare.com/client/v4/accounts/{account_id}/security/scan", headers=headers, json=payload) as response:
+            async with self.session.post(f"https://api.cloudflare.com/client/v4/accounts/{account_id}/urlscanner/scan", headers=headers, json=payload) as response:
                 if response.status != 200:
                     await message.channel.send(embed=discord.Embed(
                         title="Error",
@@ -2446,7 +2447,7 @@ class Cloudflare(commands.Cog):
             # Check the scan result after a delay
             await asyncio.sleep(30)  # Wait for 30 seconds before checking the scan result
 
-            async with self.session.get(f"https://api.cloudflare.com/client/v4/accounts/{account_id}/security/scan/{scan_id}", headers=headers) as response:
+            async with self.session.get(f"https://api.cloudflare.com/client/v4/accounts/{account_id}/urlscanner/scan/{scan_id}", headers=headers) as response:
                 if response.status != 200:
                     await message.channel.send(embed=discord.Embed(
                         title="Error",
