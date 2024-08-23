@@ -2444,7 +2444,7 @@ class Cloudflare(commands.Cog):
                     ))
                     continue
 
-                scan_id = data["result"].get("id")
+                scan_id = data.get("result", {}).get("id")
                 if not scan_id:
                     await message.channel.send(embed=discord.Embed(
                         title="Error",
