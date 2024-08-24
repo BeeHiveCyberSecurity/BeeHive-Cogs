@@ -31,7 +31,7 @@ class VirusTotal(commands.Cog):
         vt_key = await self.bot.get_shared_api_tokens("virustotal")
         api_key_status = "set" if vt_key.get("api_key") else "not set"
         
-        version = "1.0.0"
+        version = "1.0.1"
         last_update = "August 24th, 2024"
         
         embed = discord.Embed(title="VirusTotal Settings", colour=discord.Colour(0x2BBD8E))
