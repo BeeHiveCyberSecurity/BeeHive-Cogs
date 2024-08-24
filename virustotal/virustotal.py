@@ -1,17 +1,21 @@
 import aiohttp #type: ignore
 import asyncio
 import discord #type: ignore
-from redbot.core import commands #type: ignore
+from redbot.core import commands, Config #type: ignore
 
 class VirusTotal(commands.Cog):
     """VirusTotal file upload and analysis via Discord"""
 
     def __init__(self, bot):
         self.bot = bot
-        self.submission_history = {}
-        self.auto_scan_enabled = False
-        self.info_emoji_enabled = False
+        self.config = Config.get_conf(self, identifier=1234567890)
+        self.config.register_global(auto_scan_enabled=False, info_emoji_enabled=False, submission_history={})
         self.info_emoji = "ℹ️"
+
+    async def initialize(self):
+        self.auto_scan_enabled = await self.config.auto_scan_enabled()
+        self.info_emoji_enabled = await self.config.info_emoji_enabled()
+        self.submission_history = await self.config.submission_history()
 
     @commands.group(name="virustotal", invoke_without_command=True)
     async def virustotal(self, ctx):
@@ -22,6 +26,7 @@ class VirusTotal(commands.Cog):
     async def toggle_auto_scan(self, ctx):
         """Toggle automatic file scanning on or off"""
         self.auto_scan_enabled = not self.auto_scan_enabled
+        await self.config.auto_scan_enabled.set(self.auto_scan_enabled)
         status = "enabled" if self.auto_scan_enabled else "disabled"
         await ctx.send(f"Automatic file scanning has been {status}.")
 
@@ -29,6 +34,7 @@ class VirusTotal(commands.Cog):
     async def toggle_info_emoji(self, ctx):
         """Toggle automatic info emoji reaction on or off"""
         self.info_emoji_enabled = not self.info_emoji_enabled
+        await self.config.info_emoji_enabled.set(self.info_emoji_enabled)
         status = "enabled" if self.info_emoji_enabled else "disabled"
         await ctx.send(f"Info emoji reaction has been {status}.")
 
