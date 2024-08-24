@@ -55,9 +55,9 @@ class VirusTotal(commands.Cog):
         
         vt_key = await self.bot.get_shared_api_tokens("virustotal")
         if vt_key.get("api_key"):
-            api_key_status = "Linked"
+            api_key_status = ":white_check_mark: Set"
         else:
-            api_key_status = "You don't have a VirusTotal key added yet. Add a VirusTotal key to enable this cog."
+            api_key_status = ":x: Missing"
         
         version = "1.2.0"
         last_update = "August 24th, 2024"
