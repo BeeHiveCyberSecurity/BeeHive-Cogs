@@ -26,7 +26,7 @@ class VirusTotal(commands.Cog):
     @virustotal.command(name="settings")
     async def settings(self, ctx):
         """Show current settings for VirusTotal"""
-        status = "enabled" if self.auto_scan_enabled else "disabled"
+        status = "Enabled" if self.auto_scan_enabled else "Disabled"
         
         vt_key = await self.bot.get_shared_api_tokens("virustotal")
         if vt_key.get("api_key"):
@@ -34,11 +34,11 @@ class VirusTotal(commands.Cog):
         else:
             api_key_status = "You don't have a VirusTotal key added yet. Add a VirusTotal key to enable this cog."
         
-        version = "1.0.2"
+        version = "1.0.3"
         last_update = "August 24th, 2024"
         
         embed = discord.Embed(title="VirusTotal Settings", colour=discord.Colour(0x2BBD8E))
-        embed.add_field(name="Automatic File Scanning", value=status, inline=False)
+        embed.add_field(name="Automatic file scanning", value=status, inline=False)
         embed.add_field(name="API Key", value=api_key_status, inline=False)
         embed.add_field(name="Version", value=version, inline=False)
         embed.add_field(name="Last Updated", value=last_update, inline=False)
