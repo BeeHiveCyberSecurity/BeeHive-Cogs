@@ -110,7 +110,7 @@ class VirusTotal(commands.Cog):
 
                     data = await response.json()
                     attributes = data.get("data", {}).get("attributes", {})
-                    stats = attributes.get("stats", {})
+                    stats = attributes.get("last_analysis_stats", {})
                     malicious_count = stats.get("malicious", 0)
                     suspicious_count = stats.get("suspicious", 0)
                     undetected_count = stats.get("undetected", 0)
