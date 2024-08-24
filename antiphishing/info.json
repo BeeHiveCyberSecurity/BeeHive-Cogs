@@ -2,7 +2,7 @@
     "author": ["adminescalation"],
     "description": "Enable scanning and detection for known malicious links, with customizable protection options.",
     "install_msg": "## :white_check_mark: Successfully installed AntiPhishing.\n**Questions?** [We're listening](<https://www.beehive.systems/contact-us>)\n**Interested in CyberSecurity and CyberSafety?** Join our Discord! https://discord.gg/ckdzsm7mTs",
-    "end_user_data_statement": "This cog stores no user information. This cog stores statistical information about threats actioned while installed. While using this cog, your bot's public IP may be revealed when following and scanning cloaked links",
+    "end_user_data_statement": "This cog stores no user information. This cog stores statistical information about threats actioned while installed. While using this cog, your bot's public IP may be revealed when following and scanning cloaked links, and will be logged by us when your bot fetches blocklist updates",
     "name": "antiphishing",
     "short": "Screen for malicious links in your server",
     "min_bot_version": "3.5.0"

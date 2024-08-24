@@ -1,7 +1,6 @@
 import aiohttp #type: ignore
 import asyncio
 import discord #type: ignore
-import matplotlib.pyplot as plt #type: ignore
 from redbot.core import commands #type: ignore
 
 class VirusTotal(commands.Cog):
