@@ -29,9 +29,12 @@ class VirusTotal(commands.Cog):
         status = "enabled" if self.auto_scan_enabled else "disabled"
         
         vt_key = await self.bot.get_shared_api_tokens("virustotal")
-        api_key_status = "set" if vt_key.get("api_key") else "not set"
+        if vt_key.get("api_key"):
+            api_key_status = "Linked"
+        else:
+            api_key_status = "You don't have a VirusTotal key added yet. Add a VirusTotal key to enable this cog."
         
-        version = "1.0.1"
+        version = "1.0.2"
         last_update = "August 24th, 2024"
         
         embed = discord.Embed(title="VirusTotal Settings", colour=discord.Colour(0x2BBD8E))
