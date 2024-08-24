@@ -37,7 +37,7 @@ class VirusTotal(commands.Cog):
         version = "1.0.3"
         last_update = "August 24th, 2024"
         
-        embed = discord.Embed(title="VirusTotal Settings", colour=discord.Colour(0x2BBD8E))
+        embed = discord.Embed(title="VirusTotal settings", colour=discord.Colour(0x394eff))
         embed.add_field(name="Automatic file scanning", value=status, inline=False)
         embed.add_field(name="API key", value=api_key_status, inline=False)
         embed.add_field(name="Version", value=version, inline=False)
