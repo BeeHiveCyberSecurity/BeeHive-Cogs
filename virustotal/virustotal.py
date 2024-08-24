@@ -84,18 +84,24 @@ class VirusTotal(commands.Cog):
                             continue  # Skip files without a valid analysis ID
 
                         # Check the analysis results
-                        await asyncio.sleep(15)  # Wait for the analysis to complete
-                        async with session.get(
-                            f"https://www.virustotal.com/api/v3/analyses/{analysis_id}",
-                            headers={"x-apikey": vt_key["api_key"]},
-                        ) as result_response:
-                            if result_response.status != 200:
-                                continue  # Skip files that can't be checked
+                        while True:
+                            await asyncio.sleep(15)  # Wait for the analysis to complete
+                            async with session.get(
+                                f"https://www.virustotal.com/api/v3/analyses/{analysis_id}",
+                                headers={"x-apikey": vt_key["api_key"]},
+                            ) as result_response:
+                                if result_response.status != 200:
+                                    continue  # Skip files that can't be checked
 
-                            result_data = await result_response.json()
-                            stats = result_data.get("data", {}).get("attributes", {}).get("stats", {})
-                            if stats.get("malicious", 0) > 0 or stats.get("suspicious", 0) > 0:
-                                await ctx.send(f"Alert: The file {file_name} is flagged as malicious or suspicious.")
+                                result_data = await result_response.json()
+                                status = result_data.get("data", {}).get("attributes", {}).get("status")
+                                if status == "completed":
+                                    stats = result_data.get("data", {}).get("attributes", {}).get("stats", {})
+                                    if stats.get("malicious", 0) > 0 or stats.get("suspicious", 0) > 0:
+                                        await ctx.send(f"Alert: The file {file_name} is flagged as malicious or suspicious.")
+                                    break
+                                else:
+                                    await asyncio.sleep(15)  # Wait a bit before checking again
 
     @commands.bot_has_permissions(embed_links=True)
     @virustotal.command(name="scan", aliases=["vt"])
