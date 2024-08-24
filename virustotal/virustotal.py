@@ -16,7 +16,7 @@ class VirusTotal(commands.Cog):
         """Group for VirusTotal related commands"""
         await ctx.send_help(ctx.command)
 
-    @virustotal.command(name="toggleautoscan")
+    @virustotal.command(name="autoscan")
     async def toggle_auto_scan(self, ctx):
         """Toggle automatic file scanning on or off"""
         self.auto_scan_enabled = not self.auto_scan_enabled
