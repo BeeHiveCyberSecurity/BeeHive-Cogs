@@ -55,7 +55,7 @@ class VirusTotal(commands.Cog):
         else:
             api_key_status = "You don't have a VirusTotal key added yet. Add a VirusTotal key to enable this cog."
         
-        version = "1.1.0"
+        version = "1.2.0"
         last_update = "August 24th, 2024"
         
         embed = discord.Embed(title="VirusTotal settings", colour=discord.Colour(0x394eff))
@@ -292,7 +292,7 @@ class VirusTotal(commands.Cog):
                     while attributes.get("status") != "completed":
                         await asyncio.sleep(3)
                         async with session.get(f'https://www.virustotal.com/api/v3/analyses/{analysis_id}', headers=headers) as response:
-                            if response.status != 200):
+                            if response.status != 200:
                                 raise aiohttp.ClientResponseError(response.request_info, response.history, status=response.status, message=f"HTTP error {response.status}", headers=response.headers)
                             data = await response.json()
                             attributes = data.get("data", {}).get("attributes", {})
