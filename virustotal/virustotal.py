@@ -9,16 +9,15 @@ class VirusTotal(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=1234567890)
-        self.config.register_global(auto_scan_enabled=False, info_emoji_enabled=False, submission_history={})
+        self.config.register_guild(auto_scan_enabled=False, info_emoji_enabled=False, submission_history={})
         self.info_emoji = "ℹ️"
-        self.auto_scan_enabled = False
-        self.info_emoji_enabled = False
-        self.submission_history = {}
 
     async def initialize(self):
-        self.auto_scan_enabled = await self.config.auto_scan_enabled()
-        self.info_emoji_enabled = await self.config.info_emoji_enabled()
-        self.submission_history = await self.config.submission_history()
+        for guild in self.bot.guilds:
+            guild_data = await self.config.guild(guild).all()
+            guild.auto_scan_enabled = guild_data["auto_scan_enabled"]
+            guild.info_emoji_enabled = guild_data["info_emoji_enabled"]
+            guild.submission_history = guild_data["submission_history"]
 
     @commands.group(name="virustotal", invoke_without_command=True)
     async def virustotal(self, ctx):
@@ -28,24 +27,27 @@ class VirusTotal(commands.Cog):
     @virustotal.command(name="autoscan")
     async def toggle_auto_scan(self, ctx):
         """Toggle automatic file scanning on or off"""
-        self.auto_scan_enabled = not self.auto_scan_enabled
-        await self.config.auto_scan_enabled.set(self.auto_scan_enabled)
-        status = "enabled" if self.auto_scan_enabled else "disabled"
+        guild = ctx.guild
+        guild.auto_scan_enabled = not guild.auto_scan_enabled
+        await self.config.guild(guild).auto_scan_enabled.set(guild.auto_scan_enabled)
+        status = "enabled" if guild.auto_scan_enabled else "disabled"
         await ctx.send(f"Automatic file scanning has been {status}.")
 
     @virustotal.command(name="infoemoji")
     async def toggle_info_emoji(self, ctx):
         """Toggle automatic info emoji reaction on or off"""
-        self.info_emoji_enabled = not self.info_emoji_enabled
-        await self.config.info_emoji_enabled.set(self.info_emoji_enabled)
-        status = "enabled" if self.info_emoji_enabled else "disabled"
+        guild = ctx.guild
+        guild.info_emoji_enabled = not guild.info_emoji_enabled
+        await self.config.guild(guild).info_emoji_enabled.set(guild.info_emoji_enabled)
+        status = "enabled" if guild.info_emoji_enabled else "disabled"
         await ctx.send(f"Info emoji reaction has been {status}.")
 
     @virustotal.command(name="settings")
     async def settings(self, ctx):
         """Show current settings for VirusTotal"""
-        auto_scan_status = "Enabled" if self.auto_scan_enabled else "Disabled"
-        info_emoji_status = "Enabled" if self.info_emoji_enabled else "Disabled"
+        guild = ctx.guild
+        auto_scan_status = "Enabled" if guild.auto_scan_enabled else "Disabled"
+        info_emoji_status = "Enabled" if guild.info_emoji_enabled else "Disabled"
         
         vt_key = await self.bot.get_shared_api_tokens("virustotal")
         if vt_key.get("api_key"):
@@ -67,12 +69,13 @@ class VirusTotal(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message):
         """Automatically scan files if auto_scan is enabled and react to hashes if info_emoji is enabled"""
-        if self.auto_scan_enabled and message.attachments:
+        guild = message.guild
+        if guild.auto_scan_enabled and message.attachments:
             ctx = await self.bot.get_context(message)
             if ctx.valid:
                 await self.silent_scan(ctx, message.attachments)
         
-        if self.info_emoji_enabled:
+        if guild.info_emoji_enabled:
             hashes = self.extract_hashes(message.content)
             if hashes:
                 await message.add_reaction(self.info_emoji)
@@ -289,7 +292,7 @@ class VirusTotal(commands.Cog):
                     while attributes.get("status") != "completed":
                         await asyncio.sleep(3)
                         async with session.get(f'https://www.virustotal.com/api/v3/analyses/{analysis_id}', headers=headers) as response:
-                            if response.status != 200:
+                            if response.status != 200):
                                 raise aiohttp.ClientResponseError(response.request_info, response.history, status=response.status, message=f"HTTP error {response.status}", headers=response.headers)
                             data = await response.json()
                             attributes = data.get("data", {}).get("attributes", {})
