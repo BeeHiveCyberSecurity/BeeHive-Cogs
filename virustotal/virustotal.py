@@ -11,9 +11,15 @@ class VirusTotal(commands.Cog):
         self.bot = bot
         self.submission_history = {}
 
+    @commands.group(name="virustotal", invoke_without_command=True)
+    async def virustotal(self, ctx):
+        """Group for VirusTotal related commands"""
+        await ctx.send_help(ctx.command)
+
+
     @commands.bot_has_permissions(embed_links=True)
-    @commands.command(name="virustotal", description="Submit a file for analysis via VirusTotal", aliases=["vt"])
-    async def virustotal(self, ctx, file_url: str = None):
+    @virustotal.command(name="scan", description="Submit a file for analysis via VirusTotal", aliases=["vt"])
+    async def scan(self, ctx, file_url: str = None):
         async with ctx.typing():
             vt_key = await self.bot.get_shared_api_tokens("virustotal")
             if not vt_key.get("api_key"):
