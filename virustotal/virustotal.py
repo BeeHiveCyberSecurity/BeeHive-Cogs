@@ -63,11 +63,12 @@ class VirusTotal(commands.Cog):
         last_update = "August 24th, 2024"
         
         embed = discord.Embed(title="VirusTotal settings", colour=discord.Colour(0x394eff))
-        embed.add_field(name="Automatic file scanning", value=auto_scan_status, inline=False)
-        embed.add_field(name="Intelligence reactions", value=info_emoji_status, inline=False)
-        embed.add_field(name="API key", value=api_key_status, inline=False)
-        embed.add_field(name="Version", value=version, inline=False)
-        embed.add_field(name="Last updated", value=last_update, inline=False)
+        embed.add_field(name="Automatic uploads", value=auto_scan_status, inline=True)
+        embed.add_field(name="Quick reactions", value=info_emoji_status, inline=True)
+        embed.add_field(name="API key", value=api_key_status, inline=True)
+        embed.add_field(name="About this cog", value="", inline=False)
+        embed.add_field(name="Version", value=version, inline=True)
+        embed.add_field(name="Last updated", value=last_update, inline=True)
         await ctx.send(embed=embed)
 
     @commands.Cog.listener()
