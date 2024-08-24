@@ -31,8 +31,8 @@ class VirusTotal(commands.Cog):
         vt_key = await self.bot.get_shared_api_tokens("virustotal")
         api_key_status = "set" if vt_key.get("api_key") else "not set"
         
-        version = "1.0.0"  # Example version, replace with actual version if available
-        last_update = "August 24th, 2024"  # Example last update date, replace with actual date if available
+        version = "1.0.0"
+        last_update = "August 24th, 2024"
         
         embed = discord.Embed(title="VirusTotal Settings", colour=discord.Colour(0x2BBD8E))
         embed.add_field(name="Automatic File Scanning", value=status, inline=False)
