@@ -664,9 +664,9 @@ class AntiPhishing(commands.Cog):
         last_updated_str = f"{last_updated}"
         
         embed = discord.Embed(
-            title='Protection statistics', 
+            title='Link protection statistics', 
             description=(
-                f"Your server's never been safer..."
+                f"Your server's never been safer...\n"
                 f"- Detected **`{caught}`** malicious link{s_caught} shared in chats\n"
                 f"- Warned you of danger **`{notifications}`** time{s_notifications}\n"
                 f"- Removed **`{deletions}`** message{s_deletions} to protect the community\n"
