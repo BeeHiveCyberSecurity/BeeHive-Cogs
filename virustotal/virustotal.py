@@ -22,7 +22,7 @@ class VirusTotal(commands.Cog):
 
     @commands.group(name="virustotal", invoke_without_command=True)
     async def virustotal(self, ctx):
-        """Group for VirusTotal related commands"""
+        """VirusTotal is a free online service that analyzes files and URLs to detect viruses, malware, and other security threats. Learn more at https://www.virustotal.com"""
         await ctx.send_help(ctx.command)
 
     @virustotal.command(name="autoscan")
