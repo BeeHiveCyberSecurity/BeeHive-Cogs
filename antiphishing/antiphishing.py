@@ -376,7 +376,7 @@ class AntiPhishing(commands.Cog):
             try:
                 embed = discord.Embed(
                     title="Link safety",
-                    description=f"No known threats were detected attached to this link: {message.content}. If in doubt, investigate further. Stay safe!",
+                    description=f"{message.content} was not found on any of the loaded blocklists. This does not guarentee it is 100% safe, however, it indicates that there is no known history of abuse tied to the domain. If in doubt, investigate further. Stay safe!",
                     colour=0x2bbd8e,
                 )
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/shield-checkmark.png")
