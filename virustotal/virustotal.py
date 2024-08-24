@@ -125,20 +125,20 @@ class VirusTotal(commands.Cog):
                         content = f"||<@{presid}>||"
                         if malicious_count >= 11:
                             embed.title = "Analysis complete"
-                            embed.description = f"**{int(percent)}% of security vendors rated this file dangerous!**\n\nYou should avoid this file completely, and delete it from your systems to ensure security."
+                            embed.description = f"**{int(percent)}%** of vendors rated this file dangerous! You should avoid this file completely, and delete it from your systems to ensure security."
                             embed.color = discord.Colour(0xff4545)
                             embed.set_footer(text=f"SHA1 | {sha1}")
                         elif 1 < malicious_count < 11:
                             embed.title = "Analysis complete"
-                            embed.description = f"**{int(percent)}% of security vendors rated this file dangerous**\n\nWhile there are malicious ratings available for this file, there aren't many, so this could be a false positive. **You should investigate further.**"
+                            embed.description = f"**{int(percent)}%** of vendors rated this file dangerous. While there are malicious ratings available for this file, there aren't many, so this could be a false positive. **You should investigate further before coming to a decision.**"
                             embed.color = discord.Colour(0xff9144)
                             embed.set_footer(text=f"SHA1 | {sha1}")
                         else:
                             embed.title = "Analysis complete"
                             embed.color = discord.Colour(0x2BBD8E)
-                            embed.description = "**No security vendors currently flag this file as malicious**\n\nYou should be safe to run and use it.\nCheck back on the results later to see if vendors change their minds - it happens"
+                            embed.description = f"**{safe_count}** vendors say this file is malware-free"
                             embed.set_footer(text=f"{sha1}")
-                        button = discord.ui.Button(label="View results", url=f"https://www.virustotal.com/gui/file/{sha256}", style=discord.ButtonStyle.url)
+                        button = discord.ui.Button(label="View results on VirusTotal", url=f"https://www.virustotal.com/gui/file/{sha256}", style=discord.ButtonStyle.url)
                         button2 = discord.ui.Button(label="Get a second opinion", url="https://discord.gg/6PbaH6AfvF", style=discord.ButtonStyle.url)
                         view = discord.ui.View()
                         view.add_item(button)
