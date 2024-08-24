@@ -661,7 +661,7 @@ class AntiPhishing(commands.Cog):
         s_kicks = "s" if kicks != 1 else ""
         s_bans = "s" if bans != 1 else ""
         
-        last_updated_str = f"**Last updated** **`{last_updated}`**"
+        last_updated_str = f"{last_updated}"
         
         embed = discord.Embed(
             title='Protection statistics', 
