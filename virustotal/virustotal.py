@@ -11,6 +11,7 @@ class VirusTotal(commands.Cog):
         self.config = Config.get_conf(self, identifier=1234567890)
         self.config.register_guild(auto_scan_enabled=False, info_emoji_enabled=False, submission_history={})
         self.info_emoji = "ℹ️"
+        self.submission_history = {}
 
     async def initialize(self):
         for guild in self.bot.guilds:
@@ -354,6 +355,8 @@ class VirusTotal(commands.Cog):
                                 await ctx.send(f"{content}\nAnalysis complete: **{int(percent)}%** of vendors rated this file dangerous. While there are malicious ratings available for this file, there aren't many, so this could be a false positive. **You should investigate further before coming to a decision.**\nSHA1: {sha1}\nView results on VirusTotal: https://www.virustotal.com/gui/file/{sha256}\nGet a second opinion: https://discord.gg/6PbaH6AfvF")
                             else:
                                 await ctx.send(f"{content}\nAnalysis complete: **{safe_count}** vendors say this file is malware-free\nSHA1: {sha1}\nView results on VirusTotal: https://www.virustotal.com/gui/file/{sha256}\nGet a second opinion: https://discord.gg/6PbaH6AfvF")
+                        if not hasattr(self, 'submission_history'):
+                            self.submission_history = {}
                         self.log_submission(ctx.author.id, f"`{file_name}` - **{malicious_count}/{total_count}** - [View results](https://www.virustotal.com/gui/file/{sha256})")
                     else:
                         raise ValueError("Required hash values not found in the analysis response.")
