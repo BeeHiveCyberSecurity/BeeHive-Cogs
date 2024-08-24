@@ -15,9 +15,9 @@ class VirusTotal(commands.Cog):
     async def initialize(self):
         for guild in self.bot.guilds:
             guild_data = await self.config.guild(guild).all()
-            guild.auto_scan_enabled = guild_data["auto_scan_enabled"]
-            guild.info_emoji_enabled = guild_data["info_emoji_enabled"]
-            guild.submission_history = guild_data["submission_history"]
+            await self.config.guild(guild).auto_scan_enabled.set(guild_data["auto_scan_enabled"])
+            await self.config.guild(guild).info_emoji_enabled.set(guild_data["info_emoji_enabled"])
+            await self.config.guild(guild).submission_history.set(guild_data["submission_history"])
 
     @commands.group(name="virustotal", invoke_without_command=True)
     async def virustotal(self, ctx):
@@ -28,26 +28,30 @@ class VirusTotal(commands.Cog):
     async def toggle_auto_scan(self, ctx):
         """Toggle automatic file scanning on or off"""
         guild = ctx.guild
-        guild.auto_scan_enabled = not guild.auto_scan_enabled
-        await self.config.guild(guild).auto_scan_enabled.set(guild.auto_scan_enabled)
-        status = "enabled" if guild.auto_scan_enabled else "disabled"
+        auto_scan_enabled = await self.config.guild(guild).auto_scan_enabled()
+        auto_scan_enabled = not auto_scan_enabled
+        await self.config.guild(guild).auto_scan_enabled.set(auto_scan_enabled)
+        status = "enabled" if auto_scan_enabled else "disabled"
         await ctx.send(f"Automatic file scanning has been {status}.")
 
     @virustotal.command(name="infoemoji")
     async def toggle_info_emoji(self, ctx):
         """Toggle automatic info emoji reaction on or off"""
         guild = ctx.guild
-        guild.info_emoji_enabled = not guild.info_emoji_enabled
-        await self.config.guild(guild).info_emoji_enabled.set(guild.info_emoji_enabled)
-        status = "enabled" if guild.info_emoji_enabled else "disabled"
+        info_emoji_enabled = await self.config.guild(guild).info_emoji_enabled()
+        info_emoji_enabled = not info_emoji_enabled
+        await self.config.guild(guild).info_emoji_enabled.set(info_emoji_enabled)
+        status = "enabled" if info_emoji_enabled else "disabled"
         await ctx.send(f"Info emoji reaction has been {status}.")
 
     @virustotal.command(name="settings")
     async def settings(self, ctx):
         """Show current settings for VirusTotal"""
         guild = ctx.guild
-        auto_scan_status = "Enabled" if guild.auto_scan_enabled else "Disabled"
-        info_emoji_status = "Enabled" if guild.info_emoji_enabled else "Disabled"
+        auto_scan_enabled = await self.config.guild(guild).auto_scan_enabled()
+        info_emoji_enabled = await self.config.guild(guild).info_emoji_enabled()
+        auto_scan_status = "Enabled" if auto_scan_enabled else "Disabled"
+        info_emoji_status = "Enabled" if info_emoji_enabled else "Disabled"
         
         vt_key = await self.bot.get_shared_api_tokens("virustotal")
         if vt_key.get("api_key"):
@@ -70,12 +74,14 @@ class VirusTotal(commands.Cog):
     async def on_message(self, message):
         """Automatically scan files if auto_scan is enabled and react to hashes if info_emoji is enabled"""
         guild = message.guild
-        if guild.auto_scan_enabled and message.attachments:
+        auto_scan_enabled = await self.config.guild(guild).auto_scan_enabled()
+        info_emoji_enabled = await self.config.guild(guild).info_emoji_enabled()
+        if auto_scan_enabled and message.attachments:
             ctx = await self.bot.get_context(message)
             if ctx.valid:
                 await self.silent_scan(ctx, message.attachments)
         
-        if guild.info_emoji_enabled:
+        if info_emoji_enabled:
             hashes = self.extract_hashes(message.content)
             if hashes:
                 await message.add_reaction(self.info_emoji)
