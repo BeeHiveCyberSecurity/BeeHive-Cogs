@@ -10,6 +10,8 @@ class VirusTotal(commands.Cog):
         self.bot = bot
         self.submission_history = {}
         self.auto_scan_enabled = False
+        self.info_emoji_enabled = False
+        self.info_emoji = "ℹ️"
 
     @commands.group(name="virustotal", invoke_without_command=True)
     async def virustotal(self, ctx):
@@ -23,10 +25,18 @@ class VirusTotal(commands.Cog):
         status = "enabled" if self.auto_scan_enabled else "disabled"
         await ctx.send(f"Automatic file scanning has been {status}.")
 
+    @virustotal.command(name="infoemoji")
+    async def toggle_info_emoji(self, ctx):
+        """Toggle automatic info emoji reaction on or off"""
+        self.info_emoji_enabled = not self.info_emoji_enabled
+        status = "enabled" if self.info_emoji_enabled else "disabled"
+        await ctx.send(f"Info emoji reaction has been {status}.")
+
     @virustotal.command(name="settings")
     async def settings(self, ctx):
         """Show current settings for VirusTotal"""
-        status = "Enabled" if self.auto_scan_enabled else "Disabled"
+        auto_scan_status = "Enabled" if self.auto_scan_enabled else "Disabled"
+        info_emoji_status = "Enabled" if self.info_emoji_enabled else "Disabled"
         
         vt_key = await self.bot.get_shared_api_tokens("virustotal")
         if vt_key.get("api_key"):
@@ -34,11 +44,12 @@ class VirusTotal(commands.Cog):
         else:
             api_key_status = "You don't have a VirusTotal key added yet. Add a VirusTotal key to enable this cog."
         
-        version = "1.0.3"
+        version = "1.1.0"
         last_update = "August 24th, 2024"
         
         embed = discord.Embed(title="VirusTotal settings", colour=discord.Colour(0x394eff))
-        embed.add_field(name="Automatic file scanning", value=status, inline=False)
+        embed.add_field(name="Automatic file scanning", value=auto_scan_status, inline=False)
+        embed.add_field(name="Info emoji reaction", value=info_emoji_status, inline=False)
         embed.add_field(name="API key", value=api_key_status, inline=False)
         embed.add_field(name="Version", value=version, inline=False)
         embed.add_field(name="Last updated", value=last_update, inline=False)
@@ -46,12 +57,78 @@ class VirusTotal(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        """Automatically scan files if auto_scan is enabled"""
+        """Automatically scan files if auto_scan is enabled and react to hashes if info_emoji is enabled"""
         if self.auto_scan_enabled and message.attachments:
             ctx = await self.bot.get_context(message)
             if ctx.valid:
                 await self.silent_scan(ctx, message.attachments)
-                
+        
+        if self.info_emoji_enabled:
+            hashes = self.extract_hashes(message.content)
+            if hashes:
+                await message.add_reaction(self.info_emoji)
+                def check(reaction, user):
+                    return user != self.bot.user and str(reaction.emoji) == self.info_emoji and reaction.message.id == message.id
+                try:
+                    reaction, user = await self.bot.wait_for('reaction_add', timeout=60.0, check=check)
+                    if reaction:
+                        await self.handle_hash_reaction(message, hashes)
+                except asyncio.TimeoutError:
+                    pass
+
+    def extract_hashes(self, text):
+        """Extract potential file hashes from the text"""
+        import re
+        sha1_pattern = re.compile(r'\b[0-9a-fA-F]{40}\b')
+        sha256_pattern = re.compile(r'\b[0-9a-fA-F]{64}\b')
+        md5_pattern = re.compile(r'\b[0-9a-fA-F]{32}\b')
+        return sha1_pattern.findall(text) + sha256_pattern.findall(text) + md5_pattern.findall(text)
+
+    async def handle_hash_reaction(self, message, hashes):
+        """Handle the reaction to a hash by fetching VirusTotal results"""
+        vt_key = await self.bot.get_shared_api_tokens("virustotal")
+        if not vt_key.get("api_key"):
+            return  # No API key set, silently return
+
+        async with aiohttp.ClientSession() as session:
+            for file_hash in hashes:
+                async with session.get(
+                    f"https://www.virustotal.com/api/v3/files/{file_hash}",
+                    headers={"x-apikey": vt_key["api_key"]},
+                ) as response:
+                    if response.status != 200:
+                        continue  # Skip hashes that can't be checked
+
+                    data = await response.json()
+                    attributes = data.get("data", {}).get("attributes", {})
+                    stats = attributes.get("stats", {})
+                    malicious_count = stats.get("malicious", 0)
+                    suspicious_count = stats.get("suspicious", 0)
+                    undetected_count = stats.get("undetected", 0)
+                    harmless_count = stats.get("harmless", 0)
+                    total_count = malicious_count + suspicious_count + undetected_count + harmless_count
+                    percent = round((malicious_count / total_count) * 100, 2) if total_count > 0 else 0
+
+                    embed = discord.Embed()
+                    if malicious_count >= 11:
+                        embed.title = "Analysis complete"
+                        embed.description = f"**{int(percent)}%** of vendors rated this file dangerous! You should avoid this file completely, and delete it from your systems to ensure security."
+                        embed.color = discord.Colour(0xff4545)
+                    elif 1 < malicious_count < 11:
+                        embed.title = "Analysis complete"
+                        embed.description = f"**{int(percent)}%** of vendors rated this file dangerous. While there are malicious ratings available for this file, there aren't many, so this could be a false positive. **You should investigate further before coming to a decision.**"
+                        embed.color = discord.Colour(0xff9144)
+                    else:
+                        embed.title = "Analysis complete"
+                        embed.color = discord.Colour(0x2BBD8E)
+                        embed.description = f"**{harmless_count + undetected_count}** vendors say this file is malware-free"
+
+                    embed.set_footer(text=f"SHA1 | {file_hash}")
+                    button = discord.ui.Button(label="View results on VirusTotal", url=f"https://www.virustotal.com/gui/file/{file_hash}", style=discord.ButtonStyle.url)
+                    view = discord.ui.View()
+                    view.add_item(button)
+                    await message.channel.send(embed=embed, view=view)
+
     async def silent_scan(self, ctx, attachments):
         """Scan files silently and alert only if they're malicious or suspicious"""
         vt_key = await self.bot.get_shared_api_tokens("virustotal")
