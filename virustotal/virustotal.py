@@ -11,6 +11,9 @@ class VirusTotal(commands.Cog):
         self.config = Config.get_conf(self, identifier=1234567890)
         self.config.register_global(auto_scan_enabled=False, info_emoji_enabled=False, submission_history={})
         self.info_emoji = "ℹ️"
+        self.auto_scan_enabled = False
+        self.info_emoji_enabled = False
+        self.submission_history = {}
 
     async def initialize(self):
         self.auto_scan_enabled = await self.config.auto_scan_enabled()
