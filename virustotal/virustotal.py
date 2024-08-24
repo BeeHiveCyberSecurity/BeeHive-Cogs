@@ -194,15 +194,15 @@ class VirusTotal(commands.Cog):
             self.submission_history[user_id] = []
         self.submission_history[user_id].append(summary)
 
-    @virustotal.command(name="history", description="View your submission history", aliases=["sh"])
+    @virustotal.command(name="history", aliases=["sh"])
     async def submission_history(self, ctx):
-        """View your VirusTotal submission history"""
+        """View files recently submitted by you"""
         user_id = ctx.author.id
         if user_id in self.submission_history and self.submission_history[user_id]:
             history = "\n".join(self.submission_history[user_id])
-            embed = discord.Embed(title="Your Submission History", description=history, colour=discord.Colour(0x2BBD8E))
+            embed = discord.Embed(title="Your recent VirusTotal submissions", description=history, colour=discord.Colour(0x2BBD8E))
         else:
-            embed = discord.Embed(title="No Submission History", description="You have not submitted any files for analysis yet.", colour=discord.Colour(0xff4545))
+            embed = discord.Embed(title="No recent submissions", description="You have not submitted any files for analysis yet. Submissions reset when the bot restarts.", colour=discord.Colour(0xff4545))
         await ctx.send(embed=embed)
 
 
