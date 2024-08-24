@@ -90,6 +90,21 @@ class AntiPhishing(commands.Cog):
         }
 
         async with self.session.get(
+            "https://raw.githubusercontent.com/phishfort/phishfort-lists/master/blacklists/domains.json", headers=headers
+        ) as request:
+            if request.status == 200:
+                try:
+                    data = await request.json()
+                    if isinstance(data, list):
+                        domains.extend(data)
+                    else:
+                        print("Unexpected data format received from PhishFort blacklist.")
+                except Exception as e:
+                    print(f"Error parsing JSON from PhishFort blacklist: {e}")
+            else:
+                print(f"Failed to fetch PhishFort blacklist, status code: {request.status}")
+
+        async with self.session.get(
             "https://phish.sinking.yachts/v2/all", headers=headers
         ) as request:
             if request.status == 200:
@@ -638,6 +653,7 @@ class AntiPhishing(commands.Cog):
         kicks = await self.config.guild(ctx.guild).kicks()
         bans = await self.config.guild(ctx.guild).bans()
         last_updated = self.__last_updated__
+        total_domains = len(self.domains)
         
         s_caught = "s" if caught != 1 else ""
         s_notifications = "s" if notifications != 1 else ""
@@ -655,7 +671,8 @@ class AntiPhishing(commands.Cog):
                 f"- We've warned you of danger **`{notifications}`** time{s_notifications}\n"
                 f"- We've removed **`{deletions}`** message{s_deletions} to protect the community\n"
                 f"- We've removed a user from the server **`{kicks}`** time{s_kicks}\n"
-                f"- We've delivered **`{bans}`** permanent ban{s_bans} for sharing dangerous links\n\n"
+                f"- We've delivered **`{bans}`** permanent ban{s_bans} for sharing dangerous links\n"
+                f"- We are currently monitoring **`{total_domains}`** domains for malicious activity\n\n"
                 f"{last_updated_str}\n"
                 f"**Version** **`{self.__version__}`**"
             ), 
