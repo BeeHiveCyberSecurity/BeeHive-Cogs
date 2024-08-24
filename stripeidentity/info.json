@@ -4,7 +4,7 @@
     ],
     "description": "Verify ages and identities using Stripe Identity",
     "install_msg": "## :white_check_mark: Successfully installed Stripe Identity.\n**Questions?** [We're listening](<https://www.beehive.systems/contact-us>)\n**Interested in CyberSecurity and CyberSafety?** Join our Discord! https://discord.gg/ckdzsm7mTs",
-    "name": "StripeIdentity",
+    "name": "stripeidentity",
     "hidden": false,
     "disabled": false,
     "requirements": [
@@ -18,6 +18,6 @@
         "age-gate"
     ],
     "short": "Verify ages and identities via Discord",
-    "end_user_data_statement": "Stores User ID's and Verification Session ID's, only when pending. Usage of Stripe Identity is subject to the Stripe Consumer Terms of Service, and Privacy Policy",
+    "end_user_data_statement": "Stores User ID's and Verification Session ID's, only when pending. Usage of Stripe Identity is subject to the Stripe Consumer Terms of Service, and Privacy Policy. ",
     "min_bot_version": "3.5.0"
 }

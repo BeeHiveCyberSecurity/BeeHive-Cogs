@@ -80,12 +80,13 @@ class AntiPhishing(commands.Cog):
                 case_str="Malicious link actioned",
             )
 
-    @tasks.loop(minutes=10)
+    @tasks.loop(minutes=2)
     async def get_phishing_domains(self) -> None:
         domains = []
 
         headers = {
             "X-Identity": f"BeeHive AntiPhishing v{self.__version__} (https://www.beehive.systems/)",
+            "User-Agent": f"BeeHive AntiPhishing v{self.__version__} (https://www.beehive.systems/)"
         }
 
         async with self.session.get(
