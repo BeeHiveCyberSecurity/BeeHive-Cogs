@@ -679,7 +679,7 @@ class AntiPhishing(commands.Cog):
         )
         embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/shield-checkmark.png")
         view = discord.ui.View()
-        button = discord.ui.Button(label="Learn More", url="https://www.beehive.systems")
+        button = discord.ui.Button(label="Learn more about BeeHive", url="https://www.beehive.systems")
         view.add_item(button)
         await ctx.send(embed=embed, view=view)
 
