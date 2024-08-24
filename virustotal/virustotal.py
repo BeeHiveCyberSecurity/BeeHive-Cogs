@@ -9,12 +9,90 @@ class VirusTotal(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.submission_history = {}
+        self.auto_scan_enabled = False
 
     @commands.group(name="virustotal", invoke_without_command=True)
     async def virustotal(self, ctx):
         """Group for VirusTotal related commands"""
         await ctx.send_help(ctx.command)
 
+    @virustotal.command(name="toggleautoscan")
+    async def toggle_auto_scan(self, ctx):
+        """Toggle automatic file scanning on or off"""
+        self.auto_scan_enabled = not self.auto_scan_enabled
+        status = "enabled" if self.auto_scan_enabled else "disabled"
+        await ctx.send(f"Automatic file scanning has been {status}.")
+
+    @virustotal.command(name="settings")
+    async def settings(self, ctx):
+        """Show current settings for VirusTotal"""
+        status = "enabled" if self.auto_scan_enabled else "disabled"
+        
+        vt_key = await self.bot.get_shared_api_tokens("virustotal")
+        api_key_status = "set" if vt_key.get("api_key") else "not set"
+        
+        version = "1.0.0"  # Example version, replace with actual version if available
+        last_update = "August 24th, 2024"  # Example last update date, replace with actual date if available
+        
+        embed = discord.Embed(title="VirusTotal Settings", colour=discord.Colour(0x2BBD8E))
+        embed.add_field(name="Automatic File Scanning", value=status, inline=False)
+        embed.add_field(name="API Key", value=api_key_status, inline=False)
+        embed.add_field(name="Version", value=version, inline=False)
+        embed.add_field(name="Last Updated", value=last_update, inline=False)
+        await ctx.send(embed=embed)
+
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        """Automatically scan files if auto_scan is enabled"""
+        if self.auto_scan_enabled and message.attachments:
+            ctx = await self.bot.get_context(message)
+            if ctx.valid:
+                await self.silent_scan(ctx, message.attachments)
+                
+    async def silent_scan(self, ctx, attachments):
+        """Scan files silently and alert only if they're malicious or suspicious"""
+        vt_key = await self.bot.get_shared_api_tokens("virustotal")
+        if not vt_key.get("api_key"):
+            return  # No API key set, silently return
+
+        async with aiohttp.ClientSession() as session:
+            for attachment in attachments:
+                if attachment.size > 30 * 1024 * 1024:  # 30 MB limit
+                    continue  # Skip files that are too large
+
+                async with session.get(attachment.url) as response:
+                    if response.status != 200:
+                        continue  # Skip files that can't be downloaded
+
+                    file_content = await response.read()
+                    file_name = attachment.filename
+
+                    async with session.post(
+                        "https://www.virustotal.com/api/v3/files",
+                        headers={"x-apikey": vt_key["api_key"]},
+                        data={"file": file_content},
+                    ) as vt_response:
+                        if vt_response.status != 200:
+                            continue  # Skip files that can't be uploaded
+
+                        data = await vt_response.json()
+                        analysis_id = data.get("data", {}).get("id")
+                        if not analysis_id:
+                            continue  # Skip files without a valid analysis ID
+
+                        # Check the analysis results
+                        await asyncio.sleep(15)  # Wait for the analysis to complete
+                        async with session.get(
+                            f"https://www.virustotal.com/api/v3/analyses/{analysis_id}",
+                            headers={"x-apikey": vt_key["api_key"]},
+                        ) as result_response:
+                            if result_response.status != 200:
+                                continue  # Skip files that can't be checked
+
+                            result_data = await result_response.json()
+                            stats = result_data.get("data", {}).get("attributes", {}).get("stats", {})
+                            if stats.get("malicious", 0) > 0 or stats.get("suspicious", 0) > 0:
+                                await ctx.send(f"Alert: The file {file_name} is flagged as malicious or suspicious.")
 
     @commands.bot_has_permissions(embed_links=True)
     @virustotal.command(name="scan", aliases=["vt"])
