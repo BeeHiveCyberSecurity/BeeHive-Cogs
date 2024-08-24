@@ -49,7 +49,7 @@ class VirusTotal(commands.Cog):
         
         embed = discord.Embed(title="VirusTotal settings", colour=discord.Colour(0x394eff))
         embed.add_field(name="Automatic file scanning", value=auto_scan_status, inline=False)
-        embed.add_field(name="Info emoji reaction", value=info_emoji_status, inline=False)
+        embed.add_field(name="Intelligence reactions", value=info_emoji_status, inline=False)
         embed.add_field(name="API key", value=api_key_status, inline=False)
         embed.add_field(name="Version", value=version, inline=False)
         embed.add_field(name="Last updated", value=last_update, inline=False)
