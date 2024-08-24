@@ -673,8 +673,7 @@ class AntiPhishing(commands.Cog):
                 f"- We've removed a user from the server **`{kicks}`** time{s_kicks}\n"
                 f"- We've delivered **`{bans}`** permanent ban{s_bans} for sharing dangerous links\n"
                 f"- We are currently monitoring **`{total_domains}`** domains for malicious activity\n\n"
-                f"{last_updated_str}\n"
-                f"**Version** **`{self.__version__}`**"
+                f"You're running v{self.__version__}, released {last_updated_str}\n"
             ), 
             colour=16767334,
         )
