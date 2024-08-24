@@ -666,13 +666,13 @@ class AntiPhishing(commands.Cog):
         embed = discord.Embed(
             title='Protection statistics', 
             description=(
-                f"Since being activated in {ctx.guild.name}, we've been hard at work.\n\n"
-                f"- We've detected **`{caught}`** malicious link{s_caught} shared in chats\n"
-                f"- We've warned you of danger **`{notifications}`** time{s_notifications}\n"
-                f"- We've removed **`{deletions}`** message{s_deletions} to protect the community\n"
-                f"- We've removed a user from the server **`{kicks}`** time{s_kicks}\n"
-                f"- We've delivered **`{bans}`** permanent ban{s_bans} for sharing dangerous links\n"
-                f"- We are currently monitoring **`{total_domains}`** domains for malicious activity\n\n"
+                f"Your server's never been safer..."
+                f"- Detected **`{caught}`** malicious link{s_caught} shared in chats\n"
+                f"- Warned you of danger **`{notifications}`** time{s_notifications}\n"
+                f"- Removed **`{deletions}`** message{s_deletions} to protect the community\n"
+                f"- Removed a user from the server **`{kicks}`** time{s_kicks}\n"
+                f"- Delivered **`{bans}`** permanent ban{s_bans} for sharing dangerous links\n"
+                f"- Currently monitoring **`{total_domains}`** domains for malicious activity\n\n"
                 f"You're running **v{self.__version__}**, released **{last_updated_str}**\n"
             ), 
             colour=16767334,
