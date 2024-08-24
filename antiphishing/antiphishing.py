@@ -94,11 +94,15 @@ class AntiPhishing(commands.Cog):
         ) as request:
             if request.status == 200:
                 try:
-                    data = await request.json()
-                    if isinstance(data, list):
-                        domains.extend(data)
+                    content_type = request.headers.get('Content-Type', '')
+                    if 'application/json' in content_type:
+                        data = await request.json()
+                        if isinstance(data, list):
+                            domains.extend(data)
+                        else:
+                            print("Unexpected data format received from PhishFort blacklist.")
                     else:
-                        print("Unexpected data format received from PhishFort blacklist.")
+                        print(f"Unexpected mimetype received: {content_type}")
                 except Exception as e:
                     print(f"Error parsing JSON from PhishFort blacklist: {e}")
             else:
