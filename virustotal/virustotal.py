@@ -161,8 +161,9 @@ class VirusTotal(commands.Cog):
             self.submission_history[user_id] = []
         self.submission_history[user_id].append(summary)
 
-    @commands.command(name="submissionhistory", description="View your submission history", aliases=["sh"])
+    @virustotal.command(name="history", description="View your submission history", aliases=["sh"])
     async def submission_history(self, ctx):
+        """View your VirusTotal submission history"""
         user_id = ctx.author.id
         if user_id in self.submission_history and self.submission_history[user_id]:
             history = "\n".join(self.submission_history[user_id])
