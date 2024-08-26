@@ -1,6 +1,6 @@
-import discord
-from redbot.core import commands, Config, checks
-import matplotlib.pyplot as plt
+import discord #type: ignore
+from redbot.core import commands, Config, checks #type: ignore
+import matplotlib.pyplot as plt #type: ignore
 import io
 import asyncio
 
