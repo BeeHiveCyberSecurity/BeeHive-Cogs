@@ -112,10 +112,18 @@ class InviteTracker(commands.Cog):
 
             if invite_count in self.milestones:
                 embed = discord.Embed(
-                    title="Milestone Reached",
-                    description=f"Congratulations! You've reached {invite_count} invites!",
+                    title="Milestone reached",
+                    description=(
+                        f"Congratulations! You've reached {invite_count} invites!\n\n"
+                        f"This is a significant achievement and shows your dedication to growing our community. "
+                        f"Keep up the great work and continue to invite more members to join us!"
+                    ),
                     color=discord.Color.from_str("#2bbd8e")
                 )
+                embed.add_field(name="Server", value=guild.name, inline=False)
+                embed.add_field(name="Inviter", value=inviter.mention, inline=False)
+                embed.add_field(name="Next Milestone", value=f"{invite_count + 10} invites", inline=False)
+                embed.set_footer(text="Thank you for your contributions!")
                 await inviter.send(embed=embed)
         except Exception as e:
             print(f"Failed to check milestones for inviter {inviter.id} in guild {guild.id}: {e}")
