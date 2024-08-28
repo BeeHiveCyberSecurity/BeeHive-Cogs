@@ -2,7 +2,7 @@
     "author": [
         "adminescalation"
     ],
-    "description": "Manage and display disclaimers for users based on their professions. This cog allows you to add, remove, and display predefined disclaimers for users in your Discord server.",
+    "description": "Manage and display disclaimers for users based on their professions when a disclaimer may be appropriate - eg, lawyer, doctor, judge, law enforcement. This cog allows you to add, remove, and display predefined disclaimers for users in your Discord server.",
     "install_msg": "## :white_check_mark: Successfully installed Disclaimers.\n**Questions?** [We're listening](<https://www.beehive.systems/contact-us>)\n**Need help?** [Join our Discord](https://discord.gg/ckdzsm7mTs).",
     "name": "disclaimers",
     "end_user_data_statement": "This cog stores flags on a user about their profession.",
