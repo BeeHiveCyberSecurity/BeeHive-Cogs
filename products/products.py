@@ -343,9 +343,9 @@ class Products(commands.Cog):
                 license_text = (
                     "BeeHive Bot License\n"
                     "====================\n\n"
-                    "This bot is a proprietary software developed by BeeHive Systems. All rights reserved.\n\n"
+                    "This bot is a proprietary software developed by BeeHive All rights reserved.\n\n"
                     "You are granted a non-exclusive, non-transferable, revocable license to use this bot for personal or internal business purposes only.\n\n"
-                    "Redistribution, modification, or commercial use of this bot is strictly prohibited without prior written permission from BeeHive Systems.\n\n"
+                    "Redistribution, modification, or commercial use of this bot is strictly prohibited without prior written permission from BeeHive.\n\n"
                     "For more information, please visit our website at https://www.beehive.systems or contact us at support@beehive.systems."
                 )
                 embed = discord.Embed(
