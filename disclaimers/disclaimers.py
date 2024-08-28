@@ -134,7 +134,7 @@ class Disclaimers(commands.Cog):
             colour=discord.Colour.green()
         )
         for profession, count in profession_counts.items():
-            embed.add_field(name=profession.capitalize(), value=str(count), inline=False)
+            embed.add_field(name=profession.capitalize(), value=f"{count} users", inline=False)
 
         await ctx.send(embed=embed)
 
