@@ -272,15 +272,17 @@ class ServerInfoCog(commands.Cog):
         message = await ctx.send(embed=pages[0])
         await message.add_reaction("⬅️")
         await message.add_reaction("➡️")
+        await message.add_reaction("❌")
 
         def check(reaction, user):
-            return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️"]
+            return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️", "❌"]
 
         page_number = 0
         while True:
             try:
                 reaction, user = await self.bot.wait_for("reaction_add", timeout=60.0, check=check)
             except asyncio.TimeoutError:
+                await message.clear_reactions()
                 return
             else:
                 if str(reaction.emoji) == "⬅️" and page_number > 0:
@@ -291,4 +293,7 @@ class ServerInfoCog(commands.Cog):
                     page_number += 1
                     await message.edit(embed=pages[page_number])
                     await message.remove_reaction(reaction, user)
+                elif str(reaction.emoji) == "❌":
+                    await message.delete()
+                    return
 
