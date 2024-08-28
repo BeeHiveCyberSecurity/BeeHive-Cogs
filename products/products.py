@@ -338,19 +338,14 @@ class Products(commands.Cog):
     @commands.command(name="licenseinfo", description="Show the customized license information for BeeHive's bot.")
     async def licenseinfo(self, ctx: commands.Context):
         """
-        Show the customized license information for BeeHive's bot.
+        Show the customized license information for Sentri.
         """
-        license_text = (
-            "BeeHive Bot License\n"
-            "====================\n\n"
-            "This bot is a proprietary software developed by BeeHive All rights reserved.\n\n"
-            "You are granted a non-exclusive, non-transferable, revocable license to use this bot for personal or internal business purposes only.\n\n"
-            "Redistribution, modification, or commercial use of this bot is strictly prohibited without prior written permission from BeeHive.\n\n"
-            "For more information, please visit our website at https://www.beehive.systems or contact us at support@beehive.systems."
-        )
         embed = discord.Embed(
-            title="BeeHive Bot License Information",
-            description=license_text,
+            title="Thanks for using Sentri!",
+            description="Here's the applicable license information about Sentri.",
             colour=16767334
         )
+        embed.add_field(name="Built on Red", value="Sentri is built on Red, a modern and open-source Python framework for Discord bots. [Learn more about Red](https://discord.red)")
+        embed.add_field(name="Licensed under GPLv3", value="Red is a free and open source application made available to the public and licensed under the GNU GPLv3. [Read the license](https://github.com/Cog-Creators/Red-DiscordBot/blob/V3/develop/LICENSE)")
+        embed.add_field(name="Enhanced by BeeHive", value="This bot has been enhanced by BeeHive to provide additional features and functionality. [Learn more about Sentri](https://www.beehive.systems/sentri)")
         await ctx.send(embed=embed)
