@@ -77,6 +77,9 @@ class VirusTotal(commands.Cog):
     async def on_message(self, message):
         """Automatically scan files if auto_scan is enabled and react to hashes if info_emoji is enabled"""
         guild = message.guild
+        if guild is None:
+            return  # Ignore messages not in a guild
+
         auto_scan_enabled = await self.config.guild(guild).auto_scan_enabled()
         info_emoji_enabled = await self.config.guild(guild).info_emoji_enabled()
         if auto_scan_enabled and message.attachments:
