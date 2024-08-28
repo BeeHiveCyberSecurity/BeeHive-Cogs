@@ -5,7 +5,7 @@ from redbot.core.bot import Red
 class Disclaimers(commands.Cog):
     def __init__(self, bot: Red):
         self.bot = bot
-        self.config = Config.get_conf(self, identifier=1234567890, force_registration=True)
+        self.config = Config.get_conf(self, identifier=84785745654, force_registration=True)
         self.config.register_user(disclaimers=[])
         self.predefined_disclaimers = {
             "lawyer": "⚖️ Disclaimer: This user is a lawyer, but they are not your lawyer. Any information provided is not legal advice.",
@@ -77,8 +77,8 @@ class Disclaimers(commands.Cog):
             profession = professions[page]
             disclaimer = self.predefined_disclaimers[profession]
             embed = discord.Embed(
-                title=f"Profession: {profession.capitalize()}",
-                description=f"**Disclaimer**: {disclaimer}",
+                title=f"{profession.capitalize()}",
+                description=f"{disclaimer}",
                 colour=discord.Colour.blue()
             )
             embed.set_footer(text=f"Page {page + 1}/{len(professions)}")
