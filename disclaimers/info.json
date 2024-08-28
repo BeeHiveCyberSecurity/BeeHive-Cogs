@@ -8,10 +8,6 @@
     "end_user_data_statement": "This cog stores flags on a user about their profession.",
     "hidden": false,
     "disabled": false,
-    "requirements": [
-        "discord.py",
-        "redbot.core"
-    ],
     "tags": [
         "disclaimers",
         "user management",
