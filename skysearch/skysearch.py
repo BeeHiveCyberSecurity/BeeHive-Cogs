@@ -1610,6 +1610,9 @@ class Skysearch(commands.Cog):
                 response = await self._make_request(url)
                 if response and 'ac' in response:
                     for aircraft_info in response['ac']:
+                        # Ignore aircraft with the callsign 00000000
+                        if aircraft_info.get('icao') == '00000000':
+                            continue
                         guilds = self.bot.guilds
                         for guild in guilds:
                             alert_channel_id = await self.config.guild(guild).alert_channel()
