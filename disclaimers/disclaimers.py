@@ -24,9 +24,17 @@ class Disclaimers(commands.Cog):
     async def get_disclaimers(self, user_id: int):
         return await self.config.user_from_id(user_id).disclaimers()
 
-    @commands.command(name="adddisclaimer", description="Add a disclaimer to a user.")
+    @commands.group(name="disclaimers", description="Manage user disclaimers.", invoke_without_command=True)
     @commands.has_permissions(manage_roles=True)
-    async def adddisclaimer(self, ctx: commands.Context, user: discord.Member, profession: str):
+    async def disclaimers(self, ctx: commands.Context):
+        """
+        Base command for managing disclaimers.
+        """
+        await ctx.send_help(ctx.command)
+
+    @disclaimers.command(name="add", description="Add a disclaimer to a user.")
+    @commands.has_permissions(manage_roles=True)
+    async def add(self, ctx: commands.Context, user: discord.Member, profession: str):
         """
         Add a disclaimer to a user based on their profession.
         """
@@ -39,9 +47,9 @@ class Disclaimers(commands.Cog):
         await self.save_disclaimer(user.id, disclaimer)
         await ctx.send(f"Added disclaimer to {user.display_name}: {disclaimer}")
 
-    @commands.command(name="removedisclaimer", description="Remove a disclaimer from a user.")
+    @disclaimers.command(name="remove", description="Remove a disclaimer from a user.")
     @commands.has_permissions(manage_roles=True)
-    async def removedisclaimer(self, ctx: commands.Context, user: discord.Member, *, profession: str):
+    async def remove(self, ctx: commands.Context, user: discord.Member, *, profession: str):
         """
         Remove a disclaimer from a user.
         """
