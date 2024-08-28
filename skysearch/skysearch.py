@@ -69,39 +69,39 @@ class Skysearch(commands.Cog):
 #                embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Orange/alert-circle-outline.png")
             if squawk_code == '7500':
                 embed = discord.Embed(title='Aircraft alert', description=f"# {aircraft_data.get('desc', 'N/A')}", color=discord.Colour(0xff4545))
-                emergency_status = ":rotating_light: **Aircraft has been hijacked**"
+                emergency_status = ":rotating_light: Aircraft has been **hijacked**"
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/alert-circle.png")
             elif squawk_code == '7600':
                 embed = discord.Embed(title='Aircraft alert', description=f"# {aircraft_data.get('desc', 'N/A')}", color=discord.Colour(0xff4545))
-                emergency_status = ":signal_strength: **Aircraft has lost radio contact**"
+                emergency_status = ":signal_strength: Aircraft has **lost radio contact**"
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/alert-circle.png")
             elif squawk_code == '7700':
                 embed = discord.Embed(title='Aircraft alert', description=f"# {aircraft_data.get('desc', 'N/A')}", color=discord.Colour(0xff4545))
-                emergency_status = ":warning: **Aircraft has declared an emergency**"
+                emergency_status = ":warning: Aircraft has **declared a general emergency**"
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/alert-circle.png")
             else:
                 embed = discord.Embed(title='Aircraft information', description=f"# {aircraft_data.get('desc', 'N/A')}", color=discord.Colour(0xfffffe))
-                emergency_status = ":white_check_mark: **Aircraft reports normal conditions**"
+                emergency_status = ":white_check_mark: Aircraft reports **normal** conditions"
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/airplane.png")
             callsign = aircraft_data.get('flight', 'N/A').strip()
             if not callsign or callsign == 'N/A':
                 callsign = 'BLOCKED'
-            embed.add_field(name="Callsign", value=f"**`{callsign}`**", inline=True)
+            embed.add_field(name="Callsign", value=f"`{callsign}`", inline=True)
             registration = aircraft_data.get('reg', None)
             if registration is not None:
                 registration = registration.upper()
-                embed.add_field(name="Registration", value=f"**`{registration}`**", inline=True)
+                embed.add_field(name="Registration", value=f"`{registration}`", inline=True)
             icao = aircraft_data.get('hex', 'N/A').upper()
-            embed.add_field(name="ICAO", value=f"**`{icao}`**", inline=True)
+            embed.add_field(name="ICAO", value=f"```{icao}```", inline=True)
             altitude = aircraft_data.get('alt_baro', 'N/A')
             ground_speed = aircraft_data.get('gs', 'N/A')
             if altitude == 'ground':
-                embed.add_field(name="Status", value="**`On ground`**", inline=True)
+                embed.add_field(name="Status", value="**On ground**", inline=True)
             elif altitude != 'N/A':
                 if isinstance(altitude, int):
                     altitude = "{:,}".format(altitude)
                 altitude_feet = f"{altitude} ft"
-                embed.add_field(name="Altitude", value=f"**`{altitude_feet}`**", inline=True)
+                embed.add_field(name="Altitude", value=f"`{altitude_feet}`", inline=True)
             heading = aircraft_data.get('true_heading', None)
             if heading is not None:
                 if 0 <= heading < 45:
