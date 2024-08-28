@@ -243,22 +243,22 @@ class Sesh(commands.Cog):
 
     @commands.guild_only()
     @sesh.command()
-    async def end(self, ctx, session_id: str):
+    async def end(self, ctx, identifier: str):
         """Manually end a smoking session.
         
-        Provide the session ID to end the session.
+        Provide the session ID or the voice channel ID to end the session.
         """
         async with self.config.guild(ctx.guild).sessions() as sessions:
             for session in sessions:
-                if session["id"] == session_id:
+                if session["id"] == identifier or session.get("voice_channel_id") == identifier:
                     if 'voice_channel_id' in session:
                         voice_channel = ctx.guild.get_channel(session['voice_channel_id'])
                         if voice_channel:
                             await voice_channel.delete()
                     sessions.remove(session)
-                    await ctx.send(f"Smoking session with ID {session_id} has been manually ended.")
+                    await ctx.send(f"Smoking session with ID {session['id']} has been manually ended.")
                     return
-            await ctx.send("No session found with that ID.")
+            await ctx.send("No session found with that ID or voice channel ID.")
 
 async def setup(bot):
     await bot.add_cog(Sesh(bot))
