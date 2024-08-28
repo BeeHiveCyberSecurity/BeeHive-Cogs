@@ -8,7 +8,7 @@ class Disclaimers(commands.Cog):
         self.config = Config.get_conf(self, identifier=84785745654, force_registration=True)
         self.config.register_user(disclaimers=[])
         self.predefined_disclaimers = {
-            "lawyer": "⚖️ Disclaimer: This user is a lawyer, but they are not your lawyer. Any information provided is not legal advice.",
+            "lawyer": "This user is a licensed attorney; however, they are not your personal legal representative. Any information or opinions shared here are intended solely for general informational purposes and should not be interpreted as legal advice. Opinions expressed are purely social remarks and reflect personal viewpoints, not legal counsel. For tailored legal guidance or assistance specific to your situation, please consult with a qualified attorney who can provide professional advice based on your individual circumstances.",
             "doctor": "🩺 Disclaimer: This user is a doctor, but they are not your doctor. Any information provided is not medical advice."
         }
 
