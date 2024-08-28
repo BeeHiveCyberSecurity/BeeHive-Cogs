@@ -263,7 +263,7 @@ class ServerInfoCog(commands.Cog):
                 title="Guild Splash",
                 colour=await ctx.embed_colour(),
             )
-            page6.set_image(url=guild.splash.url.replace(format="png"))
+            page6.set_image(url=guild.splash.url.replace(".webp", ".png"))
             pages.append(page6)
 
         for page in pages:
