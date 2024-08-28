@@ -1,6 +1,6 @@
-import discord  # type: ignore
-import speedtest  # type: ignore
-from redbot.core import commands  # Import Red's commands
+import discord  #type: ignore
+import speedtest  #type: ignore
+from redbot.core import commands #type: ignore
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 
