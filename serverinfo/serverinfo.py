@@ -198,7 +198,7 @@ class ServerInfoCog(commands.Cog):
                 emoji_count=bold(humanize_number(len(guild.emojis))),
                 role_count=bold(humanize_number(len(guild.roles))),
                 boosts=bold(boosts),
-                boost_level=bold(boost_level),
+                boost_level=bold(str(boost_level)),
             ),
             inline=False,
         )
