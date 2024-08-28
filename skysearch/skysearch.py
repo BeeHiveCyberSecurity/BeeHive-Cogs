@@ -1,16 +1,13 @@
 import discord #type: ignore
-import json
 import aiohttp #type: ignore
 import re
 import asyncio
 import urllib
-import typing
 import os
 import io
 import tempfile
 import csv
 import datetime
-import time
 from urllib.parse import quote_plus
 from discord.ext import tasks, commands #type: ignore
 from redbot.core import commands, Config #type: ignore
