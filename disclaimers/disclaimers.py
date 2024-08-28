@@ -62,6 +62,61 @@ class Disclaimers(commands.Cog):
         await self.remove_disclaimer(user.id, disclaimer)
         await ctx.send(f"Removed disclaimer from {user.display_name}: {disclaimer}")
 
+    @disclaimers.command(name="list", description="List all professions and their disclaimers.")
+    @commands.has_permissions(manage_roles=True)
+    async def list(self, ctx: commands.Context):
+        """
+        List all professions and their disclaimers, allowing users to scroll through them using reactions.
+        """
+        professions = list(self.predefined_disclaimers.keys())
+        if not professions:
+            await ctx.send("No predefined disclaimers available.")
+            return
+
+        def get_embed(page):
+            profession = professions[page]
+            disclaimer = self.predefined_disclaimers[profession]
+            embed = discord.Embed(
+                title=f"Profession: {profession.capitalize()}",
+                description=f"**Disclaimer**: {disclaimer}",
+                colour=discord.Colour.blue()
+            )
+            embed.set_footer(text=f"Page {page + 1}/{len(professions)}")
+            return embed
+
+        current_page = 0
+        message = await ctx.send(embed=get_embed(current_page))
+
+        await message.add_reaction("⬅️")
+        await message.add_reaction("➡️")
+        await message.add_reaction("❌")
+
+        def check(reaction, user):
+            return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️", "❌"] and reaction.message.id == message.id
+
+        while True:
+            try:
+                reaction, user = await self.bot.wait_for('reaction_add', timeout=60.0, check=check)
+                if str(reaction.emoji) == "➡️":
+                    if current_page < len(professions) - 1:
+                        current_page += 1
+                        await message.edit(embed=get_embed(current_page))
+                elif str(reaction.emoji) == "⬅️":
+                    if current_page > 0:
+                        current_page -= 1
+                        await message.edit(embed=get_embed(current_page))
+                elif str(reaction.emoji) == "❌":
+                    await message.clear_reactions()
+                    break
+                await message.remove_reaction(reaction, user)
+            except asyncio.TimeoutError:
+                break
+
+        await message.clear_reactions()
+
+
+
+
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
         if message.author.bot:
