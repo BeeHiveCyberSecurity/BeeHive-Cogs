@@ -60,6 +60,9 @@ class ServerInfoCog(commands.Cog):
         text_channels = humanize_number(len(guild.text_channels))
         voice_channels = humanize_number(len(guild.voice_channels))
         stage_channels = humanize_number(len(guild.stage_channels))
+        categories = humanize_number(len(guild.categories))
+        boosts = humanize_number(guild.premium_subscription_count)
+        boost_level = guild.premium_tier
 
         def _size(num: int):
             for unit in ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB"]:
@@ -157,11 +160,13 @@ class ServerInfoCog(commands.Cog):
             value=_(
                 "\N{SPEECH BALLOON} Text: {text}\n"
                 "\N{SPEAKER WITH THREE SOUND WAVES} Voice: {voice}\n"
-                "\N{STUDIO MICROPHONE} Stage: {stage}"
+                "\N{STUDIO MICROPHONE} Stage: {stage}\n"
+                "\N{FILE FOLDER} Categories: {categories}"
             ).format(
                 text=bold(text_channels),
                 voice=bold(voice_channels),
                 stage=bold(stage_channels),
+                categories=bold(categories),
             ),
         )
         page2.add_field(
@@ -184,7 +189,7 @@ class ServerInfoCog(commands.Cog):
         page3.add_field(
             name=_("Misc:"),
             value=_(
-                "AFK channel: {afk_chan}\nAFK timeout: {afk_timeout}\nCustom emojis: {emoji_count}\nRoles: {role_count}"
+                "AFK channel: {afk_chan}\nAFK timeout: {afk_timeout}\nCustom emojis: {emoji_count}\nRoles: {role_count}\nBoosts: {boosts}\nBoost Level: {boost_level}"
             ).format(
                 afk_chan=bold(str(guild.afk_channel))
                 if guild.afk_channel
@@ -192,6 +197,8 @@ class ServerInfoCog(commands.Cog):
                 afk_timeout=bold(humanize_timedelta(seconds=guild.afk_timeout)),
                 emoji_count=bold(humanize_number(len(guild.emojis))),
                 role_count=bold(humanize_number(len(guild.roles))),
+                boosts=bold(boosts),
+                boost_level=bold(boost_level),
             ),
             inline=False,
         )
