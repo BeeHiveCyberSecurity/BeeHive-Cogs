@@ -156,9 +156,6 @@ class Disclaimers(commands.Cog):
 
             try:
                 reaction, user = await self.bot.wait_for('reaction_add', timeout=60.0, check=check)
-            except asyncio.TimeoutError:
-                return
-            else:
                 disclaimers_text = "\n".join(disclaimers)
                 embed = discord.Embed(
                     title=f"Disclaimer for {message.author.display_name}",
@@ -166,6 +163,10 @@ class Disclaimers(commands.Cog):
                     colour=discord.Colour.orange()
                 )
                 await message.channel.send(embed=embed)
+            except asyncio.TimeoutError:
+                return
+            finally:
+                await message.clear_reactions()
 
 async def setup(bot: Red):
     await bot.add_cog(Disclaimers(bot))
