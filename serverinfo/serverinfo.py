@@ -148,7 +148,7 @@ class ServerInfoCog(commands.Cog):
             else None,
         )
         if guild.icon:
-            page1.set_thumbnail(url=guild.icon)
+            page1.set_thumbnail(url=guild.icon.url)
         page1.add_field(name=_("Members:"), value=member_msg)
         pages.append(page1)
 
@@ -263,7 +263,7 @@ class ServerInfoCog(commands.Cog):
                 title="Guild Splash",
                 colour=await ctx.embed_colour(),
             )
-            page6.set_image(url=guild.splash.replace(format="png"))
+            page6.set_image(url=guild.splash.url.replace(format="png"))
             pages.append(page6)
 
         for page in pages:
