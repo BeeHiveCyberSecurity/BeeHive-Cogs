@@ -92,11 +92,10 @@ class Skysearch(commands.Cog):
                 registration = registration.upper()
                 embed.add_field(name="Registration", value=f"`{registration}`", inline=True)
             icao = aircraft_data.get('hex', 'N/A').upper()
-            embed.add_field(name="ICAO", value=f"```{icao}```", inline=True)
+            embed.add_field(name="ICAO", value=f"`{icao}`", inline=True)
             altitude = aircraft_data.get('alt_baro', 'N/A')
-            ground_speed = aircraft_data.get('gs', 'N/A')
             if altitude == 'ground':
-                embed.add_field(name="Status", value="**On ground**", inline=True)
+                embed.add_field(name="Status", value="On ground", inline=True)
             elif altitude != 'N/A':
                 if isinstance(altitude, int):
                     altitude = "{:,}".format(altitude)
@@ -120,7 +119,7 @@ class Skysearch(commands.Cog):
                     emoji = ":arrow_upper_left:"
                 else:
                     emoji = ":arrow_up:"
-                embed.add_field(name="Heading", value=f"{emoji} **`{heading}°`**", inline=True)
+                embed.add_field(name="Heading", value=f"{emoji} `{heading}**°**`", inline=True)
             lat = aircraft_data.get('lat', 'N/A')
             lon = aircraft_data.get('lon', 'N/A')
             if lat != 'N/A':
@@ -132,18 +131,18 @@ class Skysearch(commands.Cog):
                 lon_dir = "E" if lon >= 0 else "W"
                 lon = f"{abs(lon)}{lon_dir}"
             if lat != 'N/A' and lon != 'N/A':
-                embed.add_field(name="Position", value=f"**`{lat}, {lon}`**", inline=True)
-            embed.add_field(name="Squawk", value=f"**`{aircraft_data.get('squawk', 'BLOCKED')}`**", inline=True)
+                embed.add_field(name="Position", value=f"`{lat}, {lon}`", inline=True)
+            embed.add_field(name="Squawk", value=f"`{aircraft_data.get('squawk', 'BLOCKED')}`", inline=True)
             if aircraft_data.get('year', None) is not None:
-                embed.add_field(name="Built", value=f"**`{aircraft_data.get('year')}`**", inline=True)
+                embed.add_field(name="Built", value=f"`{aircraft_data.get('year')}`", inline=True)
             
             aircraft_model = aircraft_data.get('t', None)
             if aircraft_model is not None:
-                embed.add_field(name="Model", value=f"**`{aircraft_model}`**", inline=True)
+                embed.add_field(name="Model", value=f"`{aircraft_model}`", inline=True)
             ground_speed_knots = aircraft_data.get('gs', 'N/A')
             if ground_speed_knots != 'N/A':
                 ground_speed_mph = round(float(ground_speed_knots) * 1.15078)  # Convert knots to mph
-                embed.add_field(name="Speed", value=f"**`{ground_speed_mph} mph`**", inline=True)
+                embed.add_field(name="Speed", value=f"`{ground_speed_mph} mph`", inline=True)
             category_code_to_label = {
                 "A0": "`No info available`",
                 "A1": "`Light (< 15500 lbs)`",
