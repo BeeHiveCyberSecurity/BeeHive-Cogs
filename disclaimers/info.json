@@ -1,0 +1,22 @@
+{
+    "author": [
+        "adminescalation"
+    ],
+    "description": "Manage and display disclaimers for users based on their professions. This cog allows you to add, remove, and display predefined disclaimers for users in your Discord server.",
+    "install_msg": "## :white_check_mark: Successfully installed Disclaimers.\n**Questions?** [We're listening](<https://www.beehive.systems/contact-us>)\n**Need help?** [Join our Discord](https://discord.gg/ckdzsm7mTs).",
+    "name": "disclaimers",
+    "end_user_data_statement": "This cog stores flags on a user about their profession.",
+    "hidden": false,
+    "disabled": false,
+    "requirements": [
+        "discord.py",
+        "redbot.core"
+    ],
+    "tags": [
+        "disclaimers",
+        "user management",
+        "profession"
+    ],
+    "short": "Manage and display user disclaimers based on professions",
+    "min_bot_version": "3.5.0"
+}
