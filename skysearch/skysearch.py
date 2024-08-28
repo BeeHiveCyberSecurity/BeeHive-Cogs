@@ -11,6 +11,7 @@ import tempfile
 import csv
 import datetime
 import time
+from urllib.parse import quote_plus
 from discord.ext import tasks, commands #type: ignore
 from redbot.core import commands, Config #type: ignore
 from reportlab.lib.pagesizes import letter, landscape, A4 #type: ignore
@@ -176,7 +177,8 @@ class Skysearch(commands.Cog):
 
             operator = aircraft_data.get('ownOp', None)
             if operator is not None:
-                embed.add_field(name="Operated by", value=f"[{operator}](https://www.google.com/search?q={operator})", inline=False)
+                operator_encoded = quote_plus(operator)
+                embed.add_field(name="Operated by", value=f"[{operator}](https://www.google.com/search?q={operator_encoded})", inline=False)
             
             last_seen = aircraft_data.get('seen', 'N/A')
             if last_seen != 'N/A':
