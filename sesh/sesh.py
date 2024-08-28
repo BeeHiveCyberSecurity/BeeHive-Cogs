@@ -80,11 +80,9 @@ class Sesh(commands.Cog):
                 if remaining_time.total_seconds() <= 0:
                     break
 
-                participant_types = [p["type"] for p in session["participants"]]
-                most_popular_type = max(set(participant_types), key=participant_types.count)
                 participant_count = len(session["participants"])
 
-                new_name = f"Sesh-{session['id']} | Ends in {remaining_time.seconds // 60}m | {most_popular_type} | {participant_count} participants"
+                new_name = f"Sesh-{session['id']} | Ends in {remaining_time.seconds // 60}m | {participant_count} participants"
                 await voice_channel.edit(name=new_name)
                 
                 # Check if all users have left the voice channel
@@ -127,16 +125,6 @@ class Sesh(commands.Cog):
             return
         duration = {"1️⃣": 15, "2️⃣": 30, "3️⃣": 45, "4️⃣": 60}[duration]
 
-        marijuana_type = await ask_question(ctx, "Enter type (flower, concentrate, distillate, edibles)", ["🌸", "💧", "💊", "🍪"])
-        if not marijuana_type:
-            return
-        marijuana_type = {"🌸": "flower", "💧": "concentrate", "💊": "distillate", "🍪": "edibles"}[marijuana_type]
-
-        strain_type = await ask_question(ctx, "Enter strain (indica, sativa, hybrid)", ["🌙", "☀️", "🌗"])
-        if not strain_type:
-            return
-        strain_type = {"🌙": "indica", "☀️": "sativa", "🌗": "hybrid"}[strain_type]
-
         session_time = datetime.datetime.utcnow()
         session_end_time = session_time + datetime.timedelta(minutes=duration)
 
@@ -146,7 +134,7 @@ class Sesh(commands.Cog):
             "time": session_time.isoformat(),
             "end_time": session_end_time.isoformat(),
             "creator": ctx.author.id,
-            "participants": [{"id": ctx.author.id, "type": marijuana_type, "strain": strain_type}]
+            "participants": [{"id": ctx.author.id}]
         }
 
         async with self.config.guild(ctx.guild).sessions() as sessions:
@@ -189,44 +177,10 @@ class Sesh(commands.Cog):
                 session_end_time = datetime.datetime.fromisoformat(session["end_time"])
                 if session_time <= current_time < session_end_time:
                     if not any(p["id"] == ctx.author.id for p in session["participants"]):
-                        await ctx.send("What type of marijuana are you consuming? (e.g., flower, concentrate, distillate, edibles, etc.)", 
-                                       components=[
-                                           discord.ui.Button(label="Flower", style=discord.ButtonStyle.primary, custom_id="flower"),
-                                           discord.ui.Button(label="Concentrate", style=discord.ButtonStyle.primary, custom_id="concentrate"),
-                                           discord.ui.Button(label="Distillate", style=discord.ButtonStyle.primary, custom_id="distillate"),
-                                           discord.ui.Button(label="Edibles", style=discord.ButtonStyle.primary, custom_id="edibles")
-                                       ])
-                        
-                        def check_type(interaction):
-                            return interaction.user == ctx.author and interaction.message.channel == ctx.channel
-                        
-                        try:
-                            type_interaction = await self.bot.wait_for('interaction', check=check_type, timeout=60.0)
-                            marijuana_type = type_interaction.data['custom_id']
-                            await type_interaction.response.send_message(f"You selected {marijuana_type}. Now, is it indica, sativa, or a hybrid?", 
-                                                                         components=[
-                                                                             discord.ui.Button(label="Indica", style=discord.ButtonStyle.primary, custom_id="indica"),
-                                                                             discord.ui.Button(label="Sativa", style=discord.ButtonStyle.primary, custom_id="sativa"),
-                                                                             discord.ui.Button(label="Hybrid", style=discord.ButtonStyle.primary, custom_id="hybrid")
-                                                                         ])
-                        except asyncio.TimeoutError:
-                            await ctx.send("You took too long to respond. Please try joining the session again.")
-                            return
-                        
-                        try:
-                            strain_interaction = await self.bot.wait_for('interaction', check=check_type, timeout=60.0)
-                            strain_type = strain_interaction.data['custom_id']
-                            await strain_interaction.response.send_message(f"You selected {strain_type}. You have joined the session.")
-                        except asyncio.TimeoutError:
-                            await ctx.send("You took too long to respond. Please try joining the session again.")
-                            return
-                        
                         session["participants"].append({
-                            "id": ctx.author.id,
-                            "type": marijuana_type,
-                            "strain": strain_type
+                            "id": ctx.author.id
                         })
-                        await ctx.send(f"You have joined the smoking session at {session_time.strftime('%H:%M')} with {marijuana_type} ({strain_type}).")
+                        await ctx.send(f"You have joined the smoking session at {session_time.strftime('%H:%M')}.")
                     else:
                         await ctx.send("You are already in this session.")
                     return
@@ -258,7 +212,7 @@ class Sesh(commands.Cog):
         embed = discord.Embed(title="Upcoming Smoking Sessions", color=discord.Color.green())
         for session in sessions:
             creator = self.bot.get_user(session["creator"])
-            participant_details = ", ".join([f"{self.bot.get_user(p['id']).name} ({p['type']}, {p['strain']})" for p in session["participants"] if self.bot.get_user(p['id'])])
+            participant_details = ", ".join([f"{self.bot.get_user(p['id']).name}" for p in session["participants"] if self.bot.get_user(p['id'])])
             session_time = datetime.datetime.fromisoformat(session["time"])
             embed.add_field(
                 name=f"Session ID: {session['id']}",
