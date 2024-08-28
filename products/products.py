@@ -335,3 +335,22 @@ class Products(commands.Cog):
         else:
             await ctx.send("No suitable staff roles found in this server or unable to assign any of the roles.")
 
+            @commands.command(name="licenseinfo", description="Show the customized license information for BeeHive's bot.")
+            async def licenseinfo(self, ctx: commands.Context):
+                """
+                Show the customized license information for BeeHive's bot.
+                """
+                license_text = (
+                    "BeeHive Bot License\n"
+                    "====================\n\n"
+                    "This bot is a proprietary software developed by BeeHive Systems. All rights reserved.\n\n"
+                    "You are granted a non-exclusive, non-transferable, revocable license to use this bot for personal or internal business purposes only.\n\n"
+                    "Redistribution, modification, or commercial use of this bot is strictly prohibited without prior written permission from BeeHive Systems.\n\n"
+                    "For more information, please visit our website at https://www.beehive.systems or contact us at support@beehive.systems."
+                )
+                embed = discord.Embed(
+                    title="BeeHive Bot License Information",
+                    description=license_text,
+                    colour=16767334
+                )
+                await ctx.send(embed=embed)
