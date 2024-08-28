@@ -114,8 +114,29 @@ class Disclaimers(commands.Cog):
 
         await message.clear_reactions()
 
+    @disclaimers.command(name="stats", description="Show stats on how many users are assigned to each profession.")
+    @commands.has_permissions(manage_roles=True)
+    async def stats(self, ctx: commands.Context):
+        """
+        Show stats on how many users are assigned to each profession.
+        """
+        user_data = await self.config.all_users()
+        profession_counts = {profession: 0 for profession in self.predefined_disclaimers}
 
+        for user_id, data in user_data.items():
+            for disclaimer in data.get("disclaimers", []):
+                for profession, text in self.predefined_disclaimers.items():
+                    if disclaimer == text:
+                        profession_counts[profession] += 1
 
+        embed = discord.Embed(
+            title="Disclaimer Stats",
+            colour=discord.Colour.green()
+        )
+        for profession, count in profession_counts.items():
+            embed.add_field(name=profession.capitalize(), value=str(count), inline=False)
+
+        await ctx.send(embed=embed)
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
