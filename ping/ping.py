@@ -45,16 +45,19 @@ class Ping(commands.Cog):  # Use Red's Cog class
         if avg_latency > 100:  # Adjust thresholds as needed
             embed_color = discord.Color(0xff4545)
             embed_title = "Connection impacted"
+            embed_description = "Need better bot performance? Consider upgrading to a dedicated server for optimal performance. [Here's $100 on us to try out dedicated hosting with Linode](https://www.linode.com/lp/refer/?r=577180eb1019c3b67e5f5d732b5d66a2c5727fe9)"
         else:
             embed_color = discord.Color(0x2bbd8e)
             embed_title = "Connection OK"
+            embed_description = "Your connection is stable and performing well for bot operations."
 
         # Create an embed for a more detailed response
-        embed = discord.Embed(title=embed_title, color=embed_color)
-        embed.add_field(name="Averaged latency", value=f"{avg_latency}ms", inline=True)
-        embed.add_field(name="Backbone latency", value=f"{ping} ms", inline=True)
+        embed = discord.Embed(title=embed_title, description=embed_description, color=embed_color)
+        embed.add_field(name="Network latency", value=f"{avg_latency}ms", inline=True)
+        embed.add_field(name="Host latency", value=f"{ping} ms", inline=True)
         embed.add_field(name="", value="\u200b", inline=False)
         embed.add_field(name="Download speed", value=f"{download_speed} Mbps", inline=True)
         embed.add_field(name="Upload speed", value=f"{upload_speed} Mbps", inline=True)
+
 
         await ctx.send(embed=embed)
