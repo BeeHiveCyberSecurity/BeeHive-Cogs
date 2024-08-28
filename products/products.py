@@ -342,7 +342,7 @@ class Products(commands.Cog):
         """
         embed = discord.Embed(
             title="Thanks for using Sentri!",
-            description="Here's the applicable license information about Sentri.",
+            description="Here's the applicable license information about this bot",
             colour=16767334
         )
         embed.add_field(name="Built on Red", value="Sentri is built on Red, a modern and open-source Python framework for Discord bots. [Learn more about Red](https://discord.red)", inline=False)
