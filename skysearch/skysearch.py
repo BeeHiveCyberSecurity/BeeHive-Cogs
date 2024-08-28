@@ -172,33 +172,33 @@ class Skysearch(commands.Cog):
             category = aircraft_data.get('category', None)
             if category is not None:
                 category_label = category_code_to_label.get(category, "Unknown category")
-                embed.add_field(name="Category", value=f"**{category_label}**", inline=False)
+                embed.add_field(name="Category", value=f"{category_label}", inline=False)
 
             operator = aircraft_data.get('ownOp', None)
             if operator is not None:
-                embed.add_field(name="Operated by", value=f"**`{operator}`**", inline=False)
+                embed.add_field(name="Operated by", value=f"`{operator}`", inline=False)
             
             last_seen = aircraft_data.get('seen', 'N/A')
             if last_seen != 'N/A':
-                last_seen_text = ":green_circle: **Just now**" if float(last_seen) < 1 else f":hourglass: **{int(float(last_seen))} seconds ago**"
+                last_seen_text = ":green_circle: Just **now**" if float(last_seen) < 1 else f":hourglass: **{int(float(last_seen))}** seconds ago"
                 embed.add_field(name="Last signal", value=last_seen_text, inline=True)
             
             last_seen_pos = aircraft_data.get('seen_pos', 'N/A')
             if last_seen_pos != 'N/A':
-                last_seen_pos_text = ":green_circle: **Just now**" if float(last_seen_pos) < 1 else f":hourglass: **{int(float(last_seen_pos))} seconds ago**"
+                last_seen_pos_text = ":green_circle: Just **now**" if float(last_seen_pos) < 1 else f":hourglass: **{int(float(last_seen_pos))}** seconds ago"
                 embed.add_field(name="Last position", value=last_seen_pos_text, inline=True)
             
             baro_rate = aircraft_data.get('baro_rate', 'N/A')
             if baro_rate == 'N/A':
-                embed.add_field(name="Altitude trend", value=":grey_question: **Altitude trends unavailable, not enough data...**", inline=False)
+                embed.add_field(name="Altitude trend", value=":grey_question: Altitude trends unavailable, **not enough data**", inline=False)
             else:
                 baro_rate_fps = round(int(baro_rate) / 60, 2)  # Convert feet per minute to feet per second
                 if abs(baro_rate_fps) < 50/60:
-                    embed.add_field(name="Altitude data", value=":cloud: **Maintaining consistent altitude**", inline=False)
+                    embed.add_field(name="Altitude data", value=":cloud: Maintaining **consistent** altitude", inline=False)
                 elif baro_rate_fps > 0:
-                    embed.add_field(name="Altitude data", value=":airplane_departure: **Climbing @**  " + f"**{baro_rate_fps} feet/sec**", inline=False)
+                    embed.add_field(name="Altitude data", value=":airplane_departure: Climbing @  " + f"**{baro_rate_fps} feet/sec**", inline=False)
                 else:
-                    embed.add_field(name="Altitude data", value=":airplane_arriving: **Descending @ ** " + f"**{abs(baro_rate_fps)} feet/sec**", inline=False)
+                    embed.add_field(name="Altitude data", value=":airplane_arriving: Descending @  " + f"**{abs(baro_rate_fps)} feet/sec**", inline=False)
             embed.add_field(name="Flight status", value=emergency_status, inline=True)
 
 
