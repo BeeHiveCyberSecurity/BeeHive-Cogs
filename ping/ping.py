@@ -12,9 +12,6 @@ class Ping(commands.Cog):  # Use Red's Cog class
     @commands.command(name="ping", description="Displays the bot's latency and additional diagnostic information.")
     async def ping(self, ctx: commands.Context):
         await ctx.defer()
-
-        latency = self.bot.latency
-        heartbeat_latency = round(latency * 1000, 2)
         ws_latency = round(self.bot.latency * 1000, 2)
 
         if not hasattr(self, 'latency_history'):
