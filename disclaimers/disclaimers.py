@@ -74,7 +74,12 @@ class Disclaimers(commands.Cog):
                 return
             else:
                 disclaimers_text = "\n".join(disclaimers)
-                await message.channel.send(f"Disclaimer for {message.author.display_name}:\n{disclaimers_text}")
+                embed = discord.Embed(
+                    title=f"Disclaimer for {message.author.display_name}",
+                    description=disclaimers_text,
+                    colour=discord.Colour.orange()
+                )
+                await message.channel.send(embed=embed)
 
 async def setup(bot: Red):
     await bot.add_cog(Disclaimers(bot))
