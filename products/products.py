@@ -335,6 +335,7 @@ class Products(commands.Cog):
         else:
             await ctx.send("No suitable staff roles found in this server or unable to assign any of the roles.")
 
+    @commands.cooldown(1, 60, commands.BucketType.user)
     @commands.command(name="licenseinfo", description="Show the customized license information for BeeHive's bot.")
     async def licenseinfo(self, ctx: commands.Context):
         """
