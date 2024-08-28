@@ -9,7 +9,7 @@ class Disclaimers(commands.Cog):
         self.config.register_user(disclaimers=[])
         self.predefined_disclaimers = {
             "lawyer": "This user is a licensed attorney; however, they are not your personal legal representative. Any information or opinions shared here are intended solely for general informational purposes and should not be interpreted as legal advice. Opinions expressed are purely social remarks and reflect personal viewpoints, not legal counsel. For tailored legal guidance or assistance specific to your situation, please consult with a qualified attorney who can provide professional advice based on your individual circumstances.",
-            "doctor": "🩺 Disclaimer: This user is a doctor, but they are not your doctor. Any information provided is not medical advice."
+            "doctor": "This user is a licensed medical professional, but they are not your personal doctor. Any information or opinions shared here are intended for general informational purposes only and should not be considered medical advice. Opinions expressed are purely social remarks and should not be relied upon for making health-related decisions. If you feel immediately unwell or unsafe, please seek emergency assistance by calling 911 or going to the nearest emergency room. For personalized medical guidance and treatment, consult directly with a qualified healthcare provider who can offer advice based on your specific health needs and conditions."
         }
 
     async def save_disclaimer(self, user_id: int, disclaimer: str):
