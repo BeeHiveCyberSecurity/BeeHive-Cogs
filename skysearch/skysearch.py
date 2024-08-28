@@ -176,7 +176,7 @@ class Skysearch(commands.Cog):
 
             operator = aircraft_data.get('ownOp', None)
             if operator is not None:
-                embed.add_field(name="Operated by", value=f"`{operator}`", inline=False)
+                embed.add_field(name="Operated by", value=f"[{operator}](https://www.google.com/search?q={operator})", inline=False)
             
             last_seen = aircraft_data.get('seen', 'N/A')
             if last_seen != 'N/A':
