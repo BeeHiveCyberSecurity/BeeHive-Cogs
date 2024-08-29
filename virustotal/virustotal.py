@@ -106,7 +106,9 @@ class VirusTotal(commands.Cog):
         sha1_pattern = re.compile(r'\b[0-9a-fA-F]{40}\b')
         sha256_pattern = re.compile(r'\b[0-9a-fA-F]{64}\b')
         md5_pattern = re.compile(r'\b[0-9a-fA-F]{32}\b')
-        return sha1_pattern.findall(text) + sha256_pattern.findall(text) + md5_pattern.findall(text)
+        imphash_pattern = re.compile(r'\b[0-9a-fA-F]{32}\b')  # imphash has the same length as md5
+        ssdeep_pattern = re.compile(r'\b[0-9a-zA-Z/+]{1,64}==\b')  # ssdeep pattern
+        return sha1_pattern.findall(text) + sha256_pattern.findall(text) + md5_pattern.findall(text) + imphash_pattern.findall(text) + ssdeep_pattern.findall(text)
 
     async def handle_hash_reaction(self, message, hashes):
         """Handle the reaction to a hash by fetching VirusTotal results"""
