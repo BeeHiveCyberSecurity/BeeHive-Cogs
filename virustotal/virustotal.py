@@ -60,8 +60,8 @@ class VirusTotal(commands.Cog):
         else:
             api_key_status = ":x: Missing"
         
-        version = "1.2.0"
-        last_update = "August 24th, 2024"
+        version = "1.2.2"
+        last_update = "August 29th, 2024"
         
         embed = discord.Embed(title="VirusTotal settings", colour=discord.Colour(0x394eff))
         embed.add_field(name="Overview", value="", inline=False)
@@ -137,15 +137,15 @@ class VirusTotal(commands.Cog):
 
                     embed = discord.Embed()
                     if malicious_count >= 11:
-                        embed.title = "Analysis complete"
+                        embed.title = "File intelligence"
                         embed.description = f"**{int(percent)}%** of vendors rated this file dangerous! You should avoid this file completely, and delete it from your systems to ensure security."
                         embed.color = discord.Colour(0xff4545)
                     elif 1 < malicious_count < 11:
-                        embed.title = "Analysis complete"
+                        embed.title = "File intelligence"
                         embed.description = f"**{int(percent)}%** of vendors rated this file dangerous. While there are malicious ratings available for this file, there aren't many, so this could be a false positive. **You should investigate further before coming to a decision.**"
                         embed.color = discord.Colour(0xff9144)
                     else:
-                        embed.title = "Analysis complete"
+                        embed.title = "File intelligence"
                         embed.color = discord.Colour(0x2BBD8E)
                         embed.description = f"**{harmless_count + undetected_count}** vendors say this file is malware-free"
 
