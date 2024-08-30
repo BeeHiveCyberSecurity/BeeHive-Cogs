@@ -282,7 +282,7 @@ class Skysearch(commands.Cog):
     @commands.group(name='skysearch', help='Core menu for the cog', invoke_without_command=True)
     async def skysearch(self, ctx):
         """SkySearch command group"""
-        embed = discord.Embed(title="Thanks for using SkySearch", description="SkySearch is a powerful, easy-to-use OSINT tool for tracking aircraft.\n\nHere are the commands you can use with SkySearch...", color=0xfffffe)
+        embed = discord.Embed(title="Thanks for using SkySearch", description="SkySearch is a powerful, easy-to-use OSINT tool for tracking aircraft.", color=0xfffffe)
         embed.add_field(name="aircraft", value="Use `aircraft` to show available commands to fetch information about live aircraft.", inline=False)
         embed.add_field(name="airport", value="Use `airport` to show available commands to fetch information and imagery of airports around the world.", inline=False)
         await ctx.send(embed=embed)
@@ -302,10 +302,10 @@ class Skysearch(commands.Cog):
                     raise aiohttp.ClientError(f"API responded with status code: {response.status}")
 
             stats_fields = {
-                "beast": {"name": "Beast", "value": "**`{} feeders`**"},
-                "mlat": {"name": "MLAT", "value": "**`{} feeders`**"},
-                "other": {"name": "Other Freq's", "value": "**`{} feeders`**"},
-                "aircraft": {"name": "Aircraft tracked right now", "value": "**`{} aircraft`**"}
+                "beast": {"name": "Beast", "value": "`{} feeders`"},
+                "mlat": {"name": "MLAT", "value": "`{} feeders`"},
+                "other": {"name": "Other Freq's", "value": "`{} feeders`"},
+                "aircraft": {"name": "Aircraft tracked right now", "value": "`{} aircraft`"}
             }
 
             embed = discord.Embed(title="Air traffic data", description="Live flight data powered by [airplanes.live](https://airplanes.live) API", color=0xfffffe)
@@ -316,7 +316,7 @@ class Skysearch(commands.Cog):
                     value = field["value"].format("{:,}".format(data[key]))
                     embed.add_field(name=name, value=value, inline=True)
 
-            embed.add_field(name="Appears in", value="**`aircraft callsign` `aircraft icao` `aircraft reg` `aircraft squawk` `aircraft type` `aircraft radius` `aircraft pia` `aircraft mil` `aircraft ladd` `aircraft export`**", inline=False)
+            embed.add_field(name="Appears in", value="`aircraft callsign` `aircraft icao` `aircraft reg` `aircraft squawk` `aircraft type` `aircraft radius` `aircraft pia` `aircraft mil` `aircraft ladd` `aircraft export`", inline=False)
 
             embed2 = discord.Embed(title="Aircraft tags", description="Aircraft and air asset intelligence tags are powered by [BeeHive](https://www.beehive.systems). From time to time, you'll see tags on aircraft you query that contain cool or useful bits of information about them.", color=0xffd966)
             embed2.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/sparkles.png")
