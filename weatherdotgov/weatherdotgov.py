@@ -138,7 +138,8 @@ class Weather(commands.Cog):
         # Page 3: areas
         embed3 = discord.Embed(title="Active Weather Alerts - Areas", color=0x1E90FF)
         if "areas" in data:
-            embed3.add_field(name="areas", value=data["areas"], inline=False)
+            for state, count in data["areas"].items():
+                embed3.add_field(name=state, value=count, inline=True)
         pages.append(embed3)
 
         if not pages:
