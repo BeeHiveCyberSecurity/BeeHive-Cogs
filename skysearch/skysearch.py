@@ -15,7 +15,9 @@ from reportlab.lib.pagesizes import letter, landscape, A4 #type: ignore
 from reportlab.pdfgen import canvas #type: ignore 
 from reportlab.lib import colors #type: ignore
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle #type: ignore
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak, Table, TableStyle #type: ignore
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak, Table, TableStyle
+
+import skysearch #type: ignore
 from .icao_codes import law_enforcement_icao_set, military_icao_set, medical_icao_set, suspicious_icao_set, newsagency_icao_set, balloons_icao_set, global_prior_known_accident_set, ukr_conflict_set, agri_utility_set
 
 class Skysearch(commands.Cog):
@@ -275,6 +277,86 @@ class Skysearch(commands.Cog):
         except (KeyError, IndexError, aiohttp.ClientError):
             pass
         return None, None
+
+    @commands.guild_only()
+    @commands.group(name='skysearch', help='Core menu for the cog', invoke_without_command=True)
+    async def skysearch(self, ctx):
+        """SkySearch command group"""
+        embed = discord.Embed(title="Thanks for using SkySearch", description="SkySearch is a powerful, easy-to-use OSINT tool for tracking aircraft.\n\nHere are the commands you can use with SkySearch...", color=0x00ff00)
+        embed.add_field(name="aircraft", value="Use `aircraft` to show available commands to fetch information about live aircraft.", inline=False)
+        embed.add_field(name="airport", value="Use `airport` to show available commands to fetch information and imagery of airports around the world.", inline=False)
+        await ctx.send(embed=embed)
+    
+    @commands.guild_only()
+    @skysearch.command(name='stats', help='Get statistics about SkySearch and the data used here')
+    async def stats(self, ctx):
+        url = "https://api.airplanes.live/stats"
+
+        try:
+            if not hasattr(self, '_http_client'):
+                self._http_client = aiohttp.ClientSession()
+            async with self._http_client.get(url) as response:
+                if response.status == 200:
+                    data = await response.json()
+                else:
+                    raise aiohttp.ClientError(f"API responded with status code: {response.status}")
+
+            stats_fields = {
+                "beast": {"name": "Beast", "value": "**`{} feeders`**"},
+                "mlat": {"name": "MLAT", "value": "**`{} feeders`**"},
+                "other": {"name": "Other Freq's", "value": "**`{} feeders`**"},
+                "aircraft": {"name": "Aircraft tracked right now", "value": "**`{} aircraft`**"}
+            }
+
+            embed = discord.Embed(title="Air traffic data", description="Live flight data powered by [airplanes.live](https://airplanes.live) API", color=0xfffffe)
+            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/airplane.png")
+            for key, field in stats_fields.items():
+                if key in data:
+                    name = field["name"]
+                    value = field["value"].format("{:,}".format(data[key]))
+                    embed.add_field(name=name, value=value, inline=True)
+
+            embed.add_field(name="Appears in", value="**`aircraft callsign` `aircraft icao` `aircraft reg` `aircraft squawk` `aircraft type` `aircraft radius` `aircraft pia` `aircraft mil` `aircraft ladd` `aircraft export`**", inline=False)
+
+            embed2 = discord.Embed(title="Aircraft tags", description="Aircraft and air asset intelligence tags are powered by [BeeHive](https://www.beehive.systems). From time to time, you'll see tags on aircraft you query that contain cool or useful bits of information about them.", color=0xffd966)
+            embed2.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/sparkles.png")
+            embed2.add_field(name="Law enforcement aircraft", value="**`{:,} tagged`**".format(len(self.law_enforcement_icao_set)), inline=True)
+            embed2.add_field(name="Military & government aircraft", value="**`{:,} tagged`**".format(len(self.military_icao_set)), inline=True)
+            embed2.add_field(name="Medical aircraft", value="**`{:,} tagged`**".format(len(self.medical_icao_set)), inline=True)
+            embed2.add_field(name="Media aircraft", value="**`{:,} known`**".format(len(self.newsagency_icao_set)), inline=True)
+            embed2.add_field(name="Damaged aircraft", value="**`{:,} known`**".format(len(self.global_prior_known_accident_set)), inline=True)
+            embed2.add_field(name="Wartime aircraft", value="**`{:,} observed`**".format(len(self.ukr_conflict_set)), inline=True)
+            embed2.add_field(name="Utility aircraft", value="**`{:,} spotted`**".format(len(self.agri_utility_set)), inline=True)
+            embed2.add_field(name="Balloons", value="**`{:,} known`**".format(len(self.balloons_icao_set)), inline=True)
+            embed2.add_field(name="Suspicious aircraft", value="**`{:,} identifiers`**".format(len(self.suspicious_icao_set)), inline=True)
+            embed2.add_field(name="Appears in", value="**`aircraft callsign` `aircraft icao` `aircraft reg` `aircraft squawk` `aircraft type` `aircraft radius` `aircraft pia` `aircraft mil` `aircraft ladd`**", inline=False)
+
+            embed3 = discord.Embed(title="Photography", description="Photos are powered by community contributions at [planespotters.net](https://www.planespotters.net/)", color=0xfffffe)
+            embed3.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/camera.png")
+            embed3.add_field(name="Appears in", value="**`aircraft callsign` `aircraft icao` `aircraft reg` `aircraft squawk` `aircraft type`**", inline=False)
+
+            embed4 = discord.Embed(title="Airport data", description="Airport data is powered by the [airport-data.com](https://airport-data.com/) API service", color=0xfffffe)
+            embed4.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/location.png")
+            embed4.add_field(name="Appears in", value="**`airport about`**", inline=False)
+
+            embed5 = discord.Embed(title="Runway data", description="Runway data is powered by the [airportdb.io](https://airportdb.io) API service", color=0xfffffe)
+            embed5.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/layers.png")
+            embed5.add_field(name="Appears in", value="**`airport runway`**", inline=False)
+
+            embed6 = discord.Embed(title="Mapping and imagery", description="Mapping and ground imagery powered by [Google Maps](https://maps.google.com) and the [Maps Static API](https://developers.google.com/maps/documentation/maps-static)", color=0xfffffe)
+            embed6.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/map.png")
+            embed6.add_field(name="Appears in", value="**`airport about`**", inline=False)
+
+            await ctx.send(embed=embed)
+            await ctx.send(embed=embed2)
+            await ctx.send(embed=embed3)
+            await ctx.send(embed=embed4)
+            await ctx.send(embed=embed5)
+            await ctx.send(embed=embed6)
+        except aiohttp.ClientError as e:
+            embed = discord.Embed(title="Error", description=f"Error fetching data: {e}", color=0xff4545)
+            await ctx.send(embed=embed)
+        
 
     @commands.guild_only()
     @commands.group(name='aircraft', help='Get information about aircraft.', invoke_without_command=True)
@@ -625,75 +707,6 @@ class Skysearch(commands.Cog):
             embed = discord.Embed(title="Error", description="Error retrieving aircraft information.", color=0xff4545)
             await ctx.send(embed=embed)
 
-    @commands.guild_only()
-    @aircraft_group.command(name='stats', help='Get statistics about SkySearch and the data used here')
-    async def stats(self, ctx):
-        url = "https://api.airplanes.live/stats"
-
-        try:
-            if not hasattr(self, '_http_client'):
-                self._http_client = aiohttp.ClientSession()
-            async with self._http_client.get(url) as response:
-                if response.status == 200:
-                    data = await response.json()
-                else:
-                    raise aiohttp.ClientError(f"API responded with status code: {response.status}")
-
-            stats_fields = {
-                "beast": {"name": "Beast", "value": "**`{} feeders`**"},
-                "mlat": {"name": "MLAT", "value": "**`{} feeders`**"},
-                "other": {"name": "Other Freq's", "value": "**`{} feeders`**"},
-                "aircraft": {"name": "Aircraft tracked right now", "value": "**`{} aircraft`**"}
-            }
-
-            embed = discord.Embed(title="Air traffic data", description="Live flight data powered by [airplanes.live](https://airplanes.live) API", color=0xfffffe)
-            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/airplane.png")
-            for key, field in stats_fields.items():
-                if key in data:
-                    name = field["name"]
-                    value = field["value"].format("{:,}".format(data[key]))
-                    embed.add_field(name=name, value=value, inline=True)
-
-            embed.add_field(name="Appears in", value="**`aircraft callsign` `aircraft icao` `aircraft reg` `aircraft squawk` `aircraft type` `aircraft radius` `aircraft pia` `aircraft mil` `aircraft ladd` `aircraft export`**", inline=False)
-
-            embed2 = discord.Embed(title="Aircraft tags", description="Aircraft and air asset intelligence tags are powered by [BeeHive](https://www.beehive.systems). From time to time, you'll see tags on aircraft you query that contain cool or useful bits of information about them.", color=0xffd966)
-            embed2.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/sparkles.png")
-            embed2.add_field(name="Law enforcement aircraft", value="**`{:,} tagged`**".format(len(self.law_enforcement_icao_set)), inline=True)
-            embed2.add_field(name="Military & government aircraft", value="**`{:,} tagged`**".format(len(self.military_icao_set)), inline=True)
-            embed2.add_field(name="Medical aircraft", value="**`{:,} tagged`**".format(len(self.medical_icao_set)), inline=True)
-            embed2.add_field(name="Media aircraft", value="**`{:,} known`**".format(len(self.newsagency_icao_set)), inline=True)
-            embed2.add_field(name="Damaged aircraft", value="**`{:,} known`**".format(len(self.global_prior_known_accident_set)), inline=True)
-            embed2.add_field(name="Wartime aircraft", value="**`{:,} observed`**".format(len(self.ukr_conflict_set)), inline=True)
-            embed2.add_field(name="Utility aircraft", value="**`{:,} spotted`**".format(len(self.agri_utility_set)), inline=True)
-            embed2.add_field(name="Balloons", value="**`{:,} known`**".format(len(self.balloons_icao_set)), inline=True)
-            embed2.add_field(name="Suspicious aircraft", value="**`{:,} identifiers`**".format(len(self.suspicious_icao_set)), inline=True)
-            embed2.add_field(name="Appears in", value="**`aircraft callsign` `aircraft icao` `aircraft reg` `aircraft squawk` `aircraft type` `aircraft radius` `aircraft pia` `aircraft mil` `aircraft ladd`**", inline=False)
-
-            embed3 = discord.Embed(title="Photography", description="Photos are powered by community contributions at [planespotters.net](https://www.planespotters.net/)", color=0xfffffe)
-            embed3.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/camera.png")
-            embed3.add_field(name="Appears in", value="**`aircraft callsign` `aircraft icao` `aircraft reg` `aircraft squawk` `aircraft type`**", inline=False)
-
-            embed4 = discord.Embed(title="Airport data", description="Airport data is powered by the [airport-data.com](https://airport-data.com/) API service", color=0xfffffe)
-            embed4.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/location.png")
-            embed4.add_field(name="Appears in", value="**`airport about`**", inline=False)
-
-            embed5 = discord.Embed(title="Runway data", description="Runway data is powered by the [airportdb.io](https://airportdb.io) API service", color=0xfffffe)
-            embed5.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/layers.png")
-            embed5.add_field(name="Appears in", value="**`airport runway`**", inline=False)
-
-            embed6 = discord.Embed(title="Mapping and imagery", description="Mapping and ground imagery powered by [Google Maps](https://maps.google.com) and the [Maps Static API](https://developers.google.com/maps/documentation/maps-static)", color=0xfffffe)
-            embed6.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/map.png")
-            embed6.add_field(name="Appears in", value="**`airport about`**", inline=False)
-
-            await ctx.send(embed=embed)
-            await ctx.send(embed=embed2)
-            await ctx.send(embed=embed3)
-            await ctx.send(embed=embed4)
-            await ctx.send(embed=embed5)
-            await ctx.send(embed=embed6)
-        except aiohttp.ClientError as e:
-            embed = discord.Embed(title="Error", description=f"Error fetching data: {e}", color=0xff4545)
-            await ctx.send(embed=embed)
 
     @commands.guild_only()
     @aircraft_group.command(name='scroll', help='Scroll through available planes.')

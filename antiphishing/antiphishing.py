@@ -582,6 +582,7 @@ class AntiPhishing(commands.Cog):
         """
         Settings to configure phishing protection in this server.
         """
+        
     @commands.has_permissions(administrator=True)
     @antiphishing.command()
     async def action(self, ctx: Context, action: str):
