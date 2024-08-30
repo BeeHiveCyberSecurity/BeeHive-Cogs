@@ -221,9 +221,9 @@ class Weather(commands.Cog):
                     return
                 
                 pages = []
-                for i in range(0, len(stations), 10):
+                for i in range(0, len(stations), 15):
                     embed = discord.Embed(title="Weather observation stations", color=0x1E90FF)
-                    for station in stations[i:i+10]:
+                    for station in stations[i:i+15]:
                         station_name = station["properties"].get("name", "Unknown")
                         station_id = station["properties"].get("stationIdentifier", "Unknown")
                         coordinates = station["geometry"]["coordinates"] if "geometry" in station else ["Unknown", "Unknown"]
