@@ -241,8 +241,8 @@ class Weather(commands.Cog):
                 
                 message = await ctx.send(embed=pages[0])
                 await message.add_reaction("⬅️")
+                await message.add_reaction("❌")
                 await message.add_reaction("➡️")
-                await message.add_reaction("❌")  # Add a close reaction
 
                 def check(reaction, user):
                     return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️", "❌"]
