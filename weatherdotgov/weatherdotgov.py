@@ -126,13 +126,13 @@ class Weather(commands.Cog):
         embed1 = discord.Embed(title="Active Weather Alerts - Summary", color=0x1E90FF)
         for key in ["total", "land", "marine"]:
             if key in data:
-                embed1.add_field(name=key.capitalize(), value=data[key], inline=False)
+                embed1.add_field(name=key.capitalize(), value=data[key], inline=True)
         pages.append(embed1)
 
         # Page 2: regions
         embed2 = discord.Embed(title="Active Weather Alerts - Regions", color=0x1E90FF)
         if "regions" in data:
-            embed2.add_field(name="regions", value=data["regions"], inline=False)
+            embed2.add_field(name="regions", value=data["regions"], inline=True)
         pages.append(embed2)
 
         # Page 3 and beyond: areas
