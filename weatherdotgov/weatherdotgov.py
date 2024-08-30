@@ -130,7 +130,7 @@ class Weather(commands.Cog):
         pages.append(embed1)
 
         # Page 2: regions
-        embed2 = discord.Embed(title="Active Weather Alerts per Region", color=0x1E90FF)
+        embed2 = discord.Embed(title="Active weather alerts per region", color=0x1E90FF)
         region_full_names = {
             "AL": "Alaska", "AT": "Atlantic", "GL": "Great Lakes", "GM": "Gulf of Mexico",
             "PA": "Pacific", "PI": "Pacific Islands"
