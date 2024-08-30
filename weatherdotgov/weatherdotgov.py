@@ -230,7 +230,7 @@ class Weather(commands.Cog):
                         elevation = station["properties"].get("elevation", {}).get("value", "Unknown")
                         embed.add_field(
                             name=station_name, 
-                            value=f"`{station_id}`\n`{coordinates[1]}, {coordinates[0]}`\n`{elevation} meters`", 
+                            value=f"`{station_id}`\n`{coordinates[1]}, {coordinates[0]}`\n`{elevation} meters high`", 
                             inline=True
                         )
                     pages.append(embed)
