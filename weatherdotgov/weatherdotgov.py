@@ -135,12 +135,14 @@ class Weather(commands.Cog):
             embed2.add_field(name="regions", value=data["regions"], inline=False)
         pages.append(embed2)
 
-        # Page 3: areas
-        embed3 = discord.Embed(title="Active Weather Alerts - Areas", color=0x1E90FF)
+        # Page 3 and beyond: areas
         if "areas" in data:
-            for state, count in data["areas"].items():
-                embed3.add_field(name=state, value=count, inline=True)
-        pages.append(embed3)
+            states = list(data["areas"].items())
+            for i in range(0, len(states), 25):
+                embed = discord.Embed(title="Active Weather Alerts - Areas", color=0x1E90FF)
+                for state, count in states[i:i+25]:
+                    embed.add_field(name=state, value=count, inline=True)
+                pages.append(embed)
 
         if not pages:
             await ctx.send("No valid alert data found.")
