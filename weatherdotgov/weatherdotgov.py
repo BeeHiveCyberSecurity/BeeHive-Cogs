@@ -156,7 +156,7 @@ class Weather(commands.Cog):
             "AM": "Atlantic Ocean", "GM": "Gulf of Mexico", "LE": "Lake Erie", "LH": "Lake Huron",
             "LM": "Lake Michigan", "LO": "Lake Ontario", "LS": "Lake Superior", "PH": "Pacific Ocean (Hawaii)",
             "PK": "Pacific Ocean (Alaska)", "PS": "Pacific Ocean (California)", "PZ": "Pacific Ocean (Washington)",
-            "LC": "Lake Champlain", "PM": "Puerto Rico", "PR": "Puerto Rico", "VI": "Virgin Islands"
+            "LC": "Lake Champlain", "PM": "Puerto Rico (Marine)", "PR": "Puerto Rico (Land)", "VI": "Virgin Islands"
         }
 
         if "areas" in data:
