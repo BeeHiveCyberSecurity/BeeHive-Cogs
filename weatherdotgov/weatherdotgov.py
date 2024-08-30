@@ -22,7 +22,8 @@ class Weather(commands.Cog):
     @weather.command(name="glossary")
     async def glossary(self, ctx, *, search_term: str = None):
         """Fetch and display the weather glossary from weather.gov"""
-        async with self.session.get("https://api.weather.gov/glossary") as response:
+        headers = {"Accept": "application/ld+json"}
+        async with self.session.get("https://api.weather.gov/glossary", headers=headers) as response:
             if response.status != 200:
                 await ctx.send("Failed to fetch the glossary. Please try again later.")
                 return
@@ -45,6 +46,8 @@ class Weather(commands.Cog):
             for term in terms:
                 word = term.get("term", "No title")
                 description = term.get("definition", "No description")
+                if not description:  # Ensure description is not empty
+                    description = "No description available."
                 embed = discord.Embed(title=word, description=description, color=0x1E90FF)
                 pages.append(embed)
 
