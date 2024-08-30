@@ -15,9 +15,7 @@ class Weather(commands.Cog):
 
     @commands.group()
     async def weather(self, ctx):
-        """Weather command group"""
-        if ctx.invoked_subcommand is None:
-            await ctx.send("Please specify a subcommand for weather.")
+        """Interact with the weather.gov API to fetch weather data via Discord"""
 
     @weather.command(name="glossary")
     async def glossary(self, ctx, *, search_term: str = None):
@@ -123,14 +121,14 @@ class Weather(commands.Cog):
         pages = []
 
         # Page 1: total, land, marine
-        embed1 = discord.Embed(title="Summary of active weather alerts", color=0x1E90FF)
+        embed1 = discord.Embed(title="Summary of active weather alerts", color=0xfffffe)
         for key in ["total", "land", "marine"]:
             if key in data:
                 embed1.add_field(name=key.capitalize(), value=data[key], inline=True)
         pages.append(embed1)
 
         # Page 2: regions
-        embed2 = discord.Embed(title="Active weather alerts per region", color=0x1E90FF)
+        embed2 = discord.Embed(title="Active weather alerts per region", color=0xfffffe)
         region_full_names = {
             "AL": "Alaska", "AT": "Atlantic", "GL": "Great Lakes", "GM": "Gulf of Mexico",
             "PA": "Pacific", "PI": "Pacific Islands"
@@ -162,7 +160,7 @@ class Weather(commands.Cog):
         if "areas" in data:
             states = list(data["areas"].items())
             for i in range(0, len(states), 25):
-                embed = discord.Embed(title="Active weather alerts per area", color=0x1E90FF)
+                embed = discord.Embed(title="Active weather alerts per area", color=0xfffffe)
                 for state, count in states[i:i+25]:
                     full_name = state_full_names.get(state, state)
                     embed.add_field(name=full_name, value=count, inline=True)
@@ -222,7 +220,7 @@ class Weather(commands.Cog):
                 
                 pages = []
                 for i in range(0, len(stations), 15):
-                    embed = discord.Embed(title="Weather observation stations", color=0x1E90FF)
+                    embed = discord.Embed(title="Weather observation stations", color=0xfffffe)
                     for station in stations[i:i+15]:
                         station_name = station["properties"].get("name", "Unknown")
                         station_id = station["properties"].get("stationIdentifier", "Unknown")
