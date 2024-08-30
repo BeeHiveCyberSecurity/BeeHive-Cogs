@@ -126,7 +126,7 @@ class Weather(commands.Cog):
         embed1 = discord.Embed(title="Active Weather Alerts - Summary", color=0x1E90FF)
         for key in ["total", "land", "marine"]:
             if key in data:
-                embed1.add_field(name=key, value=data[key], inline=False)
+                embed1.add_field(name=key.capitalize(), value=data[key], inline=False)
         pages.append(embed1)
 
         # Page 2: regions
@@ -146,7 +146,10 @@ class Weather(commands.Cog):
             "NM": "New Mexico", "NY": "New York", "NC": "North Carolina", "ND": "North Dakota", "OH": "Ohio",
             "OK": "Oklahoma", "OR": "Oregon", "PA": "Pennsylvania", "RI": "Rhode Island", "SC": "South Carolina",
             "SD": "South Dakota", "TN": "Tennessee", "TX": "Texas", "UT": "Utah", "VT": "Vermont",
-            "VA": "Virginia", "WA": "Washington", "WV": "West Virginia", "WI": "Wisconsin", "WY": "Wyoming"
+            "VA": "Virginia", "WA": "Washington", "WV": "West Virginia", "WI": "Wisconsin", "WY": "Wyoming",
+            "AM": "Atlantic Ocean", "GM": "Gulf of Mexico", "LE": "Lake Erie", "LH": "Lake Huron",
+            "LM": "Lake Michigan", "LO": "Lake Ontario", "LS": "Lake Superior", "PH": "Pacific Ocean",
+            "PK": "Pacific Ocean", "PS": "Pacific Ocean", "PZ": "Pacific Ocean"
         }
 
         if "areas" in data:
