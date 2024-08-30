@@ -890,7 +890,7 @@ class Skysearch(commands.Cog):
             embed3.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/camera.png")
             embed3.add_field(name="Appears in", value="**`aircraft callsign` `aircraft icao` `aircraft reg` `aircraft squawk` `aircraft type`**", inline=False)
 
-            embed4 = discord.Embed(title="Airport data", description="Airport data is powered by the [airport-data.com](https://www.airport-data.com/) API service", color=0xfffffe)
+            embed4 = discord.Embed(title="Airport data", description="Airport data is powered by the [airport-data.com](https://airport-data.com/) API service", color=0xfffffe)
             embed4.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/location.png")
             embed4.add_field(name="Appears in", value="**`airport about`**", inline=False)
 
@@ -1197,7 +1197,7 @@ class Skysearch(commands.Cog):
             return
 
         try:
-            url1 = f"https://www.airport-data.com/api/ap_info.json?{code_type}={code}"
+            url1 = f"https://airport-data.com/api/ap_info.json?{code_type}={code}"
             async with aiohttp.ClientSession() as session:
                 async with session.get(url1) as response1:
                     data1 = await response1.json()
@@ -1256,7 +1256,7 @@ class Skysearch(commands.Cog):
                 if 'link' in data1:
                     link = data1['link']
                     if not (link.startswith('http://') or link.startswith('https://')):
-                        link = 'https://www.airport-data.com' + link
+                        link = 'https://airport-data.com' + link
                     # URL button
                     view_airport = discord.ui.Button(label=f"More info about {data1['icao']}", url=link, style=discord.ButtonStyle.link)
                     view.add_item(view_airport)
@@ -1283,7 +1283,7 @@ class Skysearch(commands.Cog):
 
         try:
             if code_type == 'iata':
-                url1 = f"https://www.airport-data.com/api/ap_info.json?iata={code}"
+                url1 = f"https://airport-data.com/api/ap_info.json?iata={code}"
                 async with aiohttp.ClientSession() as session:
                     async with session.get(url1) as response1:
                         data1 = await response1.json()
@@ -1405,7 +1405,7 @@ class Skysearch(commands.Cog):
 
         try:
             if code_type == 'iata':
-                url1 = f"https://www.airport-data.com/api/ap_info.json?iata={code}"
+                url1 = f"https://airport-data.com/api/ap_info.json?iata={code}"
                 async with aiohttp.ClientSession() as session:
                     async with session.get(url1) as response1:
                         data1 = await response1.json()
@@ -1491,7 +1491,7 @@ class Skysearch(commands.Cog):
 
         try:
             async with aiohttp.ClientSession() as session:
-                async with session.get(f"https://www.airport-data.com/api/ap_info.json?{code_type}={code}") as response1:
+                async with session.get(f"https://airport-data.com/api/ap_info.json?{code_type}={code}") as response1:
                     data1 = await response1.json()
                     latitude, longitude = data1.get('latitude'), data1.get('longitude')
                     if not latitude or not longitude:
