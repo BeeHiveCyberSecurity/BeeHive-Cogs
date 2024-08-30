@@ -42,6 +42,28 @@ class Weather(commands.Cog):
                 await ctx.send(f"No glossary terms found for '{search_term}'.")
                 return
 
+            def html_to_markdown(html):
+                """Convert HTML to Markdown"""
+                replacements = {
+                    "<b>": "**", "</b>": "**",
+                    "<i>": "*", "</i>": "*",
+                    "<strong>": "**", "</strong>": "**",
+                    "<em>": "*", "</em>": "*",
+                    "<br>": "\n", "<br/>": "\n", "<br />": "\n",
+                    "<p>": "\n", "</p>": "\n",
+                    "<ul>": "\n", "</ul>": "\n",
+                    "<li>": "- ", "</li>": "\n",
+                    "<h1>": "# ", "</h1>": "\n",
+                    "<h2>": "## ", "</h2>": "\n",
+                    "<h3>": "### ", "</h3>": "\n",
+                    "<h4>": "#### ", "</h4>": "\n",
+                    "<h5>": "##### ", "</h5>": "\n",
+                    "<h6>": "###### ", "</h6>": "\n",
+                }
+                for html_tag, markdown in replacements.items():
+                    html = html.replace(html_tag, markdown)
+                return html
+
             pages = []
             for term in terms:
                 word = term.get("term", "No title")
@@ -50,6 +72,7 @@ class Weather(commands.Cog):
                     continue
                 if not description:  # Ensure description is not empty
                     description = "No description available."
+                description = html_to_markdown(description)
                 embed = discord.Embed(title=word, description=description, color=0x1E90FF)
                 pages.append(embed)
 
