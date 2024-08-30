@@ -123,14 +123,14 @@ class Weather(commands.Cog):
         pages = []
 
         # Page 1: total, land, marine
-        embed1 = discord.Embed(title="Active Weather Alerts - Summary", color=0x1E90FF)
+        embed1 = discord.Embed(title="Active Weather Alert Summary", color=0x1E90FF)
         for key in ["total", "land", "marine"]:
             if key in data:
                 embed1.add_field(name=key.capitalize(), value=data[key], inline=True)
         pages.append(embed1)
 
         # Page 2: regions
-        embed2 = discord.Embed(title="Active Weather Alerts - Regions", color=0x1E90FF)
+        embed2 = discord.Embed(title="Active Weather Alerts per Region", color=0x1E90FF)
         if "regions" in data:
             embed2.add_field(name="regions", value=data["regions"], inline=True)
         pages.append(embed2)
@@ -149,7 +149,8 @@ class Weather(commands.Cog):
             "VA": "Virginia", "WA": "Washington", "WV": "West Virginia", "WI": "Wisconsin", "WY": "Wyoming",
             "AM": "Atlantic Ocean", "GM": "Gulf of Mexico", "LE": "Lake Erie", "LH": "Lake Huron",
             "LM": "Lake Michigan", "LO": "Lake Ontario", "LS": "Lake Superior", "PH": "Pacific Ocean",
-            "PK": "Pacific Ocean", "PS": "Pacific Ocean", "PZ": "Pacific Ocean", "LC": "Lake Champlain"
+            "PK": "Pacific Ocean", "PS": "Pacific Ocean", "PZ": "Pacific Ocean", "LC": "Lake Champlain",
+            "PM": "Puerto Rico", "PR": "Puerto Rico", "VI": "Virgin Islands"
         }
 
         if "areas" in data:
