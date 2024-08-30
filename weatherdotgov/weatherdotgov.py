@@ -200,7 +200,8 @@ class Weather(commands.Cog):
             except asyncio.TimeoutError:
                 await message.clear_reactions()
                 break
-
+    
+    @commands.guild_only()
     @weather.command()
     async def stations(self, ctx):
         """Fetch and display weather observation stations."""
