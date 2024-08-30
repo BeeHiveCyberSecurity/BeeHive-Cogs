@@ -154,9 +154,9 @@ class Weather(commands.Cog):
             "SD": "South Dakota", "TN": "Tennessee", "TX": "Texas", "UT": "Utah", "VT": "Vermont",
             "VA": "Virginia", "WA": "Washington", "WV": "West Virginia", "WI": "Wisconsin", "WY": "Wyoming",
             "AM": "Atlantic Ocean", "GM": "Gulf of Mexico", "LE": "Lake Erie", "LH": "Lake Huron",
-            "LM": "Lake Michigan", "LO": "Lake Ontario", "LS": "Lake Superior", "PH": "Pacific Ocean",
-            "PK": "Pacific Ocean", "PS": "Pacific Ocean", "PZ": "Pacific Ocean", "LC": "Lake Champlain",
-            "PM": "Puerto Rico", "PR": "Puerto Rico", "VI": "Virgin Islands"
+            "LM": "Lake Michigan", "LO": "Lake Ontario", "LS": "Lake Superior", "PH": "Pacific Ocean (Hawaii)",
+            "PK": "Pacific Ocean (Alaska)", "PS": "Pacific Ocean (California)", "PZ": "Pacific Ocean (Washington)",
+            "LC": "Lake Champlain", "PM": "Puerto Rico", "PR": "Puerto Rico", "VI": "Virgin Islands"
         }
 
         if "areas" in data:
