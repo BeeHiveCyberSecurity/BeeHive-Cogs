@@ -5,8 +5,7 @@
     "end_user_data_statement": "This cog stores no user data",
     "short": "Weather information from weather.gov",
     "requirements": [],
-    "tags": ["weather", "weather.gov", "forecast"],
-    "type": "COG"
+    "tags": ["weather", "weather.gov", "forecast"]
 }
 
 
