@@ -282,7 +282,7 @@ class Skysearch(commands.Cog):
     @commands.group(name='skysearch', help='Core menu for the cog', invoke_without_command=True)
     async def skysearch(self, ctx):
         """SkySearch command group"""
-        embed = discord.Embed(title="Thanks for using SkySearch", description="SkySearch is a powerful, easy-to-use OSINT tool for tracking aircraft.\n\nHere are the commands you can use with SkySearch...", color=0x00ff00)
+        embed = discord.Embed(title="Thanks for using SkySearch", description="SkySearch is a powerful, easy-to-use OSINT tool for tracking aircraft.\n\nHere are the commands you can use with SkySearch...", color=0xfffffe)
         embed.add_field(name="aircraft", value="Use `aircraft` to show available commands to fetch information about live aircraft.", inline=False)
         embed.add_field(name="airport", value="Use `airport` to show available commands to fetch information and imagery of airports around the world.", inline=False)
         await ctx.send(embed=embed)
