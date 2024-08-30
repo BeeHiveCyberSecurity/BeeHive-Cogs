@@ -109,6 +109,23 @@ class Weather(commands.Cog):
                     await message.clear_reactions()
                     break
 
+    @weather.command(name="activealerts")
+    async def activealerts(self, ctx):
+        """Fetches the counts of active alerts from weather.gov and displays them in an embed."""
+        url = "https://api.weather.gov/alerts/active/count"
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as response:
+                if response.status != 200:
+                    await ctx.send("Failed to fetch active alerts.")
+                    return
+                data = await response.json()
+                    
+        embed = discord.Embed(title="Active Weather Alerts", color=0x1E90FF)
+        for key, value in data.items():
+            embed.add_field(name=key, value=value, inline=False)
+                    
+        await ctx.send(embed=embed)
+
 
 
 
