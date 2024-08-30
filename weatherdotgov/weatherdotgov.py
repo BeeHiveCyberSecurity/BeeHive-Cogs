@@ -12,46 +12,59 @@ class Weather(commands.Cog):
     def cog_unload(self):
         self.bot.loop.create_task(self.session.close())
 
-    @commands.command()
-    async def weather(self, ctx, location: str):
-        """Get the current weather for a location from weather.gov"""
-        async with self.session.get(f"https://api.weather.gov/points/{location}") as response:
+    @commands.group()
+    async def weather(self, ctx):
+        """Weather command group"""
+        if ctx.invoked_subcommand is None:
+            await ctx.send("Please specify a subcommand for weather.")
+
+    @weather.command(name="glossary")
+    async def glossary(self, ctx):
+        """Fetch and display the weather glossary from weather.gov"""
+        async with self.session.get("https://api.weather.gov/glossary") as response:
             if response.status != 200:
-                await ctx.send("Could not retrieve weather data.")
+                await ctx.send("Failed to fetch the glossary. Please try again later.")
                 return
 
             data = await response.json()
-            forecast_url = data['properties']['forecast']
-            alerts_url = data['properties']['alerts']
+            terms = data.get("glossary", [])
 
-            async with self.session.get(forecast_url) as forecast_response:
-                if forecast_response.status != 200:
-                    await ctx.send("Could not retrieve forecast data.")
-                    return
+            if not terms:
+                await ctx.send("No glossary terms found.")
+                return
 
-                forecast_data = await forecast_response.json()
-                periods = forecast_data['properties']['periods']
-                current_period = periods[0]
+            pages = []
+            for term in terms:
+                word = term.get("term", "No title")
+                description = term.get("definition", "No description")
+                embed = discord.Embed(title=word, description=description, color=0x1E90FF)
+                pages.append(embed)
 
-                embed = discord.Embed(
-                    title=f"Weather for {location}",
-                    description=current_period['detailedForecast'],
-                    color=discord.Color.blue()
-                )
-                embed.add_field(name="Temperature", value=f"{current_period['temperature']} {current_period['temperatureUnit']}")
-                embed.add_field(name="Wind", value=current_period['windSpeed'])
-                embed.add_field(name="Wind Direction", value=current_period['windDirection'])
-                embed.set_thumbnail(url=current_period['icon'])
+            message = await ctx.send(embed=pages[0])
+            await message.add_reaction("⬅️")
+            await message.add_reaction("➡️")
 
-                # Check for alerts
-                async with self.session.get(alerts_url) as alerts_response:
-                    if alerts_response.status == 200:
-                        alerts_data = await alerts_response.json()
-                        alerts = alerts_data['features']
-                        if alerts:
-                            alert_messages = [alert['properties']['headline'] for alert in alerts]
-                            embed.add_field(name="Alerts", value="\n".join(alert_messages), inline=False)
+            def check(reaction, user):
+                return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️"]
 
-                await ctx.send(embed=embed)
+            i = 0
+            reaction = None
+            while True:
+                if str(reaction) == "⬅️":
+                    if i > 0:
+                        i -= 1
+                        await message.edit(embed=pages[i])
+                elif str(reaction) == "➡️":
+                    if i < len(pages) - 1:
+                        i += 1
+                        await message.edit(embed=pages[i])
+                try:
+                    reaction, user = await self.bot.wait_for("reaction_add", timeout=30.0, check=check)
+                    await message.remove_reaction(reaction, user)
+                except asyncio.TimeoutError:
+                    await message.clear_reactions()
+                    break
+
+
 
 
