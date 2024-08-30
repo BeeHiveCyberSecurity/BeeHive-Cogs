@@ -149,7 +149,7 @@ class Weather(commands.Cog):
             "VA": "Virginia", "WA": "Washington", "WV": "West Virginia", "WI": "Wisconsin", "WY": "Wyoming",
             "AM": "Atlantic Ocean", "GM": "Gulf of Mexico", "LE": "Lake Erie", "LH": "Lake Huron",
             "LM": "Lake Michigan", "LO": "Lake Ontario", "LS": "Lake Superior", "PH": "Pacific Ocean",
-            "PK": "Pacific Ocean", "PS": "Pacific Ocean", "PZ": "Pacific Ocean"
+            "PK": "Pacific Ocean", "PS": "Pacific Ocean", "PZ": "Pacific Ocean", "LC": "Lake Champlain"
         }
 
         if "areas" in data:
