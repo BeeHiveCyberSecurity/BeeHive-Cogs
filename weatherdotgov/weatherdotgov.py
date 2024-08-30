@@ -201,6 +201,65 @@ class Weather(commands.Cog):
                 await message.clear_reactions()
                 break
 
+    @weather.command()
+    async def stations(self, ctx):
+        """Fetch and display weather observation stations."""
+        url = "https://api.weather.gov/stations"
+        headers = {"accept": "application/geo+json"}
+        
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, headers=headers) as response:
+                if response.status != 200:
+                    await ctx.send("Failed to fetch stations data.")
+                    return
+                data = await response.json()
+                
+                stations = data.get("features", [])
+                if not stations:
+                    await ctx.send("No stations data found.")
+                    return
+                
+                pages = []
+                for i in range(0, len(stations), 10):
+                    embed = discord.Embed(title="Weather Observation Stations", color=0x1E90FF)
+                    for station in stations[i:i+10]:
+                        station_name = station["properties"].get("name", "Unknown")
+                        station_id = station["properties"].get("stationIdentifier", "Unknown")
+                        embed.add_field(name=station_name, value=f"ID: {station_id}", inline=True)
+                    pages.append(embed)
+                
+                if not pages:
+                    await ctx.send("No valid stations data found.")
+                    return
+                
+                message = await ctx.send(embed=pages[0])
+                await message.add_reaction("⬅️")
+                await message.add_reaction("➡️")
+                await message.add_reaction("❌")  # Add a close reaction
+
+                def check(reaction, user):
+                    return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️", "❌"]
+
+                i = 0
+                reaction = None
+                while True:
+                    if str(reaction) == "⬅️":
+                        if i > 0:
+                            i -= 1
+                            await message.edit(embed=pages[i])
+                    elif str(reaction) == "➡️":
+                        if i < len(pages) - 1:
+                            i += 1
+                            await message.edit(embed=pages[i])
+                    elif str(reaction) == "❌":
+                        await message.delete()
+                        break
+                    try:
+                        reaction, user = await self.bot.wait_for("reaction_add", timeout=30.0, check=check)
+                        await message.remove_reaction(reaction, user)
+                    except asyncio.TimeoutError:
+                        await message.clear_reactions()
+                        break
 
 
 
