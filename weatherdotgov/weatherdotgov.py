@@ -46,10 +46,16 @@ class Weather(commands.Cog):
             for term in terms:
                 word = term.get("term", "No title")
                 description = term.get("definition", "No description")
+                if word is None or description is None:  # Ignore terms or descriptions that are "null"
+                    continue
                 if not description:  # Ensure description is not empty
                     description = "No description available."
                 embed = discord.Embed(title=word, description=description, color=0x1E90FF)
                 pages.append(embed)
+
+            if not pages:
+                await ctx.send("No valid glossary terms found.")
+                return
 
             message = await ctx.send(embed=pages[0])
             await message.add_reaction("⬅️")
