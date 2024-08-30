@@ -283,7 +283,7 @@ class Skysearch(commands.Cog):
     async def skysearch(self, ctx):
         """SkySearch command group"""
         embed = discord.Embed(title="Thanks for using SkySearch", description="SkySearch is a powerful, easy-to-use OSINT tool for tracking aircraft.", color=0xfffffe)
-        embed.add_field(name="aircraft", value="Use `aircraft` to show available commands to fetch information about live aircraft.", inline=False)
+        embed.add_field(name="aircraft", value="Use `aircraft` to show available commands to fetch information about live aircraft and configure emergency squawk alerts.", inline=False)
         embed.add_field(name="airport", value="Use `airport` to show available commands to fetch information and imagery of airports around the world.", inline=False)
         await ctx.send(embed=embed)
     
