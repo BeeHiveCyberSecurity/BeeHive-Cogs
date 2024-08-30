@@ -222,7 +222,7 @@ class Weather(commands.Cog):
                 
                 pages = []
                 for i in range(0, len(stations), 10):
-                    embed = discord.Embed(title="Weather Observation Stations", color=0x1E90FF)
+                    embed = discord.Embed(title="Weather observation stations", color=0x1E90FF)
                     for station in stations[i:i+10]:
                         station_name = station["properties"].get("name", "Unknown")
                         station_id = station["properties"].get("stationIdentifier", "Unknown")
