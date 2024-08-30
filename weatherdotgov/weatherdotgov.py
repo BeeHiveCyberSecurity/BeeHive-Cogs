@@ -60,9 +60,10 @@ class Weather(commands.Cog):
             message = await ctx.send(embed=pages[0])
             await message.add_reaction("⬅️")
             await message.add_reaction("➡️")
+            await message.add_reaction("❌")  # Add a close reaction
 
             def check(reaction, user):
-                return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️"]
+                return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️", "❌"]
 
             i = 0
             reaction = None
@@ -75,6 +76,9 @@ class Weather(commands.Cog):
                     if i < len(pages) - 1:
                         i += 1
                         await message.edit(embed=pages[i])
+                elif str(reaction) == "❌":
+                    await message.delete()
+                    break
                 try:
                     reaction, user = await self.bot.wait_for("reaction_add", timeout=30.0, check=check)
                     await message.remove_reaction(reaction, user)
