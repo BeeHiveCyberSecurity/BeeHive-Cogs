@@ -136,12 +136,26 @@ class Weather(commands.Cog):
         pages.append(embed2)
 
         # Page 3 and beyond: areas
+        state_full_names = {
+            "AL": "Alabama", "AK": "Alaska", "AZ": "Arizona", "AR": "Arkansas", "CA": "California",
+            "CO": "Colorado", "CT": "Connecticut", "DE": "Delaware", "FL": "Florida", "GA": "Georgia",
+            "HI": "Hawaii", "ID": "Idaho", "IL": "Illinois", "IN": "Indiana", "IA": "Iowa",
+            "KS": "Kansas", "KY": "Kentucky", "LA": "Louisiana", "ME": "Maine", "MD": "Maryland",
+            "MA": "Massachusetts", "MI": "Michigan", "MN": "Minnesota", "MS": "Mississippi", "MO": "Missouri",
+            "MT": "Montana", "NE": "Nebraska", "NV": "Nevada", "NH": "New Hampshire", "NJ": "New Jersey",
+            "NM": "New Mexico", "NY": "New York", "NC": "North Carolina", "ND": "North Dakota", "OH": "Ohio",
+            "OK": "Oklahoma", "OR": "Oregon", "PA": "Pennsylvania", "RI": "Rhode Island", "SC": "South Carolina",
+            "SD": "South Dakota", "TN": "Tennessee", "TX": "Texas", "UT": "Utah", "VT": "Vermont",
+            "VA": "Virginia", "WA": "Washington", "WV": "West Virginia", "WI": "Wisconsin", "WY": "Wyoming"
+        }
+
         if "areas" in data:
             states = list(data["areas"].items())
             for i in range(0, len(states), 25):
                 embed = discord.Embed(title="Active Weather Alerts - Areas", color=0x1E90FF)
                 for state, count in states[i:i+25]:
-                    embed.add_field(name=state, value=count, inline=True)
+                    full_name = state_full_names.get(state, state)
+                    embed.add_field(name=full_name, value=count, inline=True)
                 pages.append(embed)
 
         if not pages:
