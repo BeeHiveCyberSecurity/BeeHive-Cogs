@@ -109,9 +109,9 @@ class Weather(commands.Cog):
                     await message.clear_reactions()
                     break
 
-    @weather.command(name="activealerts")
-    async def activealerts(self, ctx):
-        """Fetches the counts of active alerts from weather.gov and displays them in an embed."""
+    @weather.command(name="alertsummary")
+    async def alertsummary(self, ctx):
+        """Shows a statistical summary of active weather alerts"""
         url = "https://api.weather.gov/alerts/active/count"
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as response:
