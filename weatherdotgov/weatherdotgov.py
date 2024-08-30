@@ -225,7 +225,13 @@ class Weather(commands.Cog):
                     for station in stations[i:i+10]:
                         station_name = station["properties"].get("name", "Unknown")
                         station_id = station["properties"].get("stationIdentifier", "Unknown")
-                        embed.add_field(name=station_name, value=f"ID: {station_id}", inline=True)
+                        coordinates = station["geometry"]["coordinates"] if "geometry" in station else ["Unknown", "Unknown"]
+                        elevation = station["properties"].get("elevation", {}).get("value", "Unknown")
+                        embed.add_field(
+                            name=station_name, 
+                            value=f"ID: {station_id}\nCoordinates: {coordinates[1]}, {coordinates[0]}\nElevation: {elevation} meters", 
+                            inline=True
+                        )
                     pages.append(embed)
                 
                 if not pages:
