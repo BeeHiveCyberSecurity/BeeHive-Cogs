@@ -19,7 +19,7 @@ class Weather(commands.Cog):
             await ctx.send("Please specify a subcommand for weather.")
 
     @weather.command(name="glossary")
-    async def glossary(self, ctx):
+    async def glossary(self, ctx, *, search_term: str = None):
         """Fetch and display the weather glossary from weather.gov"""
         async with self.session.get("https://api.weather.gov/glossary") as response:
             if response.status != 200:
@@ -31,6 +31,13 @@ class Weather(commands.Cog):
 
             if not terms:
                 await ctx.send("No glossary terms found.")
+                return
+
+            if search_term:
+                terms = [term for term in terms if search_term.lower() in term.get("term", "").lower()]
+
+            if not terms:
+                await ctx.send(f"No glossary terms found for '{search_term}'.")
                 return
 
             pages = []
