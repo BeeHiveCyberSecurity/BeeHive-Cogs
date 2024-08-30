@@ -227,8 +227,12 @@ class Weather(commands.Cog):
                         station_name = station["properties"].get("name", "Unknown")
                         station_id = station["properties"].get("stationIdentifier", "Unknown")
                         coordinates = station["geometry"]["coordinates"] if "geometry" in station else ["Unknown", "Unknown"]
+                        if coordinates != ["Unknown", "Unknown"]:
+                            coordinates = [round(coordinates[0], 2), round(coordinates[1], 2)]
                         elevation = station["properties"].get("elevation", {}).get("value", "Unknown")
-                        time_zone = station["properties"].get("timeZone", "Unknown")
+                        if elevation != "Unknown":
+                            elevation = int(elevation)
+                        time_zone = station["properties"].get("timeZone", "Unknown").replace("_", " ")
                         embed.add_field(
                             name=station_name, 
                             value=f"`{station_id}`\n`{coordinates[1]}, {coordinates[0]}`\n`{elevation} meters high`\n`{time_zone}`", 
