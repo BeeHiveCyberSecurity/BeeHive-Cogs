@@ -123,7 +123,7 @@ class Weather(commands.Cog):
         pages = []
 
         # Page 1: total, land, marine
-        embed1 = discord.Embed(title="Active Weather Alert Summary", color=0x1E90FF)
+        embed1 = discord.Embed(title="Summary of active weather alerts", color=0x1E90FF)
         for key in ["total", "land", "marine"]:
             if key in data:
                 embed1.add_field(name=key.capitalize(), value=data[key], inline=True)
@@ -131,8 +131,14 @@ class Weather(commands.Cog):
 
         # Page 2: regions
         embed2 = discord.Embed(title="Active Weather Alerts per Region", color=0x1E90FF)
+        region_full_names = {
+            "AL": "Alaska", "AT": "Atlantic", "GL": "Great Lakes", "GM": "Gulf of Mexico",
+            "PA": "Pacific", "PI": "Pacific Islands"
+        }
         if "regions" in data:
-            embed2.add_field(name="regions", value=data["regions"], inline=True)
+            for region, count in data["regions"].items():
+                full_name = region_full_names.get(region, region)
+                embed2.add_field(name=full_name, value=count, inline=True)
         pages.append(embed2)
 
         # Page 3 and beyond: areas
@@ -156,7 +162,7 @@ class Weather(commands.Cog):
         if "areas" in data:
             states = list(data["areas"].items())
             for i in range(0, len(states), 25):
-                embed = discord.Embed(title="Active Weather Alerts - Areas", color=0x1E90FF)
+                embed = discord.Embed(title="Active weather alerts per area", color=0x1E90FF)
                 for state, count in states[i:i+25]:
                     full_name = state_full_names.get(state, state)
                     embed.add_field(name=full_name, value=count, inline=True)
