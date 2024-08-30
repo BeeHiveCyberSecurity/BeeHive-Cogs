@@ -1,6 +1,7 @@
 import discord
-from discord.ext import commands
+from redbot.core import commands
 import aiohttp
+import asyncio
 
 class Weather(commands.Cog):
     """Weather information from weather.gov"""
