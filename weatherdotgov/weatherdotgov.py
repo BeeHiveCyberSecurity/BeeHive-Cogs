@@ -120,11 +120,59 @@ class Weather(commands.Cog):
                     return
                 data = await response.json()
                     
-        embed = discord.Embed(title="Active Weather Alerts", color=0x1E90FF)
-        for key, value in data.items():
-            embed.add_field(name=key, value=value, inline=False)
-                    
-        await ctx.send(embed=embed)
+        pages = []
+
+        # Page 1: total, land, marine
+        embed1 = discord.Embed(title="Active Weather Alerts - Summary", color=0x1E90FF)
+        for key in ["total", "land", "marine"]:
+            if key in data:
+                embed1.add_field(name=key, value=data[key], inline=False)
+        pages.append(embed1)
+
+        # Page 2: regions
+        embed2 = discord.Embed(title="Active Weather Alerts - Regions", color=0x1E90FF)
+        if "regions" in data:
+            embed2.add_field(name="regions", value=data["regions"], inline=False)
+        pages.append(embed2)
+
+        # Page 3: areas
+        embed3 = discord.Embed(title="Active Weather Alerts - Areas", color=0x1E90FF)
+        if "areas" in data:
+            embed3.add_field(name="areas", value=data["areas"], inline=False)
+        pages.append(embed3)
+
+        if not pages:
+            await ctx.send("No valid alert data found.")
+            return
+
+        message = await ctx.send(embed=pages[0])
+        await message.add_reaction("⬅️")
+        await message.add_reaction("➡️")
+        await message.add_reaction("❌")  # Add a close reaction
+
+        def check(reaction, user):
+            return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️", "❌"]
+
+        i = 0
+        reaction = None
+        while True:
+            if str(reaction) == "⬅️":
+                if i > 0:
+                    i -= 1
+                    await message.edit(embed=pages[i])
+            elif str(reaction) == "➡️":
+                if i < len(pages) - 1:
+                    i += 1
+                    await message.edit(embed=pages[i])
+            elif str(reaction) == "❌":
+                await message.delete()
+                break
+            try:
+                reaction, user = await self.bot.wait_for("reaction_add", timeout=30.0, check=check)
+                await message.remove_reaction(reaction, user)
+            except asyncio.TimeoutError:
+                await message.clear_reactions()
+                break
 
 
 
