@@ -1206,7 +1206,7 @@ class Skysearch(commands.Cog):
             embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/location.png")
 
             googlemaps_tokens = await self.bot.get_shared_api_tokens("googlemaps")
-            google_street_view_api_key = googlemaps_tokens.get("api_key", "YOUR_API_KEY")  # Use the API key from the shared tokens, default to "YOUR_API_KEY" if not found
+            google_street_view_api_key = googlemaps_tokens.get("api_key", "YOUR_API_KEY")
             
             file = None  # Initialize file to None to handle cases where no image is available
             if google_street_view_api_key != "YOUR_API_KEY":
@@ -1238,19 +1238,19 @@ class Skysearch(commands.Cog):
                 embed.add_field(name="Error", value="No airport found with the provided code.", inline=False)
             else:
                 if 'icao' in data1:
-                    embed.add_field(name='ICAO', value=f"**`{data1['icao']}`**", inline=True)
+                    embed.add_field(name='ICAO', value=f"`{data1['icao']}`", inline=True)
                 if 'iata' in data1:
-                    embed.add_field(name='IATA', value=f"**`{data1['iata']}`**", inline=True)
+                    embed.add_field(name='IATA', value=f"`{data1['iata']}`", inline=True)
                 if 'country_code' in data1:
-                    embed.add_field(name='Country Code', value=f"**`{data1['country_code']}`**", inline=True)
+                    embed.add_field(name='Country Code', value=f"`{data1['country_code']}`", inline=True)
                 if 'location' in data1:
-                    embed.add_field(name='Location', value=f"**`{data1['location']}`**", inline=True)
+                    embed.add_field(name='Location', value=f"`{data1['location']}`", inline=True)
                 if 'country' in data1:
-                    embed.add_field(name='Country', value=f"**`{data1['country']}`**", inline=True)
+                    embed.add_field(name='Country', value=f"`{data1['country']}`", inline=True)
                 if 'longitude' in data1:
-                    embed.add_field(name='Longitude', value=f"**```{data1['longitude']}```**", inline=False)
+                    embed.add_field(name='Longitude', value=f"`{data1['longitude']}`", inline=True)
                 if 'latitude' in data1:
-                    embed.add_field(name='Latitude', value=f"**```{data1['latitude']}```**", inline=False)
+                    embed.add_field(name='Latitude', value=f"`{data1['latitude']}`", inline=True)
                 
                 # Check if 'link' is in data1 and add it to the view
                 if 'link' in data1:
