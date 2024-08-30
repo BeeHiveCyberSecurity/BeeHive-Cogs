@@ -36,7 +36,7 @@ class Weather(commands.Cog):
                 return
 
             if search_term:
-                terms = [term for term in terms if search_term.lower() in term.get("term", "").lower()]
+                terms = [term for term in terms if term.get("term") and search_term.lower() in term.get("term", "").lower()]
 
             if not terms:
                 await ctx.send(f"No glossary terms found for '{search_term}'.")
