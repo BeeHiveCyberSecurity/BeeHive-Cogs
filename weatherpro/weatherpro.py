@@ -344,8 +344,8 @@ class Weather(commands.Cog):
         # Fetch current weather data using the latitude and longitude
         url = "https://api.open-meteo.com/v1/forecast"
         params = {
-            "latitude": latitude,
-            "longitude": longitude,
+            "latitude": str(latitude).strip(),
+            "longitude": str(longitude).strip(),
             "current_weather": "true",
             "temperature_unit": "fahrenheit",
             "wind_speed_unit": "mph",
