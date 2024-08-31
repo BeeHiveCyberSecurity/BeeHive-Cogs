@@ -47,7 +47,7 @@ class Weather(commands.Cog):
                 example_alert = discord.Embed(
                     title="Example Severe Thunderstorm Warning",
                     description="This is an example of a Severe Thunderstorm Warning to show you how alerts will look. Future alerts will not be examples, and you should listen to their guidance and instruction.",
-                    color=discord.Color.red()
+                    color=0xff4545
                 )
                 example_alert.add_field(name="Description", value="Severe thunderstorms are occurring in your area.", inline=False)
                 example_alert.add_field(name="Instruction", value="Take shelter immediately.", inline=False)
@@ -93,7 +93,7 @@ class Weather(commands.Cog):
                             embed = discord.Embed(
                                 title="Active weather alert for your location",
                                 description=alert['properties']['headline'],
-                                color=discord.Color.red()
+                                color=0xff4545
                             )
                             embed.add_field(name="Description", value=alert['properties']['description'], inline=False)
                             embed.add_field(name="Instruction", value=alert['properties']['instruction'], inline=False)
@@ -131,7 +131,7 @@ class Weather(commands.Cog):
 
         embed = discord.Embed(
             title="Weather usage data",
-            color=discord.Color.blue()
+            color=0xfffffe
         )
         embed.add_field(name="Total weather users", value=total_users, inline=False)
         embed.add_field(name="Zip codes currently saved", value=users_with_zip, inline=False)
