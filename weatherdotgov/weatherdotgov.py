@@ -297,28 +297,29 @@ class Weather(commands.Cog):
             return
         
         pages = []
-        for i in range(0, len(stations), 15):
-            embed = discord.Embed(title="Radar Stations", color=discord.Color.blue())
-            for station in stations[i:i+15]:
-                station_name = station["properties"].get("name", "Unknown")
-                station_id = station["properties"].get("stationIdentifier", "Unknown")
-                coordinates = station["geometry"]["coordinates"] if "geometry" in station else ["Unknown", "Unknown"]
-                if coordinates != ["Unknown", "Unknown"]:
-                    coordinates = [round(coordinates[0], 2), round(coordinates[1], 2)]
-                elevation = station["properties"].get("elevation", {}).get("value", "Unknown")
-                if elevation != "Unknown":
-                    elevation = int(elevation)
-                time_zone = station["properties"].get("timeZone", "Unknown").replace("_", " ")
-                
-                rda_details = station["properties"].get("rda", "Unknown")
-                latency = station["properties"].get("latency", "Unknown")
-                related = station["properties"].get("related", "Unknown")
-                
-                description = f"`{station_id}`\n`{coordinates[1]}, {coordinates[0]}`\n`{elevation} meters high`\n`{time_zone}`"
-                embed.add_field(name=station_name, value=description, inline=False)
-                embed.add_field(name="RDA Details", value=rda_details, inline=True)
-                embed.add_field(name="Latency", value=latency, inline=True)
-                embed.add_field(name="Related", value=related, inline=True)
+        for station in stations:
+            embed = discord.Embed(title="Radar Station Information", color=discord.Color.blue())
+            
+            station_name = station["properties"].get("name", "Unknown")
+            station_id = station["properties"].get("stationIdentifier", "Unknown")
+            coordinates = station["geometry"]["coordinates"] if "geometry" in station else ["Unknown", "Unknown"]
+            if coordinates != ["Unknown", "Unknown"]:
+                coordinates = [round(coordinates[0], 2), round(coordinates[1], 2)]
+            elevation = station["properties"].get("elevation", {}).get("value", "Unknown")
+            if elevation != "Unknown":
+                elevation = int(elevation)
+            time_zone = station["properties"].get("timeZone", "Unknown").replace("_", " ")
+            
+            rda_details = station["properties"].get("rda", "Unknown")
+            latency = station["properties"].get("latency", "Unknown")
+            related = station["properties"].get("related", "Unknown")
+            
+            description = f"`{station_id}`\n`{coordinates[1]}, {coordinates[0]}`\n`{elevation} meters high`\n`{time_zone}`"
+            embed.add_field(name=station_name, value=description, inline=False)
+            embed.add_field(name="RDA Details", value=rda_details, inline=True)
+            embed.add_field(name="Latency", value=latency, inline=True)
+            embed.add_field(name="Related", value=related, inline=True)
+            
             pages.append(embed)
         
         if not pages:
