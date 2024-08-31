@@ -133,10 +133,10 @@ class Weather(commands.Cog):
             title="Weather usage data",
             color=0xfffffe
         )
-        embed.add_field(name="Total weather users", value=total_users, inline=False)
-        embed.add_field(name="Zip codes currently saved", value=users_with_zip, inline=False)
-        embed.add_field(name="Users with alerts enabled", value=users_with_alerts, inline=False)
-        embed.add_field(name="Total alerts sent", value=total_alerts_sent, inline=False)
+        embed.add_field(name="Total weather users", value=total_users, inline=True)
+        embed.add_field(name="Zip codes currently saved", value=users_with_zip, inline=True)
+        embed.add_field(name="Users with alerts enabled", value=users_with_alerts, inline=True)
+        embed.add_field(name="Total alerts sent", value=total_alerts_sent, inline=True)
 
         await ctx.send(embed=embed)
 
