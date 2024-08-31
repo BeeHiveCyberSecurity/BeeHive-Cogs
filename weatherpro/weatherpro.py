@@ -378,19 +378,19 @@ class Weather(commands.Cog):
                 color=0xfffffe
             )
             embed.add_field(name="Temperature", value=f"{current.get('temperature_2m', 'N/A')}°F")
-            embed.add_field(name="Feels Like", value=f"{current.get('apparent_temperature', 'N/A')}°F")
+            embed.add_field(name="Feels like", value=f"{current.get('apparent_temperature', 'N/A')}°F")
 
             ground_temp = hourly.get('soil_temperature_0cm', 'N/A')
             if isinstance(ground_temp, list) and ground_temp:
                 ground_temp = ground_temp[0]
-            embed.add_field(name="Ground Temperature", value=f"{ground_temp}°F")
+            embed.add_field(name="Ground temperature", value=f"{ground_temp}°F")
             
             embed.add_field(name="Humidity", value=f"{current.get('relative_humidity_2m', 'N/A')}%")
             embed.add_field(name="Precipitation", value=f"{current.get('precipitation', 'N/A')} inches")
-            embed.add_field(name="Cloud Cover", value=f"{current.get('cloud_cover', 'N/A')}%")
+            embed.add_field(name="Cloud cover", value=f"{current.get('cloud_cover', 'N/A')}%")
             embed.add_field(name="Pressure (MSL)", value=f"{current.get('pressure_msl', 'N/A')} hPa")
-            embed.add_field(name="Surface Pressure", value=f"{current.get('surface_pressure', 'N/A')} hPa")
-            embed.add_field(name="Wind Speed", value=f"{current.get('wind_speed_10m', 'N/A')} mph")
+            embed.add_field(name="Surface pressure", value=f"{current.get('surface_pressure', 'N/A')} hPa")
+            embed.add_field(name="Wind speed", value=f"{current.get('wind_speed_10m', 'N/A')} mph")
             wind_direction = current.get('wind_direction_10m', 'N/A')
             if wind_direction != 'N/A':
                 if (wind_direction >= 0 and wind_direction <= 22.5) or (wind_direction > 337.5 and wind_direction <= 360):
@@ -411,8 +411,8 @@ class Weather(commands.Cog):
                     wind_direction_str = '🡼 Northwest'
             else:
                 wind_direction_str = 'N/A'
-            embed.add_field(name="Wind Direction", value=wind_direction_str)
-            embed.add_field(name="Wind Gusts", value=f"{current.get('wind_gusts_10m', 'N/A')} mph")
+            embed.add_field(name="Wind direction", value=wind_direction_str)
+            embed.add_field(name="Wind gusts", value=f"{current.get('wind_gusts_10m', 'N/A')} mph")
             
             
             
@@ -436,7 +436,7 @@ class Weather(commands.Cog):
                 lightning_potential_str = 'High'
             else:
                 lightning_potential_str = 'Extreme'
-            embed.add_field(name="Lightning Potential", value=f"{lightning_potential_str}")
+            embed.add_field(name="Lightning potential", value=f"{lightning_potential_str}")
             
             await ctx.send(embed=embed)
             nowcasts_fetched = await self.config.nowcasts_fetched()
