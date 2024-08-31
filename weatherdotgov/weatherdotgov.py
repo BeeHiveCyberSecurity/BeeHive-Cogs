@@ -22,6 +22,7 @@ class Weather(commands.Cog):
             "total_alerts_sent": 0,
             "nowcasts_fetched": 0,
             "forecasts_fetched": 0,
+            "glossary_definitions_shown": 0,
         }
         self.config.register_global(**default_global)
         data_dir = bundled_data_path(self)
@@ -401,6 +402,8 @@ class Weather(commands.Cog):
                 return
 
             message = await ctx.send(embed=pages[0])
+            glossary_definitions_shown = await self.config.glossary_definitions_shown()
+            await self.config.glossary_definitions_shown.set(glossary_definitions_shown + 1)
             await message.add_reaction("⬅️")
             await message.add_reaction("➡️")
             await message.add_reaction("❌")  # Add a close reaction
@@ -419,6 +422,8 @@ class Weather(commands.Cog):
                     if i < len(pages) - 1:
                         i += 1
                         await message.edit(embed=pages[i])
+                        glossary_definitions_shown = await self.config.glossary_definitions_shown()
+                        await self.config.glossary_definitions_shown.set(glossary_definitions_shown + 1)
                 elif str(reaction) == "❌":
                     await message.delete()
                     break
