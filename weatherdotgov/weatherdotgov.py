@@ -298,9 +298,8 @@ class Weather(commands.Cog):
         
         pages = []
         for station in stations:
-            embed = discord.Embed(title="Radar Station Information", color=discord.Color.blue())
-            
             station_name = station["properties"].get("name", "Unknown")
+            description = f"`{station_id}`\n`{coordinates[1]}, {coordinates[0]}`\n`{elevation} meters high`\n`{time_zone}`"
             station_id = station["properties"].get("stationIdentifier", "Unknown")
             coordinates = station["geometry"]["coordinates"] if "geometry" in station else ["Unknown", "Unknown"]
             if coordinates != ["Unknown", "Unknown"]:
@@ -310,15 +309,35 @@ class Weather(commands.Cog):
                 elevation = int(elevation)
             time_zone = station["properties"].get("timeZone", "Unknown").replace("_", " ")
             
-            rda_details = station["properties"].get("rda", "Unknown")
+            rda_details = station["properties"].get("rda", {})
             latency = station["properties"].get("latency", "Unknown")
             related = station["properties"].get("related", "Unknown")
+
+            embed = discord.Embed(title=f"{station_name} radar", description=description, color=0xfffffe)
             
-            description = f"`{station_id}`\n`{coordinates[1]}, {coordinates[0]}`\n`{elevation} meters high`\n`{time_zone}`"
-            embed.add_field(name=station_name, value=description, inline=False)
-            embed.add_field(name="RDA Details", value=rda_details, inline=True)
-            embed.add_field(name="Latency", value=latency, inline=True)
-            embed.add_field(name="Related", value=related, inline=True)
+            if rda_details != "Unknown":
+                embed.add_field(name="RDA Timestamp", value=rda_details.get("timestamp", "Unknown"), inline=True)
+                embed.add_field(name="Reporting Host", value=rda_details.get("reportingHost", "Unknown"), inline=True)
+                properties = rda_details.get("properties", {})
+                embed.add_field(name="Resolution Version", value=properties.get("resolutionVersion", "Unknown"), inline=True)
+                embed.add_field(name="NL2 Path", value=properties.get("nl2Path", "Unknown"), inline=True)
+                embed.add_field(name="Volume Coverage Pattern", value=properties.get("volumeCoveragePattern", "Unknown"), inline=True)
+                embed.add_field(name="Control Status", value=properties.get("controlStatus", "Unknown"), inline=True)
+                embed.add_field(name="Build Number", value=properties.get("buildNumber", "Unknown"), inline=True)
+                embed.add_field(name="Alarm Summary", value=properties.get("alarmSummary", "Unknown"), inline=True)
+                embed.add_field(name="Mode", value=properties.get("mode", "Unknown"), inline=True)
+                embed.add_field(name="Generator State", value=properties.get("generatorState", "Unknown"), inline=True)
+                embed.add_field(name="Super Resolution Status", value=properties.get("superResolutionStatus", "Unknown"), inline=True)
+                embed.add_field(name="Operability Status", value=properties.get("operabilityStatus", "Unknown"), inline=True)
+                embed.add_field(name="Status", value=properties.get("status", "Unknown"), inline=True)
+                avg_transmitter_power = properties.get("averageTransmitterPower", {})
+                embed.add_field(name="Average Transmitter Power", value=f"{avg_transmitter_power.get('value', 'Unknown')} {avg_transmitter_power.get('unitCode', '')}", inline=True)
+                reflectivity_calibration = properties.get("reflectivityCalibrationCorrection", {})
+                embed.add_field(name="Reflectivity Calibration Correction", value=f"{reflectivity_calibration.get('value', 'Unknown')} {reflectivity_calibration.get('unitCode', '')}", inline=True)
+            
+            embed.add_field(name="Latency", value=latency, inline=False)
+            embed.add_field(name="Related", value=related, inline=False)
+            pages.append(embed)
             
             pages.append(embed)
         
