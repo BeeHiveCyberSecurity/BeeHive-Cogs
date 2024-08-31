@@ -310,6 +310,16 @@ class Weather(commands.Cog):
             
             rda_details = station["properties"].get("rda", None)
             latency = station["properties"].get("latency", "Unknown")
+            if latency != "Unknown":
+                latency = (
+                    f"Current: {latency['current']['value']} {latency['current']['unitCode']}\n"
+                    f"Average: {latency['average']['value']} {latency['average']['unitCode']}\n"
+                    f"Max: {latency['max']['value']} {latency['max']['unitCode']}\n"
+                    f"Level Two Last Received Time: {latency['levelTwoLastReceivedTime']}\n"
+                    f"Max Latency Time: {latency['maxLatencyTime']}\n"
+                    f"Reporting Host: {latency['reportingHost']}\n"
+                    f"Host: {latency['host']}"
+                )
             related = station["properties"].get("related", "Unknown")
             description = f"`{station_id}`\n`{coordinates[1]}, {coordinates[0]}`\n`{elevation} meters high`\n`{time_zone}`"
 
