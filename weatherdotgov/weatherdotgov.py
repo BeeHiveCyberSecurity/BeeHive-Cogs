@@ -36,7 +36,8 @@ class Weather(commands.Cog):
             }
         
     def cog_load(self):
-        self.bot.loop.create_task(self.start_alerts_task())
+        self.bot.loop.create_task(self.start_severe_alerts_task())
+        self.bot.loop.create_task(self.start_freeze_alerts_task())
 
     def cog_unload(self):
         self.bot.loop.create_task(self.session.close())
@@ -152,7 +153,7 @@ class Weather(commands.Cog):
                             total_alerts_sent = await self.config.total_alerts_sent()
                             await self.config.total_alerts_sent.set(total_alerts_sent + 1)
 
-    async def start_alerts_task(self):
+    async def start_severe_alerts_task(self):
         while True:
             await self.check_weather_alerts()
             await asyncio.sleep(900)
