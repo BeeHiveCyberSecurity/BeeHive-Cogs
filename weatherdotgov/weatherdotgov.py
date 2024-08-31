@@ -110,10 +110,28 @@ class Weather(commands.Cog):
         self.bot.loop.create_task(self.start_alerts_task())
 
     @weatherset.command(name="zip")
-    async def weatherset_zip(self, ctx, zip_code: str):
+    async def zip(self, ctx, zip_code: str):
         """Save your zip code to the bot's config"""
         await self.config.user(ctx.author).zip_code.set(zip_code)
         await ctx.send(f"Your zip code has been set to `{zip_code}`. This is the location that will now be used in the future for your weather queries.")
+
+    @weatherset.command(name="stats")
+    async def stats(self, ctx):
+        """Show statistics about zip code subscriptions and alert subscriptions"""
+        all_users = await self.config.all_users()
+        total_users = len(all_users)
+        users_with_zip = sum(1 for user_data in all_users.values() if user_data.get("zip_code"))
+        users_with_alerts = sum(1 for user_id in self.users_with_alerts)
+
+        embed = discord.Embed(
+            title="Weather Subscription Stats",
+            color=discord.Color.blue()
+        )
+        embed.add_field(name="Total Users", value=total_users, inline=False)
+        embed.add_field(name="Users with Zip Codes", value=users_with_zip, inline=False)
+        embed.add_field(name="Users Subscribed to Alerts", value=users_with_alerts, inline=False)
+
+        await ctx.send(embed=embed)
 
 
     @commands.group()
