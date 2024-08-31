@@ -52,18 +52,19 @@ class Weather(commands.Cog):
         user = ctx.author
         user_data = await self.config.user(user).all()
         zip_code = user_data.get("zip_code", "Not set")
-        alerts_enabled = user_data.get("severealerts", False)
+        severe_alerts_enabled = user_data.get("severealerts", False)
+        freeze_alerts_enabled = user_data.get("freezealerts", False)
         
         # Determine the current weather season
         month = datetime.now().month
         if month in [12, 1, 2]:
-            season = "Winter"
+            season = "❄️Winter"
         elif month in [3, 4, 5]:
-            season = "Spring"
+            season = "🌸Spring"
         elif month in [6, 7, 8]:
-            season = "Summer"
+            season = "☀️Summer"
         else:
-            season = "Fall"
+            season = "🍂Fall"
         
         embed = discord.Embed(
             title=f"Weather profile for {user.name}",
@@ -76,7 +77,8 @@ class Weather(commands.Cog):
         else:
             embed.add_field(name="Zip code", value="Censored for privacy", inline=True)
         
-        embed.add_field(name="Severe alerts", value="Enabled" if alerts_enabled else "Disabled", inline=True)
+        embed.add_field(name="Severe alerts", value="Enabled" if severe_alerts_enabled else "Disabled", inline=True)
+        embed.add_field(name="Extreme cold alerts", value="Enabled" if freeze_alerts_enabled else "Disabled", inline=True)
         embed.add_field(name="Local season", value=season, inline=True)
         
         await ctx.send(embed=embed)
