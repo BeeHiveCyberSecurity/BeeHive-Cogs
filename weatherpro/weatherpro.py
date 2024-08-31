@@ -340,46 +340,63 @@ class Weather(commands.Cog):
             return
         
         latitude, longitude = self.zip_codes[zip_code]
-        points_url = f"https://api.weather.gov/points/{latitude.strip()},{longitude.strip()}"
         
-        # Fetch weather data using the latitude and longitude
-        async with self.session.get(points_url) as response:
+        # Fetch current weather data using the latitude and longitude
+        url = "https://api.open-meteo.com/v1/forecast"
+        params = {
+            "latitude": latitude,
+            "longitude": longitude,
+            "current_weather": "true",
+            "temperature_unit": "fahrenheit",
+            "wind_speed_unit": "mph",
+            "precipitation_unit": "inch"
+        }
+        
+        queryString = "&".join(f"{key}={value}" for key, value in params.items())
+        weather_url = f"{url}?{queryString}"
+        
+        async with self.session.get(weather_url) as response:
             if response.status != 200:
-                await ctx.send(f"Failed to fetch the weather data. URL: {points_url}, Status Code: {response.status}")
+                await ctx.send(f"Failed to fetch the weather data. URL: {weather_url}, Status Code: {response.status}")
                 return
 
             data = await response.json()
-            forecast_url = data.get('properties', {}).get('forecast')
-            if not forecast_url:
-                await ctx.send(f"Failed to retrieve forecast URL. URL: {points_url}, Data: {data}")
+            current_weather = data.get('current_weather', {})
+            if not current_weather:
+                await ctx.send(f"Failed to retrieve current weather data. URL: {weather_url}, Data: {data}")
                 return
             
-            async with self.session.get(forecast_url) as forecast_response:
-                if forecast_response.status != 200:
-                    await ctx.send(f"Failed to fetch the forecast data. URL: {forecast_url}, Status Code: {forecast_response.status}")
-                    return
-                
-                forecast_data = await forecast_response.json()
-                periods = forecast_data.get('properties', {}).get('periods', [])
-                if not periods:
-                    await ctx.send(f"Failed to retrieve forecast periods. URL: {forecast_url}, Data: {forecast_data}")
-                    return
-                
-                current_forecast = periods[0]
-                detailed_forecast = current_forecast.get('detailedForecast', 'No detailed forecast available.')
-                
-                embed = discord.Embed(
-                    title="Your current conditions",
-                    description=detailed_forecast,
-                    color=0xfffffe
-                )
-                embed.add_field(name="Temperature", value=f"{current_forecast.get('temperature', 'N/A')}°F")
-                embed.add_field(name="Wind Speed", value=current_forecast.get('windSpeed', 'N/A'))
-                embed.add_field(name="Wind Direction", value=current_forecast.get('windDirection', 'N/A'))
-                
-                await ctx.send(embed=embed)
-                nowcasts_fetched = await self.config.nowcasts_fetched()
-                await self.config.nowcasts_fetched.set(nowcasts_fetched + 1)
+            temperature = current_weather.get('temperature', 'N/A')
+            wind_speed = current_weather.get('windspeed', 'N/A')
+            wind_direction = current_weather.get('winddirection', 'N/A')
+            weather_code = current_weather.get('weathercode', 'N/A')
+            apparent_temperature = current_weather.get('apparent_temperature', 'N/A')
+            relative_humidity = current_weather.get('relative_humidity', 'N/A')
+            precipitation = current_weather.get('precipitation', 'N/A')
+            cloud_cover = current_weather.get('cloud_cover', 'N/A')
+            pressure_msl = current_weather.get('pressure_msl', 'N/A')
+            surface_pressure = current_weather.get('surface_pressure', 'N/A')
+            wind_gusts = current_weather.get('wind_gusts', 'N/A')
+            
+            embed = discord.Embed(
+                title="Your current conditions",
+                description=f"Weather Code: {weather_code}",
+                color=0xfffffe
+            )
+            embed.add_field(name="Temperature", value=f"{temperature}°F")
+            embed.add_field(name="Feels Like", value=f"{apparent_temperature}°F")
+            embed.add_field(name="Humidity", value=f"{relative_humidity}%")
+            embed.add_field(name="Precipitation", value=f"{precipitation} inches")
+            embed.add_field(name="Cloud Cover", value=f"{cloud_cover}%")
+            embed.add_field(name="Pressure (MSL)", value=f"{pressure_msl} hPa")
+            embed.add_field(name="Surface Pressure", value=f"{surface_pressure} hPa")
+            embed.add_field(name="Wind Speed", value=f"{wind_speed} mph")
+            embed.add_field(name="Wind Direction", value=f"{wind_direction}°")
+            embed.add_field(name="Wind Gusts", value=f"{wind_gusts} mph")
+            
+            await ctx.send(embed=embed)
+            nowcasts_fetched = await self.config.nowcasts_fetched()
+            await self.config.nowcasts_fetched.set(nowcasts_fetched + 1)
 
     @commands.guild_only()
     @weather.command(name="forecast")
