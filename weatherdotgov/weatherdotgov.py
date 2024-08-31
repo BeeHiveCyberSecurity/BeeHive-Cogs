@@ -648,41 +648,41 @@ class Weather(commands.Cog):
                 if rda_timestamp != "Unknown":
                     rda_timestamp = discord.utils.format_dt(discord.utils.parse_time(rda_timestamp))
                 if rda_timestamp != "Unknown":
-                    embed.add_field(name="RDA Timestamp", value=rda_timestamp, inline=True)
+                    embed.add_field(name="RDA time", value=rda_timestamp, inline=True)
                 reporting_host = rda_details.get('reportingHost', 'Unknown').upper()
                 if reporting_host != "UNKNOWN":
-                    embed.add_field(name="Reporting Host", value=f"`{reporting_host}`", inline=True)
+                    embed.add_field(name="Reporting host", value=f"`{reporting_host}`", inline=True)
                 properties = rda_details.get("properties", {})
                 resolution_version = properties.get('resolutionVersion', 'Unknown')
                 if resolution_version != "Unknown":
-                    embed.add_field(name="Resolution Version", value=f"`{resolution_version}`", inline=True)
+                    embed.add_field(name="Resolution version", value=f"`{resolution_version}`", inline=True)
                 nl2_path = properties.get('nl2Path', 'Unknown')
                 if nl2_path != "Unknown":
-                    embed.add_field(name="NL2 Path", value=f"`{nl2_path}`", inline=True)
+                    embed.add_field(name="NL2 path", value=f"`{nl2_path}`", inline=True)
                 volume_coverage_pattern = properties.get('volumeCoveragePattern', 'Unknown')
                 if volume_coverage_pattern != "Unknown":
-                    embed.add_field(name="Volume Coverage Pattern", value=f"`{volume_coverage_pattern}`", inline=True)
+                    embed.add_field(name="Volume coverage pattern", value=f"`{volume_coverage_pattern}`", inline=True)
                 control_status = properties.get('controlStatus', 'Unknown')
                 if control_status != "Unknown":
-                    embed.add_field(name="Control Status", value=f"`{control_status}`", inline=True)
+                    embed.add_field(name="Control status", value=f"`{control_status}`", inline=True)
                 build_number = properties.get('buildNumber', 'Unknown')
                 if build_number != "Unknown":
-                    embed.add_field(name="Build Number", value=f"`{build_number}`", inline=True)
+                    embed.add_field(name="Build number", value=f"`{build_number}`", inline=True)
                 alarm_summary = properties.get('alarmSummary', 'Unknown')
                 if alarm_summary != "Unknown":
-                    embed.add_field(name="Alarm Summary", value=f"`{alarm_summary}`", inline=True)
+                    embed.add_field(name="Alarm summary", value=f"`{alarm_summary}`", inline=True)
                 mode = properties.get('mode', 'Unknown')
                 if mode != "Unknown":
                     embed.add_field(name="Mode", value=f"`{mode}`", inline=True)
                 generator_state = properties.get('generatorState', 'Unknown')
                 if generator_state != "Unknown":
-                    embed.add_field(name="Generator State", value=f"`{generator_state}`", inline=True)
+                    embed.add_field(name="Generator state", value=f"`{generator_state}`", inline=True)
                 super_resolution_status = properties.get('superResolutionStatus', 'Unknown')
                 if super_resolution_status != "Unknown":
-                    embed.add_field(name="Super Resolution Status", value=f"`{super_resolution_status}`", inline=True)
+                    embed.add_field(name="Super resolution status", value=f"`{super_resolution_status}`", inline=True)
                 operability_status = properties.get('operabilityStatus', 'Unknown')
                 if operability_status != "Unknown":
-                    embed.add_field(name="Operability Status", value=f"`{operability_status}`", inline=True)
+                    embed.add_field(name="Operability status", value=f"`{operability_status}`", inline=True)
                 status = properties.get('status', 'Unknown')
                 if status != "Unknown":
                     embed.add_field(name="Status", value=f"`{status}`", inline=True)
@@ -690,19 +690,19 @@ class Weather(commands.Cog):
                 avg_transmitter_power_value = avg_transmitter_power.get('value', 'Unknown')
                 if avg_transmitter_power_value != "Unknown":
                     unit_code = avg_transmitter_power.get('unitCode', '').replace('wmoUnit:', '')
-                    embed.add_field(name="Average Transmitter Power", value=f"`{avg_transmitter_power_value} {unit_code}`", inline=True)
+                    embed.add_field(name="Average transmitter power", value=f"`{avg_transmitter_power_value} {unit_code}`", inline=True)
                 reflectivity_calibration = properties.get("reflectivityCalibrationCorrection", {})
                 reflectivity_calibration_value = reflectivity_calibration.get('value', 'Unknown')
                 if reflectivity_calibration_value != "Unknown":
                     unit_code = reflectivity_calibration.get('unitCode', '').replace('wmoUnit:', '')
-                    embed.add_field(name="Reflectivity Calibration Correction", value=f"`{reflectivity_calibration_value} {unit_code}`", inline=True)
+                    embed.add_field(name="Reflectivity calibration correction", value=f"`{reflectivity_calibration_value} {unit_code}`", inline=True)
             
             if latency != "Unknown":
-                embed.add_field(name="Current Latency", value=f"`{current_value} ms`", inline=True)
-                embed.add_field(name="Average Latency", value=f"`{average_value} ms`", inline=True)
-                embed.add_field(name="Max Latency", value=f"`{max_value} ms`", inline=True)
-                embed.add_field(name="L2 Last Received Time", value=level_two_last_received_time, inline=True)
-                embed.add_field(name="Max Latency Time", value=max_latency_time, inline=True)
+                embed.add_field(name="Current latency", value=f"`{current_value} ms`", inline=True)
+                embed.add_field(name="Average latency", value=f"`{average_value} ms`", inline=True)
+                embed.add_field(name="Max latency", value=f"`{max_value} ms`", inline=True)
+                embed.add_field(name="L2 last received time", value=level_two_last_received_time, inline=True)
+                embed.add_field(name="Max latency time", value=max_latency_time, inline=True)
                 embed.add_field(name="Host", value=f"`{host.upper()}`", inline=True)
             
             pages.append(embed)
