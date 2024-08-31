@@ -78,7 +78,7 @@ class Weather(commands.Cog):
         if isinstance(ctx.channel, discord.DMChannel):
             embed.add_field(name="Zip code", value=zip_code, inline=True)
         else:
-            embed.add_field(name="Zip code", value="Censored for privacy", inline=True)
+            embed.add_field(name="Zip code", value="||Censored for privacy||", inline=True)
         
         embed.add_field(name="Severe storm alerts", value="Enabled" if severe_alerts_enabled else "Disabled", inline=True)
         embed.add_field(name="Extreme cold alerts", value="Enabled" if freeze_alerts_enabled else "Disabled", inline=True)
