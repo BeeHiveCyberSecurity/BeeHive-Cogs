@@ -465,7 +465,7 @@ class Weather(commands.Cog):
                             headline = alert['properties']['headline']
                             expires = alert['properties'].get('expires')
                             if expires:
-                                expires_timestamp = f"<t:{int(datetime.datetime.fromisoformat(expires[:-1]).timestamp())}:R>"
+                                expires_timestamp = f"<t:{int(datetime.fromisoformat(expires[:-1]).timestamp())}:R>"
                                 alert_titles.append(f"**{headline}** - {expires_timestamp}")
                             else:
                                 alert_titles.append(f"**{headline}** - No expiry time")
@@ -473,7 +473,7 @@ class Weather(commands.Cog):
                     else:
                         alert_status = "No active alerts"
                 except Exception as e:
-                    alert_status = f"Failed to fetch alerts: {e.status}, message='{e.message}', url={alerts_url}"
+                    alert_status = f"Failed to fetch alerts: {str(e)}, url={alerts_url}"
             
             embed.add_field(name="Currently in effect", value=alert_status)
             
