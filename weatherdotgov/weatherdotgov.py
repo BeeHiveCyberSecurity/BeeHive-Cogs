@@ -80,9 +80,9 @@ class Weather(commands.Cog):
         else:
             embed.add_field(name="Zip code", value="Censored for privacy", inline=True)
         
-        embed.add_field(name="Severe alerts", value="Enabled" if severe_alerts_enabled else "Disabled", inline=True)
+        embed.add_field(name="Severe storm alerts", value="Enabled" if severe_alerts_enabled else "Disabled", inline=True)
         embed.add_field(name="Extreme cold alerts", value="Enabled" if freeze_alerts_enabled else "Disabled", inline=True)
-        embed.add_field(name="Heat alerts", value="Enabled" if heat_alerts_enabled else "Disabled", inline=True)
+        embed.add_field(name="Extreme heat alerts", value="Enabled" if heat_alerts_enabled else "Disabled", inline=True)
         embed.add_field(name="Local season", value=season, inline=True)
         
         await ctx.send(embed=embed)
