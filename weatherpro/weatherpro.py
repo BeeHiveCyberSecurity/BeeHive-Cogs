@@ -403,7 +403,7 @@ class Weather(commands.Cog):
             lightning_potential = minutely_15.get('lightning_potential', 'N/A')
             if isinstance(lightning_potential, list) and lightning_potential:
                 lightning_potential = lightning_potential[0]
-            if lightning_potential == 'N/A' or lightning_potential == 0:
+            if lightning_potential == 'N/A' or lightning_potential is None or lightning_potential == 0:
                 lightning_potential_str = 'N/A'
             elif lightning_potential < 500:
                 lightning_potential_str = 'Low'
