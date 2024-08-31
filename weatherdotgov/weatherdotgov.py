@@ -46,7 +46,7 @@ class Weather(commands.Cog):
         pass
 
     @weather.command(name="now")
-    async def weather_now(self, ctx):
+    async def now(self, ctx):
         """Fetch the current weather for your saved zip code"""
         zip_code = await self.config.user(ctx.author).zip_code()
         if not zip_code:
