@@ -352,7 +352,7 @@ class Weather(commands.Cog):
                 embed.add_field(name="Current Latency", value=current_value, inline=True)
                 embed.add_field(name="Average Latency", value=average_value, inline=True)
                 embed.add_field(name="Max Latency", value=max_value, inline=True)
-                embed.add_field(name="Level Two Last Received Time", value=level_two_last_received_time, inline=True)
+                embed.add_field(name="L2 Last Received Time", value=level_two_last_received_time, inline=True)
                 embed.add_field(name="Max Latency Time", value=max_latency_time, inline=True)
                 embed.add_field(name="Reporting Host", value=reporting_host, inline=True)
                 embed.add_field(name="Host", value=host, inline=True)
