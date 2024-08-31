@@ -451,7 +451,7 @@ class Weather(commands.Cog):
             else:
                 lightning_potential_str = 'Extreme'
             embed.add_field(name="Lightning potential", value=f"{lightning_potential_str}")
-            embed.set_footer(text="Follow skies over screens, and when thunder roars go indoors. If you can hear thunder, you can be struck by lightning.")
+            embed.set_footer(text="When thunder roars, go indoors. If you can hear thunder, you can be struck by lightning.")
             
             # Fetch severe and extreme weather alerts
             alerts_url = f"https://api.weather.gov/alerts/active?point={latitude.strip()},{longitude.strip()}"
