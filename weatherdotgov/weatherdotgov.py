@@ -194,7 +194,7 @@ class Weather(commands.Cog):
                     description=detailed_forecast,
                     color=0xfffffe
                 )
-                embed.add_field(name="Temperature", value=f"{current_forecast.get('temperature', 'N/A')}°")
+                embed.add_field(name="Temperature", value=f"{current_forecast.get('temperature', 'N/A')}°F")
                 embed.add_field(name="Wind Speed", value=current_forecast.get('windSpeed', 'N/A'))
                 embed.add_field(name="Wind Direction", value=current_forecast.get('windDirection', 'N/A'))
                 
