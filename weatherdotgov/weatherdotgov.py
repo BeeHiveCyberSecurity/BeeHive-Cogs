@@ -249,7 +249,7 @@ class Weather(commands.Cog):
                 
                 embeds = []
                 
-                for period in periods[:5]:  # Create a page for each of the next 5 forecast periods
+                for period in periods[:10]:  # Create a page for each of the next 5 forecast periods
                     name = period.get('name', 'N/A')
                     detailed_forecast = period.get('detailedForecast', 'No detailed forecast available.')
                     temperature = period.get('temperature', 'N/A')
