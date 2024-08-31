@@ -7,7 +7,7 @@ from redbot.core import commands, Config #type: ignore
 from redbot.core.data_manager import bundled_data_path #type: ignore
 
 class Weather(commands.Cog):
-    """Weather information from weather.gov"""
+    """Weather.gov is the official website of the National Weather Service (NWS), a U.S. government agency responsible for providing weather, water, and climate data, forecasts, and warnings. It offers accurate and timely information on weather conditions, alerts for severe weather events, and climate-related updates to help the public stay informed and safe."""
     
     def __init__(self, bot):
         self.bot = bot
@@ -324,7 +324,7 @@ class Weather(commands.Cog):
 
     @commands.group()
     async def weather(self, ctx):
-        """Weather.gov is the official website of the National Weather Service (NWS), a U.S. government agency responsible for providing weather, water, and climate data, forecasts, and warnings. It offers accurate and timely information on weather conditions, alerts for severe weather events, and climate-related updates to help the public stay informed and safe."""
+        """Fetch current and upcoming conditions, search and explore hundreds of weather-focused words, check alert statistics across the country, and fetch information on observation stations and radar installations"""
 
     @weather.command(name="now")
     async def now(self, ctx):
@@ -525,7 +525,7 @@ class Weather(commands.Cog):
                 if not description:  # Ensure description is not empty
                     description = "No description available."
                 description = html_to_markdown(description)
-                embed = discord.Embed(title=word, description=description, color=0x1E90FF)
+                embed = discord.Embed(title=word, description=description, color=0xfffffe)
                 pages.append(embed)
 
             if not pages:
@@ -663,7 +663,7 @@ class Weather(commands.Cog):
     @commands.guild_only()
     @weather.command(name="stations")
     async def stations(self, ctx):
-        """Fetch and display weather observation stations."""
+        """Explore US weather observation stations"""
         url = "https://api.weather.gov/stations"
         headers = {"accept": "application/geo+json"}
         
@@ -739,7 +739,7 @@ class Weather(commands.Cog):
     @commands.guild_only()
     @weather.command()
     async def radars(self, ctx):
-        """Fetch and display radar stations information."""
+        """Explore US weather radar installations"""
         url = "https://api.weather.gov/radar/stations"
         headers = {"accept": "application/geo+json"}
         
@@ -758,7 +758,6 @@ class Weather(commands.Cog):
         pages = []
         for station in stations:
             station_name = station["properties"].get("name", "Unknown")
-            station_id = station["properties"].get("stationIdentifier", "Unknown")
             coordinates = station["geometry"]["coordinates"] if "geometry" in station else ["Unknown", "Unknown"]
             if coordinates != ["Unknown", "Unknown"]:
                 coordinates = [round(coordinates[0], 2), round(coordinates[1], 2)]
