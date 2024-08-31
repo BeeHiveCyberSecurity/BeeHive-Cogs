@@ -36,14 +36,13 @@ class Weather(commands.Cog):
         
     def cog_load(self):
         self.bot.loop.create_task(self.start_alerts_task())
-        
+
     def cog_unload(self):
         self.bot.loop.create_task(self.session.close())
 
     @commands.group()
     async def weatherset(self, ctx):
-        """Set your weather preferences"""
-        pass
+        """Configure settings and features of weather"""
 
 
     @weatherset.command(name="profile")
