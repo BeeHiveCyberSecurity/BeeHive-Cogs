@@ -327,7 +327,7 @@ class Weather(commands.Cog):
                 if rda_timestamp != "Unknown":
                     rda_timestamp = discord.utils.format_dt(discord.utils.parse_time(rda_timestamp))
                 embed.add_field(name="RDA Timestamp", value=rda_timestamp, inline=True)
-                embed.add_field(name="Reporting Host", value=rda_details.get("reportingHost", "Unknown"), inline=True)
+                embed.add_field(name="Reporting Host", value=rda_details.get("reportingHost", "Unknown").upper(), inline=True)
                 properties = rda_details.get("properties", {})
                 embed.add_field(name="Resolution Version", value=properties.get("resolutionVersion", "Unknown"), inline=True)
                 embed.add_field(name="NL2 Path", value=properties.get("nl2Path", "Unknown"), inline=True)
@@ -348,12 +348,12 @@ class Weather(commands.Cog):
                 embed.add_field(name="Reflectivity Calibration Correction", value=f"{reflectivity_calibration.get('value', 'Unknown')} {unit_code}", inline=True)
             
             if latency != "Unknown":
-                embed.add_field(name="Current Latency", value=f"{current_value} ms", inline=True)
-                embed.add_field(name="Average Latency", value=f"{average_value} ms", inline=True)
-                embed.add_field(name="Max Latency", value=f"{max_value} ms", inline=True)
+                embed.add_field(name="Current Latency", value=f"`{current_value} ms`", inline=True)
+                embed.add_field(name="Average Latency", value=f"`{average_value} ms`", inline=True)
+                embed.add_field(name="Max Latency", value=f"`{max_value} ms`", inline=True)
                 embed.add_field(name="L2 Last Received Time", value=level_two_last_received_time, inline=True)
                 embed.add_field(name="Max Latency Time", value=max_latency_time, inline=True)
-                embed.add_field(name="Host", value=host.upper(), inline=True)
+                embed.add_field(name="Host", value=f"`{host.upper()}`", inline=True)
             
             pages.append(embed)
         
