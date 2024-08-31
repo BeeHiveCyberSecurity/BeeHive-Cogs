@@ -308,14 +308,14 @@ class Weather(commands.Cog):
                 elevation = int(elevation)
             time_zone = station["properties"].get("timeZone", "Unknown").replace("_", " ")
             
-            rda_details = station["properties"].get("rda", {})
+            rda_details = station["properties"].get("rda", None)
             latency = station["properties"].get("latency", "Unknown")
             related = station["properties"].get("related", "Unknown")
             description = f"`{station_id}`\n`{coordinates[1]}, {coordinates[0]}`\n`{elevation} meters high`\n`{time_zone}`"
 
             embed = discord.Embed(title=f"{station_name} radar", description=description, color=0xfffffe)
             
-            if rda_details != "Unknown":
+            if rda_details is not None:
                 embed.add_field(name="RDA Timestamp", value=rda_details.get("timestamp", "Unknown"), inline=True)
                 embed.add_field(name="Reporting Host", value=rda_details.get("reportingHost", "Unknown"), inline=True)
                 properties = rda_details.get("properties", {})
@@ -337,8 +337,6 @@ class Weather(commands.Cog):
             
             embed.add_field(name="Latency", value=latency, inline=False)
             embed.add_field(name="Related", value=related, inline=False)
-            pages.append(embed)
-            
             pages.append(embed)
         
         if not pages:
