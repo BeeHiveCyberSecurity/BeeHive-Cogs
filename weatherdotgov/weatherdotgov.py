@@ -80,11 +80,15 @@ class Weather(commands.Cog):
         
         await ctx.send(embed=embed)
 
+    @commands.cooldown(1, 900, commands.BucketType.user)
     @weatherset.command(name="severealerts")
-    async def severealerts(self, ctx, enable: bool):
-        """Enable or disable weather alerts for your saved zip code"""
+    async def severealerts(self, ctx):
+        """Toggle weather alerts for your saved zip code"""
         user = ctx.author
-        if enable:
+        current_setting = await self.config.user(user).severealerts()
+        new_setting = not current_setting
+
+        if new_setting:
             try:
                 example_alert = discord.Embed(
                     title="Example Severe Thunderstorm Warning",
