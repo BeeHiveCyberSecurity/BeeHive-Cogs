@@ -86,7 +86,17 @@ class Weather(commands.Cog):
                 
                 current_forecast = periods[0]
                 detailed_forecast = current_forecast.get('detailedForecast', 'No detailed forecast available.')
-                await ctx.send(f"The current weather is {detailed_forecast}")
+                
+                embed = discord.Embed(
+                    title="Current Weather",
+                    description=detailed_forecast,
+                    color=discord.Color.blue()
+                )
+                embed.add_field(name="Temperature", value=current_forecast.get('temperature', 'N/A'))
+                embed.add_field(name="Wind Speed", value=current_forecast.get('windSpeed', 'N/A'))
+                embed.add_field(name="Wind Direction", value=current_forecast.get('windDirection', 'N/A'))
+                
+                await ctx.send(embed=embed)
 
     @commands.guild_only()
     @weather.command(name="glossary")
