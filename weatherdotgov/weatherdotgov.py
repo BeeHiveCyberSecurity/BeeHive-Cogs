@@ -1,10 +1,10 @@
-import discord
-import aiohttp
+import discord #type: ignore
+import aiohttp #type: ignore
 import asyncio
 import csv
 from datetime import datetime
-from redbot.core import commands, Config
-from redbot.core.data_manager import bundled_data_path
+from redbot.core import commands, Config #type: ignore
+from redbot.core.data_manager import bundled_data_path #type: ignore
 
 class Weather(commands.Cog):
     """Weather information from weather.gov"""
@@ -22,6 +22,8 @@ class Weather(commands.Cog):
         self.config.register_user(**default_user)
         default_global = {
             "total_alerts_sent": 0,
+            "total_heat_alerts_sent": 0,
+            "total_freeze_alerts_sent": 0,
             "nowcasts_fetched": 0,
             "forecasts_fetched": 0,
             "glossary_definitions_shown": 0,
@@ -300,15 +302,15 @@ class Weather(commands.Cog):
             title="Weather usage data",
             color=0xfffffe
         )
-        embed.add_field(name="Total weather users", value=total_users, inline=True)
-        embed.add_field(name="Zip codes currently saved", value=users_with_zip, inline=True)
-        embed.add_field(name="Severe alert subscribers", value=users_with_severe_alerts, inline=True)
-        embed.add_field(name="Freeze alert subscribers", value=users_with_freeze_alerts, inline=True)
-        embed.add_field(name="Heat alert subscribers", value=users_with_heat_alerts, inline=True)
-        embed.add_field(name="Severe alerts dispatched", value=total_alerts_sent, inline=True)
-        embed.add_field(name="Nowcasts provided", value=nowcasts_fetched, inline=True)
-        embed.add_field(name="Forecasts provided", value=forecasts_fetched, inline=True)
-        embed.add_field(name="Glossary terms shown", value=glossary_definitions_shown, inline=True)
+        embed.add_field(name="Total weather users", value=f"{total_users} user{'s' if total_users != 1 else ''}", inline=True)
+        embed.add_field(name="Zip codes currently saved", value=f"{users_with_zip} zip code{'s' if users_with_zip != 1 else ''}", inline=True)
+        embed.add_field(name="Severe alert subscribers", value=f"{users_with_severe_alerts} subscriber{'s' if users_with_severe_alerts != 1 else ''}", inline=True)
+        embed.add_field(name="Freeze alert subscribers", value=f"{users_with_freeze_alerts} subscriber{'s' if users_with_freeze_alerts != 1 else ''}", inline=True)
+        embed.add_field(name="Heat alert subscribers", value=f"{users_with_heat_alerts} subscriber{'s' if users_with_heat_alerts != 1 else ''}", inline=True)
+        embed.add_field(name="Severe alerts dispatched", value=f"{total_alerts_sent} alert{'s' if total_alerts_sent != 1 else ''}", inline=True)
+        embed.add_field(name="Nowcasts provided", value=f"{nowcasts_fetched} nowcast{'s' if nowcasts_fetched != 1 else ''}", inline=True)
+        embed.add_field(name="Forecasts provided", value=f"{forecasts_fetched} forecast{'s' if forecasts_fetched != 1 else ''}", inline=True)
+        embed.add_field(name="Glossary terms shown", value=f"{glossary_definitions_shown} term{'s' if glossary_definitions_shown != 1 else ''}", inline=True)
 
         await ctx.send(embed=embed)
 
