@@ -59,28 +59,29 @@ class Weather(commands.Cog):
             return
         
         latitude, longitude = self.zip_codes[zip_code]
+        points_url = f"https://api.weather.gov/points/{latitude},{longitude}"
         
         # Fetch weather data using the latitude and longitude
-        async with self.session.get(f"https://api.weather.gov/points/{latitude},{longitude}") as response:
+        async with self.session.get(points_url) as response:
             if response.status != 200:
-                await ctx.send("Failed to fetch the weather data. Please try again later.")
+                await ctx.send(f"Failed to fetch the weather data. URL: {points_url}, Status Code: {response.status}")
                 return
 
             data = await response.json()
             forecast_url = data.get('properties', {}).get('forecast')
             if not forecast_url:
-                await ctx.send("Failed to retrieve forecast URL. Please try again later.")
+                await ctx.send(f"Failed to retrieve forecast URL. URL: {points_url}, Data: {data}")
                 return
             
             async with self.session.get(forecast_url) as forecast_response:
                 if forecast_response.status != 200:
-                    await ctx.send("Failed to fetch the forecast data. Please try again later.")
+                    await ctx.send(f"Failed to fetch the forecast data. URL: {forecast_url}, Status Code: {forecast_response.status}")
                     return
                 
                 forecast_data = await forecast_response.json()
                 periods = forecast_data.get('properties', {}).get('periods', [])
                 if not periods:
-                    await ctx.send("Failed to retrieve forecast periods. Please try again later.")
+                    await ctx.send(f"Failed to retrieve forecast periods. URL: {forecast_url}, Data: {forecast_data}")
                     return
                 
                 current_forecast = periods[0]
