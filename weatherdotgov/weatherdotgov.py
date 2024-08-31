@@ -214,7 +214,7 @@ class Weather(commands.Cog):
 
     @weatherset.command(name="zip")
     async def zip(self, ctx, zip_code: str):
-        """Save your zip code to the bot's config"""
+        """Set your zip code for queries"""
         await self.config.user(ctx.author).zip_code.set(zip_code)
         if isinstance(ctx.channel, discord.DMChannel):
             await ctx.send(f"Your zip code has been set to `{zip_code}`. This is the location that will now be used in the future for your weather queries.")
