@@ -460,7 +460,15 @@ class Weather(commands.Cog):
                     alerts_data = await alerts_response.json()
                     alerts = alerts_data.get('features', [])
                     if alerts:
-                        alert_titles = [alert['properties']['headline'] for alert in alerts]
+                        alert_titles = []
+                        for alert in alerts:
+                            headline = alert['properties']['headline']
+                            expires = alert['properties'].get('expires')
+                            if expires:
+                                expires_timestamp = f"<t:{int(datetime.datetime.fromisoformat(expires[:-1]).timestamp())}:R>"
+                                alert_titles.append(f"**{headline}** - {expires_timestamp}")
+                            else:
+                                alert_titles.append(f"**{headline}** - No expiry time")
                         alert_status = "\n".join(alert_titles)
                     else:
                         alert_status = "No active alerts"
