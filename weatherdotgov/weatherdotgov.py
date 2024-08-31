@@ -58,13 +58,13 @@ class Weather(commands.Cog):
         # Determine the current weather season
         month = datetime.now().month
         if month in [12, 1, 2]:
-            season = "❄️Winter"
+            season = "❄️ Winter"
         elif month in [3, 4, 5]:
-            season = "🌸Spring"
+            season = "🌸 Spring"
         elif month in [6, 7, 8]:
-            season = "☀️Summer"
+            season = "☀️ Summer"
         else:
-            season = "🍂Fall"
+            season = "🍂 Fall"
         
         embed = discord.Embed(
             title=f"Weather profile for {user.name}",
