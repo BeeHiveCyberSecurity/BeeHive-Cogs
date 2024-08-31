@@ -13,7 +13,8 @@ class Weather(commands.Cog):
         self.session = aiohttp.ClientSession()
         self.config = Config.get_conf(self, identifier=1234567890)
         default_user = {
-            "zip_code": None
+            "zip_code": None,
+            "alerts": False  # Add alerts to default user config
         }
         self.config.register_user(**default_user)
         data_dir = bundled_data_path(self)
@@ -32,6 +33,49 @@ class Weather(commands.Cog):
     async def weatherset(self, ctx):
         """Set your weather preferences"""
         pass
+
+    @weatherset.command(name="alerts")
+    async def weatherset_alerts(self, ctx, enable: bool):
+        """Enable or disable weather alerts for your saved zip code"""
+        await self.config.user(ctx.author).alerts.set(enable)
+        status = "enabled" if enable else "disabled"
+        await ctx.send(f"Weather alerts have been {status}.")
+
+    async def check_weather_alerts(self):
+        """Check for weather alerts and DM users if any severe or extreme warnings are issued"""
+        all_users = await self.config.all_users()
+        users_with_alerts = [user_id for user_id, data in all_users.items() if data.get("alerts")]
+
+        for user_id in users_with_alerts:
+            user_data = await self.config.user_from_id(user_id).all()
+            zip_code = user_data.get("zip_code")
+            if not zip_code or zip_code not in self.zip_codes:
+                continue
+
+            latitude, longitude = self.zip_codes[zip_code]
+            alerts_url = f"https://api.weather.gov/alerts/active?point={latitude.strip()},{longitude.strip()}"
+
+            async with self.session.get(alerts_url) as response:
+                if response.status != 200:
+                    continue
+
+                data = await response.json()
+                alerts = data.get('features', [])
+                severe_alerts = [alert for alert in alerts if alert['properties']['severity'] in ['Severe', 'Extreme']]
+
+                if severe_alerts:
+                    user = self.bot.get_user(user_id)
+                    if user:
+                        alert_messages = [alert['properties']['headline'] for alert in severe_alerts]
+                        await user.send(f"Severe weather alerts for your location:\n" + "\n".join(alert_messages))
+
+    async def start_alerts_task(self):
+        while True:
+            await self.check_weather_alerts()
+            await asyncio.sleep(900)
+
+    def cog_load(self):
+        self.bot.loop.create_task(self.start_alerts_task())
 
     @weatherset.command(name="zip")
     async def weatherset_zip(self, ctx, zip_code: str):
