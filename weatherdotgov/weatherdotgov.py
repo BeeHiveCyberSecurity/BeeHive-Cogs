@@ -67,7 +67,10 @@ class Weather(commands.Cog):
                 return
 
             data = await response.json()
-            forecast_url = data['properties']['forecast']
+            forecast_url = data.get('properties', {}).get('forecast')
+            if not forecast_url:
+                await ctx.send("Failed to retrieve forecast URL. Please try again later.")
+                return
             
             async with self.session.get(forecast_url) as forecast_response:
                 if forecast_response.status != 200:
@@ -75,8 +78,14 @@ class Weather(commands.Cog):
                     return
                 
                 forecast_data = await forecast_response.json()
-                current_forecast = forecast_data['properties']['periods'][0]
-                await ctx.send(f"The current weather is {current_forecast['detailedForecast']}")
+                periods = forecast_data.get('properties', {}).get('periods', [])
+                if not periods:
+                    await ctx.send("Failed to retrieve forecast periods. Please try again later.")
+                    return
+                
+                current_forecast = periods[0]
+                detailed_forecast = current_forecast.get('detailedForecast', 'No detailed forecast available.')
+                await ctx.send(f"The current weather is {detailed_forecast}")
 
     @commands.guild_only()
     @weather.command(name="glossary")
