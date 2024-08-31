@@ -354,7 +354,7 @@ class Weather(commands.Cog):
                 embed.add_field(name="Max Latency", value=f"{max_value} ms", inline=True)
                 embed.add_field(name="L2 Last Received Time", value=level_two_last_received_time, inline=True)
                 embed.add_field(name="Max Latency Time", value=max_latency_time, inline=True)
-                embed.add_field(name="Host", value=host, inline=True)
+                embed.add_field(name="Host", value=host.upper(), inline=True)
             
             pages.append(embed)
         
