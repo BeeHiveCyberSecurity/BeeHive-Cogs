@@ -37,9 +37,29 @@ class Weather(commands.Cog):
     @weatherset.command(name="alerts")
     async def weatherset_alerts(self, ctx, enable: bool):
         """Enable or disable weather alerts for your saved zip code"""
-        await self.config.user(ctx.author).alerts.set(enable)
-        status = "enabled" if enable else "disabled"
-        await ctx.send(f"Weather alerts have been {status}.")
+        user = ctx.author
+        if enable:
+            try:
+                example_alert = discord.Embed(
+                    title="Example Severe Thunderstorm Warning",
+                    description="This is an example of a Severe Thunderstorm Warning to show you how alerts will look. Future alerts will not be examples, and you should listen to their guidance and instruction.",
+                    color=discord.Color.red()
+                )
+                example_alert.add_field(name="Description", value="Severe thunderstorms are occurring in your area.", inline=False)
+                example_alert.add_field(name="Instruction", value="Take shelter immediately.", inline=False)
+                example_alert.add_field(name="Severity", value="Severe", inline=True)
+                example_alert.add_field(name="Urgency", value="Immediate", inline=True)
+                example_alert.add_field(name="Certainty", value="Observed", inline=True)
+                example_alert.set_footer(text="Issued by National Weather Service")
+
+                await user.send(embed=example_alert)
+                await self.config.user(user).alerts.set(True)
+                await ctx.send("Weather alerts have been enabled.")
+            except discord.Forbidden:
+                await ctx.send("I cannot send you direct messages. Please enable DMs from server members and try again.")
+        else:
+            await self.config.user(user).alerts.set(False)
+            await ctx.send("Weather alerts have been disabled.")
 
     async def check_weather_alerts(self):
         """Check for weather alerts and DM users if any severe or extreme warnings are issued"""
@@ -66,8 +86,20 @@ class Weather(commands.Cog):
                 if severe_alerts:
                     user = self.bot.get_user(user_id)
                     if user:
-                        alert_messages = [alert['properties']['headline'] for alert in severe_alerts]
-                        await user.send(f"Severe weather alerts for your location:\n" + "\n".join(alert_messages))
+                        for alert in severe_alerts:
+                            embed = discord.Embed(
+                                title="Active weather alert for your location",
+                                description=alert['properties']['headline'],
+                                color=discord.Color.red()
+                            )
+                            embed.add_field(name="Description", value=alert['properties']['description'], inline=False)
+                            embed.add_field(name="Instruction", value=alert['properties']['instruction'], inline=False)
+                            embed.add_field(name="Severity", value=alert['properties']['severity'], inline=True)
+                            embed.add_field(name="Urgency", value=alert['properties']['urgency'], inline=True)
+                            embed.add_field(name="Certainty", value=alert['properties']['certainty'], inline=True)
+                            embed.set_footer(text=f"Issued by {alert['properties']['senderName']}")
+
+                            await user.send(embed=embed)
 
     async def start_alerts_task(self):
         while True:
