@@ -90,7 +90,7 @@ class Weather(commands.Cog):
                 embed = discord.Embed(
                     title="Current Weather",
                     description=detailed_forecast,
-                    color=discord.Color.blue()
+                    color=0xfffffe
                 )
                 embed.add_field(name="Temperature", value=current_forecast.get('temperature', 'N/A'))
                 embed.add_field(name="Wind Speed", value=current_forecast.get('windSpeed', 'N/A'))
@@ -152,7 +152,7 @@ class Weather(commands.Cog):
                     embed = discord.Embed(
                         title=f"Weather forecast for {name}",
                         description=f"{detailed_forecast}",
-                        color=discord.Color.blue()
+                        color=0xfffffe
                     )
                     embed.add_field(name="Temperature", value=temperature)
                     embed.add_field(name="Wind Speed", value=wind_speed)
