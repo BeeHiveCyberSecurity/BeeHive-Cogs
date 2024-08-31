@@ -472,6 +472,18 @@ class Weather(commands.Cog):
                             "Hurricane Warning": ":cyclone:",
                             "Tsunami Warning": ":ocean:",
                             "Earthquake Warning": ":earth_americas:",
+                            "Blizzard Warning": ":snowflake:",
+                            "Dust Storm Warning": ":dash:",
+                            "Extreme Cold Warning": ":cold_face:",
+                            "Extreme Heat Warning": ":hot_face:",
+                            "Gale Warning": ":wind_face:",
+                            "Ice Storm Warning": ":ice_cube:",
+                            "Red Flag Warning": ":triangular_flag_on_post:",
+                            "Severe Weather Statement": ":cloud_with_lightning_and_rain:",
+                            "Special Marine Warning": ":anchor:",
+                            "Storm Surge Warning": ":ocean:",
+                            "Tropical Storm Warning": ":tropical_storm:",
+                            "Volcano Warning": ":volcano:",
                             # Add more event types and corresponding emojis as needed
                         }
                         for alert in alerts:
