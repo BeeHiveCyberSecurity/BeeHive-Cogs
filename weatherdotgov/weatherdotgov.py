@@ -288,12 +288,13 @@ class Weather(commands.Cog):
     async def stats(self, ctx):
         """Show statistics about weather feature usage"""
         all_users = await self.config.all_users()
-        total_users = len(all_users)
         users_with_zip = sum(1 for user_data in all_users.values() if user_data.get("zip_code"))
         users_with_severe_alerts = sum(1 for user_data in all_users.values() if user_data.get("severealerts"))
         users_with_freeze_alerts = sum(1 for user_data in all_users.values() if user_data.get("freezealerts"))
         users_with_heat_alerts = sum(1 for user_data in all_users.values() if user_data.get("heatalerts"))
         total_alerts_sent = await self.config.total_alerts_sent()
+        heat_alerts_sent = await self.config.total_heat_alerts_sent()
+        cold_alerts_sent = await self.config.total_freeze_alerts_sent()
         nowcasts_fetched = await self.config.nowcasts_fetched()
         forecasts_fetched = await self.config.forecasts_fetched()
         glossary_definitions_shown = await self.config.glossary_definitions_shown()
@@ -302,14 +303,15 @@ class Weather(commands.Cog):
             title="Weather usage data",
             color=0xfffffe
         )
-        embed.add_field(name="Total weather users", value=f"{total_users} user{'s' if total_users != 1 else ''}", inline=True)
         embed.add_field(name="Zip codes currently saved", value=f"{users_with_zip} zip code{'s' if users_with_zip != 1 else ''}", inline=True)
         embed.add_field(name="Severe alert subscribers", value=f"{users_with_severe_alerts} subscriber{'s' if users_with_severe_alerts != 1 else ''}", inline=True)
         embed.add_field(name="Freeze alert subscribers", value=f"{users_with_freeze_alerts} subscriber{'s' if users_with_freeze_alerts != 1 else ''}", inline=True)
         embed.add_field(name="Heat alert subscribers", value=f"{users_with_heat_alerts} subscriber{'s' if users_with_heat_alerts != 1 else ''}", inline=True)
-        embed.add_field(name="Severe alerts dispatched", value=f"{total_alerts_sent} alert{'s' if total_alerts_sent != 1 else ''}", inline=True)
-        embed.add_field(name="Nowcasts provided", value=f"{nowcasts_fetched} nowcast{'s' if nowcasts_fetched != 1 else ''}", inline=True)
-        embed.add_field(name="Forecasts provided", value=f"{forecasts_fetched} forecast{'s' if forecasts_fetched != 1 else ''}", inline=True)
+        embed.add_field(name="Severe alerts sent", value=f"{total_alerts_sent} alert{'s' if total_alerts_sent != 1 else ''}", inline=True)
+        embed.add_field(name="Cold alerts sent", value=f"{cold_alerts_sent} alert{'s' if cold_alerts_sent != 1 else ''}", inline=True)
+        embed.add_field(name="Heat alerts sent", value=f"{heat_alerts_sent} alert{'s' if heat_alerts_sent != 1 else ''}", inline=True)
+        embed.add_field(name="Nowcasts served", value=f"{nowcasts_fetched} nowcast{'s' if nowcasts_fetched != 1 else ''}", inline=True)
+        embed.add_field(name="Forecasts served", value=f"{forecasts_fetched} forecast{'s' if forecasts_fetched != 1 else ''}", inline=True)
         embed.add_field(name="Glossary terms shown", value=f"{glossary_definitions_shown} term{'s' if glossary_definitions_shown != 1 else ''}", inline=True)
 
         await ctx.send(embed=embed)
