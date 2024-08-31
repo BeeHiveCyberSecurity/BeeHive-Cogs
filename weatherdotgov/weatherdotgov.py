@@ -635,8 +635,8 @@ class Weather(commands.Cog):
                 current_value = latency['current']['value']
                 average_value = latency['average']['value']
                 max_value = latency['max']['value']
-                level_two_last_received_time = discord.utils.format_dt(discord.utils.parse_time(latency['levelTwoLastReceivedTime']))
-                max_latency_time = discord.utils.format_dt(discord.utils.parse_time(latency['maxLatencyTime']))
+                level_two_last_received_time = discord.utils.format_dt(discord.utils.parse_time(latency['levelTwoLastReceivedTime']), style='R')
+                max_latency_time = discord.utils.format_dt(discord.utils.parse_time(latency['maxLatencyTime']), style='R')
                 host = latency['host']
                 
             description = f"Located at `{coordinates[1]}, {coordinates[0]}`, `{elevation} meters high` and operating in the `{time_zone}` timezone"
