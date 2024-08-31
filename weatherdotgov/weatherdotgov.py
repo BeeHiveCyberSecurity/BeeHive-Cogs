@@ -299,7 +299,6 @@ class Weather(commands.Cog):
         pages = []
         for station in stations:
             station_name = station["properties"].get("name", "Unknown")
-            description = f"`{station_id}`\n`{coordinates[1]}, {coordinates[0]}`\n`{elevation} meters high`\n`{time_zone}`"
             station_id = station["properties"].get("stationIdentifier", "Unknown")
             coordinates = station["geometry"]["coordinates"] if "geometry" in station else ["Unknown", "Unknown"]
             if coordinates != ["Unknown", "Unknown"]:
@@ -312,6 +311,7 @@ class Weather(commands.Cog):
             rda_details = station["properties"].get("rda", {})
             latency = station["properties"].get("latency", "Unknown")
             related = station["properties"].get("related", "Unknown")
+            description = f"`{station_id}`\n`{coordinates[1]}, {coordinates[0]}`\n`{elevation} meters high`\n`{time_zone}`"
 
             embed = discord.Embed(title=f"{station_name} radar", description=description, color=0xfffffe)
             
