@@ -320,7 +320,6 @@ class Weather(commands.Cog):
                     f"Reporting Host: {latency['reportingHost']}\n"
                     f"Host: {latency['host']}"
                 )
-            related = station["properties"].get("related", "Unknown")
             description = f"`{station_id}`\n`{coordinates[1]}, {coordinates[0]}`\n`{elevation} meters high`\n`{time_zone}`"
 
             embed = discord.Embed(title=f"{station_name} radar", description=description, color=0xfffffe)
@@ -346,7 +345,6 @@ class Weather(commands.Cog):
                 embed.add_field(name="Reflectivity Calibration Correction", value=f"{reflectivity_calibration.get('value', 'Unknown')} {reflectivity_calibration.get('unitCode', '')}", inline=True)
             
             embed.add_field(name="Latency", value=latency, inline=False)
-            embed.add_field(name="Related", value=related, inline=False)
             pages.append(embed)
         
         if not pages:
