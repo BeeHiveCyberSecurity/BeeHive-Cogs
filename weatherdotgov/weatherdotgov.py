@@ -277,6 +277,11 @@ class Weather(commands.Cog):
     @weatherset.command(name="zip")
     async def zip(self, ctx, zip_code: str):
         """Set your zip code for queries"""
+        # Validate the zip code against zipcodes.csv
+        if zip_code not in self.zip_codes:
+            await ctx.send("Invalid zip code. Please provide a valid zip code.")
+            return
+
         await self.config.user(ctx.author).zip_code.set(zip_code)
         if isinstance(ctx.channel, discord.DMChannel):
             await ctx.send(f"Your zip code has been set to `{zip_code}`. This is the location that will now be used in the future for your weather queries.")
