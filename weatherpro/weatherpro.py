@@ -362,7 +362,7 @@ class Weather(commands.Cog):
                 return
 
             data = await response.json()
-            current_weather = data.get('current_weather', {})
+            current_weather = data.get('current', {})
             if not current_weather:
                 await ctx.send(f"Failed to retrieve current weather data. URL: {weather_url}, Data: {data}")
                 return
