@@ -346,11 +346,14 @@ class Weather(commands.Cog):
         params = {
             "latitude": str(latitude).strip(),
             "longitude": str(longitude).strip(),
-            "current_weather": "true",
+            "current": "temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,showers,snowfall,cloud_cover,pressure_msl,surface_pressure,wind_speed_10m,wind_direction_10m,wind_gusts_10m",
+            "hourly": "uv_index,cape,direct_radiation_instant,soil_temperature_0cm",
+            "minutely_15": "lightning_potential,visibility,soil_moisture_0_to_1cm",
             "temperature_unit": "fahrenheit",
             "wind_speed_unit": "mph",
             "precipitation_unit": "inch",
-            "current": "temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,showers,snowfall,cloud_cover,pressure_msl,surface_pressure,wind_speed_10m,wind_direction_10m,wind_gusts_10m"
+            "forecast_hours": 1,
+            "forecast_minutely_15": 1
         }
         
         queryString = "&".join(f"{key}={value}" for key, value in params.items())
@@ -362,41 +365,35 @@ class Weather(commands.Cog):
                 return
 
             data = await response.json()
-            current_weather = data.get('current_weather', {})
-            current_weather2 = data.get('current', {})
-            if not current_weather:
+            if not data:
                 await ctx.send(f"Failed to retrieve current weather data. URL: {weather_url}, Data: {data}")
                 return
             
-            temperature = current_weather.get('temperature', 'N/A')
-            wind_speed = current_weather.get('windspeed', 'N/A')
-            wind_direction = current_weather2.get('winddirection', 'N/A')
-            weather_code = current_weather2.get('weathercode', 'N/A')
-            apparent_temperature = current_weather2.get('apparent_temperature', 'N/A')
-            relative_humidity = current_weather2.get('relativehumidity_2m', 'N/A')
-            precipitation = current_weather2.get('precipitation', 'N/A')
-            cloud_cover = current_weather.get('cloudcover', 'N/A')
-            pressure_msl = current_weather.get('pressure_msl', 'N/A')
-            surface_pressure = current_weather2.get('surface_pressure', 'N/A')
-            wind_gusts = current_weather2.get('windgusts_10m', 'N/A')
+            current = data.get('current', {})
+            hourly = data.get('hourly', {})
+            minutely_15 = data.get('minutely_15', {})
             
             embed = discord.Embed(
                 title="Your current conditions",
-                description=f"Weather Code: {weather_code}",
                 color=0xfffffe
             )
-            embed.add_field(name="Temperature", value=f"{temperature}°F")
-            embed.add_field(name="Feels Like", value=f"{apparent_temperature}°F")
-            embed.add_field(name="Humidity", value=f"{relative_humidity}%")
-            embed.add_field(name="Precipitation", value=f"{precipitation} inches")
-            embed.add_field(name="Cloud Cover", value=f"{cloud_cover}%")
-            embed.add_field(name="Pressure (MSL)", value=f"{pressure_msl} hPa")
-            embed.add_field(name="Surface Pressure", value=f"{surface_pressure} hPa")
-            embed.add_field(name="Wind Speed", value=f"{wind_speed} mph")
-            embed.add_field(name="Wind Direction", value=f"{wind_direction}°")
-            embed.add_field(name="Wind Gusts", value=f"{wind_gusts} mph")
+            embed.add_field(name="Temperature", value=f"{current.get('temperature_2m', 'N/A')}°F")
+            embed.add_field(name="Feels Like", value=f"{current.get('apparent_temperature', 'N/A')}°F")
+            embed.add_field(name="Humidity", value=f"{current.get('relative_humidity_2m', 'N/A')}%")
+            embed.add_field(name="Precipitation", value=f"{current.get('precipitation', 'N/A')} inches")
+            embed.add_field(name="Cloud Cover", value=f"{current.get('cloud_cover', 'N/A')}%")
+            embed.add_field(name="Pressure (MSL)", value=f"{current.get('pressure_msl', 'N/A')} hPa")
+            embed.add_field(name="Surface Pressure", value=f"{current.get('surface_pressure', 'N/A')} hPa")
+            embed.add_field(name="Wind Speed", value=f"{current.get('wind_speed_10m', 'N/A')} mph")
+            embed.add_field(name="Wind Direction", value=f"{current.get('wind_direction_10m', 'N/A')}°")
+            embed.add_field(name="Wind Gusts", value=f"{current.get('wind_gusts_10m', 'N/A')} mph")
+            embed.add_field(name="Ground Temperature", value=f"{hourly.get('soil_temperature_0cm', 'N/A')}°F")
+            embed.add_field(name="Visibility", value=f"{(minutely_15.get('visibility', 0) / 5280):.2f} miles")
+            embed.add_field(name="Lightning Potential", value=f"{minutely_15.get('lightning_potential', 'N/A')}")
             
             await ctx.send(embed=embed)
+            nowcasts_fetched = await self.config.nowcasts_fetched()
+            await self.config.nowcasts_fetched.set(nowcasts_fetched + 1)
             nowcasts_fetched = await self.config.nowcasts_fetched()
             await self.config.nowcasts_fetched.set(nowcasts_fetched + 1)
 
