@@ -34,6 +34,9 @@ class Weather(commands.Cog):
             if i != 0
         }
         
+    def cog_load(self):
+        self.bot.loop.create_task(self.start_alerts_task())
+        
     def cog_unload(self):
         self.bot.loop.create_task(self.session.close())
 
@@ -151,8 +154,6 @@ class Weather(commands.Cog):
             await self.check_weather_alerts()
             await asyncio.sleep(900)
 
-    def cog_load(self):
-        self.bot.loop.create_task(self.start_alerts_task())
 
     @weatherset.command(name="zip")
     async def zip(self, ctx, zip_code: str):
