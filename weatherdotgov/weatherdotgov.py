@@ -17,6 +17,7 @@ class Weather(commands.Cog):
             "zip_code": None,
             "severealerts": False,
             "freezealerts": False,
+            "heatalerts": False,
         }
         self.config.register_user(**default_user)
         default_global = {
@@ -38,6 +39,7 @@ class Weather(commands.Cog):
     def cog_load(self):
         self.bot.loop.create_task(self.start_severe_alerts_task())
         self.bot.loop.create_task(self.start_freeze_alerts_task())
+        self.bot.loop.create_task(self.start_heat_alerts_task())
 
     def cog_unload(self):
         self.bot.loop.create_task(self.session.close())
@@ -54,6 +56,7 @@ class Weather(commands.Cog):
         zip_code = user_data.get("zip_code", "Not set")
         severe_alerts_enabled = user_data.get("severealerts", False)
         freeze_alerts_enabled = user_data.get("freezealerts", False)
+        heat_alerts_enabled = user_data.get("heatalerts", False)
         
         # Determine the current weather season
         month = datetime.now().month
@@ -79,6 +82,7 @@ class Weather(commands.Cog):
         
         embed.add_field(name="Severe alerts", value="Enabled" if severe_alerts_enabled else "Disabled", inline=True)
         embed.add_field(name="Extreme cold alerts", value="Enabled" if freeze_alerts_enabled else "Disabled", inline=True)
+        embed.add_field(name="Heat alerts", value="Enabled" if heat_alerts_enabled else "Disabled", inline=True)
         embed.add_field(name="Local season", value=season, inline=True)
         
         await ctx.send(embed=embed)
@@ -214,6 +218,59 @@ class Weather(commands.Cog):
             await self.check_freeze_alerts()
             await asyncio.sleep(604800)  # 7 days in seconds
 
+    @commands.cooldown(1, 900, commands.BucketType.user)
+    @weatherset.command(name="heatalerts")
+    async def heatalerts(self, ctx):
+        """Toggle heat alerts for your saved location"""
+        user_data = await self.config.user(ctx.author).all()
+        heat_alerts_enabled = user_data.get("heatalerts", False)
+        await self.config.user(ctx.author).heatalerts.set(not heat_alerts_enabled)
+        status = "enabled" if not heat_alerts_enabled else "disabled"
+        await ctx.send(f"Heat alerts have been {status} for your location.")
+
+    async def check_heat_alerts(self):
+        """Check for upcoming dangerously hot temperatures and DM users if any are expected"""
+        all_users = await self.config.all_users()
+        users_with_heat_alerts = [user_id for user_id, data in all_users.items() if data.get("heatalerts")]
+
+        for user_id in users_with_heat_alerts:
+            user_data = await self.config.user_from_id(user_id).all()
+            zip_code = user_data.get("zip_code")
+            if not zip_code or zip_code not in self.zip_codes:
+                continue
+
+            latitude, longitude = self.zip_codes[zip_code]
+            forecast_url = f"https://api.weather.gov/points/{latitude.strip()},{longitude.strip()}/forecast"
+
+            async with self.session.get(forecast_url) as response:
+                if response.status != 200:
+                    continue
+
+                data = await response.json()
+                periods = data.get('properties', {}).get('periods', [])
+                heat_alerts = [period for period in periods if period['temperature'] >= 100]
+
+                if heat_alerts:
+                    user = self.bot.get_user(user_id)
+                    if user:
+                        for alert in heat_alerts:
+                            embed = discord.Embed(
+                                title="Upcoming Heat Alert for Your Location",
+                                description=f"Expected dangerously hot temperatures: {alert['temperature']}°F",
+                                color=0xFF4500
+                            )
+                            embed.add_field(name="Time", value=alert['name'], inline=True)
+                            embed.add_field(name="Detailed Forecast", value=alert['detailedForecast'], inline=False)
+                            embed.set_footer(text="Stay cool and take necessary precautions.")
+
+                            await user.send(embed=embed)
+                            total_heat_alerts_sent = await self.config.total_heat_alerts_sent()
+                            await self.config.total_heat_alerts_sent.set(total_heat_alerts_sent + 1)
+
+    async def start_heat_alerts_task(self):
+        while True:
+            await self.check_heat_alerts()
+            await asyncio.sleep(604800)  # 7 days in seconds
 
     @weatherset.command(name="zip")
     async def zip(self, ctx, zip_code: str):
@@ -233,6 +290,7 @@ class Weather(commands.Cog):
         users_with_zip = sum(1 for user_data in all_users.values() if user_data.get("zip_code"))
         users_with_severe_alerts = sum(1 for user_data in all_users.values() if user_data.get("severealerts"))
         users_with_freeze_alerts = sum(1 for user_data in all_users.values() if user_data.get("freezealerts"))
+        users_with_heat_alerts = sum(1 for user_data in all_users.values() if user_data.get("heatalerts"))
         total_alerts_sent = await self.config.total_alerts_sent()
         nowcasts_fetched = await self.config.nowcasts_fetched()
         forecasts_fetched = await self.config.forecasts_fetched()
@@ -246,6 +304,7 @@ class Weather(commands.Cog):
         embed.add_field(name="Zip codes currently saved", value=users_with_zip, inline=True)
         embed.add_field(name="Severe alert subscribers", value=users_with_severe_alerts, inline=True)
         embed.add_field(name="Freeze alert subscribers", value=users_with_freeze_alerts, inline=True)
+        embed.add_field(name="Heat alert subscribers", value=users_with_heat_alerts, inline=True)
         embed.add_field(name="Severe alerts dispatched", value=total_alerts_sent, inline=True)
         embed.add_field(name="Nowcasts provided", value=nowcasts_fetched, inline=True)
         embed.add_field(name="Forecasts provided", value=forecasts_fetched, inline=True)
