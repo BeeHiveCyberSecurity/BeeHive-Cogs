@@ -23,7 +23,7 @@ class Weather(commands.Cog):
         self.zip_codes = {
             row[0]: (row[1], row[2])
             for i, row in enumerate(csv_reader)
-            if i != 0  # skip header
+            if i != 0
         }
         
     def cog_unload(self):
