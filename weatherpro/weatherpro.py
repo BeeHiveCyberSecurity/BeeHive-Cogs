@@ -400,7 +400,7 @@ class Weather(commands.Cog):
                 visibility_value = 0
             embed.add_field(name="Visibility", value=f"{visibility_value:.2f} miles")
             
-            lightning_potential = minutely_15.get('lightning_potential', 'N/A')
+            lightning_potential = minutely_15.get('lightning_potential', 'None')
             if isinstance(lightning_potential, list) and lightning_potential:
                 lightning_potential = lightning_potential[0]
             if lightning_potential == 'N/A' or lightning_potential is None or lightning_potential == 0:
