@@ -319,7 +319,7 @@ class Weather(commands.Cog):
                 reporting_host = latency['reportingHost']
                 host = latency['host']
                 
-            description = f"Located at `{coordinates[1]}, {coordinates[0]}`, `{elevation} meters high` and operates in the `{time_zone}` timezone"
+            description = f"Located at `{coordinates[1]}, {coordinates[0]}`, `{elevation} meters high` and operating in the `{time_zone}` timezone"
 
             embed = discord.Embed(title=f"{station_name} radar", description=description, color=0xfffffe)
             
