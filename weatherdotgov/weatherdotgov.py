@@ -19,7 +19,7 @@ class Weather(commands.Cog):
 
     @weather.command(name="glossary")
     async def glossary(self, ctx, *, search_term: str = None):
-        """Fetch and display the weather glossary from weather.gov"""
+        """Show a glossary, or specify a word to search"""
         headers = {"Accept": "application/ld+json"}
         async with self.session.get("https://api.weather.gov/glossary", headers=headers) as response:
             if response.status != 200:
