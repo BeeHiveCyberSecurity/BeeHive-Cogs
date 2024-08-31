@@ -324,7 +324,10 @@ class Weather(commands.Cog):
             embed = discord.Embed(title=f"{station_name} radar", description=description, color=0xfffffe)
             
             if rda_details is not None:
-                embed.add_field(name="RDA Timestamp", value=rda_details.get("timestamp", "Unknown"), inline=True)
+                rda_timestamp = rda_details.get("timestamp", "Unknown")
+                if rda_timestamp != "Unknown":
+                    rda_timestamp = discord.utils.format_dt(discord.utils.parse_time(rda_timestamp))
+                embed.add_field(name="RDA Timestamp", value=rda_timestamp, inline=True)
                 embed.add_field(name="Reporting Host", value=rda_details.get("reportingHost", "Unknown"), inline=True)
                 properties = rda_details.get("properties", {})
                 embed.add_field(name="Resolution Version", value=properties.get("resolutionVersion", "Unknown"), inline=True)
