@@ -470,6 +470,7 @@ class Weather(commands.Cog):
                             "Winter Storm Warning": ":cloud_snow:",
                             "High Wind Warning": ":wind_blowing_face:",
                             "Fire Weather Watch": ":fire:",
+                            "Flood Advisory": ":ocean:",
                             "Hurricane Warning": ":cyclone:",
                             "Tsunami Warning": ":ocean:",
                             "Earthquake Warning": ":earth_americas:",
