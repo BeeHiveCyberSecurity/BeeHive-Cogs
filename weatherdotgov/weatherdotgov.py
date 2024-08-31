@@ -138,26 +138,31 @@ class Weather(commands.Cog):
                     await ctx.send(f"Failed to retrieve forecast periods. URL: {forecast_url}, Data: {forecast_data}")
                     return
                 
-                embed = discord.Embed(
-                    title="Upcoming Weather Forecast",
-                    description="Here is the upcoming weather forecast for your area:",
-                    color=discord.Color.blue()
-                )
+                embeds = []
                 
-                for period in periods[:5]:  # Display the next 5 forecast periods
+                for period in periods[:5]:  # Create a page for each of the next 5 forecast periods
                     name = period.get('name', 'N/A')
                     detailed_forecast = period.get('detailedForecast', 'No detailed forecast available.')
                     temperature = period.get('temperature', 'N/A')
                     wind_speed = period.get('windSpeed', 'N/A')
                     wind_direction = period.get('windDirection', 'N/A')
                     
-                    embed.add_field(
-                        name=name,
-                        value=f"**Forecast:** {detailed_forecast}\n**Temperature:** {temperature}\n**Wind Speed:** {wind_speed}\n**Wind Direction:** {wind_direction}",
-                        inline=False
+                    embed = discord.Embed(
+                        title=f"Weather Forecast: {name}",
+                        description=f"**Forecast:** {detailed_forecast}",
+                        color=discord.Color.blue()
                     )
+                    embed.add_field(name="Temperature", value=temperature)
+                    embed.add_field(name="Wind Speed", value=wind_speed)
+                    embed.add_field(name="Wind Direction", value=wind_direction)
+                    
+                    embeds.append(embed)
                 
-                await ctx.send(embed=embed)
+                paginator = commands.Paginator()
+                for embed in embeds:
+                    paginator.add_page(embed)
+                
+                await paginator.send(ctx)
 
 
     @commands.guild_only()
