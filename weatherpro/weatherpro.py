@@ -466,6 +466,7 @@ class Weather(commands.Cog):
                             "Severe Thunderstorm Warning": ":thunder_cloud_rain:",
                             "Flood Warning": ":ocean:",
                             "Heat Advisory": ":desert:",
+                            "Special Weather Statement": ":information_source:",
                             "Winter Storm Warning": ":cloud_snow:",
                             "High Wind Warning": ":wind_blowing_face:",
                             "Fire Weather Watch": ":fire:",
