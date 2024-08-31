@@ -346,6 +346,7 @@ class Weather(commands.Cog):
         params = {
             "latitude": str(latitude).strip(),
             "longitude": str(longitude).strip(),
+            "current_weather": "true",
             "temperature_unit": "fahrenheit",
             "wind_speed_unit": "mph",
             "precipitation_unit": "inch",
