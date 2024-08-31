@@ -1,8 +1,9 @@
 import discord
-from redbot.core import commands, Config
 import aiohttp
 import asyncio
 import csv
+from datetime import datetime
+from redbot.core import commands, Config
 from redbot.core.data_manager import bundled_data_path
 
 class Weather(commands.Cog):
@@ -39,6 +40,42 @@ class Weather(commands.Cog):
     async def weatherset(self, ctx):
         """Set your weather preferences"""
         pass
+
+
+    @weatherset.command(name="profile")
+    async def profile(self, ctx):
+        """Show your currently set zip code, alert settings, and the current weather season"""
+        user = ctx.author
+        user_data = await self.config.user(user).all()
+        zip_code = user_data.get("zip_code", "Not set")
+        alerts_enabled = user_data.get("alerts", False)
+        
+        # Determine the current weather season
+        month = datetime.now().month
+        if month in [12, 1, 2]:
+            season = "Winter"
+        elif month in [3, 4, 5]:
+            season = "Spring"
+        elif month in [6, 7, 8]:
+            season = "Summer"
+        else:
+            season = "Fall"
+        
+        embed = discord.Embed(
+            title=f"{user.name}'s Weather Profile",
+            color=0x00ff00
+        )
+        
+        # Censor zip code if command is used in a public channel
+        if isinstance(ctx.channel, discord.DMChannel):
+            embed.add_field(name="Zip Code", value=zip_code, inline=False)
+        else:
+            embed.add_field(name="Zip Code", value="Censored for privacy", inline=False)
+        
+        embed.add_field(name="Alerts Enabled", value="Yes" if alerts_enabled else "No", inline=False)
+        embed.add_field(name="Current Season", value=season, inline=False)
+        
+        await ctx.send(embed=embed)
 
     @weatherset.command(name="severealerts")
     async def severealerts(self, ctx, enable: bool):
