@@ -452,7 +452,7 @@ class Weather(commands.Cog):
                     else:
                         alert_status = "No active alerts"
                 except Exception as e:
-                    alert_status = f"Failed to fetch alerts: {str(e)}"
+                    alert_status = f"Failed to fetch alerts: {e.status}, message='{e.message}', url={alerts_url}"
             
             embed.add_field(name="Currently in effect", value=alert_status)
             
