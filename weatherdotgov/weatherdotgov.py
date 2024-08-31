@@ -83,7 +83,7 @@ class Weather(commands.Cog):
     @commands.cooldown(1, 900, commands.BucketType.user)
     @weatherset.command(name="severealerts")
     async def severealerts(self, ctx):
-        """Toggle weather alerts for your saved zip code"""
+        """Toggle severe alerts for your saved location"""
         user = ctx.author
         current_setting = await self.config.user(user).severealerts()
         new_setting = not current_setting
@@ -157,9 +157,10 @@ class Weather(commands.Cog):
             await self.check_weather_alerts()
             await asyncio.sleep(900)
 
+    @commands.cooldown(1, 900, commands.BucketType.user)
     @weatherset.command(name="freezealerts")
     async def freezealerts(self, ctx):
-        """Enable or disable freeze alerts for your location"""
+        """Toggle freeze alerts for your saved location"""
         user_data = await self.config.user(ctx.author).all()
         freeze_alerts_enabled = user_data.get("freezealerts", False)
         await self.config.user(ctx.author).freezealerts.set(not freeze_alerts_enabled)
