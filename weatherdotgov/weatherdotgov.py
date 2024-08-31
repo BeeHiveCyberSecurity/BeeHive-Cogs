@@ -319,15 +319,6 @@ class Weather(commands.Cog):
                 reporting_host = latency['reportingHost']
                 host = latency['host']
                 
-                latency = (
-                    f"Current: {current_value}\n"
-                    f"Average: {average_value}\n"
-                    f"Max: {max_value}\n"
-                    f"Level Two Last Received Time: {level_two_last_received_time}\n"
-                    f"Max Latency Time: {max_latency_time}\n"
-                    f"Reporting Host: {reporting_host}\n"
-                    f"Host: {host}"
-                )
             description = f"`{station_id}`\n`{coordinates[1]}, {coordinates[0]}`\n`{elevation} meters high`\n`{time_zone}`"
 
             embed = discord.Embed(title=f"{station_name} radar", description=description, color=0xfffffe)
@@ -354,7 +345,15 @@ class Weather(commands.Cog):
                 unit_code = reflectivity_calibration.get('unitCode', '').replace('wmoUnit:', '')
                 embed.add_field(name="Reflectivity Calibration Correction", value=f"{reflectivity_calibration.get('value', 'Unknown')} {unit_code}", inline=True)
             
-            embed.add_field(name="Latency", value=latency, inline=False)
+            if latency != "Unknown":
+                embed.add_field(name="Current Latency", value=current_value, inline=True)
+                embed.add_field(name="Average Latency", value=average_value, inline=True)
+                embed.add_field(name="Max Latency", value=max_value, inline=True)
+                embed.add_field(name="Level Two Last Received Time", value=level_two_last_received_time, inline=True)
+                embed.add_field(name="Max Latency Time", value=max_latency_time, inline=True)
+                embed.add_field(name="Reporting Host", value=reporting_host, inline=True)
+                embed.add_field(name="Host", value=host, inline=True)
+            
             pages.append(embed)
         
         if not pages:
