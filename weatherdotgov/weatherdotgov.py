@@ -131,6 +131,7 @@ class Weather(commands.Cog):
         users_with_alerts = sum(1 for user_data in all_users.values() if user_data.get("alerts"))
         total_alerts_sent = await self.config.total_alerts_sent()
         nowcasts_fetched = await self.config.nowcasts_fetched()
+        forecasts_fetched = await self.config.forecasts_fetched()
 
         embed = discord.Embed(
             title="Weather usage data",
@@ -139,8 +140,9 @@ class Weather(commands.Cog):
         embed.add_field(name="Total weather users", value=total_users, inline=True)
         embed.add_field(name="Zip codes currently saved", value=users_with_zip, inline=True)
         embed.add_field(name="Users with alerts enabled", value=users_with_alerts, inline=True)
-        embed.add_field(name="Total alerts sent", value=total_alerts_sent, inline=True)
+        embed.add_field(name="Severe alerts dispatched", value=total_alerts_sent, inline=True)
         embed.add_field(name="Nowcasts provided", value=nowcasts_fetched, inline=True)
+        embed.add_field(name="Forecasts provided", value=forecasts_fetched, inline=True)
 
         await ctx.send(embed=embed)
 
@@ -268,6 +270,8 @@ class Weather(commands.Cog):
                     embeds.append(embed)
                 
                 message = await ctx.send(embed=embeds[0])
+                forecasts_fetched = await self.config.forecasts_fetched()
+                await self.config.forecasts_fetched.set(forecasts_fetched + 1)
                 page = 0
                 await message.add_reaction("⬅️")
                 await message.add_reaction("➡️")
