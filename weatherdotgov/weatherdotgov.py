@@ -122,7 +122,7 @@ class Weather(commands.Cog):
 
     @weatherset.command(name="stats")
     async def stats(self, ctx):
-        """Show statistics about zip code subscriptions and alert subscriptions"""
+        """Show statistics about weather feature usage"""
         all_users = await self.config.all_users()
         total_users = len(all_users)
         users_with_zip = sum(1 for user_data in all_users.values() if user_data.get("zip_code"))
@@ -130,7 +130,7 @@ class Weather(commands.Cog):
         total_alerts_sent = await self.config.total_alerts_sent()
 
         embed = discord.Embed(
-            title="Weather Subscription Stats",
+            title="Weather usage data",
             color=discord.Color.blue()
         )
         embed.add_field(name="Total weather users", value=total_users, inline=False)
