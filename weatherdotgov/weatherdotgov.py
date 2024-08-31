@@ -224,7 +224,7 @@ class Weather(commands.Cog):
                 for i in range(0, len(stations), 15):
                     embed = discord.Embed(
                         title="Weather observation stations", 
-                        description=f"There are {len(stations)} stations", 
+                        description=f"There are {len(stations)} stations in the coverage area", 
                         color=0xfffffe
                     )
                     for station in stations[i:i+15]:
