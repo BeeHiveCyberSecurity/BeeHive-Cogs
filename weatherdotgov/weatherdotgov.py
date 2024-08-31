@@ -19,6 +19,8 @@ class Weather(commands.Cog):
         self.config.register_user(**default_user)
         default_global = {
             "total_alerts_sent": 0  # Add a global counter for total alerts sent
+            "nowcasts_fetched": 0 # Global counter for nowcasts
+            "forecasts_fetched": 0 # Global counter for forecasts
         }
         self.config.register_global(**default_global)
         data_dir = bundled_data_path(self)
@@ -128,6 +130,7 @@ class Weather(commands.Cog):
         users_with_zip = sum(1 for user_data in all_users.values() if user_data.get("zip_code"))
         users_with_alerts = sum(1 for user_data in all_users.values() if user_data.get("alerts"))
         total_alerts_sent = await self.config.total_alerts_sent()
+        nowcasts_fetched = await self.config.nowcasts_fetched()
 
         embed = discord.Embed(
             title="Weather usage data",
@@ -137,6 +140,7 @@ class Weather(commands.Cog):
         embed.add_field(name="Zip codes currently saved", value=users_with_zip, inline=True)
         embed.add_field(name="Users with alerts enabled", value=users_with_alerts, inline=True)
         embed.add_field(name="Total alerts sent", value=total_alerts_sent, inline=True)
+        embed.add_field(name="Nowcasts provided", value=nowcasts_fetched, inline=True)
 
         await ctx.send(embed=embed)
 
@@ -198,6 +202,8 @@ class Weather(commands.Cog):
                 embed.add_field(name="Wind Direction", value=current_forecast.get('windDirection', 'N/A'))
                 
                 await ctx.send(embed=embed)
+                nowcasts_fetched = await self.config.nowcasts_fetched()
+                await self.config.nowcasts_fetched.set(nowcasts_fetched + 1)
 
     @commands.guild_only()
     @weather.command(name="forecast")
