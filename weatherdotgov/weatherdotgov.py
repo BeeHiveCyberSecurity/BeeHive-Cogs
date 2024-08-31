@@ -149,7 +149,7 @@ class Weather(commands.Cog):
 
     @weather.command(name="now")
     async def now(self, ctx):
-        """Fetch the current weather for your saved zip code"""
+        """Fetch your current conditions and now-cast"""
         zip_code = await self.config.user(ctx.author).zip_code()
         if not zip_code:
             await ctx.send("You haven't set a zip code yet. Use the `weatherset zip` command to set one.")
@@ -190,7 +190,7 @@ class Weather(commands.Cog):
                 detailed_forecast = current_forecast.get('detailedForecast', 'No detailed forecast available.')
                 
                 embed = discord.Embed(
-                    title="Current Weather",
+                    title="Your current conditions",
                     description=detailed_forecast,
                     color=0xfffffe
                 )
@@ -203,7 +203,7 @@ class Weather(commands.Cog):
     @commands.guild_only()
     @weather.command(name="forecast")
     async def forecast(self, ctx):
-        """Fetch and display the upcoming forecast for the user's saved zip code"""
+        """Fetch your future forecast"""
         zip_code = await self.config.user(ctx.author).zip_code()
         if not zip_code:
             await ctx.send("You haven't set a zip code yet. Use the `weatherset zip` command to set one.")
