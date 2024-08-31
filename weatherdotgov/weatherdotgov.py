@@ -1,21 +1,82 @@
 import discord
-from redbot.core import commands
+from redbot.core import commands, Config
 import aiohttp
 import asyncio
+import csv
+from redbot.core.data_manager import bundled_data_path
 
 class Weather(commands.Cog):
     """Weather information from weather.gov"""
-
+    
     def __init__(self, bot):
         self.bot = bot
         self.session = aiohttp.ClientSession()
-
+        self.config = Config.get_conf(self, identifier=1234567890)
+        default_user = {
+            "zip_code": None
+        }
+        self.config.register_user(**default_user)
+        data_dir = bundled_data_path(self)
+        zip_code_file = (data_dir / "zipcodes.csv").open(mode="r")
+        csv_reader = csv.reader(zip_code_file)
+        self.zip_codes = {
+            row[0]: (row[1], row[2])
+            for i, row in enumerate(csv_reader)
+            if i != 0  # skip header
+        }
+        
     def cog_unload(self):
         self.bot.loop.create_task(self.session.close())
 
     @commands.group()
+    async def weatherset(self, ctx):
+        """Set your weather preferences"""
+        pass
+
+    @weatherset.command(name="zip")
+    async def weatherset_zip(self, ctx, zip_code: str):
+        """Save your zip code to the bot's config"""
+        await self.config.user(ctx.author).zip_code.set(zip_code)
+        await ctx.send(f"Your zip code has been set to {zip_code}.")
+
+
+    @commands.group()
     async def weather(self, ctx):
         """Interact with the weather.gov API to fetch weather data via Discord"""
+        pass
+
+    @weather.command(name="now")
+    async def weather_now(self, ctx):
+        """Fetch the current weather for your saved zip code"""
+        zip_code = await self.config.user(ctx.author).zip_code()
+        if not zip_code:
+            await ctx.send("You haven't set a zip code yet. Use the `weatherset zip` command to set one.")
+            return
+        
+        # Fetch latitude and longitude using the zip code
+        if zip_code not in self.zip_codes:
+            await ctx.send("Invalid zip code. Please set a valid zip code.")
+            return
+        
+        latitude, longitude = self.zip_codes[zip_code]
+        
+        # Fetch weather data using the latitude and longitude
+        async with self.session.get(f"https://api.weather.gov/points/{latitude},{longitude}") as response:
+            if response.status != 200:
+                await ctx.send("Failed to fetch the weather data. Please try again later.")
+                return
+
+            data = await response.json()
+            forecast_url = data['properties']['forecast']
+            
+            async with self.session.get(forecast_url) as forecast_response:
+                if forecast_response.status != 200:
+                    await ctx.send("Failed to fetch the forecast data. Please try again later.")
+                    return
+                
+                forecast_data = await forecast_response.json()
+                current_forecast = forecast_data['properties']['periods'][0]
+                await ctx.send(f"The current weather is {current_forecast['detailedForecast']}")
 
     @commands.guild_only()
     @weather.command(name="glossary")
