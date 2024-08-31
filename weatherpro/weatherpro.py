@@ -391,7 +391,27 @@ class Weather(commands.Cog):
             embed.add_field(name="Pressure (MSL)", value=f"{current.get('pressure_msl', 'N/A')} hPa")
             embed.add_field(name="Surface Pressure", value=f"{current.get('surface_pressure', 'N/A')} hPa")
             embed.add_field(name="Wind Speed", value=f"{current.get('wind_speed_10m', 'N/A')} mph")
-            embed.add_field(name="Wind Direction", value=f"{current.get('wind_direction_10m', 'N/A')}°")
+            wind_direction = current.get('wind_direction_10m', 'N/A')
+            if wind_direction != 'N/A':
+                if (wind_direction >= 0 and wind_direction <= 22.5) or (wind_direction > 337.5 and wind_direction <= 360):
+                    wind_direction_str = '🡹 North'
+                elif wind_direction > 22.5 and wind_direction <= 67.5:
+                    wind_direction_str = '🡽 Northeast'
+                elif wind_direction > 67.5 and wind_direction <= 112.5:
+                    wind_direction_str = '🡺 East'
+                elif wind_direction > 112.5 and wind_direction <= 157.5:
+                    wind_direction_str = '🡾 Southeast'
+                elif wind_direction > 157.5 and wind_direction <= 202.5:
+                    wind_direction_str = '🡻 South'
+                elif wind_direction > 202.5 and wind_direction <= 247.5:
+                    wind_direction_str = '🡿 Southwest'
+                elif wind_direction > 247.5 and wind_direction <= 292.5:
+                    wind_direction_str = '🡸 West'
+                else:
+                    wind_direction_str = '🡼 Northwest'
+            else:
+                wind_direction_str = 'N/A'
+            embed.add_field(name="Wind Direction", value=wind_direction_str)
             embed.add_field(name="Wind Gusts", value=f"{current.get('wind_gusts_10m', 'N/A')} mph")
             
             
