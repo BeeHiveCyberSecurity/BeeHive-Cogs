@@ -723,7 +723,7 @@ class Weather(commands.Cog):
         reaction = None
         while True:
             try:
-                reaction, user = await self.bot.wait_for("reaction_add", timeout=30.0, check=check)
+                reaction, user = await self.bot.wait_for("reaction_add", timeout=90.0, check=check)
                 if str(reaction) == "⬅️":
                     if i > 0:
                         i -= 1
