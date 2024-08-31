@@ -62,8 +62,8 @@ class Weather(commands.Cog):
             season = "Fall"
         
         embed = discord.Embed(
-            title=f"{user.name}'s Weather Profile",
-            color=0x00ff00
+            title=f"Weather profile for {user.name}",
+            color=0xfffffe
         )
         
         # Censor zip code if command is used in a public channel
