@@ -390,6 +390,19 @@ class Weather(commands.Cog):
             precipitation = current.get('precipitation', 'N/A')
             if precipitation != 'N/A' and precipitation != 0.0:
                 embed.add_field(name="Precipitation", value=f"{precipitation} inches")
+            
+            rain = current.get('rain', 'N/A')
+            if rain != 'N/A' and rain != 0.0:
+                embed.add_field(name="Rain", value=f"{rain} inches")
+            
+            showers = current.get('showers', 'N/A')
+            if showers != 'N/A' and showers != 0.0:
+                embed.add_field(name="Showers", value=f"{showers} inches")
+            
+            snowfall = current.get('snowfall', 'N/A')
+            if snowfall != 'N/A' and snowfall != 0.0:
+                embed.add_field(name="Snowfall", value=f"{snowfall} inches")
+            
             embed.add_field(name="Cloud cover", value=f"{current.get('cloud_cover', 'N/A')}%")
             embed.add_field(name="Pressure (MSL)", value=f"{current.get('pressure_msl', 'N/A')} hPa")
             embed.add_field(name="Surface pressure", value=f"{current.get('surface_pressure', 'N/A')} hPa")
