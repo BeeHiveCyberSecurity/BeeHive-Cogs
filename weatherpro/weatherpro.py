@@ -349,7 +349,8 @@ class Weather(commands.Cog):
             "current_weather": "true",
             "temperature_unit": "fahrenheit",
             "wind_speed_unit": "mph",
-            "precipitation_unit": "inch"
+            "precipitation_unit": "inch",
+            "current": "temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,showers,snowfall,cloud_cover,pressure_msl,surface_pressure,wind_speed_10m,wind_direction_10m,wind_gusts_10m"
         }
         
         queryString = "&".join(f"{key}={value}" for key, value in params.items())
