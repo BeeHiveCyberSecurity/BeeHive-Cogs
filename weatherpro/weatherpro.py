@@ -442,7 +442,8 @@ class Weather(commands.Cog):
             # Fetch severe and extreme weather alerts
             alerts_url = f"https://api.weather.gov/alerts/active?point={latitude},{longitude}"
             async with self.session.get(alerts_url) as alerts_response:
-                if alerts_response.status == 200:
+                try:
+                    alerts_response.raise_for_status()
                     alerts_data = await alerts_response.json()
                     alerts = alerts_data.get('features', [])
                     if alerts:
@@ -450,8 +451,8 @@ class Weather(commands.Cog):
                         alert_status = "\n".join(alert_titles)
                     else:
                         alert_status = "No active alerts"
-                else:
-                    alert_status = "Failed to fetch alerts"
+                except Exception as e:
+                    alert_status = f"Failed to fetch alerts: {str(e)}"
             
             embed.add_field(name="Currently in effect", value=alert_status)
             
