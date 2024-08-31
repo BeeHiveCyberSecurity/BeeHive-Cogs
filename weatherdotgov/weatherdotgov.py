@@ -68,12 +68,12 @@ class Weather(commands.Cog):
         
         # Censor zip code if command is used in a public channel
         if isinstance(ctx.channel, discord.DMChannel):
-            embed.add_field(name="Zip Code", value=zip_code, inline=False)
+            embed.add_field(name="Zip code", value=zip_code, inline=False)
         else:
-            embed.add_field(name="Zip Code", value="Censored for privacy", inline=False)
+            embed.add_field(name="Zip code", value="Censored for privacy", inline=False)
         
-        embed.add_field(name="Alerts Enabled", value="Yes" if alerts_enabled else "No", inline=False)
-        embed.add_field(name="Current Season", value=season, inline=False)
+        embed.add_field(name="Severe alerts", value="Enabled" if alerts_enabled else "Disabled", inline=False)
+        embed.add_field(name="Local season", value=season, inline=False)
         
         await ctx.send(embed=embed)
 
