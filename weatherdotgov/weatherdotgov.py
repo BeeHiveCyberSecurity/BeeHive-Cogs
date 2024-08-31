@@ -38,8 +38,8 @@ class Weather(commands.Cog):
         """Set your weather preferences"""
         pass
 
-    @weatherset.command(name="alerts")
-    async def weatherset_alerts(self, ctx, enable: bool):
+    @weatherset.command(name="severealerts")
+    async def severealerts(self, ctx, enable: bool):
         """Enable or disable weather alerts for your saved zip code"""
         user = ctx.author
         if enable:
