@@ -109,8 +109,8 @@ class Weather(commands.Cog):
                     break
 
     @commands.guild_only()
-    @weather.command(name="alertsummary")
-    async def alertsummary(self, ctx):
+    @weather.command(name="alerts")
+    async def alerts(self, ctx):
         """Shows a statistical summary of active weather alerts"""
         url = "https://api.weather.gov/alerts/active/count"
         async with aiohttp.ClientSession() as session:
@@ -202,7 +202,7 @@ class Weather(commands.Cog):
                 break
     
     @commands.guild_only()
-    @weather.command()
+    @weather.command(name="stations")
     async def stations(self, ctx):
         """Fetch and display weather observation stations."""
         url = "https://api.weather.gov/stations"
