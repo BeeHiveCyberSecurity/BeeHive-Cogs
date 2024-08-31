@@ -99,6 +99,68 @@ class Weather(commands.Cog):
                 await ctx.send(embed=embed)
 
     @commands.guild_only()
+    @weather.command(name="forecast")
+    async def forecast(self, ctx):
+        """Fetch and display the upcoming forecast for the user's saved zip code"""
+        zip_code = await self.config.user(ctx.author).zip_code()
+        if not zip_code:
+            await ctx.send("You haven't set a zip code yet. Use the `weatherset zip` command to set one.")
+            return
+        
+        # Fetch latitude and longitude using the zip code
+        if zip_code not in self.zip_codes:
+            await ctx.send("Invalid zip code. Please set a valid zip code.")
+            return
+        
+        latitude, longitude = self.zip_codes[zip_code]
+        points_url = f"https://api.weather.gov/points/{latitude.strip()},{longitude.strip()}"
+        
+        # Fetch weather data using the latitude and longitude
+        async with self.session.get(points_url) as response:
+            if response.status != 200:
+                await ctx.send(f"Failed to fetch the weather data. URL: {points_url}, Status Code: {response.status}")
+                return
+
+            data = await response.json()
+            forecast_url = data.get('properties', {}).get('forecast')
+            if not forecast_url:
+                await ctx.send(f"Failed to retrieve forecast URL. URL: {points_url}, Data: {data}")
+                return
+            
+            async with self.session.get(forecast_url) as forecast_response:
+                if forecast_response.status != 200:
+                    await ctx.send(f"Failed to fetch the forecast data. URL: {forecast_url}, Status Code: {forecast_response.status}")
+                    return
+                
+                forecast_data = await forecast_response.json()
+                periods = forecast_data.get('properties', {}).get('periods', [])
+                if not periods:
+                    await ctx.send(f"Failed to retrieve forecast periods. URL: {forecast_url}, Data: {forecast_data}")
+                    return
+                
+                embed = discord.Embed(
+                    title="Upcoming Weather Forecast",
+                    description="Here is the upcoming weather forecast for your area:",
+                    color=discord.Color.blue()
+                )
+                
+                for period in periods[:5]:  # Display the next 5 forecast periods
+                    name = period.get('name', 'N/A')
+                    detailed_forecast = period.get('detailedForecast', 'No detailed forecast available.')
+                    temperature = period.get('temperature', 'N/A')
+                    wind_speed = period.get('windSpeed', 'N/A')
+                    wind_direction = period.get('windDirection', 'N/A')
+                    
+                    embed.add_field(
+                        name=name,
+                        value=f"**Forecast:** {detailed_forecast}\n**Temperature:** {temperature}\n**Wind Speed:** {wind_speed}\n**Wind Direction:** {wind_direction}",
+                        inline=False
+                    )
+                
+                await ctx.send(embed=embed)
+
+
+    @commands.guild_only()
     @weather.command(name="glossary")
     async def glossary(self, ctx, *, search_term: str = None):
         """Show a glossary, or specify a word to search"""
