@@ -387,18 +387,25 @@ class Weather(commands.Cog):
             embed.add_field(name="Wind Speed", value=f"{current.get('wind_speed_10m', 'N/A')} mph")
             embed.add_field(name="Wind Direction", value=f"{current.get('wind_direction_10m', 'N/A')}°")
             embed.add_field(name="Wind Gusts", value=f"{current.get('wind_gusts_10m', 'N/A')} mph")
-            embed.add_field(name="Ground Temperature", value=f"{hourly.get('soil_temperature_0cm', 'N/A')}°F")
+            
+            ground_temp = hourly.get('soil_temperature_0cm', 'N/A')
+            if isinstance(ground_temp, list) and ground_temp:
+                ground_temp = ground_temp[0]
+            embed.add_field(name="Ground Temperature", value=f"{ground_temp}°F")
+            
             visibility = minutely_15.get('visibility', [0])
             if isinstance(visibility, list) and visibility:
                 visibility_value = visibility[0] / 5280
             else:
                 visibility_value = 0
             embed.add_field(name="Visibility", value=f"{visibility_value:.2f} miles")
-            embed.add_field(name="Lightning Potential", value=f"{minutely_15.get('lightning_potential', 'N/A')}")
+            
+            lightning_potential = minutely_15.get('lightning_potential', 'N/A')
+            if isinstance(lightning_potential, list) and lightning_potential:
+                lightning_potential = lightning_potential[0]
+            embed.add_field(name="Lightning Potential", value=f"{lightning_potential}")
             
             await ctx.send(embed=embed)
-            nowcasts_fetched = await self.config.nowcasts_fetched()
-            await self.config.nowcasts_fetched.set(nowcasts_fetched + 1)
             nowcasts_fetched = await self.config.nowcasts_fetched()
             await self.config.nowcasts_fetched.set(nowcasts_fetched + 1)
 
