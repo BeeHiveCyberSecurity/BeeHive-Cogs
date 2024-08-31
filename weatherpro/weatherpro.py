@@ -396,21 +396,21 @@ class Weather(commands.Cog):
             wind_direction = current.get('wind_direction_10m', 'N/A')
             if wind_direction != 'N/A':
                 if (wind_direction >= 0 and wind_direction <= 22.5) or (wind_direction > 337.5 and wind_direction <= 360):
-                    wind_direction_str = '🡹 North'
+                    wind_direction_str = 'North'
                 elif wind_direction > 22.5 and wind_direction <= 67.5:
-                    wind_direction_str = '🡽 Northeast'
+                    wind_direction_str = 'Northeast'
                 elif wind_direction > 67.5 and wind_direction <= 112.5:
-                    wind_direction_str = '🡺 East'
+                    wind_direction_str = 'East'
                 elif wind_direction > 112.5 and wind_direction <= 157.5:
-                    wind_direction_str = '🡾 Southeast'
+                    wind_direction_str = 'Southeast'
                 elif wind_direction > 157.5 and wind_direction <= 202.5:
-                    wind_direction_str = '🡻 South'
+                    wind_direction_str = 'South'
                 elif wind_direction > 202.5 and wind_direction <= 247.5:
-                    wind_direction_str = '🡿 Southwest'
+                    wind_direction_str = 'Southwest'
                 elif wind_direction > 247.5 and wind_direction <= 292.5:
-                    wind_direction_str = '🡸 West'
+                    wind_direction_str = 'West'
                 else:
-                    wind_direction_str = '🡼 Northwest'
+                    wind_direction_str = 'Northwest'
             else:
                 wind_direction_str = 'N/A'
             embed.add_field(name="Wind direction", value=wind_direction_str)
