@@ -386,7 +386,9 @@ class Weather(commands.Cog):
             embed.add_field(name="Ground temperature", value=f"{ground_temp}°F")
             
             embed.add_field(name="Humidity", value=f"{current.get('relative_humidity_2m', 'N/A')}%")
-            embed.add_field(name="Precipitation", value=f"{current.get('precipitation', 'N/A')} inches")
+            precipitation = current.get('precipitation', 'N/A')
+            if precipitation != 'N/A' and precipitation != 0.0:
+                embed.add_field(name="Precipitation", value=f"{precipitation} inches")
             embed.add_field(name="Cloud cover", value=f"{current.get('cloud_cover', 'N/A')}%")
             embed.add_field(name="Pressure (MSL)", value=f"{current.get('pressure_msl', 'N/A')} hPa")
             embed.add_field(name="Surface pressure", value=f"{current.get('surface_pressure', 'N/A')} hPa")
