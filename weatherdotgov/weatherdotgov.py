@@ -15,7 +15,8 @@ class Weather(commands.Cog):
         self.config = Config.get_conf(self, identifier=1234567890)
         default_user = {
             "zip_code": None,
-            "alerts": False  # Add alerts to default user config
+            "severealerts": False,
+            "freezealerts": False,
         }
         self.config.register_user(**default_user)
         default_global = {
@@ -26,13 +27,13 @@ class Weather(commands.Cog):
         }
         self.config.register_global(**default_global)
         data_dir = bundled_data_path(self)
-        zip_code_file = (data_dir / "zipcodes.csv").open(mode="r")
-        csv_reader = csv.reader(zip_code_file)
-        self.zip_codes = {
-            row[0]: (row[1], row[2])
-            for i, row in enumerate(csv_reader)
-            if i != 0
-        }
+        with (data_dir / "zipcodes.csv").open(mode="r") as zip_code_file:
+            csv_reader = csv.reader(zip_code_file)
+            self.zip_codes = {
+                row[0]: (row[1], row[2])
+                for i, row in enumerate(csv_reader)
+                if i != 0
+            }
         
     def cog_load(self):
         self.bot.loop.create_task(self.start_alerts_task())
@@ -44,14 +45,13 @@ class Weather(commands.Cog):
     async def weatherset(self, ctx):
         """Configure settings and features of weather"""
 
-
     @weatherset.command(name="profile")
     async def profile(self, ctx):
         """Show your currently set zip code, alert settings, and the current weather season"""
         user = ctx.author
         user_data = await self.config.user(user).all()
         zip_code = user_data.get("zip_code", "Not set")
-        alerts_enabled = user_data.get("alerts", False)
+        alerts_enabled = user_data.get("severealerts", False)
         
         # Determine the current weather season
         month = datetime.now().month
@@ -98,18 +98,18 @@ class Weather(commands.Cog):
                 example_alert.add_field(name="Certainty", value="Observed", inline=True)
 
                 await user.send(embed=example_alert)
-                await self.config.user(user).alerts.set(True)
+                await self.config.user(user).severealerts.set(True)
                 await ctx.send("Weather alerts have been enabled.")
             except discord.Forbidden:
                 await ctx.send("I cannot send you direct messages. Please enable DMs from server members and try again.")
         else:
-            await self.config.user(user).alerts.set(False)
+            await self.config.user(user).severealerts.set(False)
             await ctx.send("Weather alerts have been disabled.")
 
     async def check_weather_alerts(self):
         """Check for weather alerts and DM users if any severe or extreme warnings are issued"""
         all_users = await self.config.all_users()
-        users_with_alerts = [user_id for user_id, data in all_users.items() if data.get("alerts")]
+        users_with_alerts = [user_id for user_id, data in all_users.items() if data.get("severealerts")]
 
         for user_id in users_with_alerts:
             user_data = await self.config.user_from_id(user_id).all()
@@ -152,6 +152,59 @@ class Weather(commands.Cog):
         while True:
             await self.check_weather_alerts()
             await asyncio.sleep(900)
+
+    @weatherset.command(name="freezealerts")
+    async def freezealerts(self, ctx):
+        """Enable or disable freeze alerts for your location"""
+        user_data = await self.config.user(ctx.author).all()
+        freeze_alerts_enabled = user_data.get("freezealerts", False)
+        await self.config.user(ctx.author).freezealerts.set(not freeze_alerts_enabled)
+        status = "enabled" if not freeze_alerts_enabled else "disabled"
+        await ctx.send(f"Freeze alerts have been {status} for your location.")
+
+    async def check_freeze_alerts(self):
+        """Check for upcoming dangerously cold temperatures and DM users if any are expected"""
+        all_users = await self.config.all_users()
+        users_with_freeze_alerts = [user_id for user_id, data in all_users.items() if data.get("freezealerts")]
+
+        for user_id in users_with_freeze_alerts:
+            user_data = await self.config.user_from_id(user_id).all()
+            zip_code = user_data.get("zip_code")
+            if not zip_code or zip_code not in self.zip_codes:
+                continue
+
+            latitude, longitude = self.zip_codes[zip_code]
+            forecast_url = f"https://api.weather.gov/points/{latitude.strip()},{longitude.strip()}/forecast"
+
+            async with self.session.get(forecast_url) as response:
+                if response.status != 200:
+                    continue
+
+                data = await response.json()
+                periods = data.get('properties', {}).get('periods', [])
+                cold_alerts = [period for period in periods if period['temperature'] <= 32]
+
+                if cold_alerts:
+                    user = self.bot.get_user(user_id)
+                    if user:
+                        for alert in cold_alerts:
+                            embed = discord.Embed(
+                                title="Upcoming Freeze Alert for Your Location",
+                                description=f"Expected dangerously cold temperatures: {alert['temperature']}°F",
+                                color=0x1E90FF
+                            )
+                            embed.add_field(name="Time", value=alert['name'], inline=True)
+                            embed.add_field(name="Detailed Forecast", value=alert['detailedForecast'], inline=False)
+                            embed.set_footer(text="Stay warm and take necessary precautions.")
+
+                            await user.send(embed=embed)
+                            total_freeze_alerts_sent = await self.config.total_freeze_alerts_sent()
+                            await self.config.total_freeze_alerts_sent.set(total_freeze_alerts_sent + 1)
+
+    async def start_freeze_alerts_task(self):
+        while True:
+            await self.check_freeze_alerts()
+            await asyncio.sleep(604800)  # 7 days in seconds
 
 
     @weatherset.command(name="zip")
