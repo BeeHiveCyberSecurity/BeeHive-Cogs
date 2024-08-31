@@ -194,14 +194,14 @@ class Weather(commands.Cog):
 
                 data = await response.json()
                 periods = data.get('properties', {}).get('periods', [])
-                cold_alerts = [period for period in periods if period['temperature'] <= 32]
+                cold_alerts = [period for period in periods if period['temperature'] <= 10]
 
                 if cold_alerts:
                     user = self.bot.get_user(user_id)
                     if user:
                         for alert in cold_alerts:
                             embed = discord.Embed(
-                                title="Upcoming Freeze Alert for Your Location",
+                                title="Extreme cold alert",
                                 description=f"Expected dangerously cold temperatures: {alert['temperature']}°F",
                                 color=0x1E90FF
                             )
@@ -255,7 +255,7 @@ class Weather(commands.Cog):
                     if user:
                         for alert in heat_alerts:
                             embed = discord.Embed(
-                                title="Upcoming Heat Alert for Your Location",
+                                title="Extreme heat alert",
                                 description=f"Expected dangerously hot temperatures: {alert['temperature']}°F",
                                 color=0xFF4500
                             )
