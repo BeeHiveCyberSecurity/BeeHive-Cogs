@@ -162,9 +162,10 @@ class Weather(commands.Cog):
                 page = 0
                 await message.add_reaction("⬅️")
                 await message.add_reaction("➡️")
+                await message.add_reaction("❌")
 
                 def check(reaction, user):
-                    return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️"] and reaction.message.id == message.id
+                    return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️", "❌"] and reaction.message.id == message.id
 
                 while True:
                     try:
@@ -173,6 +174,9 @@ class Weather(commands.Cog):
                             page = (page + 1) % len(embeds)
                         elif str(reaction.emoji) == "⬅️":
                             page = (page - 1) % len(embeds)
+                        elif str(reaction.emoji) == "❌":
+                            await message.delete()
+                            break
                         
                         await message.edit(embed=embeds[page])
                         await message.remove_reaction(reaction, user)
