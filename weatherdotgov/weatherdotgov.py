@@ -158,11 +158,26 @@ class Weather(commands.Cog):
                     
                     embeds.append(embed)
                 
-                paginator = commands.Paginator()
-                for embed in embeds:
-                    paginator.add_page(embed)
-                
-                await paginator.send(ctx)
+                message = await ctx.send(embed=embeds[0])
+                page = 0
+                await message.add_reaction("⬅️")
+                await message.add_reaction("➡️")
+
+                def check(reaction, user):
+                    return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️"] and reaction.message.id == message.id
+
+                while True:
+                    try:
+                        reaction, user = await self.bot.wait_for("reaction_add", timeout=60.0, check=check)
+                        if str(reaction.emoji) == "➡️":
+                            page = (page + 1) % len(embeds)
+                        elif str(reaction.emoji) == "⬅️":
+                            page = (page - 1) % len(embeds)
+                        
+                        await message.edit(embed=embeds[page])
+                        await message.remove_reaction(reaction, user)
+                    except asyncio.TimeoutError:
+                        break
 
 
     @commands.guild_only()
