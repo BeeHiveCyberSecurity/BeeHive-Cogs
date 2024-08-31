@@ -403,7 +403,17 @@ class Weather(commands.Cog):
             lightning_potential = minutely_15.get('lightning_potential', 'N/A')
             if isinstance(lightning_potential, list) and lightning_potential:
                 lightning_potential = lightning_potential[0]
-            embed.add_field(name="Lightning Potential", value=f"{lightning_potential}")
+            if lightning_potential == 'N/A' or lightning_potential == 0:
+                lightning_potential_str = 'N/A'
+            elif lightning_potential < 500:
+                lightning_potential_str = 'Low'
+            elif lightning_potential < 1000:
+                lightning_potential_str = 'Medium'
+            elif lightning_potential < 2000:
+                lightning_potential_str = 'High'
+            else:
+                lightning_potential_str = 'Extreme'
+            embed.add_field(name="Lightning Potential", value=f"{lightning_potential_str}")
             
             await ctx.send(embed=embed)
             nowcasts_fetched = await self.config.nowcasts_fetched()
