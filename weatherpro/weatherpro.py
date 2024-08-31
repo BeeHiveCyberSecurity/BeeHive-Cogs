@@ -363,21 +363,22 @@ class Weather(commands.Cog):
 
             data = await response.json()
             current_weather = data.get('current_weather', {})
+            current_weather2 = data.get('current', {})
             if not current_weather:
                 await ctx.send(f"Failed to retrieve current weather data. URL: {weather_url}, Data: {data}")
                 return
             
             temperature = current_weather.get('temperature', 'N/A')
             wind_speed = current_weather.get('windspeed', 'N/A')
-            wind_direction = current_weather.get('winddirection', 'N/A')
-            weather_code = current_weather.get('weathercode', 'N/A')
-            apparent_temperature = current_weather.get('apparent_temperature', 'N/A')
-            relative_humidity = current_weather.get('relativehumidity_2m', 'N/A')
-            precipitation = current_weather.get('precipitation', 'N/A')
+            wind_direction = current_weather2.get('winddirection', 'N/A')
+            weather_code = current_weather2.get('weathercode', 'N/A')
+            apparent_temperature = current_weather2.get('apparent_temperature', 'N/A')
+            relative_humidity = current_weather2.get('relativehumidity_2m', 'N/A')
+            precipitation = current_weather2.get('precipitation', 'N/A')
             cloud_cover = current_weather.get('cloudcover', 'N/A')
             pressure_msl = current_weather.get('pressure_msl', 'N/A')
-            surface_pressure = current_weather.get('surface_pressure', 'N/A')
-            wind_gusts = current_weather.get('windgusts_10m', 'N/A')
+            surface_pressure = current_weather2.get('surface_pressure', 'N/A')
+            wind_gusts = current_weather2.get('windgusts_10m', 'N/A')
             
             embed = discord.Embed(
                 title="Your current conditions",
