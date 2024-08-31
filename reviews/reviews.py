@@ -2,15 +2,16 @@ import csv
 import os
 import discord  #type: ignore
 import asyncio  #type: ignore
+import aiohttp #type: ignore
 import tempfile
 import datetime
-from reportlab.lib.pagesizes import letter #type: ignore
-from reportlab.pdfgen import canvas #type: ignore 
-from reportlab.lib import colors#type: ignore
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle #type: ignore
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak, Table, TableStyle #type: ignore
-from redbot.core import commands, Config #type: ignore
-from discord.ui import Button, View #type: ignore
+from reportlab.lib.pagesizes import letter  # type: ignore
+from reportlab.pdfgen import canvas  # type: ignore
+from reportlab.lib import colors  # type: ignore
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle  # type: ignore
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak, Table, TableStyle  # type: ignore
+from redbot.core import commands, Config  # type: ignore
+from discord.ui import Button, View  # type: ignore
 
 class ReviewButton(discord.ui.Button):
     def __init__(self, label, review_id, style=discord.ButtonStyle.primary):
@@ -29,7 +30,7 @@ class ReviewsCog(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.config = Config.get_conf(self, identifier=1234567890)
+        self.config = Config.get_conf(self, identifier=1234567890, force_registration=True)
         default_guild = {
             "reviews": {},
             "review_channel": None,
@@ -42,7 +43,7 @@ class ReviewsCog(commands.Cog):
             review = reviews.get(str(review_id))
             if review:
                 review['rating'] = rating
-                embed = discord.Embed(description=f"Thank you for rating the review {rating} stars!", color=discord.Color.from_str("#2bbd8e"))
+                embed = discord.Embed(description=f"Thank you for rating the experience {rating} stars!", color=discord.Color.from_str("#2bbd8e"))
                 await interaction.response.send_message(embed=embed, ephemeral=True)
             else:
                 embed = discord.Embed(description="Review not found.", color=discord.Color(0xff4545))
@@ -110,6 +111,21 @@ class ReviewsCog(commands.Cog):
 
         content = msg.content
 
+        embed = discord.Embed(title="Please provide your email", description="Reply in chat with your email address or type **`cancel`** to abandon the process.", color=discord.Color.from_str("#fffffe"))
+        await ctx.send(embed=embed)
+        try:
+            email_msg = await self.bot.wait_for('message', check=check, timeout=120.0)
+            if email_msg.content.lower() == 'cancel':
+                embed = discord.Embed(description=":x: **Review process has been canceled**", color=discord.Color(0xff4545))
+                await ctx.send(embed=embed)
+                return
+        except asyncio.TimeoutError:
+            embed = discord.Embed(description=":x: **Timed out, you took too long to reply**", color=discord.Color(0xff4545))
+            await ctx.send(embed=embed)
+            return
+
+        email = email_msg.content
+
         review_id = await self.config.guild(ctx.guild).next_id()
         async with self.config.guild(ctx.guild).reviews() as reviews:
             reviews[str(review_id)] = {"author": ctx.author.id, "content": content, "status": "pending", "rating": None}
@@ -123,17 +139,48 @@ class ReviewsCog(commands.Cog):
             view.add_item(button)
         view.cog = self  # Assign the cog reference to the view for callback access
 
-        embed = discord.Embed(description="Please rate your experience from 1 to 5 stars, where...\n\n- **1 star** indicates **poor** customer service, product quality, or overall experience\n\nand\n\n- **5 stars** indicates an **excellent** experience, **high** product quality, or **extremely helpful** customer service.", color=discord.Color.from_str("#fffffe"))
+        embed = discord.Embed(description="Please rate your experience from 1 to 5 stars, where...\n\n- **1 star** indicates **poor** customer service, product quality, or overall experience\nand\n- **5 stars** indicates an **excellent** experience, **high** product quality, or **extremely helpful** customer service.", color=discord.Color.from_str("#fffffe"))
         message = await ctx.send(embed=embed, view=view)
         await view.wait()  # Wait for the interaction to be completed
 
         if not view.children:  # If the view has no children, the interaction was completed
             embed = discord.Embed(description="Thank you for submitting your review!", color=discord.Color.from_str("#2bbd8e"))
             await message.edit(embed=embed, view=None)
+
+            # Check if the bot has a testimonialto API key set
+            api_key = await self.bot.get_shared_api_tokens("testimonialto")
+            if api_key:
+                # Prepare the data to be sent
+                data = {
+                    "testimonial": content,
+                    "rating": view.selected_rating,  # Assuming the rating is stored in view.selected_rating
+                    "name": str(ctx.author),
+                    "title": "Member of " + ctx.guild.name,
+                    "email": email,
+                    "avatarURL": ctx.author.display_avatar.url,
+                    "attachedImageURL": ctx.guild.icon.url if ctx.guild.icon else "",
+                    "confirm": True,
+                    "isLiked": True
+                }
+
+                # Send the data to the testimonialto API
+                async with aiohttp.ClientSession() as session:
+                    async with session.post(
+                        'https://api.testimonial.to/v1/submit/text',
+                        headers={
+                            'Authorization': f'Bearer {api_key}',
+                            'Content-Type': 'application/json'
+                        },
+                        json=data
+                    ) as response:
+                        if response.status == 200:
+                            print("Review submitted to testimonialto API successfully.")
+                        else:
+                            print(f"Failed to submit review to testimonialto API. Status code: {response.status}")
         else:
             embed = discord.Embed(description="Review rating was not received. Please try submitting again.", color=discord.Color(0xff4545))
             await message.edit(embed=embed, view=None)
-            
+
     @review.command(name="approve")
     @commands.has_permissions(manage_guild=True)
     async def review_approve(self, ctx, review_id: int):
@@ -159,7 +206,7 @@ class ReviewsCog(commands.Cog):
                             embed.set_author(name=str(user), icon_url=user.display_avatar.url)
                         else:
                             embed.set_author(name="User not found")
-                        embed.set_footer(text=f"User ID: {ctx.author.id}")
+                        embed.set_footer(text=f"User ID: {review['author']}")
                         embed.set_thumbnail(url=ctx.guild.icon.url if ctx.guild.icon else discord.Embed.Empty)
                         embed.timestamp = datetime.datetime.utcnow()
                         await review_channel.send(embed=embed)
@@ -207,11 +254,10 @@ class ReviewsCog(commands.Cog):
                         writer.writerow([review_id, review["author"], review["content"], review["status"], review.get("rating", "Not rated")])
                 await ctx.send(file=discord.File(file_path))
             elif file_format.lower() == "pdf":
-
                 doc = SimpleDocTemplate(file_path, pagesize=letter)
                 styles = getSampleStyleSheet()
                 # Ensure the font name is a standard font available in ReportLab, such as 'Helvetica'
-                styles.add(ParagraphStyle(name='Normal-Bold', fontName='Helvetica-Bold', fontSize=12, leading=14, alignment=LEFT))
+                styles.add(ParagraphStyle(name='Normal-Bold', fontName='Helvetica-Bold', fontSize=12, leading=14))
                 flowables = []
 
                 flowables.append(Paragraph("Guild Reviews", styles['Normal-Bold']))
@@ -235,7 +281,7 @@ class ReviewsCog(commands.Cog):
 
                 doc.build(flowables)
                 await ctx.send(file=discord.File(file_path))
-        except PermissionError as e:
+        except PermissionError:
             await ctx.send("I do not have permission to write to the file system.")
         finally:
             if os.path.exists(file_path):
@@ -268,6 +314,7 @@ class ReviewsCog(commands.Cog):
             rating = review.get('rating', 'Not rated')
             embed.add_field(name="Rating", value=rating, inline=False)
             await ctx.send(embed=embed)
+
 def setup(bot):
     bot.add_cog(ReviewsCog(bot))
 

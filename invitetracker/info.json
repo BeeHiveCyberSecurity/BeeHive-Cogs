@@ -1,0 +1,20 @@
+{
+    "author": [
+        "adminescalation"
+    ],
+    "description": "Tracks user invites with customizable announcements, rewards, and perks.",
+    "install_msg": "## :white_check_mark: Successfully installed InviteTracker.\n**Questions?** [We're listening](<https://www.beehive.systems/contact-us>)\n**Interested in CyberSecurity and CyberSafety?** Join our Discord! https://discord.gg/ckdzsm7mTs",
+    "name": "InviteTracker",
+    "hidden": false,
+    "disabled": false,
+    "requirements": [
+        "matplotlib"
+    ],
+    "tags": [
+        "invites",
+        "rewards",
+        "announcements"
+    ],
+    "short": "Tracks user invites with customizable announcements, rewards, and perks.",
+    "min_bot_version": "3.5.0"
+}

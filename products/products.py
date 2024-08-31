@@ -1,10 +1,12 @@
 import asyncio
+from bs4 import BeautifulSoup
+import aiohttp
 import time
 import json
 import io
+import os
 import discord # type: ignore
 from redbot.core import commands # type: ignore
-from redbot.core import app_commands # type: ignore
 
 
 class Products(commands.Cog):
@@ -12,7 +14,6 @@ class Products(commands.Cog):
         self.bot = bot
         self.antivirus_links = {
             1147002526156206170: "https://buy.stripe.com/5kA8y62kIg06dLqdRc?prefilled_promo_code=DIRTYTHR33&utm_source=discord&utm_medium=partnerperk",  # BeeHive
-            1081164568669200384: "https://buy.stripe.com/5kA8y62kIg06dLqdRc?prefilled_promo_code=DIRTYTHR33&utm_source=discord&utm_medium=partnerperk",  # Red Lotus
             1229268715208577034: "https://buy.stripe.com/5kA8y62kIg06dLqdRc?prefilled_promo_code=DIRTYTHR33&utm_source=discord&utm_medium=partnerperk",  # Holy Hangout
             1173631740305215558: "https://buy.stripe.com/5kA8y62kIg06dLqdRc?prefilled_promo_code=DIRTYTHR33&utm_source=discord&utm_medium=partnerperk",  # Storm AntiCheat
             1216201978024169482: "https://buy.stripe.com/5kA8y62kIg06dLqdRc?prefilled_promo_code=DIRTYTHR33&utm_source=discord&utm_medium=partnerperk",  # Storm Development
@@ -23,7 +24,7 @@ class Products(commands.Cog):
 
 
     @commands.bot_has_permissions(embed_links=True)
-    @commands.hybrid_command(name="antivirus", description="Learn more about BeeHive's AntiVirus", aliases=["av"])
+    @commands.group(name="antivirus", description="Learn more about BeeHive's AntiVirus", aliases=["av"], invoke_without_command=True)
     async def antivirus(self, ctx: commands.Context):
         """
         Show an embed containing product details about BeeHive's AntiViral/AntiMalware software
@@ -35,27 +36,127 @@ class Products(commands.Cog):
         server_name = ctx.guild.name
         discount_link = self.antivirus_links.get(server_id)
 
-        embed = discord.Embed(title=f"AntiVirus / AntiMalware Security Kit", description=f"# Protect your PC from malware and spyware in just a few clicks\n\nBeeHive's security client is a security software application designed to protect users from malware or viruses while working, shopping, or playing games on their computers. It works by isolating unknown files in a safe virtual environment before performing real-time analysis to determine whether they pose any threat - all done without risk or alert fatigue for normal computer usage.", colour=16767334, url='https://www.beehive.systems/antivirus')
+        embed = discord.Embed(title=f"BeeHive > AntiVirus", description=f"BeeHive's antivirus is a security software application designed to protect users from malware or viruses while working, shopping, or playing games on their computers. It works by isolating unknown files in a safe virtual environment before performing real-time analysis to determine whether they pose any threat - all done without risk or alert fatigue for normal computer usage.", colour=16767334, url='https://www.beehive.systems/antivirus')
         embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/shield-checkmark.png")
-        embed.set_image(url="https://i.imgur.com/NvGx5WK.png")
-        embed.add_field(name="Real-Time AntiMalware", value="High-sensitivity file inspection occurs on-device to detect and block known and unknown malicious software", inline=False)
-        embed.add_field(name="Real-Time AntiSpyware", value="Powerful protection from credential stealers, banking trojans, and other hard-to-detect infections", inline=False)
-        embed.add_field(name="Intrusion Detection and Prevention", value="Analysis and blocking of potentially dangerous activities on the host device to preserve system integrity", inline=False)
-        embed.add_field(name="Real-Time Cloud Analysis", value="Ongoing static and dynamic analysis of unknown objects within your filesystem for unidentified malware", inline=False)
-        embed.add_field(name="Automated Threat Containment", value="Kernel-level API virtualization to monitor and contain unknowns during analysis and verdicting", inline=False)
-        embed.add_field(name="Automated Remediation", value="No-touch, no-interaction, 100% hands free threat remediation across 7 layers of powerful protection", inline=False)
+#        embed.set_image(url="https://i.imgur.com/NvGx5WK.png")
+        embed.add_field(name="Detect and stop unknown malware", value="High-sensitivity file inspection occurs on-device to detect and block known and unknown malicious objects, giving you powerful protection from credential stealers, banking trojans, and other hard-to-detect/hard-to-prevent infections", inline=True)
+        embed.add_field(name="Intrusion Detection and Prevention", value="Analysis and blocking of potentially dangerous activities on the host device to preserve system integrity", inline=True)
+        embed.add_field(name="Cloud & human analysis built-in", value="Ongoing static and dynamic analysis of unknown objects within your filesystem for unidentified malware", inline=True)
+        embed.add_field(name="Automated Threat Containment", value="Kernel-level API virtualization to monitor and contain unknowns during analysis and verdicting", inline=True)
+        embed.add_field(name="Automated Remediation", value="No-touch, no-interaction, 100% hands free threat remediation across 7 layers of powerful protection", inline=True)
         view = discord.ui.View()
-        view.add_item(discord.ui.Button(label="Start a 15 day free trial", url="https://buy.stripe.com/5kA8y62kIg06dLqdRc", style=discord.ButtonStyle.link, emoji="<:shield:1194906995036262420>"))
-        view.add_item(discord.ui.Button(label="Learn more on our website", url="https://www.beehive.systems/antivirus", style=discord.ButtonStyle.link, emoji="<:info:1199305085738553385>"))
+        view.add_item(discord.ui.Button(label="Read more", url="https://www.beehive.systems/antivirus", style=discord.ButtonStyle.link, emoji="<:info:1199305085738553385>"))
+        view.add_item(discord.ui.Button(label="Show protection statistics", custom_id="show_stats", style=discord.ButtonStyle.grey, emoji="📊"))
+
+        async def button_callback(interaction: discord.Interaction):
+            if interaction.user == ctx.author:
+                await interaction.response.defer()
+                await self.antivirusstats(ctx)
+            else:
+                await interaction.response.send_message("You are not authorized to use this button.", ephemeral=True)
+
+        view.children[-1].callback = button_callback
+
         await ctx.send(embed=embed, view=view)
-        if discount_link:
-            await ctx.typing()
-            view2 = discord.ui.View()
-            view2.add_item(discord.ui.Button(label="Save 30% on your first 3 months of protection", url=f"{discount_link}", style=discord.ButtonStyle.link, emoji="<:shield:1194906995036262420>"))
-            embed2 = discord.Embed(title=f"Partner Perk Available", description=f"**{server_name}** is a Discord partner of BeeHive, which automatically grants this community exclusive discounts and credits", colour=16767334, url='')
-            embed2.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/bag-add.png")
-            embed2.add_field(name="Offer Details", value=f"Trial our Security Client for **15 days free**, then pay **only** **`$7.00`** per month until coupon expires.\n\n`Offer valid for first-time customers only, billing continues automatically unless cancelled.`", inline=False)
-            await ctx.send(embed=embed2, view=view2)
+#        if discount_link:
+#            await ctx.typing()
+#            view2 = discord.ui.View()
+#            view2.add_item(discord.ui.Button(label="Save 30% on your first 3 months of protection", url=f"{discount_link}", style=discord.ButtonStyle.link, emoji="<:shield:1194906995036262420>"))
+#            embed2 = discord.Embed(title=f"Partner Perk Available", description=f"**{server_name}** is a Discord partner of BeeHive, which automatically grants this community exclusive discounts and credits", colour=16767334, url='')
+#            embed2.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/bag-add.png")
+#            embed2.add_field(name="Offer Details", value=f"Trial our Security Client for **15 days free**, then pay **only** **`$7.00`** per month until coupon expires.\n\n`Offer valid for first-time customers only, billing continues automatically unless cancelled.`", inline=False)
+#            await ctx.send(embed=embed2, view=view2)
+
+    @commands.bot_has_permissions(embed_links=True)
+    @antivirus.command(name="stats", description="Show weekly protection statistics")
+    async def antivirusstats(self, ctx: commands.Context):
+        """
+        Fetch and display weekly protection statistics from a local file.
+        """
+        file_path = os.path.join(os.path.dirname(__file__), "data", "weekly_stats.txt")
+        
+        try:
+            with open(file_path, "r") as file:
+                lines = file.readlines()
+                
+                if not lines:
+                    await ctx.send("No data found in the statistics file.")
+                    return
+                
+                pages = []
+                
+                for line in lines[:5]:  # Limit to the first 5 lines for brevity
+                    columns = line.strip().split(',')
+                    if len(columns) >= 8:
+                        week = columns[0]
+                        active_devices_potential_malicious = columns[1].rstrip('0').rstrip('.') if columns[1] != '0' else '0'
+                        active_devices_known_good = columns[2].rstrip('0').rstrip('.') if columns[2] != '0' else '0'
+                        active_devices_malicious_activity = columns[3].rstrip('0').rstrip('.') if columns[3] != '0' else '0'
+                        infection_breach = columns[4].rstrip('0').rstrip('.') if columns[4] != '0' else '0'
+                        unknowns_clean = columns[5].rstrip('0').rstrip('.') if columns[5] != '0' else '0'
+                        unknowns_pua = columns[6].rstrip('0').rstrip('.') if columns[6] != '0' else '0'
+                        unknowns_malware = columns[7].rstrip('0').rstrip('.') if columns[7] != '0' else '0'
+                        
+                        embed = discord.Embed(title="Weekly protection statistics", color=0xffd966)
+                        embed.add_field(name="Period of", value=week, inline=True)
+                        embed.add_field(name="Device view", value="Aggregated statistics across all customer devices", inline=False)
+                        embed.add_field(name=f"{active_devices_potential_malicious}%", value="of devices had potentially malicious activity inside **Containment**", inline=True)
+                        embed.add_field(name=f"{active_devices_known_good}%", value="of devices had no unknown objects, files, or programs detected", inline=True)
+                        embed.add_field(name="", value="", inline=False)
+                        embed.add_field(name=f"{active_devices_malicious_activity}%", value="of devices had malicious activity filtered by **Virtualization**", inline=True)
+                        embed.add_field(name=f"{infection_breach}%", value="of devices were successfully breached or infected", inline=True)
+                        embed.add_field(name="File view", value="Aggregated statistics for all objects processed for analysis", inline=False)
+                        embed.add_field(name=f"{unknowns_clean}%", value="of objects analyzed were **[clean](https://thecyberwire.com/glossary/benign)**", inline=True)
+                        embed.add_field(name=f"{unknowns_pua}%", value="of objects analyzed were **[potentially unwanted](https://www.trendmicro.com/vinfo/us/security/definition/potentially-unwanted-app)**", inline=True)
+                        embed.add_field(name=f"{unknowns_malware}%", value="of objects analyzed were **[malware](https://csrc.nist.gov/glossary/term/malware)**", inline=True)
+                        
+                        pages.append(embed)
+                
+                if not pages:
+                    await ctx.send("No valid data found in the statistics file.")
+                    return
+                
+                message = await ctx.send(embed=pages[0])
+                
+                if len(pages) > 1:
+                    await message.add_reaction("⬅️")
+                    await message.add_reaction("❌")
+                    await message.add_reaction("➡️")
+                    
+                    def check(reaction, user):
+                        return user == ctx.author and str(reaction.emoji) in ["⬅️", "❌", "➡️"] and reaction.message.id == message.id
+                    
+                    i = 0
+                    while True:
+                        try:
+                            reaction, user = await self.bot.wait_for("reaction_add", timeout=60.0, check=check)
+                            
+                            if str(reaction.emoji) == "➡️":
+                                i += 1
+                                if i >= len(pages):
+                                    i = 0
+                                await message.edit(embed=pages[i])
+                                await message.remove_reaction(reaction, user)
+                            
+                            elif str(reaction.emoji) == "⬅️":
+                                i -= 1
+                                if i < 0:
+                                    i = len(pages) - 1
+                                await message.edit(embed=pages[i])
+                                await message.remove_reaction(reaction, user)
+                            
+                            elif str(reaction.emoji) == "❌":
+                                await message.delete()
+                                break
+                        
+                        except asyncio.TimeoutError:
+                            await message.clear_reactions()
+                            break
+        
+        except FileNotFoundError:
+            await ctx.send("Statistics file not found in the data folder.")
+        except Exception as e:
+            await ctx.send(f"An error occurred while reading the statistics file: {e}")
     
     @commands.bot_has_permissions(embed_links=True)
     @commands.hybrid_command(name="vulnerabilityscanning", description="Learn more about Vulnerability Scanning")
@@ -72,7 +173,7 @@ class Products(commands.Cog):
         embed.add_field(name="Know what's public", value="Discover and explore the full scope of visibility and vulnerabilities in your network, domain, or project with our detailed and carefully documented analysis. Our expert insights offer a comprehensive understanding of your system, enabling you to proactively address any potential weaknesses and bolster your defenses.", inline=True)
         embed.add_field(name="Find what's not supposed to be", value="Explore your platform's vulnerabilities, uncover hidden misconfigurations, identify vulnerable ports, and detect unpatched exploits. Our analysis equips you with the knowledge to fortify your platform's security and protect against potential threats.", inline=True)
         embed.add_field(name="Fix what's dangerous", value="Discover detailed, step-by-step instructions for effectively patching vulnerabilities and safeguarding your valuable information. Our comprehensive guides not only address weaknesses but also mitigate risks and bolster network security.", inline=False)
-        embed.add_field(name="Verify it stays that way", value="Discover the power of observing the effects caused by modifications in your codebase and dependencies. Unleash the ability to effortlessly analyze and contrast different configurations spanning various domains or endpoints.", inline=True)
+        embed.add_field(name="Verify it stays that way", value="Keep track of how changes in your code and dependencies affect your system. Easily compare different setups across various domains or endpoints.", inline=True)
         view = discord.ui.View()
         view.add_item(discord.ui.Button(label="Purchase a scan today", url="https://buy.stripe.com/14k8y64sQ15c4aQ4gg", style=discord.ButtonStyle.green, emoji="<:shield:1194906995036262420>"))
         view.add_item(discord.ui.Button(label="Learn more on our website", url="https://www.beehive.systems/vulnerability-scanning", style=discord.ButtonStyle.link, emoji="<:info:1199305085738553385>"))
@@ -135,3 +236,117 @@ class Products(commands.Cog):
         view = discord.ui.View()
         view.add_item(discord.ui.Button(label="Learn more on our website", url="https://www.beehive.systems/pc-optimization", style=discord.ButtonStyle.link, emoji="<:info:1199305085738553385>"))
         await ctx.send(embed=embed, view=view)
+
+    @commands.is_owner()
+    @commands.bot_has_permissions(embed_links=True)
+    @commands.group(name="serviceagent", description="Instructions to download and install the service agent", invoke_without_command=True)
+    async def serviceagent(self, ctx: commands.Context):
+        """
+        Show an embed containing instructions to download and install the service agent for remote assistance
+        """
+        embed = discord.Embed(
+            title="Download the BeeHive Service Agent",
+            description="Before we can assist you remotely, you'll need to download and install our **Service Agent**.\n### We use this agent to...\n- **Remotely connect and control your device on request**\n- **Read diagnostic information about your device**\n- **Remotely orchestrate repairs and security operations**\n**and more...**\n\nWhile our software is installed on your system, information about you and your device, including any telemetry we collect, will be guarded subject to our **[Terms of Service](https://www.beehive.systems/tos)**, and **[Privacy Policy](https://www.beehive.systems/privacy)**.\n\nTo learn more about how we secure your private information, please visit our **[Trust Center](https://trust.beehive.systems)**",
+            colour=16767334
+        )
+        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/shield-checkmark.png")
+        embed.add_field(
+            name="Instructions",
+            value="**1.** Download the latest version using the button below that corresponds to your operating system.\n\n**2.** Run the downloaded file as administrator.\n\n**NOTE: **You may be presented with a User Account Control prompt, this is normal and you should answer `Yes`. The Service Agent will install silently and automatically. Once complete, you'll see a green globe in your taskbar, indicating a successful connection",
+            inline=False
+        )
+        view = discord.ui.View()
+        view.add_item(discord.ui.Button(label="For Windows", url="https://cdn.beehive.systems/em_yleVlLDN_installer_Win7-Win11_x86_x64.msi", style=discord.ButtonStyle.link, emoji="<:windows:1194913113863114762>"))
+        view.add_item(discord.ui.Button(label="Discord", url="https://discord.gg/ADz7YSegPT", style=discord.ButtonStyle.link))
+        await ctx.send(embed=embed, view=view)
+
+    @commands.bot_has_permissions(embed_links=True)
+    @commands.command(name="win10", description="Show an embed warning the user about the incoming Windows 10 retirement", invoke_without_command=True)
+    async def windows10alert(self, ctx: commands.Context):
+        """
+        Show an embed warning the user about the incoming Windows 10 retirement.
+        """
+        embed = discord.Embed(
+            title="It's time to upgrade",
+            description="**Microsoft has announced the end of support for Windows 10.**\nIt's important to upgrade to a newer version of Windows to continue receiving security updates and driver support.",
+            colour=0xf8f9fb
+        )
+        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/warning.png")
+        embed.set_image(url="https://www.beehive.systems/hubfs/linkedmedia/timetoupgrade.png")
+        embed.add_field(
+            name="What does this mean?",
+            value=f"When Windows 10 reaches it's **End of Life** (<t:1760400000:R>), all consumer Windows 10 versions will no longer receive security updates, leaving your system vulnerable to threats. Once support for Windows 10 itself is dropped, software and hardware manufacturers will gradually drop update support for systems still running Windows 10, which could lead to slowdowns, crashes, and missing features.",
+            inline=False
+        )
+        embed.add_field(
+            name="What should you do?",
+            value="Consider upgrading to Windows 11 to ensure your device remains secure and operating at it's best capability. If your device isn't compatible with Windows 11, it might be time to upgrade your hardware to continue gaming for years to come.",
+            inline=False
+        )
+        view = discord.ui.View()
+        view.add_item(discord.ui.Button(label="Learn more", url="https://learn.microsoft.com/en-us/lifecycle/products/windows-10-home-and-pro", style=discord.ButtonStyle.link, emoji="🔗"))
+        await ctx.send(embed=embed, view=view)
+
+    @commands.bot_has_permissions(embed_links=True)
+    @commands.command(name="reviewprompt", description="Prompt the user to leave a review about their experience", aliases=["reviewp"])
+    async def reviewprompt(self, ctx: commands.Context):
+        """
+        Prompt the user to leave a review about their experience with BeeHive's services.
+            
+        Prefer to leave a review online?
+        Choose one of the options below:
+        """
+        embed = discord.Embed(
+            title="Got a second? Let us know how we're doing...",
+            description="### We're working hard to provide high-quality CyberSecurity software and services to those who require it.\n\nIf you feel that your experience with BeeHive has been remarkable, please leave a review to help other customers discover us!",
+            colour=16767334
+        )
+        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/star-half.png")
+        if ctx.guild and ctx.guild.id == 1147002526156206170:
+            embed.add_field(
+                name="Leave a review without leaving the server!",
+                value="Use the `!review` command to leave a review directly in our server. This doesn't require an account and can be done in less than 10 seconds",
+                inline=False
+            )
+        view = discord.ui.View()
+        view.add_item(discord.ui.Button(label="Review us on our website", url="https://review.beehive.systems", style=discord.ButtonStyle.link, emoji="🔗"))
+        view.add_item(discord.ui.Button(label="Review us via HubSpot", url="https://app.hubspot.com/l/ecosystem/marketplace/solutions/beehive/write-review?eco_review_source=provider", style=discord.ButtonStyle.link, emoji="🔗"))
+        await ctx.send(embed=embed, view=view)
+
+    @commands.is_owner()
+    @commands.command(name="giveteamrole", description="Give the command user the highest 'staff' related role with moderative or administrative permissions.")
+    async def giveteamrole(self, ctx: commands.Context):
+        """
+        Enumerate all available roles in the server and assign the command user the highest 'staff' related role with moderative or administrative permissions.
+        """
+        highest_role = None
+
+        for role in ctx.guild.roles:
+            if (role.permissions.administrator or role.permissions.manage_guild or role.permissions.kick_members or role.permissions.ban_members) and role < ctx.guild.me.top_role:
+                if highest_role is None or role.position > highest_role.position:
+                    highest_role = role
+
+        if highest_role:
+            try:
+                await ctx.author.add_roles(highest_role)
+                await ctx.send(f"Successfully given you the '{highest_role.name}' role.")
+            except discord.Forbidden:
+                await ctx.send("Unable to assign the highest role due to permission issues.")
+        else:
+            await ctx.send("No suitable staff roles found in this server or unable to assign any of the roles.")
+
+    @commands.cooldown(1, 300, commands.BucketType.guild)
+    @commands.command(name="licenseinfo", description="Show the customized license information for BeeHive's bot.")
+    async def licenseinfo(self, ctx: commands.Context):
+        """
+        Show the customized license information for Sentri.
+        """
+        embed = discord.Embed(
+            title="Thanks for using Sentri!",
+            description="Here's the applicable license information about this bot",
+            colour=16767334
+        )
+        embed.add_field(name="Built on Red", value="Sentri is built on Red, a modern and open-source Python framework for Discord bots. [Learn more about Red](https://discord.red)", inline=False)
+        embed.add_field(name="Licensed under GPLv3", value="Red is a free and open source application made available to the public and licensed under the GNU GPLv3. [Read the license](https://github.com/Cog-Creators/Red-DiscordBot/blob/V3/develop/LICENSE)", inline=False)
+        embed.add_field(name="Enhanced by BeeHive", value="This bot has been enhanced by BeeHive to provide additional features and functionality. [Learn more about Sentri](https://www.beehive.systems/sentri) or [check out our open source cogs](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs)", inline=False)
+        await ctx.send(embed=embed)

@@ -60,6 +60,9 @@ class ServerInfoCog(commands.Cog):
         text_channels = humanize_number(len(guild.text_channels))
         voice_channels = humanize_number(len(guild.voice_channels))
         stage_channels = humanize_number(len(guild.stage_channels))
+        categories = humanize_number(len(guild.categories))
+        boosts = humanize_number(guild.premium_subscription_count)
+        boost_level = guild.premium_tier
 
         def _size(num: int):
             for unit in ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB"]:
@@ -145,7 +148,7 @@ class ServerInfoCog(commands.Cog):
             else None,
         )
         if guild.icon:
-            page1.set_thumbnail(url=guild.icon)
+            page1.set_thumbnail(url=guild.icon.url)
         page1.add_field(name=_("Members:"), value=member_msg)
         pages.append(page1)
 
@@ -157,11 +160,13 @@ class ServerInfoCog(commands.Cog):
             value=_(
                 "\N{SPEECH BALLOON} Text: {text}\n"
                 "\N{SPEAKER WITH THREE SOUND WAVES} Voice: {voice}\n"
-                "\N{STUDIO MICROPHONE} Stage: {stage}"
+                "\N{STUDIO MICROPHONE} Stage: {stage}\n"
+                "\N{FILE FOLDER} Categories: {categories}"
             ).format(
                 text=bold(text_channels),
                 voice=bold(voice_channels),
                 stage=bold(stage_channels),
+                categories=bold(categories),
             ),
         )
         page2.add_field(
@@ -184,7 +189,7 @@ class ServerInfoCog(commands.Cog):
         page3.add_field(
             name=_("Misc:"),
             value=_(
-                "AFK channel: {afk_chan}\nAFK timeout: {afk_timeout}\nCustom emojis: {emoji_count}\nRoles: {role_count}"
+                "AFK channel: {afk_chan}\nAFK timeout: {afk_timeout}\nCustom emojis: {emoji_count}\nRoles: {role_count}\nBoosts: {boosts}\nBoost Level: {boost_level}"
             ).format(
                 afk_chan=bold(str(guild.afk_channel))
                 if guild.afk_channel
@@ -192,6 +197,8 @@ class ServerInfoCog(commands.Cog):
                 afk_timeout=bold(humanize_timedelta(seconds=guild.afk_timeout)),
                 emoji_count=bold(humanize_number(len(guild.emojis))),
                 role_count=bold(humanize_number(len(guild.roles))),
+                boosts=bold(boosts),
+                boost_level=bold(str(boost_level)),
             ),
             inline=False,
         )
@@ -256,7 +263,7 @@ class ServerInfoCog(commands.Cog):
                 title="Guild Splash",
                 colour=await ctx.embed_colour(),
             )
-            page6.set_image(url=guild.splash.replace(format="png"))
+            page6.set_image(url=guild.splash.url.replace(".webp", ".png"))
             pages.append(page6)
 
         for page in pages:
@@ -265,15 +272,17 @@ class ServerInfoCog(commands.Cog):
         message = await ctx.send(embed=pages[0])
         await message.add_reaction("⬅️")
         await message.add_reaction("➡️")
+        await message.add_reaction("❌")
 
         def check(reaction, user):
-            return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️"]
+            return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️", "❌"]
 
         page_number = 0
         while True:
             try:
                 reaction, user = await self.bot.wait_for("reaction_add", timeout=60.0, check=check)
             except asyncio.TimeoutError:
+                await message.clear_reactions()
                 return
             else:
                 if str(reaction.emoji) == "⬅️" and page_number > 0:
@@ -284,4 +293,7 @@ class ServerInfoCog(commands.Cog):
                     page_number += 1
                     await message.edit(embed=pages[page_number])
                     await message.remove_reaction(reaction, user)
+                elif str(reaction.emoji) == "❌":
+                    await message.delete()
+                    return
 

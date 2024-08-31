@@ -1,0 +1,10 @@
+{
+    "author": ["adminescalation", "escalateprivs"],
+    "description": "A simple ping command to check the bot's latency and network speed.",
+    "install_msg": "## :white_check_mark: Successfully installed Ping.\nUse `[p]ping` to check the bot's latency and network speed. Make sure you load this cog with `[p]load ping`",
+    "end_user_data_statement": "This cog stores no user information",
+    "name": "ping",
+    "short": "Check bot's latency and network speed",
+    "min_bot_version": "3.5.0",
+    "requirements": ["speedtest-cli"]
+}

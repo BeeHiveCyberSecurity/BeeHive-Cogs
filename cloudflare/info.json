@@ -1,0 +1,21 @@
+{
+    "author": [
+        "adminescalation"
+    ],
+    "description": "Interact with Cloudflare services thru your Discord bot",
+    "install_msg": "## :white_check_mark: Successfully installed Cloudflare.\n**Questions?** [We're listening](<https://www.beehive.systems/contact-us>)\n**Interested in CyberSecurity and CyberSafety?** Join our Discord! https://discord.gg/ckdzsm7mTs",
+    "name": "Cloudflare",
+    "hidden": false,
+    "disabled": false,
+    "requirements": [
+        "aiohttp"
+    ],
+    "tags": [
+        "R2",
+        "Email Routing",
+        "HyperDrive",
+        "Intelligence"
+    ],
+    "short": "Interact with your Cloudflare account, zones, and assets thru Red-Discordbot",
+    "min_bot_version": "3.5.0"
+}
