@@ -379,6 +379,12 @@ class Weather(commands.Cog):
             )
             embed.add_field(name="Temperature", value=f"{current.get('temperature_2m', 'N/A')}°F")
             embed.add_field(name="Feels Like", value=f"{current.get('apparent_temperature', 'N/A')}°F")
+
+            ground_temp = hourly.get('soil_temperature_0cm', 'N/A')
+            if isinstance(ground_temp, list) and ground_temp:
+                ground_temp = ground_temp[0]
+            embed.add_field(name="Ground Temperature", value=f"{ground_temp}°F")
+            
             embed.add_field(name="Humidity", value=f"{current.get('relative_humidity_2m', 'N/A')}%")
             embed.add_field(name="Precipitation", value=f"{current.get('precipitation', 'N/A')} inches")
             embed.add_field(name="Cloud Cover", value=f"{current.get('cloud_cover', 'N/A')}%")
@@ -388,10 +394,7 @@ class Weather(commands.Cog):
             embed.add_field(name="Wind Direction", value=f"{current.get('wind_direction_10m', 'N/A')}°")
             embed.add_field(name="Wind Gusts", value=f"{current.get('wind_gusts_10m', 'N/A')} mph")
             
-            ground_temp = hourly.get('soil_temperature_0cm', 'N/A')
-            if isinstance(ground_temp, list) and ground_temp:
-                ground_temp = ground_temp[0]
-            embed.add_field(name="Ground Temperature", value=f"{ground_temp}°F")
+            
             
             visibility = minutely_15.get('visibility', [0])
             if isinstance(visibility, list) and visibility:
