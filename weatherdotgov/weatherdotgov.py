@@ -18,9 +18,9 @@ class Weather(commands.Cog):
         }
         self.config.register_user(**default_user)
         default_global = {
-            "total_alerts_sent": 0  # Add a global counter for total alerts sent
-            "nowcasts_fetched": 0 # Global counter for nowcasts
-            "forecasts_fetched": 0 # Global counter for forecasts
+            "total_alerts_sent": 0,  # Add a global counter for total alerts sent
+            "nowcasts_fetched": 0, # Global counter for nowcasts
+            "forecasts_fetched": 0, # Global counter for forecasts
         }
         self.config.register_global(**default_global)
         data_dir = bundled_data_path(self)
