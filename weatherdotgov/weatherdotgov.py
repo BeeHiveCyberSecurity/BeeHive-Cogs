@@ -48,7 +48,7 @@ class Weather(commands.Cog):
 
     @weatherset.command(name="profile")
     async def profile(self, ctx):
-        """Show your currently set zip code, alert settings, and the current weather season"""
+        """View your weather profile"""
         user = ctx.author
         user_data = await self.config.user(user).all()
         zip_code = user_data.get("zip_code", "Not set")
