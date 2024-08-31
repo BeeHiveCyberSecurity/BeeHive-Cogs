@@ -420,6 +420,8 @@ class Weather(commands.Cog):
                     if i > 0:
                         i -= 1
                         await message.edit(embed=pages[i])
+                        glossary_definitions_shown = await self.config.glossary_definitions_shown()
+                        await self.config.glossary_definitions_shown.set(glossary_definitions_shown + 1)
                 elif str(reaction) == "➡️":
                     if i < len(pages) - 1:
                         i += 1
