@@ -324,8 +324,7 @@ class Weather(commands.Cog):
 
     @commands.group()
     async def weather(self, ctx):
-        """Interact with the weather.gov API to fetch weather data via Discord"""
-        pass
+        """Weather.gov is the official website of the National Weather Service (NWS), a U.S. government agency responsible for providing weather, water, and climate data, forecasts, and warnings. It offers accurate and timely information on weather conditions, alerts for severe weather events, and climate-related updates to help the public stay informed and safe."""
 
     @weather.command(name="now")
     async def now(self, ctx):
@@ -470,7 +469,6 @@ class Weather(commands.Cog):
                         await message.remove_reaction(reaction, user)
                     except asyncio.TimeoutError:
                         break
-
 
     @commands.guild_only()
     @weather.command(name="glossary")
