@@ -319,7 +319,7 @@ class Weather(commands.Cog):
         embed.add_field(name="Nowcasts served", value=f"{nowcasts_fetched} nowcast{'s' if nowcasts_fetched != 1 else ''}", inline=True)
         embed.add_field(name="Forecasts served", value=f"{forecasts_fetched} forecast{'s' if forecasts_fetched != 1 else ''}", inline=True)
         embed.add_field(name="Glossary terms shown", value=f"{glossary_definitions_shown} term{'s' if glossary_definitions_shown != 1 else ''}", inline=True)
-        embed.set_author(iconurl="https://www.beehive.systems/hubfs/Icon%20Packs/White/thunderstorm.png")        
+        embed.set_author(icon_url="https://www.beehive.systems/hubfs/Icon%20Packs/White/thunderstorm.png")        
 
         await ctx.send(embed=embed)
 
