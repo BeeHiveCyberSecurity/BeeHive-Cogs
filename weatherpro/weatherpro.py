@@ -417,8 +417,6 @@ class Weather(commands.Cog):
             embed.add_field(name="Wind direction", value=wind_direction_str)
             embed.add_field(name="Wind gusts", value=f"{current.get('wind_gusts_10m', 'N/A')} mph")
             
-            
-            
             visibility = minutely_15.get('visibility', [0])
             if isinstance(visibility, list) and visibility:
                 visibility_value = visibility[0] / 5280
@@ -440,6 +438,22 @@ class Weather(commands.Cog):
             else:
                 lightning_potential_str = 'Extreme'
             embed.add_field(name="Lightning potential", value=f"{lightning_potential_str}")
+            
+            # Fetch severe and extreme weather alerts
+            alerts_url = f"https://api.weather.gov/alerts/active?point={latitude},{longitude}"
+            async with self.session.get(alerts_url) as alerts_response:
+                if alerts_response.status == 200:
+                    alerts_data = await alerts_response.json()
+                    alerts = alerts_data.get('features', [])
+                    if alerts:
+                        alert_titles = [alert['properties']['headline'] for alert in alerts]
+                        alert_status = "\n".join(alert_titles)
+                    else:
+                        alert_status = "No active alerts"
+                else:
+                    alert_status = "Failed to fetch alerts"
+            
+            embed.add_field(name="Currently in effect", value=alert_status)
             
             await ctx.send(embed=embed)
             nowcasts_fetched = await self.config.nowcasts_fetched()
