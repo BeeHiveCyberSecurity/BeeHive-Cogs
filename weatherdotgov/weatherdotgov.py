@@ -161,6 +161,7 @@ class Weather(commands.Cog):
             await ctx.send(f"Your zip code has been set to `{zip_code}`. This is the location that will now be used in the future for your weather queries.")
         else:
             await ctx.send("Your zip code has been set. This is the location that will now be used in the future for your weather queries. For privacy reasons, the zip code is not displayed here. Use the `weatherset profile` command in a DM to see your saved settings.")
+            await ctx.message.delete()
 
     @weatherset.command(name="stats")
     async def stats(self, ctx):
