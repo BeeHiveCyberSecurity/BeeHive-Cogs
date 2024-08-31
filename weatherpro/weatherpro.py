@@ -388,7 +388,12 @@ class Weather(commands.Cog):
             embed.add_field(name="Wind Direction", value=f"{current.get('wind_direction_10m', 'N/A')}°")
             embed.add_field(name="Wind Gusts", value=f"{current.get('wind_gusts_10m', 'N/A')} mph")
             embed.add_field(name="Ground Temperature", value=f"{hourly.get('soil_temperature_0cm', 'N/A')}°F")
-            embed.add_field(name="Visibility", value=f"{(minutely_15.get('visibility', 0) / 5280):.2f} miles")
+            visibility = minutely_15.get('visibility', [0])
+            if isinstance(visibility, list) and visibility:
+                visibility_value = visibility[0] / 5280
+            else:
+                visibility_value = 0
+            embed.add_field(name="Visibility", value=f"{visibility_value:.2f} miles")
             embed.add_field(name="Lightning Potential", value=f"{minutely_15.get('lightning_potential', 'N/A')}")
             
             await ctx.send(embed=embed)
