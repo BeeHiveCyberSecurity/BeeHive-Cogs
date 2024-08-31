@@ -276,6 +276,81 @@ class Weather(commands.Cog):
                     except asyncio.TimeoutError:
                         await message.clear_reactions()
                         break
+    
+    @commands.guild_only()
+    @weather.command()
+    async def radars(self, ctx):
+        """Fetch and display radar stations information."""
+        url = "https://api.weather.gov/radar/stations"
+        headers = {"accept": "application/geo+json"}
+        
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, headers=headers) as response:
+                if response.status != 200:
+                    await ctx.send("Failed to fetch radar stations data.")
+                    return
+                data = await response.json()
+        
+        stations = data.get("features", [])
+        if not stations:
+            await ctx.send("No radar stations data found.")
+            return
+        
+        pages = []
+        for i in range(0, len(stations), 15):
+            embed = discord.Embed(title="Radar Stations", color=discord.Color.blue())
+            for station in stations[i:i+15]:
+                station_name = station["properties"].get("name", "Unknown")
+                station_id = station["properties"].get("stationIdentifier", "Unknown")
+                coordinates = station["geometry"]["coordinates"] if "geometry" in station else ["Unknown", "Unknown"]
+                if coordinates != ["Unknown", "Unknown"]:
+                    coordinates = [round(coordinates[0], 2), round(coordinates[1], 2)]
+                elevation = station["properties"].get("elevation", {}).get("value", "Unknown")
+                if elevation != "Unknown":
+                    elevation = int(elevation)
+                time_zone = station["properties"].get("timeZone", "Unknown").replace("_", " ")
+                
+                rda_details = station["properties"].get("rda", "Unknown")
+                latency = station["properties"].get("latency", "Unknown")
+                related = station["properties"].get("related", "Unknown")
+                
+                description = f"`{station_id}`\n`{coordinates[1]}, {coordinates[0]}`\n`{elevation} meters high`\n`{time_zone}`"
+                embed.add_field(name=station_name, value=description, inline=False)
+                embed.add_field(name="RDA Details", value=rda_details, inline=True)
+                embed.add_field(name="Latency", value=latency, inline=True)
+                embed.add_field(name="Related", value=related, inline=True)
+            pages.append(embed)
+        
+        if not pages:
+            await ctx.send("No valid radar stations data found.")
+            return
+        
+        message = await ctx.send(embed=pages[0])
+        await message.add_reaction("⬅️")
+        await message.add_reaction("❌")
+        await message.add_reaction("➡️")
 
+        def check(reaction, user):
+            return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️", "❌"]
 
+        i = 0
+        reaction = None
+        while True:
+            try:
+                reaction, user = await self.bot.wait_for("reaction_add", timeout=30.0, check=check)
+                if str(reaction) == "⬅️":
+                    if i > 0:
+                        i -= 1
+                        await message.edit(embed=pages[i])
+                elif str(reaction) == "➡️":
+                    if i < len(pages) - 1:
+                        i += 1
+                        await message.edit(embed=pages[i])
+                elif str(reaction) == "❌":
+                    await message.delete()
+                    break
+                await message.remove_reaction(reaction, user)
+            except asyncio.TimeoutError:
+                await message.clear_reactions()
+                break
 
