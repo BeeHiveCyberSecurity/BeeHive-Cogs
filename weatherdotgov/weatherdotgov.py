@@ -646,7 +646,7 @@ class Weather(commands.Cog):
             if rda_details is not None:
                 rda_timestamp = rda_details.get("timestamp", "Unknown")
                 if rda_timestamp != "Unknown":
-                    rda_timestamp = discord.utils.format_dt(discord.utils.parse_time(rda_timestamp))
+                    rda_timestamp = discord.utils.format_dt(discord.utils.parse_time(rda_timestamp), style='R')
                 if rda_timestamp != "Unknown":
                     embed.add_field(name="RDA time", value=rda_timestamp, inline=True)
                 reporting_host = rda_details.get('reportingHost', 'Unknown').upper()
