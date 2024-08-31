@@ -461,8 +461,22 @@ class Weather(commands.Cog):
                     alerts = alerts_data.get('features', [])
                     if alerts:
                         alert_titles = []
+                        event_emojis = {
+                            "Tornado Warning": ":tornado:",
+                            "Severe Thunderstorm Warning": ":thunder_cloud_rain:",
+                            "Flood Warning": ":droplet:",
+                            "Heat Advisory": ":thermometer:",
+                            "Winter Storm Warning": ":snowflake:",
+                            "High Wind Warning": ":wind_blowing_face:",
+                            "Fire Weather Watch": ":fire:",
+                            "Hurricane Warning": ":cyclone:",
+                            "Tsunami Warning": ":ocean:",
+                            "Earthquake Warning": ":earth_americas:",
+                            # Add more event types and corresponding emojis as needed
+                        }
                         for alert in alerts:
                             event = alert['properties']['event']
+                            emoji = event_emojis.get(event, ":warning:")  # Default to warning emoji if event not found
                             expires = alert['properties'].get('expires')
                             if expires:
                                 try:
@@ -474,9 +488,9 @@ class Weather(commands.Cog):
                                         expires_timestamp = f"<t:{int(datetime.fromisoformat(corrected_expires[:-1]).timestamp())}:R>"
                                     except ValueError as ve:
                                         expires_timestamp = f"Invalid expiry time format: {expires}"
-                                alert_titles.append(f":warning: **{event}** - ends {expires_timestamp}")
+                                alert_titles.append(f"{emoji} **{event}** - ends {expires_timestamp}")
                             else:
-                                alert_titles.append(f":warning: **{event}**")
+                                alert_titles.append(f"{emoji} **{event}**")
                         alert_status = "\n".join(alert_titles)
                     else:
                         alert_status = "No active alerts"
