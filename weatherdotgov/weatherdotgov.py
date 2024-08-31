@@ -144,12 +144,14 @@ class Weather(commands.Cog):
                     name = period.get('name', 'N/A')
                     detailed_forecast = period.get('detailedForecast', 'No detailed forecast available.')
                     temperature = period.get('temperature', 'N/A')
+                    if temperature != 'N/A':
+                        temperature = f"{temperature}°F"
                     wind_speed = period.get('windSpeed', 'N/A')
                     wind_direction = period.get('windDirection', 'N/A')
                     
                     embed = discord.Embed(
-                        title=f"Weather Forecast: {name}",
-                        description=f"**Forecast:** {detailed_forecast}",
+                        title=f"Weather forecast for {name}",
+                        description=f"{detailed_forecast}",
                         color=discord.Color.blue()
                     )
                     embed.add_field(name="Temperature", value=temperature)
