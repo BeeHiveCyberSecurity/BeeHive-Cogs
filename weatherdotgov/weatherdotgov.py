@@ -54,7 +54,6 @@ class Weather(commands.Cog):
                 example_alert.add_field(name="Severity", value="Severe", inline=True)
                 example_alert.add_field(name="Urgency", value="Immediate", inline=True)
                 example_alert.add_field(name="Certainty", value="Observed", inline=True)
-                example_alert.set_footer(text="Issued by National Weather Service")
 
                 await user.send(embed=example_alert)
                 await self.config.user(user).alerts.set(True)
