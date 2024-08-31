@@ -465,7 +465,15 @@ class Weather(commands.Cog):
                             headline = alert['properties']['headline']
                             expires = alert['properties'].get('expires')
                             if expires:
-                                expires_timestamp = f"<t:{int(datetime.fromisoformat(expires[:-1]).timestamp())}:R>"
+                                try:
+                                    expires_timestamp = f"<t:{int(datetime.fromisoformat(expires[:-1]).timestamp())}:R>"
+                                except ValueError:
+                                    # Attempt to correct the timestamp format
+                                    try:
+                                        corrected_expires = expires + '0'  # Adding missing zero
+                                        expires_timestamp = f"<t:{int(datetime.fromisoformat(corrected_expires[:-1]).timestamp())}:R>"
+                                    except ValueError as ve:
+                                        expires_timestamp = f"Invalid expiry time format: {expires}"
                                 alert_titles.append(f"**{headline}** - {expires_timestamp}")
                             else:
                                 alert_titles.append(f"**{headline}** - No expiry time")
