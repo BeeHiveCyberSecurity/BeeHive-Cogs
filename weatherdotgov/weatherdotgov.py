@@ -59,7 +59,7 @@ class Weather(commands.Cog):
             return
         
         latitude, longitude = self.zip_codes[zip_code]
-        points_url = f"https://api.weather.gov/points/{latitude},{longitude}"
+        points_url = f"https://api.weather.gov/points/{latitude.strip()},{longitude.strip()}"
         
         # Fetch weather data using the latitude and longitude
         async with self.session.get(points_url) as response:
