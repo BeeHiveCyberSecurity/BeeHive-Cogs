@@ -462,11 +462,11 @@ class Weather(commands.Cog):
                     if alerts:
                         alert_titles = []
                         event_emojis = {
-                            "Tornado Warning": ":tornado:",
+                            "Tornado Warning": ":cloud_tornado:",
                             "Severe Thunderstorm Warning": ":thunder_cloud_rain:",
-                            "Flood Warning": ":droplet:",
-                            "Heat Advisory": ":thermometer:",
-                            "Winter Storm Warning": ":snowflake:",
+                            "Flood Warning": ":ocean:",
+                            "Heat Advisory": ":desert:",
+                            "Winter Storm Warning": ":cloud_snow:",
                             "High Wind Warning": ":wind_blowing_face:",
                             "Fire Weather Watch": ":fire:",
                             "Hurricane Warning": ":cyclone:",
