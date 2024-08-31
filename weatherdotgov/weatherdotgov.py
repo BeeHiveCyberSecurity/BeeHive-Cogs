@@ -17,6 +17,7 @@ class Weather(commands.Cog):
     async def weather(self, ctx):
         """Interact with the weather.gov API to fetch weather data via Discord"""
 
+    @commands.guild_only()
     @weather.command(name="glossary")
     async def glossary(self, ctx, *, search_term: str = None):
         """Show a glossary, or specify a word to search"""
@@ -107,6 +108,7 @@ class Weather(commands.Cog):
                     await message.clear_reactions()
                     break
 
+    @commands.guild_only()
     @weather.command(name="alertsummary")
     async def alertsummary(self, ctx):
         """Shows a statistical summary of active weather alerts"""
