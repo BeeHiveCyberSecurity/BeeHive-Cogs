@@ -2388,6 +2388,10 @@ class Cloudflare(commands.Cog):
         if message.author.bot:
             return
 
+        # Check if the message.guild is None
+        if message.guild is None:
+            return
+
         # Check if autoscan is enabled
         auto_scan_enabled = await self.config.guild(message.guild).auto_scan()
         if not auto_scan_enabled:
