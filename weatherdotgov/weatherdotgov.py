@@ -349,9 +349,9 @@ class Weather(commands.Cog):
                 embed.add_field(name="Reflectivity Calibration Correction", value=f"{reflectivity_calibration.get('value', 'Unknown')} {unit_code}", inline=True)
             
             if latency != "Unknown":
-                embed.add_field(name="Current Latency", value=current_value, inline=True)
-                embed.add_field(name="Average Latency", value=average_value, inline=True)
-                embed.add_field(name="Max Latency", value=max_value, inline=True)
+                embed.add_field(name="Current Latency", value=f"{current_value}ms", inline=True)
+                embed.add_field(name="Average Latency", value=f"{average_value}ms", inline=True)
+                embed.add_field(name="Max Latency", value=f"{max_value}ms", inline=True)
                 embed.add_field(name="L2 Last Received Time", value=level_two_last_received_time, inline=True)
                 embed.add_field(name="Max Latency Time", value=max_latency_time, inline=True)
                 embed.add_field(name="Reporting Host", value=reporting_host, inline=True)
