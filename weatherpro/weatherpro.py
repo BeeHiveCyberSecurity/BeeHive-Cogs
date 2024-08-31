@@ -474,9 +474,9 @@ class Weather(commands.Cog):
                                         expires_timestamp = f"<t:{int(datetime.fromisoformat(corrected_expires[:-1]).timestamp())}:R>"
                                     except ValueError as ve:
                                         expires_timestamp = f"Invalid expiry time format: {expires}"
-                                alert_titles.append(f"**{event}** - ends {expires_timestamp}")
+                                alert_titles.append(f":warning: **{event}** - ends {expires_timestamp}")
                             else:
-                                alert_titles.append(f"**{event}** - No expiry time")
+                                alert_titles.append(f":warning: **{event}**")
                         alert_status = "\n".join(alert_titles)
                     else:
                         alert_status = "No active alerts"
