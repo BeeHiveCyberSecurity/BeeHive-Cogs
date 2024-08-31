@@ -440,7 +440,7 @@ class Weather(commands.Cog):
             embed.add_field(name="Lightning potential", value=f"{lightning_potential_str}")
             
             # Fetch severe and extreme weather alerts
-            alerts_url = f"https://api.weather.gov/alerts/active?point={latitude},{longitude}"
+            alerts_url = f"https://api.weather.gov/alerts/active?point={latitude.strip()},{longitude.strip()}"
             async with self.session.get(alerts_url) as alerts_response:
                 try:
                     alerts_response.raise_for_status()
