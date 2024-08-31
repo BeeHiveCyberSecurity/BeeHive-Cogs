@@ -121,7 +121,7 @@ class Weather(commands.Cog):
         all_users = await self.config.all_users()
         total_users = len(all_users)
         users_with_zip = sum(1 for user_data in all_users.values() if user_data.get("zip_code"))
-        users_with_alerts = sum(1 for user_id in self.users_with_alerts)
+        users_with_alerts = sum(1 for user_data in all_users.values() if user_data.get("alerts"))
 
         embed = discord.Embed(
             title="Weather Subscription Stats",
