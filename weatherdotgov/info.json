@@ -1,6 +1,6 @@
 {
     "author": ["adminelevation"],
-    "name": "weatherdotgov"
+    "name": "weatherdotgov",
     "description": "A cog for fetching and displaying weather information from weather.gov. Data available thru this cog is relevant to the United States and nearby Weather.gov service area.",
     "install_msg": "Thank you for installing the WeatherDotGov cog. Use `[p]weather` to get started.",
     "end_user_data_statement": "This cog stores zip codes and alert preferences linked to users.",
