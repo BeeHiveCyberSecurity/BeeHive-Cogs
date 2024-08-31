@@ -174,6 +174,7 @@ class Weather(commands.Cog):
         total_alerts_sent = await self.config.total_alerts_sent()
         nowcasts_fetched = await self.config.nowcasts_fetched()
         forecasts_fetched = await self.config.forecasts_fetched()
+        glossary_definitions_shown = await self.config.glossary_definitions_shown()
 
         embed = discord.Embed(
             title="Weather usage data",
@@ -185,6 +186,7 @@ class Weather(commands.Cog):
         embed.add_field(name="Severe alerts dispatched", value=total_alerts_sent, inline=True)
         embed.add_field(name="Nowcasts provided", value=nowcasts_fetched, inline=True)
         embed.add_field(name="Forecasts provided", value=forecasts_fetched, inline=True)
+        embed.add_field(name="Glossary terms shown", value=glossary_definitions_shown, inline=True)
 
         await ctx.send(embed=embed)
 
