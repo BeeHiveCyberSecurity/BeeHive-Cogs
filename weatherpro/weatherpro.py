@@ -505,11 +505,11 @@ class Weather(commands.Cog):
                                 alert_titles.append(f"{emoji} **{event}**")
                         alert_status = "\n".join(alert_titles)
                     else:
-                        alert_status = "No active alerts"
+                        alert_status = "None currently - get out there!"
                 except Exception as e:
                     alert_status = f"Failed to fetch alerts: {str(e)}, url={alerts_url}"
             
-            embed.add_field(name="Currently in effect", value=alert_status)
+            embed.add_field(name="Active alerts", value=alert_status)
             
             await ctx.send(embed=embed)
             nowcasts_fetched = await self.config.nowcasts_fetched()
