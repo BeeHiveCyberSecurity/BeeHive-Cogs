@@ -17,6 +17,10 @@ class Weather(commands.Cog):
             "alerts": False  # Add alerts to default user config
         }
         self.config.register_user(**default_user)
+        default_global = {
+            "total_alerts_sent": 0  # Add a global counter for total alerts sent
+        }
+        self.config.register_global(**default_global)
         data_dir = bundled_data_path(self)
         zip_code_file = (data_dir / "zipcodes.csv").open(mode="r")
         csv_reader = csv.reader(zip_code_file)
@@ -100,6 +104,8 @@ class Weather(commands.Cog):
                             embed.set_footer(text=f"Issued by {alert['properties']['senderName']}")
 
                             await user.send(embed=embed)
+                            total_alerts_sent = await self.config.total_alerts_sent()
+                            await self.config.total_alerts_sent.set(total_alerts_sent + 1)
 
     async def start_alerts_task(self):
         while True:
@@ -122,14 +128,16 @@ class Weather(commands.Cog):
         total_users = len(all_users)
         users_with_zip = sum(1 for user_data in all_users.values() if user_data.get("zip_code"))
         users_with_alerts = sum(1 for user_data in all_users.values() if user_data.get("alerts"))
+        total_alerts_sent = await self.config.total_alerts_sent()
 
         embed = discord.Embed(
             title="Weather Subscription Stats",
             color=discord.Color.blue()
         )
-        embed.add_field(name="Total Users", value=total_users, inline=False)
-        embed.add_field(name="Users with Zip Codes", value=users_with_zip, inline=False)
-        embed.add_field(name="Users Subscribed to Alerts", value=users_with_alerts, inline=False)
+        embed.add_field(name="Total weather users", value=total_users, inline=False)
+        embed.add_field(name="Zip codes currently saved", value=users_with_zip, inline=False)
+        embed.add_field(name="Users with alerts enabled", value=users_with_alerts, inline=False)
+        embed.add_field(name="Total alerts sent", value=total_alerts_sent, inline=False)
 
         await ctx.send(embed=embed)
 
