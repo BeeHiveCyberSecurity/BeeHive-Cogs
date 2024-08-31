@@ -311,14 +311,22 @@ class Weather(commands.Cog):
             rda_details = station["properties"].get("rda", None)
             latency = station["properties"].get("latency", "Unknown")
             if latency != "Unknown":
+                current_value = latency['current']['value']
+                average_value = latency['average']['value']
+                max_value = latency['max']['value']
+                level_two_last_received_time = discord.utils.format_dt(discord.utils.parse_time(latency['levelTwoLastReceivedTime']))
+                max_latency_time = discord.utils.format_dt(discord.utils.parse_time(latency['maxLatencyTime']))
+                reporting_host = latency['reportingHost']
+                host = latency['host']
+                
                 latency = (
-                    f"Current: {latency['current']['value']} {latency['current']['unitCode']}\n"
-                    f"Average: {latency['average']['value']} {latency['average']['unitCode']}\n"
-                    f"Max: {latency['max']['value']} {latency['max']['unitCode']}\n"
-                    f"Level Two Last Received Time: {latency['levelTwoLastReceivedTime']}\n"
-                    f"Max Latency Time: {latency['maxLatencyTime']}\n"
-                    f"Reporting Host: {latency['reportingHost']}\n"
-                    f"Host: {latency['host']}"
+                    f"Current: {current_value}\n"
+                    f"Average: {average_value}\n"
+                    f"Max: {max_value}\n"
+                    f"Level Two Last Received Time: {level_two_last_received_time}\n"
+                    f"Max Latency Time: {max_latency_time}\n"
+                    f"Reporting Host: {reporting_host}\n"
+                    f"Host: {host}"
                 )
             description = f"`{station_id}`\n`{coordinates[1]}, {coordinates[0]}`\n`{elevation} meters high`\n`{time_zone}`"
 
@@ -340,9 +348,11 @@ class Weather(commands.Cog):
                 embed.add_field(name="Operability Status", value=properties.get("operabilityStatus", "Unknown"), inline=True)
                 embed.add_field(name="Status", value=properties.get("status", "Unknown"), inline=True)
                 avg_transmitter_power = properties.get("averageTransmitterPower", {})
-                embed.add_field(name="Average Transmitter Power", value=f"{avg_transmitter_power.get('value', 'Unknown')} {avg_transmitter_power.get('unitCode', '')}", inline=True)
+                unit_code = avg_transmitter_power.get('unitCode', '').replace('wmoUnit:', '')
+                embed.add_field(name="Average Transmitter Power", value=f"{avg_transmitter_power.get('value', 'Unknown')} {unit_code}", inline=True)
                 reflectivity_calibration = properties.get("reflectivityCalibrationCorrection", {})
-                embed.add_field(name="Reflectivity Calibration Correction", value=f"{reflectivity_calibration.get('value', 'Unknown')} {reflectivity_calibration.get('unitCode', '')}", inline=True)
+                unit_code = reflectivity_calibration.get('unitCode', '').replace('wmoUnit:', '')
+                embed.add_field(name="Reflectivity Calibration Correction", value=f"{reflectivity_calibration.get('value', 'Unknown')} {unit_code}", inline=True)
             
             embed.add_field(name="Latency", value=latency, inline=False)
             pages.append(embed)
