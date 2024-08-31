@@ -6,7 +6,8 @@
     "end_user_data_statement": "This cog stores zip codes and alert preferences linked to users.",
     "short": "Weather information from weather.gov",
     "requirements": [],
-    "tags": ["weather", "weather.gov", "forecast"]
+    "tags": ["weather", "weather.gov", "forecast"],
+    "min_bot_version": "3.5.0"
 }
 
 
