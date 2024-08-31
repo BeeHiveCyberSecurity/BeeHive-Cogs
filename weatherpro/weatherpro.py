@@ -509,7 +509,7 @@ class Weather(commands.Cog):
                 except Exception as e:
                     alert_status = f"Failed to fetch alerts: {str(e)}, url={alerts_url}"
             
-            embed.add_field(name="Active alerts", value=alert_status)
+            embed.add_field(name="Active alerts", value=alert_status, inline=False)
             
             await ctx.send(embed=embed)
             nowcasts_fetched = await self.config.nowcasts_fetched()
