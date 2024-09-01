@@ -31,6 +31,7 @@ class Weather(commands.Cog):
             "lowest_temperature": None,
             "highest_wind_speed": None,
             "highest_precipitation": None,
+            "highest_wind_gusts": None,
         }
         self.config.register_global(**default_global)
         data_dir = bundled_data_path(self)
@@ -72,6 +73,7 @@ class Weather(commands.Cog):
         lowest_temperature = await self.config.lowest_temperature()
         highest_wind_speed = await self.config.highest_wind_speed()
         highest_precipitation = await self.config.highest_precipitation()
+        highest_wind_gusts = await self.config.highest_wind_gusts()
 
         embed = discord.Embed(
             title="Weather usage data",
@@ -88,12 +90,16 @@ class Weather(commands.Cog):
         embed.add_field(name="Nowcasts served", value=f"{nowcasts_fetched} nowcast{'s' if nowcasts_fetched != 1 else ''}", inline=True)
         embed.add_field(name="Forecasts served", value=f"{forecasts_fetched} forecast{'s' if forecasts_fetched != 1 else ''}", inline=True)
         embed.add_field(name="Glossary terms shown", value=f"{glossary_definitions_shown} term{'s' if glossary_definitions_shown != 1 else ''}", inline=True)
-        embed.add_field(name="Highest Temperature", value=f"{highest_temperature}°F" if highest_temperature is not None else "N/A", inline=True)
-        embed.add_field(name="Lowest Temperature", value=f"{lowest_temperature}°F" if lowest_temperature is not None else "N/A", inline=True)
-        embed.add_field(name="Highest Wind Speed", value=f"{highest_wind_speed} mph" if highest_wind_speed is not None else "N/A", inline=True)
-        embed.add_field(name="Highest Precipitation", value=f"{highest_precipitation} inches" if highest_precipitation is not None else "N/A", inline=True)
+        embed2 = discord.Embed(title="Historical records", description="Records recorded by the bot that users experienced in real life.")
+        embed2.add_field(name="Highest temperature", value=f"{highest_temperature}°F" if highest_temperature is not None else "N/A", inline=True)
+        embed2.add_field(name="Lowest temperature", value=f"{lowest_temperature}°F" if lowest_temperature is not None else "N/A", inline=True)
+        embed2.add_field(name="Highest wind speed", value=f"{highest_wind_speed} mph" if highest_wind_speed is not None else "N/A", inline=True)
+        embed2.add_field(name="Highest precipitation", value=f"{highest_precipitation} inches" if highest_precipitation is not None else "N/A", inline=True)
+        embed2.add_field(name="Highest wind gusts", value=f"{highest_wind_gusts} mph" if highest_wind_gusts is not None else "N/A", inline=True)
 
         await ctx.send(embed=embed)
+        await asyncio.wait(2)
+        await ctx.send(embed=embed2)
 
     @weather.command(name="now")
     async def now(self, ctx):
@@ -198,7 +204,8 @@ class Weather(commands.Cog):
             else:
                 wind_direction_str = 'N/A'
             embed.add_field(name="Wind direction", value=wind_direction_str)
-            embed.add_field(name="Wind gusts", value=f"{current.get('wind_gusts_10m', 'N/A')} mph")
+            wind_gusts = current.get('wind_gusts_10m', 'N/A')
+            embed.add_field(name="Wind gusts", value=f"{wind_gusts} mph")
             
             visibility = minutely_15.get('visibility', [0])
             if isinstance(visibility, list) and visibility:
@@ -293,6 +300,7 @@ class Weather(commands.Cog):
             lowest_temperature = await self.config.lowest_temperature()
             highest_wind_speed = await self.config.highest_wind_speed()
             highest_precipitation = await self.config.highest_precipitation()
+            highest_wind_gusts = await self.config.highest_wind_gusts()
 
             if temperature != 'N/A':
                 if highest_temperature is None or temperature > highest_temperature:
@@ -303,6 +311,10 @@ class Weather(commands.Cog):
             if wind_speed != 'N/A':
                 if highest_wind_speed is None or wind_speed > highest_wind_speed:
                     await self.config.highest_wind_speed.set(wind_speed)
+
+            if wind_gusts != 'N/A':
+                if highest_wind_gusts is None or wind_gusts > highest_wind_gusts:
+                    await self.config.highest_wind_gusts.set(wind_gusts)
 
             if precipitation != 'N/A' and precipitation != 0.0:
                 if highest_precipitation is None or precipitation > highest_precipitation:
