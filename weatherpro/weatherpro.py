@@ -331,17 +331,17 @@ class Weather(commands.Cog):
             if wind_speed != 'N/A':
                 if highest_wind_speed is None or wind_speed > highest_wind_speed:
                     await self.config.highest_wind_speed.set(wind_speed)
-                    await self.config.highest_wind_speed_date.set(current_date)  # Missing logic to set the date
+                    await self.config.highest_wind_speed_date.set(current_date)
 
             if wind_gusts != 'N/A':
                 if highest_wind_gusts is None or wind_gusts > highest_wind_gusts:
                     await self.config.highest_wind_gusts.set(wind_gusts)
-                    await self.config.highest_wind_gusts_date.set(current_date)  # Missing logic to set the date
+                    await self.config.highest_wind_gusts_date.set(current_date)
 
             if precipitation != 'N/A' and precipitation != 0.0:
                 if highest_precipitation is None or precipitation > highest_precipitation:
                     await self.config.highest_precipitation.set(precipitation)
-                    await self.config.highest_precipitation_date.set(current_date)  # Missing logic to set the date
+                    await self.config.highest_precipitation_date.set(current_date)
 
     @commands.guild_only()
     @weather.command(name="forecast")
