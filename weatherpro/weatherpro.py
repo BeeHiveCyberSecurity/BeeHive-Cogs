@@ -37,6 +37,8 @@ class Weather(commands.Cog):
             "highest_precipitation_date": None,
             "highest_wind_gusts": None,
             "highest_wind_gusts_date": None,
+            "highest_snowfall": None,
+            "highest_snowfall_date": None,
         }
         self.config.register_global(**default_global)
         data_dir = bundled_data_path(self)
@@ -84,6 +86,8 @@ class Weather(commands.Cog):
         highest_precipitation_date = await self.config.highest_precipitation_date()
         highest_wind_gusts = await self.config.highest_wind_gusts()
         highest_wind_gusts_date = await self.config.highest_wind_gusts_date()
+        highest_snowfall = await self.config.highest_snowfall()
+        highest_snowfall_date = await self.config.highest_snowfall_date()
 
         embed = discord.Embed(
             title="Weather usage data",
@@ -107,6 +111,7 @@ class Weather(commands.Cog):
         embed2.add_field(name="Highest wind speed", value=f"{highest_wind_speed} mph on <t:{int(datetime.fromisoformat(str(highest_wind_speed_date)).timestamp())}:D>" if highest_wind_speed is not None and highest_wind_speed_date is not None else "N/A", inline=True)
         embed2.add_field(name="Highest precipitation", value=f"{highest_precipitation} inches on <t:{int(datetime.fromisoformat(str(highest_precipitation_date)).timestamp())}:D>" if highest_precipitation is not None and highest_precipitation_date is not None else "N/A", inline=True)
         embed2.add_field(name="Highest wind gusts", value=f"{highest_wind_gusts} mph on <t:{int(datetime.fromisoformat(str(highest_wind_gusts_date)).timestamp())}:D>" if highest_wind_gusts is not None and highest_wind_gusts_date is not None else "N/A", inline=True)
+        embed2.add_field(name="Highest snowfall", value=f"{highest_snowfall} inches on <t:{int(datetime.fromisoformat(str(highest_snowfall_date)).timestamp())}:D>" if highest_snowfall is not None and highest_snowfall_date is not None else "N/A", inline=True)
 
         await ctx.send(embed=embed)
         await asyncio.sleep(1)
@@ -317,6 +322,8 @@ class Weather(commands.Cog):
             highest_precipitation_date = await self.config.highest_precipitation_date()
             highest_wind_gusts = await self.config.highest_wind_gusts()
             highest_wind_gusts_date = await self.config.highest_wind_gusts_date()
+            highest_snowfall = await self.config.highest_snowfall()
+            highest_snowfall_date = await self.config.highest_snowfall_date()
 
             current_date = datetime.now().isoformat()
 
@@ -342,6 +349,11 @@ class Weather(commands.Cog):
                 if highest_precipitation is None or precipitation > highest_precipitation:
                     await self.config.highest_precipitation.set(precipitation)
                     await self.config.highest_precipitation_date.set(current_date)
+
+            if snowfall != 'N/A' and snowfall != 0.0:
+                if highest_snowfall is None or snowfall > highest_snowfall:
+                    await self.config.highest_snowfall.set(snowfall)
+                    await self.config.highest_snowfall_date.set(current_date)
 
     @commands.guild_only()
     @weather.command(name="forecast")
