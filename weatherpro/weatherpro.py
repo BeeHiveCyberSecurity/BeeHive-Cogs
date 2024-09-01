@@ -1104,14 +1104,29 @@ class Weather(commands.Cog):
         """Set your zip code for queries"""
         # Validate the zip code against zipcodes.csv
         if zip_code not in self.zip_codes:
-            await ctx.send("Invalid zip code. Please provide a valid zip code.")
+            embed = discord.Embed(
+                title="Invalid Zip Code",
+                description="Invalid zip code. Please provide a valid zip code.",
+                color=0xff4545
+            )
+            await ctx.send(embed=embed)
             return
 
         await self.config.user(ctx.author).zip_code.set(zip_code)
         if isinstance(ctx.channel, discord.DMChannel):
-            await ctx.send(f"Your zip code has been set to `{zip_code}`. This is the location that will now be used in the future for your weather queries.")
+            embed = discord.Embed(
+                title="Weather profile updated",
+                description=f"Your zip code has been set to `{zip_code}`. This is the location that will now be used in the future for your weather queries.",
+                color=0x2bbd8e
+            )
+            await ctx.send(embed=embed)
         else:
-            await ctx.send("Your zip code has been set. This is the location that will now be used in the future for your weather queries. For privacy reasons, the zip code is not displayed here. Use the `weatherset profile` command in a DM to see your saved settings.")
+            embed = discord.Embed(
+                title="Weather profile updated",
+                description="Your zip code has been set. This is the location that will now be used in the future for your weather queries. For privacy reasons, the zip code is not displayed here. Use the `weatherset profile` command in a DM to see your saved settings.",
+                color=0x2bbd8e
+            )
+            await ctx.send(embed=embed)
             await ctx.message.delete()
 
     
