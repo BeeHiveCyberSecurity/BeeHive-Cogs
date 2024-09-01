@@ -113,10 +113,10 @@ class Weather(commands.Cog):
         embed2.add_field(name="Highest temperature", value=f"**{highest_temperature}°F** on **<t:{int(datetime.fromisoformat(str(highest_temperature_date)).timestamp())}:D>**" if highest_temperature is not None and highest_temperature_date is not None else "N/A", inline=True)
         embed2.add_field(name="Lowest temperature", value=f"**{lowest_temperature}°F** on **<t:{int(datetime.fromisoformat(str(lowest_temperature_date)).timestamp())}:D>**" if lowest_temperature is not None and lowest_temperature_date is not None else "N/A", inline=True)
         embed2.add_field(name="Highest wind speed", value=f"**{highest_wind_speed} mph** on **<t:{int(datetime.fromisoformat(str(highest_wind_speed_date)).timestamp())}:D>**" if highest_wind_speed is not None and highest_wind_speed_date is not None else "N/A", inline=True)
-        embed2.add_field(name="Highest precipitation", value=f"**{highest_precipitation} inches** on **<t:{int(datetime.fromisoformat(str(highest_precipitation_date)).timestamp())}:D>**" if highest_precipitation is not None and highest_precipitation_date is not None else "N/A", inline=True)
         embed2.add_field(name="Highest wind gusts", value=f"**{highest_wind_gusts} mph** on **<t:{int(datetime.fromisoformat(str(highest_wind_gusts_date)).timestamp())}:D>**" if highest_wind_gusts is not None and highest_wind_gusts_date is not None else "N/A", inline=True)
-        embed2.add_field(name="Highest snowfall", value=f"**{highest_snowfall} inches** on **<t:{int(datetime.fromisoformat(str(highest_snowfall_date)).timestamp())}:D>**" if highest_snowfall is not None and highest_snowfall_date is not None else "N/A", inline=True)
-        embed2.add_field(name="Highest rainfall", value=f"**{highest_rainfall} inches** on **<t:{int(datetime.fromisoformat(str(highest_rainfall_date)).timestamp())}:D>**" if highest_rainfall is not None and highest_rainfall_date is not None else "N/A", inline=True)
+        embed2.add_field(name="Most precipitation", value=f"**{highest_precipitation} inches** on **<t:{int(datetime.fromisoformat(str(highest_precipitation_date)).timestamp())}:D>**" if highest_precipitation is not None and highest_precipitation_date is not None else "N/A", inline=True)
+        embed2.add_field(name="Most snowfall", value=f"**{highest_snowfall} inches** on **<t:{int(datetime.fromisoformat(str(highest_snowfall_date)).timestamp())}:D>**" if highest_snowfall is not None and highest_snowfall_date is not None else "N/A", inline=True)
+        embed2.add_field(name="Most rainfall", value=f"**{highest_rainfall} inches** on **<t:{int(datetime.fromisoformat(str(highest_rainfall_date)).timestamp())}:D>**" if highest_rainfall is not None and highest_rainfall_date is not None else "N/A", inline=True)
 
         await ctx.send(embed=embed)
         await asyncio.sleep(1)
@@ -124,7 +124,7 @@ class Weather(commands.Cog):
 
     @weather.command(name="now")
     async def now(self, ctx):
-        """Fetch your current conditions and now-cast"""
+        """Check current conditions and alerts"""
         zip_code = await self.config.user(ctx.author).zip_code()
         if not zip_code:
             await ctx.send("You haven't set a zip code yet. Use the `weatherset zip` command to set one.")
