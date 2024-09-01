@@ -102,11 +102,11 @@ class Weather(commands.Cog):
         embed.add_field(name="Glossary terms shown", value=f"{glossary_definitions_shown} term{'s' if glossary_definitions_shown != 1 else ''}", inline=True)
 
         embed2 = discord.Embed(title="Historical records", description="Records recorded by the bot that users experienced in real life.", color=0xfffffe)
-        embed2.add_field(name="Highest temperature", value=f"{highest_temperature}°F on <t:{int(datetime.fromisoformat(highest_temperature_date).timestamp())}:D>" if highest_temperature is not None else "N/A", inline=True)
-        embed2.add_field(name="Lowest temperature", value=f"{lowest_temperature}°F on <t:{int(datetime.fromisoformat(lowest_temperature_date).timestamp())}:D>" if lowest_temperature is not None else "N/A", inline=True)
-        embed2.add_field(name="Highest wind speed", value=f"{highest_wind_speed} mph on <t:{int(datetime.fromisoformat(highest_wind_speed_date).timestamp())}:D>" if highest_wind_speed is not None else "N/A", inline=True)
-        embed2.add_field(name="Highest precipitation", value=f"{highest_precipitation} inches on <t:{int(datetime.fromisoformat(highest_precipitation_date).timestamp())}:D>" if highest_precipitation is not None else "N/A", inline=True)
-        embed2.add_field(name="Highest wind gusts", value=f"{highest_wind_gusts} mph on <t:{int(datetime.fromisoformat(highest_wind_gusts_date).timestamp())}:D>" if highest_wind_gusts is not None else "N/A", inline=True)
+        embed2.add_field(name="Highest temperature", value=f"{highest_temperature}°F on <t:{int(datetime.fromisoformat(str(highest_temperature_date)).timestamp())}:D>" if highest_temperature is not None else "N/A", inline=True)
+        embed2.add_field(name="Lowest temperature", value=f"{lowest_temperature}°F on <t:{int(datetime.fromisoformat(str(lowest_temperature_date)).timestamp())}:D>" if lowest_temperature is not None else "N/A", inline=True)
+        embed2.add_field(name="Highest wind speed", value=f"{highest_wind_speed} mph on <t:{int(datetime.fromisoformat(str(highest_wind_speed_date)).timestamp())}:D>" if highest_wind_speed is not None else "N/A", inline=True)
+        embed2.add_field(name="Highest precipitation", value=f"{highest_precipitation} inches on <t:{int(datetime.fromisoformat(str(highest_precipitation_date)).timestamp())}:D>" if highest_precipitation is not None else "N/A", inline=True)
+        embed2.add_field(name="Highest wind gusts", value=f"{highest_wind_gusts} mph on <t:{int(datetime.fromisoformat(str(highest_wind_gusts_date)).timestamp())}:D>" if highest_wind_gusts is not None else "N/A", inline=True)
 
         await ctx.send(embed=embed)
         await asyncio.sleep(1)
