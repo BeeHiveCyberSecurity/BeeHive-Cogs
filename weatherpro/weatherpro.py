@@ -91,7 +91,7 @@ class Weather(commands.Cog):
 
         embed = discord.Embed(
             title="Weather usage data",
-            description="Data aggregated from global usage of bot",
+            description="Data aggregated from use of weather features overtime.",
             color=0xfffffe
         )
         embed.add_field(name="Zip codes stored", value=f"{users_with_zip} zip code{'s' if users_with_zip != 1 else ''}", inline=True)
