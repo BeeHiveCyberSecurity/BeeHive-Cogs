@@ -139,7 +139,7 @@ class Weather(commands.Cog):
         # Fetch latitude and longitude using the zip code
         if zip_code not in self.zip_codes:
             embed = discord.Embed(
-                title="Invalid Zip Code",
+                title="Invalid zip code",
                 description="Invalid zip code. Please set a valid 5 digit, US zip code.",
                 color=0xff4545
             )
