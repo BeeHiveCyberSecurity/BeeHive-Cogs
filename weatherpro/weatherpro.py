@@ -6,7 +6,7 @@ from datetime import datetime
 from redbot.core import commands, Config #type: ignore
 from redbot.core.data_manager import bundled_data_path #type: ignore
 
-class WeatherPro(commands.Cog):
+class Weather(commands.Cog):
     """It's beautiful out there"""
     
     def __init__(self, bot):
