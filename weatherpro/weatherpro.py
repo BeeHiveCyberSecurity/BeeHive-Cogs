@@ -124,7 +124,7 @@ class Weather(commands.Cog):
 
     @weather.command(name="now")
     async def now(self, ctx, zip_code: str = None):
-        """Check current conditions and alerts"""
+        """Check current conditions and alerts, specify a zip for conditions at that location"""
         if not zip_code:
             zip_code = await self.config.user(ctx.author).zip_code()
             if not zip_code:
