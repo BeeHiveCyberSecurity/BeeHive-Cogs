@@ -94,6 +94,9 @@ class Weather(commands.Cog):
             highest_rainfall = await self.config.highest_rainfall()
             highest_rainfall_date = await self.config.highest_rainfall_date()
 
+            def fahrenheit_to_celsius(f):
+                return (f - 32) * 5.0/9.0
+
             usage = discord.Embed(
                 title="Weather usage data",
                 description="Data aggregated from all user's use of weather features overtime. Increase these stats by utilizing the commands and features this cog provides.",
@@ -111,8 +114,8 @@ class Weather(commands.Cog):
             usage.add_field(name="Glossary terms shown", value=f"**{glossary_definitions_shown}** term{'s' if glossary_definitions_shown != 1 else ''}", inline=True)
 
             history = discord.Embed(title="Historical records", description="Records observed by the bot that users experienced in real life. Check the weather often to update statistics.", color=0xfffffe)
-            history.add_field(name="Highest temperature", value=f"**{highest_temperature}°F**\n**<t:{int(datetime.fromisoformat(str(highest_temperature_date)).timestamp())}:D>**" if highest_temperature is not None and highest_temperature_date is not None else "N/A", inline=True)
-            history.add_field(name="Lowest temperature", value=f"**{lowest_temperature}°F**\n**<t:{int(datetime.fromisoformat(str(lowest_temperature_date)).timestamp())}:D>**" if lowest_temperature is not None and lowest_temperature_date is not None else "N/A", inline=True)
+            history.add_field(name="Highest temperature", value=f"**{highest_temperature}°F ({fahrenheit_to_celsius(highest_temperature):.2f}°C)**\n**<t:{int(datetime.fromisoformat(str(highest_temperature_date)).timestamp())}:D>**" if highest_temperature is not None and highest_temperature_date is not None else "N/A", inline=True)
+            history.add_field(name="Lowest temperature", value=f"**{lowest_temperature}°F ({fahrenheit_to_celsius(lowest_temperature):.2f}°C)**\n**<t:{int(datetime.fromisoformat(str(lowest_temperature_date)).timestamp())}:D>**" if lowest_temperature is not None and lowest_temperature_date is not None else "N/A", inline=True)
             history.add_field(name="Highest wind speed", value=f"**{highest_wind_speed} mph**\n**<t:{int(datetime.fromisoformat(str(highest_wind_speed_date)).timestamp())}:D>**" if highest_wind_speed is not None and highest_wind_speed_date is not None else "N/A", inline=True)
             history.add_field(name="Highest wind gusts", value=f"**{highest_wind_gusts} mph**\n**<t:{int(datetime.fromisoformat(str(highest_wind_gusts_date)).timestamp())}:D>**" if highest_wind_gusts is not None and highest_wind_gusts_date is not None else "N/A", inline=True)
             history.add_field(name="Most precipitation", value=f"**{highest_precipitation} inches**\n**<t:{int(datetime.fromisoformat(str(highest_precipitation_date)).timestamp())}:D>**" if highest_precipitation is not None and highest_precipitation_date is not None else "N/A", inline=True)
@@ -185,13 +188,13 @@ class Weather(commands.Cog):
                 color=0xfffffe
             )
             temperature = current.get('temperature_2m', 'N/A')
-            embed.add_field(name="Temperature", value=f"{temperature}°F")
-            embed.add_field(name="Feels like", value=f"{current.get('apparent_temperature', 'N/A')}°F")
+            embed.add_field(name="Temperature", value=f"{temperature}°F ({fahrenheit_to_celsius(temperature):.2f}°C)")
+            embed.add_field(name="Feels like", value=f"{current.get('apparent_temperature', 'N/A')}°F ({fahrenheit_to_celsius(current.get('apparent_temperature', 'N/A')):.2f}°C)")
 
             ground_temp = hourly.get('soil_temperature_0cm', 'N/A')
             if isinstance(ground_temp, list) and ground_temp:
                 ground_temp = ground_temp[0]
-            embed.add_field(name="Ground temperature", value=f"{ground_temp}°F")
+            embed.add_field(name="Ground temperature", value=f"{ground_temp}°F ({fahrenheit_to_celsius(ground_temp):.2f}°C)")
             
             embed.add_field(name="Humidity", value=f"{current.get('relative_humidity_2m', 'N/A')}%")
             precipitation = current.get('precipitation', 'N/A')
