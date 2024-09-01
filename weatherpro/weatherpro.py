@@ -27,6 +27,10 @@ class Weather(commands.Cog):
             "nowcasts_fetched": 0,
             "forecasts_fetched": 0,
             "glossary_definitions_shown": 0,
+            "highest_temperature": None,
+            "lowest_temperature": None,
+            "highest_wind_speed": None,
+            "highest_precipitation": None,
         }
         self.config.register_global(**default_global)
         data_dir = bundled_data_path(self)
@@ -64,6 +68,10 @@ class Weather(commands.Cog):
         nowcasts_fetched = await self.config.nowcasts_fetched()
         forecasts_fetched = await self.config.forecasts_fetched()
         glossary_definitions_shown = await self.config.glossary_definitions_shown()
+        highest_temperature = await self.config.highest_temperature()
+        lowest_temperature = await self.config.lowest_temperature()
+        highest_wind_speed = await self.config.highest_wind_speed()
+        highest_precipitation = await self.config.highest_precipitation()
 
         embed = discord.Embed(
             title="Weather usage data",
@@ -79,7 +87,11 @@ class Weather(commands.Cog):
         embed.add_field(name="Heat alerts sent", value=f"{heat_alerts_sent} alert{'s' if heat_alerts_sent != 1 else ''}", inline=True)
         embed.add_field(name="Nowcasts served", value=f"{nowcasts_fetched} nowcast{'s' if nowcasts_fetched != 1 else ''}", inline=True)
         embed.add_field(name="Forecasts served", value=f"{forecasts_fetched} forecast{'s' if forecasts_fetched != 1 else ''}", inline=True)
-        embed.add_field(name="Glossary terms shown", value=f"{glossary_definitions_shown} term{'s' if glossary_definitions_shown != 1 else ''}", inline=True)      
+        embed.add_field(name="Glossary terms shown", value=f"{glossary_definitions_shown} term{'s' if glossary_definitions_shown != 1 else ''}", inline=True)
+        embed.add_field(name="Highest Temperature", value=f"{highest_temperature}°F" if highest_temperature is not None else "N/A", inline=True)
+        embed.add_field(name="Lowest Temperature", value=f"{lowest_temperature}°F" if lowest_temperature is not None else "N/A", inline=True)
+        embed.add_field(name="Highest Wind Speed", value=f"{highest_wind_speed} mph" if highest_wind_speed is not None else "N/A", inline=True)
+        embed.add_field(name="Highest Precipitation", value=f"{highest_precipitation} inches" if highest_precipitation is not None else "N/A", inline=True)
 
         await ctx.send(embed=embed)
 
@@ -134,7 +146,8 @@ class Weather(commands.Cog):
                 title="Your current conditions",
                 color=0xfffffe
             )
-            embed.add_field(name="Temperature", value=f"{current.get('temperature_2m', 'N/A')}°F")
+            temperature = current.get('temperature_2m', 'N/A')
+            embed.add_field(name="Temperature", value=f"{temperature}°F")
             embed.add_field(name="Feels like", value=f"{current.get('apparent_temperature', 'N/A')}°F")
 
             ground_temp = hourly.get('soil_temperature_0cm', 'N/A')
@@ -162,7 +175,8 @@ class Weather(commands.Cog):
             embed.add_field(name="Cloud cover", value=f"{current.get('cloud_cover', 'N/A')}%")
             embed.add_field(name="Pressure (MSL)", value=f"{current.get('pressure_msl', 'N/A')} hPa")
             embed.add_field(name="Surface pressure", value=f"{current.get('surface_pressure', 'N/A')} hPa")
-            embed.add_field(name="Wind speed", value=f"{current.get('wind_speed_10m', 'N/A')} mph")
+            wind_speed = current.get('wind_speed_10m', 'N/A')
+            embed.add_field(name="Wind speed", value=f"{wind_speed} mph")
             wind_direction = current.get('wind_direction_10m', 'N/A')
             if wind_direction != 'N/A':
                 if (wind_direction >= 0 and wind_direction <= 22.5) or (wind_direction > 337.5 and wind_direction <= 360):
@@ -273,6 +287,26 @@ class Weather(commands.Cog):
             await ctx.send(embed=embed)
             nowcasts_fetched = await self.config.nowcasts_fetched()
             await self.config.nowcasts_fetched.set(nowcasts_fetched + 1)
+
+            # Update highest and lowest values
+            highest_temperature = await self.config.highest_temperature()
+            lowest_temperature = await self.config.lowest_temperature()
+            highest_wind_speed = await self.config.highest_wind_speed()
+            highest_precipitation = await self.config.highest_precipitation()
+
+            if temperature != 'N/A':
+                if highest_temperature is None or temperature > highest_temperature:
+                    await self.config.highest_temperature.set(temperature)
+                if lowest_temperature is None or temperature < lowest_temperature:
+                    await self.config.lowest_temperature.set(temperature)
+
+            if wind_speed != 'N/A':
+                if highest_wind_speed is None or wind_speed > highest_wind_speed:
+                    await self.config.highest_wind_speed.set(wind_speed)
+
+            if precipitation != 'N/A' and precipitation != 0.0:
+                if highest_precipitation is None or precipitation > highest_precipitation:
+                    await self.config.highest_precipitation.set(precipitation)
 
     @commands.guild_only()
     @weather.command(name="forecast")
