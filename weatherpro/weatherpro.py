@@ -105,7 +105,7 @@ class Weather(commands.Cog):
         embed.add_field(name="Forecasts served", value=f"**{forecasts_fetched}** forecast{'s' if forecasts_fetched != 1 else ''}", inline=True)
         embed.add_field(name="Glossary terms shown", value=f"**{glossary_definitions_shown}** term{'s' if glossary_definitions_shown != 1 else ''}", inline=True)
 
-        embed2 = discord.Embed(title="Historical records", description="Records recorded by the bot that users experienced in real life. Check the weather often to update statistics.", color=0xfffffe)
+        embed2 = discord.Embed(title="Historical records", description="Records observed by the bot that users experienced in real life. Check the weather often to update statistics.", color=0xfffffe)
         embed2.add_field(name="Highest temperature", value=f"**{highest_temperature}°F** on **<t:{int(datetime.fromisoformat(str(highest_temperature_date)).timestamp())}:D>**" if highest_temperature is not None and highest_temperature_date is not None else "N/A", inline=True)
         embed2.add_field(name="Lowest temperature", value=f"**{lowest_temperature}°F** on **<t:{int(datetime.fromisoformat(str(lowest_temperature_date)).timestamp())}:D>**" if lowest_temperature is not None and lowest_temperature_date is not None else "N/A", inline=True)
         embed2.add_field(name="Highest wind speed", value=f"**{highest_wind_speed} mph** on **<t:{int(datetime.fromisoformat(str(highest_wind_speed_date)).timestamp())}:D>**" if highest_wind_speed is not None and highest_wind_speed_date is not None else "N/A", inline=True)
