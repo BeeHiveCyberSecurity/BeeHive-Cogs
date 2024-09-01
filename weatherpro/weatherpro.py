@@ -120,7 +120,6 @@ class Weather(commands.Cog):
             embed2.add_field(name="Most rainfall", value=f"**{highest_rainfall} inches** on **<t:{int(datetime.fromisoformat(str(highest_rainfall_date)).timestamp())}:D>**" if highest_rainfall is not None and highest_rainfall_date is not None else "N/A", inline=True)
 
             await ctx.send(embed=embed)
-            await asyncio.sleep(1)
             await ctx.send(embed=embed2)
 
     @weather.command(name="now")
