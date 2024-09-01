@@ -61,7 +61,8 @@ class Weather(commands.Cog):
         self.bot.loop.create_task(self.session.close())
 
     def fahrenheit_to_celsius(self, f):
-        return round((f - 32) * 5.0/9.0, 1)
+        result = round((f - 32) * 5.0 / 9.0, 1)
+        return int(result) if result.is_integer() else result
     
     
     @commands.group()
