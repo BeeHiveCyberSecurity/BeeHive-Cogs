@@ -877,7 +877,6 @@ class Weather(commands.Cog):
                 await message.clear_reactions()
                 break
 
-
     @weather.command(name="profile")
     async def profile(self, ctx):
         """View your weather profile"""
