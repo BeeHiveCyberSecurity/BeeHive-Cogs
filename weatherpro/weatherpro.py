@@ -98,7 +98,7 @@ class Weather(commands.Cog):
             description="Data aggregated from all user's use of weather features overtime.",
             color=0xfffffe
         )
-        embed.add_field(name="Zip codes stored", value=f"{users_with_zip} zip code{'s' if users_with_zip != 1 else ''}", inline=True)
+        embed.add_field(name="Zip codes stored", value=f"**{users_with_zip}** zip code{'s' if users_with_zip != 1 else ''}", inline=True)
         embed.add_field(name="Severe alert subscribers", value=f"**{users_with_severe_alerts}** subscriber{'s' if users_with_severe_alerts != 1 else ''}", inline=True)
         embed.add_field(name="Freeze alert subscribers", value=f"**{users_with_freeze_alerts}** subscriber{'s' if users_with_freeze_alerts != 1 else ''}", inline=True)
         embed.add_field(name="Heat alert subscribers", value=f"**{users_with_heat_alerts}** subscriber{'s' if users_with_heat_alerts != 1 else ''}", inline=True)
