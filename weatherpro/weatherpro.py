@@ -7,7 +7,7 @@ from redbot.core import commands, Config #type: ignore
 from redbot.core.data_manager import bundled_data_path #type: ignore
 
 class Weather(commands.Cog):
-    """Weather.gov is the official website of the National Weather Service (NWS), a U.S. government agency responsible for providing weather, water, and climate data, forecasts, and warnings. It offers accurate and timely information on weather conditions, alerts for severe weather events, and climate-related updates to help the public stay informed and safe."""
+    """It's beautiful out there"""
     
     def __init__(self, bot):
         self.bot = bot
@@ -102,11 +102,11 @@ class Weather(commands.Cog):
         embed.add_field(name="Glossary terms shown", value=f"{glossary_definitions_shown} term{'s' if glossary_definitions_shown != 1 else ''}", inline=True)
 
         embed2 = discord.Embed(title="Historical records", description="Records recorded by the bot that users experienced in real life.", color=0xfffffe)
-        embed2.add_field(name="Highest temperature", value=f"{highest_temperature}°F on {highest_temperature_date}" if highest_temperature is not None else "N/A", inline=True)
-        embed2.add_field(name="Lowest temperature", value=f"{lowest_temperature}°F on {lowest_temperature_date}" if lowest_temperature is not None else "N/A", inline=True)
-        embed2.add_field(name="Highest wind speed", value=f"{highest_wind_speed} mph on {highest_wind_speed_date}" if highest_wind_speed is not None else "N/A", inline=True)
-        embed2.add_field(name="Highest precipitation", value=f"{highest_precipitation} inches on {highest_precipitation_date}" if highest_precipitation is not None else "N/A", inline=True)
-        embed2.add_field(name="Highest wind gusts", value=f"{highest_wind_gusts} mph on {highest_wind_gusts_date}" if highest_wind_gusts is not None else "N/A", inline=True)
+        embed2.add_field(name="Highest temperature", value=f"{highest_temperature}°F on <t:{int(datetime.fromisoformat(highest_temperature_date).timestamp())}:D>" if highest_temperature is not None else "N/A", inline=True)
+        embed2.add_field(name="Lowest temperature", value=f"{lowest_temperature}°F on <t:{int(datetime.fromisoformat(lowest_temperature_date).timestamp())}:D>" if lowest_temperature is not None else "N/A", inline=True)
+        embed2.add_field(name="Highest wind speed", value=f"{highest_wind_speed} mph on <t:{int(datetime.fromisoformat(highest_wind_speed_date).timestamp())}:D>" if highest_wind_speed is not None else "N/A", inline=True)
+        embed2.add_field(name="Highest precipitation", value=f"{highest_precipitation} inches on <t:{int(datetime.fromisoformat(highest_precipitation_date).timestamp())}:D>" if highest_precipitation is not None else "N/A", inline=True)
+        embed2.add_field(name="Highest wind gusts", value=f"{highest_wind_gusts} mph on <t:{int(datetime.fromisoformat(highest_wind_gusts_date).timestamp())}:D>" if highest_wind_gusts is not None else "N/A", inline=True)
 
         await ctx.send(embed=embed)
         await asyncio.sleep(1)
@@ -318,7 +318,7 @@ class Weather(commands.Cog):
             highest_wind_gusts = await self.config.highest_wind_gusts()
             highest_wind_gusts_date = await self.config.highest_wind_gusts_date()
 
-            current_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            current_date = datetime.now().isoformat()
 
             if temperature != 'N/A':
                 if highest_temperature is None or temperature > highest_temperature:
@@ -326,7 +326,7 @@ class Weather(commands.Cog):
                     await self.config.highest_temperature_date.set(current_date)
                 if lowest_temperature is None or temperature < lowest_temperature:
                     await self.config.lowest_temperature.set(temperature)
-                    await self.config.lowest_temperature_date.set(current_date)  # Missing logic to set the date
+                    await self.config.lowest_temperature_date.set(current_date)
 
             if wind_speed != 'N/A':
                 if highest_wind_speed is None or wind_speed > highest_wind_speed:
