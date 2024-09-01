@@ -190,13 +190,13 @@ class Weather(commands.Cog):
                 color=0xfffffe
             )
             temperature = current.get('temperature_2m', 'N/A')
-            embed.add_field(name="Temperature", value=f"{temperature}°F ({self.fahrenheit_to_celsius(temperature)}°C)")
-            embed.add_field(name="Feels like", value=f"{current.get('apparent_temperature', 'N/A')}°F ({self.fahrenheit_to_celsius(current.get('apparent_temperature', 'N/A'))}°C)")
+            embed.add_field(name="Temperature", value=f"**{temperature}°F** / *{self.fahrenheit_to_celsius(temperature)}°C*")
+            embed.add_field(name="Feels like", value=f"**{current.get('apparent_temperature', 'N/A')}°F** / *{self.fahrenheit_to_celsius(current.get('apparent_temperature', 'N/A'))}°C*")
 
             ground_temp = hourly.get('soil_temperature_0cm', 'N/A')
             if isinstance(ground_temp, list) and ground_temp:
                 ground_temp = ground_temp[0]
-            embed.add_field(name="Ground temperature", value=f"{ground_temp}°F ({self.fahrenheit_to_celsius(ground_temp)}°C)")
+            embed.add_field(name="Ground temperature", value=f"**{ground_temp}°F** / *{self.fahrenheit_to_celsius(ground_temp)}°C*")
             
             embed.add_field(name="Humidity", value=f"{current.get('relative_humidity_2m', 'N/A')}%")
             precipitation = current.get('precipitation', 'N/A')
