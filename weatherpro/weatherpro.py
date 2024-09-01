@@ -1017,3 +1017,6 @@ class Weather(commands.Cog):
                 await message.clear_reactions()
                 break
 
+
+
+    
