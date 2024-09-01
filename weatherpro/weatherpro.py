@@ -301,7 +301,7 @@ class Weather(commands.Cog):
                                 alert_titles.append(f"{emoji} **{event}**")
                         alert_status = "\n".join(alert_titles)
                     else:
-                        alert_status = "None right now **#ItsAmazingOutThere**"
+                        alert_status = "None right now **#It'sAmazingOutThere**"
                 except Exception as e:
                     alert_status = f"Failed to fetch alerts: {str(e)}, url={alerts_url}"
             
