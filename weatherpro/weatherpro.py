@@ -971,11 +971,16 @@ class Weather(commands.Cog):
                                 color=0xff4545
                             )
 #                            embed.add_field(name="Description", value=alert['properties']['description'], inline=False)
-                            embed.add_field(name="Instruction", value=alert['properties']['instruction'], inline=False)
-                            embed.add_field(name="Severity", value=alert['properties']['severity'], inline=True)
-                            embed.add_field(name="Urgency", value=alert['properties']['urgency'], inline=True)
-                            embed.add_field(name="Certainty", value=alert['properties']['certainty'], inline=True)
-                            embed.set_footer(text=f"Issued by {alert['properties']['senderName']}")
+                            if 'instruction' in alert['properties']:
+                                embed.add_field(name="Instruction", value=alert['properties']['instruction'], inline=False)
+                            if 'severity' in alert['properties']:
+                                embed.add_field(name="Severity", value=alert['properties']['severity'], inline=True)
+                            if 'urgency' in alert['properties']:
+                                embed.add_field(name="Urgency", value=alert['properties']['urgency'], inline=True)
+                            if 'certainty' in alert['properties']:
+                                embed.add_field(name="Certainty", value=alert['properties']['certainty'], inline=True)
+                            if 'senderName' in alert['properties']:
+                                embed.set_footer(text=f"Issued by {alert['properties']['senderName']}")
 
                             await user.send(embed=embed)
                             total_alerts_sent = await self.config.total_alerts_sent()
