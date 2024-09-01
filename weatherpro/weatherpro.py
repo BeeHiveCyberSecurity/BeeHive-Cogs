@@ -62,7 +62,7 @@ class Weather(commands.Cog):
 
     def fahrenheit_to_celsius(self, f):
         result = round((f - 32) * 5.0 / 9.0, 1)
-        return int(result) if result.is_integer() else result
+        return f"{result:.1f}"
     
     
     @commands.group()
