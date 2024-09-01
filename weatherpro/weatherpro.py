@@ -99,7 +99,7 @@ class Weather(commands.Cog):
         embed2.add_field(name="Highest wind gusts", value=f"{highest_wind_gusts} mph" if highest_wind_gusts is not None else "N/A", inline=True)
 
         await ctx.send(embed=embed)
-        await asyncio.sleep(2)
+        await asyncio.sleep(1)
         await ctx.send(embed=embed2)
 
     @weather.command(name="now")
