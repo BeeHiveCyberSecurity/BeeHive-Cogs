@@ -967,7 +967,7 @@ class Weather(commands.Cog):
                         for alert in severe_alerts:
                             embed = discord.Embed(
                                 title=alert['properties']['event'],
-                                description=f"{'An' if alert['properties']['event'][0].lower() in 'aeiou' else 'A'} {alert['properties']['event']} was issued at <t:{int(datetime.fromisoformat(alert['properties']['sent']).timestamp())}:F> for your location and is in effect until <t:{int(datetime.fromisoformat(alert['properties']['expires']).timestamp())}:F>.",
+                                description=f"{'An' if alert['properties']['event'][0].lower() in 'aeiou' else 'A'} **{alert['properties']['event']}** was issued at **<t:{int(datetime.fromisoformat(alert['properties']['sent']).timestamp())}:F>** for your location and is in effect until **<t:{int(datetime.fromisoformat(alert['properties']['expires']).timestamp())}:F>**.",
                                 color=0xff4545
                             )
 #                            embed.add_field(name="Description", value=alert['properties']['description'], inline=False)
@@ -975,10 +975,6 @@ class Weather(commands.Cog):
                             embed.add_field(name="Severity", value=alert['properties']['severity'], inline=True)
                             embed.add_field(name="Urgency", value=alert['properties']['urgency'], inline=True)
                             embed.add_field(name="Certainty", value=alert['properties']['certainty'], inline=True)
-                            issue_time = int(datetime.fromisoformat(alert['properties']['sent']).timestamp())
-                            expiry_time = int(datetime.fromisoformat(alert['properties']['expires']).timestamp())
-                            embed.add_field(name="Issued At", value=f"<t:{issue_time}:F>", inline=False)
-                            embed.add_field(name="Expires In", value=f"<t:{expiry_time}:R>", inline=False)
                             embed.set_footer(text=f"Issued by {alert['properties']['senderName']}")
 
                             await user.send(embed=embed)
