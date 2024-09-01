@@ -60,6 +60,10 @@ class Weather(commands.Cog):
     def cog_unload(self):
         self.bot.loop.create_task(self.session.close())
 
+    def fahrenheit_to_celsius(f):
+                return (f - 32) * 5.0/9.0
+    
+    
     @commands.group()
     async def weather(self, ctx):
         """Fetch current and upcoming conditions, search and explore hundreds of weather-focused words, check alert statistics across the country, and fetch information on observation stations and radar installations"""
@@ -93,9 +97,6 @@ class Weather(commands.Cog):
             highest_snowfall_date = await self.config.highest_snowfall_date()
             highest_rainfall = await self.config.highest_rainfall()
             highest_rainfall_date = await self.config.highest_rainfall_date()
-
-            def fahrenheit_to_celsius(f):
-                return (f - 32) * 5.0/9.0
 
             usage = discord.Embed(
                 title="Weather usage data",
