@@ -28,10 +28,15 @@ class Weather(commands.Cog):
             "forecasts_fetched": 0,
             "glossary_definitions_shown": 0,
             "highest_temperature": None,
+            "highest_temperature_date": None,
             "lowest_temperature": None,
+            "lowest_temperature_date": None,
             "highest_wind_speed": None,
+            "highest_wind_speed_date": None,
             "highest_precipitation": None,
+            "highest_precipitation_date": None,
             "highest_wind_gusts": None,
+            "highest_wind_gusts_date": None,
         }
         self.config.register_global(**default_global)
         data_dir = bundled_data_path(self)
@@ -70,10 +75,15 @@ class Weather(commands.Cog):
         forecasts_fetched = await self.config.forecasts_fetched()
         glossary_definitions_shown = await self.config.glossary_definitions_shown()
         highest_temperature = await self.config.highest_temperature()
+        highest_temperature_date = await self.config.highest_temperature_date()
         lowest_temperature = await self.config.lowest_temperature()
+        lowest_temperature_date = await self.config.lowest_temperature_date()
         highest_wind_speed = await self.config.highest_wind_speed()
+        highest_wind_speed_date = await self.config.highest_wind_speed_date()
         highest_precipitation = await self.config.highest_precipitation()
+        highest_precipitation_date = await self.config.highest_precipitation_date()
         highest_wind_gusts = await self.config.highest_wind_gusts()
+        highest_wind_gusts_date = await self.config.highest_wind_gusts_date()
 
         embed = discord.Embed(
             title="Weather usage data",
@@ -92,11 +102,11 @@ class Weather(commands.Cog):
         embed.add_field(name="Glossary terms shown", value=f"{glossary_definitions_shown} term{'s' if glossary_definitions_shown != 1 else ''}", inline=True)
 
         embed2 = discord.Embed(title="Historical records", description="Records recorded by the bot that users experienced in real life.", color=0xfffffe)
-        embed2.add_field(name="Highest temperature", value=f"{highest_temperature}°F" if highest_temperature is not None else "N/A", inline=True)
-        embed2.add_field(name="Lowest temperature", value=f"{lowest_temperature}°F" if lowest_temperature is not None else "N/A", inline=True)
-        embed2.add_field(name="Highest wind speed", value=f"{highest_wind_speed} mph" if highest_wind_speed is not None else "N/A", inline=True)
-        embed2.add_field(name="Highest precipitation", value=f"{highest_precipitation} inches" if highest_precipitation is not None else "N/A", inline=True)
-        embed2.add_field(name="Highest wind gusts", value=f"{highest_wind_gusts} mph" if highest_wind_gusts is not None else "N/A", inline=True)
+        embed2.add_field(name="Highest temperature", value=f"{highest_temperature}°F on {highest_temperature_date}" if highest_temperature is not None else "N/A", inline=True)
+        embed2.add_field(name="Lowest temperature", value=f"{lowest_temperature}°F on {lowest_temperature_date}" if lowest_temperature is not None else "N/A", inline=True)
+        embed2.add_field(name="Highest wind speed", value=f"{highest_wind_speed} mph on {highest_wind_speed_date}" if highest_wind_speed is not None else "N/A", inline=True)
+        embed2.add_field(name="Highest precipitation", value=f"{highest_precipitation} inches on {highest_precipitation_date}" if highest_precipitation is not None else "N/A", inline=True)
+        embed2.add_field(name="Highest wind gusts", value=f"{highest_wind_gusts} mph on {highest_wind_gusts_date}" if highest_wind_gusts is not None else "N/A", inline=True)
 
         await ctx.send(embed=embed)
         await asyncio.sleep(1)
@@ -298,28 +308,40 @@ class Weather(commands.Cog):
 
             # Update highest and lowest values
             highest_temperature = await self.config.highest_temperature()
+            highest_temperature_date = await self.config.highest_temperature_date()
             lowest_temperature = await self.config.lowest_temperature()
+            lowest_temperature_date = await self.config.lowest_temperature_date()
             highest_wind_speed = await self.config.highest_wind_speed()
+            highest_wind_speed_date = await self.config.highest_wind_speed_date()
             highest_precipitation = await self.config.highest_precipitation()
+            highest_precipitation_date = await self.config.highest_precipitation_date()
             highest_wind_gusts = await self.config.highest_wind_gusts()
+            highest_wind_gusts_date = await self.config.highest_wind_gusts_date()
+
+            current_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
             if temperature != 'N/A':
                 if highest_temperature is None or temperature > highest_temperature:
                     await self.config.highest_temperature.set(temperature)
+                    await self.config.highest_temperature_date.set(current_date)
                 if lowest_temperature is None or temperature < lowest_temperature:
                     await self.config.lowest_temperature.set(temperature)
+                    await self.config.lowest_temperature_date.set(current_date)  # Missing logic to set the date
 
             if wind_speed != 'N/A':
                 if highest_wind_speed is None or wind_speed > highest_wind_speed:
                     await self.config.highest_wind_speed.set(wind_speed)
+                    await self.config.highest_wind_speed_date.set(current_date)  # Missing logic to set the date
 
             if wind_gusts != 'N/A':
                 if highest_wind_gusts is None or wind_gusts > highest_wind_gusts:
                     await self.config.highest_wind_gusts.set(wind_gusts)
+                    await self.config.highest_wind_gusts_date.set(current_date)  # Missing logic to set the date
 
             if precipitation != 'N/A' and precipitation != 0.0:
                 if highest_precipitation is None or precipitation > highest_precipitation:
                     await self.config.highest_precipitation.set(precipitation)
+                    await self.config.highest_precipitation_date.set(current_date)  # Missing logic to set the date
 
     @commands.guild_only()
     @weather.command(name="forecast")
