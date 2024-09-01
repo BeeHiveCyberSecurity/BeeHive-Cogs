@@ -127,12 +127,22 @@ class Weather(commands.Cog):
         """Check current conditions and alerts"""
         zip_code = await self.config.user(ctx.author).zip_code()
         if not zip_code:
-            await ctx.send("You haven't set a zip code yet. Use the `weatherset zip` command to set one.")
+            embed = discord.Embed(
+                title="Weather profile not configured",
+                description="You haven't set a zip code yet. Use the `weatherset zip` command to set one.",
+                color=0xff4545
+            )
+            await ctx.send(embed=embed)
             return
         
         # Fetch latitude and longitude using the zip code
         if zip_code not in self.zip_codes:
-            await ctx.send("Invalid zip code. Please set a valid zip code.")
+            embed = discord.Embed(
+                title="Invalid Zip Code",
+                description="Invalid zip code. Please set a valid 5 digit, US zip code.",
+                color=0xff4545
+            )
+            await ctx.send(embed=embed)
             return
         
         latitude, longitude = self.zip_codes[zip_code]
