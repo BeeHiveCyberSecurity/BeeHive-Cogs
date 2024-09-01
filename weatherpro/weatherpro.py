@@ -877,11 +877,8 @@ class Weather(commands.Cog):
                 await message.clear_reactions()
                 break
 
-    @commands.group()
-    async def weatherset(self, ctx):
-        """Configure settings and features of weather"""
 
-    @weatherset.command(name="profile")
+    @weather.command(name="profile")
     async def profile(self, ctx):
         """View your weather profile"""
         user = ctx.author
@@ -892,12 +889,20 @@ class Weather(commands.Cog):
         heat_alerts_enabled = user_data.get("heatalerts", False)
         
         # Determine the current weather season
-        month = datetime.now().month
-        if month in [12, 1, 2]:
+        today = datetime.now()
+        year = today.year
+
+        # Define the solstices and equinoxes
+        winter_solstice = datetime(year, 12, 21)
+        spring_equinox = datetime(year, 3, 20)
+        summer_solstice = datetime(year, 6, 21)
+        fall_equinox = datetime(year, 9, 22)
+
+        if today >= winter_solstice or today < spring_equinox:
             season = "❄️ Winter"
-        elif month in [3, 4, 5]:
+        elif spring_equinox <= today < summer_solstice:
             season = "🌸 Spring"
-        elif month in [6, 7, 8]:
+        elif summer_solstice <= today < fall_equinox:
             season = "☀️ Summer"
         else:
             season = "🍂 Fall"
@@ -920,6 +925,10 @@ class Weather(commands.Cog):
         
         await ctx.send(embed=embed)
 
+    @commands.group()
+    async def weatherset(self, ctx):
+        """Configure settings and features of weather"""
+        
     @commands.cooldown(1, 900, commands.BucketType.user)
     @weatherset.command(name="severealerts")
     async def severealerts(self, ctx):
