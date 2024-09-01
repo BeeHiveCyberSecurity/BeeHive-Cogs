@@ -94,33 +94,33 @@ class Weather(commands.Cog):
             highest_rainfall = await self.config.highest_rainfall()
             highest_rainfall_date = await self.config.highest_rainfall_date()
 
-            embed = discord.Embed(
+            usage = discord.Embed(
                 title="Weather usage data",
                 description="Data aggregated from all user's use of weather features overtime. Increase these stats by utilizing the commands and features this cog provides.",
                 color=0xfffffe
             )
-            embed.add_field(name="Zip codes stored", value=f"**{users_with_zip}** zip code{'s' if users_with_zip != 1 else ''}", inline=True)
-            embed.add_field(name="Severe alert subscribers", value=f"**{users_with_severe_alerts}** subscriber{'s' if users_with_severe_alerts != 1 else ''}", inline=True)
-            embed.add_field(name="Freeze alert subscribers", value=f"**{users_with_freeze_alerts}** subscriber{'s' if users_with_freeze_alerts != 1 else ''}", inline=True)
-            embed.add_field(name="Heat alert subscribers", value=f"**{users_with_heat_alerts}** subscriber{'s' if users_with_heat_alerts != 1 else ''}", inline=True)
-            embed.add_field(name="Severe alerts sent", value=f"**{total_alerts_sent}** alert{'s' if total_alerts_sent != 1 else ''}", inline=True)
-            embed.add_field(name="Cold alerts sent", value=f"**{cold_alerts_sent}** alert{'s' if cold_alerts_sent != 1 else ''}", inline=True)
-            embed.add_field(name="Heat alerts sent", value=f"**{heat_alerts_sent}** alert{'s' if heat_alerts_sent != 1 else ''}", inline=True)
-            embed.add_field(name="Nowcasts served", value=f"**{nowcasts_fetched}** nowcast{'s' if nowcasts_fetched != 1 else ''}", inline=True)
-            embed.add_field(name="Forecasts served", value=f"**{forecasts_fetched}** forecast{'s' if forecasts_fetched != 1 else ''}", inline=True)
-            embed.add_field(name="Glossary terms shown", value=f"**{glossary_definitions_shown}** term{'s' if glossary_definitions_shown != 1 else ''}", inline=True)
+            usage.add_field(name="Zip codes stored", value=f"**{users_with_zip}** zip code{'s' if users_with_zip != 1 else ''}", inline=True)
+            usage.add_field(name="Severe alert subscribers", value=f"**{users_with_severe_alerts}** subscriber{'s' if users_with_severe_alerts != 1 else ''}", inline=True)
+            usage.add_field(name="Freeze alert subscribers", value=f"**{users_with_freeze_alerts}** subscriber{'s' if users_with_freeze_alerts != 1 else ''}", inline=True)
+            usage.add_field(name="Heat alert subscribers", value=f"**{users_with_heat_alerts}** subscriber{'s' if users_with_heat_alerts != 1 else ''}", inline=True)
+            usage.add_field(name="Severe alerts sent", value=f"**{total_alerts_sent}** alert{'s' if total_alerts_sent != 1 else ''}", inline=True)
+            usage.add_field(name="Cold alerts sent", value=f"**{cold_alerts_sent}** alert{'s' if cold_alerts_sent != 1 else ''}", inline=True)
+            usage.add_field(name="Heat alerts sent", value=f"**{heat_alerts_sent}** alert{'s' if heat_alerts_sent != 1 else ''}", inline=True)
+            usage.add_field(name="Nowcasts served", value=f"**{nowcasts_fetched}** nowcast{'s' if nowcasts_fetched != 1 else ''}", inline=True)
+            usage.add_field(name="Forecasts served", value=f"**{forecasts_fetched}** forecast{'s' if forecasts_fetched != 1 else ''}", inline=True)
+            usage.add_field(name="Glossary terms shown", value=f"**{glossary_definitions_shown}** term{'s' if glossary_definitions_shown != 1 else ''}", inline=True)
 
-            embed2 = discord.Embed(title="Historical records", description="Records observed by the bot that users experienced in real life. Check the weather often to update statistics.", color=0xfffffe)
-            embed2.add_field(name="Highest temperature", value=f"**{highest_temperature}°F** on **<t:{int(datetime.fromisoformat(str(highest_temperature_date)).timestamp())}:D>**" if highest_temperature is not None and highest_temperature_date is not None else "N/A", inline=True)
-            embed2.add_field(name="Lowest temperature", value=f"**{lowest_temperature}°F** on **<t:{int(datetime.fromisoformat(str(lowest_temperature_date)).timestamp())}:D>**" if lowest_temperature is not None and lowest_temperature_date is not None else "N/A", inline=True)
-            embed2.add_field(name="Highest wind speed", value=f"**{highest_wind_speed} mph** on **<t:{int(datetime.fromisoformat(str(highest_wind_speed_date)).timestamp())}:D>**" if highest_wind_speed is not None and highest_wind_speed_date is not None else "N/A", inline=True)
-            embed2.add_field(name="Highest wind gusts", value=f"**{highest_wind_gusts} mph** on **<t:{int(datetime.fromisoformat(str(highest_wind_gusts_date)).timestamp())}:D>**" if highest_wind_gusts is not None and highest_wind_gusts_date is not None else "N/A", inline=True)
-            embed2.add_field(name="Most precipitation", value=f"**{highest_precipitation} inches** on **<t:{int(datetime.fromisoformat(str(highest_precipitation_date)).timestamp())}:D>**" if highest_precipitation is not None and highest_precipitation_date is not None else "N/A", inline=True)
-            embed2.add_field(name="Most snowfall", value=f"**{highest_snowfall} inches** on **<t:{int(datetime.fromisoformat(str(highest_snowfall_date)).timestamp())}:D>**" if highest_snowfall is not None and highest_snowfall_date is not None else "N/A", inline=True)
-            embed2.add_field(name="Most rainfall", value=f"**{highest_rainfall} inches** on **<t:{int(datetime.fromisoformat(str(highest_rainfall_date)).timestamp())}:D>**" if highest_rainfall is not None and highest_rainfall_date is not None else "N/A", inline=True)
+            history = discord.Embed(title="Historical records", description="Records observed by the bot that users experienced in real life. Check the weather often to update statistics.", color=0xfffffe)
+            history.add_field(name="Highest temperature", value=f"**{highest_temperature}°F** on **<t:{int(datetime.fromisoformat(str(highest_temperature_date)).timestamp())}:D>**" if highest_temperature is not None and highest_temperature_date is not None else "N/A", inline=True)
+            history.add_field(name="Lowest temperature", value=f"**{lowest_temperature}°F** on **<t:{int(datetime.fromisoformat(str(lowest_temperature_date)).timestamp())}:D>**" if lowest_temperature is not None and lowest_temperature_date is not None else "N/A", inline=True)
+            history.add_field(name="Highest wind speed", value=f"**{highest_wind_speed} mph** on **<t:{int(datetime.fromisoformat(str(highest_wind_speed_date)).timestamp())}:D>**" if highest_wind_speed is not None and highest_wind_speed_date is not None else "N/A", inline=True)
+            history.add_field(name="Highest wind gusts", value=f"**{highest_wind_gusts} mph** on **<t:{int(datetime.fromisoformat(str(highest_wind_gusts_date)).timestamp())}:D>**" if highest_wind_gusts is not None and highest_wind_gusts_date is not None else "N/A", inline=True)
+            history.add_field(name="Most precipitation", value=f"**{highest_precipitation} inches** on **<t:{int(datetime.fromisoformat(str(highest_precipitation_date)).timestamp())}:D>**" if highest_precipitation is not None and highest_precipitation_date is not None else "N/A", inline=True)
+            history.add_field(name="Most snowfall", value=f"**{highest_snowfall} inches** on **<t:{int(datetime.fromisoformat(str(highest_snowfall_date)).timestamp())}:D>**" if highest_snowfall is not None and highest_snowfall_date is not None else "N/A", inline=True)
+            history.add_field(name="Most rainfall", value=f"**{highest_rainfall} inches** on **<t:{int(datetime.fromisoformat(str(highest_rainfall_date)).timestamp())}:D>**" if highest_rainfall is not None and highest_rainfall_date is not None else "N/A", inline=True)
 
-            await ctx.send(embed=embed)
-            await ctx.send(embed=embed2)
+            await ctx.send(embed=usage)
+            await ctx.send(embed=history)
 
     @weather.command(name="now")
     async def now(self, ctx):
