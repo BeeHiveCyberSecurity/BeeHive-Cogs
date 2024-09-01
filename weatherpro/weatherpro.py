@@ -123,17 +123,18 @@ class Weather(commands.Cog):
             await ctx.send(embed=history)
 
     @weather.command(name="now")
-    async def now(self, ctx):
+    async def now(self, ctx, zip_code: str = None):
         """Check current conditions and alerts"""
-        zip_code = await self.config.user(ctx.author).zip_code()
         if not zip_code:
-            embed = discord.Embed(
-                title="Weather profile not configured",
-                description="You haven't set a zip code yet. Use the `weatherset zip` command to set one.",
-                color=0xff4545
-            )
-            await ctx.send(embed=embed)
-            return
+            zip_code = await self.config.user(ctx.author).zip_code()
+            if not zip_code:
+                embed = discord.Embed(
+                    title="Weather profile not configured",
+                    description="You haven't set a zip code yet. Use the `weatherset zip` command to set one.",
+                    color=0xff4545
+                )
+                await ctx.send(embed=embed)
+                return
         
         # Fetch latitude and longitude using the zip code
         if zip_code not in self.zip_codes:
@@ -180,7 +181,7 @@ class Weather(commands.Cog):
             minutely_15 = data.get('minutely_15', {})
             
             embed = discord.Embed(
-                title="Your current conditions",
+                title=f"Current conditions",
                 color=0xfffffe
             )
             temperature = current.get('temperature_2m', 'N/A')
