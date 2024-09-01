@@ -90,6 +90,7 @@ class Weather(commands.Cog):
         embed.add_field(name="Nowcasts served", value=f"{nowcasts_fetched} nowcast{'s' if nowcasts_fetched != 1 else ''}", inline=True)
         embed.add_field(name="Forecasts served", value=f"{forecasts_fetched} forecast{'s' if forecasts_fetched != 1 else ''}", inline=True)
         embed.add_field(name="Glossary terms shown", value=f"{glossary_definitions_shown} term{'s' if glossary_definitions_shown != 1 else ''}", inline=True)
+        
         embed2 = discord.Embed(title="Historical records", description="Records recorded by the bot that users experienced in real life.")
         embed2.add_field(name="Highest temperature", value=f"{highest_temperature}°F" if highest_temperature is not None else "N/A", inline=True)
         embed2.add_field(name="Lowest temperature", value=f"{lowest_temperature}°F" if lowest_temperature is not None else "N/A", inline=True)
