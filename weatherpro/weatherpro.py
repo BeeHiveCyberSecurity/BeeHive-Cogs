@@ -205,11 +205,6 @@ class Weather(commands.Cog):
                 ground_temp = ground_temp[0]
             embed.add_field(name="Ground temperature", value=f"**{ground_temp}°F** • {self.fahrenheit_to_celsius(ground_temp)}°C")
 
-            wind_speed = current.get('wind_speed_10m', 'N/A')
-            if wind_speed != 'N/A':
-                wind_speed_knots = self.mph_to_knots(wind_speed)
-                embed.add_field(name="Wind speed", value=f"{wind_speed} mph • {wind_speed_knots} kts")
-
             wind_direction = current.get('wind_direction_10m', 'N/A')
             if wind_direction != 'N/A':
                 if (wind_direction >= 0 and wind_direction <= 22.5) or (wind_direction > 337.5 and wind_direction <= 360):
@@ -231,6 +226,12 @@ class Weather(commands.Cog):
             else:
                 wind_direction_str = 'N/A'
             embed.add_field(name="Wind direction", value=wind_direction_str)
+
+            wind_speed = current.get('wind_speed_10m', 'N/A')
+            if wind_speed != 'N/A':
+                wind_speed_knots = self.mph_to_knots(wind_speed)
+                embed.add_field(name="Wind speed", value=f"{wind_speed} mph • {wind_speed_knots} kts")
+
             wind_gusts = current.get('wind_gusts_10m', 'N/A')
             if wind_gusts != 'N/A':
                 wind_gusts_knots = self.mph_to_knots(wind_gusts)
