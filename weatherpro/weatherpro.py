@@ -68,6 +68,10 @@ class Weather(commands.Cog):
         knots = mph * 0.868976
         return f"{knots:.1f}"
     
+    def miles_to_meters(self, miles):
+        meters = miles * 1609.34
+        return f"{meters:.1f}"
+
     @commands.group()
     async def weather(self, ctx):
         """Fetch current and upcoming conditions, search and explore hundreds of weather-focused words, check alert statistics across the country, and fetch information on observation stations and radar installations"""
@@ -255,10 +259,17 @@ class Weather(commands.Cog):
             
             visibility = minutely_15.get('visibility', [0])
             if isinstance(visibility, list) and visibility:
-                visibility_value = visibility[0] / 5280
+                visibility_value_miles = visibility[0] / 5280
+                visibility_value_meters = float(self.miles_to_meters(visibility_value_miles))
+                if visibility_value_meters < 1000:
+                    visibility_str = f"{visibility_value_meters:.1f} meters"
+                else:
+                    visibility_value_km = visibility_value_meters / 1000
+                    visibility_str = f"{visibility_value_km:.1f} km"
             else:
-                visibility_value = 0
-            embed.add_field(name="Visibility", value=f"{visibility_value:.2f} miles")
+                visibility_value_miles = 0
+                visibility_str = "0.0 miles"
+            embed.add_field(name="Visibility", value=f"{visibility_value_miles:.2f} miles • {visibility_str}")
             
             lightning_potential = minutely_15.get('lightning_potential', 'None')
             if isinstance(lightning_potential, list) and lightning_potential:
