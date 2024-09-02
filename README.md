@@ -23,7 +23,9 @@ We'll provide a, relatively same-in-spirit disclaimer below.
 
 
 ## Public cogs
-**[weatherpro](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/weatherpro)**
+Our public cogs are the cogs we make that do, assorted things. Maybe you'll find them useful - or maybe not. 
+
+### [weatherpro](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/weatherpro)
 
 Access detailed weather information, forecasts, and historical data for any location in the United States using ZIP codes. Perfect for planning events, travel, or just staying informed about the weather in your area. `[p]weather`, `[p]weatherset`.
 
