@@ -37,9 +37,10 @@ To add this repo to your Red bot, use the command
 > ```
 
 - **[skysearch](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/skysearch)** - Interactive features to let you explore and search for aircraft by their registrations, squawks, ICAO 24-bit addresses, and more, as well as fetch information about airports like locations, photos, forecasts, and more. Start SkySearch once installed using `[p]aircraft` or `[p]airport`, respectively.
-> `[p]cog install BeeHive-Cogs skysearch`
-
-> `[p]load skysearch`
+> ```
+> [p]cog install BeeHive-Cogs skysearch
+> [p]load skysearch
+> ```
 
 - **[products](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/products)** - Cog made for primarily our server to help us deliver information on our products to inquisitive users. `(incomplete)`
 
