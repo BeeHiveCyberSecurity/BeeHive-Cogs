@@ -370,7 +370,7 @@ class Weather(commands.Cog):
                 visibility_value_miles = 0
                 visibility_str = "0.0 miles"
             embed.add_field(name="Visibility", value=f"{visibility_value_miles:.2f} mi • {visibility_str}")
-            
+
             embed.add_field(name="Pressure (MSL)", value=f"{current.get('pressure_msl', 'N/A')} hPa")
             embed.add_field(name="Surface pressure", value=f"{current.get('surface_pressure', 'N/A')} hPa")
             
@@ -389,7 +389,6 @@ class Weather(commands.Cog):
             else:
                 lightning_potential_str = 'Extreme'
             embed.add_field(name="Lightning potential", value=f"{lightning_potential_str}")
-            embed.set_footer(text="When thunder roars, go indoors. If you can hear thunder, you can be struck by lightning.")
             
             # Fetch severe and extreme weather alerts
             alerts_url = f"https://api.weather.gov/alerts/active?point={latitude.strip()},{longitude.strip()}"
@@ -399,6 +398,7 @@ class Weather(commands.Cog):
                     alerts_data = await alerts_response.json()
                     alerts = alerts_data.get('features', [])
                     if alerts:
+                        embed.set_footer(text="When thunder roars, go indoors. If you can hear thunder, you can be struck by lightning.")
                         alert_titles = []
                         event_emojis = {
                             "Tornado Warning": ":cloud_tornado:",
