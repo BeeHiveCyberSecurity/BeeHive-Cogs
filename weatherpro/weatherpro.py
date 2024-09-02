@@ -78,12 +78,13 @@ class Weather(commands.Cog):
 
     @commands.guild_only()
     @weather.command(name="forecast")
-    async def forecast(self, ctx):
+    async def forecast(self, ctx, zip_code: str = None):
         """Fetch your future forecast"""
-        zip_code = await self.config.user(ctx.author).zip_code()
         if not zip_code:
-            await ctx.send("You haven't set a zip code yet. Use the `weatherset zip` command to set one.")
-            return
+            zip_code = await self.config.user(ctx.author).zip_code()
+            if not zip_code:
+                await ctx.send("You haven't set a zip code yet. Use the `weatherset zip` command to set one.")
+                return
         
         # Fetch latitude and longitude using the zip code
         if zip_code not in self.zip_codes:
