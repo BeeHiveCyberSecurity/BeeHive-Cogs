@@ -15,26 +15,26 @@ To add this repo to your Red bot, use the command
 **[weatherpro](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/weatherpro)**
 
 Access detailed weather information, forecasts, and historical data for any location in the United States using ZIP codes. Perfect for planning events, travel, or just staying informed about the weather in your area. `[p]weather`, `[p]weatherset`.
-> ```
-> [p]cog install BeeHive-Cogs weatherpro
-> [p]load weatherpro
-> ```
+```
+[p]cog install BeeHive-Cogs weatherpro
+[p]load weatherpro
+```
 
 **[ping](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/ping)**
 
 A nice, functional ping-and-speedtest cog that shows your host latency, transit latency, download speed, and upload speed in a neat, orderly, no-frills embed. If your bot is hosted on a poor quality connection, includes a special offer when detected. `[p]ping`
-> ```
-> [p]cog install BeeHive-Cogs ping
-> [p]load ping
-> ```
+```
+[p]cog install BeeHive-Cogs ping
+[p]load ping
+```
 
 **[names](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/names)**
 
 Help manage unruly, unsightly, and otherwise annoying nicknames/screennames in your server. Purify and normalize visually obnoxious names manually, or enable automatic cleanups to keep your server tidy. `[p]nickname`.
-> ```
-> [p]cog install BeeHive-Cogs names
-> [p]load names
-> ```
+```
+[p]cog install BeeHive-Cogs names
+[p]load names
+```
 
 **[antiphishing](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/antiphishing)**
 
