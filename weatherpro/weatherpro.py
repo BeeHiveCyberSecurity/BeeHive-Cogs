@@ -230,12 +230,12 @@ class Weather(commands.Cog):
             wind_speed = current.get('wind_speed_10m', 'N/A')
             if wind_speed != 'N/A':
                 wind_speed_knots = self.mph_to_knots(wind_speed)
-                embed.add_field(name="Wind speed", value=f"{wind_speed} mph • {wind_speed_knots} kts")
+                embed.add_field(name="Wind speed", value=f"**{wind_speed} mph** • {wind_speed_knots} kts")
 
             wind_gusts = current.get('wind_gusts_10m', 'N/A')
             if wind_gusts != 'N/A':
                 wind_gusts_knots = self.mph_to_knots(wind_gusts)
-                embed.add_field(name="Wind gusts", value=f"{wind_gusts} mph • {wind_gusts_knots} kts")
+                embed.add_field(name="Wind gusts", value=f"**{wind_gusts} mph** • {wind_gusts_knots} kts")
             
             embed.add_field(name="Humidity", value=f"{current.get('relative_humidity_2m', 'N/A')}%")
             
