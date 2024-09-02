@@ -18,7 +18,7 @@ then load the newly installed cog with
 ```[p]load (cogname)```
 
 ## Cog directory
-- **[weatherpro](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/weatherpro)** - Access detailed weather information, forecasts, and historical data for any location using ZIP codes. Perfect for planning events, travel, or just staying informed about the weather in your area. `[p]weather`, `[p]weatherset`.
+- **[weatherpro](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/weatherpro)** - Access detailed weather information, forecasts, and historical data for any location in the United States using ZIP codes. Perfect for planning events, travel, or just staying informed about the weather in your area. `[p]weather`, `[p]weatherset`.
 - **[ping](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/ping)** - A nice, functional ping and SpeedTest tool combined. One command, no fuss - `[p]ping`
 - **[nicknamemanagement](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/nicknamemanagement)** - Help manage unruly, unsightly, and otherwise annoying nicknames/screennames in your server. A dehoister on steroids, that dislikes anything that isn't alphanumeric.
 - **[cloudflare](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/cloudflare)** - Utilize a multitude of advanced Cloudflare tools thru Discord, including the Cloudflare URL Scanner. For the bot owner, unlock the ability to interact with multiple Cloudflare products you utilize thru your Red-DiscordBot instance.
