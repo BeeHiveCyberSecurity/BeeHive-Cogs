@@ -1,14 +1,14 @@
-# About this repo
+## About this repo
 Red is a free, self-hostable, open-source Discord bot that can be used in growing Discord communities to help personalize and modularize server management, moderation, games, and more. 
 
 This repo contains cogs built for Red that can help keep your community safer, in many cases for free. 
 
-## Adding the repo
+### Adding the repo
 To add this repo to your Red bot, use the command
 
 ```[p]repo add BeeHive-Cogs https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs```
 
-## Adding cogs to your bot
+### Adding cogs to your bot
 To install cogs from this repo to your Red instance, use the command
 
 ```[p]cog install BeeHive-Cogs (cogname)```
@@ -17,7 +17,7 @@ then load the newly installed cog with
 
 ```[p]load (cogname)```
 
-## Cog directory
+### Our cogs
 - **[weatherpro](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/weatherpro)** - Access detailed weather information, forecasts, and historical data for any location in the United States using ZIP codes. Perfect for planning events, travel, or just staying informed about the weather in your area. `[p]weather`, `[p]weatherset`.
 >[!NOTE]
 >The [weatherpro](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/weatherpro) cog relies on pre-mapped location information that from time to time, may be inaccurate. If you feel the conditions shown in this cog are, out-of-parity with the conditions you're experiencing in real life, you should [open an issue](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/issues/new/choose) to ask us to review our location mapped for your zip code.
