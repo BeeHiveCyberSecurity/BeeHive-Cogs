@@ -38,7 +38,7 @@ Access detailed weather information, forecasts, and historical data for any loca
 ```
 
 
-**[ping](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/ping)**
+### [ping](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/ping)
 
 A nice, functional ping-and-speedtest cog that shows your host latency, transit latency, download speed, and upload speed in a neat, orderly, no-frills embed. If your bot is hosted on a poor quality connection, includes a special offer when detected. `[p]ping`
 
@@ -49,7 +49,7 @@ A nice, functional ping-and-speedtest cog that shows your host latency, transit 
 [p]load ping
 ```
 
-**[names](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/names)**
+### [names](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/names)
 
 Help manage unruly, unsightly, and otherwise annoying nicknames/screennames in your server. Purify and normalize visually obnoxious names manually, or enable automatic cleanups to keep your server tidy. `[p]nickname`.
 
@@ -60,7 +60,7 @@ Help manage unruly, unsightly, and otherwise annoying nicknames/screennames in y
 [p]load names
 ```
 
-**[antiphishing](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/antiphishing)**
+### [antiphishing](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/antiphishing)
 
 Passively detect and remove known malicious websites sent in your server's chats.`[p]antiphishing`
 
@@ -71,7 +71,7 @@ Passively detect and remove known malicious websites sent in your server's chats
 [p]load antiphishing
 ```
 
-**[skysearch](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/skysearch)**
+### [skysearch](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/skysearch)
 
 Interactive features to let you explore and search for aircraft by their registrations, squawks, ICAO 24-bit addresses, and more, as well as fetch information about airports like locations, photos, forecasts, and more. `[p]aircraft`, `[p]airport`.
 
@@ -82,7 +82,7 @@ Interactive features to let you explore and search for aircraft by their registr
 [p]load skysearch
 ```
 
-**[disclaimers](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/disclaimers)**
+### [disclaimers](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/disclaimers)
 
 Set up and manage pre-defined disclaimers that attach to users of particular significance, like lawyers, financial advisors, or other professions where a disclaimer may be warranted as a responsible disclosure. `[p]disclaimer`, `[p]disclaimerset`.
 
@@ -94,7 +94,7 @@ Set up and manage pre-defined disclaimers that attach to users of particular sig
 ```
 
 
-**[products](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/products)**
+### [products](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/products)
 
 Cog made for primarily our server to help us deliver information on our products to inquisitive users. `(incomplete)`
 
@@ -106,7 +106,7 @@ Brand cogs are cogs we make that are intended to integrate other third party ser
 >These are made open-effort and open-source to extend the functionality of Red-DiscordBot, not to imbibe an endorsement of any one specific brand.
 >If you choose to use these in potentially sensitive environments, this is the disclaimer that indicates you do so at your own risk and liability.
 
-**[cloudflare](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/cloudflare)**
+### [cloudflare](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/cloudflare)
 
 Utilize a multitude of advanced Cloudflare tools thru Discord, including the Cloudflare URL Scanner. For the bot owner, unlock the ability to interact with multiple Cloudflare products you utilize thru your Red-DiscordBot instance.
 
@@ -117,7 +117,7 @@ Utilize a multitude of advanced Cloudflare tools thru Discord, including the Clo
 [p]load cloudflare
 ```
 
-**[virustotal](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/virustotal)**
+### [virustotal](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/virustotal)
 
 Utilize the VirusTotal API with a free API key to scan and analyze files for potential threats and malicious content. `[p]virustotal`.
 
@@ -128,7 +128,7 @@ Utilize the VirusTotal API with a free API key to scan and analyze files for pot
 [p]load virustotal
 ```
 
-**[urlscan](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/urlscan)**
+### [urlscan](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/urlscan)
 
 Leverage the power of the URLScan.io API with a `free` URLScan API Key to evaluate URLs for safety and security. Enable `[p]urlscan autoscan` to automatically monitor and protect your chat from potentially harmful links. `[p]urlscan`.
 
@@ -139,7 +139,7 @@ Leverage the power of the URLScan.io API with a `free` URLScan API Key to evalua
 [p]load urlscan
 ```
 
-**[stripeidentity](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/stripeidentity)**
+### [stripeidentity](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/stripeidentity)
 
 Utilize Stripe Identity through your Red-DiscordBot instance to intake and verify various forms of identification, including driver's licenses, passports, and state IDs. This feature is ideal for enforcing age restrictions in adult-only servers. Note that a Stripe account in good standing with access to Stripe Identity is required. Verification costs are $0.50 or $1.50 per verification. `[p]agecheck`, `[p]identitycheck`.
 
