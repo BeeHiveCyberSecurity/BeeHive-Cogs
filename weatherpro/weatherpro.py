@@ -181,20 +181,6 @@ class Weather(commands.Cog):
             nowcasts_fetched = await self.config.nowcasts_fetched()
             forecasts_fetched = await self.config.forecasts_fetched()
             glossary_definitions_shown = await self.config.glossary_definitions_shown()
-            highest_temperature = await self.config.highest_temperature()
-            highest_temperature_date = await self.config.highest_temperature_date()
-            lowest_temperature = await self.config.lowest_temperature()
-            lowest_temperature_date = await self.config.lowest_temperature_date()
-            highest_wind_speed = await self.config.highest_wind_speed()
-            highest_wind_speed_date = await self.config.highest_wind_speed_date()
-            highest_precipitation = await self.config.highest_precipitation()
-            highest_precipitation_date = await self.config.highest_precipitation_date()
-            highest_wind_gusts = await self.config.highest_wind_gusts()
-            highest_wind_gusts_date = await self.config.highest_wind_gusts_date()
-            highest_snowfall = await self.config.highest_snowfall()
-            highest_snowfall_date = await self.config.highest_snowfall_date()
-            highest_rainfall = await self.config.highest_rainfall()
-            highest_rainfall_date = await self.config.highest_rainfall_date()
 
             usage = discord.Embed(
                 title="Weather usage data",
@@ -212,6 +198,27 @@ class Weather(commands.Cog):
             usage.add_field(name="Forecasts served", value=f"**{forecasts_fetched}** forecast{'s' if forecasts_fetched != 1 else ''}", inline=True)
             usage.add_field(name="Glossary terms shown", value=f"**{glossary_definitions_shown}** term{'s' if glossary_definitions_shown != 1 else ''}", inline=True)
 
+            await ctx.send(embed=usage)
+
+    @weather.command(name="records")
+    async def records(self, ctx):
+        """Show historical weather records"""
+        async with ctx.typing():
+            highest_temperature = await self.config.highest_temperature()
+            highest_temperature_date = await self.config.highest_temperature_date()
+            lowest_temperature = await self.config.lowest_temperature()
+            lowest_temperature_date = await self.config.lowest_temperature_date()
+            highest_wind_speed = await self.config.highest_wind_speed()
+            highest_wind_speed_date = await self.config.highest_wind_speed_date()
+            highest_precipitation = await self.config.highest_precipitation()
+            highest_precipitation_date = await self.config.highest_precipitation_date()
+            highest_wind_gusts = await self.config.highest_wind_gusts()
+            highest_wind_gusts_date = await self.config.highest_wind_gusts_date()
+            highest_snowfall = await self.config.highest_snowfall()
+            highest_snowfall_date = await self.config.highest_snowfall_date()
+            highest_rainfall = await self.config.highest_rainfall()
+            highest_rainfall_date = await self.config.highest_rainfall_date()
+
             history = discord.Embed(title="Historical records", description="Records observed by the bot that users experienced in real life. Check the weather often to update statistics.", color=0xfffffe)
             history.add_field(name="Highest temperature", value=f"**{highest_temperature}°F** • {self.fahrenheit_to_celsius(highest_temperature)}°C\n**<t:{int(datetime.fromisoformat(str(highest_temperature_date)).timestamp())}:D>**" if highest_temperature is not None and highest_temperature_date is not None else "N/A", inline=True)
             history.add_field(name="Lowest temperature", value=f"**{lowest_temperature}°F** • {self.fahrenheit_to_celsius(lowest_temperature)}°C\n**<t:{int(datetime.fromisoformat(str(lowest_temperature_date)).timestamp())}:D>**" if lowest_temperature is not None and lowest_temperature_date is not None else "N/A", inline=True)
@@ -221,7 +228,6 @@ class Weather(commands.Cog):
             history.add_field(name="Most snowfall", value=f"**{highest_snowfall} inches**\n**<t:{int(datetime.fromisoformat(str(highest_snowfall_date)).timestamp())}:D>**" if highest_snowfall is not None and highest_snowfall_date is not None else "N/A", inline=True)
             history.add_field(name="Most rainfall", value=f"**{highest_rainfall} inches**\n**<t:{int(datetime.fromisoformat(str(highest_rainfall_date)).timestamp())}:D>**" if highest_rainfall is not None and highest_rainfall_date is not None else "N/A", inline=True)
 
-            await ctx.send(embed=usage)
             await ctx.send(embed=history)
 
     @weather.command(name="now")
