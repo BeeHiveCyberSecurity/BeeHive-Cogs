@@ -221,10 +221,12 @@ class Weather(commands.Cog):
             embed.add_field(name="Cloud cover", value=f"{current.get('cloud_cover', 'N/A')}%")
             embed.add_field(name="Pressure (MSL)", value=f"{current.get('pressure_msl', 'N/A')} hPa")
             embed.add_field(name="Surface pressure", value=f"{current.get('surface_pressure', 'N/A')} hPa")
+
             wind_speed = current.get('wind_speed_10m', 'N/A')
             if wind_speed != 'N/A':
                 wind_speed_knots = self.mph_to_knots(wind_speed)
                 embed.add_field(name="Wind speed", value=f"{wind_speed} mph • {wind_speed_knots} knots")
+
             wind_direction = current.get('wind_direction_10m', 'N/A')
             if wind_direction != 'N/A':
                 if (wind_direction >= 0 and wind_direction <= 22.5) or (wind_direction > 337.5 and wind_direction <= 360):
@@ -247,7 +249,9 @@ class Weather(commands.Cog):
                 wind_direction_str = 'N/A'
             embed.add_field(name="Wind direction", value=wind_direction_str)
             wind_gusts = current.get('wind_gusts_10m', 'N/A')
-            embed.add_field(name="Wind gusts", value=f"{wind_gusts} mph")
+            if wind_gusts != 'N/A':
+                wind_gusts_knots = self.mph_to_knots(wind_gusts)
+                embed.add_field(name="Wind gusts", value=f"{wind_gusts} mph • {wind_gusts_knots} knots")
             
             visibility = minutely_15.get('visibility', [0])
             if isinstance(visibility, list) and visibility:
