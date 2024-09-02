@@ -9,17 +9,33 @@ To add this repo to your Red bot, use the command
 `[p]repo add BeeHive-Cogs https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs`
 
 
-### Multipurpose cogs
+### Public cogs
 - **[weatherpro](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/weatherpro)** - Access detailed weather information, forecasts, and historical data for any location in the United States using ZIP codes. Perfect for planning events, travel, or just staying informed about the weather in your area. `[p]weather`, `[p]weatherset`.
 > `[p]cog install BeeHive-Cogs weatherpro`
 
 > `[p]load weatherpro`
 
 
-- **[ping](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/ping)** - A nice, functional ping and SpeedTest tool combined. One command, no fuss - `[p]ping`
+- **[ping](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/ping)** - A nice, functional ping and SpeedTest tool combined. One command, no fuss. `[p]ping`
+> `[p]cog install BeeHive-Cogs ping`
+
+> `[p]load ping`
+
 - **[names](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/names)** - Help manage unruly, unsightly, and otherwise annoying nicknames/screennames in your server. A dehoister on steroids, that dislikes anything that isn't alphanumeric.
+> `[p]cog install BeeHive-Cogs names`
+
+> `[p]load names`
+
 - **[antiphishing](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/antiphishing)** - Passively detect and remove malicious websites sent in your server's chats. Always on, always watchful. `(recommended)`
+> `[p]cog install BeeHive-Cogs antiphishing`
+
+> `[p]load antiphishing`
+
 - **[skysearch](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/skysearch)** - Interactive features to let you explore and search for aircraft by their registrations, squawks, ICAO 24-bit addresses, and more, as well as fetch information about airports like locations, photos, forecasts, and more. Start SkySearch once installed using `[p]aircraft` or `[p]airport`, respectively.
+> `[p]cog install BeeHive-Cogs skysearch`
+
+> `[p]load skysearch`
+
 - **[products](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/products)** - Cog made for primarily our server to help us deliver information on our products to inquisitive users. `(incomplete)`
 
 ### Brand cogs
