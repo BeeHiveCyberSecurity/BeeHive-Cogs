@@ -25,14 +25,16 @@ To add this repo to your Red bot, use the command
 > ```
 
 **[names](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/names)** - Help manage unruly, unsightly, and otherwise annoying nicknames/screennames in your server. A dehoister on steroids, that dislikes anything that isn't alphanumeric.
-> `[p]cog install BeeHive-Cogs names`
+> ```
+> [p]cog install BeeHive-Cogs names
+> [p]load names
+> ```
 
-> `[p]load names`
-
-**[antiphishing](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/antiphishing)** - Passively detect and remove malicious websites sent in your server's chats. Always on, always watchful. `(recommended)`
-> `[p]cog install BeeHive-Cogs antiphishing`
-
-> `[p]load antiphishing`
+**[antiphishing](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/antiphishing)** - Passively detect and remove malicious websites sent in your server's chats. Always on, always watchful.
+> ```
+> [p]cog install BeeHive-Cogs antiphishing
+> [p]load antiphishing
+> ```
 
 - **[skysearch](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/skysearch)** - Interactive features to let you explore and search for aircraft by their registrations, squawks, ICAO 24-bit addresses, and more, as well as fetch information about airports like locations, photos, forecasts, and more. Start SkySearch once installed using `[p]aircraft` or `[p]airport`, respectively.
 > `[p]cog install BeeHive-Cogs skysearch`
