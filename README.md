@@ -74,7 +74,7 @@ Utilize a multitude of advanced Cloudflare tools thru Discord, including the Clo
 
 **[virustotal](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/virustotal)**
 
-Leverage the VirusTotal API with a free API key to scan and analyze files and URLs for potential threats and malicious content.
+Leverage the VirusTotal API with a free API key to scan and analyze files  for potential threats and malicious content.
 > ```
 > [p]cog install BeeHive-Cogs virustotal
 > [p]load virustotal
