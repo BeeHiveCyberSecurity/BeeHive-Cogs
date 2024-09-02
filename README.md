@@ -13,9 +13,10 @@ To add this repo to your Red bot, use the command
 
 ### Public cogs
 - **[weatherpro](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/weatherpro)** - Access detailed weather information, forecasts, and historical data for any location in the United States using ZIP codes. Perfect for planning events, travel, or just staying informed about the weather in your area. `[p]weather`, `[p]weatherset`.
-> ```[p]cog install BeeHive-Cogs weatherpro```
-
-> `[p]load weatherpro`
+> ```
+> [p]cog install BeeHive-Cogs weatherpro
+> [p]load weatherpro
+> ```
 
 - **[ping](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/ping)** - A nice, functional ping and SpeedTest tool combined. One command, no fuss. `[p]ping`
 > `[p]cog install BeeHive-Cogs ping`
