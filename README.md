@@ -30,7 +30,7 @@ A nice, functional ping and SpeedTest tool combined. One command, no fuss. `[p]p
 
 **[names](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/names)**
 
-Help manage unruly, unsightly, and otherwise annoying nicknames/screennames in your server. A dehoister on steroids, that dislikes anything that isn't alphanumeric.
+Help manage unruly, unsightly, and otherwise annoying nicknames/screennames in your server. Purify and normalize visually obnoxious names, or enable automatic cleanups to keep your server tidy. `[p]nickname`.
 > ```
 > [p]cog install BeeHive-Cogs names
 > [p]load names
@@ -38,7 +38,7 @@ Help manage unruly, unsightly, and otherwise annoying nicknames/screennames in y
 
 **[antiphishing](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/antiphishing)**
 
-Passively detect and remove malicious websites sent in your server's chats. Always on, always watchful.
+Passively detect and remove malicious websites sent in your server's chats. Always on, always watchful. `[p]antiphishing`
 > ```
 > [p]cog install BeeHive-Cogs antiphishing
 > [p]load antiphishing
