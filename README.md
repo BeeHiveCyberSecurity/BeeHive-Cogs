@@ -15,7 +15,6 @@ To add this repo to your Red bot, use the command
 
 > `[p]load weatherpro`
 
-
 - **[ping](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/ping)** - A nice, functional ping and SpeedTest tool combined. One command, no fuss. `[p]ping`
 > `[p]cog install BeeHive-Cogs ping`
 
