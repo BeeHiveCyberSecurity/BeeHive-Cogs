@@ -27,7 +27,6 @@ Fetch current and upcoming conditions, search and explore hundreds of weather-fo
 
 Fetch your future forecast
 
-Extended Arg Info
 > ### zip_code: str = None
 > ```
 > A single word, if not using slash and multiple words are necessary use a quote e.g "Hello world".
@@ -37,7 +36,6 @@ Extended Arg Info
 
 Check current conditions and alerts, specify a zip for conditions at that location
 
-Extended Arg Info
 > ### zip_code: str = None
 > ```
 > A single word, if not using slash and multiple words are necessary use a quote e.g "Hello world".
@@ -71,7 +69,6 @@ Explore US weather radar installations
 
 Show a glossary, or specify a word to search
 
-Extended Arg Info
 > ### search_term: str = None
 > ```
 > A single word, if not using slash and multiple words are necessary use a quote e.g "Hello world".
@@ -114,7 +111,6 @@ Toggle severe alerts for your saved location
 
 Set your zip code for queries
 
-Extended Arg Info
 > ### zip_code: str
 > ```
 > A single word, if not using slash and multiple words are necessary use a quote e.g "Hello world".
