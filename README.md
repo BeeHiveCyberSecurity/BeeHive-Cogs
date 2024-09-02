@@ -30,6 +30,8 @@ Access detailed weather information, forecasts, and historical data for any loca
 
 ```
 [p]cog install BeeHive-Cogs weatherpro
+```
+```
 [p]load weatherpro
 ```
 
