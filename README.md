@@ -6,12 +6,12 @@ This repo contains cogs built for Red that can help keep your community safer, i
 ### Adding the repo
 To add this repo to your Red bot, use the command
 
-`[p]repo add BeeHive-Cogs https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs`
+```[p]repo add BeeHive-Cogs https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs```
 
 
 ### Public cogs
 - **[weatherpro](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/weatherpro)** - Access detailed weather information, forecasts, and historical data for any location in the United States using ZIP codes. Perfect for planning events, travel, or just staying informed about the weather in your area. `[p]weather`, `[p]weatherset`.
-> `[p]cog install BeeHive-Cogs weatherpro`
+> ```[p]cog install BeeHive-Cogs weatherpro```
 
 > `[p]load weatherpro`
 
