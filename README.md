@@ -39,18 +39,18 @@ Help manage unruly, unsightly, and otherwise annoying nicknames/screennames in y
 **[antiphishing](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/antiphishing)**
 
 Passively detect and remove known malicious websites sent in your server's chats.`[p]antiphishing`
-> ```
-> [p]cog install BeeHive-Cogs antiphishing
-> [p]load antiphishing
-> ```
+```
+[p]cog install BeeHive-Cogs antiphishing
+[p]load antiphishing
+```
 
 **[skysearch](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/skysearch)**
 
 Interactive features to let you explore and search for aircraft by their registrations, squawks, ICAO 24-bit addresses, and more, as well as fetch information about airports like locations, photos, forecasts, and more. Start SkySearch once installed using `[p]aircraft` or `[p]airport`, respectively.
-> ```
-> [p]cog install BeeHive-Cogs skysearch
-> [p]load skysearch
-> ```
+```
+[p]cog install BeeHive-Cogs skysearch
+[p]load skysearch
+```
 
 **[products](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/products)**
 
@@ -67,34 +67,34 @@ Brand cogs are cogs we make that are intended to integrate other third party ser
 **[cloudflare](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/cloudflare)**
 
 Utilize a multitude of advanced Cloudflare tools thru Discord, including the Cloudflare URL Scanner. For the bot owner, unlock the ability to interact with multiple Cloudflare products you utilize thru your Red-DiscordBot instance.
-> ```
-> [p]cog install BeeHive-Cogs cloudflare
-> [p]load cloudflare
-> ```
+```
+[p]cog install BeeHive-Cogs cloudflare
+[p]load cloudflare
+```
 
 **[virustotal](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/virustotal)**
 
 Leverage the VirusTotal API with a free API key to scan and analyze files  for potential threats and malicious content.
-> ```
-> [p]cog install BeeHive-Cogs virustotal
-> [p]load virustotal
-> ```
+```
+[p]cog install BeeHive-Cogs virustotal
+[p]load virustotal
+```
 
 **[urlscan](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/urlscan)**
 
 Leverage the power of the URLScan.io API with a `free` URLScan API Key to evaluate URLs for safety and security. Enable `[p]urlscan autoscan` to automatically monitor and protect your chat from potentially harmful links.
-> ```
-> [p]cog install BeeHive-Cogs urlscan
-> [p]load urlscan
-> ```
+```
+[p]cog install BeeHive-Cogs urlscan
+[p]load urlscan
+```
 
 **[stripeidentity](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/stripeidentity)**
 
 Utilize Stripe Identity through your Red-DiscordBot instance to intake and verify various forms of identification, including driver's licenses, passports, and state IDs. This feature is ideal for enforcing age restrictions in adult-only servers. Note that a Stripe account in good standing with access to Stripe Identity is required. Verification costs are $0.50 or $1.50 per verification.
-> ```
-> [p]cog install BeeHive-Cogs stripeidentity
-> [p]load stripeidentity
-> ```
+```
+[p]cog install BeeHive-Cogs stripeidentity
+[p]load stripeidentity
+```
 
 
 
