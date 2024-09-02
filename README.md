@@ -17,7 +17,7 @@ To add this repo to your Red bot, use the command
 
 
 - **[ping](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/ping)** - A nice, functional ping and SpeedTest tool combined. One command, no fuss - `[p]ping`
-- **[nicknamemanagement](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/nicknamemanagement)** - Help manage unruly, unsightly, and otherwise annoying nicknames/screennames in your server. A dehoister on steroids, that dislikes anything that isn't alphanumeric.
+- **[names](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/names)** - Help manage unruly, unsightly, and otherwise annoying nicknames/screennames in your server. A dehoister on steroids, that dislikes anything that isn't alphanumeric.
 - **[antiphishing](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/antiphishing)** - Passively detect and remove malicious websites sent in your server's chats. Always on, always watchful. `(recommended)`
 - **[skysearch](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/skysearch)** - Interactive features to let you explore and search for aircraft by their registrations, squawks, ICAO 24-bit addresses, and more, as well as fetch information about airports like locations, photos, forecasts, and more. Start SkySearch once installed using `[p]aircraft` or `[p]airport`, respectively.
 - **[products](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/products)** - Cog made for primarily our server to help us deliver information on our products to inquisitive users. `(incomplete)`
