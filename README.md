@@ -42,6 +42,8 @@ A nice, functional ping-and-speedtest cog that shows your host latency, transit 
 
 ```
 [p]cog install BeeHive-Cogs ping
+```
+```
 [p]load ping
 ```
 
@@ -51,6 +53,8 @@ Help manage unruly, unsightly, and otherwise annoying nicknames/screennames in y
 
 ```
 [p]cog install BeeHive-Cogs names
+```
+```
 [p]load names
 ```
 
@@ -60,6 +64,8 @@ Passively detect and remove known malicious websites sent in your server's chats
 
 ```
 [p]cog install BeeHive-Cogs antiphishing
+```
+```
 [p]load antiphishing
 ```
 
@@ -69,6 +75,8 @@ Interactive features to let you explore and search for aircraft by their registr
 
 ```
 [p]cog install BeeHive-Cogs skysearch
+```
+```
 [p]load skysearch
 ```
 
@@ -78,6 +86,8 @@ Set up and manage pre-defined disclaimers that attach to users of particular sig
 
 ```
 [p]cog install BeeHive-Cogs disclaimers
+```
+```
 [p]load disclaimers
 ```
 
@@ -100,6 +110,8 @@ Utilize a multitude of advanced Cloudflare tools thru Discord, including the Clo
 
 ```
 [p]cog install BeeHive-Cogs cloudflare
+```
+```
 [p]load cloudflare
 ```
 
@@ -109,6 +121,8 @@ Utilize the VirusTotal API with a free API key to scan and analyze files for pot
 
 ```
 [p]cog install BeeHive-Cogs virustotal
+```
+```
 [p]load virustotal
 ```
 
@@ -118,6 +132,8 @@ Leverage the power of the URLScan.io API with a `free` URLScan API Key to evalua
 
 ```
 [p]cog install BeeHive-Cogs urlscan
+```
+```
 [p]load urlscan
 ```
 
@@ -127,6 +143,8 @@ Utilize Stripe Identity through your Red-DiscordBot instance to intake and verif
 
 ```
 [p]cog install BeeHive-Cogs stripeidentity
+```
+```
 [p]load stripeidentity
 ```
 
