@@ -43,10 +43,10 @@ class Ping(commands.Cog):  # Use Red's Cog class
 
         # Create an embed for a more detailed response
         embed = discord.Embed(title=embed_title, description=embed_description, color=embed_color)
-        embed.add_field(name="Latency", value="\u200b", inline=False)
+        embed.add_field(name="Latency", value="", inline=False)
         embed.add_field(name="Network latency", value=f"**{avg_latency}ms**", inline=True)
         embed.add_field(name="Host latency", value=f"**{ping}ms**", inline=True)
-        embed.add_field(name="Speedtest", value="\u200b", inline=False)
+        embed.add_field(name="Speedtest", value="", inline=False)
         embed.add_field(name="Download speed", value=f"**{download_speed}Mbps**", inline=True)
         embed.add_field(name="Upload speed", value=f"**{upload_speed}Mbps**", inline=True)
 
