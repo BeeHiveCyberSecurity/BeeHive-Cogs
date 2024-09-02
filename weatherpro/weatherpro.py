@@ -144,8 +144,8 @@ class Weather(commands.Cog):
                 await self.config.forecasts_fetched.set(forecasts_fetched + 1)
                 page = 0
                 await message.add_reaction("⬅️")
-                await message.add_reaction("➡️")
                 await message.add_reaction("❌")
+                await message.add_reaction("➡️")
 
                 def check(reaction, user):
                     return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️", "❌"] and reaction.message.id == message.id
