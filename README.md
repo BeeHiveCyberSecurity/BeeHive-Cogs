@@ -22,7 +22,7 @@ Access detailed weather information, forecasts, and historical data for any loca
 
 **[ping](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/ping)**
 
-A nice, functional ping and SpeedTest tool combined. One command, no fuss. `[p]ping`
+A nice, functional ping-and-speedtest cog that shows your host latency, transit latency, download speed, and upload speed in a neat, orderly, no-frills embed. If your bot is hosted on a poor quality connection, includes a special offer when detected. `[p]ping`
 > ```
 > [p]cog install BeeHive-Cogs ping
 > [p]load ping
@@ -30,7 +30,7 @@ A nice, functional ping and SpeedTest tool combined. One command, no fuss. `[p]p
 
 **[names](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/names)**
 
-Help manage unruly, unsightly, and otherwise annoying nicknames/screennames in your server. Purify and normalize visually obnoxious names, or enable automatic cleanups to keep your server tidy. `[p]nickname`.
+Help manage unruly, unsightly, and otherwise annoying nicknames/screennames in your server. Purify and normalize visually obnoxious names manually, or enable automatic cleanups to keep your server tidy. `[p]nickname`.
 > ```
 > [p]cog install BeeHive-Cogs names
 > [p]load names
@@ -38,7 +38,7 @@ Help manage unruly, unsightly, and otherwise annoying nicknames/screennames in y
 
 **[antiphishing](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/antiphishing)**
 
-Passively detect and remove malicious websites sent in your server's chats. Always on, always watchful. `[p]antiphishing`
+Passively detect and remove known malicious websites sent in your server's chats.`[p]antiphishing`
 > ```
 > [p]cog install BeeHive-Cogs antiphishing
 > [p]load antiphishing
