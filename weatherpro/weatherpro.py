@@ -640,7 +640,6 @@ class Weather(commands.Cog):
         pages.append(embed2)
 
         # Page 3: alert types
-        embed3 = discord.Embed(title="Active weather alerts by type", color=0xfffffe)
         alerts_url = "https://api.weather.gov/alerts/active"
         async with aiohttp.ClientSession() as session:
             async with session.get(alerts_url) as alerts_response:
@@ -656,9 +655,13 @@ class Weather(commands.Cog):
                             alert_types[alert_type] += 1
                         else:
                             alert_types[alert_type] = 1
-                    for alert_type, count in alert_types.items():
-                        embed3.add_field(name=alert_type, value=count, inline=True)
-        pages.append(embed3)
+
+                    alert_type_items = list(alert_types.items())
+                    for i in range(0, len(alert_type_items), 25):
+                        embed = discord.Embed(title="Active weather alerts by type", color=0xfffffe)
+                        for alert_type, count in alert_type_items[i:i+25]:
+                            embed.add_field(name=alert_type, value=count, inline=True)
+                        pages.append(embed)
 
         # Page 4 and beyond: areas
         state_full_names = {
