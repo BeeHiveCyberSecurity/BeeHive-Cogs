@@ -689,7 +689,7 @@ class Weather(commands.Cog):
                 embed = discord.Embed(title="Active weather alerts per area", color=0xfffffe)
                 for state, count in states[i:i+25]:
                     full_name = state_full_names.get(state, state)
-                    embed.add_field(name=full_name, value=count, inline=True)
+                    embed.add_field(name=full_name, value=f"**{count}** alerts", inline=True)
                 pages.append(embed)
 
         if not pages:
