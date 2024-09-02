@@ -52,7 +52,7 @@ Passively detect and remove known malicious websites sent in your server's chats
 
 **[skysearch](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/skysearch)**
 
-Interactive features to let you explore and search for aircraft by their registrations, squawks, ICAO 24-bit addresses, and more, as well as fetch information about airports like locations, photos, forecasts, and more. Start SkySearch once installed using `[p]aircraft` or `[p]airport`, respectively.
+Interactive features to let you explore and search for aircraft by their registrations, squawks, ICAO 24-bit addresses, and more, as well as fetch information about airports like locations, photos, forecasts, and more. `[p]aircraft`, `[p]airport`.
 
 ```
 [p]cog install BeeHive-Cogs skysearch
@@ -82,7 +82,7 @@ Utilize a multitude of advanced Cloudflare tools thru Discord, including the Clo
 
 **[virustotal](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/virustotal)**
 
-Utilize the VirusTotal API with a free API key to scan and analyze files for potential threats and malicious content.
+Utilize the VirusTotal API with a free API key to scan and analyze files for potential threats and malicious content. `[p]virustotal`.
 
 ```
 [p]cog install BeeHive-Cogs virustotal
@@ -91,7 +91,7 @@ Utilize the VirusTotal API with a free API key to scan and analyze files for pot
 
 **[urlscan](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/urlscan)**
 
-Leverage the power of the URLScan.io API with a `free` URLScan API Key to evaluate URLs for safety and security. Enable `[p]urlscan autoscan` to automatically monitor and protect your chat from potentially harmful links.
+Leverage the power of the URLScan.io API with a `free` URLScan API Key to evaluate URLs for safety and security. Enable `[p]urlscan autoscan` to automatically monitor and protect your chat from potentially harmful links. `[p]urlscan`.
 
 ```
 [p]cog install BeeHive-Cogs urlscan
@@ -100,7 +100,7 @@ Leverage the power of the URLScan.io API with a `free` URLScan API Key to evalua
 
 **[stripeidentity](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/stripeidentity)**
 
-Utilize Stripe Identity through your Red-DiscordBot instance to intake and verify various forms of identification, including driver's licenses, passports, and state IDs. This feature is ideal for enforcing age restrictions in adult-only servers. Note that a Stripe account in good standing with access to Stripe Identity is required. Verification costs are $0.50 or $1.50 per verification.
+Utilize Stripe Identity through your Red-DiscordBot instance to intake and verify various forms of identification, including driver's licenses, passports, and state IDs. This feature is ideal for enforcing age restrictions in adult-only servers. Note that a Stripe account in good standing with access to Stripe Identity is required. Verification costs are $0.50 or $1.50 per verification. `[p]agecheck`, `[p]identitycheck`.
 
 ```
 [p]cog install BeeHive-Cogs stripeidentity
