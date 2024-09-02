@@ -12,23 +12,24 @@ To add this repo to your Red bot, use the command
 
 
 ### Public cogs
-- **[weatherpro](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/weatherpro)** - Access detailed weather information, forecasts, and historical data for any location in the United States using ZIP codes. Perfect for planning events, travel, or just staying informed about the weather in your area. `[p]weather`, `[p]weatherset`.
+**[weatherpro](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/weatherpro)** - Access detailed weather information, forecasts, and historical data for any location in the United States using ZIP codes. Perfect for planning events, travel, or just staying informed about the weather in your area. `[p]weather`, `[p]weatherset`.
 > ```
 > [p]cog install BeeHive-Cogs weatherpro
 > [p]load weatherpro
 > ```
 
-- **[ping](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/ping)** - A nice, functional ping and SpeedTest tool combined. One command, no fuss. `[p]ping`
-> `[p]cog install BeeHive-Cogs ping`
+**[ping](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/ping)** - A nice, functional ping and SpeedTest tool combined. One command, no fuss. `[p]ping`
+> ```
+> [p]cog install BeeHive-Cogs ping
+> [p]load ping
+> ```
 
-> `[p]load ping`
-
-- **[names](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/names)** - Help manage unruly, unsightly, and otherwise annoying nicknames/screennames in your server. A dehoister on steroids, that dislikes anything that isn't alphanumeric.
+**[names](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/names)** - Help manage unruly, unsightly, and otherwise annoying nicknames/screennames in your server. A dehoister on steroids, that dislikes anything that isn't alphanumeric.
 > `[p]cog install BeeHive-Cogs names`
 
 > `[p]load names`
 
-- **[antiphishing](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/antiphishing)** - Passively detect and remove malicious websites sent in your server's chats. Always on, always watchful. `(recommended)`
+**[antiphishing](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/antiphishing)** - Passively detect and remove malicious websites sent in your server's chats. Always on, always watchful. `(recommended)`
 > `[p]cog install BeeHive-Cogs antiphishing`
 
 > `[p]load antiphishing`
