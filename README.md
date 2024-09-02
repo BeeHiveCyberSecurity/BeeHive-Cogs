@@ -13,7 +13,7 @@ Before you can install our cogs, you need to add our repo to your instance so it
 When you run this command, Red may give you a warning about installing third party cogs. If you're presented with this, you'll need to respond in chat with "I agree". We'll provide a, relatively same-in-spirit disclaimer below.
 
 >[!WARNING]
->**Installing third-party cogs can increase resource utilization of your bot and severely degrade usability in resource-restricted environments.** Only install, cogs, from sources that you trust, and when possible, audit code before updating the versions your bot loads.  
+>**Installing third-party cogs can increase resource utilization, create security risks, reduce system stability, and otherwise severely degrade usability of your bot, especially in resource-restricted environments.** Only install cogs from sources that you trust, of which you trust test and verify their code.  
 
 
 ### Public cogs
