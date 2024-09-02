@@ -624,7 +624,9 @@ class Weather(commands.Cog):
         embed1 = discord.Embed(title="Summary of active weather alerts", color=0xfffffe)
         for key in ["total", "land", "marine"]:
             if key in data:
-                embed1.add_field(name=key.capitalize(), value=f"**{data[key]}** alerts", inline=True)
+                count = data[key]
+                alert_word = "alert" if count == 1 else "alerts"
+                embed1.add_field(name=key.capitalize(), value=f"**{count}** {alert_word}", inline=True)
         pages.append(embed1)
 
         # Page 2: regions
@@ -636,7 +638,8 @@ class Weather(commands.Cog):
         if "regions" in data:
             for region, count in data["regions"].items():
                 full_name = region_full_names.get(region, region)
-                embed2.add_field(name=full_name, value=f"**{count}** alerts", inline=True)
+                alert_word = "alert" if count == 1 else "alerts"
+                embed2.add_field(name=full_name, value=f"**{count}** {alert_word}", inline=True)
         pages.append(embed2)
 
         # Page 3: alert types
@@ -662,7 +665,8 @@ class Weather(commands.Cog):
                     for i in range(0, len(alert_type_items), 25):
                         embed = discord.Embed(title="Active weather alerts by type", color=0xfffffe)
                         for alert_type, count in alert_type_items[i:i+25]:
-                            embed.add_field(name=alert_type, value=f"**{count}** active", inline=True)
+                            alert_word = "alert" if count == 1 else "alerts"
+                            embed.add_field(name=alert_type, value=f"**{count}** {alert_word}", inline=True)
                         pages.append(embed)
 
         # Page 4 and beyond: areas
@@ -690,7 +694,8 @@ class Weather(commands.Cog):
                 embed = discord.Embed(title="Active weather alerts per area", color=0xfffffe)
                 for state, count in states[i:i+25]:
                     full_name = state_full_names.get(state, state)
-                    embed.add_field(name=full_name, value=f"**{count}** alerts", inline=True)
+                    alert_word = "alert" if count == 1 else "alerts"
+                    embed.add_field(name=full_name, value=f"**{count}** {alert_word}", inline=True)
                 pages.append(embed)
 
         if not pages:
