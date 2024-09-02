@@ -1,4 +1,4 @@
-from .nicknamemanagement import NicknameManagement
+from .names import NicknameManagement
 
 async def setup(bot):
     cog = NicknameManagement(bot)
