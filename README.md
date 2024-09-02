@@ -4,11 +4,16 @@ Red is a free, self-hostable, open-source Discord bot that can be used in growin
 This repository contains cogs that can help equip your Red instance with advanced features that safeguard your community, and improve your member's server experience.
 
 ### Adding the repo
-To add this repo to your Red bot, use the command
+Before you can install our cogs, you need to add our repo to your instance so it can find, our cogs by name. To do so, run the following command.
 
 ```
 [p]repo add BeeHive-Cogs https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs
 ```
+
+When you run this command, Red may give you a warning about installing third party cogs. If you're presented with this, you'll need to respond in chat with "I agree". We'll provide a, relatively same-in-spirit disclaimer below.
+
+>[!WARNING]
+>**Installing third-party cogs can increase resource utilization of your bot and severely degrade usability in resource-restricted environments.** Only install, cogs, from sources that you trust, and when possible, audit code before updating the versions your bot loads.  
 
 
 ### Public cogs
