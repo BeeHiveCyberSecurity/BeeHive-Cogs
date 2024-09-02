@@ -6,9 +6,9 @@ This repository contains cogs that can help equip your Red instance with advance
 ### Adding the repo
 To add this repo to your Red bot, use the command
 
-> ```
-> [p]repo add BeeHive-Cogs https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs
-> ```
+```
+[p]repo add BeeHive-Cogs https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs
+```
 
 
 ### Public cogs
