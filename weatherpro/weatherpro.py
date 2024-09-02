@@ -204,28 +204,6 @@ class Weather(commands.Cog):
             if isinstance(ground_temp, list) and ground_temp:
                 ground_temp = ground_temp[0]
             embed.add_field(name="Ground temperature", value=f"**{ground_temp}°F** • {self.fahrenheit_to_celsius(ground_temp)}°C")
-            
-            embed.add_field(name="Humidity", value=f"{current.get('relative_humidity_2m', 'N/A')}%")
-            
-            precipitation = current.get('precipitation', 'N/A')
-            if precipitation != 'N/A' and precipitation != 0.0:
-                embed.add_field(name="Precipitation", value=f"{precipitation} inches")
-            
-            rain = current.get('rain', 'N/A')
-            if rain != 'N/A' and rain != 0.0:
-                embed.add_field(name="Rain", value=f"{rain} inches")
-            
-            showers = current.get('showers', 'N/A')
-            if showers != 'N/A' and showers != 0.0:
-                embed.add_field(name="Showers", value=f"{showers} inches")
-            
-            snowfall = current.get('snowfall', 'N/A')
-            if snowfall != 'N/A' and snowfall != 0.0:
-                embed.add_field(name="Snowfall", value=f"{snowfall} inches")
-            
-            embed.add_field(name="Cloud cover", value=f"{current.get('cloud_cover', 'N/A')}%")
-            embed.add_field(name="Pressure (MSL)", value=f"{current.get('pressure_msl', 'N/A')} hPa")
-            embed.add_field(name="Surface pressure", value=f"{current.get('surface_pressure', 'N/A')} hPa")
 
             wind_speed = current.get('wind_speed_10m', 'N/A')
             if wind_speed != 'N/A':
@@ -257,6 +235,28 @@ class Weather(commands.Cog):
             if wind_gusts != 'N/A':
                 wind_gusts_knots = self.mph_to_knots(wind_gusts)
                 embed.add_field(name="Wind gusts", value=f"{wind_gusts} mph • {wind_gusts_knots} kts")
+            
+            embed.add_field(name="Humidity", value=f"{current.get('relative_humidity_2m', 'N/A')}%")
+            
+            precipitation = current.get('precipitation', 'N/A')
+            if precipitation != 'N/A' and precipitation != 0.0:
+                embed.add_field(name="Precipitation", value=f"{precipitation} inches")
+            
+            rain = current.get('rain', 'N/A')
+            if rain != 'N/A' and rain != 0.0:
+                embed.add_field(name="Rain", value=f"{rain} inches")
+            
+            showers = current.get('showers', 'N/A')
+            if showers != 'N/A' and showers != 0.0:
+                embed.add_field(name="Showers", value=f"{showers} inches")
+            
+            snowfall = current.get('snowfall', 'N/A')
+            if snowfall != 'N/A' and snowfall != 0.0:
+                embed.add_field(name="Snowfall", value=f"{snowfall} inches")
+            
+            embed.add_field(name="Cloud cover", value=f"{current.get('cloud_cover', 'N/A')}%")
+            embed.add_field(name="Pressure (MSL)", value=f"{current.get('pressure_msl', 'N/A')} hPa")
+            embed.add_field(name="Surface pressure", value=f"{current.get('surface_pressure', 'N/A')} hPa")
             
             visibility = minutely_15.get('visibility', [0])
             if isinstance(visibility, list) and visibility:
