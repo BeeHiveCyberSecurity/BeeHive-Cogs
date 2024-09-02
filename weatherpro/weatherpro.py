@@ -642,8 +642,10 @@ class Weather(commands.Cog):
         # Page 3: alert types
         embed3 = discord.Embed(title="Active weather alerts by type", color=0xfffffe)
         if "alerts" in data:
-            for alert_type, count in data["alerts"].items():
-                embed3.add_field(name=alert_type, value=count, inline=True)
+            for alert in data["alerts"]:
+                alert_type = alert.get("event", "Unknown")
+                alert_count = alert.get("count", 0)
+                embed3.add_field(name=alert_type, value=alert_count, inline=True)
         pages.append(embed3)
 
         # Page 4 and beyond: areas
