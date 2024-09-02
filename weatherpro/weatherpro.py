@@ -636,7 +636,7 @@ class Weather(commands.Cog):
         if "regions" in data:
             for region, count in data["regions"].items():
                 full_name = region_full_names.get(region, region)
-                embed2.add_field(name=full_name, value=count, inline=True)
+                embed2.add_field(name=full_name, value=f"**{count}** alerts", inline=True)
         pages.append(embed2)
 
         # Page 3: alert types
@@ -662,7 +662,7 @@ class Weather(commands.Cog):
                     for i in range(0, len(alert_type_items), 25):
                         embed = discord.Embed(title="Active weather alerts by type", color=0xfffffe)
                         for alert_type, count in alert_type_items[i:i+25]:
-                            embed.add_field(name=alert_type, value=count, inline=True)
+                            embed.add_field(name=alert_type, value=f"**{count}** active", inline=True)
                         pages.append(embed)
 
         # Page 4 and beyond: areas
