@@ -262,14 +262,14 @@ class Weather(commands.Cog):
                 visibility_value_miles = visibility[0] / 5280
                 visibility_value_meters = float(self.miles_to_meters(visibility_value_miles))
                 if visibility_value_meters < 1000:
-                    visibility_str = f"{visibility_value_meters:.1f} meters"
+                    visibility_str = f"{visibility_value_meters:.1f} m"
                 else:
                     visibility_value_km = visibility_value_meters / 1000
                     visibility_str = f"{visibility_value_km:.1f} km"
             else:
                 visibility_value_miles = 0
                 visibility_str = "0.0 miles"
-            embed.add_field(name="Visibility", value=f"{visibility_value_miles:.2f} miles • {visibility_str}")
+            embed.add_field(name="Visibility", value=f"{visibility_value_miles:.2f} mi • {visibility_str}")
             
             lightning_potential = minutely_15.get('lightning_potential', 'None')
             if isinstance(lightning_potential, list) and lightning_potential:
