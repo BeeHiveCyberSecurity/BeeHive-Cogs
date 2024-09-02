@@ -5,6 +5,8 @@ import csv
 from datetime import datetime
 from redbot.core import commands, Config #type: ignore
 from redbot.core.data_manager import bundled_data_path #type: ignore
+import matplotlib.pyplot as plt
+import io
 
 class Weather(commands.Cog):
     """It's beautiful out there"""
@@ -118,7 +120,11 @@ class Weather(commands.Cog):
                     return
                 
                 embeds = []
-                
+                high_temps = []
+                low_temps = []
+                precip_chances = []
+                time_labels = []
+
                 for period in periods[:10]:  # Create a page for each of the next 5 forecast periods
                     name = period.get('name', 'N/A')
                     detailed_forecast = period.get('detailedForecast', 'No detailed forecast available.')
@@ -138,14 +144,69 @@ class Weather(commands.Cog):
                     embed.add_field(name="Wind Direction", value=wind_direction)
                     
                     embeds.append(embed)
+
+                    # Collect data for graphs
+                    high_temps.append(period.get('temperature', 0))
+                    low_temps.append(period.get('temperature', 0))  # Assuming low temps are the same as high for simplicity
+                    precip_chances.append(period.get('probabilityOfPrecipitation', {}).get('value', 0))
+                    time_labels.append(name)
                 
-                message = await ctx.send(embed=embeds[0])
+                # Create graphs
+                fig, ax = plt.subplots()
+                ax.plot(time_labels, high_temps, label='High Temperatures')
+                ax.plot(time_labels, low_temps, label='Low Temperatures')
+                ax.set_xlabel('Time')
+                ax.set_ylabel('Temperature (°F)')
+                ax.set_title('Temperature Forecast')
+                ax.legend()
+                buf = io.BytesIO()
+                plt.savefig(buf, format='png')
+                buf.seek(0)
+                file = discord.File(buf, filename="temperature_forecast.png")
+                temp_embed = discord.Embed(title="Temperature Forecast", color=0xfffffe)
+                temp_embed.set_image(url="attachment://temperature_forecast.png")
+                embeds.append(temp_embed)
+
+                fig, ax = plt.subplots()
+                ax.plot(time_labels, precip_chances, label='Chance of Precipitation')
+                ax.set_xlabel('Time')
+                ax.set_ylabel('Precipitation Chance (%)')
+                ax.set_title('Precipitation Forecast')
+                ax.legend()
+                buf = io.BytesIO()
+                plt.savefig(buf, format='png')
+                buf.seek(0)
+                file2 = discord.File(buf, filename="precipitation_forecast.png")
+                precip_embed = discord.Embed(title="Precipitation Forecast", color=0xfffffe)
+                precip_embed.set_image(url="attachment://precipitation_forecast.png")
+                embeds.append(precip_embed)
+                
+                message = await ctx.send(embed=embeds[0], files=[file, file2])
                 forecasts_fetched = await self.config.forecasts_fetched()
                 await self.config.forecasts_fetched.set(forecasts_fetched + 1)
                 page = 0
                 await message.add_reaction("⬅️")
                 await message.add_reaction("❌")
                 await message.add_reaction("➡️")
+
+                def check(reaction, user):
+                    return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️", "❌"] and reaction.message.id == message.id
+
+                while True:
+                    try:
+                        reaction, user = await self.bot.wait_for("reaction_add", timeout=60.0, check=check)
+                        if str(reaction.emoji) == "➡️":
+                            page = (page + 1) % len(embeds)
+                        elif str(reaction.emoji) == "⬅️":
+                            page = (page - 1) % len(embeds)
+                        elif str(reaction.emoji) == "❌":
+                            await message.delete()
+                            break
+                        
+                        await message.edit(embed=embeds[page])
+                        await message.remove_reaction(reaction, user)
+                    except asyncio.TimeoutError:
+                        break
 
                 def check(reaction, user):
                     return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️", "❌"] and reaction.message.id == message.id
