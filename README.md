@@ -16,7 +16,7 @@ When you run this command, Red may give you a warning about installing third par
 
 We'll provide a, relatively same-in-spirit disclaimer below.
 
->[!WARNING]
+>[!CAUTION]
 >**Installing third-party cogs can increase resource utilization, create security risks, reduce system stability, and otherwise severely degrade usability of your bot, especially in resource-restricted environments.** 
 >
 >**Only install cogs from sources that you trust.** 
@@ -101,7 +101,7 @@ Cog made for primarily our server to help us deliver information on our products
 ## Brand cogs
 Brand cogs are cogs we make that are intended to integrate other third party services primarily with your, Red instance. Red is a powerful tool when correctly equipped, and we hope these cogs help extend your Red-bot's capabilities.
 
->[!WARNING]
+>[!TIP]
 >Unless otherwise specified, brand cogs are not authored, audited, or endorsed by the brands and tools that they interact with.
 >These are made open-effort and open-source to extend the functionality of Red-DiscordBot, not to imbibe an endorsement of any one specific brand.
 >If you choose to use these in potentially sensitive environments, this is the disclaimer that indicates you do so at your own risk and liability.

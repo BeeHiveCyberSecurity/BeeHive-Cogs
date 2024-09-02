@@ -11,7 +11,7 @@ WeatherPro is a powerful cog for the Red Discord bot that provides detailed weat
 - **Heat Alerts**: Get notified about dangerously hot temperatures.
 - **Customizable**: Set your ZIP code for personalized weather queries.
 
->[!NOTE]
+>[!TIP]
 >The **[weatherpro](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/weatherpro)** cog relies on pre-mapped location information that from time to time, may be inaccurate. If you feel the conditions shown in this cog are, out-of-parity with the conditions you're experiencing in real life, you should [open an issue](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/issues/new?assignees=&labels=enhancement%2C+good+first+issue&projects=&template=location-review.md&title=%28Location+review%29) to ask us to review our location mapped for your zip code.
 
 # Commands
