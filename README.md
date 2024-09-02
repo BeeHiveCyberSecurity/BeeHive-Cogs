@@ -70,6 +70,16 @@ Interactive features to let you explore and search for aircraft by their registr
 [p]load skysearch
 ```
 
+**[disclaimers](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/disclaimers)**
+
+Set up and manage pre-defined disclaimers that attach to users of particular significance, like lawyers, financial advisors, or other professions where a disclaimer may be warranted as a responsible disclosure. `[p]disclaimer`, `[p]disclaimerset`.
+
+```
+[p]cog install BeeHive-Cogs disclaimers
+[p]load disclaimers
+```
+
+
 **[products](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/products)**
 
 Cog made for primarily our server to help us deliver information on our products to inquisitive users. `(incomplete)`
