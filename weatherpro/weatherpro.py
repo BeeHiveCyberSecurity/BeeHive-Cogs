@@ -76,6 +76,95 @@ class Weather(commands.Cog):
     async def weather(self, ctx):
         """Fetch current and upcoming conditions, search and explore hundreds of weather-focused words, check alert statistics across the country, and fetch information on observation stations and radar installations"""
 
+    @commands.guild_only()
+    @weather.command(name="forecast")
+    async def forecast(self, ctx):
+        """Fetch your future forecast"""
+        zip_code = await self.config.user(ctx.author).zip_code()
+        if not zip_code:
+            await ctx.send("You haven't set a zip code yet. Use the `weatherset zip` command to set one.")
+            return
+        
+        # Fetch latitude and longitude using the zip code
+        if zip_code not in self.zip_codes:
+            await ctx.send("Invalid zip code. Please set a valid zip code.")
+            return
+        
+        latitude, longitude = self.zip_codes[zip_code]
+        points_url = f"https://api.weather.gov/points/{latitude.strip()},{longitude.strip()}"
+        
+        # Fetch weather data using the latitude and longitude
+        async with self.session.get(points_url) as response:
+            if response.status != 200:
+                await ctx.send(f"Failed to fetch the weather data. URL: {points_url}, Status Code: {response.status}")
+                return
+
+            data = await response.json()
+            forecast_url = data.get('properties', {}).get('forecast')
+            if not forecast_url:
+                await ctx.send(f"Failed to retrieve forecast URL. URL: {points_url}, Data: {data}")
+                return
+            
+            async with self.session.get(forecast_url) as forecast_response:
+                if forecast_response.status != 200:
+                    await ctx.send(f"Failed to fetch the forecast data. URL: {forecast_url}, Status Code: {forecast_response.status}")
+                    return
+                
+                forecast_data = await forecast_response.json()
+                periods = forecast_data.get('properties', {}).get('periods', [])
+                if not periods:
+                    await ctx.send(f"Failed to retrieve forecast periods. URL: {forecast_url}, Data: {forecast_data}")
+                    return
+                
+                embeds = []
+                
+                for period in periods[:10]:  # Create a page for each of the next 5 forecast periods
+                    name = period.get('name', 'N/A')
+                    detailed_forecast = period.get('detailedForecast', 'No detailed forecast available.')
+                    temperature = period.get('temperature', 'N/A')
+                    if temperature != 'N/A':
+                        temperature = f"{temperature}°F"
+                    wind_speed = period.get('windSpeed', 'N/A')
+                    wind_direction = period.get('windDirection', 'N/A')
+                    
+                    embed = discord.Embed(
+                        title=f"Weather forecast for {name}",
+                        description=f"{detailed_forecast}",
+                        color=0xfffffe
+                    )
+                    embed.add_field(name="Temperature", value=temperature)
+                    embed.add_field(name="Wind Speed", value=wind_speed)
+                    embed.add_field(name="Wind Direction", value=wind_direction)
+                    
+                    embeds.append(embed)
+                
+                message = await ctx.send(embed=embeds[0])
+                forecasts_fetched = await self.config.forecasts_fetched()
+                await self.config.forecasts_fetched.set(forecasts_fetched + 1)
+                page = 0
+                await message.add_reaction("⬅️")
+                await message.add_reaction("➡️")
+                await message.add_reaction("❌")
+
+                def check(reaction, user):
+                    return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️", "❌"] and reaction.message.id == message.id
+
+                while True:
+                    try:
+                        reaction, user = await self.bot.wait_for("reaction_add", timeout=60.0, check=check)
+                        if str(reaction.emoji) == "➡️":
+                            page = (page + 1) % len(embeds)
+                        elif str(reaction.emoji) == "⬅️":
+                            page = (page - 1) % len(embeds)
+                        elif str(reaction.emoji) == "❌":
+                            await message.delete()
+                            break
+                        
+                        await message.edit(embed=embeds[page])
+                        await message.remove_reaction(reaction, user)
+                    except asyncio.TimeoutError:
+                        break
+
     @weather.command(name="stats")
     async def stats(self, ctx):
         """Show statistics about weather feature usage"""
@@ -405,95 +494,6 @@ class Weather(commands.Cog):
                 if highest_rainfall is None or showers > highest_rainfall:
                     await self.config.highest_rainfall.set(showers)
                     await self.config.highest_rainfall_date.set(current_date)
-
-    @commands.guild_only()
-    @weather.command(name="forecast")
-    async def forecast(self, ctx):
-        """Fetch your future forecast"""
-        zip_code = await self.config.user(ctx.author).zip_code()
-        if not zip_code:
-            await ctx.send("You haven't set a zip code yet. Use the `weatherset zip` command to set one.")
-            return
-        
-        # Fetch latitude and longitude using the zip code
-        if zip_code not in self.zip_codes:
-            await ctx.send("Invalid zip code. Please set a valid zip code.")
-            return
-        
-        latitude, longitude = self.zip_codes[zip_code]
-        points_url = f"https://api.weather.gov/points/{latitude.strip()},{longitude.strip()}"
-        
-        # Fetch weather data using the latitude and longitude
-        async with self.session.get(points_url) as response:
-            if response.status != 200:
-                await ctx.send(f"Failed to fetch the weather data. URL: {points_url}, Status Code: {response.status}")
-                return
-
-            data = await response.json()
-            forecast_url = data.get('properties', {}).get('forecast')
-            if not forecast_url:
-                await ctx.send(f"Failed to retrieve forecast URL. URL: {points_url}, Data: {data}")
-                return
-            
-            async with self.session.get(forecast_url) as forecast_response:
-                if forecast_response.status != 200:
-                    await ctx.send(f"Failed to fetch the forecast data. URL: {forecast_url}, Status Code: {forecast_response.status}")
-                    return
-                
-                forecast_data = await forecast_response.json()
-                periods = forecast_data.get('properties', {}).get('periods', [])
-                if not periods:
-                    await ctx.send(f"Failed to retrieve forecast periods. URL: {forecast_url}, Data: {forecast_data}")
-                    return
-                
-                embeds = []
-                
-                for period in periods[:10]:  # Create a page for each of the next 5 forecast periods
-                    name = period.get('name', 'N/A')
-                    detailed_forecast = period.get('detailedForecast', 'No detailed forecast available.')
-                    temperature = period.get('temperature', 'N/A')
-                    if temperature != 'N/A':
-                        temperature = f"{temperature}°F"
-                    wind_speed = period.get('windSpeed', 'N/A')
-                    wind_direction = period.get('windDirection', 'N/A')
-                    
-                    embed = discord.Embed(
-                        title=f"Weather forecast for {name}",
-                        description=f"{detailed_forecast}",
-                        color=0xfffffe
-                    )
-                    embed.add_field(name="Temperature", value=temperature)
-                    embed.add_field(name="Wind Speed", value=wind_speed)
-                    embed.add_field(name="Wind Direction", value=wind_direction)
-                    
-                    embeds.append(embed)
-                
-                message = await ctx.send(embed=embeds[0])
-                forecasts_fetched = await self.config.forecasts_fetched()
-                await self.config.forecasts_fetched.set(forecasts_fetched + 1)
-                page = 0
-                await message.add_reaction("⬅️")
-                await message.add_reaction("➡️")
-                await message.add_reaction("❌")
-
-                def check(reaction, user):
-                    return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️", "❌"] and reaction.message.id == message.id
-
-                while True:
-                    try:
-                        reaction, user = await self.bot.wait_for("reaction_add", timeout=60.0, check=check)
-                        if str(reaction.emoji) == "➡️":
-                            page = (page + 1) % len(embeds)
-                        elif str(reaction.emoji) == "⬅️":
-                            page = (page - 1) % len(embeds)
-                        elif str(reaction.emoji) == "❌":
-                            await message.delete()
-                            break
-                        
-                        await message.edit(embed=embeds[page])
-                        await message.remove_reaction(reaction, user)
-                    except asyncio.TimeoutError:
-                        break
 
     @commands.guild_only()
     @weather.command(name="glossary")
