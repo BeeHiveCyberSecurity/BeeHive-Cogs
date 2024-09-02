@@ -639,7 +639,14 @@ class Weather(commands.Cog):
                 embed2.add_field(name=full_name, value=count, inline=True)
         pages.append(embed2)
 
-        # Page 3 and beyond: areas
+        # Page 3: alert types
+        embed3 = discord.Embed(title="Active weather alerts by type", color=0xfffffe)
+        if "alerts" in data:
+            for alert_type, count in data["alerts"].items():
+                embed3.add_field(name=alert_type, value=count, inline=True)
+        pages.append(embed3)
+
+        # Page 4 and beyond: areas
         state_full_names = {
             "AL": "Alabama", "AK": "Alaska", "AZ": "Arizona", "AR": "Arkansas", "CA": "California",
             "CO": "Colorado", "CT": "Connecticut", "DE": "Delaware", "FL": "Florida", "GA": "Georgia",
