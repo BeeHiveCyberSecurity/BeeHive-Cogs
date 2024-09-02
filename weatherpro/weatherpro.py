@@ -356,9 +356,7 @@ class Weather(commands.Cog):
                 embed.add_field(name="Snowfall", value=f"{snowfall} inches")
             
             embed.add_field(name="Cloud cover", value=f"{current.get('cloud_cover', 'N/A')}%")
-            embed.add_field(name="Pressure (MSL)", value=f"{current.get('pressure_msl', 'N/A')} hPa")
-            embed.add_field(name="Surface pressure", value=f"{current.get('surface_pressure', 'N/A')} hPa")
-            
+
             visibility = minutely_15.get('visibility', [0])
             if isinstance(visibility, list) and visibility:
                 visibility_value_miles = visibility[0] / 5280
@@ -372,6 +370,10 @@ class Weather(commands.Cog):
                 visibility_value_miles = 0
                 visibility_str = "0.0 miles"
             embed.add_field(name="Visibility", value=f"{visibility_value_miles:.2f} mi • {visibility_str}")
+            
+            embed.add_field(name="Pressure (MSL)", value=f"{current.get('pressure_msl', 'N/A')} hPa")
+            embed.add_field(name="Surface pressure", value=f"{current.get('surface_pressure', 'N/A')} hPa")
+            
             
             lightning_potential = minutely_15.get('lightning_potential', 'None')
             if isinstance(lightning_potential, list) and lightning_potential:
