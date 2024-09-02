@@ -74,7 +74,7 @@ Utilize a multitude of advanced Cloudflare tools thru Discord, including the Clo
 
 **[virustotal](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/virustotal)**
 
-Utilize the VirusTotal API and a `free` VirusTotal API Key to analyze files and URLs for malicious content.
+Leverage the VirusTotal API with a free API key to scan and analyze files and URLs for potential threats and malicious content.
 > ```
 > [p]cog install BeeHive-Cogs virustotal
 > [p]load virustotal
@@ -82,7 +82,7 @@ Utilize the VirusTotal API and a `free` VirusTotal API Key to analyze files and 
 
 **[urlscan](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/urlscan)**
 
-Utilize the URLScan.io API and a `free` URLScan API Key to analyze URL's for safety and/or security, or enable `[p]urlscan autoscan` to keep your chat safer on autopilot.
+Leverage the power of the URLScan.io API with a `free` URLScan API Key to evaluate URLs for safety and security. Enable `[p]urlscan autoscan` to automatically monitor and protect your chat from potentially harmful links.
 > ```
 > [p]cog install BeeHive-Cogs urlscan
 > [p]load urlscan
@@ -90,7 +90,7 @@ Utilize the URLScan.io API and a `free` URLScan API Key to analyze URL's for saf
 
 **[stripeidentity](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/stripeidentity)**
 
-Intake and verify drivers licenses, passports, state ID's, and more using Stripe Identity thru your Red-DiscordBot instance to enforce age restrictions in your adults-only server. Requires a Stripe account in good standing with access to Stripe Identity. Costs 50c/$1.50 per verification.
+Utilize Stripe Identity through your Red-DiscordBot instance to intake and verify various forms of identification, including driver's licenses, passports, and state IDs. This feature is ideal for enforcing age restrictions in adult-only servers. Note that a Stripe account in good standing with access to Stripe Identity is required. Verification costs are $0.50 or $1.50 per verification.
 > ```
 > [p]cog install BeeHive-Cogs stripeidentity
 > [p]load stripeidentity
