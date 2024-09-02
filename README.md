@@ -5,7 +5,7 @@ Red is a free, self-hostable, open-source Discord bot that can be used in growin
 
 This repository contains cogs that can help equip your Red instance with advanced features that safeguard your community, and improve your member's server experience.
 
-### Adding the repo
+## Adding the repo
 Before you can install our cogs, you need to add our repo to your instance so it can find, our cogs by name. To do so, run the following command.
 
 ```
@@ -22,7 +22,7 @@ We'll provide a, relatively same-in-spirit disclaimer below.
 >**Only install cogs from sources that you trust.** 
 
 
-### Public cogs
+## Public cogs
 **[weatherpro](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/weatherpro)**
 
 Access detailed weather information, forecasts, and historical data for any location in the United States using ZIP codes. Perfect for planning events, travel, or just staying informed about the weather in your area. `[p]weather`, `[p]weatherset`.
@@ -84,7 +84,7 @@ Set up and manage pre-defined disclaimers that attach to users of particular sig
 
 Cog made for primarily our server to help us deliver information on our products to inquisitive users. `(incomplete)`
 
-### Brand cogs
+## Brand cogs
 Brand cogs are cogs we make that are intended to integrate other third party services primarily with your, Red instance. Red is a powerful tool when correctly equipped, and we hope these cogs help extend your Red-bot's capabilities.
 
 >[!WARNING]
