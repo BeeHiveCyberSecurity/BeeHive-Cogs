@@ -66,7 +66,7 @@ class Weather(commands.Cog):
     
     def mph_to_knots(self, mph):
         knots = mph * 0.868976
-        return round(knots, 2)
+        return f"{knots:.1f}"
     
     @commands.group()
     async def weather(self, ctx):
