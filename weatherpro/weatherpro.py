@@ -651,6 +651,8 @@ class Weather(commands.Cog):
                     alert_types = {}
                     for alert in alerts_data["features"]:
                         alert_type = alert["properties"].get("event", "Unknown")
+                        if alert_type == "Test Message":
+                            continue  # Skip "Test Message" events
                         if alert_type in alert_types:
                             alert_types[alert_type] += 1
                         else:
