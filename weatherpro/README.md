@@ -14,13 +14,112 @@ WeatherPro is a powerful cog for the Red Discord bot that provides detailed weat
 >[!NOTE]
 >The **[weatherpro](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/weatherpro)** cog relies on pre-mapped location information that from time to time, may be inaccurate. If you feel the conditions shown in this cog are, out-of-parity with the conditions you're experiencing in real life, you should [open an issue](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/issues/new?assignees=&labels=enhancement%2C+good+first+issue&projects=&template=location-review.md&title=%28Location+review%29) to ask us to review our location mapped for your zip code.
 
-## Commands
+# Commands
 
-### `[p]weather forecast [zip_code]`
-Fetch the future weather forecast for the specified ZIP code. If no ZIP code is provided, it will use the ZIP code set in your profile.
+## weather
+ - Usage: `[p]weather `
 
-### `[p]weatherset zip [zip_code]`
-Set your ZIP code for personalized weather queries. This ZIP code will be used for future weather commands if no ZIP code is specified.
+Fetch current and upcoming conditions, search and explore hundreds of weather-focused words, check alert statistics across the country, and fetch information on observation stations and radar installations
+
+### weather forecast
+ - Usage: `[p]weather forecast [zip_code=None] `
+ - Checks: `server_only`
+
+Fetch your future forecast
+
+Extended Arg Info
+> ### zip_code: str = None
+> ```
+> A single word, if not using slash and multiple words are necessary use a quote e.g "Hello world".
+> ```
+### weather now
+ - Usage: `[p]weather now [zip_code=None] `
+
+Check current conditions and alerts, specify a zip for conditions at that location
+
+Extended Arg Info
+> ### zip_code: str = None
+> ```
+> A single word, if not using slash and multiple words are necessary use a quote e.g "Hello world".
+> ```
+### weather stats
+ - Usage: `[p]weather stats `
+
+Show statistics about weather feature usage
+
+### weather alerts
+ - Usage: `[p]weather alerts `
+ - Checks: `server_only`
+
+Shows a statistical summary of active weather alerts
+
+### weather stations
+ - Usage: `[p]weather stations `
+ - Checks: `server_only`
+
+Explore US weather observation stations
+
+### weather radars
+ - Usage: `[p]weather radars `
+ - Checks: `server_only`
+
+Explore US weather radar installations
+
+### weather glossary
+ - Usage: `[p]weather glossary [search_term] `
+ - Checks: `server_only`
+
+Show a glossary, or specify a word to search
+
+Extended Arg Info
+> ### search_term: str = None
+> ```
+> A single word, if not using slash and multiple words are necessary use a quote e.g "Hello world".
+> ```
+### weather records
+ - Usage: `[p]weather records `
+
+Show historical weather records
+
+### weather profile
+ - Usage: `[p]weather profile `
+
+View your weather profile
+
+## weatherset
+ - Usage: `[p]weatherset `
+
+Configure settings and features of weather
+
+### weatherset freezealerts
+ - Usage: `[p]weatherset freezealerts `
+ - Cooldown: `1 per 900.0 seconds`
+
+Toggle freeze alerts for your saved location
+
+### weatherset heatalerts
+ - Usage: `[p]weatherset heatalerts `
+ - Cooldown: `1 per 900.0 seconds`
+
+Toggle heat alerts for your saved location
+
+### weatherset severealerts
+ - Usage: `[p]weatherset severealerts `
+ - Cooldown: `1 per 900.0 seconds`
+
+Toggle severe alerts for your saved location
+
+### weatherset zip
+ - Usage: `[p]weatherset zip <zip_code> `
+
+Set your zip code for queries
+
+Extended Arg Info
+> ### zip_code: str
+> ```
+> A single word, if not using slash and multiple words are necessary use a quote e.g "Hello world".
+> ```
+
 
 ## Installation
 
