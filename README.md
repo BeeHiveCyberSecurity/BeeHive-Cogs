@@ -32,6 +32,11 @@ then load the newly installed cog with
 ### Brand cogs
 Brand cogs are cogs we make that are intended to integrate other third party services primarily with your, Red instance. Red is a powerful tool when correctly equipped, and we hope these cogs help extend your Red-bot's capabilities.
 
+>[!WARNING]
+>Unless otherwise specified, brand cogs are not authored, audited, or endorsed by the brands and tools that they interact with.
+>These are made open-effort and open-source to extend the functionality of Red-DiscordBot, not to imbibe an endorsement of any one specific brand.
+>If you choose to use these in potentially sensitive environments, this is the disclaimer that indicates you do so at your own risk and liability.
+
 - **[cloudflare](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/cloudflare)** - Utilize a multitude of advanced Cloudflare tools thru Discord, including the Cloudflare URL Scanner. For the bot owner, unlock the ability to interact with multiple Cloudflare products you utilize thru your Red-DiscordBot instance.
 - **[virustotal](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/virustotal)** - Utilize the VirusTotal API and a `free` VirusTotal API Key to analyze files and URLs for malicious content.
 - **[urlscan](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/urlscan)** - Utilize the URLScan.io API and a `free` URLScan API Key to analyze URL's for safety and/or security, or enable `[p]urlscan autoscan` to keep your chat safer on autopilot.
