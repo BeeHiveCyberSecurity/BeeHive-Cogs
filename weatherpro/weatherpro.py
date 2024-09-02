@@ -624,7 +624,7 @@ class Weather(commands.Cog):
         embed1 = discord.Embed(title="Summary of active weather alerts", color=0xfffffe)
         for key in ["total", "land", "marine"]:
             if key in data:
-                embed1.add_field(name=key.capitalize(), value=data[key], inline=True)
+                embed1.add_field(name=key.capitalize(), value=f"{data[key]} alerts", inline=True)
         pages.append(embed1)
 
         # Page 2: regions
@@ -696,8 +696,8 @@ class Weather(commands.Cog):
 
         message = await ctx.send(embed=pages[0])
         await message.add_reaction("⬅️")
+        await message.add_reaction("❌")
         await message.add_reaction("➡️")
-        await message.add_reaction("❌")  # Add a close reaction
 
         def check(reaction, user):
             return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️", "❌"]
@@ -717,7 +717,7 @@ class Weather(commands.Cog):
                 await message.delete()
                 break
             try:
-                reaction, user = await self.bot.wait_for("reaction_add", timeout=30.0, check=check)
+                reaction, user = await self.bot.wait_for("reaction_add", timeout=60.0, check=check)
                 await message.remove_reaction(reaction, user)
             except asyncio.TimeoutError:
                 await message.clear_reactions()
