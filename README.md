@@ -15,8 +15,6 @@ To add this repo to your Red bot, use the command
 
 > `[p]load weatherpro`
 
->[!NOTE]
->The **[weatherpro](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/weatherpro)** cog relies on pre-mapped location information that from time to time, may be inaccurate. If you feel the conditions shown in this cog are, out-of-parity with the conditions you're experiencing in real life, you should [open an issue](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/issues/new?assignees=&labels=enhancement%2C+good+first+issue&projects=&template=location-review.md&title=%28Location+review%29) to ask us to review our location mapped for your zip code.
 
 - **[ping](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/ping)** - A nice, functional ping and SpeedTest tool combined. One command, no fuss - `[p]ping`
 - **[nicknamemanagement](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/nicknamemanagement)** - Help manage unruly, unsightly, and otherwise annoying nicknames/screennames in your server. A dehoister on steroids, that dislikes anything that isn't alphanumeric.
