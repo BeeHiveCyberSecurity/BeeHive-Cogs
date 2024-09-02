@@ -641,11 +641,23 @@ class Weather(commands.Cog):
 
         # Page 3: alert types
         embed3 = discord.Embed(title="Active weather alerts by type", color=0xfffffe)
-        if "alerts" in data:
-            for alert in data["alerts"]:
-                alert_type = alert.get("event", "Unknown")
-                alert_count = alert.get("count", 0)
-                embed3.add_field(name=alert_type, value=alert_count, inline=True)
+        alerts_url = "https://api.weather.gov/alerts/active"
+        async with aiohttp.ClientSession() as session:
+            async with session.get(alerts_url) as alerts_response:
+                if alerts_response.status != 200:
+                    await ctx.send("Failed to fetch active alerts by type.")
+                    return
+                alerts_data = await alerts_response.json()
+                if "features" in alerts_data:
+                    alert_types = {}
+                    for alert in alerts_data["features"]:
+                        alert_type = alert["properties"].get("event", "Unknown")
+                        if alert_type in alert_types:
+                            alert_types[alert_type] += 1
+                        else:
+                            alert_types[alert_type] = 1
+                    for alert_type, count in alert_types.items():
+                        embed3.add_field(name=alert_type, value=count, inline=True)
         pages.append(embed3)
 
         # Page 4 and beyond: areas
