@@ -1,4 +1,4 @@
-# WeatherPro Cog
+# WeatherPro
 
 WeatherPro is a powerful cog for the Red Discord bot that provides detailed weather information, forecasts, and historical data for any location in the United States using ZIP codes. This cog is perfect for planning events, travel, or just staying informed about the weather in your area.
 
