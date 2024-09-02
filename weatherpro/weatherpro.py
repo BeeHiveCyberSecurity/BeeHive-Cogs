@@ -323,6 +323,7 @@ class Weather(commands.Cog):
                             "Storm Surge Warning": ":ocean:",
                             "Tropical Storm Warning": ":tropical_storm:",
                             "Volcano Warning": ":volcano:",
+                            "Flash Flood Warning": ":ocean:",
                             # Add more event types and corresponding emojis as needed
                         }
                         for alert in alerts:
