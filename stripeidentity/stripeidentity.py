@@ -81,7 +81,7 @@ class StripeIdentity(commands.Cog):
         if session_id:
             try:
                 verification_session = stripe.identity.VerificationSession.retrieve(session_id)
-                if verification_session.status in ["requires_input", "processing"]:
+                if verification_session.status == "requires_input":
                     stripe.identity.VerificationSession.cancel(session_id)
                     await self.config.pending_verification_sessions.clear_raw(str(user.id))
                     await self.send_embed(ctx, f"Verification session for {user.display_name} has been canceled and removed.", discord.Color(0x2BBD8E))
