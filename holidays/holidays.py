@@ -190,7 +190,7 @@ class Holidays(commands.Cog):
                     start_date = dt.strptime(weekend['startDate'], '%Y-%m-%d')
                     end_date = dt.strptime(weekend['endDate'], '%Y-%m-%d')
                     embed.add_field(
-                        name=f"Long Weekend ({weekend['dayCount']} days)",
+                        name=f"Long weekend ({weekend['dayCount']} days)",
                         value=f"**Start:** <t:{int(start_date.timestamp())}:D>\n**End:** <t:{int(end_date.timestamp())}:D>",
                         inline=True
                     )
