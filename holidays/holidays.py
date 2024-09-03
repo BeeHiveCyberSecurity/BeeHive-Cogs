@@ -1,6 +1,6 @@
 from redbot.core import commands, Config
 import aiohttp
-from datetime import datetime as dt
+from datetime import datetime as dt, timedelta
 import discord
 import asyncio
 import json
@@ -14,7 +14,8 @@ class Holidays(commands.Cog):
         self.session = aiohttp.ClientSession()
         self.config = Config.get_conf(self, identifier=1234567890, force_registration=True)
         default_user = {
-            "country_code": None
+            "country_code": None,
+            "dm_alerts": False
         }
         self.config.register_user(**default_user)
         
@@ -25,9 +26,46 @@ class Holidays(commands.Cog):
             self.valid_country_codes = {entry["countryCode"] for entry in country_data}
             self.country_data = country_data
 
+        self.bot.loop.create_task(self.send_holiday_alerts())
+
     def cog_unload(self):
         # Ensure the session is closed properly
         asyncio.create_task(self.session.close())
+
+    async def send_holiday_alerts(self):
+        await self.bot.wait_until_ready()
+        while not self.bot.is_closed():
+            current_time = dt.now()
+            if current_time.hour == 8:  # Check at 8 AM every day
+                users = await self.config.all_users()
+                for user_id, user_data in users.items():
+                    if user_data["dm_alerts"] and user_data["country_code"]:
+                        await self.send_next_holiday_alert(user_id, user_data["country_code"])
+            await asyncio.sleep(3600)  # Wait for an hour before checking again
+
+    async def send_next_holiday_alert(self, user_id, country_code):
+        user = self.bot.get_user(user_id)
+        if not user:
+            return
+
+        current_year = dt.now().year
+        async with self.session.get(f"https://date.nager.at/Api/v2/PublicHolidays/{current_year}/{country_code}") as response:
+            if response.status != 200:
+                return
+
+            data = await response.json()
+            if data:
+                upcoming_holidays = [holiday for holiday in data if dt.strptime(holiday['date'], '%Y-%m-%d') >= dt.now()]
+                if upcoming_holidays:
+                    next_holiday = upcoming_holidays[0]
+                    holiday_date = dt.strptime(next_holiday['date'], '%Y-%m-%d')
+                    if holiday_date.date() == dt.now().date() + timedelta(days=1):
+                        embed = discord.Embed(
+                            title=f"Upcoming {country_code} public holiday",
+                            description=f"**{next_holiday['localName']}** occurring tomorrow on **<t:{int(holiday_date.timestamp())}:D>**.",
+                            color=0xfffffe
+                        )
+                        await user.send(embed=embed)
 
     @commands.group(name="holiday")
     async def holiday(self, ctx):
@@ -198,32 +236,6 @@ class Holidays(commands.Cog):
             else:
                 await ctx.send(f"No long weekends found for {country_code} in {year}.")
 
-    @commands.group(name="holidayset")
-    async def holidayset(self, ctx):
-        """Group command for interacting with holidays."""
-
-    @holidayset.command(name="country")
-    async def country(self, ctx, country_code: str):
-        """Set your country code for fetching public holidays."""
-        country_code = country_code.upper()
-        if country_code not in self.valid_country_codes:
-            await ctx.send(f"{country_code} is not a valid country code. Please provide a valid country code.")
-            return
-        
-        country_name = next((country['name'] for country in self.country_data if country['countryCode'] == country_code), None)
-        if not country_name:
-            await ctx.send(f"{country_code} is not a valid country code. Please provide a valid country code.")
-            return
-        
-        await self.config.user(ctx.author).country_code.set(country_code)
-        
-        embed = discord.Embed(
-            title="Country Code Set",
-            description=f"Your country code has been set to **{country_code}** ({country_name}).",
-            color=0x2bbd8e
-        )
-        await ctx.send(embed=embed)
-
     @holiday.command(name="regions")
     async def regions(self, ctx):
         """Show a directory of all settable country codes and country names."""
@@ -274,3 +286,42 @@ class Holidays(commands.Cog):
             except asyncio.TimeoutError:
                 break
         await message.clear_reactions()
+
+    @commands.group(name="holidayset")
+    async def holidayset(self, ctx):
+        """Configure holiday-related settings"""
+
+    @holidayset.command(name="country")
+    async def country(self, ctx, country_code: str):
+        """Set your country code for fetching public holidays."""
+        country_code = country_code.upper()
+        if country_code not in self.valid_country_codes:
+            await ctx.send(f"{country_code} is not a valid country code. Please provide a valid country code.")
+            return
+        
+        country_name = next((country['name'] for country in self.country_data if country['countryCode'] == country_code), None)
+        if not country_name:
+            await ctx.send(f"{country_code} is not a valid country code. Please provide a valid country code.")
+            return
+        
+        await self.config.user(ctx.author).country_code.set(country_code)
+        
+        embed = discord.Embed(
+            title="Country Code Set",
+            description=f"Your country code has been set to **{country_code}** ({country_name}).",
+            color=0x2bbd8e
+        )
+        await ctx.send(embed=embed)
+
+    @holidayset.command(name="dmalerts")
+    async def dmalerts(self, ctx, enable: bool):
+        """Enable or disable DM alerts for holidays."""
+        await self.config.user(ctx.author).dm_alerts.set(enable)
+        status = "enabled" if enable else "disabled"
+        embed = discord.Embed(
+            title="DM Alerts Updated",
+            description=f"DM alerts for holidays have been {status}.",
+            color=0x2bbd8e
+        )
+        await ctx.send(embed=embed)
+
