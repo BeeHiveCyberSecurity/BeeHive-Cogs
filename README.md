@@ -19,7 +19,7 @@ We'll provide a, relatively same-in-spirit disclaimer below.
 >[!CAUTION]
 >**Installing third-party cogs can increase resource utilization, create security risks, reduce system stability, and otherwise severely degrade usability of your bot, especially in resource-restricted environments.** 
 >
->**Only install cogs from sources that you trust.** 
+>**Only install cogs from sources that you trust. The creator of Red and its community have no responsibility for any potential damage that the content of 3rd party repositories might cause.** 
 
 
 ## Public cogs
