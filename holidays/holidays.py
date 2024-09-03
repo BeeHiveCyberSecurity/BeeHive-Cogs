@@ -1,6 +1,6 @@
 from redbot.core import commands, Config
 import aiohttp
-import datetime
+from datetime import datetime as dt
 import discord
 import asyncio
 import json
@@ -74,7 +74,7 @@ class Holidays(commands.Cog):
                 for holiday in data:
                     embed.add_field(
                         name=holiday['localName'],
-                        value=f"<t:{int(datetime.strptime(holiday['date'], '%Y-%m-%d').timestamp())}:D>",
+                        value=f"<t:{int(dt.strptime(holiday['date'], '%Y-%m-%d').timestamp())}:D>",
                         inline=True
                     )
                 await ctx.send(embed=embed)
