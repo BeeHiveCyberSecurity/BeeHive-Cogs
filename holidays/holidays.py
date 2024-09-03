@@ -1,5 +1,6 @@
 from redbot.core import commands, Config
 import aiohttp
+import discord
 import asyncio
 import json
 from redbot.core.data_manager import bundled_data_path
