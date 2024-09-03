@@ -38,23 +38,43 @@ class Holidays(commands.Cog):
         """Fetch the next public holiday."""
         country_code = await self.config.user(ctx.author).country_code()
         if not country_code:
-            await ctx.send("You need to set your country code first using the `setcountry` command.")
+            embed = discord.Embed(
+                title="Country Code Not Set",
+                description="You need to set your country code first using the `setcountry` command.",
+                color=0xff4545
+            )
+            await ctx.send(embed=embed)
             return
 
         async with self.session.get(f"https://date.nager.at/Api/v2/NextPublicHolidaysWorldwide") as response:
             if response.status != 200:
-                await ctx.send("Failed to fetch holidays. Please try again later.")
+                embed = discord.Embed(
+                    title="Failed to Fetch Holidays",
+                    description="Failed to fetch holidays. Please try again later.",
+                    color=0xff4545
+                )
+                await ctx.send(embed=embed)
                 return
 
             data = await response.json()
             next_holiday = next((holiday for holiday in data if holiday["countryCode"] == country_code), None)
             if next_holiday:
-                await ctx.send(f"The next public holiday in {country_code} is {next_holiday['localName']} on {next_holiday['date']}.")
+                embed = discord.Embed(
+                    title="Next Public Holiday",
+                    description=f"The next public holiday in {country_code} is {next_holiday['localName']} on {next_holiday['date']}.",
+                    color=0x00ff00
+                )
+                await ctx.send(embed=embed)
             else:
-                await ctx.send(f"No upcoming public holidays found for {country_code}.")
+                embed = discord.Embed(
+                    title="No Upcoming Holidays",
+                    description=f"No upcoming public holidays found for {country_code}.",
+                    color=0xff4545
+                )
+                await ctx.send(embed=embed)
 
     @holidays.command(name="list")
-    async def holidays_list(self, ctx):
+    async def list(self, ctx):
         """List all public holidays for the current year."""
         country_code = await self.config.user(ctx.author).country_code()
         if not country_code:
