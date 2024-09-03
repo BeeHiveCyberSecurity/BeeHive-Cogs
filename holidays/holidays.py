@@ -64,6 +64,9 @@ class Holidays(commands.Cog):
                     description=f"The next public holiday in {country_code} is {next_holiday['localName']} on {next_holiday['date']}.",
                     color=0x00ff00
                 )
+                embed.add_field(name="Global", value=str(next_holiday["global"]))
+                embed.add_field(name="Counties", value=str(next_holiday["counties"]))
+                embed.add_field(name="Type", value=str(next_holiday["type"]))
                 await ctx.send(embed=embed)
             else:
                 embed = discord.Embed(
