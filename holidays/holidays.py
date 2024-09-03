@@ -59,7 +59,7 @@ class Holidays(commands.Cog):
                 if upcoming_holidays:
                     next_holiday = upcoming_holidays[0]
                     holiday_date = dt.strptime(next_holiday['date'], '%Y-%m-%d')
-                    if holiday_date.date() == dt.now().date() + timedelta(days=1):
+                    if holiday_date.date() == (dt.now() + timedelta(days=1)).date():
                         embed = discord.Embed(
                             title=f"Upcoming {country_code} public holiday",
                             description=f"**{next_holiday['localName']}** occurring tomorrow on **<t:{int(holiday_date.timestamp())}:D>**.",
@@ -137,7 +137,7 @@ class Holidays(commands.Cog):
         """List all public holidays for the current year."""
         country_code = await self.config.user(ctx.author).country_code()
         if not country_code:
-            await ctx.send("You need to set your country code first using the `setcountry` command.")
+            await ctx.send("You need to set your country code first using the `holidayset country` command.")
             return
 
         if country_code not in self.valid_country_codes:
@@ -324,4 +324,3 @@ class Holidays(commands.Cog):
             color=0x2bbd8e
         )
         await ctx.send(embed=embed)
-
