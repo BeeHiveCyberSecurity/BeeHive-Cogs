@@ -66,7 +66,7 @@ class Holidays(commands.Cog):
                     holiday_date = dt.strptime(next_holiday['date'], '%Y-%m-%d')
                     embed = discord.Embed(
                         title=f"Next {country_code} public holiday",
-                        description=f"**{next_holiday['localName']}** occurring on **<t:{int(holiday_date.timestamp())}:D>** **<t:{int(holiday_date.timestamp())}:R>**.",
+                        description=f"**{next_holiday['localName']}** occurring on **<t:{int(holiday_date.timestamp())}:D>** (**<t:{int(holiday_date.timestamp())}:R>**).",
                         color=0xfffffe
                     )
                     await ctx.send(embed=embed)
