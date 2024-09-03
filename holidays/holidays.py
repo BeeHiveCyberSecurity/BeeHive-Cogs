@@ -62,7 +62,7 @@ class Holidays(commands.Cog):
                     if holiday_date.date() == (dt.now() + timedelta(days=1)).date():
                         embed = discord.Embed(
                             title=f"Upcoming {country_code} public holiday",
-                            description=f"**{next_holiday['localName']}** occurring tomorrow on **<t:{int(holiday_date.timestamp())}:D>**.",
+                            description=f"**{next_holiday['localName']}** occurring tomorrow on **<t:{int((holiday_date + timedelta(hours=7)).timestamp())}:D>**.",
                             color=0xfffffe
                         )
                         await user.send(embed=embed)
@@ -113,7 +113,7 @@ class Holidays(commands.Cog):
                     holiday_date = dt.strptime(next_holiday['date'], '%Y-%m-%d')
                     embed = discord.Embed(
                         title=f"Next {country_code} public holiday",
-                        description=f"**{next_holiday['localName']}** occurring on **<t:{int(holiday_date.timestamp())}:D>** (**<t:{int(holiday_date.timestamp())}:R>**).",
+                        description=f"**{next_holiday['localName']}** occurring on **<t:{int((holiday_date + timedelta(hours=7)).timestamp())}:D>** (**<t:{int((holiday_date + timedelta(hours=7)).timestamp())}:R>**).",
                         color=0xfffffe
                     )
                     await ctx.send(embed=embed)
@@ -163,7 +163,7 @@ class Holidays(commands.Cog):
                         seen_holidays.add(holiday_key)
                         embed.add_field(
                             name=holiday['localName'],
-                            value=f"**<t:{int(holiday_date.timestamp())}:D>** (**<t:{int(holiday_date.timestamp())}:R>**)",
+                            value=f"**<t:{int((holiday_date + timedelta(hours=7)).timestamp())}:D>** (**<t:{int((holiday_date + timedelta(hours=7)).timestamp())}:R>**)",
                             inline=True
                         )
                 await ctx.send(embed=embed)
@@ -188,7 +188,7 @@ class Holidays(commands.Cog):
                     holiday_date = dt.strptime(holiday['date'], '%Y-%m-%d')
                     embed.add_field(
                         name=f"{holiday['localName']} ({holiday['countryCode']})",
-                        value=f"**<t:{int(holiday_date.timestamp())}:D>** (**<t:{int(holiday_date.timestamp())}:R>**)",
+                        value=f"**<t:{int((holiday_date + timedelta(hours=7)).timestamp())}:D>** (**<t:{int((holiday_date + timedelta(hours=7)).timestamp())}:R>**)",
                         inline=True
                     )
                 await ctx.send(embed=embed)
@@ -229,7 +229,7 @@ class Holidays(commands.Cog):
                     end_date = dt.strptime(weekend['endDate'], '%Y-%m-%d')
                     embed.add_field(
                         name=f"Long weekend ({weekend['dayCount']} days)",
-                        value=f"**Start:** <t:{int(start_date.timestamp())}:D>\n**End:** <t:{int(end_date.timestamp())}:D>",
+                        value=f"**Start:** <t:{int((start_date + timedelta(hours=7)).timestamp())}:D>\n**End:** <t:{int((end_date + timedelta(hours=7)).timestamp())}:D>",
                         inline=True
                     )
                 await ctx.send(embed=embed)
