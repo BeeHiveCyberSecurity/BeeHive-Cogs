@@ -23,6 +23,7 @@ class Holidays(commands.Cog):
         with (data_dir / "country_codes.json").open(mode="r") as f:
             country_data = json.load(f)
             self.valid_country_codes = {entry["countryCode"] for entry in country_data}
+            self.country_data = country_data
 
     def cog_unload(self):
         # Ensure the session is closed properly
@@ -93,7 +94,7 @@ class Holidays(commands.Cog):
             await ctx.send(f"{country_code} is not a valid country code. Please provide a valid country code.")
             return
         
-        country_name = next((country['name'] for country in self.valid_country_codes if country['countryCode'] == country_code), None)
+        country_name = next((country['name'] for country in self.country_data if country['countryCode'] == country_code), None)
         if not country_name:
             await ctx.send(f"{country_code} is not a valid country code. Please provide a valid country code.")
             return
@@ -106,3 +107,53 @@ class Holidays(commands.Cog):
             color=0x2bbd8e
         )
         await ctx.send(embed=embed)
+
+    @holidays.command(name="regions")
+    async def regions(self, ctx):
+        """Show a directory of all settable country codes and country names."""
+        country_list = sorted(self.country_data, key=lambda x: x['name'])
+        pages = [country_list[i:i + 15] for i in range(0, len(country_list), 15)]
+        
+        embeds = []
+        for i, page in enumerate(pages):
+            embed = discord.Embed(
+                title=f"Country Codes (Page {i + 1}/{len(pages)})",
+                color=0x2bbd8e
+            )
+            for country in page:
+                embed.add_field(
+                    name=country['name'],
+                    value=country['countryCode'],
+                    inline=True
+                )
+            embeds.append(embed)
+        
+        message = await ctx.send(embed=embeds[0])
+        if len(embeds) > 1:
+            await self.paginate_embeds(ctx, message, embeds)
+
+    async def paginate_embeds(self, ctx, message, embeds):
+        current_page = 0
+        await message.add_reaction("◀️")
+        await message.add_reaction("▶️")
+        await message.add_reaction("❌")
+
+        def check(reaction, user):
+            return user == ctx.author and str(reaction.emoji) in ["◀️", "▶️", "❌"] and reaction.message.id == message.id
+
+        while True:
+            try:
+                reaction, user = await self.bot.wait_for("reaction_add", timeout=60.0, check=check)
+                if str(reaction.emoji) == "▶️" and current_page < len(embeds) - 1:
+                    current_page += 1
+                    await message.edit(embed=embeds[current_page])
+                elif str(reaction.emoji) == "◀️" and current_page > 0:
+                    current_page -= 1
+                    await message.edit(embed=embeds[current_page])
+                elif str(reaction.emoji) == "❌":
+                    await message.clear_reactions()
+                    break
+                await message.remove_reaction(reaction, user)
+            except asyncio.TimeoutError:
+                break
+        await message.clear_reactions()
