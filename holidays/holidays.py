@@ -29,7 +29,7 @@ class Holidays(commands.Cog):
         # Ensure the session is closed properly
         asyncio.create_task(self.session.close())
 
-    @commands.group(name="holidays")
+    @commands.group(name="holiday")
     async def holiday(self, ctx):
         """Group command for interacting with holidays."""
 
