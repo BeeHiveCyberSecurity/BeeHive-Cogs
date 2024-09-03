@@ -34,7 +34,7 @@ class Holidays(commands.Cog):
         """Group command for interacting with holidays."""
 
     @holidays.command(name="next")
-    async def holidays_next(self, ctx):
+    async def next(self, ctx):
         """Fetch the next public holiday."""
         country_code = await self.config.user(ctx.author).country_code()
         if not country_code:
@@ -46,7 +46,7 @@ class Holidays(commands.Cog):
             await ctx.send(embed=embed)
             return
 
-        async with self.session.get(f"https://date.nager.at/Api/v2/NextPublicHolidaysWorldwide") as response:
+        async with self.session.get(f"https://date.nager.at/Api/v2/PublicHolidays/{dt.now().year}/{country_code}") as response:
             if response.status != 200:
                 embed = discord.Embed(
                     title="Failed to Fetch Holidays",
@@ -57,8 +57,8 @@ class Holidays(commands.Cog):
                 return
 
             data = await response.json()
-            next_holiday = next((holiday for holiday in data if holiday["countryCode"] == country_code), None)
-            if next_holiday:
+            if data:
+                next_holiday = data[0]
                 embed = discord.Embed(
                     title="Next Public Holiday",
                     description=f"The next public holiday in {country_code} is {next_holiday['localName']} on {next_holiday['date']}.",
