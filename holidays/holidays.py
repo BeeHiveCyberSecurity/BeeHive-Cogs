@@ -72,14 +72,14 @@ class Holidays(commands.Cog):
                     await ctx.send(embed=embed)
                 else:
                     embed = discord.Embed(
-                        title="No Upcoming Holidays",
+                        title="No upcoming holidays",
                         description=f"No upcoming public holidays found for {country_code}.",
                         color=0xff4545
                     )
                     await ctx.send(embed=embed)
             else:
                 embed = discord.Embed(
-                    title="No Upcoming Holidays",
+                    title="No upcoming holidays",
                     description=f"No upcoming public holidays found for {country_code}.",
                     color=0xff4545
                 )
