@@ -144,6 +144,37 @@ class Holidays(commands.Cog):
             else:
                 await ctx.send("No upcoming public holidays found.")
 
+    @holiday.command(name="weekends")
+    async def weekends(self, ctx, year: int, country_code: str):
+        """Fetch long weekends for a given year and country."""
+        country_code = country_code.upper()
+        if country_code not in self.valid_country_codes:
+            await ctx.send(f"{country_code} is not a valid country code. Please provide a valid country code.")
+            return
+
+        async with self.session.get(f"https://date.nager.at/api/v3/LongWeekend/{year}/{country_code}") as response:
+            if response.status != 200:
+                await ctx.send("Failed to fetch long weekends. Please try again later.")
+                return
+
+            data = await response.json()
+            if data:
+                embed = discord.Embed(
+                    title=f"Long weekends in {country_code} for {year}",
+                    color=0xfffffe
+                )
+                for weekend in data:
+                    start_date = dt.strptime(weekend['startDate'], '%Y-%m-%d')
+                    end_date = dt.strptime(weekend['endDate'], '%Y-%m-%d')
+                    embed.add_field(
+                        name=f"Long Weekend ({weekend['dayCount']} days)",
+                        value=f"**Start:** <t:{int(start_date.timestamp())}:D>\n**End:** <t:{int(end_date.timestamp())}:D>",
+                        inline=True
+                    )
+                await ctx.send(embed=embed)
+            else:
+                await ctx.send(f"No long weekends found for {country_code} in {year}.")
+
     @commands.group(name="holidayset")
     async def holidayset(self, ctx):
         """Group command for interacting with holidays."""
