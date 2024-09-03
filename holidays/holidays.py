@@ -119,6 +119,31 @@ class Holidays(commands.Cog):
             else:
                 await ctx.send(f"No public holidays found for {country_code} in {ctx.message.created_at.year}.")
 
+    @holiday.command(name="upcoming")
+    async def upcoming(self, ctx):
+        """Fetch upcoming public holidays worldwide."""
+        async with self.session.get("https://date.nager.at/api/v3/NextPublicHolidaysWorldwide") as response:
+            if response.status != 200:
+                await ctx.send("Failed to fetch upcoming holidays. Please try again later.")
+                return
+
+            data = await response.json()
+            if data:
+                embed = discord.Embed(
+                    title="Upcoming Public Holidays Worldwide",
+                    color=0xfffffe
+                )
+                for holiday in data[:10]:  # Limit to the first 10 holidays to avoid too long messages
+                    holiday_date = dt.strptime(holiday['date'], '%Y-%m-%d')
+                    embed.add_field(
+                        name=f"{holiday['localName']} ({holiday['countryCode']})",
+                        value=f"**<t:{int(holiday_date.timestamp())}:D>** (**<t:{int(holiday_date.timestamp())}:R>**)",
+                        inline=True
+                    )
+                await ctx.send(embed=embed)
+            else:
+                await ctx.send("No upcoming public holidays found.")
+
     @commands.group(name="holidayset")
     async def holidayset(self, ctx):
         """Group command for interacting with holidays."""
