@@ -19,7 +19,8 @@ class Holidays(commands.Cog):
         # Load valid country codes from the JSON file
         data_dir = bundled_data_path(self)
         with (data_dir / "country_codes.json").open(mode="r") as f:
-            self.valid_country_codes = json.load(f)
+            country_data = json.load(f)
+            self.valid_country_codes = {entry["countryCode"] for entry in country_data}
 
     def cog_unload(self):
         # Ensure the session is closed properly
