@@ -93,6 +93,17 @@ Set up and manage pre-defined disclaimers that attach to users of particular sig
 [p]load disclaimers
 ```
 
+### [serverinfo](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/serverinfo)
+
+Provides detailed information about your Discord server, including member statistics, channel counts, role information, and more. Useful to keep track of various server metrics and check if the server is configured, relatively, correctly. `[p]serverinfo`.
+
+```
+[p]cog install BeeHive-Cogs serverinfo
+```
+```
+[p]load serverinfo
+```
+
 
 ### [products](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/products)
 
