@@ -252,10 +252,17 @@ class Weather(commands.Cog):
         if zip_code not in self.zip_codes:
             embed = discord.Embed(
                 title="Invalid zip code",
-                description="Invalid zip code. Please set a valid 5 digit, US zip code.\nIf this is a valid zip code and we don't know about it yet, please [open an issue](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/issues/new?assignees=&labels=enhancement%2C+good+first+issue&projects=&template=location-review.md&title=%28Location+review%29) and we'll add it.",
+                description="Invalid zip code. Please set a valid 5 digit, US zip code.\nIf this is a valid zip code and we don't know about it yet, please open an issue using the button below and we'll add it.",
                 color=0xff4545
             )
-            await ctx.send(embed=embed)
+            issue_button = discord.ui.Button(
+                label="Open an Issue",
+                url="https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/issues/new?assignees=&labels=enhancement%2C+good+first+issue&projects=&template=location-review.md&title=%28Location+review%29",
+                style=discord.ButtonStyle.link
+            )
+            view = discord.ui.View()
+            view.add_item(issue_button)
+            await ctx.send(embed=embed, view=view)
             return
         
         latitude, longitude = self.zip_codes[zip_code]
