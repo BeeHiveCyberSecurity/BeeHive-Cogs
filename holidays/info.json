@@ -1,0 +1,9 @@
+{
+    "name": "holidays",
+    "description": "Cog to view and check public holidays and get alerted when it is one, in your supported country",
+    "author": ["adminelevation"],
+    "short": "Fetch public holidays",
+    "requirements": ["aiohttp", "asyncio"],
+    "tags": ["holidays", "API", "Nager.Date"],
+    "end_user_data_statement": "This cog stores user country codes for fetching public holidays."
+}
