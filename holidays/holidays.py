@@ -25,10 +25,9 @@ class Holidays(commands.Cog):
         # Ensure the session is closed properly
         asyncio.create_task(self.session.close())
 
-    @commands.group(name="holidays", invoke_without_command=True)
+    @commands.group(name="holidays")
     async def holidays(self, ctx):
         """Group command for interacting with holidays."""
-        await ctx.send("Use the subcommands to interact with holidays.")
 
     @holidays.command(name="next")
     async def holidays_next(self, ctx):
