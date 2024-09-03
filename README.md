@@ -115,6 +115,16 @@ Manage and track invite links for your Discord server. This cog allows you to se
 [p]load invites
 ```
 
+### [holidays](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/holidays)
+
+Keep track of various holidays and special events from around the world. This cog allows you to fetch information about upcoming holidays as well as set reminders for holidays in your region. Perfect for community engagement and planning events. `[p]holiday`, `[p]holidayset`.
+
+```
+[p]cog install BeeHive-Cogs holidays
+```
+```
+[p]load holidays
+```
 
 
 ### [products](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/products)
