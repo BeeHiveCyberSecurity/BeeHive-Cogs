@@ -62,7 +62,7 @@ Help manage unruly, unsightly, and otherwise annoying nicknames/screennames in y
 
 ### [antiphishing](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/antiphishing)
 
-Passively detect and remove known malicious websites sent in your server's chats.`[p]antiphishing`
+Passively detect and remove known malicious websites sent in your server's chats. `[p]antiphishing`
 
 ```
 [p]cog install BeeHive-Cogs antiphishing
