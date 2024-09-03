@@ -259,8 +259,14 @@ class Skysearch(commands.Cog):
             embed.add_field(name="Details", value="No aircraft information found or the response format is incorrect.", inline=False)
             message = await ctx.send(embed=embed)
             await asyncio.sleep(5)
-            await ctx.message.delete()
-            await message.delete()
+            try:
+                await ctx.message.delete()
+            except discord.errors.Forbidden:
+                pass
+            try:
+                await message.delete()
+            except discord.errors.Forbidden:
+                pass
 
     async def _get_photo_by_hex(self, hex_id):
         if not hasattr(self, '_http_client'):
