@@ -46,7 +46,8 @@ class Holidays(commands.Cog):
             await ctx.send(embed=embed)
             return
 
-        async with self.session.get(f"https://date.nager.at/Api/v2/PublicHolidays/{dt.now().year}/{country_code}") as response:
+        current_year = dt.now().year
+        async with self.session.get(f"https://date.nager.at/Api/v2/PublicHolidays/{current_year}/{country_code}") as response:
             if response.status != 200:
                 embed = discord.Embed(
                     title="Failed to Fetch Holidays",
@@ -58,14 +59,24 @@ class Holidays(commands.Cog):
 
             data = await response.json()
             if data:
-                next_holiday = data[0]
-                holiday_date = dt.strptime(next_holiday['date'], '%Y-%m-%d')
-                embed = discord.Embed(
-                    title="Next Public Holiday",
-                    description=f"The next public holiday in {country_code} is {next_holiday['localName']} on <t:{int(holiday_date.timestamp())}:D>.",
-                    color=0x00ff00
-                )
-                await ctx.send(embed=embed)
+                # Filter out past holidays
+                upcoming_holidays = [holiday for holiday in data if dt.strptime(holiday['date'], '%Y-%m-%d') >= dt.now()]
+                if upcoming_holidays:
+                    next_holiday = upcoming_holidays[0]
+                    holiday_date = dt.strptime(next_holiday['date'], '%Y-%m-%d')
+                    embed = discord.Embed(
+                        title="Next Public Holiday",
+                        description=f"The next public holiday in {country_code} is {next_holiday['localName']} on <t:{int(holiday_date.timestamp())}:D>.",
+                        color=0x00ff00
+                    )
+                    await ctx.send(embed=embed)
+                else:
+                    embed = discord.Embed(
+                        title="No Upcoming Holidays",
+                        description=f"No upcoming public holidays found for {country_code}.",
+                        color=0xff4545
+                    )
+                    await ctx.send(embed=embed)
             else:
                 embed = discord.Embed(
                     title="No Upcoming Holidays",
