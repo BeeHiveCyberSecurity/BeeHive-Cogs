@@ -1,6 +1,8 @@
 from redbot.core import commands, Config
 import aiohttp
 import asyncio
+import json
+from redbot.core.data_manager import bundled_data_path
 
 class Holidays(commands.Cog):
     """Cog to interact with the Nager.Date API to fetch public holidays."""
@@ -13,14 +15,68 @@ class Holidays(commands.Cog):
             "country_code": None
         }
         self.config.register_user(**default_user)
+        
+        # Load valid country codes from the JSON file
+        data_dir = bundled_data_path(self)
+        with (data_dir / "country_codes.json").open(mode="r") as f:
+            self.valid_country_codes = json.load(f)
 
     def cog_unload(self):
         # Ensure the session is closed properly
         asyncio.create_task(self.session.close())
 
-    @commands.command(name="setcountry")
+    @commands.group(name="holidays", invoke_without_command=True)
+    async def holidays(self, ctx):
+        """Group command for interacting with holidays."""
+        await ctx.send("Use the subcommands to interact with holidays.")
+
+    @holidays.command(name="next")
+    async def holidays_next(self, ctx):
+        """Fetch the next public holiday."""
+        country_code = await self.config.user(ctx.author).country_code()
+        if not country_code:
+            await ctx.send("You need to set your country code first using the `setcountry` command.")
+            return
+
+        async with self.session.get(f"https://date.nager.at/Api/v2/NextPublicHolidaysWorldwide") as response:
+            if response.status != 200:
+                await ctx.send("Failed to fetch holidays. Please try again later.")
+                return
+
+            data = await response.json()
+            next_holiday = next((holiday for holiday in data if holiday["countryCode"] == country_code), None)
+            if next_holiday:
+                await ctx.send(f"The next public holiday in {country_code} is {next_holiday['localName']} on {next_holiday['date']}.")
+            else:
+                await ctx.send(f"No upcoming public holidays found for {country_code}.")
+
+    @holidays.command(name="list")
+    async def holidays_list(self, ctx):
+        """List all public holidays for the current year."""
+        country_code = await self.config.user(ctx.author).country_code()
+        if not country_code:
+            await ctx.send("You need to set your country code first using the `setcountry` command.")
+            return
+
+        async with self.session.get(f"https://date.nager.at/Api/v2/PublicHolidays/{ctx.message.created_at.year}/{country_code}") as response:
+            if response.status != 200:
+                await ctx.send("Failed to fetch holidays. Please try again later.")
+                return
+
+            data = await response.json()
+            if data:
+                holidays_list = "\n".join([f"{holiday['localName']} on {holiday['date']}" for holiday in data])
+                await ctx.send(f"Public holidays in {country_code} for {ctx.message.created_at.year}:\n{holidays_list}")
+            else:
+                await ctx.send(f"No public holidays found for {country_code} in {ctx.message.created_at.year}.")
+
+    @holidays.command(name="setcountry")
     async def set_country(self, ctx, country_code: str):
         """Set your country code for fetching public holidays."""
-        await self.config.user(ctx.author).country_code.set(country_code.upper())
-        await ctx.send(f"Your country code has been set to {country_code.upper()}.")
-
+        country_code = country_code.upper()
+        if country_code not in self.valid_country_codes:
+            await ctx.send(f"{country_code} is not a valid country code. Please provide a valid country code.")
+            return
+        
+        await self.config.user(ctx.author).country_code.set(country_code)
+        await ctx.send(f"Your country code has been set to {country_code}.")
