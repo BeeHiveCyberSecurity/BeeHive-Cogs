@@ -69,7 +69,7 @@ class Holidays(commands.Cog):
             if data:
                 embed = discord.Embed(
                     title=f"Public holidays in {country_code} for {ctx.message.created_at.year}",
-                    color=discord.Color.blue()
+                    color=0xfffffe
                 )
                 for holiday in data:
                     embed.add_field(
@@ -81,13 +81,28 @@ class Holidays(commands.Cog):
             else:
                 await ctx.send(f"No public holidays found for {country_code} in {ctx.message.created_at.year}.")
 
-    @holidays.command(name="setcountry")
-    async def set_country(self, ctx, country_code: str):
+    @commands.group(name="holidayset")
+    async def holidayset(self, ctx):
+        """Group command for interacting with holidays."""
+
+    @holidayset.command(name="country")
+    async def country(self, ctx, country_code: str):
         """Set your country code for fetching public holidays."""
         country_code = country_code.upper()
         if country_code not in self.valid_country_codes:
             await ctx.send(f"{country_code} is not a valid country code. Please provide a valid country code.")
             return
         
+        country_name = next((country['name'] for country in self.valid_country_codes if country['countryCode'] == country_code), None)
+        if not country_name:
+            await ctx.send(f"{country_code} is not a valid country code. Please provide a valid country code.")
+            return
+        
         await self.config.user(ctx.author).country_code.set(country_code)
-        await ctx.send(f"Your country code has been set to {country_code}.")
+        
+        embed = discord.Embed(
+            title="Country Code Set",
+            description=f"Your country code has been set to {country_code} ({country_name}).",
+            color=0x2bbd8e
+        )
+        await ctx.send(embed=embed)
