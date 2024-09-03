@@ -35,7 +35,7 @@ class Holidays(commands.Cog):
 
     @holiday.command(name="next")
     async def next(self, ctx):
-        """Fetch the next public holiday."""
+        """Fetch the next public holiday for your saved region."""
         country_code = await self.config.user(ctx.author).country_code()
         if not country_code:
             embed = discord.Embed(
