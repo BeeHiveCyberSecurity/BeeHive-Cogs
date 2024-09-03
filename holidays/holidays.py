@@ -59,14 +59,12 @@ class Holidays(commands.Cog):
             data = await response.json()
             if data:
                 next_holiday = data[0]
+                holiday_date = dt.strptime(next_holiday['date'], '%Y-%m-%d')
                 embed = discord.Embed(
                     title="Next Public Holiday",
-                    description=f"The next public holiday in {country_code} is {next_holiday['localName']} on {next_holiday['date']}.",
+                    description=f"The next public holiday in {country_code} is {next_holiday['localName']} on <t:{int(holiday_date.timestamp())}:D>.",
                     color=0x00ff00
                 )
-                embed.add_field(name="Global", value=str(next_holiday["global"]))
-                embed.add_field(name="Counties", value=str(next_holiday["counties"]))
-                embed.add_field(name="Type", value=str(next_holiday["type"]))
                 await ctx.send(embed=embed)
             else:
                 embed = discord.Embed(
