@@ -39,8 +39,8 @@ class Holidays(commands.Cog):
         country_code = await self.config.user(ctx.author).country_code()
         if not country_code:
             embed = discord.Embed(
-                title="Country Code Not Set",
-                description="You need to set your country code first using the `setcountry` command.",
+                title="Country not set",
+                description="You need to set your country code first using the `holidayset country` command.",
                 color=0xff4545
             )
             await ctx.send(embed=embed)
@@ -50,7 +50,7 @@ class Holidays(commands.Cog):
         async with self.session.get(f"https://date.nager.at/Api/v2/PublicHolidays/{current_year}/{country_code}") as response:
             if response.status != 200:
                 embed = discord.Embed(
-                    title="Failed to Fetch Holidays",
+                    title="Failed to fetch holidays",
                     description="Failed to fetch holidays. Please try again later.",
                     color=0xff4545
                 )
