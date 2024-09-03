@@ -252,7 +252,7 @@ class Weather(commands.Cog):
         if zip_code not in self.zip_codes:
             embed = discord.Embed(
                 title="Invalid zip code",
-                description="Invalid zip code. Please set a valid 5 digit, US zip code.",
+                description="Invalid zip code. Please set a valid 5 digit, US zip code.\nIf this is a valid zip code and we don't know about it yet, please [open an issue](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/issues/new?assignees=&labels=enhancement%2C+good+first+issue&projects=&template=location-review.md&title=%28Location+review%29) and we'll add it.",
                 color=0xff4545
             )
             await ctx.send(embed=embed)
