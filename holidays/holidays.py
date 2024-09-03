@@ -105,9 +105,10 @@ class Holidays(commands.Cog):
                     color=0xfffffe
                 )
                 for holiday in data:
+                    holiday_date = dt.strptime(holiday['date'], '%Y-%m-%d')
                     embed.add_field(
                         name=holiday['localName'],
-                        value=f"<t:{int(dt.strptime(holiday['date'], '%Y-%m-%d').timestamp())}:D>",
+                        value=f"**<t:{int(holiday_date.timestamp())}:D>** (**<t:{int(holiday_date.timestamp())}:R>**)",
                         inline=True
                     )
                 await ctx.send(embed=embed)
