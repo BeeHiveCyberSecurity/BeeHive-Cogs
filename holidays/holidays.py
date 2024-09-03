@@ -161,10 +161,10 @@ class Holidays(commands.Cog):
     async def weekends(self, ctx, year: int = None, country_code: str = None):
         """Fetch long weekends for a given year and country."""
         if year is None:
-            year = dt.now().year
+        year = dt.now().year
         
         if country_code is None:
-            country_code = await self.config.user(ctx.author).country_code()
+        country_code = await self.config.user(ctx.author).country_code()
             if not country_code:
                 await ctx.send("You need to set your country code first using the `holidayset country` command.")
                 return
