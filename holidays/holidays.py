@@ -117,8 +117,8 @@ class Holidays(commands.Cog):
         embeds = []
         for i, page in enumerate(pages):
             embed = discord.Embed(
-                title=f"Country Codes (Page {i + 1}/{len(pages)})",
-                color=0x2bbd8e
+                title=f"Country codes (Page {i + 1}/{len(pages)})",
+                color=0xfffffe
             )
             for country in page:
                 embed.add_field(
@@ -135,8 +135,9 @@ class Holidays(commands.Cog):
     async def paginate_embeds(self, ctx, message, embeds):
         current_page = 0
         await message.add_reaction("◀️")
-        await message.add_reaction("▶️")
         await message.add_reaction("❌")
+        await message.add_reaction("▶️")
+        
 
         def check(reaction, user):
             return user == ctx.author and str(reaction.emoji) in ["◀️", "▶️", "❌"] and reaction.message.id == message.id
