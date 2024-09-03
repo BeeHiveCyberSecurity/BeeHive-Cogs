@@ -30,10 +30,10 @@ class Holidays(commands.Cog):
         asyncio.create_task(self.session.close())
 
     @commands.group(name="holidays")
-    async def holidays(self, ctx):
+    async def holiday(self, ctx):
         """Group command for interacting with holidays."""
 
-    @holidays.command(name="next")
+    @holiday.command(name="next")
     async def next(self, ctx):
         """Fetch the next public holiday."""
         country_code = await self.config.user(ctx.author).country_code()
@@ -85,7 +85,7 @@ class Holidays(commands.Cog):
                 )
                 await ctx.send(embed=embed)
 
-    @holidays.command(name="list")
+    @holiday.command(name="list")
     async def list(self, ctx):
         """List all public holidays for the current year."""
         country_code = await self.config.user(ctx.author).country_code()
@@ -140,7 +140,7 @@ class Holidays(commands.Cog):
         )
         await ctx.send(embed=embed)
 
-    @holidays.command(name="regions")
+    @holiday.command(name="regions")
     async def regions(self, ctx):
         """Show a directory of all settable country codes and country names."""
         country_list = sorted(self.country_data, key=lambda x: x['name'])
