@@ -84,7 +84,7 @@ Interactive features to let you explore and search for aircraft by their registr
 
 ### [disclaimers](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/disclaimers)
 
-Set up and manage pre-defined disclaimers that attach to users of particular significance, like lawyers, financial advisors, or other professions where a disclaimer may be warranted as a responsible disclosure. `[p]disclaimer`, `[p]disclaimerset`.
+Set up and manage pre-defined disclaimers that attach to users of particular significance, like lawyers, financial advisors, or other professions where a disclaimer may be warranted as a responsible disclosure. `[p]disclaimers`.
 
 ```
 [p]cog install BeeHive-Cogs disclaimers
