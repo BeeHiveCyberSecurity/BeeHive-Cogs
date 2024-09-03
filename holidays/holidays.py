@@ -100,17 +100,21 @@ class Holidays(commands.Cog):
 
             data = await response.json()
             if data:
+                seen_holidays = set()
                 embed = discord.Embed(
                     title=f"Public holidays in {country_code} for {ctx.message.created_at.year}",
                     color=0xfffffe
                 )
                 for holiday in data:
                     holiday_date = dt.strptime(holiday['date'], '%Y-%m-%d')
-                    embed.add_field(
-                        name=holiday['localName'],
-                        value=f"**<t:{int(holiday_date.timestamp())}:D>** (**<t:{int(holiday_date.timestamp())}:R>**)",
-                        inline=True
-                    )
+                    holiday_key = (holiday['localName'], holiday_date)
+                    if holiday_key not in seen_holidays:
+                        seen_holidays.add(holiday_key)
+                        embed.add_field(
+                            name=holiday['localName'],
+                            value=f"**<t:{int(holiday_date.timestamp())}:D>** (**<t:{int(holiday_date.timestamp())}:R>**)",
+                            inline=True
+                        )
                 await ctx.send(embed=embed)
             else:
                 await ctx.send(f"No public holidays found for {country_code} in {ctx.message.created_at.year}.")
