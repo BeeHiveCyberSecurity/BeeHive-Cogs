@@ -104,6 +104,18 @@ Provides detailed information about your Discord server, including member statis
 [p]load serverinfo
 ```
 
+### [invites](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/invites)
+
+Manage and track invite links for your Discord server. This cog allows you to see who invited whom, track the number of uses for each invite link, and generate new invite links with specific settings. Useful for community growth and moderation. `[p]invites`.
+
+```
+[p]cog install BeeHive-Cogs invites
+```
+```
+[p]load invites
+```
+
+
 
 ### [products](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/products)
 
