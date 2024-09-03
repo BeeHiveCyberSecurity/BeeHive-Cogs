@@ -46,6 +46,15 @@ class Holidays(commands.Cog):
             await ctx.send(embed=embed)
             return
 
+        if country_code not in self.valid_country_codes:
+            embed = discord.Embed(
+                title="Invalid Country Code",
+                description="The saved country code is not valid. Please set a valid country code using the `holidayset country` command.",
+                color=0xff4545
+            )
+            await ctx.send(embed=embed)
+            return
+
         current_year = dt.now().year
         async with self.session.get(f"https://date.nager.at/Api/v2/PublicHolidays/{current_year}/{country_code}") as response:
             if response.status != 200:
@@ -91,6 +100,10 @@ class Holidays(commands.Cog):
         country_code = await self.config.user(ctx.author).country_code()
         if not country_code:
             await ctx.send("You need to set your country code first using the `setcountry` command.")
+            return
+
+        if country_code not in self.valid_country_codes:
+            await ctx.send(f"{country_code} is not a valid country code. Please set a valid country code using the `holidayset country` command.")
             return
 
         async with self.session.get(f"https://date.nager.at/Api/v2/PublicHolidays/{ctx.message.created_at.year}/{country_code}") as response:
@@ -145,9 +158,19 @@ class Holidays(commands.Cog):
                 await ctx.send("No upcoming public holidays found.")
 
     @holiday.command(name="weekends")
-    async def weekends(self, ctx, year: int, country_code: str):
+    async def weekends(self, ctx, year: int = None, country_code: str = None):
         """Fetch long weekends for a given year and country."""
-        country_code = country_code.upper()
+        if year is None:
+            year = dt.now().year
+        
+        if country_code is None:
+            country_code = await self.config.user(ctx.author).country_code()
+            if not country_code:
+                await ctx.send("You need to set your country code first using the `holidayset country` command.")
+                return
+        else:
+            country_code = country_code.upper()
+
         if country_code not in self.valid_country_codes:
             await ctx.send(f"{country_code} is not a valid country code. Please provide a valid country code.")
             return
