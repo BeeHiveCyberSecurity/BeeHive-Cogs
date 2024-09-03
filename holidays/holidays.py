@@ -313,11 +313,13 @@ class Holidays(commands.Cog):
         )
         await ctx.send(embed=embed)
 
-    @holidayset.command(name="dmalerts")
-    async def dmalerts(self, ctx, enable: bool):
-        """Enable or disable DM alerts for holidays."""
-        await self.config.user(ctx.author).dm_alerts.set(enable)
-        status = "enabled" if enable else "disabled"
+    @holidayset.command(name="dms")
+    async def dms(self, ctx):
+        """Toggle DM alerts for holidays."""
+        current_status = await self.config.user(ctx.author).dm_alerts()
+        new_status = not current_status
+        await self.config.user(ctx.author).dm_alerts.set(new_status)
+        status = "enabled" if new_status else "disabled"
         embed = discord.Embed(
             title="DM Alerts Updated",
             description=f"DM alerts for holidays have been {status}.",
