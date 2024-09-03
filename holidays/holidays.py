@@ -126,7 +126,7 @@ class Holidays(commands.Cog):
         
         embed = discord.Embed(
             title="Country Code Set",
-            description=f"Your country code has been set to {country_code} ({country_name}).",
+            description=f"Your country code has been set to **{country_code}** ({country_name}).",
             color=0x2bbd8e
         )
         await ctx.send(embed=embed)
