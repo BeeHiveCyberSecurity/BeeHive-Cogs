@@ -242,8 +242,8 @@ class Meetings(commands.Cog):
             meeting_time_utc = creator_timezone.localize(meeting_time_creator_tz).astimezone(pytz.utc)
             timestamp = int(meeting_time_utc.timestamp())
             embed.add_field(
-                name=f"{details['name']} (ID: {meeting_id})",
-                value=f"```{details['description']}```\nTime: <t:{timestamp}:F> (<t:{timestamp}:R>)\nAttendees: {len(details['attendees'])}",
+                name=f"{details['name']} ({meeting_id})",
+                value=f"- {details['description']}\nTime: <t:{timestamp}:F> (<t:{timestamp}:R>)\nAttendees: {len(details['attendees'])}",
                 inline=False
             )
         await ctx.send(embed=embed)
