@@ -414,9 +414,13 @@ class Meetings(commands.Cog):
                 embed = discord.Embed(
                     title="🔔 Your meeting starts soon",
                     description=f"The meeting '{meeting['name']}' (ID: {meeting_id}) is scheduled.",
-                    color=0x00ff00
+                    color=0xfffffe
                 )
-                embed.add_field(name="Scheduled Time", value=user_time.strftime('%Y-%m-%d %H:%M %Z'), inline=False)
+                embed.add_field(name="Meeting ID", value=meeting_id, inline=False)
+                embed.add_field(name="Title", value=meeting['name'], inline=False)
+                embed.add_field(name="Description", value=meeting.get('description', 'No description provided'), inline=False)
+                embed.add_field(name="Attendee Count", value=str(len(meeting['attendees'])), inline=False)
+                embed.add_field(name="Scheduled Time", value=f"<t:{int(user_time.timestamp())}:F>", inline=False)
                 await user.send(embed=embed)
         
         # Mark the alert as sent
