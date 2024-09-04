@@ -44,7 +44,7 @@ class Meetings(commands.Cog):
         user_timezone = await self.config.member(ctx.author).timezone()
         if user_timezone == "UTC":
             embed = discord.Embed(
-                title="Timezone Not Set",
+                title="No user timezone",
                 description="You need to set your timezone before creating a meeting. Use the `!meetingset timezone` command.",
                 color=0xff4545
             )
@@ -67,7 +67,7 @@ class Meetings(commands.Cog):
         async with self.config.guild(ctx.guild).meetings() as meetings:
             if any(meeting["name"] == name for meeting in meetings.values()):
                 embed = discord.Embed(
-                    title="Meeting Exists",
+                    title="Meeting name already taken",
                     description=f"A meeting with the name '{name}' already exists.",
                     color=0xff4545
                 )
@@ -96,7 +96,7 @@ class Meetings(commands.Cog):
                 datetime.strptime(time, "%Y-%m-%d %H:%M")
             except ValueError:
                 embed = discord.Embed(
-                    title="Invalid Time Format",
+                    title="Invalid time format",
                     description="Invalid time format. Please use 'YYYY-MM-DD HH:MM'.",
                     color=0xff4545
                 )
@@ -117,8 +117,8 @@ class Meetings(commands.Cog):
             users = invite_msg.mentions
             if not users:
                 embed = discord.Embed(
-                    title="No Users Mentioned",
-                    description="No users mentioned. Meeting setup cancelled.",
+                    title="No attendees added",
+                    description="You can't have a meeting all by yourself, silly...",
                     color=0xff4545
                 )
                 await ctx.send(embed=embed)
