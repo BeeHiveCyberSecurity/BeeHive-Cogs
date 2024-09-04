@@ -327,6 +327,8 @@ class Meetings(commands.Cog):
         upcoming_meetings = []
         
         for meeting_id, details in user_meetings:
+            if "time" not in details or "creator_timezone" not in details or "duration" not in details or "description" not in details:
+                continue  # Skip meetings with missing information
             meeting_time_creator_tz = datetime.strptime(details["time"], "%Y-%m-%d %H:%M")
             creator_timezone = pytz.timezone(details["creator_timezone"])
             meeting_time_utc = creator_timezone.localize(meeting_time_creator_tz).astimezone(pytz.utc)
