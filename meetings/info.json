@@ -1,0 +1,11 @@
+{
+    "name": "meetings",
+    "author": ["adminelevation"],
+    "description": "Schedule meetings with users and bring all users into one place to meet, with reminders and notes.",
+    "short": "Manage and schedule meetings.",
+    "requirements": [],
+    "tags": ["meetings", "scheduling", "management"],
+    "min_bot_version": "3.5.0",
+    "hidden": false,
+    "disabled": false
+}
