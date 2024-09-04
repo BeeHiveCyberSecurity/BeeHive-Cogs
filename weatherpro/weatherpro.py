@@ -436,8 +436,13 @@ class Weather(commands.Cog):
                             "Frost Advisory": ":snowflake:",
                             # Add more event types and corresponding emojis as needed
                         }
+                        event_transformations = {
+                            "Evacuation - Immediate": "Evacuation Order",
+                            # Add more event transformations as needed
+                        }
                         for alert in alerts:
                             event = alert['properties']['event']
+                            event = event_transformations.get(event, event)  # Transform event name if applicable
                             emoji = event_emojis.get(event, ":warning:")  # Default to warning emoji if event not found
                             expires = alert['properties'].get('expires')
                             if expires:
