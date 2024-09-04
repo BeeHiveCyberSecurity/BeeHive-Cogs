@@ -182,11 +182,22 @@ class Meetings(commands.Cog):
     async def timezones(self, ctx: commands.Context):
         """List all timezones and their current times."""
         now_utc = datetime.utcnow().replace(tzinfo=pytz.utc)
+        timezones = pytz.all_timezones
+        embeds = []
         embed = discord.Embed(title="Available Timezones", color=discord.Color.orange())
-        for timezone in pytz.all_timezones:
+        
+        for i, timezone in enumerate(timezones):
             local_time = now_utc.astimezone(pytz.timezone(timezone))
             embed.add_field(name=timezone, value=local_time.strftime('%Y-%m-%d %H:%M %Z'), inline=False)
-        await ctx.send(embed=embed)
+            if (i + 1) % 25 == 0:  # Discord has a limit of 25 fields per embed
+                embeds.append(embed)
+                embed = discord.Embed(title="Available Timezones (cont.)", color=discord.Color.orange())
+        
+        if embed.fields:
+            embeds.append(embed)
+        
+        for embed in embeds:
+            await ctx.send(embed=embed)
 
     @commands.guild_only()
     @commands.group()
