@@ -413,7 +413,7 @@ class Meetings(commands.Cog):
                 # Create an embed for the notification
                 embed = discord.Embed(
                     title="🔔 Your meeting starts soon",
-                    description=f"`{meeting['name']}` is scheduled to start soon!.",
+                    description=f"`{meeting['name']}` is scheduled to start soon!",
                     color=0xfffffe
                 )
                 embed.add_field(name="Meeting ID", value=meeting_id, inline=False)
