@@ -327,8 +327,8 @@ class Meetings(commands.Cog):
             end_timestamp = int(end_time_utc.timestamp())
             status = "Active" if now_utc >= meeting_time_utc else "Upcoming"
             embed.add_field(
-                name=f"{details['name']} (ID: {meeting_id})",
-                value=f"Description: {details['description']}\nTime: <t:{timestamp}:F> to <t:{end_timestamp}:F> (<t:{timestamp}:R>)\nDuration: {details['duration']} minutes\nStatus: {status}",
+                name=f"{details['name']} ({meeting_id})",
+                value=f"> {details['description']}\n- **<t:{timestamp}:F>** to **<t:{end_timestamp}:F>** (<t:{timestamp}:R>)\n- **{details['duration']}** minutes\n- {status}",
                 inline=False
             )
         await ctx.send(embed=embed)
