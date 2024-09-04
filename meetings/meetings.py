@@ -176,6 +176,28 @@ class Meetings(commands.Cog):
             await ctx.send(embed=embed)
 
     @meeting.command()
+    async def delete(self, ctx: commands.Context, meeting_id: str):
+        """Delete a meeting by its ID."""
+        guild = ctx.guild
+        async with self.config.guild(guild).meetings() as meetings:
+            if meeting_id not in meetings:
+                embed = discord.Embed(
+                    title="Meeting Not Found",
+                    description=f"No meeting found with the ID '{meeting_id}'.",
+                    color=0xff4545
+                )
+                await ctx.send(embed=embed)
+                return
+            
+            del meetings[meeting_id]
+            embed = discord.Embed(
+                title="Meeting Deleted",
+                description=f"Meeting with ID '{meeting_id}' has been deleted.",
+                color=0x2bbd8e
+            )
+            await ctx.send(embed=embed)
+
+    @meeting.command()
     async def list(self, ctx: commands.Context):
         """List all meetings."""
         guild = ctx.guild
