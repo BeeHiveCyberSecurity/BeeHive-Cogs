@@ -139,6 +139,22 @@ class Meetings(commands.Cog):
         await self.config.member(ctx.author).timezone.set(timezone)
         await ctx.send(f"Your timezone has been set to {timezone}.")
 
+    @meeting.command()
+    async def myschedule(self, ctx: commands.Context):
+        """Check your upcoming meetings."""
+        user_id = ctx.author.id
+        guild = ctx.guild
+        meetings = await self.config.guild(guild).meetings()
+        user_meetings = [name for name, details in meetings.items() if user_id in details["attendees"]]
+        if not user_meetings:
+            await ctx.send("You have no upcoming meetings.")
+            return
+        embed = discord.Embed(title="Your Upcoming Meetings", color=discord.Color.purple())
+        for name in user_meetings:
+            details = meetings[name]
+            embed.add_field(name=name, value=f"Description: {details['description']}\nTime: {details['time']} {details['creator_timezone']}", inline=False)
+        await ctx.send(embed=embed)
+
     async def send_meeting_alert(self, meeting_name: str, guild: discord.Guild):
         """Send meeting alert to all attendees considering their timezones."""
         meetings = await self.config.guild(guild).meetings()
