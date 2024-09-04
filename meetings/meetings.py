@@ -52,6 +52,29 @@ class Meetings(commands.Cog):
                         for meeting_id in to_remove:
                             del guild_meetings[meeting_id]
 
+    @meetingset.command()
+    async def cleanup(self, ctx: commands.Context):
+        """Cleanup all meetings that are past their end time/date."""
+        current_time = datetime.now(pytz.UTC)  # Fixed bug: datetime.datetime.now should be datetime.now
+        all_guilds = await self.config.all_guilds()  # Fixed bug: self.config.all_meetings() should be self.config.all_guilds()
+        removed_meetings = 0
+
+        for guild_id, guild_data in all_guilds.items():
+            meetings = guild_data.get("meetings", {})
+            for meeting_id, meeting_data in meetings.items():
+                end_time = datetime.fromisoformat(meeting_data['time']) + timedelta(minutes=meeting_data['duration'])  # Fixed bug: meeting_data['end_time'] should be calculated
+                if end_time < current_time:
+                    async with self.config.guild_from_id(guild_id).meetings() as guild_meetings:
+                        del guild_meetings[meeting_id]
+                    removed_meetings += 1
+
+        embed = discord.Embed(
+            title="Cleanup complete",
+            description=f"Removed {removed_meetings} meetings that were past their end time/date.",
+            color=0x2bbd8e
+        )
+        await ctx.send(embed=embed)
+        
     @commands.guild_only()
     @commands.group()
     async def meeting(self, ctx: commands.Context):
@@ -617,22 +640,4 @@ class Meetings(commands.Cog):
         )
         await ctx.send(embed=embed)
 
-    @meetingset.command()
-    async def cleanup(self, ctx: commands.Context):
-        """Cleanup all meetings that are past their end time/date."""
-        current_time = datetime.datetime.now(pytz.UTC)
-        meetings = await self.config.all_meetings()
-        removed_meetings = 0
 
-        for meeting_id, meeting_data in meetings.items():
-            end_time = datetime.datetime.fromisoformat(meeting_data['end_time'])
-            if end_time < current_time:
-                await self.config.clear_meeting(meeting_id)
-                removed_meetings += 1
-
-        embed = discord.Embed(
-            title="Cleanup complete",
-            description=f"Removed {removed_meetings} meetings that were past their end time/date.",
-            color=0x2bbd8e
-        )
-        await ctx.send(embed=embed)
