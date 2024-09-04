@@ -482,7 +482,7 @@ class StripeIdentity(commands.Cog):
         self.bot.add_view(view)
         self.bot.add_listener(handle_interaction, "on_interaction")
 
-        completion_embed = discord.Embed(description="Click the button below once you have completed the verification session.", color=discord.Color.blue())
+        completion_embed = discord.Embed(description="Click the button below once you have finished verifying and been told to return here.", color=discord.Color.blue())
         completion_view = discord.ui.View()
         completion_view.add_item(discord.ui.Button(label="Completed", style=discord.ButtonStyle.green, custom_id="completed_button"))
         await ctx.send(embed=completion_embed, view=completion_view)
