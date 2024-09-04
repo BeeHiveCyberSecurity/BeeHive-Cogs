@@ -437,7 +437,7 @@ class Weather(commands.Cog):
                             # Add more event types and corresponding emojis as needed
                         }
                         event_transformations = {
-                            "Evacuation - Immediate": "Evacuation Order",
+                            "Evacuation - Immediate": "Mandatory evacuation order",
                             # Add more event transformations as needed
                         }
                         for alert in alerts:
