@@ -45,7 +45,7 @@ class Meetings(commands.Cog):
         if user_timezone == "UTC":
             embed = discord.Embed(
                 title="Timezone Not Set",
-                description="You need to set your timezone before creating a meeting. Use the `!meeting settimezone <timezone>` command.",
+                description="You need to set your timezone before creating a meeting. Use the `!meetingset timezone` command.",
                 color=0xff4545
             )
             await ctx.send(embed=embed)
@@ -313,7 +313,7 @@ class Meetings(commands.Cog):
         pass
 
     @meetingset.command()
-    async def settimezone(self, ctx: commands.Context, timezone: str):
+    async def timezone(self, ctx: commands.Context, timezone: str):
         """Set your timezone."""
         if timezone not in pytz.all_timezones:
             embed = discord.Embed(
