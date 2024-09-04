@@ -37,7 +37,12 @@ class Meetings(commands.Cog):
 
         user_timezone = await self.config.member(ctx.author).timezone()
         if user_timezone == "UTC":
-            await ctx.send("You need to set your timezone before creating a meeting. Use the `!meeting settimezone <timezone>` command.")
+            embed = discord.Embed(
+                title="Timezone Not Set",
+                description="You need to set your timezone before creating a meeting. Use the `!meeting settimezone <timezone>` command.",
+                color=0xff4545
+            )
+            await ctx.send(embed=embed)
             return
 
         await ctx.send("Let's start the meeting setup process. What will be the name of the meeting?")
@@ -45,12 +50,22 @@ class Meetings(commands.Cog):
             name_msg = await self.bot.wait_for('message', check=check, timeout=60)
             name = name_msg.content
         except asyncio.TimeoutError:
-            await ctx.send("You took too long to respond. Meeting setup cancelled.")
+            embed = discord.Embed(
+                title="Timeout",
+                description="You took too long to respond. Meeting setup cancelled.",
+                color=0xff4545
+            )
+            await ctx.send(embed=embed)
             return
 
         async with self.config.guild(ctx.guild).meetings() as meetings:
             if name in meetings:
-                await ctx.send(f"A meeting with the name '{name}' already exists.")
+                embed = discord.Embed(
+                    title="Meeting Exists",
+                    description=f"A meeting with the name '{name}' already exists.",
+                    color=0xff4545
+                )
+                await ctx.send(embed=embed)
                 return
 
         await ctx.send("Please provide a description for the meeting.")
@@ -58,7 +73,12 @@ class Meetings(commands.Cog):
             description_msg = await self.bot.wait_for('message', check=check, timeout=60)
             description = description_msg.content
         except asyncio.TimeoutError:
-            await ctx.send("You took too long to respond. Meeting setup cancelled.")
+            embed = discord.Embed(
+                title="Timeout",
+                description="You took too long to respond. Meeting setup cancelled.",
+                color=0xff4545
+            )
+            await ctx.send(embed=embed)
             return
 
         await ctx.send(f"Please provide the time for the meeting (e.g., '2023-10-01 15:00' in your timezone: {user_timezone}).")
@@ -69,10 +89,20 @@ class Meetings(commands.Cog):
             try:
                 datetime.strptime(time, "%Y-%m-%d %H:%M")
             except ValueError:
-                await ctx.send("Invalid time format. Please use 'YYYY-MM-DD HH:MM'.")
+                embed = discord.Embed(
+                    title="Invalid Time Format",
+                    description="Invalid time format. Please use 'YYYY-MM-DD HH:MM'.",
+                    color=0xff4545
+                )
+                await ctx.send(embed=embed)
                 return
         except asyncio.TimeoutError:
-            await ctx.send("You took too long to respond. Meeting setup cancelled.")
+            embed = discord.Embed(
+                title="Timeout",
+                description="You took too long to respond. Meeting setup cancelled.",
+                color=0xff4545
+            )
+            await ctx.send(embed=embed)
             return
 
         await ctx.send("Please mention the users you want to invite to the meeting.")
@@ -80,10 +110,20 @@ class Meetings(commands.Cog):
             invite_msg = await self.bot.wait_for('message', check=check, timeout=60)
             users = invite_msg.mentions
             if not users:
-                await ctx.send("No users mentioned. Meeting setup cancelled.")
+                embed = discord.Embed(
+                    title="No Users Mentioned",
+                    description="No users mentioned. Meeting setup cancelled.",
+                    color=0xff4545
+                )
+                await ctx.send(embed=embed)
                 return
         except asyncio.TimeoutError:
-            await ctx.send("You took too long to respond. Meeting setup cancelled.")
+            embed = discord.Embed(
+                title="Timeout",
+                description="You took too long to respond. Meeting setup cancelled.",
+                color=0xff4545
+            )
+            await ctx.send(embed=embed)
             return
 
         async with self.config.guild(ctx.guild).meetings() as meetings:
@@ -94,7 +134,12 @@ class Meetings(commands.Cog):
                 "creator_timezone": user_timezone
             }
 
-        await ctx.send(f"Meeting '{name}' created successfully with {len(users)} attendees.")
+        embed = discord.Embed(
+            title="Meeting Created",
+            description=f"Meeting '{name}' created successfully with {len(users)} attendees.",
+            color=0x2bbd8e
+        )
+        await ctx.send(embed=embed)
 
     @meeting.command()
     async def invite(self, ctx: commands.Context, name: str, users: commands.Greedy[discord.Member]):
@@ -102,12 +147,22 @@ class Meetings(commands.Cog):
         guild = ctx.guild
         async with self.config.guild(guild).meetings() as meetings:
             if name not in meetings:
-                await ctx.send(f"No meeting found with the name '{name}'.")
+                embed = discord.Embed(
+                    title="Meeting Not Found",
+                    description=f"No meeting found with the name '{name}'.",
+                    color=0xff4545
+                )
+                await ctx.send(embed=embed)
                 return
             for user in users:
                 if user.id not in meetings[name]["attendees"]:
                     meetings[name]["attendees"].append(user.id)
-            await ctx.send(f"Users invited to the meeting '{name}'.")
+            embed = discord.Embed(
+                title="Users Invited",
+                description=f"Users invited to the meeting '{name}'.",
+                color=0x2bbd8e
+            )
+            await ctx.send(embed=embed)
 
     @meeting.command()
     async def list(self, ctx: commands.Context):
@@ -115,9 +170,14 @@ class Meetings(commands.Cog):
         guild = ctx.guild
         meetings = await self.config.guild(guild).meetings()
         if not meetings:
-            await ctx.send("No meetings scheduled.")
+            embed = discord.Embed(
+                title="No Meetings",
+                description="No meetings scheduled.",
+                color=0xff4545
+            )
+            await ctx.send(embed=embed)
             return
-        embed = discord.Embed(title="Scheduled Meetings", color=discord.Color.blue())
+        embed = discord.Embed(title="Scheduled Meetings", color=0xfffffe)
         for name, details in meetings.items():
             embed.add_field(name=name, value=f"Description: {details['description']}\nTime: {details['time']} {details['creator_timezone']}\nAttendees: {len(details['attendees'])}", inline=False)
         await ctx.send(embed=embed)
@@ -128,12 +188,17 @@ class Meetings(commands.Cog):
         guild = ctx.guild
         meetings = await self.config.guild(guild).meetings()
         if name not in meetings:
-            await ctx.send(f"No meeting found with the name '{name}'.")
+            embed = discord.Embed(
+                title="Meeting Not Found",
+                description=f"No meeting found with the name '{name}'.",
+                color=0xff4545
+            )
+            await ctx.send(embed=embed)
             return
         details = meetings[name]
         attendees = [guild.get_member(user_id) for user_id in details["attendees"]]
         attendee_names = ", ".join([user.display_name for user in attendees if user])
-        embed = discord.Embed(title=f"Meeting: {name}", color=discord.Color.green())
+        embed = discord.Embed(title=f"Meeting: {name}", color=0x2bbd8e)
         embed.add_field(name="Description", value=details["description"], inline=False)
         embed.add_field(name="Time", value=f"{details['time']} {details['creator_timezone']}", inline=False)
         embed.add_field(name="Attendees", value=attendee_names or "None", inline=False)
@@ -148,9 +213,14 @@ class Meetings(commands.Cog):
         meetings = await self.config.guild(guild).meetings()
         user_meetings = [name for name, details in meetings.items() if user_id in details["attendees"]]
         if not user_meetings:
-            await ctx.send("You have no upcoming meetings.")
+            embed = discord.Embed(
+                title="No Upcoming Meetings",
+                description="You have no upcoming meetings.",
+                color=0xff4545
+            )
+            await ctx.send(embed=embed)
             return
-        embed = discord.Embed(title="Your Upcoming Meetings", color=discord.Color.purple())
+        embed = discord.Embed(title="Your Upcoming Meetings", color=0xfffffe)
         for name in user_meetings:
             details = meetings[name]
             embed.add_field(name=name, value=f"Description: {details['description']}\nTime: {details['time']} {details['creator_timezone']}", inline=False)
@@ -196,7 +266,7 @@ class Meetings(commands.Cog):
         current_page = 0
 
         def generate_embed(page):
-            embed = discord.Embed(title="Current times in various timezones", color=discord.Color.blue())
+            embed = discord.Embed(title="Current times in various timezones", color=0xfffffe)
             for timezone in pages[page]:
                 local_time = now_utc.astimezone(pytz.timezone(timezone))
                 timestamp = int(local_time.timestamp())
@@ -239,8 +309,18 @@ class Meetings(commands.Cog):
     async def settimezone(self, ctx: commands.Context, timezone: str):
         """Set your timezone."""
         if timezone not in pytz.all_timezones:
-            await ctx.send("Invalid timezone. Please provide a valid timezone from the IANA timezone database.")
+            embed = discord.Embed(
+                title="Invalid Timezone",
+                description="Invalid timezone. Please provide a valid timezone from the IANA timezone database.",
+                color=0xff4545
+            )
+            await ctx.send(embed=embed)
             return
         await self.config.member(ctx.author).timezone.set(timezone)
-        await ctx.send(f"Your timezone has been set to {timezone}.")
+        embed = discord.Embed(
+            title="Timezone Set",
+            description=f"Your timezone has been set to {timezone}.",
+            color=0x2bbd8e
+        )
+        await ctx.send(embed=embed)
 
