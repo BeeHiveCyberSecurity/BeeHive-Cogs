@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt #type: ignore
 import io
 import asyncio
 
-class InviteTracker(commands.Cog):
+class Invites(commands.Cog):
     """Tracks user invites with customizable announcements, rewards, and perks."""
 
     DISBOARD_BOT_ID = 302050872383242240
