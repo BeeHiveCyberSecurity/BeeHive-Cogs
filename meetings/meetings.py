@@ -428,14 +428,14 @@ class Meetings(commands.Cog):
         
         if active_meetings:
             active_value = "\n".join(
-                f"> {details['description']} (ID: {meeting_id})\n- started **<t:{timestamp}:R>**\n- **<t:{timestamp}:F>**\n- **<t:{end_timestamp}:F>**\n- **{details['duration']}** minutes\n- {attendee_names or 'None'}"
+                f"> {details['description']} (ID: {meeting_id})\n- started **<t:{timestamp}:R>**\n- **<t:{timestamp}:F>**\n- **<t:{end_timestamp}:F>**\n- **{details['duration']}** minutes\n- {details.get('location', 'N/A').capitalize()}\n- {attendee_names or 'None'}"
                 for meeting_id, details, timestamp, end_timestamp, attendee_names in active_meetings
             )
             embed.add_field(name="Right now", value=active_value, inline=False)
         
         if upcoming_meetings:
             upcoming_value = "\n".join(
-                f"> {details['description']} (ID: {meeting_id})\n- starting **<t:{timestamp}:R>**\n- **<t:{timestamp}:F>**\n- **<t:{end_timestamp}:F>**\n- **{details['duration']}** minutes\n- {attendee_names or 'None'}"
+                f"> {details['description']} (ID: {meeting_id})\n- starting **<t:{timestamp}:R>**\n- **<t:{timestamp}:F>**\n- **<t:{end_timestamp}:F>**\n- **{details['duration']}** minutes\n- {details.get('location', 'N/A').capitalize()}\n- {attendee_names or 'None'}"
                 for meeting_id, details, timestamp, end_timestamp, attendee_names in upcoming_meetings
             )
             embed.add_field(name="Coming up", value=upcoming_value, inline=False)
@@ -482,7 +482,7 @@ class Meetings(commands.Cog):
                 
                 # Add location if available
                 if "location" in meeting:
-                    embed.add_field(name="Location", value=meeting["location"], inline=False)
+                    embed.add_field(name="Location", value=meeting["location"].title(), inline=False)
                 
                 # Add meeting link as a URL button if available
                 if "meeting_link" in meeting:
