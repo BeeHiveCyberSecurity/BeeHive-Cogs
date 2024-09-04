@@ -183,21 +183,24 @@ class Meetings(commands.Cog):
         """List all timezones and their current times."""
         now_utc = datetime.utcnow().replace(tzinfo=pytz.utc)
         timezones = pytz.all_timezones
-        embeds = []
-        embed = discord.Embed(title="Available Timezones", color=discord.Color.orange())
-        
-        for i, timezone in enumerate(timezones):
+        options = []
+
+        for timezone in timezones:
             local_time = now_utc.astimezone(pytz.timezone(timezone))
-            embed.add_field(name=timezone, value=local_time.strftime('%Y-%m-%d %H:%M %Z'), inline=False)
-            if (i + 1) % 25 == 0:  # Discord has a limit of 25 fields per embed
-                embeds.append(embed)
-                embed = discord.Embed(title="Available Timezones (cont.)", color=discord.Color.orange())
+            options.append(discord.SelectOption(label=timezone, description=local_time.strftime('%Y-%m-%d %H:%M %Z')))
+
+        select = discord.ui.Select(placeholder="Choose a timezone...", options=options, max_values=1)
         
-        if embed.fields:
-            embeds.append(embed)
+        async def select_callback(interaction):
+            selected_timezone = select.values[0]
+            local_time = now_utc.astimezone(pytz.timezone(selected_timezone))
+            await interaction.response.send_message(f"Current time in {selected_timezone}: {local_time.strftime('%Y-%m-%d %H:%M %Z')}")
+
+        select.callback = select_callback
+        view = discord.ui.View()
+        view.add_item(select)
         
-        for embed in embeds:
-            await ctx.send(embed=embed)
+        await ctx.send("Select a timezone to see its current time:", view=view)
 
     @commands.guild_only()
     @commands.group()
