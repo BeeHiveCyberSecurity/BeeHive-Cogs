@@ -22,7 +22,10 @@ class Meetings(commands.Cog):
         }
         self.config.register_guild(**default_guild)
         self.config.register_member(**default_member)
-        self.bot.loop.create_task(self.check_meetings())
+        self.meeting_task = self.bot.loop.create_task(self.check_meetings())
+
+    def cog_unload(self):
+        self.meeting_task.cancel()
 
     def generate_meeting_id(self):
         """Generate a random 4 character meeting ID."""
@@ -167,7 +170,8 @@ class Meetings(commands.Cog):
                 "time": meeting_time.strftime("%Y-%m-%d %H:%M"),
                 "duration": duration,
                 "attendees": [user.id for user in users],
-                "creator_timezone": user_timezone
+                "creator_timezone": user_timezone,
+                "alert_sent": False  # Initialize alert_sent to False
             }
 
         timestamp = int(meeting_time.timestamp())
@@ -342,12 +346,21 @@ class Meetings(commands.Cog):
         meeting_time_creator_tz = datetime.strptime(meeting["time"], "%Y-%m-%d %H:%M")
         creator_timezone = pytz.timezone(meeting["creator_timezone"])
         meeting_time_utc = creator_timezone.localize(meeting_time_creator_tz).astimezone(pytz.utc)
+        
+        # Check if the alert has already been sent
+        if "alert_sent" in meeting and meeting["alert_sent"]:
+            return
+        
         for user_id in meeting["attendees"]:
             user = guild.get_member(user_id)
             if user:
                 user_timezone = await self.config.member(user).timezone()
                 user_time = meeting_time_utc.astimezone(pytz.timezone(user_timezone))
                 await user.send(f"Reminder: The meeting '{meeting['name']}' (ID: {meeting_id}) is scheduled for {user_time.strftime('%Y-%m-%d %H:%M %Z')} in your timezone.")
+        
+        # Mark the alert as sent
+        meeting["alert_sent"] = True
+        await self.config.guild(guild).meetings.set_raw(meeting_id, value=meeting)
 
     async def check_meetings(self):
         """Check for upcoming meetings and send alerts."""
