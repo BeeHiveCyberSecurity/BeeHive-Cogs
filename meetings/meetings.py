@@ -68,7 +68,12 @@ class Meetings(commands.Cog):
             await ctx.send(embed=embed)
             return
 
-        await ctx.send("Let's start the meeting setup process. What will be the name of the meeting?")
+        embed = discord.Embed(
+            title="Meeting setup started",
+            description="Let's start the meeting setup process. What will be the name of the meeting?",
+            color=0xfffffe
+        )
+        await ctx.send(embed=embed)
         while True:
             try:
                 name_msg = await self.bot.wait_for('message', check=check, timeout=60)
@@ -92,7 +97,12 @@ class Meetings(commands.Cog):
                 await ctx.send(embed=embed)
                 return
 
-        await ctx.send("Please provide a description for the meeting.")
+        embed = discord.Embed(
+            title="Meeting description",
+            description="Please provide a description for the meeting.",
+            color=0xfffffe
+        )
+        await ctx.send(embed=embed)
         while True:
             try:
                 description_msg = await self.bot.wait_for('message', check=check, timeout=60)
@@ -111,9 +121,9 @@ class Meetings(commands.Cog):
         today = now.strftime("%B %d, %Y")
         tomorrow = (now + timedelta(days=1)).strftime("%B %d, %Y")
         embed = discord.Embed(
-            title="Meeting Time",
-            description=f"Please provide the date and time for the meeting (e.g., 'October 1, 2023 at 3:00 PM' in your timezone: {user_timezone}).\nFor reference, today is {today} and tomorrow is {tomorrow}.",
-            color=0x2bbd8e
+            title="Meeting time",
+            description=f"Please provide the date and time for the meeting in the following format\n`October 1, 2023 at 3:00 PM` in *your* native timezone, **{user_timezone}**.\n\nFor reference,\n- Today is {today}\n- Tomorrow is {tomorrow}.",
+            color=0xfffffe
         )
         await ctx.send(embed=embed)
         while True:
@@ -141,7 +151,12 @@ class Meetings(commands.Cog):
                 await ctx.send(embed=embed)
                 return
 
-        await ctx.send("How long will the meeting last? Please provide the duration in minutes.")
+        embed = discord.Embed(
+            title="Meeting duration",
+            description="How long will the meeting last? Please provide the duration in minutes, eg `30`, `60`.",
+            color=0xfffffe
+        )
+        await ctx.send(embed=embed)
         while True:
             try:
                 duration_msg = await self.bot.wait_for('message', check=check, timeout=60)
@@ -160,7 +175,12 @@ class Meetings(commands.Cog):
                 if isinstance(duration_msg, asyncio.TimeoutError):
                     return
 
-        await ctx.send("Please mention the users you want to invite to the meeting.")
+        embed = discord.Embed(
+            title="Invite others to your meeting",
+            description="Please mention the users you want to invite to the meeting. There is no limit on how many users you can invite to a meeting.",
+            color=0xfffffe
+        )
+        await ctx.send(embed=embed)
         while True:
             try:
                 invite_msg = await self.bot.wait_for('message', check=check, timeout=60)
@@ -183,7 +203,12 @@ class Meetings(commands.Cog):
                 await ctx.send(embed=embed)
                 return
 
-        await ctx.send("Where will the meeting take place? Type 'discord' for a Discord voice channel, 'zoom' for a Zoom meeting, or 'google' for a Google Meet.")
+        embed = discord.Embed(
+            title="Meeting location",
+            description="Where will the meeting take place? Type 'discord' for a Discord voice channel, 'zoom' for a Zoom meeting, or 'google' for a Google Meet.",
+            color=0xfffffe
+        )
+        await ctx.send(embed=embed)
         while True:
             try:
                 location_msg = await self.bot.wait_for('message', check=check, timeout=60)
@@ -210,12 +235,17 @@ class Meetings(commands.Cog):
         if location == "discord":
             meeting_link = ctx.channel.jump_url
         elif location in ["zoom", "google"]:
-            await ctx.send(f"Please provide the {location} meeting link.")
+            embed = discord.Embed(
+                title="Add your meeting link",
+                description=f"Please provide a {location} meeting link users will be able to use to attend this meeting.",
+                color=0xfffffe
+            )
+            await ctx.send(embed=embed)
             while True:
                 try:
                     link_msg = await self.bot.wait_for('message', check=check, timeout=60)
                     meeting_link = link_msg.content
-                    if meeting_link.startswith("http"):
+                    if meeting_link.startswith("https"):
                         break
                     else:
                         embed = discord.Embed(
@@ -258,12 +288,12 @@ class Meetings(commands.Cog):
             description=f"Your meeting is successfully setup! Here's the summary...",
             color=0x2bbd8e
         )
-        embed.add_field(name="Meeting ID", value=f"Your meeting ID is `{meeting_id}`\nSave this for your records, you'll need it to fetch information about this meeting's details, or to cancel this meeting.", inline=False)
-        embed.add_field(name="Name", value=name, inline=True)
-        embed.add_field(name="Description", value=description, inline=True)
-        embed.add_field(name="Time", value=f"<t:{timestamp}:F> to <t:{end_timestamp}:F> (<t:{timestamp}:R>) {user_timezone}", inline=True)
-        embed.add_field(name="Duration", value=f"{duration} minutes", inline=True)
-        embed.add_field(name="Location", value=location.capitalize(), inline=True)
+        embed.add_field(name="Meeting ID", value=f"Your meeting ID is **`{meeting_id}`**\n\nSave this for your records, you'll need it to fetch information about this meeting's details, or to cancel this meeting.", inline=False)
+        embed.add_field(name="Name", value=name, inline=False)
+        embed.add_field(name="Description", value=description, inline=False)
+        embed.add_field(name="Time", value=f"<t:{timestamp}:F> to <t:{end_timestamp}:F> (<t:{timestamp}:R>) {user_timezone}", inline=False)
+        embed.add_field(name="Duration", value=f"{duration} minutes", inline=False)
+        embed.add_field(name="Location", value=location.capitalize(), inline=False)
         if meeting_link:
             embed.add_field(name="Meeting Link", value=meeting_link, inline=False)
         embed.add_field(name="Attendees", value=", ".join([user.mention for user in users]), inline=False)
