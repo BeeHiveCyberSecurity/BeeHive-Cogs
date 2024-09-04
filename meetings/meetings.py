@@ -191,7 +191,7 @@ class Meetings(commands.Cog):
             for timezone in pages[page]:
                 local_time = now_utc.astimezone(pytz.timezone(timezone))
                 timestamp = int(local_time.timestamp())
-                embed.add_field(name=timezone, value=f"<t:{timestamp}:F>", inline=False)
+                embed.add_field(name=timezone, value=f"<t:{timestamp}:F>", inline=True)
             embed.set_footer(text=f"Page {page + 1} of {len(pages)}")
             return embed
 
