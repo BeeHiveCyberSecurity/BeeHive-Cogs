@@ -183,24 +183,47 @@ class Meetings(commands.Cog):
         """List all timezones and their current times."""
         now_utc = datetime.utcnow().replace(tzinfo=pytz.utc)
         timezones = pytz.all_timezones
-        options = []
+        pages = [timezones[i:i + 25] for i in range(0, len(timezones), 25)]
+        current_page = 0
 
-        for timezone in timezones:
-            local_time = now_utc.astimezone(pytz.timezone(timezone))
-            options.append(discord.SelectOption(label=timezone, description=local_time.strftime('%Y-%m-%d %H:%M %Z')))
+        async def generate_view(page):
+            options = []
+            for timezone in pages[page]:
+                local_time = now_utc.astimezone(pytz.timezone(timezone))
+                options.append(discord.SelectOption(label=timezone, description=local_time.strftime('%Y-%m-%d %H:%M %Z')))
 
-        select = discord.ui.Select(placeholder="Choose a timezone...", options=options, max_values=1)
-        
-        async def select_callback(interaction):
-            selected_timezone = select.values[0]
-            local_time = now_utc.astimezone(pytz.timezone(selected_timezone))
-            await interaction.response.send_message(f"Current time in {selected_timezone}: {local_time.strftime('%Y-%m-%d %H:%M %Z')}")
+            select = discord.ui.Select(placeholder="Choose a timezone...", options=options, max_values=1)
+            
+            async def select_callback(interaction):
+                selected_timezone = select.values[0]
+                local_time = now_utc.astimezone(pytz.timezone(selected_timezone))
+                await interaction.response.send_message(f"Current time in {selected_timezone}: {local_time.strftime('%Y-%m-%d %H:%M %Z')}")
 
-        select.callback = select_callback
-        view = discord.ui.View()
-        view.add_item(select)
-        
-        await ctx.send("Select a timezone to see its current time:", view=view)
+            select.callback = select_callback
+            view = discord.ui.View()
+            view.add_item(select)
+
+            if page > 0:
+                view.add_item(discord.ui.Button(label="Previous", style=discord.ButtonStyle.primary, emoji="⬅️", custom_id="previous"))
+            if page < len(pages) - 1:
+                view.add_item(discord.ui.Button(label="Next", style=discord.ButtonStyle.primary, emoji="➡️", custom_id="next"))
+
+            return view
+
+        async def update_message(interaction, page):
+            view = await generate_view(page)
+            await interaction.response.edit_message(view=view)
+
+        view = await generate_view(current_page)
+        message = await ctx.send("Select a timezone to see its current time:", view=view)
+
+        while True:
+            interaction = await self.bot.wait_for("interaction", check=lambda i: i.message.id == message.id)
+            if interaction.data["custom_id"] == "previous":
+                current_page -= 1
+            elif interaction.data["custom_id"] == "next":
+                current_page += 1
+            await update_message(interaction, current_page)
 
     @commands.guild_only()
     @commands.group()
