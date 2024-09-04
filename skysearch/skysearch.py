@@ -857,7 +857,7 @@ class Skysearch(commands.Cog):
                 await ctx.send(embed=embed)
 
     @commands.guild_only()
-    @commands.group(name='airport', help='Airport-related master command')
+    @commands.group(name='airport', help='Command center for airport related commands')
     async def airport_group(self, ctx):
          """Command center for airport related commands"""
 
