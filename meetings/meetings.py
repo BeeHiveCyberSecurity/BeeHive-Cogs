@@ -23,13 +23,27 @@ class Meetings(commands.Cog):
         self.config.register_guild(**default_guild)
         self.config.register_member(**default_member)
         self.meeting_task = self.bot.loop.create_task(self.check_meetings())
+        self.cleanup_task = self.bot.loop.create_task(self.cleanup_old_meetings())
 
     def cog_unload(self):
         self.meeting_task.cancel()
+        self.cleanup_task.cancel()
 
     def generate_meeting_id(self):
         """Generate a random 4 character meeting ID."""
         return ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
+
+    async def cleanup_old_meetings(self):
+        """Periodically clean up old meetings."""
+        while True:
+            await asyncio.sleep(3600)  # Run every hour
+            async with self.config.all_guilds() as all_guilds:
+                for guild_id, guild_data in all_guilds.items():
+                    meetings = guild_data.get("meetings", {})
+                    current_time = datetime.now(pytz.utc)
+                    to_remove = [meeting_id for meeting_id, meeting in meetings.items() if datetime.fromisoformat(meeting["time"]) + timedelta(minutes=meeting["duration"]) < current_time]
+                    for meeting_id in to_remove:
+                        del meetings[meeting_id]
 
     @commands.guild_only()
     @commands.group()
