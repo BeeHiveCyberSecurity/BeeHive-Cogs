@@ -188,7 +188,7 @@ class StripeIdentity(commands.Cog):
                     for event in session.last_error:
                         if event.code in ['consent_declined', 'device_unsupported', 'under_supported_age', 'phone_otp_declined', 'email_verification_declined']:
                             return event.code, session
-                return session.status == 'verified', session
+                return session.status, session
 
             for _ in range(15):  # Check every minute for 15 minutes
                 await asyncio.sleep(60)
