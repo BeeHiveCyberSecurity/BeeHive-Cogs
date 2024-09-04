@@ -405,8 +405,12 @@ class StripeIdentity(commands.Cog):
                 # Assuming session_info is a timestamp string, parse it into a datetime object
                 try:
                     start_time = datetime.fromisoformat(session_info)
-                    time_remaining = discord.utils.format_dt(start_time + timedelta(minutes=15), style='R')
-                    embed.add_field(name=f"User: {member.display_name} (ID: {user_id})", value=f"Time remaining: {time_remaining}", inline=False)
+                    time_remaining = start_time + timedelta(minutes=15) - datetime.now()
+                    if time_remaining.total_seconds() > 0:
+                        formatted_time_remaining = discord.utils.format_dt(start_time + timedelta(minutes=15), style='R')
+                        embed.add_field(name=f"User: {member.display_name} (ID: {user_id})", value=f"Time remaining: {formatted_time_remaining}", inline=False)
+                    else:
+                        embed.add_field(name=f"User: {member.display_name} (ID: {user_id})", value="Verification session expired.", inline=False)
                 except ValueError:
                     embed.add_field(name=f"User: {member.display_name} (ID: {user_id})", value="Invalid session start time.", inline=False)
             else:
@@ -438,7 +442,7 @@ class StripeIdentity(commands.Cog):
                     session = stripe.identity.VerificationSession.create(
                         type='document',
                         metadata={'user_id': str(ctx.author.id)},
-                        document={'allowed_types': ['driving_license']}
+                        document={'allowed_types': ['driving_license', 'passport', 'id_card']}
                     )
                     embed = discord.Embed(description=f"Document verification session created. Please complete the verification using this link: {session.url}", color=discord.Color.green())
                     await ctx.send(embed=embed)
@@ -452,7 +456,11 @@ class StripeIdentity(commands.Cog):
                 return await interaction.response.send_message("This button is not for you.", ephemeral=True)
             
             if interaction.custom_id == "completed_button":
-                session_id = interaction.message.embeds[0].description.split("session: ")[1]
+                try:
+                    session_id = interaction.message.embeds[0].description.split("session: ")[1]
+                except IndexError:
+                    return await interaction.response.send_message("Invalid session ID in the message.", ephemeral=True)
+                
                 verification_status = await self.check_verification_status(session_id)
                 if verification_status == "verified":
                     age_verification_role = discord.utils.get(ctx.guild.roles, name="Age Verified")
