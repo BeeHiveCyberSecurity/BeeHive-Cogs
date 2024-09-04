@@ -482,11 +482,13 @@ class Meetings(commands.Cog):
                 if "location" in meeting:
                     embed.add_field(name="Location", value=meeting["location"], inline=False)
                 
-                # Add meeting link if available
+                # Add meeting link as a URL button if available
                 if "meeting_link" in meeting:
-                    embed.add_field(name="Meeting Link", value=meeting["meeting_link"], inline=False)
-                
-                await user.send(embed=embed)
+                    view = discord.ui.View()
+                    view.add_item(discord.ui.Button(label=f"Join via {meeting.get('location', 'Meeting Link')}", url=meeting["meeting_link"]))
+                    await user.send(embed=embed, view=view)
+                else:
+                    await user.send(embed=embed)
         
         # Mark the alert as sent
         meeting["alert_sent"] = True
