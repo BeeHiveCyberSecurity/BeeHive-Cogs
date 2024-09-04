@@ -203,11 +203,6 @@ class Meetings(commands.Cog):
             view = discord.ui.View()
             view.add_item(select)
 
-            if page > 0:
-                view.add_item(discord.ui.Button(label="Previous", style=discord.ButtonStyle.primary, emoji="⬅️", custom_id="previous"))
-            if page < len(pages) - 1:
-                view.add_item(discord.ui.Button(label="Next", style=discord.ButtonStyle.primary, emoji="➡️", custom_id="next"))
-
             return view
 
         async def update_message(interaction, page):
@@ -217,13 +212,24 @@ class Meetings(commands.Cog):
         view = await generate_view(current_page)
         message = await ctx.send("Select a timezone to see its current time:", view=view)
 
+        await message.add_reaction("⬅️")
+        await message.add_reaction("➡️")
+        await message.add_reaction("❌")
+
+        def check(reaction, user):
+            return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️", "❌"] and reaction.message.id == message.id
+
         while True:
-            interaction = await self.bot.wait_for("interaction", check=lambda i: i.message.id == message.id)
-            if interaction.data["custom_id"] == "previous":
+            reaction, user = await self.bot.wait_for("reaction_add", check=check)
+            if str(reaction.emoji) == "⬅️" and current_page > 0:
                 current_page -= 1
-            elif interaction.data["custom_id"] == "next":
+            elif str(reaction.emoji) == "➡️" and current_page < len(pages) - 1:
                 current_page += 1
-            await update_message(interaction, current_page)
+            elif str(reaction.emoji) == "❌":
+                await message.delete()
+                break
+            await update_message(reaction.message, current_page)
+            await message.remove_reaction(reaction.emoji, user)
 
     @commands.guild_only()
     @commands.group()
