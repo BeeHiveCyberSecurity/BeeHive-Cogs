@@ -183,6 +183,54 @@ class Meetings(commands.Cog):
                 await ctx.send(embed=embed)
                 return
 
+        await ctx.send("Where will the meeting take place? Type 'discord' for a Discord voice channel, 'zoom' for a Zoom meeting, or 'google' for a Google Meet.")
+        while True:
+            try:
+                location_msg = await self.bot.wait_for('message', check=check, timeout=60)
+                location = location_msg.content.lower()
+                if location in ["discord", "zoom", "google"]:
+                    break
+                else:
+                    embed = discord.Embed(
+                        title="Invalid location",
+                        description="Please type 'discord', 'zoom', or 'google'.",
+                        color=0xff4545
+                    )
+                    await ctx.send(embed=embed)
+            except asyncio.TimeoutError:
+                embed = discord.Embed(
+                    title="Timeout",
+                    description="You took too long to respond. Meeting setup cancelled.",
+                    color=0xff4545
+                )
+                await ctx.send(embed=embed)
+                return
+
+        meeting_link = None
+        if location in ["zoom", "google"]:
+            await ctx.send(f"Please provide the {location} meeting link.")
+            while True:
+                try:
+                    link_msg = await self.bot.wait_for('message', check=check, timeout=60)
+                    meeting_link = link_msg.content
+                    if meeting_link.startswith("http"):
+                        break
+                    else:
+                        embed = discord.Embed(
+                            title="Invalid link",
+                            description="Please provide a valid meeting link.",
+                            color=0xff4545
+                        )
+                        await ctx.send(embed=embed)
+                except asyncio.TimeoutError:
+                    embed = discord.Embed(
+                        title="Timeout",
+                        description="You took too long to respond. Meeting setup cancelled.",
+                        color=0xff4545
+                    )
+                    await ctx.send(embed=embed)
+                    return
+
         # Add the command author to the list of attendees
         users.append(ctx.author)
 
@@ -195,6 +243,8 @@ class Meetings(commands.Cog):
                 "duration": duration,
                 "attendees": [user.id for user in users],
                 "creator_timezone": user_timezone,
+                "location": location,
+                "meeting_link": meeting_link,
                 "alert_sent": False  # Initialize alert_sent to False
             }
 
@@ -211,6 +261,9 @@ class Meetings(commands.Cog):
         embed.add_field(name="Description", value=description, inline=True)
         embed.add_field(name="Time", value=f"<t:{timestamp}:F> to <t:{end_timestamp}:F> (<t:{timestamp}:R>) {user_timezone}", inline=True)
         embed.add_field(name="Duration", value=f"{duration} minutes", inline=True)
+        embed.add_field(name="Location", value=location.capitalize(), inline=True)
+        if meeting_link:
+            embed.add_field(name="Meeting Link", value=meeting_link, inline=False)
         embed.add_field(name="Attendees", value=", ".join([user.mention for user in users]), inline=False)
         await ctx.send(embed=embed)
 
@@ -327,6 +380,9 @@ class Meetings(commands.Cog):
         embed.add_field(name="Description", value=details["description"], inline=False)
         embed.add_field(name="Time", value=f"<t:{timestamp}:F> to <t:{end_timestamp}:F> (<t:{timestamp}:R>)", inline=False)
         embed.add_field(name="Duration", value=f"{details['duration']} minutes", inline=False)
+        embed.add_field(name="Location", value=details["location"].capitalize(), inline=False)
+        if details.get("meeting_link"):
+            embed.add_field(name="Meeting Link", value=details["meeting_link"], inline=False)
         embed.add_field(name="Attendees", value=attendee_names or "None", inline=False)
         await ctx.send(embed=embed)
 
@@ -421,11 +477,21 @@ class Meetings(commands.Cog):
                 embed.add_field(name="Description", value=meeting.get('description', 'No description provided'), inline=False)
                 embed.add_field(name="Attendee Count", value=str(len(meeting['attendees'])), inline=False)
                 embed.add_field(name="Scheduled Time", value=f"<t:{int(user_time.timestamp())}:F>", inline=False)
+                
+                # Add location if available
+                if "location" in meeting:
+                    embed.add_field(name="Location", value=meeting["location"], inline=False)
+                
+                # Add meeting link if available
+                if "meeting_link" in meeting:
+                    embed.add_field(name="Meeting Link", value=meeting["meeting_link"], inline=False)
+                
                 await user.send(embed=embed)
         
         # Mark the alert as sent
         meeting["alert_sent"] = True
         await self.config.guild(guild).meetings.set_raw(meeting_id, value=meeting)
+        
 
     async def check_meetings(self):
         """Check for upcoming meetings and send alerts."""
