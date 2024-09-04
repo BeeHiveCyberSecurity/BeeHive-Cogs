@@ -435,6 +435,8 @@ class Weather(commands.Cog):
                             "Volcano Warning": ":volcano:",
                             "Flash Flood Warning": ":ocean:",
                             "Frost Advisory": ":snowflake:",
+                            "Hydrologic Outlook": ":notepad_spiral:",
+                            "Rip Current Statement": ":ocean:",
                             "Mandatory evacuation order": ":person_running:",
                             # Add more event types and corresponding emojis as needed
                         }
