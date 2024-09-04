@@ -3,7 +3,7 @@ import asyncio
 from redbot.core import commands, Config #type: ignore
 from redbot.core.bot import Red #type: ignore
 from typing import List
-from datetime import datetime
+from datetime import datetime, timedelta
 import pytz
 
 class Meetings(commands.Cog):
@@ -20,6 +20,7 @@ class Meetings(commands.Cog):
         }
         self.config.register_guild(**default_guild)
         self.config.register_member(**default_member)
+        self.bot.loop.create_task(self.check_meetings())
 
     @commands.guild_only()
     @commands.group()
@@ -145,3 +146,16 @@ class Meetings(commands.Cog):
                 user_timezone = await self.config.member(user).timezone()
                 user_time = meeting_time_utc.astimezone(pytz.timezone(user_timezone))
                 await user.send(f"Reminder: The meeting '{meeting_name}' is scheduled for {user_time.strftime('%Y-%m-%d %H:%M %Z')} in your timezone.")
+
+    async def check_meetings(self):
+        """Check for upcoming meetings and send alerts."""
+        await self.bot.wait_until_ready()
+        while not self.bot.is_closed():
+            for guild in self.bot.guilds:
+                meetings = await self.config.guild(guild).meetings()
+                for name, details in meetings.items():
+                    meeting_time_utc = datetime.strptime(details["time"], "%Y-%m-%d %H:%M")
+                    now_utc = datetime.utcnow()
+                    if now_utc + timedelta(minutes=10) >= meeting_time_utc > now_utc:
+                        await self.send_meeting_alert(name, guild)
+            await asyncio.sleep(60)  # Check every minute
