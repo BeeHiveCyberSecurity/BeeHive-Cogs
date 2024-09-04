@@ -207,7 +207,9 @@ class Meetings(commands.Cog):
                 return
 
         meeting_link = None
-        if location in ["zoom", "google"]:
+        if location == "discord":
+            meeting_link = ctx.channel.jump_url
+        elif location in ["zoom", "google"]:
             await ctx.send(f"Please provide the {location} meeting link.")
             while True:
                 try:
