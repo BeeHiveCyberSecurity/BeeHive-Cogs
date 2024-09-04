@@ -4,7 +4,7 @@ from redbot.core import commands, Config #type: ignore
 from redbot.core.bot import Red #type: ignore
 from typing import List
 from datetime import datetime, timedelta
-import pytz
+import pytz #type: ignore
 import random
 import string
 
@@ -317,7 +317,7 @@ class Meetings(commands.Cog):
         """Set your timezone."""
         if timezone not in pytz.all_timezones:
             embed = discord.Embed(
-                title="Invalid Timezone",
+                title="Invalid timezone",
                 description="Invalid timezone. Please provide a valid timezone from the IANA timezone database.",
                 color=0xff4545
             )
@@ -325,8 +325,8 @@ class Meetings(commands.Cog):
             return
         await self.config.member(ctx.author).timezone.set(timezone)
         embed = discord.Embed(
-            title="Timezone Set",
-            description=f"Your timezone has been set to {timezone}.",
+            title="Timezone set",
+            description=f"Your timezone has been set to **{timezone}**.",
             color=0x2bbd8e
         )
         await ctx.send(embed=embed)
