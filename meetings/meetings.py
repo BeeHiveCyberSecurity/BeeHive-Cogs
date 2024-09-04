@@ -146,10 +146,15 @@ class Meetings(commands.Cog):
             }
 
         embed = discord.Embed(
-            title="Meeting Created",
-            description=f"Meeting '{name}' created successfully with ID '{meeting_id}' and {len(users)} attendees.",
+            title="Meeting created",
+            description=f"Your meeting is successfully setup! Here's the summary...",
             color=0x2bbd8e
         )
+        embed.add_field(name="Meeting ID", value=meeting_id, inline=False)
+        embed.add_field(name="Name", value=name, inline=False)
+        embed.add_field(name="Description", value=description, inline=False)
+        embed.add_field(name="Time", value=f"{time} {user_timezone}", inline=False)
+        embed.add_field(name="Attendees", value=", ".join([user.mention for user in users]), inline=False)
         await ctx.send(embed=embed)
 
     @meeting.command()
