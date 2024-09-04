@@ -41,7 +41,12 @@ class Meetings(commands.Cog):
             for guild_id, guild_data in all_guilds.items():
                 meetings = guild_data.get("meetings", {})
                 current_time = datetime.now(pytz.utc)
-                to_remove = [meeting_id for meeting_id, meeting in meetings.items() if datetime.fromisoformat(meeting["time"]) + timedelta(minutes=meeting["duration"]) < current_time]
+                to_remove = []
+                for meeting_id, meeting in meetings.items():
+                    meeting_time = datetime.fromisoformat(meeting["time"])
+                    meeting_end_time = meeting_time + timedelta(minutes=meeting["duration"])
+                    if meeting_end_time < current_time:
+                        to_remove.append(meeting_id)
                 if to_remove:
                     async with self.config.guild_from_id(guild_id).meetings() as guild_meetings:
                         for meeting_id in to_remove:
