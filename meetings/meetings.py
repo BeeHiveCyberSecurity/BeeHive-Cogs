@@ -243,7 +243,7 @@ class Meetings(commands.Cog):
             timestamp = int(meeting_time_utc.timestamp())
             embed.add_field(
                 name=f"{details['name']} ({meeting_id})",
-                value=f"- {details['description']}\nTime: <t:{timestamp}:F> (<t:{timestamp}:R>)\nAttendees: {len(details['attendees'])}",
+                value=f"> {details['description']}\n**<t:{timestamp}:F>** (**<t:{timestamp}:R>**)\n- **{len(details['attendees'])}** attendees",
                 inline=False
             )
         await ctx.send(embed=embed)
