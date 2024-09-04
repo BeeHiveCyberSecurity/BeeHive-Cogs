@@ -207,7 +207,7 @@ class Invites(commands.Cog):
             await ctx.send(embed=embed)
 
     @invites.command()
-    async def membergrowth(self, ctx):
+    async def growthchart(self, ctx):
         """Show the overall member growth of the server as a graph."""
         growth = await self.config.guild(ctx.guild).member_growth()
         if not growth:
