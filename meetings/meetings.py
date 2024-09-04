@@ -190,10 +190,10 @@ class Meetings(commands.Cog):
                 return
             
             meeting = meetings[meeting_id]
-            if ctx.author.id not in meeting["attendees"] or meeting["attendees"][0] != ctx.author.id:
+            if ctx.author.id not in meeting["attendees"]:
                 embed = discord.Embed(
                     title="Permission Denied",
-                    description="Only the meeting's creator can delete this meeting.",
+                    description="Only an invited attendee can delete this meeting.",
                     color=0xff4545
                 )
                 await ctx.send(embed=embed)
