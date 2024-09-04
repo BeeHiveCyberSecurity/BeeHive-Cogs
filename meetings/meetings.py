@@ -51,12 +51,12 @@ class Meetings(commands.Cog):
                         removed_meetings += 1
 
         
-    @commands.guild_only()
     @commands.group()
     async def meeting(self, ctx: commands.Context):
         """Group command for managing meetings."""
         pass
 
+    @commands.guild_only()
     @meeting.command()
     async def create(self, ctx: commands.Context):
         """Start the setup process to create a new meeting."""
@@ -305,6 +305,7 @@ class Meetings(commands.Cog):
         embed.add_field(name="Attendees", value=", ".join([user.mention for user in users]), inline=False)
         await ctx.send(embed=embed)
 
+    @commands.guild_only()
     @meeting.command()
     async def invite(self, ctx: commands.Context, meeting_id: str, users: commands.Greedy[discord.Member]):
         """Invite users to a meeting."""
@@ -328,6 +329,8 @@ class Meetings(commands.Cog):
             )
             await ctx.send(embed=embed)
 
+    @commands.guild_only()
+    @commands.admin_or_permissions()
     @meeting.command()
     async def delete(self, ctx: commands.Context, meeting_id: str):
         """Delete a meeting by its ID."""
@@ -360,6 +363,7 @@ class Meetings(commands.Cog):
             )
             await ctx.send(embed=embed)
 
+    @commands.guild_only()
     @meeting.command()
     async def list(self, ctx: commands.Context):
         """List all meetings."""
@@ -548,6 +552,7 @@ class Meetings(commands.Cog):
                         await self.send_meeting_alert(meeting_id, guild)
             await asyncio.sleep(60)  # Check every minute
 
+    @commands.guild_only()
     @meeting.command()
     async def timezones(self, ctx: commands.Context):
         """List all timezones and their current times."""
