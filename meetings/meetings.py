@@ -87,17 +87,26 @@ class Meetings(commands.Cog):
             await ctx.send(embed=embed)
             return
 
-        await ctx.send(f"Please provide the time for the meeting (e.g., '2023-10-01 15:00' in your timezone: {user_timezone}).")
+        now = datetime.now(pytz.timezone(user_timezone))
+        today = now.strftime("%B %d, %Y")
+        tomorrow = (now + timedelta(days=1)).strftime("%B %d, %Y")
+        embed = discord.Embed(
+            title="Meeting Time",
+            description=f"Please provide the date and time for the meeting (e.g., 'October 1, 2023 at 3:00 PM' in your timezone: {user_timezone}).\nFor reference, today is {today} and tomorrow is {tomorrow}.",
+            color=0x2bbd8e
+        )
+        await ctx.send(embed=embed)
         try:
             time_msg = await self.bot.wait_for('message', check=check, timeout=60)
             time = time_msg.content
             # Validate time format
             try:
-                datetime.strptime(time, "%Y-%m-%d %H:%M")
+                meeting_time = datetime.strptime(time, "%B %d, %Y at %I:%M %p")
+                meeting_time = pytz.timezone(user_timezone).localize(meeting_time)
             except ValueError:
                 embed = discord.Embed(
                     title="Invalid time format",
-                    description="Invalid time format. Please use 'YYYY-MM-DD HH:MM'.",
+                    description="Invalid time format. Please use 'Month Day, Year at HH:MM AM/PM'.",
                     color=0xff4545
                 )
                 await ctx.send(embed=embed)
@@ -140,11 +149,12 @@ class Meetings(commands.Cog):
             meetings[meeting_id] = {
                 "name": name,
                 "description": description,
-                "time": time,
+                "time": meeting_time.strftime("%Y-%m-%d %H:%M"),
                 "attendees": [user.id for user in users],
                 "creator_timezone": user_timezone
             }
 
+        timestamp = int(meeting_time.timestamp())
         embed = discord.Embed(
             title="Meeting created",
             description=f"Your meeting is successfully setup! Here's the summary...",
@@ -153,7 +163,7 @@ class Meetings(commands.Cog):
         embed.add_field(name="Meeting ID", value=f"Your meeting ID is `{meeting_id}`\nSave this for your records, you'll need it to fetch information about this meeting's details, or to cancel this meeting.", inline=False)
         embed.add_field(name="Name", value=name, inline=True)
         embed.add_field(name="Description", value=description, inline=True)
-        embed.add_field(name="Time", value=f"{time} {user_timezone}", inline=True)
+        embed.add_field(name="Time", value=f"<t:{timestamp}:F> (<t:{timestamp}:R>) {user_timezone}", inline=True)
         embed.add_field(name="Attendees", value=", ".join([user.mention for user in users]), inline=False)
         await ctx.send(embed=embed)
 
@@ -227,7 +237,15 @@ class Meetings(commands.Cog):
             return
         embed = discord.Embed(title="Scheduled meetings", color=0xfffffe)
         for meeting_id, details in meetings.items():
-            embed.add_field(name=f"{details['name']} (ID: {meeting_id})", value=f"```{details['description']}```\nTime: {details['time']} {details['creator_timezone']}\nAttendees: {len(details['attendees'])}", inline=False)
+            meeting_time_creator_tz = datetime.strptime(details["time"], "%Y-%m-%d %H:%M")
+            creator_timezone = pytz.timezone(details["creator_timezone"])
+            meeting_time_utc = creator_timezone.localize(meeting_time_creator_tz).astimezone(pytz.utc)
+            timestamp = int(meeting_time_utc.timestamp())
+            embed.add_field(
+                name=f"{details['name']} (ID: {meeting_id})",
+                value=f"```{details['description']}```\nTime: <t:{timestamp}:F> (<t:{timestamp}:R>)\nAttendees: {len(details['attendees'])}",
+                inline=False
+            )
         await ctx.send(embed=embed)
 
     @meeting.command()
@@ -246,9 +264,15 @@ class Meetings(commands.Cog):
         details = meetings[meeting_id]
         attendees = [guild.get_member(user_id) for user_id in details["attendees"]]
         attendee_names = ", ".join([user.display_name for user in attendees if user])
+        
+        meeting_time_creator_tz = datetime.strptime(details["time"], "%Y-%m-%d %H:%M")
+        creator_timezone = pytz.timezone(details["creator_timezone"])
+        meeting_time_utc = creator_timezone.localize(meeting_time_creator_tz).astimezone(pytz.utc)
+        timestamp = int(meeting_time_utc.timestamp())
+        
         embed = discord.Embed(title=f"Meeting: {details['name']} (ID: {meeting_id})", color=0x2bbd8e)
         embed.add_field(name="Description", value=details["description"], inline=False)
-        embed.add_field(name="Time", value=f"{details['time']} {details['creator_timezone']}", inline=False)
+        embed.add_field(name="Time", value=f"<t:{timestamp}:F> (<t:{timestamp}:R>)", inline=False)
         embed.add_field(name="Attendees", value=attendee_names or "None", inline=False)
         await ctx.send(embed=embed)
 
@@ -262,8 +286,8 @@ class Meetings(commands.Cog):
         user_meetings = [(meeting_id, details) for meeting_id, details in meetings.items() if user_id in details["attendees"]]
         if not user_meetings:
             embed = discord.Embed(
-                title="No Upcoming or Active Meetings",
-                description="You have no upcoming or active meetings.",
+                title="Here's your schedule",
+                description="You have no upcoming or active meetings. Book a new meeting with another user using `meeting create`.",
                 color=0xff4545
             )
             await ctx.send(embed=embed)
@@ -274,8 +298,13 @@ class Meetings(commands.Cog):
             meeting_time_creator_tz = datetime.strptime(details["time"], "%Y-%m-%d %H:%M")
             creator_timezone = pytz.timezone(details["creator_timezone"])
             meeting_time_utc = creator_timezone.localize(meeting_time_creator_tz).astimezone(pytz.utc)
+            timestamp = int(meeting_time_utc.timestamp())
             status = "Active" if now_utc >= meeting_time_utc else "Upcoming"
-            embed.add_field(name=f"{details['name']} (ID: {meeting_id})", value=f"Description: {details['description']}\nTime: {details['time']} {details['creator_timezone']}\nStatus: {status}", inline=False)
+            embed.add_field(
+                name=f"{details['name']} (ID: {meeting_id})",
+                value=f"Description: {details['description']}\nTime: <t:{timestamp}:F> (<t:{timestamp}:R>)\nStatus: {status}",
+                inline=False
+            )
         await ctx.send(embed=embed)
 
     async def send_meeting_alert(self, meeting_id: str, guild: discord.Guild):
