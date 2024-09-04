@@ -127,6 +127,20 @@ Keep track of various holidays and special events from around the world. This co
 ```
 
 
+### [meetings](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/meetings)
+
+Organize and manage meetings directly within your Discord server. This cog allows you to schedule meetings, send reminders, and keep track of attendees. Perfect for community managers, project teams, and any group that needs to coordinate regular meetings. `[p]meeting`, `[p]meetingset`.
+
+```
+[p]cog install BeeHive-Cogs meetings
+```
+```
+[p]load meetings
+```
+
+
+
+
 ### [products](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/products)
 
 Cog made for primarily our server to help us deliver information on our products to inquisitive users. `(incomplete)`
