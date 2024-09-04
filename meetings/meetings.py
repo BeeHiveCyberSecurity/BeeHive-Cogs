@@ -266,9 +266,11 @@ class Meetings(commands.Cog):
             timestamp = int(meeting_time_utc.timestamp())
             end_time_utc = meeting_time_utc + timedelta(minutes=details["duration"])
             end_timestamp = int(end_time_utc.timestamp())
+            attendees = [guild.get_member(user_id) for user_id in details["attendees"]]
+            attendee_names = ", ".join([user.display_name for user in attendees if user])
             embed.add_field(
                 name=f"{details['name']} ({meeting_id})",
-                value=f"> {details['description']}\n- **<t:{timestamp}:F> to <t:{end_timestamp}:F>**, **<t:{timestamp}:R>**\n- **{len(details['attendees'])}** attendees",
+                value=f"> {details['description']}\n- **<t:{timestamp}:F> to <t:{end_timestamp}:F>**, **<t:{timestamp}:R>**\n- **{len(details['attendees'])}** attendees\n- **Attendees**: {attendee_names or 'None'}",
                 inline=False
             )
         await ctx.send(embed=embed)
@@ -335,22 +337,24 @@ class Meetings(commands.Cog):
             timestamp = int(meeting_time_utc.timestamp())
             end_time_utc = meeting_time_utc + timedelta(minutes=details["duration"])
             end_timestamp = int(end_time_utc.timestamp())
+            attendees = [guild.get_member(user_id) for user_id in details["attendees"]]
+            attendee_names = ", ".join([user.display_name for user in attendees if user])
             if now_utc >= meeting_time_utc and now_utc <= end_time_utc:
-                active_meetings.append((meeting_id, details, timestamp, end_timestamp))
+                active_meetings.append((meeting_id, details, timestamp, end_timestamp, attendee_names))
             else:
-                upcoming_meetings.append((meeting_id, details, timestamp, end_timestamp))
+                upcoming_meetings.append((meeting_id, details, timestamp, end_timestamp, attendee_names))
         
         if active_meetings:
             active_value = "\n".join(
-                f"> {details['description']}\n- **<t:{timestamp}:R>**\n- **<t:{timestamp}:F>**\n- **<t:{end_timestamp}:F>**\n- **{details['duration']}** minutes"
-                for meeting_id, details, timestamp, end_timestamp in active_meetings
+                f"> {details['description']}\n- **<t:{timestamp}:R>**\n- **<t:{timestamp}:F>**\n- **<t:{end_timestamp}:F>**\n- **{details['duration']}** minutes\n- **Attendees**: {attendee_names or 'None'}"
+                for meeting_id, details, timestamp, end_timestamp, attendee_names in active_meetings
             )
             embed.add_field(name="Right now", value=active_value, inline=False)
         
         if upcoming_meetings:
             upcoming_value = "\n".join(
-                f"> {details['description']}\n- **<t:{timestamp}:R>**\n- **<t:{timestamp}:F>**\n- **<t:{end_timestamp}:F>**\n- **{details['duration']}** minutes"
-                for meeting_id, details, timestamp, end_timestamp in upcoming_meetings
+                f"> {details['description']}\n- **<t:{timestamp}:R>**\n- **<t:{timestamp}:F>**\n- **<t:{end_timestamp}:F>**\n- **{details['duration']}** minutes\n- **Attendees**: {attendee_names or 'None'}"
+                for meeting_id, details, timestamp, end_timestamp, attendee_names in upcoming_meetings
             )
             embed.add_field(name="Coming up", value=upcoming_value, inline=False)
         
@@ -362,6 +366,12 @@ class Meetings(commands.Cog):
         if meeting_id not in meetings:
             return
         meeting = meetings[meeting_id]
+        
+        # Check for missing information
+        required_fields = ["time", "creator_timezone", "name", "attendees"]
+        if any(field not in meeting for field in required_fields):
+            return
+        
         meeting_time_creator_tz = datetime.strptime(meeting["time"], "%Y-%m-%d %H:%M")
         creator_timezone = pytz.timezone(meeting["creator_timezone"])
         meeting_time_utc = creator_timezone.localize(meeting_time_creator_tz).astimezone(pytz.utc)
@@ -375,7 +385,15 @@ class Meetings(commands.Cog):
             if user:
                 user_timezone = await self.config.member(user).timezone()
                 user_time = meeting_time_utc.astimezone(pytz.timezone(user_timezone))
-                await user.send(f"Reminder: The meeting '{meeting['name']}' (ID: {meeting_id}) is scheduled for {user_time.strftime('%Y-%m-%d %H:%M %Z')} in your timezone.")
+                
+                # Create an embed for the notification
+                embed = discord.Embed(
+                    title="🔔 Your meeting starts soon",
+                    description=f"The meeting '{meeting['name']}' (ID: {meeting_id}) is scheduled.",
+                    color=0x00ff00
+                )
+                embed.add_field(name="Scheduled Time", value=user_time.strftime('%Y-%m-%d %H:%M %Z'), inline=False)
+                await user.send(embed=embed)
         
         # Mark the alert as sent
         meeting["alert_sent"] = True
