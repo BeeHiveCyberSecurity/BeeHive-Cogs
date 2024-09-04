@@ -37,20 +37,18 @@ class Meetings(commands.Cog):
         """Periodically clean up old meetings."""
         while True:
             await asyncio.sleep(3600)  # Run every hour
+            current_time = datetime.now(pytz.UTC)
             all_guilds = await self.config.all_guilds()
+            removed_meetings = 0
+
             for guild_id, guild_data in all_guilds.items():
                 meetings = guild_data.get("meetings", {})
-                current_time = datetime.now(pytz.utc)
-                to_remove = []
-                for meeting_id, meeting in meetings.items():
-                    meeting_time = datetime.fromisoformat(meeting["time"])
-                    meeting_end_time = meeting_time + timedelta(minutes=meeting["duration"])
-                    if meeting_end_time + timedelta(minutes=30) < current_time:
-                        to_remove.append(meeting_id)
-                if to_remove:
-                    async with self.config.guild_from_id(guild_id).meetings() as guild_meetings:
-                        for meeting_id in to_remove:
+                for meeting_id, meeting_data in meetings.items():
+                    end_time = datetime.fromisoformat(meeting_data['time']).replace(tzinfo=pytz.UTC) + timedelta(minutes=meeting_data['duration'])
+                    if end_time + timedelta(minutes=30) < current_time:
+                        async with self.config.guild_from_id(guild_id).meetings() as guild_meetings:
                             del guild_meetings[meeting_id]
+                        removed_meetings += 1
 
         
     @commands.guild_only()
