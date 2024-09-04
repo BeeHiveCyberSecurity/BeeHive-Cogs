@@ -45,7 +45,7 @@ class Meetings(commands.Cog):
                 for meeting_id, meeting in meetings.items():
                     meeting_time = datetime.fromisoformat(meeting["time"])
                     meeting_end_time = meeting_time + timedelta(minutes=meeting["duration"])
-                    if meeting_end_time < current_time:
+                    if meeting_end_time + timedelta(minutes=30) < current_time:
                         to_remove.append(meeting_id)
                 if to_remove:
                     async with self.config.guild_from_id(guild_id).meetings() as guild_meetings:
