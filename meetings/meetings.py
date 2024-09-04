@@ -5,6 +5,8 @@ from redbot.core.bot import Red #type: ignore
 from typing import List
 from datetime import datetime, timedelta
 import pytz
+import random
+import string
 
 class Meetings(commands.Cog):
     """Manage and schedule meetings."""
@@ -21,6 +23,10 @@ class Meetings(commands.Cog):
         self.config.register_guild(**default_guild)
         self.config.register_member(**default_member)
         self.bot.loop.create_task(self.check_meetings())
+
+    def generate_meeting_id(self):
+        """Generate a random 4 character meeting ID."""
+        return ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
 
     @commands.guild_only()
     @commands.group()
@@ -59,7 +65,7 @@ class Meetings(commands.Cog):
             return
 
         async with self.config.guild(ctx.guild).meetings() as meetings:
-            if name in meetings:
+            if any(meeting["name"] == name for meeting in meetings.values()):
                 embed = discord.Embed(
                     title="Meeting Exists",
                     description=f"A meeting with the name '{name}' already exists.",
@@ -126,8 +132,10 @@ class Meetings(commands.Cog):
             await ctx.send(embed=embed)
             return
 
+        meeting_id = self.generate_meeting_id()
         async with self.config.guild(ctx.guild).meetings() as meetings:
-            meetings[name] = {
+            meetings[meeting_id] = {
+                "name": name,
                 "description": description,
                 "time": time,
                 "attendees": [user.id for user in users],
@@ -136,30 +144,30 @@ class Meetings(commands.Cog):
 
         embed = discord.Embed(
             title="Meeting Created",
-            description=f"Meeting '{name}' created successfully with {len(users)} attendees.",
+            description=f"Meeting '{name}' created successfully with ID '{meeting_id}' and {len(users)} attendees.",
             color=0x2bbd8e
         )
         await ctx.send(embed=embed)
 
     @meeting.command()
-    async def invite(self, ctx: commands.Context, name: str, users: commands.Greedy[discord.Member]):
+    async def invite(self, ctx: commands.Context, meeting_id: str, users: commands.Greedy[discord.Member]):
         """Invite users to a meeting."""
         guild = ctx.guild
         async with self.config.guild(guild).meetings() as meetings:
-            if name not in meetings:
+            if meeting_id not in meetings:
                 embed = discord.Embed(
                     title="Meeting Not Found",
-                    description=f"No meeting found with the name '{name}'.",
+                    description=f"No meeting found with the ID '{meeting_id}'.",
                     color=0xff4545
                 )
                 await ctx.send(embed=embed)
                 return
             for user in users:
-                if user.id not in meetings[name]["attendees"]:
-                    meetings[name]["attendees"].append(user.id)
+                if user.id not in meetings[meeting_id]["attendees"]:
+                    meetings[meeting_id]["attendees"].append(user.id)
             embed = discord.Embed(
                 title="Users Invited",
-                description=f"Users invited to the meeting '{name}'.",
+                description=f"Users invited to the meeting '{meetings[meeting_id]['name']}'.",
                 color=0x2bbd8e
             )
             await ctx.send(embed=embed)
@@ -178,27 +186,27 @@ class Meetings(commands.Cog):
             await ctx.send(embed=embed)
             return
         embed = discord.Embed(title="Scheduled Meetings", color=0xfffffe)
-        for name, details in meetings.items():
-            embed.add_field(name=name, value=f"Description: {details['description']}\nTime: {details['time']} {details['creator_timezone']}\nAttendees: {len(details['attendees'])}", inline=False)
+        for meeting_id, details in meetings.items():
+            embed.add_field(name=f"{details['name']} (ID: {meeting_id})", value=f"Description: {details['description']}\nTime: {details['time']} {details['creator_timezone']}\nAttendees: {len(details['attendees'])}", inline=False)
         await ctx.send(embed=embed)
 
     @meeting.command()
-    async def details(self, ctx: commands.Context, name: str):
+    async def details(self, ctx: commands.Context, meeting_id: str):
         """Get details of a specific meeting."""
         guild = ctx.guild
         meetings = await self.config.guild(guild).meetings()
-        if name not in meetings:
+        if meeting_id not in meetings:
             embed = discord.Embed(
                 title="Meeting Not Found",
-                description=f"No meeting found with the name '{name}'.",
+                description=f"No meeting found with the ID '{meeting_id}'.",
                 color=0xff4545
             )
             await ctx.send(embed=embed)
             return
-        details = meetings[name]
+        details = meetings[meeting_id]
         attendees = [guild.get_member(user_id) for user_id in details["attendees"]]
         attendee_names = ", ".join([user.display_name for user in attendees if user])
-        embed = discord.Embed(title=f"Meeting: {name}", color=0x2bbd8e)
+        embed = discord.Embed(title=f"Meeting: {details['name']} (ID: {meeting_id})", color=0x2bbd8e)
         embed.add_field(name="Description", value=details["description"], inline=False)
         embed.add_field(name="Time", value=f"{details['time']} {details['creator_timezone']}", inline=False)
         embed.add_field(name="Attendees", value=attendee_names or "None", inline=False)
@@ -211,7 +219,7 @@ class Meetings(commands.Cog):
         user_id = ctx.author.id
         guild = ctx.guild
         meetings = await self.config.guild(guild).meetings()
-        user_meetings = [name for name, details in meetings.items() if user_id in details["attendees"]]
+        user_meetings = [details for details in meetings.values() if user_id in details["attendees"]]
         if not user_meetings:
             embed = discord.Embed(
                 title="No Upcoming Meetings",
@@ -221,17 +229,16 @@ class Meetings(commands.Cog):
             await ctx.send(embed=embed)
             return
         embed = discord.Embed(title="Your Upcoming Meetings", color=0xfffffe)
-        for name in user_meetings:
-            details = meetings[name]
-            embed.add_field(name=name, value=f"Description: {details['description']}\nTime: {details['time']} {details['creator_timezone']}", inline=False)
+        for details in user_meetings:
+            embed.add_field(name=f"{details['name']} (ID: {details['id']})", value=f"Description: {details['description']}\nTime: {details['time']} {details['creator_timezone']}", inline=False)
         await ctx.send(embed=embed)
 
-    async def send_meeting_alert(self, meeting_name: str, guild: discord.Guild):
+    async def send_meeting_alert(self, meeting_id: str, guild: discord.Guild):
         """Send meeting alert to all attendees considering their timezones."""
         meetings = await self.config.guild(guild).meetings()
-        if meeting_name not in meetings:
+        if meeting_id not in meetings:
             return
-        meeting = meetings[meeting_name]
+        meeting = meetings[meeting_id]
         meeting_time_creator_tz = datetime.strptime(meeting["time"], "%Y-%m-%d %H:%M")
         creator_timezone = pytz.timezone(meeting["creator_timezone"])
         meeting_time_utc = creator_timezone.localize(meeting_time_creator_tz).astimezone(pytz.utc)
@@ -240,7 +247,7 @@ class Meetings(commands.Cog):
             if user:
                 user_timezone = await self.config.member(user).timezone()
                 user_time = meeting_time_utc.astimezone(pytz.timezone(user_timezone))
-                await user.send(f"Reminder: The meeting '{meeting_name}' is scheduled for {user_time.strftime('%Y-%m-%d %H:%M %Z')} in your timezone.")
+                await user.send(f"Reminder: The meeting '{meeting['name']}' (ID: {meeting_id}) is scheduled for {user_time.strftime('%Y-%m-%d %H:%M %Z')} in your timezone.")
 
     async def check_meetings(self):
         """Check for upcoming meetings and send alerts."""
@@ -248,13 +255,13 @@ class Meetings(commands.Cog):
         while not self.bot.is_closed():
             for guild in self.bot.guilds:
                 meetings = await self.config.guild(guild).meetings()
-                for name, details in meetings.items():
+                for meeting_id, details in meetings.items():
                     creator_timezone = pytz.timezone(details["creator_timezone"])
                     meeting_time_creator_tz = datetime.strptime(details["time"], "%Y-%m-%d %H:%M")
                     meeting_time_utc = creator_timezone.localize(meeting_time_creator_tz).astimezone(pytz.utc)
                     now_utc = datetime.utcnow().replace(tzinfo=pytz.utc)
                     if now_utc + timedelta(minutes=10) >= meeting_time_utc > now_utc:
-                        await self.send_meeting_alert(name, guild)
+                        await self.send_meeting_alert(meeting_id, guild)
             await asyncio.sleep(60)  # Check every minute
 
     @meeting.command()
