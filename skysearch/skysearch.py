@@ -370,10 +370,9 @@ class Skysearch(commands.Cog):
         
 
     @commands.guild_only()
-    @commands.group(name='aircraft', help='Get information about aircraft.', invoke_without_command=True)
+    @commands.group(name='aircraft', help='Command center for aircraft related commands')
     async def aircraft_group(self, ctx):
-        """Summon the aircraft panel"""
-        await ctx.send_help(ctx.command)
+        """Command center for aircraft related commands"""
    
 
     @commands.guild_only()
