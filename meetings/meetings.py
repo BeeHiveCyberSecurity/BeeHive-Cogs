@@ -120,6 +120,21 @@ class Meetings(commands.Cog):
             await ctx.send(embed=embed)
             return
 
+        await ctx.send("How long will the meeting last? Please provide the duration in minutes.")
+        try:
+            duration_msg = await self.bot.wait_for('message', check=check, timeout=60)
+            duration = int(duration_msg.content)
+            if duration <= 0:
+                raise ValueError("Duration must be a positive integer.")
+        except (asyncio.TimeoutError, ValueError):
+            embed = discord.Embed(
+                title="Invalid duration",
+                description="Invalid duration. Please provide a positive integer for the duration in minutes.",
+                color=0xff4545
+            )
+            await ctx.send(embed=embed)
+            return
+
         await ctx.send("Please mention the users you want to invite to the meeting.")
         try:
             invite_msg = await self.bot.wait_for('message', check=check, timeout=60)
@@ -150,11 +165,14 @@ class Meetings(commands.Cog):
                 "name": name,
                 "description": description,
                 "time": meeting_time.strftime("%Y-%m-%d %H:%M"),
+                "duration": duration,
                 "attendees": [user.id for user in users],
                 "creator_timezone": user_timezone
             }
 
         timestamp = int(meeting_time.timestamp())
+        end_time = meeting_time + timedelta(minutes=duration)
+        end_timestamp = int(end_time.timestamp())
         embed = discord.Embed(
             title="Meeting created",
             description=f"Your meeting is successfully setup! Here's the summary...",
@@ -163,7 +181,8 @@ class Meetings(commands.Cog):
         embed.add_field(name="Meeting ID", value=f"Your meeting ID is `{meeting_id}`\nSave this for your records, you'll need it to fetch information about this meeting's details, or to cancel this meeting.", inline=False)
         embed.add_field(name="Name", value=name, inline=True)
         embed.add_field(name="Description", value=description, inline=True)
-        embed.add_field(name="Time", value=f"<t:{timestamp}:F> (<t:{timestamp}:R>) {user_timezone}", inline=True)
+        embed.add_field(name="Time", value=f"<t:{timestamp}:F> to <t:{end_timestamp}:F> (<t:{timestamp}:R>) {user_timezone}", inline=True)
+        embed.add_field(name="Duration", value=f"{duration} minutes", inline=True)
         embed.add_field(name="Attendees", value=", ".join([user.mention for user in users]), inline=False)
         await ctx.send(embed=embed)
 
@@ -241,9 +260,11 @@ class Meetings(commands.Cog):
             creator_timezone = pytz.timezone(details["creator_timezone"])
             meeting_time_utc = creator_timezone.localize(meeting_time_creator_tz).astimezone(pytz.utc)
             timestamp = int(meeting_time_utc.timestamp())
+            end_time_utc = meeting_time_utc + timedelta(minutes=details["duration"])
+            end_timestamp = int(end_time_utc.timestamp())
             embed.add_field(
                 name=f"{details['name']} ({meeting_id})",
-                value=f"> {details['description']}\n- **<t:{timestamp}:F>**, **<t:{timestamp}:R>**\n- **{len(details['attendees'])}** attendees",
+                value=f"> {details['description']}\n- **<t:{timestamp}:F> to <t:{end_timestamp}:F>**, **<t:{timestamp}:R>**\n- **{len(details['attendees'])}** attendees",
                 inline=False
             )
         await ctx.send(embed=embed)
@@ -269,10 +290,13 @@ class Meetings(commands.Cog):
         creator_timezone = pytz.timezone(details["creator_timezone"])
         meeting_time_utc = creator_timezone.localize(meeting_time_creator_tz).astimezone(pytz.utc)
         timestamp = int(meeting_time_utc.timestamp())
+        end_time_utc = meeting_time_utc + timedelta(minutes=details["duration"])
+        end_timestamp = int(end_time_utc.timestamp())
         
         embed = discord.Embed(title=f"Meeting: {details['name']} (ID: {meeting_id})", color=0x2bbd8e)
         embed.add_field(name="Description", value=details["description"], inline=False)
-        embed.add_field(name="Time", value=f"<t:{timestamp}:F> (<t:{timestamp}:R>)", inline=False)
+        embed.add_field(name="Time", value=f"<t:{timestamp}:F> to <t:{end_timestamp}:F> (<t:{timestamp}:R>)", inline=False)
+        embed.add_field(name="Duration", value=f"{details['duration']} minutes", inline=False)
         embed.add_field(name="Attendees", value=attendee_names or "None", inline=False)
         await ctx.send(embed=embed)
 
@@ -299,10 +323,12 @@ class Meetings(commands.Cog):
             creator_timezone = pytz.timezone(details["creator_timezone"])
             meeting_time_utc = creator_timezone.localize(meeting_time_creator_tz).astimezone(pytz.utc)
             timestamp = int(meeting_time_utc.timestamp())
+            end_time_utc = meeting_time_utc + timedelta(minutes=details["duration"])
+            end_timestamp = int(end_time_utc.timestamp())
             status = "Active" if now_utc >= meeting_time_utc else "Upcoming"
             embed.add_field(
                 name=f"{details['name']} (ID: {meeting_id})",
-                value=f"Description: {details['description']}\nTime: <t:{timestamp}:F> (<t:{timestamp}:R>)\nStatus: {status}",
+                value=f"Description: {details['description']}\nTime: <t:{timestamp}:F> to <t:{end_timestamp}:F> (<t:{timestamp}:R>)\nDuration: {details['duration']} minutes\nStatus: {status}",
                 inline=False
             )
         await ctx.send(embed=embed)
