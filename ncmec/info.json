@@ -1,0 +1,10 @@
+{
+    "name": "ncmec",
+    "short": "Interact with the National Center for Missing and Exploited Children",
+    "description": "This cog allows you to fetch information about recently missing children from the National Center for Missing and Exploited Children (NCMEC).",
+    "install_msg": "Thank you for installing the NCMEC cog. Use `[p]ncmec recent` to get information about recently missing children.",
+    "author": ["adminelevation"],
+    "required_cogs": {},
+    "requirements": ["aiohttp"],
+    "tags": ["NCMEC", "Missing Children", "Information"]
+}
