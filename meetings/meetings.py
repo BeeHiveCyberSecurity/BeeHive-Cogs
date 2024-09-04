@@ -192,7 +192,7 @@ class Meetings(commands.Cog):
             meeting = meetings[meeting_id]
             if ctx.author.id not in meeting["attendees"]:
                 embed = discord.Embed(
-                    title="Permission Denied",
+                    title="Permission denied",
                     description="Only an invited attendee can delete this meeting.",
                     color=0xff4545
                 )
