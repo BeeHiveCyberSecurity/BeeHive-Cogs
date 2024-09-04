@@ -628,7 +628,7 @@ class Meetings(commands.Cog):
         for guild_id, guild_data in all_guilds.items():
             meetings = guild_data.get("meetings", {})
             for meeting_id, meeting_data in meetings.items():
-                end_time = datetime.fromisoformat(meeting_data['time']) + timedelta(minutes=meeting_data['duration'])  # Fixed bug: meeting_data['end_time'] should be calculated
+                end_time = datetime.fromisoformat(meeting_data['time']).replace(tzinfo=pytz.UTC) + timedelta(minutes=meeting_data['duration'])  # Ensure end_time is offset-aware
                 if end_time < current_time:
                     async with self.config.guild_from_id(guild_id).meetings() as guild_meetings:
                         del guild_meetings[meeting_id]
