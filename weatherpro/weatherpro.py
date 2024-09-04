@@ -434,7 +434,7 @@ class Weather(commands.Cog):
                             "Volcano Warning": ":volcano:",
                             "Flash Flood Warning": ":ocean:",
                             "Frost Advisory": ":snowflake:",
-                            "Evacuation - Immediate": ":person_running:",
+                            "Mandatory evacuation order": ":person_running:",
                             # Add more event types and corresponding emojis as needed
                         }
                         event_transformations = {
