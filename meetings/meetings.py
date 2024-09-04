@@ -1,6 +1,6 @@
-import discord
-from redbot.core import commands, Config
-from redbot.core.bot import Red
+import discord #type: ignore
+from redbot.core import commands, Config #type: ignore
+from redbot.core.bot import Red #type: ignore
 from typing import List
 
 class Meetings(commands.Cog):
