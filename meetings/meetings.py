@@ -132,6 +132,9 @@ class Meetings(commands.Cog):
             await ctx.send(embed=embed)
             return
 
+        # Add the command author to the list of attendees
+        users.append(ctx.author)
+
         meeting_id = self.generate_meeting_id()
         async with self.config.guild(ctx.guild).meetings() as meetings:
             meetings[meeting_id] = {
@@ -215,22 +218,27 @@ class Meetings(commands.Cog):
 
     @meeting.command()
     async def myschedule(self, ctx: commands.Context):
-        """Check your upcoming meetings."""
+        """Check your upcoming and active meetings."""
         user_id = ctx.author.id
         guild = ctx.guild
         meetings = await self.config.guild(guild).meetings()
         user_meetings = [(meeting_id, details) for meeting_id, details in meetings.items() if user_id in details["attendees"]]
         if not user_meetings:
             embed = discord.Embed(
-                title="No Upcoming Meetings",
-                description="You have no upcoming meetings.",
+                title="No Upcoming or Active Meetings",
+                description="You have no upcoming or active meetings.",
                 color=0xff4545
             )
             await ctx.send(embed=embed)
             return
-        embed = discord.Embed(title="Your Upcoming Meetings", color=0xfffffe)
+        embed = discord.Embed(title="Your Upcoming and Active Meetings", color=0xfffffe)
+        now_utc = datetime.utcnow().replace(tzinfo=pytz.utc)
         for meeting_id, details in user_meetings:
-            embed.add_field(name=f"{details['name']} (ID: {meeting_id})", value=f"Description: {details['description']}\nTime: {details['time']} {details['creator_timezone']}", inline=False)
+            meeting_time_creator_tz = datetime.strptime(details["time"], "%Y-%m-%d %H:%M")
+            creator_timezone = pytz.timezone(details["creator_timezone"])
+            meeting_time_utc = creator_timezone.localize(meeting_time_creator_tz).astimezone(pytz.utc)
+            status = "Active" if now_utc >= meeting_time_utc else "Upcoming"
+            embed.add_field(name=f"{details['name']} (ID: {meeting_id})", value=f"Description: {details['description']}\nTime: {details['time']} {details['creator_timezone']}\nStatus: {status}", inline=False)
         await ctx.send(embed=embed)
 
     async def send_meeting_alert(self, meeting_id: str, guild: discord.Guild):
