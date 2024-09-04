@@ -13,6 +13,9 @@
         "user management",
         "profession"
     ],
+    "permissions": [
+        "embed_links"
+    ],
     "short": "Manage and display user disclaimers based on professions",
     "min_bot_version": "3.5.0"
 }

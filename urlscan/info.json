@@ -20,6 +20,9 @@
         "security",
         "safety"
     ],
+    "permissions": [
+        "embed_links"
+    ],
     "short": "Analyze domains and URL's via URLScan, with support for automated analysis and removal",
     "min_bot_version": "3.5.0"
 }

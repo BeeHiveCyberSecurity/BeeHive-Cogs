@@ -21,6 +21,9 @@
         "security",
         "safety"
     ],
+    "permissions": [
+        "embed_links"
+    ],
     "short": "Check files using VirusTotal and an API key",
     "min_bot_version": "3.5.0"
 }

@@ -5,6 +5,9 @@
     "end_user_data_statement": "This cog stores no user information",
     "name": "ping",
     "short": "Check bot's latency and network speed",
+    "permissions": [
+        "embed_links"
+    ],
     "min_bot_version": "3.5.0",
     "requirements": ["speedtest-cli"]
 }

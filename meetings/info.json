@@ -5,6 +5,9 @@
     "short": "Manage and schedule meetings.",
     "requirements": [],
     "tags": ["meetings", "scheduling", "management"],
+    "permissions": [
+        "embed_links"
+    ],
     "min_bot_version": "3.5.0",
     "hidden": false,
     "disabled": false

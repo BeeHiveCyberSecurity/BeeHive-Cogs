@@ -4,6 +4,9 @@
     "install_msg": "## :white_check_mark: Successfully installed Sesh.\nHave fun, stonie.\n\nJoin our Discord! https://discord.gg/ckdzsm7mTs",
     "name": "sesh",
     "short": "Coordinate smoking sessions",
+    "permissions": [
+        "embed_links"
+    ],
     "min_bot_version": "3.5.0",
     "requirements": ["pynacl"]
 }

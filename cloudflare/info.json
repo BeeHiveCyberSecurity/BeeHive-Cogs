@@ -16,6 +16,9 @@
         "HyperDrive",
         "Intelligence"
     ],
+    "permissions": [
+        "embed_links"
+    ],
     "short": "Interact with your Cloudflare account, zones, and assets thru Red-Discordbot",
     "min_bot_version": "3.5.0"
 }

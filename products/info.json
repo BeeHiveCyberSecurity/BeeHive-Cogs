@@ -11,6 +11,9 @@
         "requests",
         "discord-py-interactions"
     ],
+    "permissions": [
+        "embed_links"
+    ],
     "tags": [
         "sales",
         "products",

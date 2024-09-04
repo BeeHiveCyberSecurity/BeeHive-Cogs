@@ -4,6 +4,9 @@
     "author": ["adminelevation"],
     "short": "Fetch public holidays",
     "requirements": ["aiohttp", "asyncio"],
+    "permissions": [
+        "embed_links"
+    ],
     "tags": ["holidays", "API", "Nager.Date"],
     "end_user_data_statement": "This cog stores user country codes for fetching public holidays."
 }

@@ -9,6 +9,9 @@
     "disabled": false,
     "requirements": [
     ],
+    "permissions": [
+        "embed_links"
+    ],
     "tags": [
         "nicknames",
         "management",

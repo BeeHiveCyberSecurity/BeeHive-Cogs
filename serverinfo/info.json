@@ -4,6 +4,9 @@
     "install_msg": "## :white_check_mark: Successfully installed ServerInfo.\n**Need help or have suggestions?** [Contact us](<https://www.beehive.systems/contact-us>)\n**Want to manage server information efficiently?** Join our Discord! https://discord.gg/ckdzsm7mTs",
     "name": "serverinfo",
     "short": "Display server information",
+    "permissions": [
+        "embed_links"
+    ],
     "min_bot_version": "3.5.0",
     "requirements": []
 }
