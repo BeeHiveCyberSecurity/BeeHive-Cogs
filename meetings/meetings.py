@@ -219,7 +219,7 @@ class Meetings(commands.Cog):
         user_id = ctx.author.id
         guild = ctx.guild
         meetings = await self.config.guild(guild).meetings()
-        user_meetings = [details for details in meetings.values() if user_id in details["attendees"]]
+        user_meetings = [(meeting_id, details) for meeting_id, details in meetings.items() if user_id in details["attendees"]]
         if not user_meetings:
             embed = discord.Embed(
                 title="No Upcoming Meetings",
@@ -229,8 +229,8 @@ class Meetings(commands.Cog):
             await ctx.send(embed=embed)
             return
         embed = discord.Embed(title="Your Upcoming Meetings", color=0xfffffe)
-        for details in user_meetings:
-            embed.add_field(name=f"{details['name']} (ID: {details['id']})", value=f"Description: {details['description']}\nTime: {details['time']} {details['creator_timezone']}", inline=False)
+        for meeting_id, details in user_meetings:
+            embed.add_field(name=f"{details['name']} (ID: {meeting_id})", value=f"Description: {details['description']}\nTime: {details['time']} {details['creator_timezone']}", inline=False)
         await ctx.send(embed=embed)
 
     async def send_meeting_alert(self, meeting_id: str, guild: discord.Guild):
