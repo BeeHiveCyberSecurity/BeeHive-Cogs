@@ -384,8 +384,9 @@ class Meetings(commands.Cog):
         message = await ctx.send(embed=generate_embed(current_page))
 
         await message.add_reaction("⬅️")
-        await message.add_reaction("➡️")
         await message.add_reaction("❌")
+        await message.add_reaction("➡️")
+        
 
         def check(reaction, user):
             return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️", "❌"] and reaction.message.id == message.id
