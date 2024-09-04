@@ -69,40 +69,43 @@ class Meetings(commands.Cog):
             return
 
         await ctx.send("Let's start the meeting setup process. What will be the name of the meeting?")
-        try:
-            name_msg = await self.bot.wait_for('message', check=check, timeout=60)
-            name = name_msg.content
-        except asyncio.TimeoutError:
-            embed = discord.Embed(
-                title="Timeout",
-                description="You took too long to respond. Meeting setup cancelled.",
-                color=0xff4545
-            )
-            await ctx.send(embed=embed)
-            return
-
-        async with self.config.guild(ctx.guild).meetings() as meetings:
-            if any(meeting["name"] == name for meeting in meetings.values()):
+        while True:
+            try:
+                name_msg = await self.bot.wait_for('message', check=check, timeout=60)
+                name = name_msg.content
+                async with self.config.guild(ctx.guild).meetings() as meetings:
+                    if any(meeting["name"] == name for meeting in meetings.values()):
+                        embed = discord.Embed(
+                            title="Meeting name already taken",
+                            description=f"A meeting with the name '{name}' already exists. Please provide a different name.",
+                            color=0xff4545
+                        )
+                        await ctx.send(embed=embed)
+                    else:
+                        break
+            except asyncio.TimeoutError:
                 embed = discord.Embed(
-                    title="Meeting name already taken",
-                    description=f"A meeting with the name '{name}' already exists.",
+                    title="Timeout",
+                    description="You took too long to respond. Meeting setup cancelled.",
                     color=0xff4545
                 )
                 await ctx.send(embed=embed)
                 return
 
         await ctx.send("Please provide a description for the meeting.")
-        try:
-            description_msg = await self.bot.wait_for('message', check=check, timeout=60)
-            description = description_msg.content
-        except asyncio.TimeoutError:
-            embed = discord.Embed(
-                title="Timeout",
-                description="You took too long to respond. Meeting setup cancelled.",
-                color=0xff4545
-            )
-            await ctx.send(embed=embed)
-            return
+        while True:
+            try:
+                description_msg = await self.bot.wait_for('message', check=check, timeout=60)
+                description = description_msg.content
+                break
+            except asyncio.TimeoutError:
+                embed = discord.Embed(
+                    title="Timeout",
+                    description="You took too long to respond. Meeting setup cancelled.",
+                    color=0xff4545
+                )
+                await ctx.send(embed=embed)
+                return
 
         now = datetime.now(pytz.timezone(user_timezone))
         today = now.strftime("%B %d, %Y")
@@ -113,65 +116,72 @@ class Meetings(commands.Cog):
             color=0x2bbd8e
         )
         await ctx.send(embed=embed)
-        try:
-            time_msg = await self.bot.wait_for('message', check=check, timeout=60)
-            time = time_msg.content
-            # Validate time format
+        while True:
             try:
-                meeting_time = datetime.strptime(time, "%B %d, %Y at %I:%M %p")
-                meeting_time = pytz.timezone(user_timezone).localize(meeting_time)
-            except ValueError:
+                time_msg = await self.bot.wait_for('message', check=check, timeout=60)
+                time = time_msg.content
+                # Validate time format
+                try:
+                    meeting_time = datetime.strptime(time, "%B %d, %Y at %I:%M %p")
+                    meeting_time = pytz.timezone(user_timezone).localize(meeting_time)
+                    break
+                except ValueError:
+                    embed = discord.Embed(
+                        title="Invalid time format",
+                        description="Invalid time format. Please use 'Month Day, Year at HH:MM AM/PM'.",
+                        color=0xff4545
+                    )
+                    await ctx.send(embed=embed)
+            except asyncio.TimeoutError:
                 embed = discord.Embed(
-                    title="Invalid time format",
-                    description="Invalid time format. Please use 'Month Day, Year at HH:MM AM/PM'.",
+                    title="Timeout",
+                    description="You took too long to respond. Meeting setup cancelled.",
                     color=0xff4545
                 )
                 await ctx.send(embed=embed)
                 return
-        except asyncio.TimeoutError:
-            embed = discord.Embed(
-                title="Timeout",
-                description="You took too long to respond. Meeting setup cancelled.",
-                color=0xff4545
-            )
-            await ctx.send(embed=embed)
-            return
 
         await ctx.send("How long will the meeting last? Please provide the duration in minutes.")
-        try:
-            duration_msg = await self.bot.wait_for('message', check=check, timeout=60)
-            duration = int(duration_msg.content)
-            if duration <= 0:
-                raise ValueError("Duration must be a positive integer.")
-        except (asyncio.TimeoutError, ValueError):
-            embed = discord.Embed(
-                title="Invalid duration",
-                description="Invalid duration. Please provide a positive integer for the duration in minutes.",
-                color=0xff4545
-            )
-            await ctx.send(embed=embed)
-            return
+        while True:
+            try:
+                duration_msg = await self.bot.wait_for('message', check=check, timeout=60)
+                duration = int(duration_msg.content)
+                if duration > 0:
+                    break
+                else:
+                    raise ValueError("Duration must be a positive integer.")
+            except (asyncio.TimeoutError, ValueError):
+                embed = discord.Embed(
+                    title="Invalid duration",
+                    description="Invalid duration. Please provide a positive integer for the duration in minutes.",
+                    color=0xff4545
+                )
+                await ctx.send(embed=embed)
+                if isinstance(duration_msg, asyncio.TimeoutError):
+                    return
 
         await ctx.send("Please mention the users you want to invite to the meeting.")
-        try:
-            invite_msg = await self.bot.wait_for('message', check=check, timeout=60)
-            users = invite_msg.mentions
-            if not users:
+        while True:
+            try:
+                invite_msg = await self.bot.wait_for('message', check=check, timeout=60)
+                users = invite_msg.mentions
+                if users:
+                    break
+                else:
+                    embed = discord.Embed(
+                        title="No attendees added",
+                        description="You can't have a meeting all by yourself, silly...",
+                        color=0xff4545
+                    )
+                    await ctx.send(embed=embed)
+            except asyncio.TimeoutError:
                 embed = discord.Embed(
-                    title="No attendees added",
-                    description="You can't have a meeting all by yourself, silly...",
+                    title="Timeout",
+                    description="You took too long to respond. Meeting setup cancelled.",
                     color=0xff4545
                 )
                 await ctx.send(embed=embed)
                 return
-        except asyncio.TimeoutError:
-            embed = discord.Embed(
-                title="Timeout",
-                description="You took too long to respond. Meeting setup cancelled.",
-                color=0xff4545
-            )
-            await ctx.send(embed=embed)
-            return
 
         # Add the command author to the list of attendees
         users.append(ctx.author)
