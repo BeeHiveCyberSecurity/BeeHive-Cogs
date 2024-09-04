@@ -190,7 +190,8 @@ class Meetings(commands.Cog):
             embed = discord.Embed(title="Current times in various timezones", color=discord.Color.blue())
             for timezone in pages[page]:
                 local_time = now_utc.astimezone(pytz.timezone(timezone))
-                embed.add_field(name=timezone, value=local_time.strftime('%Y-%m-%d %H:%M %Z'), inline=False)
+                timestamp = int(local_time.timestamp())
+                embed.add_field(name=timezone, value=f"<t:{timestamp}:F>", inline=False)
             embed.set_footer(text=f"Page {page + 1} of {len(pages)}")
             return embed
 
