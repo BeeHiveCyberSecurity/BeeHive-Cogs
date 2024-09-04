@@ -186,14 +186,15 @@ class Meetings(commands.Cog):
         pages = [timezones[i:i + 25] for i in range(0, len(timezones), 25)]
         current_page = 0
 
-        def generate_page_content(page):
-            content = "Current times in various timezones:\n\n"
+        def generate_embed(page):
+            embed = discord.Embed(title="Current times in various timezones", color=discord.Color.blue())
             for timezone in pages[page]:
                 local_time = now_utc.astimezone(pytz.timezone(timezone))
-                content += f"{timezone}: {local_time.strftime('%Y-%m-%d %H:%M %Z')}\n"
-            return content
+                embed.add_field(name=timezone, value=local_time.strftime('%Y-%m-%d %H:%M %Z'), inline=False)
+            embed.set_footer(text=f"Page {page + 1} of {len(pages)}")
+            return embed
 
-        message = await ctx.send(generate_page_content(current_page))
+        message = await ctx.send(embed=generate_embed(current_page))
 
         await message.add_reaction("⬅️")
         await message.add_reaction("➡️")
@@ -211,7 +212,7 @@ class Meetings(commands.Cog):
             elif str(reaction.emoji) == "❌":
                 await message.delete()
                 break
-            await message.edit(content=generate_page_content(current_page))
+            await message.edit(embed=generate_embed(current_page))
             await message.remove_reaction(reaction.emoji, user)
 
     @commands.guild_only()
