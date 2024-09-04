@@ -178,6 +178,16 @@ class Meetings(commands.Cog):
                         await self.send_meeting_alert(name, guild)
             await asyncio.sleep(60)  # Check every minute
 
+    @meeting.command()
+    async def timezones(self, ctx: commands.Context):
+        """List all timezones and their current times."""
+        now_utc = datetime.utcnow().replace(tzinfo=pytz.utc)
+        embed = discord.Embed(title="Available Timezones", color=discord.Color.orange())
+        for timezone in pytz.all_timezones:
+            local_time = now_utc.astimezone(pytz.timezone(timezone))
+            embed.add_field(name=timezone, value=local_time.strftime('%Y-%m-%d %H:%M %Z'), inline=False)
+        await ctx.send(embed=embed)
+
     @commands.guild_only()
     @commands.group()
     async def meetingset(self, ctx: commands.Context):
@@ -191,3 +201,4 @@ class Meetings(commands.Cog):
             return
         await self.config.member(ctx.author).timezone.set(timezone)
         await ctx.send(f"Your timezone has been set to {timezone}.")
+
