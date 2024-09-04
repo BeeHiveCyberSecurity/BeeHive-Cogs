@@ -65,6 +65,12 @@ class Meetings(commands.Cog):
         try:
             time_msg = await self.bot.wait_for('message', check=check, timeout=60)
             time = time_msg.content
+            # Validate time format
+            try:
+                datetime.strptime(time, "%Y-%m-%d %H:%M")
+            except ValueError:
+                await ctx.send("Invalid time format. Please use 'YYYY-MM-DD HH:MM'.")
+                return
         except asyncio.TimeoutError:
             await ctx.send("You took too long to respond. Meeting setup cancelled.")
             return
@@ -73,6 +79,9 @@ class Meetings(commands.Cog):
         try:
             invite_msg = await self.bot.wait_for('message', check=check, timeout=60)
             users = invite_msg.mentions
+            if not users:
+                await ctx.send("No users mentioned. Meeting setup cancelled.")
+                return
         except asyncio.TimeoutError:
             await ctx.send("You took too long to respond. Meeting setup cancelled.")
             return
@@ -205,21 +214,26 @@ class Meetings(commands.Cog):
             return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️", "❌"] and reaction.message.id == message.id
 
         while True:
-            reaction, user = await self.bot.wait_for("reaction_add", check=check)
-            if str(reaction.emoji) == "⬅️" and current_page > 0:
-                current_page -= 1
-            elif str(reaction.emoji) == "➡️" and current_page < len(pages) - 1:
-                current_page += 1
-            elif str(reaction.emoji) == "❌":
-                await message.delete()
+            try:
+                reaction, user = await self.bot.wait_for("reaction_add", check=check, timeout=120)
+                if str(reaction.emoji) == "⬅️" and current_page > 0:
+                    current_page -= 1
+                elif str(reaction.emoji) == "➡️" and current_page < len(pages) - 1:
+                    current_page += 1
+                elif str(reaction.emoji) == "❌":
+                    await message.delete()
+                    break
+                await message.edit(embed=generate_embed(current_page))
+                await message.remove_reaction(reaction.emoji, user)
+            except asyncio.TimeoutError:
+                await message.clear_reactions()
                 break
-            await message.edit(embed=generate_embed(current_page))
-            await message.remove_reaction(reaction.emoji, user)
 
     @commands.guild_only()
     @commands.group()
     async def meetingset(self, ctx: commands.Context):
         """Group command for managing meetings."""
+        pass
 
     @meetingset.command()
     async def settimezone(self, ctx: commands.Context, timezone: str):
