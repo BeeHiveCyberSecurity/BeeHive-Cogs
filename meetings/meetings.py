@@ -620,7 +620,7 @@ class Meetings(commands.Cog):
     @meetingset.command()
     async def cleanup(self, ctx: commands.Context):
         """Cleanup all meetings that are past their end time/date."""
-        current_time = datetime.datetime.now(pytz.utc)
+        current_time = datetime.datetime.now(pytz.UTC)
         meetings = await self.config.all_meetings()
         removed_meetings = 0
 
