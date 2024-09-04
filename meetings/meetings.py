@@ -616,6 +616,8 @@ class Meetings(commands.Cog):
         )
         await ctx.send(embed=embed)
 
+    @commands.guild_only()
+    @commands.admin_or_permissions()
     @meetingset.command()
     async def cleanup(self, ctx: commands.Context):
         """Cleanup all meetings that are past their end time/date."""
