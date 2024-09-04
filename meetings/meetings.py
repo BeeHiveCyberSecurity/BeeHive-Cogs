@@ -35,6 +35,11 @@ class Meetings(commands.Cog):
         def check(m):
             return m.author == ctx.author and m.channel == ctx.channel
 
+        user_timezone = await self.config.member(ctx.author).timezone()
+        if user_timezone == "UTC":
+            await ctx.send("You need to set your timezone before creating a meeting. Use the `!meeting settimezone <timezone>` command.")
+            return
+
         await ctx.send("Let's start the meeting setup process. What will be the name of the meeting?")
         try:
             name_msg = await self.bot.wait_for('message', check=check, timeout=60)
@@ -56,7 +61,7 @@ class Meetings(commands.Cog):
             await ctx.send("You took too long to respond. Meeting setup cancelled.")
             return
 
-        await ctx.send("Please provide the time for the meeting (e.g., '2023-10-01 15:00' in UTC).")
+        await ctx.send(f"Please provide the time for the meeting (e.g., '2023-10-01 15:00' in your timezone: {user_timezone}).")
         try:
             time_msg = await self.bot.wait_for('message', check=check, timeout=60)
             time = time_msg.content
@@ -76,7 +81,8 @@ class Meetings(commands.Cog):
             meetings[name] = {
                 "description": description,
                 "time": time,
-                "attendees": [user.id for user in users]
+                "attendees": [user.id for user in users],
+                "creator_timezone": user_timezone
             }
 
         await ctx.send(f"Meeting '{name}' created successfully with {len(users)} attendees.")
@@ -104,7 +110,7 @@ class Meetings(commands.Cog):
             return
         embed = discord.Embed(title="Scheduled Meetings", color=discord.Color.blue())
         for name, details in meetings.items():
-            embed.add_field(name=name, value=f"Description: {details['description']}\nTime: {details['time']}\nAttendees: {len(details['attendees'])}", inline=False)
+            embed.add_field(name=name, value=f"Description: {details['description']}\nTime: {details['time']} {details['creator_timezone']}\nAttendees: {len(details['attendees'])}", inline=False)
         await ctx.send(embed=embed)
 
     @meeting.command()
@@ -120,7 +126,7 @@ class Meetings(commands.Cog):
         attendee_names = ", ".join([user.display_name for user in attendees if user])
         embed = discord.Embed(title=f"Meeting: {name}", color=discord.Color.green())
         embed.add_field(name="Description", value=details["description"], inline=False)
-        embed.add_field(name="Time", value=details["time"], inline=False)
+        embed.add_field(name="Time", value=f"{details['time']} {details['creator_timezone']}", inline=False)
         embed.add_field(name="Attendees", value=attendee_names or "None", inline=False)
         await ctx.send(embed=embed)
 
@@ -139,7 +145,9 @@ class Meetings(commands.Cog):
         if meeting_name not in meetings:
             return
         meeting = meetings[meeting_name]
-        meeting_time_utc = datetime.strptime(meeting["time"], "%Y-%m-%d %H:%M")
+        meeting_time_creator_tz = datetime.strptime(meeting["time"], "%Y-%m-%d %H:%M")
+        creator_timezone = pytz.timezone(meeting["creator_timezone"])
+        meeting_time_utc = creator_timezone.localize(meeting_time_creator_tz).astimezone(pytz.utc)
         for user_id in meeting["attendees"]:
             user = guild.get_member(user_id)
             if user:
@@ -154,8 +162,10 @@ class Meetings(commands.Cog):
             for guild in self.bot.guilds:
                 meetings = await self.config.guild(guild).meetings()
                 for name, details in meetings.items():
-                    meeting_time_utc = datetime.strptime(details["time"], "%Y-%m-%d %H:%M")
-                    now_utc = datetime.utcnow()
+                    creator_timezone = pytz.timezone(details["creator_timezone"])
+                    meeting_time_creator_tz = datetime.strptime(details["time"], "%Y-%m-%d %H:%M")
+                    meeting_time_utc = creator_timezone.localize(meeting_time_creator_tz).astimezone(pytz.utc)
+                    now_utc = datetime.utcnow().replace(tzinfo=pytz.utc)
                     if now_utc + timedelta(minutes=10) >= meeting_time_utc > now_utc:
                         await self.send_meeting_alert(name, guild)
             await asyncio.sleep(60)  # Check every minute
