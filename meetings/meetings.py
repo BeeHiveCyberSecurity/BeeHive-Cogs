@@ -346,14 +346,14 @@ class Meetings(commands.Cog):
         
         if active_meetings:
             active_value = "\n".join(
-                f"> {details['description']}\n- Starting **<t:{timestamp}:R>**\n- **<t:{timestamp}:F>**\n- **<t:{end_timestamp}:F>**\n- **{details['duration']}** minutes\n- **Attendees**: {attendee_names or 'None'}"
+                f"> {details['description']}\n- Started **<t:{timestamp}:R>**\n- **<t:{timestamp}:F>**\n- **<t:{end_timestamp}:F>**\n- **{details['duration']}** minutes\n- **Attendees**: {attendee_names or 'None'}"
                 for meeting_id, details, timestamp, end_timestamp, attendee_names in active_meetings
             )
             embed.add_field(name="Right now", value=active_value, inline=False)
         
         if upcoming_meetings:
             upcoming_value = "\n".join(
-                f"> {details['description']}\n- **<t:{timestamp}:R>**\n- **<t:{timestamp}:F>**\n- **<t:{end_timestamp}:F>**\n- **{details['duration']}** minutes\n- **Attendees**: {attendee_names or 'None'}"
+                f"> {details['description']}\n- Starting **<t:{timestamp}:R>**\n- **<t:{timestamp}:F>**\n- **<t:{end_timestamp}:F>**\n- **{details['duration']}** minutes\n- **Attendees**: {attendee_names or 'None'}"
                 for meeting_id, details, timestamp, end_timestamp, attendee_names in upcoming_meetings
             )
             embed.add_field(name="Coming up", value=upcoming_value, inline=False)
