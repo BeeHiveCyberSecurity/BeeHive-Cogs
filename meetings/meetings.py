@@ -225,9 +225,9 @@ class Meetings(commands.Cog):
             )
             await ctx.send(embed=embed)
             return
-        embed = discord.Embed(title="Scheduled Meetings", color=0xfffffe)
+        embed = discord.Embed(title="Scheduled meetings", color=0xfffffe)
         for meeting_id, details in meetings.items():
-            embed.add_field(name=f"{details['name']} (ID: {meeting_id})", value=f"Description: {details['description']}\nTime: {details['time']} {details['creator_timezone']}\nAttendees: {len(details['attendees'])}", inline=False)
+            embed.add_field(name=f"{details['name']} (ID: {meeting_id})", value=f"```{details['description']}```\nTime: {details['time']} {details['creator_timezone']}\nAttendees: {len(details['attendees'])}", inline=False)
         await ctx.send(embed=embed)
 
     @meeting.command()
