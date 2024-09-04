@@ -617,3 +617,22 @@ class Meetings(commands.Cog):
         )
         await ctx.send(embed=embed)
 
+        @meetingset.command()
+        async def cleanup(self, ctx: commands.Context):
+            """Cleanup all meetings that are past their end time/date."""
+            current_time = datetime.datetime.now(pytz.utc)
+            meetings = await self.config.all_meetings()
+            removed_meetings = 0
+
+            for meeting_id, meeting_data in meetings.items():
+                end_time = datetime.datetime.fromisoformat(meeting_data['end_time'])
+                if end_time < current_time:
+                    await self.config.clear_meeting(meeting_id)
+                    removed_meetings += 1
+
+            embed = discord.Embed(
+                title="Cleanup complete",
+                description=f"Removed {removed_meetings} meetings that were past their end time/date.",
+                color=0x2bbd8e
+            )
+            await ctx.send(embed=embed)
