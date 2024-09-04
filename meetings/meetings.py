@@ -186,31 +186,14 @@ class Meetings(commands.Cog):
         pages = [timezones[i:i + 25] for i in range(0, len(timezones), 25)]
         current_page = 0
 
-        async def generate_view(page):
-            options = []
+        def generate_page_content(page):
+            content = "Current times in various timezones:\n\n"
             for timezone in pages[page]:
                 local_time = now_utc.astimezone(pytz.timezone(timezone))
-                options.append(discord.SelectOption(label=timezone, description=local_time.strftime('%Y-%m-%d %H:%M %Z')))
+                content += f"{timezone}: {local_time.strftime('%Y-%m-%d %H:%M %Z')}\n"
+            return content
 
-            select = discord.ui.Select(placeholder="Choose a timezone...", options=options, max_values=1)
-            
-            async def select_callback(interaction):
-                selected_timezone = select.values[0]
-                local_time = now_utc.astimezone(pytz.timezone(selected_timezone))
-                await interaction.response.send_message(f"Current time in {selected_timezone}: {local_time.strftime('%Y-%m-%d %H:%M %Z')}")
-
-            select.callback = select_callback
-            view = discord.ui.View()
-            view.add_item(select)
-
-            return view
-
-        async def update_message(interaction, page):
-            view = await generate_view(page)
-            await interaction.response.edit_message(view=view)
-
-        view = await generate_view(current_page)
-        message = await ctx.send("Select a timezone to see its current time:", view=view)
+        message = await ctx.send(generate_page_content(current_page))
 
         await message.add_reaction("⬅️")
         await message.add_reaction("➡️")
@@ -228,7 +211,7 @@ class Meetings(commands.Cog):
             elif str(reaction.emoji) == "❌":
                 await message.delete()
                 break
-            await update_message(reaction.message, current_page)
+            await message.edit(content=generate_page_content(current_page))
             await message.remove_reaction(reaction.emoji, user)
 
     @commands.guild_only()
