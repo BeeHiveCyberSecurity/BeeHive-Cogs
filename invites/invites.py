@@ -131,11 +131,11 @@ class InviteTracker(commands.Cog):
     @commands.guild_only()
     @commands.admin()
     @commands.group()
-    async def invitetracker(self, ctx):
+    async def invites(self, ctx):
         """Settings for the invite tracker."""
         pass
 
-    @invitetracker.command()
+    @invites.command()
     async def announcechannel(self, ctx, channel: discord.TextChannel):
         """Set the announcement channel for invites."""
         await self.config.guild(ctx.guild).announcement_channel.set(channel.id)
@@ -147,7 +147,7 @@ class InviteTracker(commands.Cog):
         )
         await ctx.send(embed=embed)
 
-    @invitetracker.command()
+    @invites.command()
     async def addreward(self, ctx, invite_count: int, role: discord.Role):
         """Add a reward for a specific number of invites."""
         async with self.config.guild(ctx.guild).rewards() as rewards:
@@ -159,7 +159,7 @@ class InviteTracker(commands.Cog):
         )
         await ctx.send(embed=embed)
 
-    @invitetracker.command()
+    @invites.command()
     async def removereward(self, ctx, invite_count: int):
         """Remove a reward for a specific number of invites."""
         async with self.config.guild(ctx.guild).rewards() as rewards:
@@ -179,7 +179,7 @@ class InviteTracker(commands.Cog):
                 )
                 await ctx.send(embed=embed)
 
-    @invitetracker.command()
+    @invites.command()
     async def leaderboard(self, ctx):
         """Show the leaderboard of top inviting users."""
         invites = await self.config.guild(ctx.guild).invites()
@@ -206,7 +206,7 @@ class InviteTracker(commands.Cog):
             )
             await ctx.send(embed=embed)
 
-    @invitetracker.command()
+    @invites.command()
     async def membergrowth(self, ctx):
         """Show the overall member growth of the server as a graph."""
         growth = await self.config.guild(ctx.guild).member_growth()
@@ -263,8 +263,8 @@ class InviteTracker(commands.Cog):
 
         await ctx.send(file=file)
 
-    @invitetracker.command()
-    async def invitestats(self, ctx):
+    @invites.command()
+    async def stats(self, ctx):
         """Fetch and show invite stats for the server."""
         invites = await ctx.guild.invites()
         if not invites:
@@ -316,6 +316,3 @@ class InviteTracker(commands.Cog):
                 await message.remove_reaction(reaction, user)
             except asyncio.TimeoutError:
                 break
-
-def setup(bot):
-    bot.add_cog(InviteTracker(bot))

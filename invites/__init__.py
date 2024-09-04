@@ -1,6 +1,6 @@
 from redbot.core.bot import Red  # type: ignore
 
-from .invites import InviteTracker
+from .invites import Invites
 
 async def setup(bot: Red):
-    await bot.add_cog(InviteTracker(bot))
+    await bot.add_cog(Invites(bot))
