@@ -15,7 +15,7 @@ from reportlab.lib.pagesizes import letter, landscape, A4 #type: ignore
 from reportlab.pdfgen import canvas #type: ignore 
 from reportlab.lib import colors #type: ignore
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle #type: ignore
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak, Table, TableStyle
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak, Table, TableStyle #type: ignore
 
 import skysearch #type: ignore
 from .icao_codes import law_enforcement_icao_set, military_icao_set, medical_icao_set, suspicious_icao_set, newsagency_icao_set, balloons_icao_set, global_prior_known_accident_set, ukr_conflict_set, agri_utility_set
