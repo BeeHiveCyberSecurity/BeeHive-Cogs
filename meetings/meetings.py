@@ -320,8 +320,12 @@ class Meetings(commands.Cog):
             )
             await ctx.send(embed=embed)
             return
-        embed = discord.Embed(title="Your Upcoming and Active Meetings", color=0xfffffe)
+        embed = discord.Embed(title="Here's your schedule", color=0xfffffe)
         now_utc = datetime.utcnow().replace(tzinfo=pytz.utc)
+        
+        active_meetings = []
+        upcoming_meetings = []
+        
         for meeting_id, details in user_meetings:
             meeting_time_creator_tz = datetime.strptime(details["time"], "%Y-%m-%d %H:%M")
             creator_timezone = pytz.timezone(details["creator_timezone"])
@@ -329,12 +333,25 @@ class Meetings(commands.Cog):
             timestamp = int(meeting_time_utc.timestamp())
             end_time_utc = meeting_time_utc + timedelta(minutes=details["duration"])
             end_timestamp = int(end_time_utc.timestamp())
-            status = "Active" if now_utc >= meeting_time_utc else "Upcoming"
-            embed.add_field(
-                name=f"{details['name']} ({meeting_id})",
-                value=f"> {details['description']}\n- **<t:{timestamp}:F>** to **<t:{end_timestamp}:F>** (<t:{timestamp}:R>)\n- **{details['duration']}** minutes\n- {status}",
-                inline=False
+            if now_utc >= meeting_time_utc and now_utc <= end_time_utc:
+                active_meetings.append((meeting_id, details, timestamp, end_timestamp))
+            else:
+                upcoming_meetings.append((meeting_id, details, timestamp, end_timestamp))
+        
+        if active_meetings:
+            active_value = "\n".join(
+                f"> {details['description']}\n- **<t:{timestamp}:F>** to **<t:{end_timestamp}:F>** (<t:{timestamp}:R>)\n- **{details['duration']}** minutes"
+                for meeting_id, details, timestamp, end_timestamp in active_meetings
             )
+            embed.add_field(name="Right now", value=active_value, inline=False)
+        
+        if upcoming_meetings:
+            upcoming_value = "\n".join(
+                f"> {details['description']}\n- **<t:{timestamp}:F>** to **<t:{end_timestamp}:F>** (<t:{timestamp}:R>)\n- **{details['duration']}** minutes"
+                for meeting_id, details, timestamp, end_timestamp in upcoming_meetings
+            )
+            embed.add_field(name="Coming up", value=upcoming_value, inline=False)
+        
         await ctx.send(embed=embed)
 
     async def send_meeting_alert(self, meeting_id: str, guild: discord.Guild):
