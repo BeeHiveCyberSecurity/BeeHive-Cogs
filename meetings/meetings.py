@@ -130,14 +130,6 @@ class Meetings(commands.Cog):
         embed.add_field(name="Attendees", value=attendee_names or "None", inline=False)
         await ctx.send(embed=embed)
 
-    @meeting.command()
-    async def settimezone(self, ctx: commands.Context, timezone: str):
-        """Set your timezone."""
-        if timezone not in pytz.all_timezones:
-            await ctx.send("Invalid timezone. Please provide a valid timezone from the IANA timezone database.")
-            return
-        await self.config.member(ctx.author).timezone.set(timezone)
-        await ctx.send(f"Your timezone has been set to {timezone}.")
 
     @meeting.command()
     async def myschedule(self, ctx: commands.Context):
@@ -185,3 +177,17 @@ class Meetings(commands.Cog):
                     if now_utc + timedelta(minutes=10) >= meeting_time_utc > now_utc:
                         await self.send_meeting_alert(name, guild)
             await asyncio.sleep(60)  # Check every minute
+
+    @commands.guild_only()
+    @commands.group()
+    async def meetingset(self, ctx: commands.Context):
+        """Group command for managing meetings."""
+
+    @meetingset.command()
+    async def settimezone(self, ctx: commands.Context, timezone: str):
+        """Set your timezone."""
+        if timezone not in pytz.all_timezones:
+            await ctx.send("Invalid timezone. Please provide a valid timezone from the IANA timezone database.")
+            return
+        await self.config.member(ctx.author).timezone.set(timezone)
+        await ctx.send(f"Your timezone has been set to {timezone}.")
