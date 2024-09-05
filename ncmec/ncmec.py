@@ -45,21 +45,19 @@ class MissingKids(commands.Cog):
                     embeds = []
                     for person in data["persons"][:25]:  # Limit to first 25 results
                         embed = discord.Embed(
-                            title=f"{person.get('firstName', 'Unknown')} {person.get('middleName', '')} {person.get('lastName', 'Unknown')}",
+                            title=f"{person.get('firstName', 'Unknown')} {person.get('middleName')} {person.get('lastName', 'Unknown')}",
                             color=0xfffffe
                         )
                         if person.get('caseNumber'):
                             embed.add_field(name="Case Number", value=person.get('caseNumber'), inline=False)
-                        if person.get('orgPrefix'):
-                            embed.add_field(name="Organization Prefix", value=person.get('orgPrefix'), inline=False)
                         if person.get('orgName'):
                             embed.add_field(name="Organization Name", value=person.get('orgName'), inline=False)
                         if person.get('firstName'):
-                            embed.add_field(name="First Name", value=person.get('firstName'), inline=False)
+                            embed.add_field(name="First Name", value=person.get('firstName'), inline=True)
                         if person.get('middleName'):
-                            embed.add_field(name="Middle Name", value=person.get('middleName'), inline=False)
+                            embed.add_field(name="Middle Name", value=person.get('middleName'), inline=True)
                         if person.get('lastName'):
-                            embed.add_field(name="Last Name", value=person.get('lastName'), inline=False)
+                            embed.add_field(name="Last Name", value=person.get('lastName'), inline=True)
                         if person.get('missingCity'):
                             embed.add_field(name="Missing City", value=person.get('missingCity'), inline=False)
                         if person.get('missingCounty'):
