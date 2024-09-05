@@ -1,4 +1,5 @@
 # Welcome to BeeHive-Cogs
+> Enjoy these cogs? Please consider [supporting them financially](https://donate.stripe.com/eVag0y2kI9BI36McNa) to help keep them maintained.
 
 ## About this repo
 Red is a free, self-hostable, open-source Discord bot that can be used in growing Discord communities to help personalize and modularize server management, moderation, games, and more. 
