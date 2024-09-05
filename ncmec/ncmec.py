@@ -24,7 +24,16 @@ class MissingKids(commands.Cog):
                     await ctx.send("Failed to fetch data from the MissingKids API.")
                     return
 
-                data = await response.json()
+                content_type = response.headers.get('Content-Type', '')
+                if 'application/json' in content_type:
+                    data = await response.json()
+                elif 'text/xml' in content_type or 'application/xml' in content_type:
+                    text = await response.text()
+                    data = await self.parse_xml(text)
+                else:
+                    await ctx.send("Received unexpected content type from the MissingKids API.")
+                    return
+
                 if not data.get("children"):
                     await ctx.send("No recently missing children found.")
                     return
@@ -41,4 +50,18 @@ class MissingKids(commands.Cog):
                     )
 
                 await ctx.send(embed=embed)
+
+    async def parse_xml(self, text):
+        import xml.etree.ElementTree as ET
+        root = ET.fromstring(text)
+        children = []
+        for child in root.findall('.//child'):
+            children.append({
+                'name': child.find('name').text if child.find('name') is not None else 'Unknown',
+                'age': child.find('age').text if child.find('age') is not None else 'Unknown',
+                'gender': child.find('gender').text if child.find('gender') is not None else 'Unknown',
+                'missingSince': child.find('missingSince').text if child.find('missingSince') is not None else 'Unknown',
+                'location': child.find('location').text if child.find('location') is not None else 'Unknown',
+            })
+        return {'children': children}
 
