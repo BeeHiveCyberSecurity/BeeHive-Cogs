@@ -54,13 +54,13 @@ class MissingKids(commands.Cog):
                             if person.get('caseNumber'):
                                 embed.add_field(name="Case number", value=person.get('caseNumber'), inline=False)
                             if person.get('orgName'):
-                                embed.add_field(name="Issuing Organization", value=person.get('orgName'), inline=False)
+                                embed.add_field(name="Issuing organization", value=person.get('orgName'), inline=False)
                             if person.get('firstName'):
-                                embed.add_field(name="First Name", value=person.get('firstName'), inline=True)
+                                embed.add_field(name="First name", value=person.get('firstName'), inline=True)
                             if person.get('middleName'):
-                                embed.add_field(name="Middle Name", value=person.get('middleName'), inline=True)
+                                embed.add_field(name="Middle name", value=person.get('middleName'), inline=True)
                             if person.get('lastName'):
-                                embed.add_field(name="Last Name", value=person.get('lastName'), inline=True)
+                                embed.add_field(name="Last name", value=person.get('lastName'), inline=True)
                             if person.get('age'):
                                 embed.add_field(name="Age", value=person.get('age'), inline=True)
                             if person.get('race'):
@@ -132,7 +132,7 @@ class MissingKids(commands.Cog):
                 i = 0
                 while True:
                     try:
-                        reaction, user = await self.bot.wait_for("reaction_add", timeout=120.0, check=check)
+                        reaction, user = await self.bot.wait_for("reaction_add", timeout=30.0, check=check)
                         if str(reaction.emoji) == "➡️":
                             i += 1
                             if i >= len(embeds):
@@ -148,7 +148,10 @@ class MissingKids(commands.Cog):
                             break
                         await message.remove_reaction(reaction, user)
                     except asyncio.TimeoutError:
-                        break
+                        i += 1
+                        if i >= len(embeds):
+                            i = 0
+                        await message.edit(embed=embeds[i])
             except aiohttp.ClientError as e:
                 await ctx.send(f"An error occurred while trying to fetch data: {str(e)}")
             except Exception as e:
