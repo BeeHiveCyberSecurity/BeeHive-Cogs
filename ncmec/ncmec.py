@@ -78,10 +78,6 @@ class MissingKids(commands.Cog):
                             embed.add_field(name="Missing Date", value=person.get('missingDate'), inline=False)
                         if person.get('age'):
                             embed.add_field(name="Age", value=person.get('age'), inline=False)
-                        if person.get('inMonth') is not None:
-                            embed.add_field(name="In Month", value=str(person.get('inMonth')), inline=False)
-                        if person.get('inDay') is not None:
-                            embed.add_field(name="In Day", value=str(person.get('inDay')), inline=False)
                         if person.get('approxAge'):
                             embed.add_field(name="Approximate Age", value=person.get('approxAge'), inline=False)
                         if person.get('hasThumbnail') is not None:
@@ -97,9 +93,9 @@ class MissingKids(commands.Cog):
                         thumbnail_url = person.get('thumbnailUrl')
                         if thumbnail_url:
                             embed.set_thumbnail(url=f"https://api.missingkids.org{thumbnail_url}")
-                        image_url = person.get('imageUrl')
-                        if image_url:
-                            embed.set_image(url=f"https://api.missingkids.org{image_url}")
+#                        image_url = person.get('imageUrl')
+#                        if image_url:
+#                            embed.set_image(url=f"https://api.missingkids.org{image_url}")
                         embeds.append(embed)
 
                     message = await ctx.send(embed=embeds[0])
