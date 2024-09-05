@@ -119,7 +119,7 @@ class MissingKids(commands.Cog):
                     return
 
                 for embed in embeds:
-                    embed.set_footer(text=f"Total records loaded: {len(embeds)}")
+                    embed.set_footer(text=f"Total cases known: {len(embeds)}")
 
                 message = await ctx.send(embed=embeds[0])
                 await message.add_reaction("⬅️")
