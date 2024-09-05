@@ -60,9 +60,11 @@ class MissingKids(commands.Cog):
                         if person.get('lastName'):
                             embed.add_field(name="Last name", value=person.get('lastName'), inline=True)
                         if person.get('age'):
-                            embed.add_field(name="Age", value=person.get('age'), inline=False)
+                            embed.add_field(name="Age", value=person.get('age'), inline=True)
+                        if person.get('race'):
+                            embed.add_field(name="Race", value=person.get('race'), inline=True)
                         if person.get('approxAge'):
-                            embed.add_field(name="Estimated age", value=person.get('approxAge'), inline=False)
+                            embed.add_field(name="Estimated age", value=person.get('approxAge'), inline=True)
                         if person.get('missingCity'):
                             embed.add_field(name="Missing city", value=person.get('missingCity').title(), inline=True)
                         if person.get('missingCounty'):
@@ -95,14 +97,12 @@ class MissingKids(commands.Cog):
                                     await ctx.send(f"Failed to parse the missing date: {missing_date}")
                                     continue
                             embed.add_field(
-                                name="Missing Date", 
+                                name="Missing date", 
                                 value=f"<t:{timestamp}:F> (<t:{timestamp}:R>)", 
                                 inline=False
                             )
                         if person.get('caseType'):
-                            embed.add_field(name="Case Type", value=person.get('caseType'), inline=False)
-                        if person.get('race'):
-                            embed.add_field(name="Race", value=person.get('race'), inline=False)
+                            embed.add_field(name="Case type", value=person.get('caseType'), inline=False)
                         thumbnail_url = person.get('thumbnailUrl')
                         if thumbnail_url:
                             embed.set_thumbnail(url=f"https://api.missingkids.org{thumbnail_url}")
