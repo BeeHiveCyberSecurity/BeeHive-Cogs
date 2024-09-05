@@ -17,8 +17,8 @@ class MissingKids(commands.Cog):
         pass
     
     @ncmec.command()
-    async def recent(self, ctx):
-        """Fetch information about recently missing children."""
+    async def list(self, ctx):
+        """Show missing persons"""
         base_url = "https://api.missingkids.org/missingkids/servlet/JSONDataServlet?action=publicSearch&goToPage={}"
         headers = {"Accept": "application/json"}
         page = 1
