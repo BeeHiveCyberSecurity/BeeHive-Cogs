@@ -73,9 +73,17 @@ class MissingKids(commands.Cog):
                             embed.add_field(name="Missing country", value=person.get('missingCountry').title(), inline=False)
                         if person.get('missingDate'):
                             missing_date = person.get('missingDate')
+                            try:
+                                timestamp = int(datetime.datetime.strptime(missing_date, '%Y-%m-%d').timestamp())
+                            except ValueError:
+                                try:
+                                    timestamp = int(datetime.datetime.strptime(missing_date, '%b %d, %Y %I:%M:%S %p').timestamp())
+                                except ValueError:
+                                    await ctx.send(f"Failed to parse the missing date: {missing_date}")
+                                    continue
                             embed.add_field(
                                 name="Missing Date", 
-                                value=f"<t:{int(datetime.datetime.strptime(missing_date, '%Y-%m-%d').timestamp())}:F> (<t:{int(datetime.datetime.strptime(missing_date, '%Y-%m-%d').timestamp())}:R>)", 
+                                value=f"<t:{timestamp}:F> (<t:{timestamp}:R>)", 
                                 inline=False
                             )
                         if person.get('caseType'):
@@ -124,4 +132,3 @@ class MissingKids(commands.Cog):
                 await ctx.send(f"An error occurred while trying to fetch data: {str(e)}")
             except Exception as e:
                 await ctx.send(f"An unexpected error occurred: {str(e)}")
-
