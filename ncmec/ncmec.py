@@ -51,7 +51,9 @@ class MissingKids(commands.Cog):
                         embed.add_field(name="Missing Since", value=person.get('missingDate', 'Unknown'), inline=False)
                         embed.add_field(name="Location", value=f"{person.get('missingCity', 'Unknown')}, {person.get('missingState', 'Unknown')}", inline=False)
                         embed.add_field(name="Case Number", value=person.get('caseNumber', 'Unknown'), inline=False)
-                        embed.set_thumbnail(url=person.get('thumbnailUrl', 'No thumbnail available'))
+                        image_url = person.get('imageURL')
+                        if image_url:
+                            embed.set_thumbnail(url=f"https://api.missingkids.org{image_url}")
                         embeds.append(embed)
 
                     message = await ctx.send(embed=embeds[0])
