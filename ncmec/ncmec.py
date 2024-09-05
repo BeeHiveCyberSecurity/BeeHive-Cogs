@@ -13,7 +13,7 @@ class MissingKids(commands.Cog):
         """Primary command group"""
         pass
 
-    @missingkids.command()
+    @ncmec.command()
     async def recent(self, ctx):
         """Fetch information about recently missing children."""
         url = "https://api.missingkids.org/missingkids/servlet/JSONDataServlet?action=publicSearch"
