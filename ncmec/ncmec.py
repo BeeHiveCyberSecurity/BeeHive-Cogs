@@ -24,10 +24,19 @@ class MissingKids(commands.Cog):
         user_id = ctx.author.id
         if self.dm_alerts_enabled.get(user_id):
             self.dm_alerts_enabled[user_id] = False
-            await ctx.send("DM alerts for new missing persons have been disabled.")
+            embed = discord.Embed(
+                title="DM alerts disabled",
+                description="DM alerts for new missing persons have been disabled.",
+                color=0xff4545
+            )
         else:
             self.dm_alerts_enabled[user_id] = True
-            await ctx.send("DM alerts for new missing persons have been enabled.")
+            embed = discord.Embed(
+                title="DM alerts enabled",
+                description="DM alerts for new missing persons have been enabled.",
+                color=0x2bbd8e
+            )
+        await ctx.send(embed=embed)
 
     async def check_for_new_records(self):
         """Check for new missing records and send DMs to users who have enabled alerts"""
