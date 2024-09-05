@@ -46,7 +46,7 @@ class MissingKids(commands.Cog):
                     embeds = []
                     for person in data["persons"][:25]:  # Limit to first 25 results
                         embed = discord.Embed(
-                            title=f"{person.get('firstName', 'Unknown')} {person.get('middleName')} {person.get('lastName', 'Unknown')}",
+                            title=f"{person.get('firstName')} {person.get('middleName')} {person.get('lastName')}",
                             color=0xfffffe
                         )
                         if person.get('caseNumber'):
