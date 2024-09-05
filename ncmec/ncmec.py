@@ -10,11 +10,95 @@ class MissingKids(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        self.dm_alerts_enabled = {}  # Dictionary to store user preferences for DM alerts
+        self.last_checked = datetime.datetime.utcnow()  # Track the last time we checked for new records
 
     @commands.group()
     async def ncmec(self, ctx):
         """Primary command group"""
         pass
+
+    @ncmec.command()
+    async def dm(self, ctx):
+        """Toggle DM alerts for new missing records"""
+        user_id = ctx.author.id
+        if self.dm_alerts_enabled.get(user_id):
+            self.dm_alerts_enabled[user_id] = False
+            await ctx.send("DM alerts for new missing records have been disabled.")
+        else:
+            self.dm_alerts_enabled[user_id] = True
+            await ctx.send("DM alerts for new missing records have been enabled.")
+
+    async def check_for_new_records(self):
+        """Check for new missing records and send DMs to users who have enabled alerts"""
+        base_url = "https://api.missingkids.org/missingkids/servlet/JSONDataServlet?action=publicSearch&goToPage={}"
+        headers = {"Accept": "application/json"}
+        page = 1
+        new_records = []
+
+        async with aiohttp.ClientSession() as session:
+            while True:
+                url = base_url.format(page)
+                async with session.get(url, headers=headers) as response:
+                    if response.status != 200:
+                        return
+
+                    try:
+                        data = await response.json()
+                    except aiohttp.ContentTypeError:
+                        text_data = await response.text()
+                        try:
+                            data = json.loads(text_data)
+                        except json.JSONDecodeError:
+                            return
+
+                    if not data.get("persons"):
+                        break
+
+                    for person in data["persons"]:
+                        record_date = datetime.datetime.strptime(person.get('dateMissing'), '%Y-%m-%d')
+                        if record_date > self.last_checked:
+                            new_records.append(person)
+
+                page += 1
+
+        if new_records:
+            self.last_checked = datetime.datetime.utcnow()
+            for user_id, enabled in self.dm_alerts_enabled.items():
+                if enabled:
+                    user = self.bot.get_user(user_id)
+                    if user:
+                        for person in new_records:
+                            embed = discord.Embed(
+                                title=f"{person.get('firstName', '')} {person.get('middleName', '')} {person.get('lastName', '')}".strip(),
+                                color=0xfffffe
+                            )
+                            if person.get('caseNumber'):
+                                embed.add_field(name="Case number", value=person.get('caseNumber'), inline=False)
+                            if person.get('orgName'):
+                                embed.add_field(name="Issuing organization", value=person.get('orgName'), inline=False)
+                            if person.get('firstName'):
+                                embed.add_field(name="First name", value=person.get('firstName'), inline=True)
+                            if person.get('middleName'):
+                                embed.add_field(name="Middle name", value=person.get('middleName'), inline=True)
+                            if person.get('lastName'):
+                                embed.add_field(name="Last name", value=person.get('lastName'), inline=True)
+                            if person.get('age'):
+                                embed.add_field(name="Age", value=person.get('age'), inline=True)
+                            if person.get('race'):
+                                embed.add_field(name="Race", value=person.get('race'), inline=True)
+                            await user.send(embed=embed)
+
+    @commands.Cog.listener()
+    async def on_ready(self):
+        """Start the background task to check for new records when the bot is ready"""
+        self.bot.loop.create_task(self.background_task())
+
+    async def background_task(self):
+        """Background task to periodically check for new records"""
+        while True:
+            await self.check_for_new_records()
+            await asyncio.sleep(3600)  # Check every hour
     
     @ncmec.command()
     async def list(self, ctx):
