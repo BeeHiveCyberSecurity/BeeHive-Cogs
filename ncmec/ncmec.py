@@ -49,29 +49,34 @@ class MissingKids(commands.Cog):
                             color=0xfffffe
                         )
                         if person.get('caseNumber'):
-                            embed.add_field(name="Case Number", value=person.get('caseNumber'), inline=False)
+                            embed.add_field(name="Case number", value=person.get('caseNumber'), inline=False)
                         if person.get('orgName'):
-                            embed.add_field(name="Organization Name", value=person.get('orgName'), inline=False)
+                            embed.add_field(name="Issuing organization", value=person.get('orgName'), inline=False)
                         if person.get('firstName'):
-                            embed.add_field(name="First Name", value=person.get('firstName'), inline=True)
+                            embed.add_field(name="First name", value=person.get('firstName'), inline=True)
                         if person.get('middleName'):
-                            embed.add_field(name="Middle Name", value=person.get('middleName'), inline=True)
+                            embed.add_field(name="Middle name", value=person.get('middleName'), inline=True)
                         if person.get('lastName'):
-                            embed.add_field(name="Last Name", value=person.get('lastName'), inline=True)
-                        if person.get('missingCity'):
-                            embed.add_field(name="Missing City", value=person.get('missingCity'), inline=False)
-                        if person.get('missingCounty'):
-                            embed.add_field(name="Missing County", value=person.get('missingCounty'), inline=False)
-                        if person.get('missingState'):
-                            embed.add_field(name="Missing State", value=person.get('missingState'), inline=False)
-                        if person.get('missingCountry'):
-                            embed.add_field(name="Missing Country", value=person.get('missingCountry'), inline=False)
-                        if person.get('missingDate'):
-                            embed.add_field(name="Missing Date", value=person.get('missingDate'), inline=False)
+                            embed.add_field(name="Last name", value=person.get('lastName'), inline=True)
                         if person.get('age'):
                             embed.add_field(name="Age", value=person.get('age'), inline=False)
                         if person.get('approxAge'):
-                            embed.add_field(name="Approximate Age", value=person.get('approxAge'), inline=False)
+                            embed.add_field(name="Estimated age", value=person.get('approxAge'), inline=False)
+                        if person.get('missingCity'):
+                            embed.add_field(name="Missing city", value=person.get('missingCity').title(), inline=False)
+                        if person.get('missingCounty'):
+                            embed.add_field(name="Missing county", value=person.get('missingCounty').title(), inline=False)
+                        if person.get('missingState'):
+                            embed.add_field(name="Missing state", value=person.get('missingState').title(), inline=False)
+                        if person.get('missingCountry'):
+                            embed.add_field(name="Missing country", value=person.get('missingCountry').title(), inline=False)
+                        if person.get('missingDate'):
+                            missing_date = person.get('missingDate')
+                            embed.add_field(
+                                name="Missing Date", 
+                                value=f"<t:{int(datetime.datetime.strptime(missing_date, '%Y-%m-%d').timestamp())}:F> (<t:{int(datetime.datetime.strptime(missing_date, '%Y-%m-%d').timestamp())}:R>)", 
+                                inline=False
+                            )
                         if person.get('caseType'):
                             embed.add_field(name="Case Type", value=person.get('caseType'), inline=False)
                         if person.get('posterTitle'):
