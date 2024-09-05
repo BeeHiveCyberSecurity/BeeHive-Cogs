@@ -77,10 +77,6 @@ class MissingKids(commands.Cog):
                             embed.add_field(name="Age", value=person.get('age'), inline=False)
                         if person.get('approxAge'):
                             embed.add_field(name="Approximate Age", value=person.get('approxAge'), inline=False)
-                        if person.get('hasThumbnail') is not None:
-                            embed.add_field(name="Has Thumbnail", value=str(person.get('hasThumbnail')), inline=False)
-                        if person.get('hasPoster') is not None:
-                            embed.add_field(name="Has Poster", value=str(person.get('hasPoster')), inline=False)
                         if person.get('caseType'):
                             embed.add_field(name="Case Type", value=person.get('caseType'), inline=False)
                         if person.get('posterTitle'):
