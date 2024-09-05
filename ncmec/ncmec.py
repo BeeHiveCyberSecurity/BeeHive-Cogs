@@ -31,7 +31,6 @@ class MissingKids(commands.Cog):
                         data = await response.json()
                     except aiohttp.ContentTypeError:
                         text_data = await response.text()
-                        await ctx.send("Received unexpected content type from the MissingKids API, attempting to parse as text.")
                         try:
                             data = json.loads(text_data)
                         except json.JSONDecodeError:
@@ -42,18 +41,43 @@ class MissingKids(commands.Cog):
                         await ctx.send("No recently missing children found.")
                         return
 
-                    embed = discord.Embed(title="Recently Missing Children", color=discord.Color.red())
+                    embeds = []
                     for person in data["persons"][:10]:  # Limit to first 10 results
-                        embed.add_field(
-                            name=f"{person.get('firstName', 'Unknown')} {person.get('lastName', 'Unknown')}",
-                            value=f"Age: {person.get('age', 'Unknown')}\n"
-                                  f"Missing Since: {person.get('missingDate', 'Unknown')}\n"
-                                  f"Location: {person.get('missingCity', 'Unknown')}, {person.get('missingState', 'Unknown')}\n"
-                                  f"Case Number: {person.get('caseNumber', 'Unknown')}",
-                            inline=False
+                        embed = discord.Embed(
+                            title=f"{person.get('firstName', 'Unknown')} {person.get('lastName', 'Unknown')}",
+                            color=discord.Color.red()
                         )
+                        embed.add_field(name="Age", value=person.get('age', 'Unknown'), inline=False)
+                        embed.add_field(name="Missing Since", value=person.get('missingDate', 'Unknown'), inline=False)
+                        embed.add_field(name="Location", value=f"{person.get('missingCity', 'Unknown')}, {person.get('missingState', 'Unknown')}", inline=False)
+                        embed.add_field(name="Case Number", value=person.get('caseNumber', 'Unknown'), inline=False)
+                        embed.set_thumbnail(url=person.get('thumbnailUrl', 'No thumbnail available'))
+                        embeds.append(embed)
 
-                    await ctx.send(embed=embed)
+                    message = await ctx.send(embed=embeds[0])
+                    await message.add_reaction("⬅️")
+                    await message.add_reaction("➡️")
+
+                    def check(reaction, user):
+                        return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️"] and reaction.message.id == message.id
+
+                    i = 0
+                    while True:
+                        try:
+                            reaction, user = await self.bot.wait_for("reaction_add", timeout=120.0, check=check)
+                            if str(reaction.emoji) == "➡️":
+                                i += 1
+                                if i >= len(embeds):
+                                    i = 0
+                                await message.edit(embed=embeds[i])
+                            elif str(reaction.emoji) == "⬅️":
+                                i -= 1
+                                if i < 0:
+                                    i = len(embeds) - 1
+                                await message.edit(embed=embeds[i])
+                            await message.remove_reaction(reaction, user)
+                        except asyncio.TimeoutError:
+                            break
             except aiohttp.ClientError as e:
                 await ctx.send(f"An error occurred while trying to fetch data: {str(e)}")
             except Exception as e:
