@@ -45,7 +45,7 @@ class MissingKids(commands.Cog):
                     embeds = []
                     for person in data["persons"][:25]:  # Limit to first 25 results
                         embed = discord.Embed(
-                            title=f"{person.get('firstName', 'Unknown')} {person.get('lastName', 'Unknown')}",
+                            title=f"{person.get('firstName', 'Unknown')} {person.get('middleName', '')} {person.get('lastName', 'Unknown')}",
                             color=0xfffffe
                         )
                         if person.get('caseNumber'):
@@ -54,9 +54,6 @@ class MissingKids(commands.Cog):
                             embed.add_field(name="Organization Prefix", value=person.get('orgPrefix'), inline=False)
                         if person.get('orgName'):
                             embed.add_field(name="Organization Name", value=person.get('orgName'), inline=False)
-                        if person.get('isChild') is not None:
-                            is_child_value = "Yes" if person.get('isChild') else "No"
-                            embed.add_field(name="Is Child", value=is_child_value, inline=False)
                         if person.get('firstName'):
                             embed.add_field(name="First Name", value=person.get('firstName'), inline=False)
                         if person.get('middleName'):
