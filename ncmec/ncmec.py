@@ -64,9 +64,9 @@ class MissingKids(commands.Cog):
                         if person.get('approxAge'):
                             embed.add_field(name="Estimated age", value=person.get('approxAge'), inline=False)
                         if person.get('missingCity'):
-                            embed.add_field(name="Missing city", value=person.get('missingCity').title(), inline=False)
+                            embed.add_field(name="Missing city", value=person.get('missingCity').title(), inline=True)
                         if person.get('missingCounty'):
-                            embed.add_field(name="Missing county", value=person.get('missingCounty').title(), inline=False)
+                            embed.add_field(name="Missing county", value=person.get('missingCounty').title(), inline=True)
                         if person.get('missingState'):
                             state_code = person.get('missingState').upper()
                             state_full_name = {
@@ -81,7 +81,7 @@ class MissingKids(commands.Cog):
                                 "SD": "South Dakota", "TN": "Tennessee", "TX": "Texas", "UT": "Utah", "VT": "Vermont",
                                 "VA": "Virginia", "WA": "Washington", "WV": "West Virginia", "WI": "Wisconsin", "WY": "Wyoming"
                             }.get(state_code, state_code)
-                            embed.add_field(name="Missing state", value=state_full_name, inline=False)
+                            embed.add_field(name="Missing state", value=state_full_name, inline=True)
                         if person.get('missingCountry'):
                             embed.add_field(name="Missing country", value=person.get('missingCountry'), inline=False)
                         if person.get('missingDate'):
@@ -101,8 +101,6 @@ class MissingKids(commands.Cog):
                             )
                         if person.get('caseType'):
                             embed.add_field(name="Case Type", value=person.get('caseType'), inline=False)
-                        if person.get('posterTitle'):
-                            embed.add_field(name="Poster Title", value=person.get('posterTitle'), inline=False)
                         if person.get('race'):
                             embed.add_field(name="Race", value=person.get('race'), inline=False)
                         thumbnail_url = person.get('thumbnailUrl')
