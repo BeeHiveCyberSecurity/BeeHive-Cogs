@@ -48,19 +48,19 @@ class MissingKids(commands.Cog):
 
                         for person in data["persons"]:
                             embed = discord.Embed(
-                                title=f"{person.get('firstName')} {person.get('middleName')} {person.get('lastName')}",
+                                title=f"{person.get('firstName', '')} {person.get('middleName', '')} {person.get('lastName', '')}".strip(),
                                 color=0xfffffe
                             )
                             if person.get('caseNumber'):
                                 embed.add_field(name="Case number", value=person.get('caseNumber'), inline=False)
                             if person.get('orgName'):
-                                embed.add_field(name="Issuing organization", value=person.get('orgName'), inline=False)
+                                embed.add_field(name="Issuing Organization", value=person.get('orgName'), inline=False)
                             if person.get('firstName'):
-                                embed.add_field(name="First name", value=person.get('firstName'), inline=True)
+                                embed.add_field(name="First Name", value=person.get('firstName'), inline=True)
                             if person.get('middleName'):
-                                embed.add_field(name="Middle name", value=person.get('middleName'), inline=True)
+                                embed.add_field(name="Middle Name", value=person.get('middleName'), inline=True)
                             if person.get('lastName'):
-                                embed.add_field(name="Last name", value=person.get('lastName'), inline=True)
+                                embed.add_field(name="Last Name", value=person.get('lastName'), inline=True)
                             if person.get('age'):
                                 embed.add_field(name="Age", value=person.get('age'), inline=True)
                             if person.get('race'):
