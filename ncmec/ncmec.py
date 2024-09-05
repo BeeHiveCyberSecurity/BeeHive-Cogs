@@ -59,10 +59,10 @@ class MissingKids(commands.Cog):
                             embed.add_field(name="Is Child", value=is_child_value, inline=False)
                         if person.get('firstName'):
                             embed.add_field(name="First Name", value=person.get('firstName'), inline=False)
-                        if person.get('lastName'):
-                            embed.add_field(name="Last Name", value=person.get('lastName'), inline=False)
                         if person.get('middleName'):
                             embed.add_field(name="Middle Name", value=person.get('middleName'), inline=False)
+                        if person.get('lastName'):
+                            embed.add_field(name="Last Name", value=person.get('lastName'), inline=False)
                         if person.get('missingCity'):
                             embed.add_field(name="Missing City", value=person.get('missingCity'), inline=False)
                         if person.get('missingCounty'):
