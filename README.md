@@ -197,5 +197,16 @@ Utilize Stripe Identity through your Red-DiscordBot instance to intake and verif
 [p]load stripeidentity
 ```
 
+### [ncmec](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/ncmec)
+
+Integrate the National Center for Missing & Exploited Children (NCMEC) API with your Red-DiscordBot to query information about missing persons. Planned, integrate with Microsoft Moderator to automatically detect and report suspected CSAM to NCMEC.
+
+```
+[p]cog install BeeHive-Cogs ncmec
+```
+```
+[p]load ncmec
+```
+
 
 
