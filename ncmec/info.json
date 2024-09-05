@@ -7,5 +7,5 @@
     "author": ["adminelevation"],
     "required_cogs": {},
     "requirements": ["aiohttp"],
-    "tags": ["NCMEC", "Missing Children", "Information"]
+    "tags": ["NCMEC", "missing persons", "have you seen them?"]
 }
