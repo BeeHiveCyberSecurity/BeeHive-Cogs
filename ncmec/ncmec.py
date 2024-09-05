@@ -114,38 +114,41 @@ class MissingKids(commands.Cog):
                             break
                         page += 1
 
-                    if not embeds:
-                        await ctx.send("No recently missing children found.")
-                        return
+                if not embeds:
+                    await ctx.send("No recently missing children found.")
+                    return
 
-                    message = await ctx.send(embed=embeds[0])
-                    await message.add_reaction("⬅️")
-                    await message.add_reaction("❌")
-                    await message.add_reaction("➡️")
-                    
-                    def check(reaction, user):
-                        return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️", "❌"] and reaction.message.id == message.id
+                for embed in embeds:
+                    embed.set_footer(text=f"Total records loaded: {len(embeds)}")
 
-                    i = 0
-                    while True:
-                        try:
-                            reaction, user = await self.bot.wait_for("reaction_add", timeout=120.0, check=check)
-                            if str(reaction.emoji) == "➡️":
-                                i += 1
-                                if i >= len(embeds):
-                                    i = 0
-                                await message.edit(embed=embeds[i])
-                            elif str(reaction.emoji) == "⬅️":
-                                i -= 1
-                                if i < 0:
-                                    i = len(embeds) - 1
-                                await message.edit(embed=embeds[i])
-                            elif str(reaction.emoji) == "❌":
-                                await message.delete()
-                                break
-                            await message.remove_reaction(reaction, user)
-                        except asyncio.TimeoutError:
+                message = await ctx.send(embed=embeds[0])
+                await message.add_reaction("⬅️")
+                await message.add_reaction("❌")
+                await message.add_reaction("➡️")
+                
+                def check(reaction, user):
+                    return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️", "❌"] and reaction.message.id == message.id
+
+                i = 0
+                while True:
+                    try:
+                        reaction, user = await self.bot.wait_for("reaction_add", timeout=120.0, check=check)
+                        if str(reaction.emoji) == "➡️":
+                            i += 1
+                            if i >= len(embeds):
+                                i = 0
+                            await message.edit(embed=embeds[i])
+                        elif str(reaction.emoji) == "⬅️":
+                            i -= 1
+                            if i < 0:
+                                i = len(embeds) - 1
+                            await message.edit(embed=embeds[i])
+                        elif str(reaction.emoji) == "❌":
+                            await message.delete()
                             break
+                        await message.remove_reaction(reaction, user)
+                    except asyncio.TimeoutError:
+                        break
             except aiohttp.ClientError as e:
                 await ctx.send(f"An error occurred while trying to fetch data: {str(e)}")
             except Exception as e:
