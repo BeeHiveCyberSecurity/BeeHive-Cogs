@@ -20,14 +20,14 @@ class MissingKids(commands.Cog):
 
     @ncmec.command()
     async def dm(self, ctx):
-        """Toggle DM alerts for new missing records"""
+        """Toggle DM alerts for new missing persons"""
         user_id = ctx.author.id
         if self.dm_alerts_enabled.get(user_id):
             self.dm_alerts_enabled[user_id] = False
-            await ctx.send("DM alerts for new missing records have been disabled.")
+            await ctx.send("DM alerts for new missing persons have been disabled.")
         else:
             self.dm_alerts_enabled[user_id] = True
-            await ctx.send("DM alerts for new missing records have been enabled.")
+            await ctx.send("DM alerts for new missing persons have been enabled.")
 
     async def check_for_new_records(self):
         """Check for new missing records and send DMs to users who have enabled alerts"""
