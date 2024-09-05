@@ -59,10 +59,12 @@ class MissingKids(commands.Cog):
 
                     message = await ctx.send(embed=embeds[0])
                     await message.add_reaction("⬅️")
+                    await message.add_reaction("❌")
                     await message.add_reaction("➡️")
+                    
 
                     def check(reaction, user):
-                        return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️"] and reaction.message.id == message.id
+                        return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️", "❌"] and reaction.message.id == message.id
 
                     i = 0
                     while True:
@@ -78,6 +80,9 @@ class MissingKids(commands.Cog):
                                 if i < 0:
                                     i = len(embeds) - 1
                                 await message.edit(embed=embeds[i])
+                            elif str(reaction.emoji) == "❌":
+                                await message.delete()
+                                break
                             await message.remove_reaction(reaction, user)
                         except asyncio.TimeoutError:
                             break
