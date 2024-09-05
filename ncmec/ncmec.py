@@ -18,7 +18,7 @@ class MissingKids(commands.Cog):
     @ncmec.command()
     async def recent(self, ctx):
         """Fetch information about recently missing children."""
-        url = "https://api.missingkids.org/missingkids/servlet/JSONDataServlet?action=publicSearch"
+        url = "https://api.missingkids.org/missingkids/servlet/JSONDataServlet?action=publicSearch&goToPage=1"
         headers = {"Accept": "application/json"}
 
         async with aiohttp.ClientSession() as session:
