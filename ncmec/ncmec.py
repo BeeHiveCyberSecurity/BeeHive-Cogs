@@ -55,7 +55,8 @@ class MissingKids(commands.Cog):
                         if person.get('orgName'):
                             embed.add_field(name="Organization Name", value=person.get('orgName'), inline=False)
                         if person.get('isChild') is not None:
-                            embed.add_field(name="Is Child", value=str(person.get('isChild')), inline=False)
+                            is_child_value = "Yes" if person.get('isChild') else "No"
+                            embed.add_field(name="Is Child", value=is_child_value, inline=False)
                         if person.get('seqNumber'):
                             embed.add_field(name="Sequence Number", value=person.get('seqNumber'), inline=False)
                         if person.get('langId'):
