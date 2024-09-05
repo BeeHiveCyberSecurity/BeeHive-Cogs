@@ -68,9 +68,22 @@ class MissingKids(commands.Cog):
                         if person.get('missingCounty'):
                             embed.add_field(name="Missing county", value=person.get('missingCounty').title(), inline=False)
                         if person.get('missingState'):
-                            embed.add_field(name="Missing state", value=person.get('missingState').title(), inline=False)
+                            state_code = person.get('missingState').upper()
+                            state_full_name = {
+                                "AL": "Alabama", "AK": "Alaska", "AZ": "Arizona", "AR": "Arkansas", "CA": "California",
+                                "CO": "Colorado", "CT": "Connecticut", "DE": "Delaware", "FL": "Florida", "GA": "Georgia",
+                                "HI": "Hawaii", "ID": "Idaho", "IL": "Illinois", "IN": "Indiana", "IA": "Iowa",
+                                "KS": "Kansas", "KY": "Kentucky", "LA": "Louisiana", "ME": "Maine", "MD": "Maryland",
+                                "MA": "Massachusetts", "MI": "Michigan", "MN": "Minnesota", "MS": "Mississippi", "MO": "Missouri",
+                                "MT": "Montana", "NE": "Nebraska", "NV": "Nevada", "NH": "New Hampshire", "NJ": "New Jersey",
+                                "NM": "New Mexico", "NY": "New York", "NC": "North Carolina", "ND": "North Dakota", "OH": "Ohio",
+                                "OK": "Oklahoma", "OR": "Oregon", "PA": "Pennsylvania", "RI": "Rhode Island", "SC": "South Carolina",
+                                "SD": "South Dakota", "TN": "Tennessee", "TX": "Texas", "UT": "Utah", "VT": "Vermont",
+                                "VA": "Virginia", "WA": "Washington", "WV": "West Virginia", "WI": "Wisconsin", "WY": "Wyoming"
+                            }.get(state_code, state_code)
+                            embed.add_field(name="Missing state", value=state_full_name, inline=False)
                         if person.get('missingCountry'):
-                            embed.add_field(name="Missing country", value=person.get('missingCountry').title(), inline=False)
+                            embed.add_field(name="Missing country", value=person.get('missingCountry'), inline=False)
                         if person.get('missingDate'):
                             missing_date = person.get('missingDate')
                             try:
