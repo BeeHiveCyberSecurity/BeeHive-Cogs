@@ -12,23 +12,29 @@ class MissingKids(commands.Cog):
     async def ncmec(self, ctx):
         """Primary command group"""
         pass
+    
     @ncmec.command()
     async def recent(self, ctx):
         """Fetch information about recently missing children."""
         url = "https://api.missingkids.org/missingkids/servlet/JSONDataServlet?action=publicSearch"
+        headers = {"Accept": "application/json"}
 
         async with aiohttp.ClientSession() as session:
-            async with session.get(url) as response:
+            async with session.get(url, headers=headers) as response:
                 if response.status != 200:
                     await ctx.send("Failed to fetch data from the MissingKids API.")
                     return
 
-                content_type = response.headers.get('Content-Type', '')
-                if 'application/json' in content_type:
+                try:
                     data = await response.json()
-                else:
-                    await ctx.send("Received unexpected content type from the MissingKids API.")
-                    return
+                except aiohttp.ContentTypeError:
+                    text_data = await response.text()
+                    await ctx.send("Received unexpected content type from the MissingKids API, attempting to parse as text.")
+                    try:
+                        data = json.loads(text_data)
+                    except json.JSONDecodeError:
+                        await ctx.send("Failed to parse the response from the MissingKids API.")
+                        return
 
                 if not data.get("persons"):
                     await ctx.send("No recently missing children found.")
