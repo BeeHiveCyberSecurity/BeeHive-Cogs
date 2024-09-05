@@ -57,10 +57,6 @@ class MissingKids(commands.Cog):
                         if person.get('isChild') is not None:
                             is_child_value = "Yes" if person.get('isChild') else "No"
                             embed.add_field(name="Is Child", value=is_child_value, inline=False)
-                        if person.get('seqNumber'):
-                            embed.add_field(name="Sequence Number", value=person.get('seqNumber'), inline=False)
-                        if person.get('langId'):
-                            embed.add_field(name="Language ID", value=person.get('langId'), inline=False)
                         if person.get('firstName'):
                             embed.add_field(name="First Name", value=person.get('firstName'), inline=False)
                         if person.get('lastName'):
