@@ -434,6 +434,16 @@ class Meetings(commands.Cog):
         """Check your upcoming and active meetings."""
         user_id = ctx.author.id
         guild = ctx.guild
+        
+        if guild is None:
+            embed = discord.Embed(
+                title="Error",
+                description="This command can only be used in a server.",
+                color=0xff4545
+            )
+            await ctx.send(embed=embed)
+            return
+        
         meetings = await self.config.guild(guild).meetings()
         user_meetings = [(meeting_id, details) for meeting_id, details in meetings.items() if user_id in details["attendees"]]
         if not user_meetings:
