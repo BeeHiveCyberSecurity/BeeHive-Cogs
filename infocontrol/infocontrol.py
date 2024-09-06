@@ -5,7 +5,7 @@ from redbot.core import commands, Config #type: ignore
 class InfoControl(commands.Cog):
     """Detect and remove potentially sensitive information from chat."""
     
-    __version__ = "1.0.2"
+    __version__ = "1.0.5"
 
     def __init__(self, bot):
         self.bot = bot
@@ -35,14 +35,14 @@ class InfoControl(commands.Cog):
             "log_channel": None,
             "moderator_roles": [],
             "patterns": {
-                "email": r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b",
+                "email": r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b",
                 "ssn": r"\b\d{3}-\d{2}-\d{4}\b",
                 "bankcard": r"\b\d{4} \d{4} \d{4} \d{4}\b",
-                "phone": r"\b\d{5}-\d{5}\b",
+                "phone": r"\b\d{3}[-.\s]?\d{3}[-.\s]?\d{4}\b",
                 "phone_no_spaces": r"\b\d{10}\b",
-                "ipv4": r"\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b",
+                "ipv4": r"\b((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b",
                 "ipv6": r"\b([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}\b",
-                "creditcard": r"\b(?:\d[ -]*?){13,16}\b",
+                "creditcard": r"\b(?:\d[ -]*?){13,19}\b",
                 "passport": r"\b[A-PR-WYa-pr-wy][1-9]\d\s?\d{4}[1-9]\b",
                 "iban": r"\b[A-Z]{2}\d{2}[A-Z0-9]{1,30}\b",
                 "mac_address": r"\b([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})\b",
@@ -50,8 +50,8 @@ class InfoControl(commands.Cog):
                 "swift_code": r"\b[A-Z]{4}[A-Z]{2}[A-Z2-9][A-NP-Z0-9]([A-Z0-9]{3})?\b",
                 "drivers_license": r"\b[A-Z]{1,2}\d{1,14}\b",
                 "vin": r"\b[A-HJ-NPR-Z0-9]{17}\b",
-                "ssn_alternative": r"\b\d{3}\s?\d{2}\s?\d{4}\b",
-                "phone_alternative": r"\b\(\d{3}\)\s?\d{3}-\d{4}\b",
+                "ssn_alternative": r"\b\d{3}[-\s]?\d{2}[-\s]?\d{4}\b",
+                "phone_alternative": r"\b\(\d{3}\)\s?\d{3}[-.\s]?\d{4}\b",
                 "zip_code": r"\b\d{5}(?:[-\s]\d{4})?\b",
                 "street_address": r"\b\d{1,5}\s(?:[A-Za-z0-9#]+\s?){1,5}\b",
                 "birthdate": r"\b\d{2}/\d{2}/\d{4}\b"
