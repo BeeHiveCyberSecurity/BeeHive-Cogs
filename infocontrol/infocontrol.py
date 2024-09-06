@@ -37,7 +37,6 @@ class InfoControl(commands.Cog):
                 "birthdate": r"\b\d{2}/\d{2}/\d{4}\b",
                 "national_id": r"\b[A-Z0-9]{9}\b",
                 "tax_id": r"\b\d{2}-\d{7}\b",
-                "medical_id": r"\b[A-Z0-9]{10}\b",
                 "student_id": r"\b[A-Z0-9]{8}\b",
                 "license_plate": r"\b[A-Z0-9]{6,7}\b"
             }
@@ -202,7 +201,6 @@ class InfoControl(commands.Cog):
             "block_birthdate": "Birth date",
             "block_national_id": "National ID",
             "block_tax_id": "Tax ID",
-            "block_medical_id": "Medical ID",
             "block_student_id": "Student ID",
             "block_license_plate": "License Plate"
         }
