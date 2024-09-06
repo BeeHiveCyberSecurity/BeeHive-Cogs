@@ -62,7 +62,7 @@ class AntiPhishing(commands.Cog):
     Guard users from malicious links and phishing attempts with customizable protection options.
     """
 
-    __version__ = "1.4.6.5"
+    __version__ = "1.4.6.6"
     __last_updated__ = "September 6, 2024"
 
     def __init__(self, bot: Red):
@@ -77,7 +77,7 @@ class AntiPhishing(commands.Cog):
             bans=0,
             max_links=3,
             last_updated=None,
-            safe_emoji=True,
+            safe_emoji=False,
         )
         self.config.register_member(caught=0)
         self.session = aiohttp.ClientSession()
