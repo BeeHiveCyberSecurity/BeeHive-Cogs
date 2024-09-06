@@ -9,7 +9,7 @@ class Ping(commands.Cog):  # Use Red's Cog class
         self.bot = bot
         self.executor = ThreadPoolExecutor(max_workers=1)
 
-    @commands.command(name="ping", description="Displays the bot's latency and additional diagnostic information.")
+    @commands.hybrid_command(name="ping", description="Displays the bot's latency and additional diagnostic information.")
     async def ping(self, ctx: commands.Context):
         await ctx.defer()
         ws_latency = round(self.bot.latency * 1000, 2)
@@ -28,9 +28,9 @@ class Ping(commands.Cog):  # Use Red's Cog class
                 await ctx.send(f"An error occurred while performing the speed test: {e}")
                 return
 
-            if ping > 250:  # If still high after retries
-                await ctx.send("Network conditions are currently fluctuating too much to measure conditions accurately. Please try again later.")
-                return
+        if ping > 250:  # If still high after retries
+            await ctx.send("Network conditions are currently fluctuating too much to measure conditions accurately. Please try again later.")
+            return
 
         if avg_latency > 100:  # Adjust thresholds as needed
             embed_color = discord.Color(0xff4545)
