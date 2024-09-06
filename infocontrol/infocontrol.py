@@ -10,33 +10,8 @@ class InfoControl(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=1234567890)
-        default_guild = {
+        self.default_guild = {
             "enabled": True,
-            "block_email": True,
-            "block_ssn": True,
-            "block_bankcard": True,
-            "block_phone": True,
-            "block_ipv4": True,
-            "block_ipv6": True,
-            "block_creditcard": True,
-            "block_passport": True,
-            "block_iban": True,
-            "block_mac_address": True,
-            "block_bitcoin_address": True,
-            "block_swift_code": True,
-            "block_drivers_license": True,
-            "block_vin": True,
-            "block_ssn_alternative": True,
-            "block_phone_alternative": True,
-            "block_phone_no_spaces": True,
-            "block_zip_code": True,
-            "block_street_address": True,
-            "block_birthdate": True,
-            "block_national_id": True,
-            "block_tax_id": True,
-            "block_medical_id": True,
-            "block_student_id": True,
-            "block_license_plate": True,
             "log_channel": None,
             "moderator_roles": [],
             "patterns": {
@@ -67,64 +42,64 @@ class InfoControl(commands.Cog):
                 "license_plate": r"\b[A-Z0-9]{6,7}\b"
             }
         }
-        self.config.register_guild(**default_guild)
+        self.default_guild.update({f"block_{key}": True for key in self.default_guild["patterns"].keys()})
+        self.config.register_guild(**self.default_guild)
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if message.author.bot:
+        if message.author.bot or not message.guild:
             return
 
-        guild = message.guild
-        if not guild:
-            return
-
-        guild_config = await self.config.guild(guild).all()
+        guild_config = await self.config.guild(message.guild).all()
         if not guild_config["enabled"]:
             return
 
         for key, pattern in guild_config["patterns"].items():
             if guild_config.get(f"block_{key}", False) and re.search(pattern, message.content):
-                try:
-                    await message.delete()
-                    embed = discord.Embed(
-                        title="Message removed",
-                        description=f"{message.author.mention}, your message contained a match for one or more potential categories and was removed as a precaution.",
-                        color=0xff4545
-                    )
-                    await message.channel.send(embed=embed)
-
-                    # Log the deletion if log_channel is set
-                    log_channel_id = guild_config.get("log_channel")
-                    if log_channel_id:
-                        log_channel = self.bot.get_channel(log_channel_id)
-                        if log_channel:
-                            log_embed = discord.Embed(
-                                title="Sensitive content matched and removed",
-                                description=f"A message from {message.author.mention} was removed in {message.channel.mention} due to containing potentially sensitive information.",
-                                color=0xff4545
-                            )
-                            log_embed.add_field(name="Author", value=message.author.mention, inline=True)
-                            log_embed.add_field(name="Channel", value=message.channel.mention, inline=True)
-                            log_embed.add_field(name="Pattern matched", value=f"`{key}`", inline=True)
-                            log_embed.add_field(name="Message content", value="```{}```".format(message.content.replace('```', '`\u200b``')), inline=False)
-                            log_embed.set_footer(text=f"Message ID: {message.id} | Author ID: {message.author.id}")
-                            
-                            # Mention moderator roles if any are set
-                            moderator_roles = guild_config.get("moderator_roles", [])
-                            if moderator_roles:
-                                mentions = " ".join([f"<@&{role_id}>" for role_id in moderator_roles])
-                                await log_channel.send(content=mentions, embed=log_embed, allowed_mentions=discord.AllowedMentions(roles=True))
-                            else:
-                                await log_channel.send(embed=log_embed)
-
-                except Exception as e:
-                    embed = discord.Embed(
-                        title="Error",
-                        description=f"Failed to delete message: {e}",
-                        color=discord.Color.red()
-                    )
-                    await message.channel.send(embed=embed)
+                await self.handle_message_deletion(message, key, guild_config)
                 break
+
+    async def handle_message_deletion(self, message, key, guild_config):
+        try:
+            await message.delete()
+            embed = discord.Embed(
+                title="Message removed",
+                description=f"{message.author.mention}, your message contained a match for one or more potential categories and was removed as a precaution.",
+                color=0xff4545
+            )
+            await message.channel.send(embed=embed)
+
+            log_channel_id = guild_config.get("log_channel")
+            if log_channel_id:
+                log_channel = self.bot.get_channel(log_channel_id)
+                if log_channel:
+                    await self.log_deletion(message, key, log_channel, guild_config)
+        except Exception as e:
+            embed = discord.Embed(
+                title="Error",
+                description=f"Failed to delete message: {e}",
+                color=discord.Color.red()
+            )
+            await message.channel.send(embed=embed)
+
+    async def log_deletion(self, message, key, log_channel, guild_config):
+        log_embed = discord.Embed(
+            title="Sensitive content matched and removed",
+            description=f"A message from {message.author.mention} was removed in {message.channel.mention} due to containing potentially sensitive information.",
+            color=0xff4545
+        )
+        log_embed.add_field(name="Author", value=message.author.mention, inline=True)
+        log_embed.add_field(name="Channel", value=message.channel.mention, inline=True)
+        log_embed.add_field(name="Pattern matched", value=f"`{key}`", inline=True)
+        log_embed.add_field(name="Message content", value="```{}```".format(message.content.replace('```', '`\u200b``')), inline=False)
+        log_embed.set_footer(text=f"Message ID: {message.id} | Author ID: {message.author.id}")
+
+        moderator_roles = guild_config.get("moderator_roles", [])
+        if moderator_roles:
+            mentions = " ".join([f"<@&{role_id}>" for role_id in moderator_roles])
+            await log_channel.send(content=mentions, embed=log_embed, allowed_mentions=discord.AllowedMentions(roles=True))
+        else:
+            await log_channel.send(embed=log_embed)
 
     @commands.group()
     @commands.guild_only()
@@ -150,12 +125,7 @@ class InfoControl(commands.Cog):
     @infocontrol.command()
     async def toggle(self, ctx, data_type: str):
         """Toggle blocking of a specific data type."""
-        valid_types = [
-            "email", "ssn", "bankcard", "phone", "phone_no_spaces", "ipv4", "ipv6", "creditcard", 
-            "passport", "iban", "mac_address", "bitcoin_address", "swift_code", 
-            "drivers_license", "vin", "ssn_alternative", "phone_alternative",
-            "zip_code", "street_address", "birthdate", "national_id", "tax_id", "medical_id", "student_id", "license_plate"
-        ]
+        valid_types = list(self.default_guild["patterns"].keys())
         if data_type not in valid_types:
             embed = discord.Embed(
                 title="Invalid check",
@@ -237,18 +207,10 @@ class InfoControl(commands.Cog):
             "block_license_plate": "License Plate"
         }
         
-        settings_list = []
-        for key, value in guild_config.items():
-            if key.startswith("block_"):
-                human_readable_key = key_transform.get(key, key)
-                settings_list.append((human_readable_key, '**Active**' if value else 'Inactive'))
+        settings_list = [(key_transform.get(key, key), '**Active**' if value else 'Inactive') for key, value in guild_config.items() if key.startswith("block_")]
         
         log_channel_id = guild_config.get("log_channel")
-        if log_channel_id:
-            log_channel = self.bot.get_channel(log_channel_id)
-            log_channel_value = log_channel.mention if log_channel else "Not found"
-        else:
-            log_channel_value = "Not set"
+        log_channel_value = self.bot.get_channel(log_channel_id).mention if log_channel_id and self.bot.get_channel(log_channel_id) else "Not set"
         
         settings_list.append(("Alert channel", log_channel_value))
         
