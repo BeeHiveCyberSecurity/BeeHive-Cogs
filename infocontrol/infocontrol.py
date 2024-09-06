@@ -133,16 +133,27 @@ class InfoControl(commands.Cog):
         valid_types = [
             "email", "ssn", "bankcard", "phone", "ipv4", "ipv6", "creditcard", 
             "passport", "iban", "mac_address", "bitcoin_address", "swift_code", 
-            "drivers_license", "vin", "ssn_alternative", "phone_alternative"
+            "drivers_license", "vin", "ssn_alternative", "phone_alternative",
+            "zip_code", "street_address", "birthdate"
         ]
         if data_type not in valid_types:
-            await ctx.send(f"Invalid data type. Valid types are: {', '.join(valid_types)}")
+            embed = discord.Embed(
+                title="Invalid Data Type",
+                description=f"Valid types are: {', '.join(valid_types)}",
+                color=discord.Color.red()
+            )
+            await ctx.send(embed=embed)
             return
 
         current = await self.config.guild(ctx.guild).get_raw(f"block_{data_type}")
         await self.config.guild(ctx.guild).set_raw(f"block_{data_type}", value=not current)
         status = "enabled" if not current else "disabled"
-        await ctx.send(f"Blocking for {data_type} is now {status}.")
+        embed = discord.Embed(
+            title="Blocking Toggled",
+            description=f"Blocking for {data_type} is now {status}.",
+            color=discord.Color.green() if status == "enabled" else discord.Color.red()
+        )
+        await ctx.send(embed=embed)
 
     @commands.admin_or_permissions()
     @infocontrol.command()
