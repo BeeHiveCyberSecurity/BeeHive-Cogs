@@ -14,9 +14,10 @@ URL_REGEX_PATTERN = re.compile(
     r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
 )
 
-# Hardcoded whitelist of media hosting domains
+# Global whitelist
 WHITELISTED_DOMAINS = [
     "youtube.com",
+    "tenor.com",
     "youtu.be",
     "vimeo.com",
     "dailymotion.com",
@@ -61,7 +62,7 @@ class AntiPhishing(commands.Cog):
     Guard users from malicious links and phishing attempts with customizable protection options.
     """
 
-    __version__ = "1.4.6.4"
+    __version__ = "1.4.6.5"
     __last_updated__ = "September 6, 2024"
 
     def __init__(self, bot: Red):
