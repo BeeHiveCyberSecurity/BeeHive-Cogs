@@ -96,7 +96,7 @@ class InfoControl(commands.Cog):
                             log_embed.add_field(name="Author", value=message.author.mention, inline=True)
                             log_embed.add_field(name="Channel", value=message.channel.mention, inline=True)
                             log_embed.add_field(name="Pattern matched", value=f"`{key}`", inline=True)
-                            log_embed.add_field(name="Message content", value=f"```{message.content}```", inline=False)
+                            log_embed.add_field(name="Message content", value=f"```{message.content.replace('```', '`\u200b``')}```", inline=False)
                             log_embed.set_footer(text=f"Message ID: {message.id} | Author ID: {message.author.id}")
                             
                             # Mention moderator roles if any are set
