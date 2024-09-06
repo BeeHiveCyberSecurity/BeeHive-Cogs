@@ -209,8 +209,6 @@ class InfoControl(commands.Cog):
         """List current settings for blocking data types."""
         guild_config = await self.config.guild(ctx.guild).all()
         
-        embed = discord.Embed(title="Current info control settings", color=0xfffffe)
-        
         key_transform = {
             "block_email": "Email",
             "block_ssn": "SSN",
@@ -239,18 +237,53 @@ class InfoControl(commands.Cog):
             "block_license_plate": "License Plate"
         }
         
+        settings_list = []
         for key, value in guild_config.items():
             if key.startswith("block_"):
                 human_readable_key = key_transform.get(key, key)
-                embed.add_field(name=human_readable_key, value='**Active**' if value else 'Inactive', inline=True)
+                settings_list.append((human_readable_key, '**Active**' if value else 'Inactive'))
         
         log_channel_id = guild_config.get("log_channel")
         if log_channel_id:
             log_channel = self.bot.get_channel(log_channel_id)
-            embed.add_field(name="Alert channel", value=log_channel.mention if log_channel else "Not found", inline=False)
+            log_channel_value = log_channel.mention if log_channel else "Not found"
         else:
-            embed.add_field(name="Alert channel", value="Not set", inline=False)
+            log_channel_value = "Not set"
         
-        embed.set_footer(text=f"Version {self.__version__}")
+        settings_list.append(("Alert channel", log_channel_value))
         
-        await ctx.send(embed=embed)
+        pages = [settings_list[i:i + 9] for i in range(0, len(settings_list), 9)]
+        
+        current_page = 0
+        total_pages = len(pages)
+        
+        def create_embed(page):
+            embed = discord.Embed(title="Current info control settings", color=0xfffffe)
+            for name, value in page:
+                embed.add_field(name=name, value=value, inline=True)
+            embed.set_footer(text=f"Page {current_page + 1}/{total_pages} | Version {self.__version__}")
+            return embed
+        
+        message = await ctx.send(embed=create_embed(pages[current_page]))
+        
+        if total_pages > 1:
+            await message.add_reaction("⬅️")
+            await message.add_reaction("➡️")
+            
+            def check(reaction, user):
+                return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️"] and reaction.message.id == message.id
+            
+            while True:
+                try:
+                    reaction, user = await self.bot.wait_for("reaction_add", timeout=60.0, check=check)
+                    
+                    if str(reaction.emoji) == "➡️" and current_page < total_pages - 1:
+                        current_page += 1
+                        await message.edit(embed=create_embed(pages[current_page]))
+                    elif str(reaction.emoji) == "⬅️" and current_page > 0:
+                        current_page -= 1
+                        await message.edit(embed=create_embed(pages[current_page]))
+                    
+                    await message.remove_reaction(reaction, user)
+                except asyncio.TimeoutError:
+                    break
