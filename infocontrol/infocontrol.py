@@ -247,3 +247,16 @@ class InfoControl(commands.Cog):
                     await message.remove_reaction(reaction, user)
                 except asyncio.TimeoutError:
                     break
+
+    @commands.admin_or_permissions()
+    @infocontrol.command()
+    async def cleanup(self, ctx):
+        """Cleanup the config and remove no longer used patterns."""
+        guild_config = await self.config.guild(ctx.guild).all()
+        valid_patterns = set(self.default_guild["patterns"].keys())
+        keys_to_remove = [key for key in guild_config.keys() if key.startswith("block_") and key[6:] not in valid_patterns]
+
+        for key in keys_to_remove:
+            await self.config.guild(ctx.guild).clear_raw(key)
+
+        await ctx.send(f"Removed {len(keys_to_remove)} no longer used patterns from the config.")
