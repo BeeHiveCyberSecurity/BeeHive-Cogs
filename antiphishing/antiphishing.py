@@ -62,7 +62,7 @@ class AntiPhishing(commands.Cog):
     Guard users from malicious links and phishing attempts with customizable protection options.
     """
 
-    __version__ = "1.4.6.8"
+    __version__ = "1.4.6.9"
     __last_updated__ = "September 6, 2024"
 
     def __init__(self, bot: Red):
@@ -77,7 +77,6 @@ class AntiPhishing(commands.Cog):
             bans=0,
             max_links=3,
             last_updated=None,
-            safe_emoji=False,
         )
         self.config.register_member(caught=0)
         self.session = aiohttp.ClientSession()
@@ -357,23 +356,6 @@ class AntiPhishing(commands.Cog):
                     await self.handle_phishing(after, domain, domains_to_check)
                     return
 
-        # If the link is clean and safe_emoji is enabled, remove all reactions and add the reaction again
-        safe_emoji = await self.config.guild(after.guild).safe_emoji()
-        if safe_emoji:
-            try:
-                await after.clear_reactions()
-                if not any(domain in WHITELISTED_DOMAINS for domain in self.get_links(after.content)):
-                    if self.bot.user.id == 1152805502116429929:
-                        emoji = discord.utils.get(self.bot.emojis, id=1275431139666034857)
-                        if emoji:
-                            await after.add_reaction(emoji)
-                        else:
-                            await after.add_reaction("<:safe:1275431139666034857>")
-                    else:
-                        await after.add_reaction("✅")
-            except discord.Forbidden:
-                pass
-
     @commands.Cog.listener()
     async def on_message_without_command(self, message: discord.Message):
         """
@@ -396,23 +378,6 @@ class AntiPhishing(commands.Cog):
                 if domain in self.domains and domain not in WHITELISTED_DOMAINS:
                     await self.handle_phishing(message, domain, domains_to_check)
                     return
-
-        # If the link is clean and safe_emoji is enabled, add the reaction
-        safe_emoji = await self.config.guild(message.guild).safe_emoji()
-        if safe_emoji:
-            try:
-                # Check if the message contains media links or whitelisted domains
-                if not any(url.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp')) for url in self.extract_urls(message.content)) and not any(domain in WHITELISTED_DOMAINS for domain in self.get_links(message.content)):
-                    if self.bot.user.id == 1152805502116429929:
-                        emoji = discord.utils.get(self.bot.emojis, id=1275431139666034857)
-                        if emoji:
-                            await message.add_reaction(emoji)
-                        else:
-                            await message.add_reaction("<:safe:1275431139666034857>")
-                    else:
-                        await message.add_reaction("✅")
-            except discord.Forbidden:
-                pass
 
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction: discord.Reaction, user: discord.User):
@@ -763,18 +728,3 @@ class AntiPhishing(commands.Cog):
         embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/notifications.png")
         await ctx.send(embed=embed)
 
-    @antiphishing.command()
-    @commands.has_permissions(administrator=True)
-    async def safeemoji(self, ctx: Context, safe_emoji: bool):
-        """
-        Toggle the safe emoji functionality.
-        """
-        await self.config.guild(ctx.guild).safe_emoji.set(safe_emoji)
-        status = "enabled" if safe_emoji else "disabled"
-        embed = discord.Embed(
-            title='Settings changed',
-            description=f"Safe emoji functionality has been **{status}**.",
-            colour=0xffd966,
-        )
-        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/notifications.png")
-        await ctx.send(embed=embed)
