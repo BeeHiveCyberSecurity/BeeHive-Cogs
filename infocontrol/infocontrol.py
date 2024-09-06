@@ -1,6 +1,6 @@
 import re
-import discord
-from redbot.core import commands, Config
+import discord #type: ignore
+from redbot.core import commands, Config #type: ignore
 
 class InfoControl(commands.Cog):
     """A cog to detect and remove sensitive information from chat."""

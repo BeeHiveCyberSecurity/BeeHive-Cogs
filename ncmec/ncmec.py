@@ -1,6 +1,6 @@
-import discord
-from redbot.core import commands
-import aiohttp
+import discord #type: ignore
+from redbot.core import commands #type: ignore
+import aiohttp #type: ignore
 import asyncio
 import json
 import datetime
