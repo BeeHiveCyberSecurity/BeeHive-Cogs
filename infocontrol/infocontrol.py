@@ -257,15 +257,8 @@ class InfoControl(commands.Cog):
 
     @commands.admin_or_permissions()
     @infocontrol.command()
-    async def cleanup(self, ctx):
-        """Cleanup the config and remove no longer used patterns."""
-        guild_config = await self.config.guild(ctx.guild).all()
-        valid_patterns = set(self.default_guild["patterns"].keys())
-        keys_to_remove = [key for key in guild_config.keys() if key.startswith("block_") and key[6:] not in valid_patterns]
+    async def reset(self, ctx):
+        """Reset the info control settings to default for this guild."""
+        await self.config.guild(ctx.guild).set(self.default_guild)
+        await ctx.send("Info control settings have been reset to default.")
 
-        for key in keys_to_remove:
-            await self.config.guild(ctx.guild).clear_raw(key)
-            del guild_config[key]  # Ensure the key is removed from the local guild_config as well
-
-        await self.config.guild(ctx.guild).set(guild_config)  # Save the updated config back to the database
-        await ctx.send(f"Removed {len(keys_to_remove)} no longer used patterns from the config.")
