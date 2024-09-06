@@ -10,7 +10,7 @@ class InfoControl(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.config = Config.get_conf(self, identifier=1234567890)
+        self.config = Config.get_conf(self, identifier=11111)
         self.default_guild = {
             "enabled": True,
             "log_channel": None,
