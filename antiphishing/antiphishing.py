@@ -362,14 +362,15 @@ class AntiPhishing(commands.Cog):
         if safe_emoji:
             try:
                 await after.clear_reactions()
-                if self.bot.user.id == 1152805502116429929:
-                    emoji = discord.utils.get(self.bot.emojis, id=1275431139666034857)
-                    if emoji:
-                        await after.add_reaction(emoji)
+                if not any(domain in WHITELISTED_DOMAINS for domain in self.get_links(after.content)):
+                    if self.bot.user.id == 1152805502116429929:
+                        emoji = discord.utils.get(self.bot.emojis, id=1275431139666034857)
+                        if emoji:
+                            await after.add_reaction(emoji)
+                        else:
+                            await after.add_reaction("<:safe:1275431139666034857>")
                     else:
-                        await after.add_reaction("<:safe:1275431139666034857>")
-                else:
-                    await after.add_reaction("✅")
+                        await after.add_reaction("✅")
             except discord.Forbidden:
                 pass
 
@@ -400,8 +401,8 @@ class AntiPhishing(commands.Cog):
         safe_emoji = await self.config.guild(message.guild).safe_emoji()
         if safe_emoji:
             try:
-                # Check if the message contains media links
-                if not any(url.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp')) for url in self.extract_urls(message.content)):
+                # Check if the message contains media links or whitelisted domains
+                if not any(url.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp')) for url in self.extract_urls(message.content)) and not any(domain in WHITELISTED_DOMAINS for domain in self.get_links(message.content)):
                     if self.bot.user.id == 1152805502116429929:
                         emoji = discord.utils.get(self.bot.emojis, id=1275431139666034857)
                         if emoji:
