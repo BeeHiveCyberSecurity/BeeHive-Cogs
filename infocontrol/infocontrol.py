@@ -70,9 +70,19 @@ class InfoControl(commands.Cog):
             if guild_config.get(f"block_{key}", False) and re.search(pattern, message.content):
                 try:
                     await message.delete()
-                    await message.channel.send(f"{message.author.mention}, your message contained sensitive information and was removed.")
+                    embed = discord.Embed(
+                        title="Message removed",
+                        description=f"{message.author.mention}, your message contained potentially sensitive information and was removed. This server asks that you not share personally identifying information of your own, or of others.",
+                        color=0xff4545
+                    )
+                    await message.channel.send(embed=embed)
                 except Exception as e:
-                    await message.channel.send(f"Failed to delete message: {e}")
+                    embed = discord.Embed(
+                        title="Error",
+                        description=f"Failed to delete message: {e}",
+                        color=discord.Color.red()
+                    )
+                    await message.channel.send(embed=embed)
                 break
 
     @commands.group()
