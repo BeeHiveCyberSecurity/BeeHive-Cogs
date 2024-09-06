@@ -1,4 +1,5 @@
 import re
+import discord
 from redbot.core import commands, Config
 
 class NoInfo(commands.Cog):
