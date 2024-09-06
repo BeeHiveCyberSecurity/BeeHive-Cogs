@@ -66,6 +66,9 @@ class InfoControl(commands.Cog):
 
         content = remove_hyperlinks_and_urls(content)
 
+        # Ignore discord user ID's, message ID's, and channel ID's
+        content = re.sub(r'\b\d{17,19}\b', '', content)  # Discord ID's
+
         for key, pattern in guild_config["patterns"].items():
             if guild_config.get(f"block_{key}", False) and re.search(pattern, content):
                 await self.handle_message_deletion(message, key, guild_config)
