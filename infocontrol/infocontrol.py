@@ -6,11 +6,11 @@ from redbot.core import commands, Config #type: ignore
 class InfoControl(commands.Cog):
     """Detect and remove potentially sensitive information from chat."""
     
-    __version__ = "1.0.5"
+    __version__ = "1.0.7"
 
     def __init__(self, bot):
         self.bot = bot
-        self.config = Config.get_conf(self, identifier=11111)
+        self.config = Config.get_conf(self, identifier=11112)
         self.default_guild = {
             "enabled": False,
             "log_channel": None,
