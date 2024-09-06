@@ -5,7 +5,7 @@ from redbot.core import commands, Config #type: ignore
 class InfoControl(commands.Cog):
     """Detect and remove potentially sensitive information from chat."""
     
-    __version__ = "1.0.0"
+    __version__ = "1.0.1"
 
     def __init__(self, bot):
         self.bot = bot
@@ -192,6 +192,6 @@ class InfoControl(commands.Cog):
         else:
             embed.add_field(name="Alert channel", value="Not set", inline=False)
         
-        embed.set_footer(text=f"InfoControl Version: {self.__version__}")
+        embed.set_footer(text=f"Version {self.__version__}")
         
         await ctx.send(embed=embed)
