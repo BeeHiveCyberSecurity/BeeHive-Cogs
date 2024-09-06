@@ -353,14 +353,16 @@ class AntiPhishing(commands.Cog):
         safe_emoji = await self.config.guild(message.guild).safe_emoji()
         if safe_emoji:
             try:
-                if self.bot.user.id == 1152805502116429929:
-                    emoji = discord.utils.get(self.bot.emojis, id=1275431139666034857)
-                    if emoji:
-                        await message.add_reaction(emoji)
+                # Check if the message contains media links
+                if not any(url.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp')) for url in self.extract_urls(message.content)):
+                    if self.bot.user.id == 1152805502116429929:
+                        emoji = discord.utils.get(self.bot.emojis, id=1275431139666034857)
+                        if emoji:
+                            await message.add_reaction(emoji)
+                        else:
+                            await message.add_reaction("<:safe:1275431139666034857>")
                     else:
-                        await message.add_reaction("<:safe:1275431139666034857>")
-                else:
-                    await message.add_reaction("✅")
+                        await message.add_reaction("✅")
             except discord.Forbidden:
                 pass
 
