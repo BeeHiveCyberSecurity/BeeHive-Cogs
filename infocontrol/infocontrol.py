@@ -3,7 +3,7 @@ import discord #type: ignore
 from redbot.core import commands, Config #type: ignore
 
 class InfoControl(commands.Cog):
-    """A cog to detect and remove sensitive information from chat."""
+    """Detect and remove potentially sensitive information from chat."""
 
     def __init__(self, bot):
         self.bot = bot
@@ -26,6 +26,9 @@ class InfoControl(commands.Cog):
             "block_vin": True,
             "block_ssn_alternative": True,
             "block_phone_alternative": True,
+            "block_zip_code": True,
+            "block_street_address": True,
+            "block_birthdate": True,
             "patterns": {
                 "email": r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b",
                 "ssn": r"\b\d{3}-\d{2}-\d{4}\b",
@@ -42,7 +45,10 @@ class InfoControl(commands.Cog):
                 "drivers_license": r"\b[A-Z]{1,2}\d{1,14}\b",
                 "vin": r"\b[A-HJ-NPR-Z0-9]{17}\b",
                 "ssn_alternative": r"\b\d{3}\s?\d{2}\s?\d{4}\b",
-                "phone_alternative": r"\b\(\d{3}\)\s?\d{3}-\d{4}\b"
+                "phone_alternative": r"\b\(\d{3}\)\s?\d{3}-\d{4}\b",
+                "zip_code": r"\b\d{5}(?:[-\s]\d{4})?\b",
+                "street_address": r"\b\d{1,5}\s\w+\s\w+\b",
+                "birthdate": r"\b\d{2}/\d{2}/\d{4}\b"
             }
         }
         self.config.register_guild(**default_guild)
