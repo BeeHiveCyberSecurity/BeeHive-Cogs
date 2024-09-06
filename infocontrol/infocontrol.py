@@ -47,7 +47,7 @@ class InfoControl(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if message.author.bot or not message.guild:
+        if message.author.bot or not message.guild or not message.mentions:
             return
 
         guild_config = await self.config.guild(message.guild).all()
