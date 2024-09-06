@@ -115,8 +115,28 @@ class NoInfo(commands.Cog):
         
         embed = discord.Embed(title="Current settings", color=0xfffffe)
         
+        key_transform = {
+            "block_email": "Email",
+            "block_ssn": "SSN",
+            "block_bankcard": "Bank Card",
+            "block_phone": "Phone",
+            "block_ipv4": "IPv4 Address",
+            "block_ipv6": "IPv6 Address",
+            "block_creditcard": "Credit Card",
+            "block_passport": "Passport",
+            "block_iban": "IBAN",
+            "block_mac_address": "MAC Address",
+            "block_bitcoin_address": "Bitcoin Address",
+            "block_swift_code": "SWIFT Code",
+            "block_drivers_license": "Driver's License",
+            "block_vin": "Vehicle Identification Number (VIN)",
+            "block_ssn_alternative": "SSN Alternative",
+            "block_phone_alternative": "Phone Alternative"
+        }
+        
         for key, value in guild_config.items():
             if key.startswith("block_"):
-                embed.add_field(name=key, value='enabled' if value else 'disabled', inline=False)
+                human_readable_key = key_transform.get(key, key)
+                embed.add_field(name=human_readable_key, value='Active' if value else 'Inactive', inline=True)
         
         await ctx.send(embed=embed)
