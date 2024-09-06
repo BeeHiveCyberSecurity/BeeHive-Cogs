@@ -143,6 +143,6 @@ class InfoControl(commands.Cog):
         for key, value in guild_config.items():
             if key.startswith("block_"):
                 human_readable_key = key_transform.get(key, key)
-                embed.add_field(name=human_readable_key, value='Active' if value else 'Inactive', inline=True)
+                embed.add_field(name=human_readable_key, value='**Active**' if value else 'Inactive', inline=True)
         
         await ctx.send(embed=embed)
