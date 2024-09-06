@@ -28,7 +28,6 @@ class InfoControl(commands.Cog):
                 "iban": r"\b[A-Z]{2}\d{2}[A-Z0-9]{1,30}\b",
                 "mac_address": r"\b([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})\b",
                 "bitcoin_address": r"\b[13][a-km-zA-HJ-NP-Z1-9]{25,34}\b",
-                "swift_code": r"\b[A-Z]{4}[A-Z]{2}[A-Z2-9][A-NP-Z0-9]([A-Z0-9]{3})?\b",
                 "drivers_license": r"\b[A-Z]{1,2}\d{1,14}\b",
                 "vin": r"\b[A-HJ-NPR-Z0-9]{17}\b",
                 "ssn_alternative": r"\b\d{3}[-\s]?\d{2}[-\s]?\d{4}\b",
@@ -38,8 +37,7 @@ class InfoControl(commands.Cog):
                 "birthdate": r"\b\d{2}/\d{2}/\d{4}\b",
                 "national_id": r"\b[A-Z0-9]{9}\b",
                 "tax_id": r"\b\d{2}-\d{7}\b",
-                "student_id": r"\b[A-Z0-9]{8}\b",
-                "license_plate": r"\b[A-Z0-9]{6,7}\b"
+                "student_id": r"\b[A-Z0-9]{8}\b"
             }
         }
         self.default_guild.update({f"block_{key}": True for key in self.default_guild["patterns"].keys()})
@@ -214,7 +212,6 @@ class InfoControl(commands.Cog):
             "block_iban": "IBAN",
             "block_mac_address": "MAC address",
             "block_bitcoin_address": "Bitcoin address",
-            "block_swift_code": "SWIFT code",
             "block_drivers_license": "Driver's license",
             "block_vin": "Vehicle ID (VIN)",
             "block_ssn_alternative": "SSN alternative",
@@ -224,8 +221,7 @@ class InfoControl(commands.Cog):
             "block_birthdate": "Birth date",
             "block_national_id": "National ID",
             "block_tax_id": "Tax ID",
-            "block_student_id": "Student ID",
-            "block_license_plate": "License Plate"
+            "block_student_id": "Student ID"
         }
         
         settings_list = [(key_transform.get(key, key), '**Active**' if value else 'Inactive') for key, value in guild_config.items() if key.startswith("block_")]
