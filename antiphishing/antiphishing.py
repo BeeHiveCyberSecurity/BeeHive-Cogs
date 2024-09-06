@@ -11,7 +11,7 @@ from redbot.core.bot import Red  # type: ignore
 from redbot.core.commands import Context  # type: ignore
 
 URL_REGEX_PATTERN = re.compile(
-    r"^(?:http[s]?:\/\/)?[\w]+(?:\.[\w]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$"
+    r"(?i)\b((?:https?://|www\d{0,3}[.]|https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
 )
 
 
@@ -136,7 +136,7 @@ class AntiPhishing(commands.Cog):
         Extract URLs from a message.
         """
         matches = URL_REGEX_PATTERN.findall(message)
-        return matches
+        return [match[0] for match in matches]
 
     def get_links(self, message: str) -> Optional[List[str]]:
         """
