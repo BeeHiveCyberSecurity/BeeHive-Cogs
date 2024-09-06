@@ -1,5 +1,5 @@
 from .noinfo import NoInfo
 
-def setup(bot):
+async def setup(bot):
     bot.add_cog(NoInfo(bot))
 
