@@ -28,6 +28,7 @@ class InfoControl(commands.Cog):
             "block_vin": True,
             "block_ssn_alternative": True,
             "block_phone_alternative": True,
+            "block_phone_no_spaces": True,
             "block_zip_code": True,
             "block_street_address": True,
             "block_birthdate": True,
@@ -37,6 +38,7 @@ class InfoControl(commands.Cog):
                 "ssn": r"\b\d{3}-\d{2}-\d{4}\b",
                 "bankcard": r"\b\d{4} \d{4} \d{4} \d{4}\b",
                 "phone": r"\b\d{5}-\d{5}\b",
+                "phone_no_spaces": r"\b\d{10}\b",
                 "ipv4": r"\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b",
                 "ipv6": r"\b([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}\b",
                 "creditcard": r"\b(?:\d[ -]*?){13,16}\b",
@@ -131,7 +133,7 @@ class InfoControl(commands.Cog):
     async def toggle(self, ctx, data_type: str):
         """Toggle blocking of a specific data type."""
         valid_types = [
-            "email", "ssn", "bankcard", "phone", "ipv4", "ipv6", "creditcard", 
+            "email", "ssn", "bankcard", "phone", "phone_no_spaces", "ipv4", "ipv6", "creditcard", 
             "passport", "iban", "mac_address", "bitcoin_address", "swift_code", 
             "drivers_license", "vin", "ssn_alternative", "phone_alternative",
             "zip_code", "street_address", "birthdate"
@@ -174,6 +176,7 @@ class InfoControl(commands.Cog):
             "block_ssn": "SSN",
             "block_bankcard": "Bank card",
             "block_phone": "Phone",
+            "block_phone_no_spaces": "Phone (no spaces)",
             "block_ipv4": "IPv4 address",
             "block_ipv6": "IPv6 address",
             "block_creditcard": "Credit card",
