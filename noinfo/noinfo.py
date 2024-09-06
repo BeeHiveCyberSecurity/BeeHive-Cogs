@@ -72,20 +72,20 @@ class NoInfo(commands.Cog):
     @commands.guild_only()
     @commands.admin_or_permissions(manage_guild=True)
     async def noinfo(self, ctx):
-        """Manage the NoInfo settings."""
+        """Manage info enforcement settings."""
         pass
 
     @noinfo.command()
     async def enable(self, ctx):
-        """Enable the NoInfo cog."""
+        """Enable info enforcement"""
         await self.config.guild(ctx.guild).enabled.set(True)
-        await ctx.send("NoInfo is now enabled.")
+        await ctx.send("Info enforcement is now enabled.")
 
     @noinfo.command()
     async def disable(self, ctx):
-        """Disable the NoInfo cog."""
+        """Disable info enforcement"""
         await self.config.guild(ctx.guild).enabled.set(False)
-        await ctx.send("NoInfo is now disabled.")
+        await ctx.send("Info enforcement is now disabled.")
 
     @noinfo.command()
     async def toggle(self, ctx, data_type: str):
@@ -105,7 +105,7 @@ class NoInfo(commands.Cog):
         await ctx.send(f"Blocking for {data_type} is now {status}.")
 
     @noinfo.command()
-    async def listsettings(self, ctx):
+    async def settings(self, ctx):
         """List current settings for blocking data types."""
         guild_config = await self.config.guild(ctx.guild).all()
         settings = "\n".join([f"{key}: {'enabled' if value else 'disabled'}" for key, value in guild_config.items() if key.startswith("block_")])
