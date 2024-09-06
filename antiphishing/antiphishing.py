@@ -1,4 +1,4 @@
-import contextlib
+Cimport contextlib
 import datetime
 import re
 from typing import List, Optional
@@ -62,7 +62,7 @@ class AntiPhishing(commands.Cog):
     Guard users from malicious links and phishing attempts with customizable protection options.
     """
 
-    __version__ = "1.4.6.6"
+    __version__ = "1.4.6.7"
     __last_updated__ = "September 6, 2024"
 
     def __init__(self, bot: Red):
@@ -231,9 +231,13 @@ class AntiPhishing(commands.Cog):
                     # Determine the status of each domain in the redirect chain
                     redirect_chain_status = []
                     for url in redirect_chain:
-                        domain = url.split('/')[2]  # Extract domain from URL
-                        status = "Malicious" if domain in self.domains else "Clean"
-                        redirect_chain_status.append(f"{url} ({status})")
+                        try:
+                            domain = url.split('/')[2]  # Extract domain from URL
+                            status = "Malicious" if domain in self.domains else "Clean"
+                            redirect_chain_status.append(f"{url} ({status})")
+                        except IndexError:
+                            print(f"Error extracting domain from URL: {url}")
+                            redirect_chain_status.append(f"{url} (Unknown)")
                     
                     redirect_chain_str = "\n".join(redirect_chain_status)
                     
