@@ -2,7 +2,7 @@ import re
 import discord
 from redbot.core import commands, Config
 
-class NoInfo(commands.Cog):
+class InfoControl(commands.Cog):
     """A cog to detect and remove sensitive information from chat."""
 
     def __init__(self, bot):
@@ -71,26 +71,26 @@ class NoInfo(commands.Cog):
 
     @commands.group()
     @commands.guild_only()
-    async def noinfo(self, ctx):
+    async def infocontrol(self, ctx):
         """Manage info enforcement settings."""
         pass
 
     @commands.admin_or_permissions()
-    @noinfo.command()
+    @infocontrol.command()
     async def enable(self, ctx):
         """Enable info enforcement"""
         await self.config.guild(ctx.guild).enabled.set(True)
         await ctx.send("Info enforcement is now enabled.")
 
     @commands.admin_or_permissions()
-    @noinfo.command()
+    @infocontrol.command()
     async def disable(self, ctx):
         """Disable info enforcement"""
         await self.config.guild(ctx.guild).enabled.set(False)
         await ctx.send("Info enforcement is now disabled.")
 
     @commands.admin_or_permissions()
-    @noinfo.command()
+    @infocontrol.command()
     async def toggle(self, ctx, data_type: str):
         """Toggle blocking of a specific data type."""
         valid_types = [
@@ -108,12 +108,12 @@ class NoInfo(commands.Cog):
         await ctx.send(f"Blocking for {data_type} is now {status}.")
 
 
-    @noinfo.command()
+    @infocontrol.command()
     async def settings(self, ctx):
         """List current settings for blocking data types."""
         guild_config = await self.config.guild(ctx.guild).all()
         
-        embed = discord.Embed(title="Current settings", color=0xfffffe)
+        embed = discord.Embed(title="Current info control settings", color=0xfffffe)
         
         key_transform = {
             "block_email": "Email",
