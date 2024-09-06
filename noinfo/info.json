@@ -1,0 +1,16 @@
+{
+    "name": "noinfo",
+    "author": ["adminelevation"],
+    "description": "A cog to automatically delete messages containing sensitive information such as emails, SSNs, bank card numbers, and phone numbers.",
+    "short": "Automatically delete sensitive information.",
+    "install_msg": "Thank you for installing NoInfo. Use `[p]noinfo` to manage settings.",
+    "requirements": [],
+    "tags": ["moderation", "security", "privacy"],
+    "min_bot_version": "3.5.0",
+    "permissions": [
+        "embed_links"
+    ],
+    "hidden": false,
+    "disabled": false,
+    "type": "COG"
+}

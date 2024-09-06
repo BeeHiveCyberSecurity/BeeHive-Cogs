@@ -1,0 +1,85 @@
+import re
+from redbot.core import commands, Config
+
+class NoInfo(commands.Cog):
+    """A cog to detect and remove sensitive information from chat."""
+
+    def __init__(self, bot):
+        self.bot = bot
+        self.config = Config.get_conf(self, identifier=1234567890)
+        default_guild = {
+            "enabled": True,
+            "block_email": True,
+            "block_ssn": True,
+            "block_bankcard": True,
+            "block_phone": True,
+            "patterns": {
+                "email": r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b",
+                "ssn": r"\b\d{3}-\d{2}-\d{4}\b",
+                "bankcard": r"\b\d{4} \d{4} \d{4} \d{4}\b",
+                "phone": r"\b\d{5}-\d{5}\b"
+            }
+        }
+        self.config.register_guild(**default_guild)
+
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        if message.author.bot:
+            return
+
+        guild = message.guild
+        if not guild:
+            return
+
+        guild_config = await self.config.guild(guild).all()
+        if not guild_config["enabled"]:
+            return
+
+        for key, pattern in guild_config["patterns"].items():
+            if guild_config[f"block_{key}"] and re.search(pattern, message.content):
+                await message.delete()
+                await message.channel.send(f"{message.author.mention}, your message contained sensitive information and was removed.")
+                break
+
+    @commands.group()
+    @commands.guild_only()
+    @commands.admin_or_permissions(manage_guild=True)
+    async def noinfo(self, ctx):
+        """Manage the NoInfo settings."""
+        pass
+
+    @noinfo.command()
+    async def enable(self, ctx):
+        """Enable the NoInfo cog."""
+        await self.config.guild(ctx.guild).enabled.set(True)
+        await ctx.send("NoInfo is now enabled.")
+
+    @noinfo.command()
+    async def disable(self, ctx):
+        """Disable the NoInfo cog."""
+        await self.config.guild(ctx.guild).enabled.set(False)
+        await ctx.send("NoInfo is now disabled.")
+
+    @noinfo.command()
+    async def toggle(self, ctx, data_type: str):
+        """Toggle blocking of a specific data type (email, ssn, bankcard, phone)."""
+        valid_types = ["email", "ssn", "bankcard", "phone"]
+        if data_type not in valid_types:
+            await ctx.send(f"Invalid data type. Valid types are: {', '.join(valid_types)}")
+            return
+
+        current = await self.config.guild(ctx.guild).get_raw(f"block_{data_type}")
+        await self.config.guild(ctx.guild).set_raw(f"block_{data_type}", value=not current)
+        status = "enabled" if not current else "disabled"
+        await ctx.send(f"Blocking for {data_type} is now {status}.")
+
+    @noinfo.command()
+    async def listsettings(self, ctx):
+        """List current settings for blocking data types."""
+        guild_config = await self.config.guild(ctx.guild).all()
+        settings = "\n".join([f"{key}: {'enabled' if value else 'disabled'}" for key, value in guild_config.items() if key.startswith("block_")])
+        await ctx.send(f"Current settings:\n{settings}")
+
+def setup(bot):
+    bot.add_cog(NoInfo(bot))
+
