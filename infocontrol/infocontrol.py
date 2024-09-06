@@ -232,9 +232,10 @@ class InfoControl(commands.Cog):
         if total_pages > 1:
             await message.add_reaction("⬅️")
             await message.add_reaction("➡️")
+            await message.add_reaction("❌")
             
             def check(reaction, user):
-                return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️"] and reaction.message.id == message.id
+                return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️", "❌"] and reaction.message.id == message.id
             
             while True:
                 try:
@@ -246,6 +247,9 @@ class InfoControl(commands.Cog):
                     elif str(reaction.emoji) == "⬅️" and current_page > 0:
                         current_page -= 1
                         await message.edit(embed=create_embed(pages[current_page]))
+                    elif str(reaction.emoji) == "❌":
+                        await message.delete()
+                        break
                     
                     await message.remove_reaction(reaction, user)
                 except asyncio.TimeoutError:
