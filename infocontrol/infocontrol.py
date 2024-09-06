@@ -29,6 +29,7 @@ class InfoControl(commands.Cog):
             "block_zip_code": True,
             "block_street_address": True,
             "block_birthdate": True,
+            "log_channel": None,
             "patterns": {
                 "email": r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b",
                 "ssn": r"\b\d{3}-\d{2}-\d{4}\b",
@@ -76,6 +77,20 @@ class InfoControl(commands.Cog):
                         color=0xff4545
                     )
                     await message.channel.send(embed=embed)
+
+                    # Log the deletion if log_channel is set
+                    log_channel_id = guild_config.get("log_channel")
+                    if log_channel_id:
+                        log_channel = self.bot.get_channel(log_channel_id)
+                        if log_channel:
+                            log_embed = discord.Embed(
+                                title="InfoControl Deletion Log",
+                                description=f"Message from {message.author.mention} was removed in {message.channel.mention}.",
+                                color=0xff4545
+                            )
+                            log_embed.add_field(name="Content", value=message.content, inline=False)
+                            await log_channel.send(embed=log_embed)
+
                 except Exception as e:
                     embed = discord.Embed(
                         title="Error",
@@ -123,6 +138,12 @@ class InfoControl(commands.Cog):
         status = "enabled" if not current else "disabled"
         await ctx.send(f"Blocking for {data_type} is now {status}.")
 
+    @commands.admin_or_permissions()
+    @infocontrol.command()
+    async def alerts(self, ctx, channel: discord.TextChannel):
+        """Set the log channel for info control deletions."""
+        await self.config.guild(ctx.guild).log_channel.set(channel.id)
+        await ctx.send(f"Log channel set to {channel.mention}.")
 
     @infocontrol.command()
     async def settings(self, ctx):
@@ -157,5 +178,12 @@ class InfoControl(commands.Cog):
             if key.startswith("block_"):
                 human_readable_key = key_transform.get(key, key)
                 embed.add_field(name=human_readable_key, value='**Active**' if value else 'Inactive', inline=True)
+        
+        log_channel_id = guild_config.get("log_channel")
+        if log_channel_id:
+            log_channel = self.bot.get_channel(log_channel_id)
+            embed.add_field(name="Alert channel", value=log_channel.mention if log_channel else "Not found", inline=False)
+        else:
+            embed.add_field(name="Alert channel", value="Not set", inline=False)
         
         await ctx.send(embed=embed)
