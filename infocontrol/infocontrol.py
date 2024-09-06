@@ -33,6 +33,7 @@ class InfoControl(commands.Cog):
             "block_street_address": True,
             "block_birthdate": True,
             "log_channel": None,
+            "moderator_roles": [],
             "patterns": {
                 "email": r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b",
                 "ssn": r"\b\d{3}-\d{2}-\d{4}\b",
@@ -97,7 +98,14 @@ class InfoControl(commands.Cog):
                             log_embed.add_field(name="Pattern matched", value=f"`{key}`", inline=True)
                             log_embed.add_field(name="Message content", value=f"```{message.content}```", inline=False)
                             log_embed.set_footer(text=f"Message ID: {message.id} | Author ID: {message.author.id}")
-                            await log_channel.send(embed=log_embed)
+                            
+                            # Mention moderator roles if any are set
+                            moderator_roles = guild_config.get("moderator_roles", [])
+                            if moderator_roles:
+                                mentions = " ".join([role.mention for role in message.guild.roles if role.id in moderator_roles])
+                                await log_channel.send(content=mentions, embed=log_embed)
+                            else:
+                                await log_channel.send(embed=log_embed)
 
                 except Exception as e:
                     embed = discord.Embed(
@@ -163,6 +171,28 @@ class InfoControl(commands.Cog):
         """Set the log channel for info control deletions."""
         await self.config.guild(ctx.guild).log_channel.set(channel.id)
         await ctx.send(f"Log channel set to {channel.mention}.")
+
+    @commands.admin_or_permissions()
+    @infocontrol.command()
+    async def addmodrole(self, ctx, role: discord.Role):
+        """Add a role to the list of roles to mention in alerts."""
+        async with self.config.guild(ctx.guild).moderator_roles() as mod_roles:
+            if role.id not in mod_roles:
+                mod_roles.append(role.id)
+                await ctx.send(f"Role {role.mention} added to the list of roles to mention in alerts.")
+            else:
+                await ctx.send(f"Role {role.mention} is already in the list of roles to mention in alerts.")
+
+    @commands.admin_or_permissions()
+    @infocontrol.command()
+    async def removemodrole(self, ctx, role: discord.Role):
+        """Remove a role from the list of roles to mention in alerts."""
+        async with self.config.guild(ctx.guild).moderator_roles() as mod_roles:
+            if role.id in mod_roles:
+                mod_roles.remove(role.id)
+                await ctx.send(f"Role {role.mention} removed from the list of roles to mention in alerts.")
+            else:
+                await ctx.send(f"Role {role.mention} is not in the list of roles to mention in alerts.")
 
     @infocontrol.command()
     async def settings(self, ctx):
