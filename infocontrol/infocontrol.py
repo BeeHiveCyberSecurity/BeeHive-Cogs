@@ -58,11 +58,13 @@ class InfoControl(commands.Cog):
         content = re.sub(r'<@!?[0-9]+>', '', message.content)  # User mentions
         content = re.sub(r'<#[0-9]+>', '', content)  # Channel mentions
 
-        # Ignore content inside hyperlinks
-        def remove_hyperlinks(text):
-            return re.sub(r'\[.*?\]\(.*?\)', '', text)
+        # Ignore content inside hyperlinks and URLs
+        def remove_hyperlinks_and_urls(text):
+            text = re.sub(r'\[.*?\]\(.*?\)', '', text)  # Hyperlinks
+            text = re.sub(r'https?://\S+', '', text)  # URLs
+            return text
 
-        content = remove_hyperlinks(content)
+        content = remove_hyperlinks_and_urls(content)
 
         for key, pattern in guild_config["patterns"].items():
             if guild_config.get(f"block_{key}", False) and re.search(pattern, content):
