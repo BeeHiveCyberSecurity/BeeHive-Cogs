@@ -5,7 +5,7 @@ from redbot.core import commands, Config #type: ignore
 class InfoControl(commands.Cog):
     """Detect and remove potentially sensitive information from chat."""
     
-    __version__ = "1.0.1"
+    __version__ = "1.0.2"
 
     def __init__(self, bot):
         self.bot = bot
