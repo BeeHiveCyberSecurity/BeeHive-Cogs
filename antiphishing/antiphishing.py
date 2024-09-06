@@ -62,7 +62,7 @@ class AntiPhishing(commands.Cog):
     Guard users from malicious links and phishing attempts with customizable protection options.
     """
 
-    __version__ = "1.4.6.7"
+    __version__ = "1.4.6.8"
     __last_updated__ = "September 6, 2024"
 
     def __init__(self, bot: Red):
