@@ -21,15 +21,21 @@ class Ping(commands.Cog):  # Use Red's Cog class
             self.latency_history.pop(0)
         avg_latency = round(sum(self.latency_history) / len(self.latency_history), 2)
 
-        async with ctx.typing():
-            try:
-                download_speed, upload_speed, ping = await asyncio.get_event_loop().run_in_executor(self.executor, self.run_speedtest)
-            except Exception as e:
-                await ctx.send(f"An error occurred while performing the speed test: {e}")
-                return
+        # Send initial response with latency information
+        embed = discord.Embed(title="Running Speedtest...", description="Please wait while we gather the speedtest results.", color=discord.Color(0x2bbd8e))
+        embed.add_field(name="Latency information", value="", inline=False)
+        embed.add_field(name="Network/Transit", value=f"**{avg_latency}ms**", inline=True)
+        initial_message = await ctx.send(embed=embed)
+
+        # Run speedtest in the background
+        try:
+            download_speed, upload_speed, ping = await asyncio.get_event_loop().run_in_executor(self.executor, self.run_speedtest)
+        except Exception as e:
+            await initial_message.edit(content=f"An error occurred while performing the speed test: {e}", embed=None)
+            return
 
         if ping > 250:  # If still high after retries
-            await ctx.send("Network conditions are currently fluctuating too much to measure conditions accurately. Please try again later.")
+            await initial_message.edit(content="Network conditions are currently fluctuating too much to measure conditions accurately. Please try again later.", embed=None)
             return
 
         if avg_latency > 100:  # Adjust thresholds as needed
@@ -41,7 +47,7 @@ class Ping(commands.Cog):  # Use Red's Cog class
             embed_title = "Connection OK"
             embed_description = "Your connection is stable and performing well for bot operations."
 
-        # Create an embed for a more detailed response
+        # Update the embed with speedtest results
         embed = discord.Embed(title=embed_title, description=embed_description, color=embed_color)
         embed.add_field(name="Latency information", value="", inline=False)
         embed.add_field(name="Host", value=f"**{ping}ms**", inline=True)
@@ -50,7 +56,7 @@ class Ping(commands.Cog):  # Use Red's Cog class
         embed.add_field(name="Bot download", value=f"**{download_speed} Mbps**", inline=True)
         embed.add_field(name="Bot upload", value=f"**{upload_speed} Mbps**", inline=True)
 
-        await ctx.send(embed=embed)
+        await initial_message.edit(embed=embed)
 
     def run_speedtest(self):
         st = speedtest.Speedtest(secure=True)
