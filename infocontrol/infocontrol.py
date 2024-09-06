@@ -48,7 +48,7 @@ class InfoControl(commands.Cog):
                 "ssn_alternative": r"\b\d{3}\s?\d{2}\s?\d{4}\b",
                 "phone_alternative": r"\b\(\d{3}\)\s?\d{3}-\d{4}\b",
                 "zip_code": r"\b\d{5}(?:[-\s]\d{4})?\b",
-                "street_address": r"\b\d{1,5}\s\w+\s\w+\b",
+                "street_address": r"\b\d{1,5}\s\w+(?:\s\w+)*\b",
                 "birthdate": r"\b\d{2}/\d{2}/\d{4}\b"
             }
         }
