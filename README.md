@@ -186,6 +186,9 @@ Leverage the power of the URLScan.io API with a `free` URLScan API Key to evalua
 ```
 [p]load urlscan
 ```
+```
+[p]set api urlscan api_key YOURAPIKEYHERE
+```
 
 ### [stripeidentity](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/stripeidentity)
 
