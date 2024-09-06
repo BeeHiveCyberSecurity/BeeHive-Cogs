@@ -22,9 +22,9 @@ class Ping(commands.Cog):  # Use Red's Cog class
         avg_latency = round(sum(self.latency_history) / len(self.latency_history), 2)
 
         # Send initial response with latency information
-        embed = discord.Embed(title="Running Speedtest...", description="Please wait while we gather the speedtest results.", color=discord.Color(0x2bbd8e))
+        embed = discord.Embed(title="Evaluating connection", description="Please wait while we gather the speedtest results.", color=discord.Color(0xfffffe))
         embed.add_field(name="Latency information", value="", inline=False)
-        embed.add_field(name="Network/Transit", value=f"**{avg_latency}ms**", inline=True)
+        embed.add_field(name="Network & transit", value=f"**{avg_latency}ms**", inline=True)
         initial_message = await ctx.send(embed=embed)
 
         # Run speedtest in the background
