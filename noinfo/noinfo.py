@@ -70,23 +70,25 @@ class NoInfo(commands.Cog):
 
     @commands.group()
     @commands.guild_only()
-    @commands.admin_or_permissions(manage_guild=True)
     async def noinfo(self, ctx):
         """Manage info enforcement settings."""
         pass
 
+    @commands.admin_or_permissions()
     @noinfo.command()
     async def enable(self, ctx):
         """Enable info enforcement"""
         await self.config.guild(ctx.guild).enabled.set(True)
         await ctx.send("Info enforcement is now enabled.")
 
+    @commands.admin_or_permissions()
     @noinfo.command()
     async def disable(self, ctx):
         """Disable info enforcement"""
         await self.config.guild(ctx.guild).enabled.set(False)
         await ctx.send("Info enforcement is now disabled.")
 
+    @commands.admin_or_permissions()
     @noinfo.command()
     async def toggle(self, ctx, data_type: str):
         """Toggle blocking of a specific data type."""
@@ -104,12 +106,16 @@ class NoInfo(commands.Cog):
         status = "enabled" if not current else "disabled"
         await ctx.send(f"Blocking for {data_type} is now {status}.")
 
+
     @noinfo.command()
     async def settings(self, ctx):
         """List current settings for blocking data types."""
         guild_config = await self.config.guild(ctx.guild).all()
-        settings = "\n".join([f"{key}: {'enabled' if value else 'disabled'}" for key, value in guild_config.items() if key.startswith("block_")])
-        await ctx.send(f"Current settings:\n{settings}")
-
-def setup(bot):
-    bot.add_cog(NoInfo(bot))
+        
+        embed = discord.Embed(title="Current settings", color=0xfffffe)
+        
+        for key, value in guild_config.items():
+            if key.startswith("block_"):
+                embed.add_field(name=key, value='enabled' if value else 'disabled', inline=False)
+        
+        await ctx.send(embed=embed)
