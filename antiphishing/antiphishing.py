@@ -232,7 +232,7 @@ class AntiPhishing(commands.Cog):
                     redirect_chain_status = []
                     for url in redirect_chain:
                         domain = url.split('/')[2]  # Extract domain from URL
-                        status = "Known bad" if domain in self.domains else "Clean"
+                        status = "Malicious" if domain in self.domains else "Clean"
                         redirect_chain_status.append(f"{url} ({status})")
                     
                     redirect_chain_str = "\n".join(redirect_chain_status)
