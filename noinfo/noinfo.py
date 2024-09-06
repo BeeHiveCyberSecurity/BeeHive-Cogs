@@ -48,9 +48,12 @@ class NoInfo(commands.Cog):
             return
 
         for key, pattern in guild_config["patterns"].items():
-            if guild_config[f"block_{key}"] and re.search(pattern, message.content):
-                await message.delete()
-                await message.channel.send(f"{message.author.mention}, your message contained sensitive information and was removed.")
+            if guild_config.get(f"block_{key}", False) and re.search(pattern, message.content):
+                try:
+                    await message.delete()
+                    await message.channel.send(f"{message.author.mention}, your message contained sensitive information and was removed.")
+                except Exception as e:
+                    await message.channel.send(f"Failed to delete message: {e}")
                 break
 
     @commands.group()
