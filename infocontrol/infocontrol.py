@@ -12,7 +12,7 @@ class InfoControl(commands.Cog):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=11111)
         self.default_guild = {
-            "enabled": True,
+            "enabled": False,
             "log_channel": None,
             "moderator_roles": [],
             "patterns": {
