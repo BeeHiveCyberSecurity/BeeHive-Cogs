@@ -4,10 +4,12 @@ from redbot.core import commands, Config #type: ignore
 
 class InfoControl(commands.Cog):
     """Detect and remove potentially sensitive information from chat."""
+    
+    __version__ = "1.0.0"
 
     def __init__(self, bot):
         self.bot = bot
-        self.config = Config.get_conf(self, identifier=1234567890)
+        self.config = Config.get_conf(self, identifier=1234567890, version=1)
         default_guild = {
             "enabled": True,
             "block_email": True,
@@ -189,5 +191,7 @@ class InfoControl(commands.Cog):
             embed.add_field(name="Alert channel", value=log_channel.mention if log_channel else "Not found", inline=False)
         else:
             embed.add_field(name="Alert channel", value="Not set", inline=False)
+        
+        embed.set_footer(text=f"InfoControl Version: {self.__version__}")
         
         await ctx.send(embed=embed)
