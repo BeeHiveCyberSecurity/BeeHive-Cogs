@@ -20,7 +20,7 @@ class AntiPhishing(commands.Cog):
     """
 
     __version__ = "1.3.6.4"
-    __last_updated__ = "August 23rd, 2024"
+    __last_updated__ = "September 6, 2024"
 
     def __init__(self, bot: Red):
         self.bot = bot
