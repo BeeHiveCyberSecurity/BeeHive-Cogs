@@ -54,8 +54,12 @@ class InfoControl(commands.Cog):
         if not guild_config["enabled"]:
             return
 
+        # Remove user and channel mentions from the message content
+        content = re.sub(r'<@!?[0-9]+>', '', message.content)  # User mentions
+        content = re.sub(r'<#[0-9]+>', '', content)  # Channel mentions
+
         for key, pattern in guild_config["patterns"].items():
-            if guild_config.get(f"block_{key}", False) and re.search(pattern, message.content):
+            if guild_config.get(f"block_{key}", False) and re.search(pattern, content):
                 await self.handle_message_deletion(message, key, guild_config)
                 break
 
