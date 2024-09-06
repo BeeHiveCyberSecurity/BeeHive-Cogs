@@ -32,6 +32,11 @@ class InfoControl(commands.Cog):
             "block_zip_code": True,
             "block_street_address": True,
             "block_birthdate": True,
+            "block_national_id": True,
+            "block_tax_id": True,
+            "block_medical_id": True,
+            "block_student_id": True,
+            "block_license_plate": True,
             "log_channel": None,
             "moderator_roles": [],
             "patterns": {
@@ -54,7 +59,12 @@ class InfoControl(commands.Cog):
                 "phone_alternative": r"\b\(\d{3}\)\s?\d{3}[-.\s]?\d{4}\b",
                 "zip_code": r"\b\d{5}(?:[-\s]\d{4})?\b",
                 "street_address": r"\b\d{1,5}\s(?:[A-Za-z0-9#]+\s?){1,5}\b",
-                "birthdate": r"\b\d{2}/\d{2}/\d{4}\b"
+                "birthdate": r"\b\d{2}/\d{2}/\d{4}\b",
+                "national_id": r"\b[A-Z0-9]{9}\b",
+                "tax_id": r"\b\d{2}-\d{7}\b",
+                "medical_id": r"\b[A-Z0-9]{10}\b",
+                "student_id": r"\b[A-Z0-9]{8}\b",
+                "license_plate": r"\b[A-Z0-9]{1,7}\b"
             }
         }
         self.config.register_guild(**default_guild)
@@ -144,7 +154,7 @@ class InfoControl(commands.Cog):
             "email", "ssn", "bankcard", "phone", "phone_no_spaces", "ipv4", "ipv6", "creditcard", 
             "passport", "iban", "mac_address", "bitcoin_address", "swift_code", 
             "drivers_license", "vin", "ssn_alternative", "phone_alternative",
-            "zip_code", "street_address", "birthdate"
+            "zip_code", "street_address", "birthdate", "national_id", "tax_id", "medical_id", "student_id", "license_plate"
         ]
         if data_type not in valid_types:
             embed = discord.Embed(
@@ -222,6 +232,11 @@ class InfoControl(commands.Cog):
             "block_zip_code": "Zip code",
             "block_street_address": "Street address",
             "block_birthdate": "Birth date",
+            "block_national_id": "National ID",
+            "block_tax_id": "Tax ID",
+            "block_medical_id": "Medical ID",
+            "block_student_id": "Student ID",
+            "block_license_plate": "License Plate"
         }
         
         for key, value in guild_config.items():
