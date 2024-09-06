@@ -349,7 +349,7 @@ class AntiPhishing(commands.Cog):
             domains_to_check = await self.follow_redirects(url)
             for domain_url in domains_to_check:
                 domain = urlparse(domain_url).netloc
-                if domain in self.domains:
+                if domain in self.domains and domain not in WHITELISTED_DOMAINS:
                     await self.handle_phishing(after, domain, domains_to_check)
                     return
 
