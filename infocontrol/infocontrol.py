@@ -265,5 +265,7 @@ class InfoControl(commands.Cog):
 
         for key in keys_to_remove:
             await self.config.guild(ctx.guild).clear_raw(key)
+            del guild_config[key]  # Ensure the key is removed from the local guild_config as well
 
+        await self.config.guild(ctx.guild).set(guild_config)  # Save the updated config back to the database
         await ctx.send(f"Removed {len(keys_to_remove)} no longer used patterns from the config.")
