@@ -102,8 +102,8 @@ class InfoControl(commands.Cog):
                             # Mention moderator roles if any are set
                             moderator_roles = guild_config.get("moderator_roles", [])
                             if moderator_roles:
-                                mentions = " ".join([f"<@&{role.id}>" for role in message.guild.roles if role.id in moderator_roles])
-                                await log_channel.send(content=mentions, embed=log_embed)
+                                mentions = " ".join([f"<@&{role_id}>" for role_id in moderator_roles])
+                                await log_channel.send(content=mentions, embed=log_embed, allowed_mentions=discord.AllowedMentions(roles=True))
                             else:
                                 await log_channel.send(embed=log_embed)
 
