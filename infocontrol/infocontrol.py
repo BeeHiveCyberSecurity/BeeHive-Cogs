@@ -220,6 +220,9 @@ class InfoControl(commands.Cog):
         
         settings_list.append(("Alert channel", log_channel_value))
         
+        cog_status = "Enabled" if guild_config.get("enabled", False) else "Disabled"
+        settings_list.append(("Cog status", cog_status))
+        
         pages = [settings_list[i:i + 9] for i in range(0, len(settings_list), 9)]
         
         current_page = 0
