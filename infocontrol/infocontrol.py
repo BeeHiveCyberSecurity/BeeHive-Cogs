@@ -64,7 +64,7 @@ class InfoControl(commands.Cog):
                 "tax_id": r"\b\d{2}-\d{7}\b",
                 "medical_id": r"\b[A-Z0-9]{10}\b",
                 "student_id": r"\b[A-Z0-9]{8}\b",
-                "license_plate": r"\b[A-Z0-9]{1,7}\b"
+                "license_plate": r"\b[A-Z0-9]{6,7}\b"
             }
         }
         self.config.register_guild(**default_guild)
