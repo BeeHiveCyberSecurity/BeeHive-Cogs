@@ -78,7 +78,7 @@ class InfoControl(commands.Cog):
                     await message.delete()
                     embed = discord.Embed(
                         title="Message removed",
-                        description=f"{message.author.mention}, your message contained potentially sensitive information and was removed. This server asks that you not share personally identifying information of your own, or of others.",
+                        description=f"{message.author.mention}, your message contained a match for one or more potential categories and was removed as a precaution.",
                         color=0xff4545
                     )
                     await message.channel.send(embed=embed)
