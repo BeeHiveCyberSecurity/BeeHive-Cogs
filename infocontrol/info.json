@@ -1,9 +1,9 @@
 {
-    "name": "noinfo",
+    "name": "infocontrol",
     "author": ["adminelevation"],
-    "description": "A cog to automatically delete messages containing sensitive information such as emails, SSNs, bank card numbers, and phone numbers.",
+    "description": "Manage what types of potentially sensitive information users are and are not allowed to share. Enable all protections to impede DOXing",
     "short": "Automatically delete sensitive information.",
-    "install_msg": "Thank you for installing NoInfo. Use `[p]noinfo` to manage settings.",
+    "install_msg": "Thank you for installing InfoControl. Use `[p]infocontrol` to manage settings.",
     "requirements": [],
     "tags": ["moderation", "security", "privacy"],
     "min_bot_version": "3.5.0",
