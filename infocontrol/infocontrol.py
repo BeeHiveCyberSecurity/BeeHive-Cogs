@@ -23,7 +23,7 @@ class InfoControl(commands.Cog):
                 "phone_no_spaces": r"\b\d{10}\b",
                 "ipv4": r"\b((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b",
                 "ipv6": r"\b([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}\b",
-                "creditcard": r"\b(?:\d[ -]*?){13,19}\b",
+                "creditcard": r"\b(?:\d[ -]?){13,19}\b",
                 "passport": r"\b[A-PR-WYa-pr-wy][1-9]\d\s?\d{4}[1-9]\b",
                 "iban": r"\b[A-Z]{2}\d{2}[A-Z0-9]{1,30}\b",
                 "mac_address": r"\b([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})\b",
