@@ -84,11 +84,15 @@ class InfoControl(commands.Cog):
                         log_channel = self.bot.get_channel(log_channel_id)
                         if log_channel:
                             log_embed = discord.Embed(
-                                title="InfoControl Deletion Log",
-                                description=f"Message from {message.author.mention} was removed in {message.channel.mention}.",
+                                title="Sensitive content matched and removed",
+                                description=f"A message from {message.author.mention} was removed in {message.channel.mention} due to containing potentially sensitive information.",
                                 color=0xff4545
                             )
-                            log_embed.add_field(name="Content", value=message.content, inline=False)
+                            log_embed.add_field(name="Author", value=message.author.mention, inline=True)
+                            log_embed.add_field(name="Channel", value=message.channel.mention, inline=True)
+                            log_embed.add_field(name="Message content", value=message.content, inline=False)
+                            log_embed.add_field(name="Pattern matched", value=key, inline=True)
+                            log_embed.set_footer(text=f"Message ID: {message.id} | Author ID: {message.author.id}")
                             await log_channel.send(embed=log_embed)
 
                 except Exception as e:
