@@ -13,6 +13,18 @@ class NoInfo(commands.Cog):
             "block_ssn": True,
             "block_bankcard": True,
             "block_phone": True,
+            "block_ipv4": True,
+            "block_ipv6": True,
+            "block_creditcard": True,
+            "block_passport": True,
+            "block_iban": True,
+            "block_mac_address": True,
+            "block_bitcoin_address": True,
+            "block_swift_code": True,
+            "block_drivers_license": True,
+            "block_vin": True,
+            "block_ssn_alternative": True,
+            "block_phone_alternative": True,
             "patterns": {
                 "email": r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b",
                 "ssn": r"\b\d{3}-\d{2}-\d{4}\b",
@@ -77,8 +89,12 @@ class NoInfo(commands.Cog):
 
     @noinfo.command()
     async def toggle(self, ctx, data_type: str):
-        """Toggle blocking of a specific data type (email, ssn, bankcard, phone)."""
-        valid_types = ["email", "ssn", "bankcard", "phone"]
+        """Toggle blocking of a specific data type."""
+        valid_types = [
+            "email", "ssn", "bankcard", "phone", "ipv4", "ipv6", "creditcard", 
+            "passport", "iban", "mac_address", "bitcoin_address", "swift_code", 
+            "drivers_license", "vin", "ssn_alternative", "phone_alternative"
+        ]
         if data_type not in valid_types:
             await ctx.send(f"Invalid data type. Valid types are: {', '.join(valid_types)}")
             return
@@ -97,4 +113,3 @@ class NoInfo(commands.Cog):
 
 def setup(bot):
     bot.add_cog(NoInfo(bot))
-
