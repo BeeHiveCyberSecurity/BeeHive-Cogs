@@ -140,7 +140,7 @@ class InfoControl(commands.Cog):
             embed = discord.Embed(
                 title="Invalid Data Type",
                 description=f"Valid types are: {', '.join(valid_types)}",
-                color=discord.Color.red()
+                color=0xff4545
             )
             await ctx.send(embed=embed)
             return
@@ -151,7 +151,7 @@ class InfoControl(commands.Cog):
         embed = discord.Embed(
             title="Blocking Toggled",
             description=f"Blocking for {data_type} is now {status}.",
-            color=discord.Color.green() if status == "enabled" else discord.Color.red()
+            color=0x2bbd8e if status == "enabled" else 0xff4545
         )
         await ctx.send(embed=embed)
 
