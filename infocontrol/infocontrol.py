@@ -9,7 +9,7 @@ class InfoControl(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.config = Config.get_conf(self, identifier=1234567890, version=1)
+        self.config = Config.get_conf(self, identifier=1234567890)
         default_guild = {
             "enabled": True,
             "block_email": True,
