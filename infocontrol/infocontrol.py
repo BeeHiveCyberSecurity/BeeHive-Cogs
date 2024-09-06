@@ -1,5 +1,6 @@
 import re
 import discord #type: ignore
+import asyncio
 from redbot.core import commands, Config #type: ignore
 
 class InfoControl(commands.Cog):
