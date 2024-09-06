@@ -47,9 +47,7 @@ class InfoControl(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if message.author.bot or not message.guild or not message.mentions:
-            return
-        if any(mention in message.content for mention in message.mentions):
+        if message.author.bot or not message.guild:
             return
 
         guild_config = await self.config.guild(message.guild).all()
@@ -76,6 +74,13 @@ class InfoControl(commands.Cog):
                 log_channel = self.bot.get_channel(log_channel_id)
                 if log_channel:
                     await self.log_deletion(message, key, log_channel, guild_config)
+        except discord.Forbidden:
+            embed = discord.Embed(
+                title="Error",
+                description="I do not have permission to delete messages.",
+                color=discord.Color.red()
+            )
+            await message.channel.send(embed=embed)
         except Exception as e:
             embed = discord.Embed(
                 title="Error",
