@@ -33,7 +33,7 @@ class RansomwareDotLive(commands.Cog):
                     if 'activity' in item:
                         embed.add_field(name="Activity", value=item['activity'], inline=False)
                     if 'country' in item:
-                        embed.add_field(name="Country", value=item['country'], inline=False)
+                        embed.add_field(name="Country of business", value=item['country'], inline=False)
                     
                     # Convert datetime string to timestamp
                     if 'published' in item:
@@ -43,9 +43,9 @@ class RansomwareDotLive(commands.Cog):
                         discovered_timestamp = int(datetime.datetime.strptime(item['discovered'], "%Y-%m-%d %H:%M:%S.%f").timestamp())
                         embed.add_field(name="Discovered by indexer", value=f"**<t:{discovered_timestamp}:R>**", inline=False)
                     if 'group_name' in item:
-                        embed.add_field(name="Group Name", value=item['group_name'], inline=False)
+                        embed.add_field(name="Ransomers known as", value=item['group_name'], inline=False)
                     if 'website' in item:
-                        embed.add_field(name="Website", value=item['website'], inline=False)
+                        embed.add_field(name="Website compromised", value=item['website'], inline=False)
                     
                     pages.append(embed)
 
