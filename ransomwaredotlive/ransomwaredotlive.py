@@ -32,7 +32,7 @@ class RansomwareDotLive(commands.Cog):
                     
                     if 'description' in group and group['description']:
                         # Transform HTML to markdown in the description
-                        description = group['description'].replace('<br>', '\n').replace('<b>', '**').replace('</b>', '**')
+                        description = group['description'].replace('<br>', '\n').replace('<b>', '**').replace('</b>', '**').replace('<BR>', '\n')
                         embed.description = description
                     
                     if 'locations' in group:
