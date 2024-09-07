@@ -26,17 +26,14 @@ class RansomwareDotLive(commands.Cog):
                 pages = []
                 for item in data:
                     embed = discord.Embed(title=item["post_title"], color=discord.Color.red())
-                    description = (
-                        f"**Activity:** {item['activity']}\n"
-                        f"**Country:** {item['country']}\n"
-                        f"**Description:** {item['description']}\n"
-                        f"**Discovered:** {item['discovered']}\n"
-                        f"**Group Name:** {item['group_name']}\n"
-                        f"**Published:** {item['published']}\n"
-                        f"**Website:** {item['website']}\n"
-                        f"[More Info]({item['post_url']})"
-                    )
-                    embed.description = description
+                    embed.description = item['description']
+                    embed.add_field(name="Activity", value=item['activity'], inline=False)
+                    embed.add_field(name="Country", value=item['country'], inline=False)
+                    embed.add_field(name="Discovered", value=f"<t:{int(item['discovered'])}:R>", inline=False)
+                    embed.add_field(name="Group Name", value=item['group_name'], inline=False)
+                    embed.add_field(name="Published", value=f"<t:{int(item['published'])}:R>", inline=False)
+                    embed.add_field(name="Website", value=item['website'], inline=False)
+                    embed.add_field(name="More Info", value=f"[More Info]({item['post_url']})", inline=False)
                     pages.append(embed)
 
                 message = await ctx.send(embed=pages[0])
