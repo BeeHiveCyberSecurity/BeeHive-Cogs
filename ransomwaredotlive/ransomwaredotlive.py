@@ -31,7 +31,7 @@ class RansomwareDotLive(commands.Cog):
                     embed.description = item['description']
                     
                     if 'activity' in item:
-                        embed.add_field(name="Activity", value=item['activity'], inline=False)
+                        embed.add_field(name="Industry of service", value=item['activity'], inline=False)
                     if 'country' in item:
                         embed.add_field(name="Country of business", value=item['country'], inline=False)
                     
@@ -44,7 +44,7 @@ class RansomwareDotLive(commands.Cog):
                         embed.add_field(name="Discovered by indexer", value=f"**<t:{discovered_timestamp}:R>**", inline=False)
                     if 'group_name' in item:
                         embed.add_field(name="Ransomers known as", value=item['group_name'], inline=False)
-                    if 'website' in item:
+                    if 'website' in item and item['website'] and item['website'].strip():
                         embed.add_field(name="Website compromised", value=item['website'], inline=False)
                     
                     pages.append(embed)
