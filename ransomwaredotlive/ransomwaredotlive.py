@@ -30,9 +30,14 @@ class RansomwareDotLive(commands.Cog):
                     embed.description = item['description']
                     embed.add_field(name="Activity", value=item['activity'], inline=False)
                     embed.add_field(name="Country", value=item['country'], inline=False)
-                    embed.add_field(name="Discovered", value=f"<t:{int(item['discovered'])}:R>", inline=False)
+                    
+                    # Convert datetime string to timestamp
+                    discovered_timestamp = int(datetime.datetime.strptime(item['discovered'], "%Y-%m-%d %H:%M:%S.%f").timestamp())
+                    published_timestamp = int(datetime.datetime.strptime(item['published'], "%Y-%m-%d %H:%M:%S.%f").timestamp())
+                    
+                    embed.add_field(name="Discovered", value=f"<t:{discovered_timestamp}:R>", inline=False)
                     embed.add_field(name="Group Name", value=item['group_name'], inline=False)
-                    embed.add_field(name="Published", value=f"<t:{int(item['published'])}:R>", inline=False)
+                    embed.add_field(name="Published", value=f"<t:{published_timestamp}:R>", inline=False)
                     embed.add_field(name="Website", value=item['website'], inline=False)
                     embed.add_field(name="More Info", value=f"[More Info]({item['post_url']})", inline=False)
                     pages.append(embed)
