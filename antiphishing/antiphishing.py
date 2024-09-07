@@ -728,24 +728,24 @@ class AntiPhishing(commands.Cog):
         embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/notifications.png")
         await ctx.send(embed=embed)
 
-        @antiphishing.command()
-        @commands.has_permissions(administrator=True)
-        async def settings(self, ctx: Context):
-            """
-            Show the current antiphishing settings.
-            """
-            guild_data = await self.config.guild(ctx.guild).all()
-            embed = discord.Embed(
-                title='Antiphishing Settings',
-                colour=0xffd966,
-            )
-            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/settings.png")
-            embed.add_field(name="Maximum Links", value=f"{guild_data['max_links']}")
-            embed.add_field(name="Enabled", value=f"{guild_data['enabled']}")
-            embed.add_field(name="Verbose", value=f"{guild_data['verbose']}")
-            embed.add_field(name="Log", value=f"{guild_data['log']}")
-            embed.add_field(name="Warn", value=f"{guild_data['warn']}")
-            embed.add_field(name="Kick", value=f"{guild_data['kick']}")
-            embed.add_field(name="Ban", value=f"{guild_data['ban']}")
-            await ctx.send(embed=embed)
+    @antiphishing.command()
+    @commands.has_permissions(administrator=True)
+    async def settings(self, ctx: Context):
+        """
+        Show the current antiphishing settings.
+        """
+        guild_data = await self.config.guild(ctx.guild).all()
+        embed = discord.Embed(
+            title='Antiphishing Settings',
+            colour=0xffd966,
+        )
+        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/settings.png")
+        embed.add_field(name="Maximum Links", value=f"{guild_data['max_links']}")
+        embed.add_field(name="Enabled", value=f"{guild_data['enabled']}")
+        embed.add_field(name="Verbose", value=f"{guild_data['verbose']}")
+        embed.add_field(name="Log", value=f"{guild_data['log']}")
+        embed.add_field(name="Warn", value=f"{guild_data['warn']}")
+        embed.add_field(name="Kick", value=f"{guild_data['kick']}")
+        embed.add_field(name="Ban", value=f"{guild_data['ban']}")
+        await ctx.send(embed=embed)
 
