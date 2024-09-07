@@ -38,10 +38,10 @@ class RansomwareDotLive(commands.Cog):
                     # Convert datetime string to timestamp
                     if 'published' in item:
                         published_timestamp = int(datetime.datetime.strptime(item['published'], "%Y-%m-%d %H:%M:%S.%f").timestamp())
-                        embed.add_field(name="Published by hackers", value=f"<t:{published_timestamp}:R>", inline=False)
+                        embed.add_field(name="Published by hackers", value=f"**<t:{published_timestamp}:R>**", inline=False)
                     if 'discovered' in item:
                         discovered_timestamp = int(datetime.datetime.strptime(item['discovered'], "%Y-%m-%d %H:%M:%S.%f").timestamp())
-                        embed.add_field(name="Discovered by indexer", value=f"<t:{discovered_timestamp}:R>", inline=False)
+                        embed.add_field(name="Discovered by indexer", value=f"**<t:{discovered_timestamp}:R>**", inline=False)
                     if 'group_name' in item:
                         embed.add_field(name="Group Name", value=item['group_name'], inline=False)
                     if 'website' in item:
