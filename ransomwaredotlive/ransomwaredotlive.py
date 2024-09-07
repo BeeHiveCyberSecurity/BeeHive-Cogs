@@ -1,8 +1,9 @@
 import discord #type: ignore
-from redbot.core import commands, tasks #type: ignore
+from redbot.core import commands #type: ignore
 import aiohttp #type: ignore
 import asyncio
 import datetime
+from discord.ext import tasks #type: ignore
 
 class RansomwareDotLive(commands.Cog):
     """Interact with the ransomware.live API"""
