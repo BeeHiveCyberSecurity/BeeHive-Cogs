@@ -23,6 +23,7 @@ class RansomwareDotLive(commands.Cog):
         """Ransomware.live API commands"""
         pass
 
+
     @ransomware.command()
     async def groups(self, ctx):
         """Get the list of ransomware groups"""
@@ -161,13 +162,18 @@ class RansomwareDotLive(commands.Cog):
                             await message.remove_reaction(emoji, self.bot.user)
                         break
 
-    @ransomware.command()
-    async def alerts(self, ctx, channel: discord.TextChannel):
+    @commands.group()
+    async def ransomwareset(self, ctx):
+        "Configure ransomware monitoring and alerting functionality"
+        pass
+
+    @ransomwareset.command()
+    async def alertchannel(self, ctx, channel: discord.TextChannel):
         """Set a channel for new ransomware victim alerts"""
         self.alert_channel_id = channel.id
         await ctx.send(f"Alerts channel set to {channel.mention}")
 
-    @ransomware.command()
+    @ransomwareset.command()
     async def alertrole(self, ctx, role: discord.Role):
         """Set a role to be mentioned for new ransomware victim alerts"""
         self.alert_role_id = role.id
