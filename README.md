@@ -41,7 +41,7 @@ Access detailed weather information, forecasts, and historical data for any loca
 
 ### [ping](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/ping)
 
-A nice, functional ping-and-speedtest cog that shows your host latency, transit latency, download speed, and upload speed in a neat, orderly, no-frills embed. If your bot is hosted on a poor quality connection, includes a special offer when detected. `[p]ping`
+A nice, functional ping-and-speedtest cog that shows your host latency, transit latency, download speed, and upload speed in a neat, orderly, no-frills embed. If your bot is hosted on a poor quality connection, includes a special offer when detected. `[p]ping`.
 
 ```
 [p]cog install BeeHive-Cogs ping
@@ -63,7 +63,7 @@ Help manage unruly, unsightly, and otherwise annoying nicknames/screennames in y
 
 ### [antiphishing](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/antiphishing)
 
-Passively detect and remove known malicious websites sent in your server's chats. `[p]antiphishing`
+Passively detect and remove known malicious websites sent in your server's chats. `[p]antiphishing`.
 
 ```
 [p]cog install BeeHive-Cogs antiphishing
@@ -188,6 +188,17 @@ Leverage the power of the URLScan.io API with a `free` URLScan API Key to evalua
 ```
 ```
 [p]set api urlscan api_key YOURAPIKEYHERE
+```
+
+### [ransomwaredotlive](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/ransomwaredotlive)
+
+Integrate the Ransomware.live API with your Red-DiscordBot to monitor and receive updates on the latest ransomware activities as well as query information about recent and historical ransomware attacks.`[p]ransomware`.
+
+```
+[p]cog install BeeHive-Cogs ransomwaredotlive
+```
+```
+[p]load ransomwaredotlive
 ```
 
 ### [stripeidentity](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/stripeidentity)
