@@ -4,6 +4,9 @@
 
 The `RansomwareDotLive` cog allows you to interact with the ransomware.live API to fetch and display information about ransomware groups and recent victims. This cog provides commands to get the list of ransomware groups, recent ransomware incidents, and configure alerting for new ransomware victims.
 
+![img](https://i.imgur.com/dAb1ptW.png)
+
+
 ## Features
 
 - **Fetch Ransomware Groups**: Retrieve and display a list of ransomware groups from the ransomware.live API.
