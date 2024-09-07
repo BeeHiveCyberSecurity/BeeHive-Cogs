@@ -58,7 +58,7 @@ class RansomwareDotLive(commands.Cog):
                     view.add_item(button)
                     await message.edit(view=view)
 
-                emojis = ['⬅️', '➡️', '❌']
+                emojis = ['⬅️', '❌', '➡️']
                 for emoji in emojis:
                     await message.add_reaction(emoji)
 
