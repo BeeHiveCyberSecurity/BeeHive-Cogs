@@ -1,3 +1,4 @@
+from urllib.parse import urlparse
 import discord #type: ignore
 import asyncio
 from redbot.core import commands, Config #type: ignore
