@@ -251,9 +251,18 @@ class Meetings(commands.Cog):
                 try:
                     link_msg = await self.bot.wait_for('message', check=check, timeout=60)
                     meeting_link = link_msg.content
-                    if (location == "zoom" and "zoom.us" in meeting_link) or (location == "google" and "meet.google.com" in meeting_link):
-                        break
-                    else:
+                    try:
+                        parsed_url = urlparse(meeting_link)
+                        if (location == "zoom" and parsed_url.hostname.endswith("zoom.us")) or (location == "google" and parsed_url.hostname.endswith("meet.google.com")):
+                            break
+                        else:
+                            embed = discord.Embed(
+                                title="Invalid link",
+                                description=f"Please provide a valid {location} meeting link.",
+                                color=0xff4545
+                            )
+                            await ctx.send(embed=embed)
+                    except ValueError:
                         embed = discord.Embed(
                             title="Invalid link",
                             description=f"Please provide a valid {location} meeting link.",
