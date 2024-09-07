@@ -1,0 +1,11 @@
+{
+    "name": "ransomwaredotlive",
+    "author": ["adminelevation"],
+    "description": "Interact with the ransomware.live API to fetch and display the latest ransomware information.",
+    "install_msg": "Thank you for installing. Use `[p]ransomware` to get started.",
+    "short": "Interact with ransomware.live API",
+    "requirements": ["aiohttp"],
+    "tags": ["ransomware", "API", "security"]
+}
+
+
