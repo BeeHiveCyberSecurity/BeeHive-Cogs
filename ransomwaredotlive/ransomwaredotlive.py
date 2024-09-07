@@ -29,17 +29,23 @@ class RansomwareDotLive(commands.Cog):
                 for item in data:
                     embed = discord.Embed(title=item["post_title"], color=0xfffffe)
                     embed.description = item['description']
-                    embed.add_field(name="Activity", value=item['activity'], inline=False)
-                    embed.add_field(name="Country", value=item['country'], inline=False)
+                    
+                    if 'activity' in item:
+                        embed.add_field(name="Activity", value=item['activity'], inline=False)
+                    if 'country' in item:
+                        embed.add_field(name="Country", value=item['country'], inline=False)
                     
                     # Convert datetime string to timestamp
-                    discovered_timestamp = int(datetime.datetime.strptime(item['discovered'], "%Y-%m-%d %H:%M:%S.%f").timestamp())
-                    published_timestamp = int(datetime.datetime.strptime(item['published'], "%Y-%m-%d %H:%M:%S.%f").timestamp())
-                    
-                    embed.add_field(name="Discovered", value=f"<t:{discovered_timestamp}:R>", inline=False)
-                    embed.add_field(name="Group Name", value=item['group_name'], inline=False)
-                    embed.add_field(name="Published", value=f"<t:{published_timestamp}:R>", inline=False)
-                    embed.add_field(name="Website", value=item['website'], inline=False)
+                    if 'discovered' in item:
+                        discovered_timestamp = int(datetime.datetime.strptime(item['discovered'], "%Y-%m-%d %H:%M:%S.%f").timestamp())
+                        embed.add_field(name="Discovered", value=f"<t:{discovered_timestamp}:R>", inline=False)
+                    if 'group_name' in item:
+                        embed.add_field(name="Group Name", value=item['group_name'], inline=False)
+                    if 'published' in item:
+                        published_timestamp = int(datetime.datetime.strptime(item['published'], "%Y-%m-%d %H:%M:%S.%f").timestamp())
+                        embed.add_field(name="Published", value=f"<t:{published_timestamp}:R>", inline=False)
+                    if 'website' in item:
+                        embed.add_field(name="Website", value=item['website'], inline=False)
                     
                     pages.append(embed)
 
@@ -48,7 +54,7 @@ class RansomwareDotLive(commands.Cog):
                 # Add URL button if post_url is present
                 if 'post_url' in data[0]:
                     view = discord.ui.View()
-                    button = discord.ui.Button(label="More Info", url=data[0]['post_url'])
+                    button = discord.ui.Button(label="Read the leak post", url=data[0]['post_url'])
                     view.add_item(button)
                     await message.edit(view=view)
 
