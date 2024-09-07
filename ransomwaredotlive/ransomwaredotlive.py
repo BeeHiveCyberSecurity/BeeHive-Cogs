@@ -1,6 +1,6 @@
-import discord
-from redbot.core import commands
-import aiohttp
+import discord #type: ignore
+from redbot.core import commands #type: ignore
+import aiohttp #type: ignore
 import asyncio
 import datetime
 
@@ -76,4 +76,6 @@ class RansomwareDotLive(commands.Cog):
 
                         await message.remove_reaction(reaction, user)
                     except asyncio.TimeoutError:
+                        for emoji in emojis:
+                            await message.remove_reaction(emoji, self.bot.user)
                         break
