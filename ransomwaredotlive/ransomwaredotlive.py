@@ -52,11 +52,18 @@ class RansomwareDotLive(commands.Cog):
                 message = await ctx.send(embed=pages[0])
 
                 # Add URL button if post_url is present
+                view = discord.ui.View()
                 if 'post_url' in data[0]:
-                    view = discord.ui.View()
                     button = discord.ui.Button(label="Read the leak post", url=data[0]['post_url'])
                     view.add_item(button)
-                    await message.edit(view=view)
+
+                # Add URL button to search the group name on Google if group_name is present
+                if 'group_name' in data[0]:
+                    google_search_url = f"https://www.google.com/search?q={data[0]['group_name']}"
+                    google_button = discord.ui.Button(label="Search on web", url=google_search_url)
+                    view.add_item(google_button)
+
+                await message.edit(view=view)
 
                 emojis = ['⬅️', '❌', '➡️']
                 for emoji in emojis:
