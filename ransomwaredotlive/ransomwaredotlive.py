@@ -27,7 +27,7 @@ class RansomwareDotLive(commands.Cog):
                 data = await response.json()
                 pages = []
                 for item in data:
-                    embed = discord.Embed(title=item["post_title"], color=discord.Color.red())
+                    embed = discord.Embed(title=item["post_title"], color=0xfffffe)
                     embed.description = item['description']
                     embed.add_field(name="Activity", value=item['activity'], inline=False)
                     embed.add_field(name="Country", value=item['country'], inline=False)
@@ -40,10 +40,17 @@ class RansomwareDotLive(commands.Cog):
                     embed.add_field(name="Group Name", value=item['group_name'], inline=False)
                     embed.add_field(name="Published", value=f"<t:{published_timestamp}:R>", inline=False)
                     embed.add_field(name="Website", value=item['website'], inline=False)
-                    embed.add_field(name="More Info", value=f"[More Info]({item['post_url']})", inline=False)
+                    
                     pages.append(embed)
 
                 message = await ctx.send(embed=pages[0])
+
+                # Add URL button if post_url is present
+                if 'post_url' in data[0]:
+                    view = discord.ui.View()
+                    button = discord.ui.Button(label="More Info", url=data[0]['post_url'])
+                    view.add_item(button)
+                    await message.edit(view=view)
 
                 emojis = ['⬅️', '➡️', '❌']
                 for emoji in emojis:
