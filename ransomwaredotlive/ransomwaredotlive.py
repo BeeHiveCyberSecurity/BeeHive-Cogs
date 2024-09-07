@@ -23,7 +23,6 @@ class RansomwareDotLive(commands.Cog):
         """Ransomware.live API commands"""
         pass
 
-
     @ransomware.command()
     async def groups(self, ctx):
         """Get the list of ransomware groups"""
@@ -106,14 +105,20 @@ class RansomwareDotLive(commands.Cog):
                     
                     # Convert datetime string to timestamp
                     if 'published' in item:
-                        published_timestamp = int(datetime.datetime.strptime(item['published'], "%Y-%m-%d %H:%M:%S.%f").timestamp())
-                        embed.add_field(name="Published by hackers", value=f"**<t:{published_timestamp}:R>**", inline=True)
+                        try:
+                            published_timestamp = int(datetime.datetime.strptime(item['published'], "%Y-%m-%d %H:%M:%S.%f").timestamp())
+                            embed.add_field(name="Published by hackers", value=f"**<t:{published_timestamp}:R>**", inline=True)
+                        except ValueError:
+                            pass
                     if 'discovered' in item:
-                        discovered_timestamp = int(datetime.datetime.strptime(item['discovered'], "%Y-%m-%d %H:%M:%S.%f").timestamp())
-                        embed.add_field(name="Discovered by indexer", value=f"**<t:{discovered_timestamp}:R>**", inline=True)
+                        try:
+                            discovered_timestamp = int(datetime.datetime.strptime(item['discovered'], "%Y-%m-%d %H:%M:%S.%f").timestamp())
+                            embed.add_field(name="Discovered by indexer", value=f"**<t:{discovered_timestamp}:R>**", inline=True)
+                        except ValueError:
+                            pass
                     if 'group_name' in item:
                         embed.add_field(name="Ransom group", value=f"`{item['group_name']}`", inline=True)
-                    if 'website' in item and item['website'] and item['website'].strip():
+                    if 'website' in item and item['website'].strip():
                         embed.add_field(name="Website compromised", value=f"`{item['website']}`", inline=True)
                     
                     pages.append(embed)
@@ -200,14 +205,20 @@ class RansomwareDotLive(commands.Cog):
             
             # Convert datetime string to timestamp
             if 'published' in item:
-                published_timestamp = int(datetime.datetime.strptime(item['published'], "%Y-%m-%d %H:%M:%S.%f").timestamp())
-                embed.add_field(name="Published by hackers", value=f"**<t:{published_timestamp}:R>**", inline=True)
+                try:
+                    published_timestamp = int(datetime.datetime.strptime(item['published'], "%Y-%m-%d %H:%M:%S.%f").timestamp())
+                    embed.add_field(name="Published by hackers", value=f"**<t:{published_timestamp}:R>**", inline=True)
+                except ValueError:
+                    pass
             if 'discovered' in item:
-                discovered_timestamp = int(datetime.datetime.strptime(item['discovered'], "%Y-%m-%d %H:%M:%S.%f").timestamp())
-                embed.add_field(name="Discovered by indexer", value=f"**<t:{discovered_timestamp}:R>**", inline=True)
+                try:
+                    discovered_timestamp = int(datetime.datetime.strptime(item['discovered'], "%Y-%m-%d %H:%M:%S.%f").timestamp())
+                    embed.add_field(name="Discovered by indexer", value=f"**<t:{discovered_timestamp}:R>**", inline=True)
+                except ValueError:
+                    pass
             if 'group_name' in item:
                 embed.add_field(name="Ransom group", value=f"`{item['group_name']}`", inline=True)
-            if 'website' in item and item['website'] and item['website'].strip():
+            if 'website' in item and item['website'].strip():
                 embed.add_field(name="Website compromised", value=f"`{item['website']}`", inline=True)
             
             await channel.send(content=role_mention, embed=embed)
