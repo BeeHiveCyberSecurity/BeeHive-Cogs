@@ -1,6 +1,7 @@
 import discord
 from redbot.core import commands
 import aiohttp
+import asyncio
 
 class RansomwareDotLive(commands.Cog):
     """Interact with the ransomware.live API"""
