@@ -253,7 +253,7 @@ class Meetings(commands.Cog):
                     meeting_link = link_msg.content
                     try:
                         parsed_url = urlparse(meeting_link)
-                        if (location == "zoom" and parsed_url.hostname.endswith("zoom.us")) or (location == "google" and parsed_url.hostname.endswith("meet.google.com")):
+                        if (location == "zoom" and parsed_url.hostname.endswith("zoom.us") and parsed_url.path.startswith("/j/")) or (location == "google" and parsed_url.hostname.endswith("meet.google.com") and parsed_url.path.startswith("/")):
                             break
                         else:
                             embed = discord.Embed(
