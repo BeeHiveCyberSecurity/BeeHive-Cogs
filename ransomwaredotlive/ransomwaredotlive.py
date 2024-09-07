@@ -1,5 +1,5 @@
 import discord #type: ignore
-from redbot.core import commands #type: ignore
+from redbot.core import commands, tasks #type: ignore
 import aiohttp #type: ignore
 import asyncio
 import datetime
@@ -9,12 +9,17 @@ class RansomwareDotLive(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        self.alert_channel_id = None
+        self.last_checked = datetime.datetime.utcnow()
+        self.check_recent_victims.start()
+
+    def cog_unload(self):
+        self.check_recent_victims.cancel()
 
     @commands.group()
     async def ransomware(self, ctx):
         """Ransomware.live API commands"""
         pass
-
 
     @ransomware.command()
     async def groups(self, ctx):
@@ -75,12 +80,6 @@ class RansomwareDotLive(commands.Cog):
                             break
 
                     await message.clear_reactions()
-
-
-
-
-
-
 
     @ransomware.command()
     async def recent(self, ctx):
@@ -159,3 +158,54 @@ class RansomwareDotLive(commands.Cog):
                         for emoji in emojis:
                             await message.remove_reaction(emoji, self.bot.user)
                         break
+
+    @ransomware.command()
+    async def alerts(self, ctx, channel: discord.TextChannel):
+        """Set a channel for new ransomware victim alerts"""
+        self.alert_channel_id = channel.id
+        await ctx.send(f"Alerts channel set to {channel.mention}")
+
+    async def send_alert(self, data):
+        if self.alert_channel_id is None:
+            return
+
+        channel = self.bot.get_channel(self.alert_channel_id)
+        if channel is None:
+            return
+
+        for item in data:
+            embed = discord.Embed(title=item["post_title"], color=0xfffffe)
+            embed.description = item['description']
+            
+            if 'activity' in item:
+                embed.add_field(name="Industry of service", value=item['activity'], inline=True)
+            if 'country' in item:
+                embed.add_field(name="Country of business", value=item['country'], inline=True)
+            
+            # Convert datetime string to timestamp
+            if 'published' in item:
+                published_timestamp = int(datetime.datetime.strptime(item['published'], "%Y-%m-%d %H:%M:%S.%f").timestamp())
+                embed.add_field(name="Published by hackers", value=f"**<t:{published_timestamp}:R>**", inline=True)
+            if 'discovered' in item:
+                discovered_timestamp = int(datetime.datetime.strptime(item['discovered'], "%Y-%m-%d %H:%M:%S.%f").timestamp())
+                embed.add_field(name="Discovered by indexer", value=f"**<t:{discovered_timestamp}:R>**", inline=True)
+            if 'group_name' in item:
+                embed.add_field(name="Ransom group", value=f"`{item['group_name']}`", inline=True)
+            if 'website' in item and item['website'] and item['website'].strip():
+                embed.add_field(name="Website compromised", value=f"`{item['website']}`", inline=True)
+            
+            await channel.send(embed=embed)
+
+    @tasks.loop(minutes=10)
+    async def check_recent_victims(self):
+        async with aiohttp.ClientSession() as session:
+            async with session.get("https://api.ransomware.live/recentvictims") as response:
+                if response.status != 200:
+                    return
+
+                data = await response.json()
+                new_victims = [item for item in data if datetime.datetime.strptime(item['published'], "%Y-%m-%d %H:%M:%S.%f") > self.last_checked]
+
+                if new_victims:
+                    await self.send_alert(new_victims)
+                    self.last_checked = datetime.datetime.utcnow()
