@@ -59,7 +59,7 @@ class RansomwareDotLive(commands.Cog):
 
                 # Add URL button to search the group name on Google if group_name is present
                 if 'group_name' in data[0]:
-                    google_search_url = f"https://www.google.com/search?q={data[0]['group_name']}"
+                    google_search_url = f"https://www.google.com/search?q={data[0]['group_name']}%20ransomware%20group"
                     google_button = discord.ui.Button(label="Search on web", url=google_search_url)
                     view.add_item(google_button)
 
