@@ -31,21 +31,21 @@ class RansomwareDotLive(commands.Cog):
                     embed.description = item['description']
                     
                     if 'activity' in item:
-                        embed.add_field(name="Industry of service", value=item['activity'], inline=False)
+                        embed.add_field(name="Industry of service", value=item['activity'], inline=True)
                     if 'country' in item:
-                        embed.add_field(name="Country of business", value=item['country'], inline=False)
+                        embed.add_field(name="Country of business", value=item['country'], inline=True)
                     
                     # Convert datetime string to timestamp
                     if 'published' in item:
                         published_timestamp = int(datetime.datetime.strptime(item['published'], "%Y-%m-%d %H:%M:%S.%f").timestamp())
-                        embed.add_field(name="Published by hackers", value=f"**<t:{published_timestamp}:R>**", inline=False)
+                        embed.add_field(name="Published by hackers", value=f"**<t:{published_timestamp}:R>**", inline=True)
                     if 'discovered' in item:
                         discovered_timestamp = int(datetime.datetime.strptime(item['discovered'], "%Y-%m-%d %H:%M:%S.%f").timestamp())
-                        embed.add_field(name="Discovered by indexer", value=f"**<t:{discovered_timestamp}:R>**", inline=False)
+                        embed.add_field(name="Discovered by indexer", value=f"**<t:{discovered_timestamp}:R>**", inline=True)
                     if 'group_name' in item:
-                        embed.add_field(name="Ransomers known as", value=item['group_name'], inline=False)
+                        embed.add_field(name="Ransom group", value=f"`{item['group_name']}`", inline=True)
                     if 'website' in item and item['website'] and item['website'].strip():
-                        embed.add_field(name="Website compromised", value=item['website'], inline=False)
+                        embed.add_field(name="Website compromised", value=item['website'], inline=True)
                     
                     pages.append(embed)
 
