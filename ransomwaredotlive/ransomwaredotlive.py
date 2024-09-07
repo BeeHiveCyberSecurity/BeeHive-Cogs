@@ -11,6 +11,7 @@ class RansomwareDotLive(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.alert_channel_id = None
+        self.alert_role_id = None
         self.last_checked = datetime.datetime.utcnow()
         self.check_recent_victims.start()
 
@@ -166,6 +167,12 @@ class RansomwareDotLive(commands.Cog):
         self.alert_channel_id = channel.id
         await ctx.send(f"Alerts channel set to {channel.mention}")
 
+    @ransomware.command()
+    async def alertrole(self, ctx, role: discord.Role):
+        """Set a role to be mentioned for new ransomware victim alerts"""
+        self.alert_role_id = role.id
+        await ctx.send(f"Alert role set to {role.mention}")
+
     async def send_alert(self, data):
         if self.alert_channel_id is None:
             return
@@ -173,6 +180,8 @@ class RansomwareDotLive(commands.Cog):
         channel = self.bot.get_channel(self.alert_channel_id)
         if channel is None:
             return
+
+        role_mention = f"<@&{self.alert_role_id}>" if self.alert_role_id else ""
 
         for item in data:
             embed = discord.Embed(title=item["post_title"], color=0xfffffe)
@@ -195,7 +204,7 @@ class RansomwareDotLive(commands.Cog):
             if 'website' in item and item['website'] and item['website'].strip():
                 embed.add_field(name="Website compromised", value=f"`{item['website']}`", inline=True)
             
-            await channel.send(embed=embed)
+            await channel.send(content=role_mention, embed=embed)
 
     @tasks.loop(minutes=10)
     async def check_recent_victims(self):
