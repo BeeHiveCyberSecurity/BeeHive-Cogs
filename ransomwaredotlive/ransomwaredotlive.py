@@ -45,7 +45,7 @@ class RansomwareDotLive(commands.Cog):
                     if 'group_name' in item:
                         embed.add_field(name="Ransom group", value=f"`{item['group_name']}`", inline=True)
                     if 'website' in item and item['website'] and item['website'].strip():
-                        embed.add_field(name="Website compromised", value=item['website'], inline=True)
+                        embed.add_field(name="Website compromised", value=f"`{item['website']}`", inline=True)
                     
                     pages.append(embed)
 
