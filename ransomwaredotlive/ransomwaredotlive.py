@@ -16,7 +16,7 @@ class RansomwareDotLive(commands.Cog):
         pass
 
     @ransomware.command()
-    async def latest(self, ctx):
+    async def recent(self, ctx):
         """Get the latest ransomware information"""
         async with aiohttp.ClientSession() as session:
             async with session.get("https://api.ransomware.live/recentvictims") as response:
