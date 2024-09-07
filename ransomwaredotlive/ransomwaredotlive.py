@@ -31,7 +31,9 @@ class RansomwareDotLive(commands.Cog):
                     embed = discord.Embed(title=group["name"], color=0xfffffe)
                     
                     if 'description' in group and group['description']:
-                        embed.description = group['description']
+                        # Transform HTML to markdown in the description
+                        description = group['description'].replace('<br>', '\n').replace('<b>', '**').replace('</b>', '**')
+                        embed.description = description
                     
                     if 'locations' in group:
                         for location in group['locations']:
@@ -50,9 +52,10 @@ class RansomwareDotLive(commands.Cog):
                 if len(pages) > 1:
                     await message.add_reaction("⬅️")
                     await message.add_reaction("➡️")
+                    await message.add_reaction("❌")  # Add close reaction
 
                     def check(reaction, user):
-                        return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️"] and reaction.message.id == message.id
+                        return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️", "❌"] and reaction.message.id == message.id
 
                     current_page = 0
                     while True:
@@ -62,6 +65,9 @@ class RansomwareDotLive(commands.Cog):
                                 current_page = (current_page - 1) % len(pages)
                             elif str(reaction.emoji) == "➡️":
                                 current_page = (current_page + 1) % len(pages)
+                            elif str(reaction.emoji) == "❌":
+                                await message.delete()
+                                break
 
                             await message.edit(embed=pages[current_page])
                             await message.remove_reaction(reaction, user)
