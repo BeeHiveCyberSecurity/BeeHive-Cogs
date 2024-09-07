@@ -166,18 +166,21 @@ class RansomwareDotLive(commands.Cog):
                         for emoji in emojis:
                             await message.remove_reaction(emoji, self.bot.user)
                         break
-
+                    
+    @commands.admin_or_permissions()
     @commands.group()
     async def ransomwareset(self, ctx):
         "Configure ransomware monitoring and alerting functionality"
         pass
 
+    @commands.admin_or_permissions()
     @ransomwareset.command()
     async def alertchannel(self, ctx, channel: discord.TextChannel):
         """Set a channel for new ransomware victim alerts"""
         self.alert_channel_id = channel.id
         await ctx.send(f"Alerts channel set to {channel.mention}")
 
+    @commands.admin_or_permissions()
     @ransomwareset.command()
     async def alertrole(self, ctx, role: discord.Role):
         """Set a role to be mentioned for new ransomware victim alerts"""

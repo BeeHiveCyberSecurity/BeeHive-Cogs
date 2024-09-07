@@ -25,6 +25,7 @@ class VirusTotal(commands.Cog):
         """VirusTotal is a free online service that analyzes files and URLs to detect viruses, malware, and other security threats. Learn more at https://www.virustotal.com"""
         await ctx.send_help(ctx.command)
 
+    @commands.admin_or_permissions()
     @virustotal.command(name="autoscan")
     async def toggle_auto_scan(self, ctx):
         """Toggle automatic file scanning on or off"""
@@ -35,6 +36,7 @@ class VirusTotal(commands.Cog):
         status = "enabled" if auto_scan_enabled else "disabled"
         await ctx.send(f"Automatic file scanning has been {status}.")
 
+    @commands.admin_or_permissions()
     @virustotal.command(name="infoemoji")
     async def toggle_info_emoji(self, ctx):
         """Toggle automatic info emoji reaction on or off"""

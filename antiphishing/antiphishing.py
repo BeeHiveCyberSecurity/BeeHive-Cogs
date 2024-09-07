@@ -168,8 +168,8 @@ class AntiPhishing(commands.Cog):
         Settings to configure phishing protection in this server.
         """
         
+    @commands.admin_or_permissions()    
     @antiphishing.command()
-    @commands.has_permissions(administrator=True)
     async def settings(self, ctx: Context):
         """
         Show the current antiphishing settings.
@@ -189,7 +189,7 @@ class AntiPhishing(commands.Cog):
         embed.add_field(name="Bans", value=f"{guild_data.get('bans', 'Not set')}")
         await ctx.send(embed=embed)
         
-    @commands.has_permissions(administrator=True)
+    @commands.admin_or_permissions()
     @antiphishing.command()
     async def action(self, ctx: Context, action: str):
         """
