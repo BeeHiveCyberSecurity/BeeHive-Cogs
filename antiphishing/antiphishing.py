@@ -19,7 +19,7 @@ class AntiPhishing(commands.Cog):
     Guard users from malicious links and phishing attempts with customizable protection options.
     """
 
-    __version__ = "1.5.8.3"
+    __version__ = "1.5.8.1"
     __last_updated__ = "September 7, 2024"
 
     def __init__(self, bot: Red):
@@ -59,48 +59,17 @@ class AntiPhishing(commands.Cog):
         urls = [match[0] for match in matches]
         return urls
 
-    async def get_links(self, message: discord.Message) -> Optional[List[str]]:
+    async def get_links(self, message: str) -> Optional[List[str]]:
         """
-        Get links from the message content and forward them if the server is enrolled.
+        Get links from the message content.
         """
         zero_width_chars = ["\u200b", "\u200c", "\u200d", "\u2060", "\uFEFF"]
-        message_content = message.content
         for char in zero_width_chars:
-            message_content = message_content.replace(char, "")
-        
-        if message_content:
-            links = self.extract_urls(message_content)
+            message = message.replace(char, "")
+        if message:
+            links = await self.extract_urls(message)
             if links:
-                unique_links = list(set(links))
-                
-                # Forward all URLs if the server is enrolled
-                webhook_url = await self.config.guild(message.guild).webhook()
-                if webhook_url:
-                    for link in unique_links:
-                        try:
-                            domain = link.split('/')[2]  # Extract domain from URL
-                            status = "Malicious" if domain in self.domains else "Non-malicious"
-                            
-                            webhook_embed = discord.Embed(
-                                title="URL Detected",
-                                description=f"A URL was detected in the server **{message.guild.name}**.",
-                                color=0xffd966 if status == "Malicious" else 0x2bbd8e,
-                            )
-                            webhook_embed.add_field(name="User", value=message.author.mention)
-                            webhook_embed.add_field(name="URL", value=link)
-                            webhook_embed.add_field(name="Status", value=status)
-                            
-                            async with self.session.post(webhook_url, json={"embeds": [webhook_embed.to_dict()]}) as response:
-                                if response.status != 204:
-                                    print(f"Failed to send webhook: {response.status}")
-                                else:
-                                    print(f"Successfully sent webhook for URL: {link}")
-                        except IndexError:
-                            print(f"Error extracting domain from URL: {link}")
-                        except Exception as e:
-                            print(f"Unexpected error processing URL {link}: {e}")
-                
-                return unique_links
+                return list(set(links))
         return None
 
     @commands.group()
