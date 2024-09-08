@@ -169,7 +169,15 @@ class RansomwareDotLive(commands.Cog):
                         for emoji in emojis:
                             await message.remove_reaction(emoji, self.bot.user)
                         break
-                    
+    
+    @ransomware.command()
+    async def about(self, ctx):
+        """Show the version and last updated date of this cog"""
+        embed = discord.Embed(title="About this cog", color=0xfffffe)
+        embed.add_field(name="Version", value=self.__version__)
+        embed.add_field(name="Last updated", value=self.__last_updated__)
+        await ctx.send(embed=embed)
+
     @commands.admin_or_permissions()
     @commands.group()
     async def ransomwareset(self, ctx):
@@ -189,14 +197,6 @@ class RansomwareDotLive(commands.Cog):
         """Set a role to be mentioned for new ransomware victim alerts"""
         self.alert_role_id = role.id
         await ctx.send(f"Alert role set to {role.mention}")
-
-    @ransomware.command()
-    async def about(self, ctx):
-        """Show the version and last updated date of this cog"""
-        embed = discord.Embed(title="About this cog", color=0xfffffe)
-        embed.add_field(name="Version", value=self.__version__)
-        embed.add_field(name="Last Updated", value=self.__last_updated__)
-        await ctx.send(embed=embed)
 
     async def send_alert(self, data):
         if self.alert_channel_id is None:
