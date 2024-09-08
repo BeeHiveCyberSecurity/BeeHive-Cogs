@@ -490,7 +490,7 @@ class AntiPhishing(commands.Cog):
 
         # Check if the guild is enrolled and send all detected links to the webhook
         if await self.config.guild(message.guild).enrolled():
-            webhook_url = await self.config.guild(message.guild).webhook_url()  # Fixed method name
+            webhook_url = await self.config.guild(message.guild).webhook_url()
             if webhook_url:
                 async with aiohttp.ClientSession() as session:
                     webhook = discord.Webhook.from_url(webhook_url, adapter=discord.AsyncWebhookAdapter(session))
@@ -507,7 +507,7 @@ class AntiPhishing(commands.Cog):
                 domain = urlparse(domain_url).netloc
                 if domain in self.domains:
                     await self.handle_phishing(message, domain, domains_to_check)
-                    return
+                    # return  # Removed premature return to handle all links
 
     @commands.Cog.listener()
     async def on_member_update(self, before: discord.Member, after: discord.Member):
