@@ -90,6 +90,33 @@ class AntiPhishing(commands.Cog):
     async def red_delete_data_for_user(self, **kwargs):
         return
 
+    async def register_casetypes(self) -> None:
+        with contextlib.suppress(RuntimeError):
+            await modlog.register_casetype(
+                name="phish_found",
+                default_setting=True,
+                image="🎣",
+                case_str="Malicious link detected",
+            )
+            await modlog.register_casetype(
+                name="phish_deleted",
+                default_setting=True,
+                image="🎣",
+                case_str="Malicious link actioned",
+            )
+            await modlog.register_casetype(
+                name="phish_kicked",
+                default_setting=True,
+                image="🎣",
+                case_str="Malicious link actioned",
+            )
+            await modlog.register_casetype(
+                name="phish_banned",
+                default_setting=True,
+                image="🎣",
+                case_str="Malicious link actioned",
+            )
+            
     def format_help_for_context(self, ctx: Context) -> str:
         pre_processed = super().format_help_for_context(ctx)
         return f"{pre_processed}\n\nVersion {self.__version__}"
@@ -274,32 +301,6 @@ class AntiPhishing(commands.Cog):
         embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/notifications.png")
         await ctx.send(embed=embed)
 
-    async def register_casetypes(self) -> None:
-        with contextlib.suppress(RuntimeError):
-            await modlog.register_casetype(
-                name="phish_found",
-                default_setting=True,
-                image="🎣",
-                case_str="Malicious link detected",
-            )
-            await modlog.register_casetype(
-                name="phish_deleted",
-                default_setting=True,
-                image="🎣",
-                case_str="Malicious link actioned",
-            )
-            await modlog.register_casetype(
-                name="phish_kicked",
-                default_setting=True,
-                image="🎣",
-                case_str="Malicious link actioned",
-            )
-            await modlog.register_casetype(
-                name="phish_banned",
-                default_setting=True,
-                image="🎣",
-                case_str="Malicious link actioned",
-            )
 
     @tasks.loop(minutes=2)
     async def get_phishing_domains(self) -> None:
