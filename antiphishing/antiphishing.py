@@ -351,7 +351,7 @@ class AntiPhishing(commands.Cog):
             webhook_embed.add_field(name="URL", value=domain)
             webhook_embed.add_field(name="Redirect Chain", value=redirect_chain_str)
             async with self.session.post(webhook_url, json={"embeds": [webhook_embed.to_dict()]}) as response:
-                if response.status != 204:
+                if response.status not in [200, 204]:
                     print(f"Failed to send webhook: {response.status}")
         
         if action == "notify":
