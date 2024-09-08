@@ -18,7 +18,7 @@ class Weather(commands.Cog):
             "severealerts": False,
             "freezealerts": False,
             "heatalerts": False,
-            "sent_alerts": None,
+            "sent_alerts": [],
         }
         self.config.register_user(**default_user)
         default_global = {
@@ -76,6 +76,59 @@ class Weather(commands.Cog):
     def inches_to_millimeters(self, inches):
         millimeters = inches * 25.4
         return f"{millimeters:.1f}"
+    
+    async def check_weather_alerts(self):
+        """Check for weather alerts and DM users if any severe or extreme warnings are issued"""
+        all_users = await self.config.all_users()
+        users_with_alerts = [user_id for user_id, data in all_users.items() if data.get("severealerts")]
+
+        for user_id in users_with_alerts:
+            user_data = await self.config.user_from_id(user_id).all()
+            zip_code = user_data.get("zip_code")
+            if not zip_code or zip_code not in self.zip_codes:
+                continue
+
+            latitude, longitude = self.zip_codes[zip_code]
+            alerts_url = f"https://api.weather.gov/alerts/active?point={latitude.strip()},{longitude.strip()}"
+
+            async with self.session.get(alerts_url) as response:
+                if response.status != 200:
+                    continue
+
+                data = await response.json()
+                alerts = data.get('features', [])
+                severe_alerts = [alert for alert in alerts if alert['properties']['severity'] in ['Severe', 'Extreme']]
+
+                if severe_alerts:
+                    user = self.bot.get_user(user_id)
+                    if user:
+                        sent_alerts = user_data.get("sent_alerts", [])
+                        new_alerts = [alert for alert in severe_alerts if alert['id'] not in sent_alerts]
+
+                        if new_alerts:
+                            for alert in new_alerts:
+                                embed = discord.Embed(
+                                    title=alert['properties']['event'],
+                                    description=f"{'An' if alert['properties']['event'][0].lower() in 'aeiou' else 'A'} **{alert['properties']['event']}** was issued at **<t:{int(datetime.fromisoformat(alert['properties']['sent']).timestamp())}:F>** for your location and is in effect until **<t:{int(datetime.fromisoformat(alert['properties']['expires']).timestamp())}:F>**.",
+                                    color=0xff4545
+                                )
+                                if 'instruction' in alert['properties']:
+                                    embed.add_field(name="Instruction", value=alert['properties']['instruction'], inline=False)
+                                if 'severity' in alert['properties']:
+                                    embed.add_field(name="Severity", value=alert['properties']['severity'], inline=True)
+                                if 'urgency' in alert['properties']:
+                                    embed.add_field(name="Urgency", value=alert['properties']['urgency'], inline=True)
+                                if 'certainty' in alert['properties']:
+                                    embed.add_field(name="Certainty", value=alert['properties']['certainty'], inline=True)
+                                if 'senderName' in alert['properties']:
+                                    embed.set_footer(text=f"Issued by {alert['properties']['senderName']}")
+
+                                await user.send(embed=embed)
+                                sent_alerts.append(alert['id'])
+
+                            await self.config.user_from_id(user_id).sent_alerts.set(sent_alerts)
+                            total_alerts_sent = await self.config.total_alerts_sent()
+                            await self.config.total_alerts_sent.set(total_alerts_sent + len(new_alerts))
 
     @commands.group()
     async def weather(self, ctx):
