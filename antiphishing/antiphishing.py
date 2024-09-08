@@ -77,6 +77,7 @@ class AntiPhishing(commands.Cog):
             bans=0,
             max_links=3,
             last_updated=None,
+            webhook=None
         )
         self.config.register_member(caught=0)
         self.session = aiohttp.ClientSession()
