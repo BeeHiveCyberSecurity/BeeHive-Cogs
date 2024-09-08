@@ -199,18 +199,18 @@ class RansomwareDotLive(commands.Cog):
         await ctx.send(f"Alert role set to {role.mention}")
 
     async def send_alert(self, data):
-        if self.alert_channel_id is None:
+        if not hasattr(self, 'alert_channel_id') or self.alert_channel_id is None:
             return
 
         channel = self.bot.get_channel(self.alert_channel_id)
         if channel is None:
             return
 
-        role_mention = f"<@&{self.alert_role_id}>" if self.alert_role_id else ""
+        role_mention = f"<@&{self.alert_role_id}>" if hasattr(self, 'alert_role_id') and self.alert_role_id else ""
 
         for item in data:
-            embed = discord.Embed(title=item["post_title"], color=0xfffffe)
-            embed.description = item['description']
+            embed = discord.Embed(title=item.get("post_title", "No Title"), color=0xfffffe)
+            embed.description = item.get('description', 'No Description')
             
             if 'activity' in item:
                 embed.add_field(name="Industry of service", value=item['activity'], inline=True)
