@@ -600,6 +600,13 @@ class Weather(commands.Cog):
             i = 0
             reaction = None
             while True:
+                try:
+                    reaction, user = await self.bot.wait_for("reaction_add", timeout=30.0, check=check)
+                    await message.remove_reaction(reaction, user)
+                except asyncio.TimeoutError:
+                    await message.clear_reactions()
+                    break
+
                 if str(reaction) == "⬅️":
                     if i > 0:
                         i -= 1
@@ -614,12 +621,6 @@ class Weather(commands.Cog):
                         await self.config.glossary_definitions_shown.set(glossary_definitions_shown + 1)
                 elif str(reaction) == "❌":
                     await message.delete()
-                    break
-                try:
-                    reaction, user = await self.bot.wait_for("reaction_add", timeout=30.0, check=check)
-                    await message.remove_reaction(reaction, user)
-                except asyncio.TimeoutError:
-                    await message.clear_reactions()
                     break
 
     @commands.guild_only()
@@ -729,6 +730,13 @@ class Weather(commands.Cog):
         i = 0
         reaction = None
         while True:
+            try:
+                reaction, user = await self.bot.wait_for("reaction_add", timeout=60.0, check=check)
+                await message.remove_reaction(reaction, user)
+            except asyncio.TimeoutError:
+                await message.clear_reactions()
+                break
+
             if str(reaction) == "⬅️":
                 if i > 0:
                     i -= 1
@@ -739,12 +747,6 @@ class Weather(commands.Cog):
                     await message.edit(embed=pages[i])
             elif str(reaction) == "❌":
                 await message.delete()
-                break
-            try:
-                reaction, user = await self.bot.wait_for("reaction_add", timeout=60.0, check=check)
-                await message.remove_reaction(reaction, user)
-            except asyncio.TimeoutError:
-                await message.clear_reactions()
                 break
     
     @commands.guild_only()
@@ -805,6 +807,13 @@ class Weather(commands.Cog):
                 i = 0
                 reaction = None
                 while True:
+                    try:
+                        reaction, user = await self.bot.wait_for("reaction_add", timeout=30.0, check=check)
+                        await message.remove_reaction(reaction, user)
+                    except asyncio.TimeoutError:
+                        await message.clear_reactions()
+                        break
+
                     if str(reaction) == "⬅️":
                         if i > 0:
                             i -= 1
@@ -815,12 +824,6 @@ class Weather(commands.Cog):
                             await message.edit(embed=pages[i])
                     elif str(reaction) == "❌":
                         await message.delete()
-                        break
-                    try:
-                        reaction, user = await self.bot.wait_for("reaction_add", timeout=30.0, check=check)
-                        await message.remove_reaction(reaction, user)
-                    except asyncio.TimeoutError:
-                        await message.clear_reactions()
                         break
     
     @commands.guild_only()
@@ -1073,27 +1076,33 @@ class Weather(commands.Cog):
                 if severe_alerts:
                     user = self.bot.get_user(user_id)
                     if user:
-                        for alert in severe_alerts:
-                            embed = discord.Embed(
-                                title=alert['properties']['event'],
-                                description=f"{'An' if alert['properties']['event'][0].lower() in 'aeiou' else 'A'} **{alert['properties']['event']}** was issued at **<t:{int(datetime.fromisoformat(alert['properties']['sent']).timestamp())}:F>** for your location and is in effect until **<t:{int(datetime.fromisoformat(alert['properties']['expires']).timestamp())}:F>**.",
-                                color=0xff4545
-                            )
-#                            embed.add_field(name="Description", value=alert['properties']['description'], inline=False)
-                            if 'instruction' in alert['properties']:
-                                embed.add_field(name="Instruction", value=alert['properties']['instruction'], inline=False)
-                            if 'severity' in alert['properties']:
-                                embed.add_field(name="Severity", value=alert['properties']['severity'], inline=True)
-                            if 'urgency' in alert['properties']:
-                                embed.add_field(name="Urgency", value=alert['properties']['urgency'], inline=True)
-                            if 'certainty' in alert['properties']:
-                                embed.add_field(name="Certainty", value=alert['properties']['certainty'], inline=True)
-                            if 'senderName' in alert['properties']:
-                                embed.set_footer(text=f"Issued by {alert['properties']['senderName']}")
+                        sent_alerts = user_data.get("sent_alerts", [])
+                        new_alerts = [alert for alert in severe_alerts if alert['id'] not in sent_alerts]
 
-                            await user.send(embed=embed)
+                        if new_alerts:
+                            for alert in new_alerts:
+                                embed = discord.Embed(
+                                    title=alert['properties']['event'],
+                                    description=f"{'An' if alert['properties']['event'][0].lower() in 'aeiou' else 'A'} **{alert['properties']['event']}** was issued at **<t:{int(datetime.fromisoformat(alert['properties']['sent']).timestamp())}:F>** for your location and is in effect until **<t:{int(datetime.fromisoformat(alert['properties']['expires']).timestamp())}:F>**.",
+                                    color=0xff4545
+                                )
+                                if 'instruction' in alert['properties']:
+                                    embed.add_field(name="Instruction", value=alert['properties']['instruction'], inline=False)
+                                if 'severity' in alert['properties']:
+                                    embed.add_field(name="Severity", value=alert['properties']['severity'], inline=True)
+                                if 'urgency' in alert['properties']:
+                                    embed.add_field(name="Urgency", value=alert['properties']['urgency'], inline=True)
+                                if 'certainty' in alert['properties']:
+                                    embed.add_field(name="Certainty", value=alert['properties']['certainty'], inline=True)
+                                if 'senderName' in alert['properties']:
+                                    embed.set_footer(text=f"Issued by {alert['properties']['senderName']}")
+
+                                await user.send(embed=embed)
+                                sent_alerts.append(alert['id'])
+
+                            await self.config.user_from_id(user_id).sent_alerts.set(sent_alerts)
                             total_alerts_sent = await self.config.total_alerts_sent()
-                            await self.config.total_alerts_sent.set(total_alerts_sent + 1)
+                            await self.config.total_alerts_sent.set(total_alerts_sent + len(new_alerts))
 
     async def start_severe_alerts_task(self):
         while True:
