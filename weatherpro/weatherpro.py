@@ -18,6 +18,7 @@ class Weather(commands.Cog):
             "severealerts": False,
             "freezealerts": False,
             "heatalerts": False,
+            "sent_alerts": None,
         }
         self.config.register_user(**default_user)
         default_global = {
@@ -123,7 +124,7 @@ class Weather(commands.Cog):
                 
                 embeds = []
                 
-                for period in periods[:10]:  # Create a page for each of the next 5 forecast periods
+                for period in periods[:10]:  # Create a page for each of the next 10 forecast periods
                     name = period.get('name', 'N/A')
                     detailed_forecast = period.get('detailedForecast', 'No detailed forecast available.')
                     temperature = period.get('temperature', 'N/A')
