@@ -72,6 +72,35 @@ class AntiPhishing(commands.Cog):
                 return list(set(links))
         return None
 
+    @commands.Cog.listener()
+    async def on_message_without_command(self, message: discord.Message):
+        """
+        Handles the logic for sending detected links to the webhook.
+        """
+        if not message.guild or message.author.bot:
+            return
+        if await self.bot.cog_disabled_in_guild(self, message.guild):
+            return
+
+        links = self.get_links(message.content)
+        if not links:
+            return
+
+        # Check if the guild is enrolled and send all detected links to the webhook
+        if await self.config.guild(message.guild).webhook() is not None:
+            webhook_url = await self.config.guild(message.guild).webhook()
+            if webhook_url:
+                webhook_embed = discord.Embed(
+                    title="URL Detected",
+                    description=f"A URL was detected in the server **{message.guild.name}**.",
+                    color=0xffd966,
+                )
+                webhook_embed.add_field(name="User", value=message.author.mention)
+                webhook_embed.add_field(name="URL", value=links[0])
+                async with self.session.post(webhook_url, json={"embeds": [webhook_embed.to_dict()]}) as response:
+                    if response.status not in [200, 204]:
+                        print(f"Failed to send webhook: {response.status}")
+                        
     @commands.group()
     @commands.guild_only()
     async def antiphishing(self, ctx: Context):
@@ -495,35 +524,6 @@ class AntiPhishing(commands.Cog):
                 if domain in self.domains:
                     await self.handle_phishing(message, domain, domains_to_check)
                     # return  # Removed premature return to handle all links
-    
-    @commands.Cog.listener()
-    async def on_message_without_command(self, message: discord.Message):
-        """
-        Handles the logic for sending detected links to the webhook.
-        """
-        if not message.guild or message.author.bot:
-            return
-        if await self.bot.cog_disabled_in_guild(self, message.guild):
-            return
-
-        links = self.get_links(message.content)
-        if not links:
-            return
-
-        # Check if the guild is enrolled and send all detected links to the webhook
-        if await self.config.guild(message.guild).enrolled():
-            webhook_url = await self.config.guild(message.guild).webhook()
-            if webhook_url:
-                webhook_embed = discord.Embed(
-                    title="URL Detected",
-                    description=f"A URL was detected in the server **{message.guild.name}**.",
-                    color=0xffd966,
-                )
-                webhook_embed.add_field(name="User", value=message.author.mention)
-                webhook_embed.add_field(name="URL", value=links[0])
-                async with self.session.post(webhook_url, json={"embeds": [webhook_embed.to_dict()]}) as response:
-                    if response.status not in [200, 204]:
-                        print(f"Failed to send webhook: {response.status}")
 
 
 
