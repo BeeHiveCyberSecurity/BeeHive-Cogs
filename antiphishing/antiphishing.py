@@ -14,55 +14,12 @@ URL_REGEX_PATTERN = re.compile(
     r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
 )
 
-# Global whitelist
-WHITELISTED_DOMAINS = [
-    "youtube.com",
-    "tenor.com",
-    "youtu.be",
-    "vimeo.com",
-    "dailymotion.com",
-    "imgur.com",
-    "giphy.com",
-    "tenor.com",
-    "flickr.com",
-    "photobucket.com",
-    "deviantart.com",
-    "instagram.com",
-    "twitter.com",
-    "facebook.com",
-    "twitch.tv",
-    "soundcloud.com",
-    "spotify.com",
-    "bandcamp.com",
-    "dropbox.com",
-    "google.com",
-    "drive.google.com",
-    "icloud.com",
-    "onedrive.live.com",
-    "mediafire.com",
-    "we.tl",
-    "wetransfer.com",
-    "mega.nz",
-    "box.com",
-    "pcloud.com",
-    "4shared.com",
-    "zippyshare.com",
-    "sendspace.com",
-    "yandex.com",
-    "yadi.sk",
-    "mail.ru",
-    "ok.ru",
-    "vk.com",
-    "discord.com",
-    "discord.gg",
-]
-
 class AntiPhishing(commands.Cog):
     """
     Guard users from malicious links and phishing attempts with customizable protection options.
     """
 
-    __version__ = "1.5.7.0"
+    __version__ = "1.5.7.1"
     __last_updated__ = "September 7, 2024"
 
     def __init__(self, bot: Red):
@@ -432,7 +389,7 @@ class AntiPhishing(commands.Cog):
                     for url in redirect_chain:
                         try:
                             domain = url.split('/')[2]  # Extract domain from URL
-                            status = "Malicious" if domain in self.domains else "Clean"
+                            status = "Malicious" if domain in self.domains else "Unknown"
                             redirect_chain_status.append(f"{url} ({status})")
                         except IndexError:
                             print(f"Error extracting domain from URL: {url}")
@@ -552,7 +509,7 @@ class AntiPhishing(commands.Cog):
             domains_to_check = await self.follow_redirects(url)
             for domain_url in domains_to_check:
                 domain = urlparse(domain_url).netloc
-                if domain in self.domains and domain not in WHITELISTED_DOMAINS:
+                if domain in self.domains:
                     await self.handle_phishing(after, domain, domains_to_check)
                     return
 
@@ -575,7 +532,7 @@ class AntiPhishing(commands.Cog):
             domains_to_check = await self.follow_redirects(url)
             for domain_url in domains_to_check:
                 domain = urlparse(domain_url).netloc
-                if domain in self.domains and domain not in WHITELISTED_DOMAINS:
+                if domain in self.domains:
                     await self.handle_phishing(message, domain, domains_to_check)
                     return
 
@@ -591,7 +548,7 @@ class AntiPhishing(commands.Cog):
                     domains_to_check = await self.follow_redirects(url)
                     for domain_url in domains_to_check:
                         domain = urlparse(domain_url).netloc
-                        if domain in self.domains and domain not in WHITELISTED_DOMAINS:
+                        if domain in self.domains:
                             await self.handle_phishing_profile(after, domain, domains_to_check)
                             return
 
@@ -602,7 +559,7 @@ class AntiPhishing(commands.Cog):
                     domains_to_check = await self.follow_redirects(url)
                     for domain_url in domains_to_check:
                         domain = urlparse(domain_url).netloc
-                        if domain in self.domains and domain not in WHITELISTED_DOMAINS:
+                        if domain in self.domains:
                             await self.handle_phishing_profile(after, domain, domains_to_check)
                             return
 
