@@ -165,7 +165,7 @@ class AntiPhishing(commands.Cog):
     @commands.guild_only()
     async def antiphishing(self, ctx: Context):
         """
-        Settings to configure phishing protection in this server.
+        Configurable options to help keep known malicious links out of your community's conversations.
         """
 
     @commands.admin_or_permissions()    
