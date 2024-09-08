@@ -182,11 +182,6 @@ class AntiPhishing(commands.Cog):
         embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/settings.png")
         embed.add_field(name="Maximum Links", value=f"{guild_data.get('max_links', 'Not set')}")
         embed.add_field(name="Action", value=f"{guild_data.get('action', 'Not set')}")
-        embed.add_field(name="Caught", value=f"{guild_data.get('caught', 'Not set')}")
-        embed.add_field(name="Notifications", value=f"{guild_data.get('notifications', 'Not set')}")
-        embed.add_field(name="Deletions", value=f"{guild_data.get('deletions', 'Not set')}")
-        embed.add_field(name="Kicks", value=f"{guild_data.get('kicks', 'Not set')}")
-        embed.add_field(name="Bans", value=f"{guild_data.get('bans', 'Not set')}")
         await ctx.send(embed=embed)
         
     @commands.admin_or_permissions()
