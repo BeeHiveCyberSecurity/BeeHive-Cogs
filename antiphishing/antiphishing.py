@@ -59,15 +59,15 @@ class AntiPhishing(commands.Cog):
         urls = [match[0] for match in matches]
         return urls
 
-    def get_links(self, message: str) -> Optional[List[str]]:
+    async def get_links(self, message: discord.Message) -> Optional[List[str]]:
         """
         Get links from the message content and forward them if the server is enrolled.
         """
         zero_width_chars = ["\u200b", "\u200c", "\u200d", "\u2060", "\uFEFF"]
         for char in zero_width_chars:
-            message = message.replace(char, "")
-        if message:
-            links = self.extract_urls(message)
+            message_content = message.content.replace(char, "")
+        if message_content:
+            links = self.extract_urls(message_content)
             if links:
                 unique_links = list(set(links))
                 
