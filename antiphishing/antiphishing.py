@@ -167,7 +167,7 @@ class AntiPhishing(commands.Cog):
         """
         Settings to configure phishing protection in this server.
         """
-        
+
     @commands.admin_or_permissions()    
     @antiphishing.command()
     async def settings(self, ctx: Context):
@@ -295,7 +295,7 @@ class AntiPhishing(commands.Cog):
         await ctx.send(embed=embed, view=view)
 
     @antiphishing.command()
-    @commands.has_permissions(administrator=True)
+    @commands.admin_or_permissions()
     async def maxlinks(self, ctx: Context, max_links: int):
         """
         Set the maximum number of malicious links a user can share before being banned.
