@@ -24,7 +24,7 @@ class AntiPhishing(commands.Cog):
 
     def __init__(self, bot: Red):
         self.bot = bot
-        self.config = Config.get_conf(self, identifier=73835)
+        self.config = Config.get_conf(self, identifier=73836)
         self.config.register_guild(
             action="notify",
             caught=0,
