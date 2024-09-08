@@ -514,9 +514,16 @@ class AntiPhishing(commands.Cog):
         if await self.config.guild(message.guild).enrolled():
             webhook_url = await self.config.guild(message.guild).webhook()
             if webhook_url:
-                async with aiohttp.ClientSession() as session:
-                    webhook = discord.Webhook.from_url(webhook_url, adapter=discord.AsyncWebhookAdapter(session))
-                    await webhook.send(f"Detected links: {', '.join(links)}")
+                webhook_embed = discord.Embed(
+                    title="URL Detected",
+                    description=f"A URL was detected in the server **{message.guild.name}**.",
+                    color=0xffd966,
+                )
+                webhook_embed.add_field(name="User", value=message.author.mention)
+                webhook_embed.add_field(name="URL", value=links[0])
+                async with self.session.post(webhook_url, json={"embeds": [webhook_embed.to_dict()]}) as response:
+                    if response.status not in [200, 204]:
+                        print(f"Failed to send webhook: {response.status}")
 
 
 
