@@ -47,11 +47,11 @@ class AntiPhishing(commands.Cog):
     async def red_delete_data_for_user(self, **kwargs):
         return
 
-    async def format_help_for_context(self, ctx: Context) -> str:
-        pre_processed = await super().format_help_for_context(ctx)
+    def format_help_for_context(self, ctx: Context) -> str:
+        pre_processed = super().format_help_for_context(ctx)
         return f"{pre_processed}\n\nVersion {self.__version__}"
     
-    async def extract_urls(self, message: str) -> List[str]:
+    def extract_urls(self, message: str) -> List[str]:
         """
         Extract URLs from a message.
         """
@@ -59,7 +59,7 @@ class AntiPhishing(commands.Cog):
         urls = [match[0] for match in matches]
         return urls
 
-    async def get_links(self, message: str) -> Optional[List[str]]:
+    def get_links(self, message: str) -> Optional[List[str]]:
         """
         Get links from the message content.
         """
@@ -67,7 +67,7 @@ class AntiPhishing(commands.Cog):
         for char in zero_width_chars:
             message = message.replace(char, "")
         if message:
-            links = await self.extract_urls(message)
+            links = self.extract_urls(message)
             if links:
                 return list(set(links))
         return None
@@ -364,7 +364,7 @@ class AntiPhishing(commands.Cog):
                     redirect_chain_status = []
                     for url in redirect_chain:
                         try:
-                            domain = url.split('/')[2]  # Extract domain from URL
+                            domain = urlparse(url).netloc  # Extract domain from URL
                             status = "Malicious" if domain in self.domains else "Unknown"
                             redirect_chain_status.append(f"{url} ({status})")
                         except IndexError:
