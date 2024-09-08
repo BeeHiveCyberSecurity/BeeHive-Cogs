@@ -8,7 +8,7 @@ from discord.ext import tasks #type: ignore
 class RansomwareDotLive(commands.Cog):
     """Interact with the ransomware.live API"""
 
-    __version__ = "**1.0.0**"
+    __version__ = "**1.0.1**"
     __last_updated__ = "**September 8th, 2024**"
 
     def __init__(self, bot):
@@ -199,14 +199,14 @@ class RansomwareDotLive(commands.Cog):
         await ctx.send(f"Alert role set to {role.mention}")
 
     async def send_alert(self, data):
-        if not hasattr(self, 'alert_channel_id') or self.alert_channel_id is None:
+        if not self.alert_channel_id:
             return
 
         channel = self.bot.get_channel(self.alert_channel_id)
         if channel is None:
             return
 
-        role_mention = f"<@&{self.alert_role_id}>" if hasattr(self, 'alert_role_id') and self.alert_role_id else ""
+        role_mention = f"<@&{self.alert_role_id}>" if self.alert_role_id else ""
 
         for item in data:
             embed = discord.Embed(title=item.get("post_title", "No Title"), color=0xfffffe)
