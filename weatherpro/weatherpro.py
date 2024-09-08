@@ -139,8 +139,8 @@ class Weather(commands.Cog):
                         color=0xfffffe
                     )
                     embed.add_field(name="Temperature", value=temperature)
-                    embed.add_field(name="Wind Speed", value=wind_speed)
-                    embed.add_field(name="Wind Direction", value=wind_direction)
+                    embed.add_field(name="Wind speed", value=wind_speed)
+                    embed.add_field(name="Wind direction", value=wind_direction)
                     
                     embeds.append(embed)
                 
