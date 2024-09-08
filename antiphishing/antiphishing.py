@@ -290,8 +290,13 @@ class AntiPhishing(commands.Cog):
             "https://phish.sinking.yachts/v2/all", headers=headers
         ) as request:
             if request.status == 200:
-                data = await request.json()
-                domains.extend(data)
+                try:
+                    data = await request.json()
+                    domains.extend(data)
+                except Exception as e:
+                    print(f"Error parsing JSON from Sinking Yachts: {e}")
+            else:
+                print(f"Failed to fetch Sinking Yachts blacklist, status code: {request.status}")
 
         async with self.session.get(
             "https://www.beehive.systems/hubfs/blocklist/blocklist.json", headers=headers
@@ -445,6 +450,14 @@ class AntiPhishing(commands.Cog):
         if not links:
             return
 
+        # Check if the guild is enrolled and send all detected links to the webhook
+        if await self.config.guild(after.guild).enrolled():
+            webhook_url = await self.config.guild(after.guild).webhook_url()
+            if webhook_url:
+                async with aiohttp.ClientSession() as session:
+                    webhook = discord.Webhook.from_url(webhook_url, adapter=discord.AsyncWebhookAdapter(session))
+                    await webhook.send(f"Detected links: {', '.join(links)}")
+
         for url in links:
             domains_to_check = await self.follow_redirects(url)
             for domain_url in domains_to_check:
@@ -467,6 +480,14 @@ class AntiPhishing(commands.Cog):
         links = self.get_links(message.content)
         if not links:
             return
+
+        # Check if the guild is enrolled and send all detected links to the webhook
+        if await self.config.guild(message.guild).enrolled():
+            webhook_url = await self.config.guild(message.guild).webhook_url()
+            if webhook_url:
+                async with aiohttp.ClientSession() as session:
+                    webhook = discord.Webhook.from_url(webhook_url, adapter=discord.AsyncWebhookAdapter(session))
+                    await webhook.send(f"Detected links: {', '.join(links)}")
 
         for url in links:
             domains_to_check = await self.follow_redirects(url)
