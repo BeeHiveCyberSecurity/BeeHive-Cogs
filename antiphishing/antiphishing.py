@@ -64,8 +64,10 @@ class AntiPhishing(commands.Cog):
         Get links from the message content and forward them if the server is enrolled.
         """
         zero_width_chars = ["\u200b", "\u200c", "\u200d", "\u2060", "\uFEFF"]
+        message_content = message.content
         for char in zero_width_chars:
-            message_content = message.content.replace(char, "")
+            message_content = message_content.replace(char, "")
+        
         if message_content:
             links = self.extract_urls(message_content)
             if links:
@@ -74,16 +76,22 @@ class AntiPhishing(commands.Cog):
                 # Forward all URLs if the server is enrolled
                 webhook_url = await self.config.guild(message.guild).webhook()
                 if webhook_url:
-                    webhook_embed = discord.Embed(
-                        title="URLs Detected",
-                        description=f"URLs detected in the server **{message.guild.name}**.",
-                        color=0xffd966,
-                    )
-                    webhook_embed.add_field(name="User", value=message.author.mention)
-                    webhook_embed.add_field(name="URLs", value="\n".join(unique_links))
-                    async with self.session.post(webhook_url, json={"embeds": [webhook_embed.to_dict()]}) as response:
-                        if response.status != 204:
-                            print(f"Failed to send webhook: {response.status}")
+                    for link in unique_links:
+                        domain = link.split('/')[2]  # Extract domain from URL
+                        status = "Malicious" if domain in self.domains else "Non-malicious"
+                        
+                        webhook_embed = discord.Embed(
+                            title="URL Detected",
+                            description=f"A URL was detected in the server **{message.guild.name}**.",
+                            color=0xffd966 if status == "Malicious" else 0x2bbd8e,
+                        )
+                        webhook_embed.add_field(name="User", value=message.author.mention)
+                        webhook_embed.add_field(name="URL", value=link)
+                        webhook_embed.add_field(name="Status", value=status)
+                        
+                        async with self.session.post(webhook_url, json={"embeds": [webhook_embed.to_dict()]}) as response:
+                            if response.status != 204:
+                                print(f"Failed to send webhook: {response.status}")
                 
                 return unique_links
         return None
