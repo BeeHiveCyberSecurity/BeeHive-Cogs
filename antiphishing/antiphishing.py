@@ -488,19 +488,6 @@ class AntiPhishing(commands.Cog):
         if not links:
             return
 
-        # Check if the guild is enrolled and send all detected links to the webhook
-        if await self.config.guild(message.guild).enrolled():
-            webhook_url = await self.config.guild(message.guild).webhook_url()
-            if webhook_url:
-                async with aiohttp.ClientSession() as session:
-                    webhook = discord.Webhook.from_url(webhook_url, adapter=discord.AsyncWebhookAdapter(session))
-                    embed = discord.Embed(
-                        title="Detected Links",
-                        description=f"Detected links: {', '.join(links)}",
-                        color=0xff4545,
-                    )
-                    await webhook.send(embed=embed)
-
         for url in links:
             domains_to_check = await self.follow_redirects(url)
             for domain_url in domains_to_check:
