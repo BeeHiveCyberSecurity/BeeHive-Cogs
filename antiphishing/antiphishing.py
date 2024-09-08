@@ -159,7 +159,7 @@ class AntiPhishing(commands.Cog):
         """
         if not webhook.startswith("http://") and not webhook.startswith("https://"):
             embed = discord.Embed(
-                title='Error: Invalid Webhook URL',
+                title='Invalid target webhook',
                 description="The provided webhook URL is invalid. Please provide a valid URL starting with `http://` or `https://`.",
                 colour=0xff4545,
             )
