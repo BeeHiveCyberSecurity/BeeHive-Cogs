@@ -19,7 +19,7 @@ class AntiPhishing(commands.Cog):
     Guard users from malicious links and phishing attempts with customizable protection options.
     """
 
-    __version__ = "1.5.7.1"
+    __version__ = "1.5.7.2"
     __last_updated__ = "September 7, 2024"
 
     def __init__(self, bot: Red):
@@ -142,13 +142,17 @@ class AntiPhishing(commands.Cog):
         Show the current antiphishing settings.
         """
         guild_data = await self.config.guild(ctx.guild).all()
+        webhook = guild_data.get('webhook', None)
+        enrollment_status = "**Enrolled**" if webhook else "Not Enrolled"
+        
         embed = discord.Embed(
-            title='Antiphishing Settings',
-            colour=0xffd966,
+            title='Current settings',
+            colour=0xfffffe,
         )
         embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/settings.png")
-        embed.add_field(name="Maximum Links", value=f"{guild_data.get('max_links', 'Not set')}")
+        embed.add_field(name="Maximum links", value=f"{guild_data.get('max_links', 'Not set')}")
         embed.add_field(name="Action", value=f"{guild_data.get('action', 'Not set')}")
+        embed.add_field(name="Enrollment status", value=enrollment_status)
         await ctx.send(embed=embed)
         
     @commands.admin_or_permissions()
