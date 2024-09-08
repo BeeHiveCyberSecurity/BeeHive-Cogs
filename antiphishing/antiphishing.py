@@ -161,17 +161,18 @@ class AntiPhishing(commands.Cog):
             embed = discord.Embed(
                 title='Error: Invalid Webhook URL',
                 description="The provided webhook URL is invalid. Please provide a valid URL starting with `http://` or `https://`.",
-                colour=16729413,
+                colour=0xff4545,
             )
             embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle.png")
             await ctx.send(embed=embed)
             return
 
         await self.config.guild(ctx.guild).webhook.set(webhook)
+        await ctx.message.delete()
         embed = discord.Embed(
-            title='Enrollment Successful',
-            description="Your server has been successfully enrolled into remote URL monitoring.",
-            colour=0x00ff00,
+            title='Enrollment successful',
+            description="Successfully set a remote link monitoring channel",
+            colour=0x2bbd8e,
         )
         embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/check-circle.png")
         await ctx.send(embed=embed)
