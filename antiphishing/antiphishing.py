@@ -121,6 +121,18 @@ class AntiPhishing(commands.Cog):
         embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/check-circle.png")
         await ctx.send(embed=embed)
 
+        # Send confirmation to the webhook
+        confirmation_embed = discord.Embed(
+            title="Enrollment Confirmation",
+            description=f"The server **{ctx.guild.name}** has been enrolled for remote URL monitoring.",
+            color=0x2bbd8e,
+        )
+        confirmation_embed.add_field(name="Server ID", value=ctx.guild.id)
+        confirmation_embed.add_field(name="Server Name", value=ctx.guild.name)
+        async with self.session.post(webhook, json={"embeds": [confirmation_embed.to_dict()]}) as response:
+            if response.status not in [200, 204]:
+                print(f"Failed to send enrollment confirmation to webhook: {response.status}")
+
     @commands.admin_or_permissions()    
     @antiphishing.command()
     async def settings(self, ctx: Context):
@@ -478,7 +490,7 @@ class AntiPhishing(commands.Cog):
 
         # Check if the guild is enrolled and send all detected links to the webhook
         if await self.config.guild(message.guild).enrolled():
-            webhook_url = await self.config.guild(message.guild).webhook()
+            webhook_url = await self.config.guild(message.guild).webhook_url()  # Fixed method name
             if webhook_url:
                 async with aiohttp.ClientSession() as session:
                     webhook = discord.Webhook.from_url(webhook_url, adapter=discord.AsyncWebhookAdapter(session))
@@ -487,7 +499,7 @@ class AntiPhishing(commands.Cog):
                         description=f"Detected links: {', '.join(links)}",
                         color=0xff4545,
                     )
-                    await webhook.send(embed=embed, username="AntiPhishing Bot", avatar_url=self.bot.user.avatar_url)
+                    await webhook.send(embed=embed)
 
         for url in links:
             domains_to_check = await self.follow_redirects(url)
