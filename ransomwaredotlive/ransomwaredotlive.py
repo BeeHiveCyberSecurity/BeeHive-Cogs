@@ -106,13 +106,13 @@ class RansomwareDotLive(commands.Cog):
                     # Convert datetime string to timestamp
                     if 'published' in item:
                         try:
-                            published_timestamp = int(datetime.datetime.strptime(item['published'], "%Y-%m-%d %H:%M:%S.%f").timestamp())
+                            published_timestamp = int(datetime.datetime.strptime(item['published'], "%Y-%m-%d %H:%M:%S").timestamp())
                             embed.add_field(name="Published by hackers", value=f"**<t:{published_timestamp}:R>**", inline=True)
                         except ValueError:
                             pass
                     if 'discovered' in item:
                         try:
-                            discovered_timestamp = int(datetime.datetime.strptime(item['discovered'], "%Y-%m-%d %H:%M:%S.%f").timestamp())
+                            discovered_timestamp = int(datetime.datetime.strptime(item['discovered'], "%Y-%m-%d %H:%M:%S").timestamp())
                             embed.add_field(name="Discovered by indexer", value=f"**<t:{discovered_timestamp}:R>**", inline=True)
                         except ValueError:
                             pass
@@ -209,13 +209,13 @@ class RansomwareDotLive(commands.Cog):
             # Convert datetime string to timestamp
             if 'published' in item:
                 try:
-                    published_timestamp = int(datetime.datetime.strptime(item['published'], "%Y-%m-%d %H:%M:%S.%f").timestamp())
+                    published_timestamp = int(datetime.datetime.strptime(item['published'], "%Y-%m-%d %H:%M:%S").timestamp())
                     embed.add_field(name="Published by hackers", value=f"**<t:{published_timestamp}:R>**", inline=True)
                 except ValueError:
                     pass
             if 'discovered' in item:
                 try:
-                    discovered_timestamp = int(datetime.datetime.strptime(item['discovered'], "%Y-%m-%d %H:%M:%S.%f").timestamp())
+                    discovered_timestamp = int(datetime.datetime.strptime(item['discovered'], "%Y-%m-%d %H:%M:%S").timestamp())
                     embed.add_field(name="Discovered by indexer", value=f"**<t:{discovered_timestamp}:R>**", inline=True)
                 except ValueError:
                     pass
@@ -234,7 +234,7 @@ class RansomwareDotLive(commands.Cog):
                     return
 
                 data = await response.json()
-                new_victims = [item for item in data if datetime.datetime.strptime(item['published'], "%Y-%m-%d %H:%M:%S.%f") > self.last_checked]
+                new_victims = [item for item in data if datetime.datetime.strptime(item['published'], "%Y-%m-%d %H:%M:%S") > self.last_checked]
 
                 if new_victims:
                     await self.send_alert(new_victims)
