@@ -62,8 +62,8 @@ class AntiPhishing(commands.Cog):
     Guard users from malicious links and phishing attempts with customizable protection options.
     """
 
-    __version__ = "1.4.6.9"
-    __last_updated__ = "September 6, 2024"
+    __version__ = "1.5.7.0"
+    __last_updated__ = "September 7, 2024"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -94,79 +94,39 @@ class AntiPhishing(commands.Cog):
         pre_processed = super().format_help_for_context(ctx)
         return f"{pre_processed}\n\nVersion {self.__version__}"
 
-    @commands.command(aliases=["checkforphish", "checkscam", "checkforscam", "checkphishing"])
-    @commands.bot_has_permissions(embed_links=True)
-    async def checkphish(self, ctx: Context, url: str = None):
-        """
-        Check if a url is a phishing scam.
-
-        You can either provide a url or reply to a message containing a url.
-        """
-        if not url and not ctx.message.reference:
-            return await ctx.send_help()
-
-        if not url:
-            try:
-                m = await ctx.channel.fetch_message(ctx.message.reference.message_id)
-            except discord.NotFound:
-                await ctx.send_help()
-                return
-            url = m.content
-
-        url = url.strip("<>")
-        if not (url.startswith("http://") or url.startswith("https://")):
-            embed = discord.Embed(
-                title='Error: Invalid URL',
-                description="The URL must start with `http://` or `https://`.\n\nPlease provide a properly formatted URL and try again.",
-                colour=16729413,
-            )
-            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle.png")
-            await ctx.send(embed=embed)
-            return
-
-        urls = self.extract_urls(url)
-        if not urls:
-            embed = discord.Embed(
-                title='Error: Invalid URL',
-                description="You provided an invalid URL.\n\nCheck the formatting of any links and try again...",
-                colour=16729413,
-            )
-            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle.png")
-            await ctx.send(embed=embed)
-            return
-
-        real_url = urls[0]
-        domains_to_check = await self.follow_redirects(real_url)
-        for domain_url in domains_to_check:
-            domain = urlparse(domain_url).netloc
-            if domain in self.domains:
-                embed = discord.Embed(
-                    title="Link query: Detected!",
-                    description=(
-                        "**This is a known dangerous website!**\n\n"
-                        "This website is blocklisted for malicious behavior or content.\n\n"
-                        f"**Redirect Chain:**\n" + "\n".join(domains_to_check)
-                    ),
-                    colour=16729413,
-                )
-                embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle.png")
-                await ctx.send(embed=embed)
-                return
-
-        embed = discord.Embed(
-            title="Link query: No detections",
-            description="**This link looks clean.**\n\nYou should be able to proceed safely. Apply caution to your best judgement while browsing this site, and leave the site if at any time your sense of trust is impaired.",
-            colour=2866574,
-        )
-        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/checkmark-circle.png")
-        await ctx.send(embed=embed)
-
-    @commands.group(aliases=["antiphish"])
+    @commands.group()
     @commands.guild_only()
     async def antiphishing(self, ctx: Context):
         """
         Configurable options to help keep known malicious links out of your community's conversations.
         """
+
+    @commands.admin_or_permissions()
+    @antiphishing.command()
+    async def enroll(self, ctx: Context, webhook: str):
+        """
+        Enroll your server into remote URL monitoring by providing a webhook URL.
+        
+        The webhook will be used to send detected URLs to a security provider for monitoring.
+        """
+        if not webhook.startswith("http://") and not webhook.startswith("https://"):
+            embed = discord.Embed(
+                title='Error: Invalid Webhook URL',
+                description="The provided webhook URL is invalid. Please provide a valid URL starting with `http://` or `https://`.",
+                colour=16729413,
+            )
+            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle.png")
+            await ctx.send(embed=embed)
+            return
+
+        await self.config.guild(ctx.guild).webhook.set(webhook)
+        embed = discord.Embed(
+            title='Enrollment Successful',
+            description="Your server has been successfully enrolled into remote URL monitoring.",
+            colour=0x00ff00,
+        )
+        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/check-circle.png")
+        await ctx.send(embed=embed)
 
     @commands.admin_or_permissions()    
     @antiphishing.command()
@@ -313,6 +273,7 @@ class AntiPhishing(commands.Cog):
         )
         embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/notifications.png")
         await ctx.send(embed=embed)
+
     async def register_casetypes(self) -> None:
         with contextlib.suppress(RuntimeError):
             await modlog.register_casetype(
@@ -440,6 +401,23 @@ class AntiPhishing(commands.Cog):
         if member_count + 1 >= max_links:
             action = "ban"
         await self.config.member(message.author).caught.set(member_count + 1)
+        
+        # Send URL to webhook if enrolled
+        webhook_url = await self.config.guild(message.guild).webhook()
+        if webhook_url:
+            redirect_chain_str = "\n".join(redirect_chain)
+            webhook_embed = discord.Embed(
+                title="URL Detected",
+                description=f"A URL was detected in the server **{message.guild.name}**.",
+                color=0xffd966,
+            )
+            webhook_embed.add_field(name="User", value=message.author.mention)
+            webhook_embed.add_field(name="URL", value=domain)
+            webhook_embed.add_field(name="Redirect Chain", value=redirect_chain_str)
+            async with self.session.post(webhook_url, json={"embeds": [webhook_embed.to_dict()]}) as response:
+                if response.status != 204:
+                    print(f"Failed to send webhook: {response.status}")
+        
         if action == "notify":
             if message.channel.permissions_for(message.guild.me).send_messages:
                 with contextlib.suppress(discord.NotFound):
