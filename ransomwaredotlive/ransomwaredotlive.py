@@ -231,9 +231,9 @@ class RansomwareDotLive(commands.Cog):
                 except ValueError:
                     pass
             if 'group_name' in item:
-                embed.add_field(name="Ransom group", value=f"`{item['group_name']}`", inline=True)
+                embed.add_field(name="Threat actor/group", value=f"`{item['group_name']}`", inline=True)
             if 'website' in item and item['website'].strip():
-                embed.add_field(name="Website compromised", value=f"`{item['website']}`", inline=True)
+                embed.add_field(name="Website hit", value=f"`{item['website']}`", inline=True)
             
             await channel.send(content=role_mention, embed=embed)
 
