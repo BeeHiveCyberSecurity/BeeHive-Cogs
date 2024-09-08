@@ -47,11 +47,11 @@ class AntiPhishing(commands.Cog):
     async def red_delete_data_for_user(self, **kwargs):
         return
 
-    def format_help_for_context(self, ctx: Context) -> str:
-        pre_processed = super().format_help_for_context(ctx)
+    async def format_help_for_context(self, ctx: Context) -> str:
+        pre_processed = await super().format_help_for_context(ctx)
         return f"{pre_processed}\n\nVersion {self.__version__}"
     
-    def extract_urls(self, message: str) -> List[str]:
+    async def extract_urls(self, message: str) -> List[str]:
         """
         Extract URLs from a message.
         """
