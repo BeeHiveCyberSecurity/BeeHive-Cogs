@@ -487,7 +487,7 @@ class AntiPhishing(commands.Cog):
                         description=f"Detected links: {', '.join(links)}",
                         color=0xff4545,
                     )
-                    await webhook.send(embed=embed)
+                    await webhook.send(embed=embed, username="AntiPhishing Bot", avatar_url=self.bot.user.avatar_url)
 
         for url in links:
             domains_to_check = await self.follow_redirects(url)
