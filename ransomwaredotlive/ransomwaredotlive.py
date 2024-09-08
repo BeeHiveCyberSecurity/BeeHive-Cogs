@@ -237,7 +237,7 @@ class RansomwareDotLive(commands.Cog):
             
             await channel.send(content=role_mention, embed=embed)
 
-    @tasks.loop(minutes=10)
+    @tasks.loop(minutes=2)
     async def check_recent_victims(self):
         async with aiohttp.ClientSession() as session:
             async with session.get("https://api.ransomware.live/recentvictims") as response:
