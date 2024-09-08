@@ -19,7 +19,7 @@ class AntiPhishing(commands.Cog):
     Guard users from malicious links and phishing attempts with customizable protection options.
     """
 
-    __version__ = "1.5.7.2"
+    __version__ = "1.5.8.0"
     __last_updated__ = "September 7, 2024"
 
     def __init__(self, bot: Red):
@@ -47,33 +47,6 @@ class AntiPhishing(commands.Cog):
 
     async def red_delete_data_for_user(self, **kwargs):
         return
-
-    async def register_casetypes(self) -> None:
-        with contextlib.suppress(RuntimeError):
-            await modlog.register_casetype(
-                name="phish_found",
-                default_setting=True,
-                image="🎣",
-                case_str="Malicious link detected",
-            )
-            await modlog.register_casetype(
-                name="phish_deleted",
-                default_setting=True,
-                image="🎣",
-                case_str="Malicious link actioned",
-            )
-            await modlog.register_casetype(
-                name="phish_kicked",
-                default_setting=True,
-                image="🎣",
-                case_str="Malicious link actioned",
-            )
-            await modlog.register_casetype(
-                name="phish_banned",
-                default_setting=True,
-                image="🎣",
-                case_str="Malicious link actioned",
-            )
 
     def format_help_for_context(self, ctx: Context) -> str:
         pre_processed = super().format_help_for_context(ctx)
@@ -415,15 +388,6 @@ class AntiPhishing(commands.Cog):
                         await message.channel.send(content=mod_mentions, allowed_mentions=discord.AllowedMentions(roles=True))
                     await message.reply(embed=embed)
                     
-                await modlog.create_case(
-                    guild=message.guild,
-                    bot=self.bot,
-                    created_at=datetime.datetime.utcnow(),
-                    action_type="phish_found",
-                    user=message.author,
-                    moderator=message.guild.me,
-                    reason=f"Sent a malicious URL **`{domain}`** in the server",
-                )
                 notifications = await self.config.guild(message.guild).notifications()
                 await self.config.guild(message.guild).notifications.set(notifications + 1)
         elif action == "delete":
@@ -431,15 +395,6 @@ class AntiPhishing(commands.Cog):
                 with contextlib.suppress(discord.NotFound):
                     await message.delete()
 
-                await modlog.create_case(
-                    guild=message.guild,
-                    bot=self.bot,
-                    created_at=datetime.datetime.utcnow(),
-                    action_type="phish_deleted",
-                    user=message.author,
-                    moderator=message.guild.me,
-                    reason=f"Sent a malicious URL **`{domain}`** in the server",
-                )
                 deletions = await self.config.guild(message.guild).deletions()
                 await self.config.guild(message.guild).deletions.set(deletions + 1)
         elif action == "kick":
@@ -457,15 +412,6 @@ class AntiPhishing(commands.Cog):
 
                     await message.author.kick()
 
-                await modlog.create_case(
-                    guild=message.guild,
-                    bot=self.bot,
-                    created_at=datetime.datetime.utcnow(),
-                    action_type="phish_kicked",
-                    user=message.author,
-                    moderator=message.guild.me,
-                    reason=f"Sent a malicious URL **`{domain}`** in the server",
-                )
                 kicks = await self.config.guild(message.guild).kicks()
                 await self.config.guild(message.guild).kicks.set(kicks + 1)
         elif action == "ban":
@@ -483,15 +429,6 @@ class AntiPhishing(commands.Cog):
 
                     await message.author.ban()
 
-                await modlog.create_case(
-                    guild=message.guild,
-                    bot=self.bot,
-                    created_at=datetime.datetime.utcnow(),
-                    action_type="phish_banned",
-                    user=message.author,
-                    moderator=message.guild.me,
-                    reason=f"Sent a malicious URL **`{domain}`** in the server",
-                )
                 bans = await self.config.guild(message.guild).bans()
                 await self.config.guild(message.guild).bans.set(bans + 1)
 
@@ -595,27 +532,9 @@ class AntiPhishing(commands.Cog):
                 await member.guild.system_channel.send(content=mod_mentions, allowed_mentions=discord.AllowedMentions(roles=True))
             await member.guild.system_channel.send(embed=embed)
             
-            await modlog.create_case(
-                guild=member.guild,
-                bot=self.bot,
-                created_at=datetime.datetime.utcnow(),
-                action_type="phish_found",
-                user=member,
-                moderator=member.guild.me,
-                reason=f"Malicious URL **`{domain}`** found in user profile",
-            )
             notifications = await self.config.guild(member.guild).notifications()
             await self.config.guild(member.guild).notifications.set(notifications + 1)
         elif action == "delete":
-            await modlog.create_case(
-                guild=member.guild,
-                bot=self.bot,
-                created_at=datetime.datetime.utcnow(),
-                action_type="phish_deleted",
-                user=member,
-                moderator=member.guild.me,
-                reason=f"Malicious URL **`{domain}`** found in user profile",
-            )
             deletions = await self.config.guild(member.guild).deletions()
             await self.config.guild(member.guild).deletions.set(deletions + 1)
         elif action == "kick":
@@ -628,15 +547,6 @@ class AntiPhishing(commands.Cog):
 
                 await member.kick()
 
-                await modlog.create_case(
-                    guild=member.guild,
-                    bot=self.bot,
-                    created_at=datetime.datetime.utcnow(),
-                    action_type="phish_kicked",
-                    user=member,
-                    moderator=member.guild.me,
-                    reason=f"Malicious URL **`{domain}`** found in user profile",
-                )
                 kicks = await self.config.guild(member.guild).kicks()
                 await self.config.guild(member.guild).kicks.set(kicks + 1)
         elif action == "ban":
@@ -649,15 +559,6 @@ class AntiPhishing(commands.Cog):
 
                 await member.ban()
 
-                await modlog.create_case(
-                    guild=member.guild,
-                    bot=self.bot,
-                    created_at=datetime.datetime.utcnow(),
-                    action_type="phish_banned",
-                    user=member,
-                    moderator=member.guild.me,
-                    reason=f"Malicious URL **`{domain}`** found in user profile",
-                )
                 bans = await self.config.guild(member.guild).bans()
                 await self.config.guild(member.guild).bans.set(bans + 1)
 
