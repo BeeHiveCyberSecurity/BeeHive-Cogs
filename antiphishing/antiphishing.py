@@ -116,10 +116,31 @@ class AntiPhishing(commands.Cog):
                 image="🎣",
                 case_str="Malicious link actioned",
             )
-            
+
     def format_help_for_context(self, ctx: Context) -> str:
         pre_processed = super().format_help_for_context(ctx)
         return f"{pre_processed}\n\nVersion {self.__version__}"
+    
+    def extract_urls(self, message: str) -> List[str]:
+        """
+        Extract URLs from a message.
+        """
+        matches = URL_REGEX_PATTERN.findall(message)
+        urls = [match[0] for match in matches]
+        return urls
+
+    def get_links(self, message: str) -> Optional[List[str]]:
+        """
+        Get links from the message content.
+        """
+        zero_width_chars = ["\u200b", "\u200c", "\u200d", "\u2060", "\uFEFF"]
+        for char in zero_width_chars:
+            message = message.replace(char, "")
+        if message:
+            links = self.extract_urls(message)
+            if links:
+                return list(set(links))
+        return None
 
     @commands.group()
     @commands.guild_only()
@@ -352,27 +373,6 @@ class AntiPhishing(commands.Cog):
             else:
                 print(f"Failed to fetch blocklist, status code: {request.status}")
         self.domains = list(set(domains))
-
-    def extract_urls(self, message: str) -> List[str]:
-        """
-        Extract URLs from a message.
-        """
-        matches = URL_REGEX_PATTERN.findall(message)
-        urls = [match[0] for match in matches]
-        return urls
-
-    def get_links(self, message: str) -> Optional[List[str]]:
-        """
-        Get links from the message content.
-        """
-        zero_width_chars = ["\u200b", "\u200c", "\u200d", "\u2060", "\uFEFF"]
-        for char in zero_width_chars:
-            message = message.replace(char, "")
-        if message:
-            links = self.extract_urls(message)
-            if links:
-                return list(set(links))
-        return None
 
     async def follow_redirects(self, url: str) -> List[str]:
         """
