@@ -97,6 +97,20 @@ class AntiPhishing(commands.Cog):
             await ctx.send(embed=embed)
             return
 
+        try:
+            async with self.session.get(webhook) as response:
+                if response.status != 200:
+                    raise ValueError("Invalid webhook URL")
+        except Exception as e:
+            embed = discord.Embed(
+                title='Invalid target webhook',
+                description=f"The provided webhook URL is invalid or unreachable. Error: {e}",
+                colour=0xff4545,
+            )
+            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle.png")
+            await ctx.send(embed=embed)
+            return
+
         await self.config.guild(ctx.guild).webhook.set(webhook)
         await ctx.message.delete()
         embed = discord.Embed(
@@ -266,25 +280,6 @@ class AntiPhishing(commands.Cog):
             "X-Identity": f"BeeHive AntiPhishing v{self.__version__} (https://www.beehive.systems/)",
             "User-Agent": f"BeeHive AntiPhishing v{self.__version__} (https://www.beehive.systems/)"
         }
-
-        async with self.session.get(
-            "https://raw.githubusercontent.com/phishfort/phishfort-lists/master/blacklists/domains.json", headers=headers
-        ) as request:
-            if request.status == 200:
-                try:
-                    content_type = request.headers.get('Content-Type', '')
-                    if 'application/json' in content_type:
-                        data = await request.json()
-                        if isinstance(data, list):
-                            domains.extend(data)
-                        else:
-                            print("Unexpected data format received from PhishFort blacklist.")
-                    else:
-                        print(f"Unexpected mimetype received: {content_type}")
-                except Exception as e:
-                    print(f"Error parsing JSON from PhishFort blacklist: {e}")
-            else:
-                print(f"Failed to fetch PhishFort blacklist, status code: {request.status}")
 
         async with self.session.get(
             "https://phish.sinking.yachts/v2/all", headers=headers
