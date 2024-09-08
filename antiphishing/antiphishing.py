@@ -38,7 +38,6 @@ class AntiPhishing(commands.Cog):
         )
         self.config.register_member(caught=0)
         self.session = aiohttp.ClientSession()
-        self.bot.loop.create_task(self.register_casetypes())
         self.bot.loop.create_task(self.get_phishing_domains())
         self.domains = []
 
