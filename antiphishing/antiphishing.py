@@ -61,7 +61,7 @@ class AntiPhishing(commands.Cog):
 
     def get_links(self, message: str) -> Optional[List[str]]:
         """
-        Get links from the message content.
+        Get links from the message content and forward them if the server is enrolled.
         """
         zero_width_chars = ["\u200b", "\u200c", "\u200d", "\u2060", "\uFEFF"]
         for char in zero_width_chars:
@@ -69,7 +69,23 @@ class AntiPhishing(commands.Cog):
         if message:
             links = self.extract_urls(message)
             if links:
-                return list(set(links))
+                unique_links = list(set(links))
+                
+                # Forward all URLs if the server is enrolled
+                webhook_url = await self.config.guild(message.guild).webhook()
+                if webhook_url:
+                    webhook_embed = discord.Embed(
+                        title="URLs Detected",
+                        description=f"URLs detected in the server **{message.guild.name}**.",
+                        color=0xffd966,
+                    )
+                    webhook_embed.add_field(name="User", value=message.author.mention)
+                    webhook_embed.add_field(name="URLs", value="\n".join(unique_links))
+                    async with self.session.post(webhook_url, json={"embeds": [webhook_embed.to_dict()]}) as response:
+                        if response.status != 204:
+                            print(f"Failed to send webhook: {response.status}")
+                
+                return unique_links
         return None
 
     @commands.group()
