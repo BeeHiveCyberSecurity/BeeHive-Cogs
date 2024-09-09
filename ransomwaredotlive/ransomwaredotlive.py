@@ -151,12 +151,12 @@ class RansomwareDotLive(commands.Cog):
                         embed.set_image(url=item['screenshot'])
                     if 'infostealer' in item:
                         infostealer_info = item['infostealer']
-                        if 'employees' in infostealer_info:
+                        if 'employees' in infostealer_info and infostealer_info.get('employees', 0) != 0:
                             embed.add_field(name="Employees with data stolen", value=infostealer_info.get('employees', 'N/A'), inline=True)
-                        if 'thirdparties' in infostealer_info:
+                        if 'thirdparties' in infostealer_info and infostealer_info.get('thirdparties', 0) != 0:
                             embed.add_field(name="Third parties with data stolen", value=infostealer_info.get('thirdparties', 'N/A'), inline=True)
-                        if 'users' in infostealer_info:
-                            embed.add_field(name="User's data stolen", value=infostealer_info.get('users', 'N/A'), inline=True)
+                        if 'users' in infostealer_info and infostealer_info.get('users', 0) != 0:
+                            embed.add_field(name="Users with data stolen", value=infostealer_info.get('users', 'N/A'), inline=True)
                     
                     pages.append(embed)
 
