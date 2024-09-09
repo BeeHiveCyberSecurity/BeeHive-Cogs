@@ -8,7 +8,7 @@ from discord.ext import tasks #type: ignore
 class RansomwareDotLive(commands.Cog):
     """Interact with the ransomware.live API"""
 
-    __version__ = "**1.0.0.6**"
+    __version__ = "**1.0.0.7**"
     __last_updated__ = "**September 9th, 2024**"
 
     def __init__(self, bot):
@@ -152,19 +152,11 @@ class RansomwareDotLive(commands.Cog):
                     if 'infostealer' in item:
                         infostealer_info = item['infostealer']
                         if 'employees' in infostealer_info:
-                            embed.add_field(name="Infostealer - Employees", value=infostealer_info.get('employees', 'N/A'), inline=True)
-                        if 'employees_url' in infostealer_info:
-                            embed.add_field(name="Infostealer - Employees URL", value=infostealer_info.get('employees_url', 'N/A'), inline=True)
+                            embed.add_field(name="Employees with data stolen", value=infostealer_info.get('employees', 'N/A'), inline=True)
                         if 'thirdparties' in infostealer_info:
                             embed.add_field(name="Third parties with data stolen", value=infostealer_info.get('thirdparties', 'N/A'), inline=True)
-                        if 'thirdparties_domain' in infostealer_info:
-                            embed.add_field(name="Infostealer - Third Parties Domain", value=infostealer_info.get('thirdparties_domain', 'N/A'), inline=True)
-                        if 'update' in infostealer_info:
-                            embed.add_field(name="Infostealer - Update", value=infostealer_info.get('update', 'N/A'), inline=True)
                         if 'users' in infostealer_info:
                             embed.add_field(name="User's data stolen", value=infostealer_info.get('users', 'N/A'), inline=True)
-                        if 'users_url' in infostealer_info:
-                            embed.add_field(name="Infostealer - Users URL", value=infostealer_info.get('users_url', 'N/A'), inline=True)
                     
                     pages.append(embed)
 
