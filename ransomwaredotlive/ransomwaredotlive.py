@@ -8,7 +8,7 @@ from discord.ext import tasks #type: ignore
 class RansomwareDotLive(commands.Cog):
     """Interact with the ransomware.live API"""
 
-    __version__ = "**1.0.0.7**"
+    __version__ = "**1.0.0.8**"
     __last_updated__ = "**September 9th, 2024**"
 
     def __init__(self, bot):
