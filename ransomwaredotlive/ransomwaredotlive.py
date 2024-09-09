@@ -146,13 +146,13 @@ class RansomwareDotLive(commands.Cog):
                         if 'employees_url' in infostealer_info:
                             embed.add_field(name="Infostealer - Employees URL", value=infostealer_info.get('employees_url', 'N/A'), inline=True)
                         if 'thirdparties' in infostealer_info:
-                            embed.add_field(name="Infostealer - Third Parties", value=infostealer_info.get('thirdparties', 'N/A'), inline=True)
+                            embed.add_field(name="Third parties with data stolen", value=infostealer_info.get('thirdparties', 'N/A'), inline=True)
                         if 'thirdparties_domain' in infostealer_info:
                             embed.add_field(name="Infostealer - Third Parties Domain", value=infostealer_info.get('thirdparties_domain', 'N/A'), inline=True)
                         if 'update' in infostealer_info:
                             embed.add_field(name="Infostealer - Update", value=infostealer_info.get('update', 'N/A'), inline=True)
                         if 'users' in infostealer_info:
-                            embed.add_field(name="Infostealer - Users", value=infostealer_info.get('users', 'N/A'), inline=True)
+                            embed.add_field(name="User's data stolen", value=infostealer_info.get('users', 'N/A'), inline=True)
                         if 'users_url' in infostealer_info:
                             embed.add_field(name="Infostealer - Users URL", value=infostealer_info.get('users_url', 'N/A'), inline=True)
                     
