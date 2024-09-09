@@ -8,7 +8,7 @@ from discord.ext import tasks #type: ignore
 class RansomwareDotLive(commands.Cog):
     """Interact with the ransomware.live API"""
 
-    __version__ = "**1.0.0.2**"
+    __version__ = "**1.0.0.4**"
     __last_updated__ = "**September 8th, 2024**"
 
     def __init__(self, bot):
@@ -20,6 +20,20 @@ class RansomwareDotLive(commands.Cog):
 
     def cog_unload(self):
         self.check_recent_victims.cancel()
+
+    @tasks.loop(minutes=2)
+    async def check_recent_victims(self):
+        async with aiohttp.ClientSession() as session:
+            async with session.get("https://api.ransomware.live/recentvictims") as response:
+                if response.status != 200:
+                    return
+
+                data = await response.json()
+                new_victims = [item for item in data if datetime.datetime.strptime(item['published'], "%Y-%m-%d %H:%M:%S") > self.last_checked]
+
+                if new_victims:
+                    await self.send_alert(new_victims)
+                    self.last_checked = datetime.datetime.utcnow()  # Update last_checked only if there are new victims
 
     @commands.group()
     async def ransomware(self, ctx):
@@ -109,13 +123,13 @@ class RansomwareDotLive(commands.Cog):
                     # Convert datetime string to timestamp
                     if 'published' in item:
                         try:
-                            published_timestamp = int(datetime.datetime.strptime(item['published'], "%Y-%m-%d %H:%M:%S").timestamp())
+                            published_timestamp = int(datetime.datetime.strptime(item['published'], "%Y-%m-%d %H:%M:%S.%f").timestamp())
                             embed.add_field(name="Published by hackers", value=f"**<t:{published_timestamp}:R>**", inline=True)
                         except ValueError:
                             pass
                     if 'discovered' in item:
                         try:
-                            discovered_timestamp = int(datetime.datetime.strptime(item['discovered'], "%Y-%m-%d %H:%M:%S").timestamp())
+                            discovered_timestamp = int(datetime.datetime.strptime(item['discovered'], "%Y-%m-%d %H:%M:%S.%f").timestamp())
                             embed.add_field(name="Discovered by indexer", value=f"**<t:{discovered_timestamp}:R>**", inline=True)
                         except ValueError:
                             pass
@@ -123,6 +137,24 @@ class RansomwareDotLive(commands.Cog):
                         embed.add_field(name="Ransom group", value=f"`{item['group_name']}`", inline=True)
                     if 'website' in item and item['website'].strip():
                         embed.add_field(name="Website compromised", value=f"`{item['website']}`", inline=True)
+                    if 'screenshot' in item and item['screenshot'].strip():
+                        embed.set_image(url=item['screenshot'])
+                    if 'infostealer' in item:
+                        infostealer_info = item['infostealer']
+                        if 'employees' in infostealer_info:
+                            embed.add_field(name="Infostealer - Employees", value=infostealer_info.get('employees', 'N/A'), inline=True)
+                        if 'employees_url' in infostealer_info:
+                            embed.add_field(name="Infostealer - Employees URL", value=infostealer_info.get('employees_url', 'N/A'), inline=True)
+                        if 'thirdparties' in infostealer_info:
+                            embed.add_field(name="Infostealer - Third Parties", value=infostealer_info.get('thirdparties', 'N/A'), inline=True)
+                        if 'thirdparties_domain' in infostealer_info:
+                            embed.add_field(name="Infostealer - Third Parties Domain", value=infostealer_info.get('thirdparties_domain', 'N/A'), inline=True)
+                        if 'update' in infostealer_info:
+                            embed.add_field(name="Infostealer - Update", value=infostealer_info.get('update', 'N/A'), inline=True)
+                        if 'users' in infostealer_info:
+                            embed.add_field(name="Infostealer - Users", value=infostealer_info.get('users', 'N/A'), inline=True)
+                        if 'users_url' in infostealer_info:
+                            embed.add_field(name="Infostealer - Users URL", value=infostealer_info.get('users_url', 'N/A'), inline=True)
                     
                     pages.append(embed)
 
@@ -236,18 +268,3 @@ class RansomwareDotLive(commands.Cog):
                 embed.add_field(name="Website hit", value=f"`{item['website']}`", inline=True)
             
             await channel.send(content=role_mention, embed=embed)
-
-    @tasks.loop(minutes=2)
-    async def check_recent_victims(self):
-        async with aiohttp.ClientSession() as session:
-            async with session.get("https://api.ransomware.live/recentvictims") as response:
-                if response.status != 200:
-                    return
-
-                data = await response.json()
-                new_victims = [item for item in data if datetime.datetime.strptime(item['published'], "%Y-%m-%d %H:%M:%S") > self.last_checked]
-
-                if new_victims:
-                    await self.send_alert(new_victims)
-        
-        self.last_checked = datetime.datetime.utcnow()
