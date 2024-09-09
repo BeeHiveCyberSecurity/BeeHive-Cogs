@@ -15,7 +15,7 @@ class RansomwareDotLive(commands.Cog):
         self.bot = bot
         self.alert_channel_id = None
         self.alert_role_id = None
-        self.last_checked = datetime.datetime.utcnow()
+        self.last_checked_name = None
         self.check_recent_victims.start()
 
     def cog_unload(self):
@@ -23,17 +23,27 @@ class RansomwareDotLive(commands.Cog):
 
     @tasks.loop(minutes=2)
     async def check_recent_victims(self):
-        async with aiohttp.ClientSession() as session:
+        headers = {
+            "User-Agent": "DiscordBot (BeeHive-Cogs, ransomwaredotlive)"
+        }
+        async with aiohttp.ClientSession(headers=headers) as session:
             async with session.get("https://api.ransomware.live/recentvictims") as response:
                 if response.status != 200:
                     return
 
                 data = await response.json()
-                new_victims = [item for item in data if datetime.datetime.strptime(item['published'], "%Y-%m-%d %H:%M:%S") > self.last_checked]
+                if self.last_checked_name:
+                    new_victims = []
+                    for item in data:
+                        if item['name'] == self.last_checked_name:
+                            break
+                        new_victims.append(item)
+                else:
+                    new_victims = data
 
                 if new_victims:
                     await self.send_alert(new_victims)
-                    self.last_checked = datetime.datetime.utcnow()  # Update last_checked only if there are new victims
+                    self.last_checked_name = new_victims[0]['name']  # Update last_checked_name only if there are new victims
 
     @commands.group()
     async def ransomware(self, ctx):
