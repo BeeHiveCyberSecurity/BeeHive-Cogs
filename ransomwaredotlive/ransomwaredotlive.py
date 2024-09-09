@@ -249,4 +249,5 @@ class RansomwareDotLive(commands.Cog):
 
                 if new_victims:
                     await self.send_alert(new_victims)
-                    self.last_checked = datetime.datetime.utcnow()
+        
+        self.last_checked = datetime.datetime.utcnow()
