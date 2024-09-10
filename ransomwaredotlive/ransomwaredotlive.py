@@ -21,8 +21,15 @@ class RansomwareDotLive(commands.Cog):
     def cog_unload(self):
         self.check_recent_victims.cancel()
 
-    @tasks.loop(minutes=2)
+    @tasks.loop(hours=24)
     async def check_recent_victims(self):
+        await self.bot.wait_until_ready()
+        now = datetime.datetime.now()
+        evening_time = now.replace(hour=18, minute=0, second=0, microsecond=0)
+        if now > evening_time:
+            evening_time += datetime.timedelta(days=1)
+        await discord.utils.sleep_until(evening_time)
+
         headers = {
             "User-Agent": "DiscordBot (BeeHive-Cogs, ransomwaredotlive)"
         }
@@ -32,17 +39,14 @@ class RansomwareDotLive(commands.Cog):
                     return
 
                 data = await response.json()
-                if self.last_checked_name:
-                    new_victims = []
-                    for item in data:
-                        if item['name'] == self.last_checked_name:
-                            break
-                        new_victims.append(item)
-                else:
-                    new_victims = data
+                today = datetime.datetime.now().date()
+                new_victims = [item for item in data if datetime.datetime.strptime(item['date'], '%Y-%m-%d').date() == today]
 
                 if new_victims:
-                    await self.send_alert(new_victims)
+                    embed = discord.Embed(title="Today's ransomware rundown", color=0xff0000)
+                    for victim in new_victims:
+                        embed.add_field(name=victim['name'], value=f"Date: {victim['date']}", inline=False)
+                    await self.send_alert(embed)
                     self.last_checked_name = new_victims[0]['name']  # Update last_checked_name only if there are new victims
 
     @commands.group()
