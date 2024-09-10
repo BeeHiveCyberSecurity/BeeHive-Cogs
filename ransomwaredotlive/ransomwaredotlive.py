@@ -8,7 +8,7 @@ from discord.ext import tasks #type: ignore
 class RansomwareDotLive(commands.Cog):
     """Interact with the ransomware.live API"""
 
-    __version__ = "**1.0.0.8**"
+    __version__ = "**1.0.0.9**"
     __last_updated__ = "**September 9th, 2024**"
 
     def __init__(self, bot):
@@ -43,7 +43,7 @@ class RansomwareDotLive(commands.Cog):
                 new_victims = [item for item in data if datetime.datetime.strptime(item['date'], '%Y-%m-%d').date() == today]
 
                 if new_victims:
-                    embed = discord.Embed(title="Today's ransomware rundown", color=0xff0000)
+                    embed = discord.Embed(title="Today's ransomware rundown", color=0xfffffe)
                     for victim in new_victims:
                         embed.add_field(name=victim['name'], value=f"Date: {victim['date']}", inline=False)
                     await self.send_alert(embed)
