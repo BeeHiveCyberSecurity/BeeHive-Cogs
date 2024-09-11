@@ -350,3 +350,19 @@ class Products(commands.Cog):
         embed.add_field(name="Licensed under GPLv3", value="Red is a free and open source application made available to the public and licensed under the GNU GPLv3. [Read the license](https://github.com/Cog-Creators/Red-DiscordBot/blob/V3/develop/LICENSE)", inline=False)
         embed.add_field(name="Enhanced by BeeHive", value="This bot has been enhanced by BeeHive to provide additional features and functionality. [Learn more about Sentri](https://www.beehive.systems/sentri) or [check out our open source cogs](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs)", inline=False)
         await ctx.send(embed=embed)
+
+    @commands.is_owner()
+    @commands.command(name="removeteamrole", description="Remove the 'Team' role from the specified user.")
+    async def removeteamrole(self, ctx: commands.Context, member: discord.Member):
+        """
+        Remove the 'Team' role from the specified user.
+        """
+        team_role = discord.utils.get(ctx.guild.roles, name="Team")
+        if team_role in member.roles:
+            try:
+                await member.remove_roles(team_role)
+                await ctx.send(f"Successfully removed the 'Team' role from {member.mention}.")
+            except discord.Forbidden:
+                await ctx.send("Unable to remove the 'Team' role due to permission issues.")
+        else:
+            await ctx.send(f"{member.mention} does not have the 'Team' role.")
