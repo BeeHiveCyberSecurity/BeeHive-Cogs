@@ -366,3 +366,32 @@ class Products(commands.Cog):
                 await ctx.send("Unable to remove the 'Team' role due to permission issues.")
         else:
             await ctx.send(f"{member.mention} does not have the 'Team' role.")
+
+    @commands.has_permissions(manage_roles=True)
+    @commands.command(name="updateroleicon", description="Update a role's icon with the specified attachment or image URL.")
+    async def updateroleicon(self, ctx: commands.Context, role: discord.Role, image_url: str = None):
+        """
+        Update a role's icon with the specified attachment or image URL.
+        """
+        if not image_url and not ctx.message.attachments:
+            await ctx.send("Please provide an image URL or attach an image.")
+            return
+
+        if image_url:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(image_url) as response:
+                    if response.status != 200:
+                        await ctx.send("Failed to fetch the image from the provided URL.")
+                        return
+                    image_data = await response.read()
+        else:
+            attachment = ctx.message.attachments[0]
+            image_data = await attachment.read()
+
+        try:
+            await role.edit(icon=image_data)
+            await ctx.send(f"Successfully updated the icon for the role '{role.name}'.")
+        except discord.Forbidden:
+            await ctx.send("Unable to update the role icon due to permission issues.")
+        except discord.HTTPException as e:
+            await ctx.send(f"Failed to update the role icon: {e}")
