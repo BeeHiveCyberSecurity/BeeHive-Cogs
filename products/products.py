@@ -389,7 +389,7 @@ class Products(commands.Cog):
             image_data = await attachment.read()
 
         try:
-            await role.edit(icon=image_data)
+            await role.edit(display_icon=image_data)
             await ctx.send(f"Successfully updated the icon for the role '{role.name}'.")
         except discord.Forbidden:
             await ctx.send("Unable to update the role icon due to permission issues.")
