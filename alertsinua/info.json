@@ -1,0 +1,9 @@
+{
+  "name": "alertsinua",
+  "author": ["adminelevation"],
+  "description": "A cog to let you interact with war intelligence within Ukraine. Endpoints this cog uses were datamined and may stop working at anytime/at the choice of the Ukrainian government",
+  "short": "Fetch and display recent war activity alerts.",
+  "requirements": [],
+  "tags": ["alerts", "war", "activity", "discord"],
+  "end_user_data_statement": "This cog does not store any end user data."
+}
