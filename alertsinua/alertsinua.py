@@ -51,9 +51,8 @@ class WarActivity(commands.Cog):
         embed = discord.Embed(
             title="Recent War Activity",
             description=post["me"],
-            colour=discord.Colour.red()
+            colour=0xfffffe
         )
-        embed.add_field(name="Message", value=post["me"], inline=False)
         embed.add_field(name="Source", value=post["su"], inline=False)
-        embed.set_footer(text=f"Page {page + 1} of {len(self.war_activity_data)}")
+        embed.set_footer(text=f"Intel report {page + 1} of {len(self.war_activity_data)}")
         return embed
