@@ -54,7 +54,7 @@ class WarActivity(commands.Cog):
         post = self.war_activity_data[page]
         description_without_emoji = ''.join(char for char in post["me"] if char.isalnum() or char.isspace() or char in '.,!?')
         embed = discord.Embed(
-            title="Recent war intelligence",
+            title="Recent war activity",
             description=description_without_emoji,
             colour=0xfffffe
         )
