@@ -10,8 +10,12 @@ class WarActivity(commands.Cog):
         self.war_activity_data = []
         self.current_page = 0
 
-    @commands.command(name="waractivity", description="Fetch and display recent war activity.")
-    async def waractivity(self, ctx):
+    @commands.group(name="war", invoke_without_command=True)
+    async def war(self, ctx):
+        await ctx.send("Available subcommands: recent")
+
+    @war.command(name="recent", description="Fetch and display recent war activity.")
+    async def recent(self, ctx):
         await self.fetch_war_activity()
         if not self.war_activity_data:
             await ctx.send("No recent war activity found.")
@@ -49,7 +53,7 @@ class WarActivity(commands.Cog):
     def create_embed(self, page):
         post = self.war_activity_data[page]
         embed = discord.Embed(
-            title="Recent War Activity",
+            title="Recent war intelligence",
             description=post["me"],
             colour=0xfffffe
         )
