@@ -1,7 +1,11 @@
-import aiohttp #type: ignore
+import aiohttp
 import asyncio
-import discord #type: ignore
-from redbot.core import commands, Config #type: ignore
+import discord
+import logging
+import re
+from redbot.core import commands, Config, checks
+
+log = logging.getLogger("red.VirusTotal")
 
 class VirusTotal(commands.Cog):
     """VirusTotal file upload and analysis via Discord"""
@@ -25,7 +29,7 @@ class VirusTotal(commands.Cog):
         """VirusTotal is a free online service that analyzes files and URLs to detect viruses, malware, and other security threats. Learn more at https://www.virustotal.com"""
         await ctx.send_help(ctx.command)
 
-    @commands.admin_or_permissions()
+    @checks.admin_or_permissions(manage_guild=True)
     @virustotal.command(name="autoscan")
     async def toggle_auto_scan(self, ctx):
         """Toggle automatic file scanning on or off"""
@@ -36,7 +40,7 @@ class VirusTotal(commands.Cog):
         status = "enabled" if auto_scan_enabled else "disabled"
         await ctx.send(f"Automatic file scanning has been {status}.")
 
-    @commands.admin_or_permissions()
+    @checks.admin_or_permissions(manage_guild=True)
     @virustotal.command(name="infoemoji")
     async def toggle_info_emoji(self, ctx):
         """Toggle automatic info emoji reaction on or off"""
@@ -104,7 +108,6 @@ class VirusTotal(commands.Cog):
 
     def extract_hashes(self, text):
         """Extract potential file hashes from the text"""
-        import re
         sha1_pattern = re.compile(r'\b[0-9a-fA-F]{40}\b')
         sha256_pattern = re.compile(r'\b[0-9a-fA-F]{64}\b')
         md5_pattern = re.compile(r'\b[0-9a-fA-F]{32}\b')
