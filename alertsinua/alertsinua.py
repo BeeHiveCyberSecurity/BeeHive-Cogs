@@ -16,9 +16,9 @@ class WarActivity(commands.Cog):
         self.war_activity_data = []
         self.current_page = 0
 
-    @commands.group(name="ukraine", invoke_without_command=True)
+    @commands.group(name="ukraine")
     async def ukraine(self, ctx):
-        """"""
+        """Fetch information about the current conflict in Ukraine"""
 
     @ukraine.command(name="recent", description="Fetch and display recent war activity.")
     async def recent(self, ctx):
