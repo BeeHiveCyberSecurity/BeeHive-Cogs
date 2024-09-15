@@ -1,22 +1,28 @@
 import discord
-from redbot.core import commands
+from redbot.core import commands, Config
 import aiohttp
 import asyncio
 
 class WarActivity(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.config = Config.get_conf(self, identifier=1234567890)
+        default_guild = {
+            "alert_channel_id": None,
+            "last_alert_id": 0
+        }
+        self.config.register_guild(**default_guild)
         self.war_activity_url = "https://api.alerts.in.ua/v3/war_activity_posts/recent.json"
         self.war_activity_data = []
         self.current_page = 0
 
     @commands.group(name="war", invoke_without_command=True)
     async def war(self, ctx):
-        await ctx.send("Available subcommands: recent")
+        await ctx.send("Available subcommands: recent, setchannel")
 
     @war.command(name="recent", description="Fetch and display recent war activity.")
     async def recent(self, ctx):
-        await self.fetch_war_activity()
+        await self.fetch_war_activity(ctx.guild.id)
         if not self.war_activity_data:
             await ctx.send("No recent war activity found.")
             return
@@ -47,17 +53,38 @@ class WarActivity(commands.Cog):
             except discord.Forbidden:
                 break  # Exit the loop if the bot cannot remove reactions
 
-    async def fetch_war_activity(self):
+    @war.command(name="setchannel", description="Set the channel for war activity alerts.")
+    @commands.has_permissions(manage_channels=True)
+    async def setchannel(self, ctx, channel: discord.TextChannel):
+        await self.config.guild(ctx.guild).alert_channel_id.set(channel.id)
+        await ctx.send(f"Alert channel set to {channel.mention}")
+
+    async def fetch_war_activity(self, guild_id):
         async with aiohttp.ClientSession() as session:
             try:
                 async with session.get(self.war_activity_url) as response:
                     if response.status == 200:
                         data = await response.json()
-                        self.war_activity_data = data.get("war_activity_posts", [])
+                        last_alert_id = await self.config.guild_from_id(guild_id).last_alert_id()
+                        new_posts = [post for post in data.get("war_activity_posts", []) if post["i"] > last_alert_id]
+                        if new_posts:
+                            self.war_activity_data = new_posts
+                            new_last_alert_id = max(post["i"] for post in new_posts)
+                            await self.config.guild_from_id(guild_id).last_alert_id.set(new_last_alert_id)
+                            await self.send_alerts(guild_id, new_posts)
                     else:
                         self.war_activity_data = []
             except aiohttp.ClientError:
                 self.war_activity_data = []
+
+    async def send_alerts(self, guild_id, new_posts):
+        alert_channel_id = await self.config.guild_from_id(guild_id).alert_channel_id()
+        if alert_channel_id:
+            channel = self.bot.get_channel(alert_channel_id)
+            if channel:
+                for post in new_posts:
+                    embed = self.create_embed_from_post(post)
+                    await channel.send(embed=embed)
 
     def create_embed(self, page):
         if not self.war_activity_data:
@@ -67,6 +94,9 @@ class WarActivity(commands.Cog):
                 colour=0xfffffe
             )
         post = self.war_activity_data[page]
+        return self.create_embed_from_post(post)
+
+    def create_embed_from_post(self, post):
         description_without_emoji = ''.join(char for char in post["me"] if char.isalnum() or char.isspace() or char in '.,!?')
         embed = discord.Embed(
             title="Recent war activity",
@@ -74,5 +104,5 @@ class WarActivity(commands.Cog):
             colour=0xfffffe
         )
         embed.add_field(name="Source", value=post["su"], inline=False)
-        embed.set_footer(text=f"Intel report {page + 1} of {len(self.war_activity_data)}")
+        embed.set_footer(text=f"Intel report")
         return embed
