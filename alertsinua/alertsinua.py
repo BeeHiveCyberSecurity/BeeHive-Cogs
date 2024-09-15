@@ -24,7 +24,20 @@ class WarActivity(commands.Cog):
     @ukraine.command(name="recent", description="Fetch and display recent war activity.")
     async def recent(self, ctx):
         """Show recent conflict activity"""
-        await self.fetch_war_activity(ctx.guild.id)
+        headers = {
+            "User-Agent": "Привіт від BeeHive, слава Україні! (Discord bot)"
+        }
+        async with aiohttp.ClientSession(headers=headers) as session:
+            try:
+                async with session.get(self.war_activity_url) as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        self.war_activity_data = data.get("war_activity_posts", [])
+                    else:
+                        self.war_activity_data = []
+            except aiohttp.ClientError:
+                self.war_activity_data = []
+
         if not self.war_activity_data:
             await ctx.send("No recent war activity found.")
             return
