@@ -77,6 +77,8 @@ class WarActivity(commands.Cog):
                             new_last_alert_id = max(post["i"] for post in new_posts)
                             await self.config.guild_from_id(guild_id).last_alert_id.set(new_last_alert_id)
                             await self.send_alerts(guild_id, new_posts)
+                        else:
+                            self.war_activity_data = []
                     else:
                         self.war_activity_data = []
             except aiohttp.ClientError:
