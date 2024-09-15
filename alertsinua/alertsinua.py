@@ -90,14 +90,10 @@ class WarActivity(commands.Cog):
                         last_alert_id = await self.config.guild_from_id(guild_id).last_alert_id()
                         new_posts = [post for post in data.get("war_activity_posts", []) if post["i"] > last_alert_id]
                         if new_posts:
-                            self.war_activity_data = new_posts
                             new_last_alert_id = max(post["i"] for post in new_posts)
                             await self.config.guild_from_id(guild_id).last_alert_id.set(new_last_alert_id)
                             await self.send_alerts(guild_id, new_posts)
-                        else:
-                            self.war_activity_data = []
-                    else:
-                        self.war_activity_data = []
+                    self.war_activity_data = new_posts if new_posts else []
             except aiohttp.ClientError:
                 self.war_activity_data = []
 
@@ -106,12 +102,10 @@ class WarActivity(commands.Cog):
         if alert_channel_id:
             channel = self.bot.get_channel(alert_channel_id)
             if channel:
-                last_alert_id = await self.config.guild_from_id(guild_id).last_alert_id()
                 for post in new_posts:
-                    if post["i"] > last_alert_id:
-                        embed = self.create_embed_from_post(post)
-                        await channel.send(embed=embed)
-                        await self.config.guild_from_id(guild_id).last_alert_id.set(post["i"])
+                    embed = self.create_embed_from_post(post)
+                    await channel.send(embed=embed)
+                    await self.config.guild_from_id(guild_id).last_alert_id.set(post["i"])
 
     async def check_and_send_alerts_loop(self):
         await self.bot.wait_until_ready()
@@ -129,8 +123,7 @@ class WarActivity(commands.Cog):
                 description="No data available.",
                 colour=0xfffffe
             )
-        post = self.war_activity_data[page]
-        return self.create_embed_from_post(post)
+        return self.create_embed_from_post(self.war_activity_data[page])
 
     def create_embed_from_post(self, post):
         description_without_emoji = ''.join(char for char in post["me"] if char.isalnum() or char.isspace() or char in '.,!?')
