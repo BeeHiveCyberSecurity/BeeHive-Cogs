@@ -45,10 +45,11 @@ class WarActivity(commands.Cog):
         embed = self.create_embed(self.current_page)
         message = await ctx.send(embed=embed)
         await message.add_reaction("⬅️")
+        await message.add_reaction("❌")
         await message.add_reaction("➡️")
 
         def check(reaction, user):
-            return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️"]
+            return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️", "❌"]
 
         while True:
             try:
@@ -57,6 +58,9 @@ class WarActivity(commands.Cog):
                     self.current_page = max(self.current_page - 1, 0)
                 elif str(reaction.emoji) == "➡️":
                     self.current_page = min(self.current_page + 1, len(self.war_activity_data) - 1)
+                elif str(reaction.emoji) == "❌":
+                    await message.delete()
+                    break
 
                 embed = self.create_embed(self.current_page)
                 await message.edit(embed=embed)
