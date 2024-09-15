@@ -113,7 +113,10 @@ class WarActivity(commands.Cog):
             for guild in self.bot.guilds:
                 await self.fetch_war_activity(guild.id)
                 if self.war_activity_data:
-                    await self.send_alerts(guild.id, self.war_activity_data)
+                    last_alert_id = await self.config.guild_from_id(guild.id).last_alert_id()
+                    new_posts = [post for post in self.war_activity_data if post["i"] > last_alert_id]
+                    if new_posts:
+                        await self.send_alerts(guild.id, new_posts)
             await asyncio.sleep(120)  # Check every 2 minutes
 
     def create_embed(self, page):
