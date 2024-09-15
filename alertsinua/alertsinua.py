@@ -23,6 +23,7 @@ class WarActivity(commands.Cog):
 
     @ukraine.command(name="recent", description="Fetch and display recent war activity.")
     async def recent(self, ctx):
+        """Show recent conflict activity"""
         await self.fetch_war_activity(ctx.guild.id)
         if not self.war_activity_data:
             await ctx.send("No recent war activity found.")
