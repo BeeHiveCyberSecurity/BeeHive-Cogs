@@ -15,6 +15,7 @@ class WarActivity(commands.Cog):
         self.war_activity_url = "https://api.alerts.in.ua/v3/war_activity_posts/recent.json"
         self.war_activity_data = []
         self.current_page = 0
+        self.bot.loop.create_task(self.check_and_send_alerts_loop())
 
     @commands.group(name="ukraine")
     async def ukraine(self, ctx):
@@ -88,6 +89,15 @@ class WarActivity(commands.Cog):
                 for post in new_posts:
                     embed = self.create_embed_from_post(post)
                     await channel.send(embed=embed)
+
+    async def check_and_send_alerts_loop(self):
+        await self.bot.wait_until_ready()
+        while not self.bot.is_closed():
+            for guild in self.bot.guilds:
+                await self.fetch_war_activity(guild.id)
+                if self.war_activity_data:
+                    await self.send_alerts(guild.id, self.war_activity_data)
+            await asyncio.sleep(120)  # Check every 2 minutes
 
     def create_embed(self, page):
         if not self.war_activity_data:
