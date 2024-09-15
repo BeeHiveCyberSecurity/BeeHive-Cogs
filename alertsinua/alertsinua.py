@@ -72,7 +72,7 @@ class WarActivity(commands.Cog):
         embed.set_footer(text=f"Intel report")
         return embed
 
-    @commands.command(name="recent")
+    @ukraine.command(name="recent")
     async def recent(self, ctx):
         """Shows all recent war activity in a scrollable embed."""
         guild_id = ctx.guild.id
