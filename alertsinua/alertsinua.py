@@ -60,7 +60,10 @@ class WarActivity(commands.Cog):
         await ctx.send(f"Alert channel set to {channel.mention}")
 
     async def fetch_war_activity(self, guild_id):
-        async with aiohttp.ClientSession() as session:
+        headers = {
+            "User-Agent": "Привіт від BeeHive, слава Україні! (Discord bot)"
+        }
+        async with aiohttp.ClientSession(headers=headers) as session:
             try:
                 async with session.get(self.war_activity_url) as response:
                     if response.status == 200:
