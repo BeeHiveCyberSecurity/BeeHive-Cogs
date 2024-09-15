@@ -13,64 +13,11 @@ class WarActivity(commands.Cog):
         }
         self.config.register_guild(**default_guild)
         self.war_activity_url = "https://api.alerts.in.ua/v3/war_activity_posts/recent.json"
-        self.war_activity_data = []
-        self.current_page = 0
         self.bot.loop.create_task(self.check_and_send_alerts_loop())
 
     @commands.group(name="ukraine")
     async def ukraine(self, ctx):
         """Fetch information about the current conflict in Ukraine"""
-
-    @ukraine.command(name="recent", description="Fetch and display recent war activity.")
-    async def recent(self, ctx):
-        """Show recent conflict activity"""
-        headers = {
-            "User-Agent": "Привіт від BeeHive, слава Україні! (Discord bot)"
-        }
-        async with aiohttp.ClientSession(headers=headers) as session:
-            try:
-                async with session.get(self.war_activity_url) as response:
-                    if response.status == 200:
-                        data = await response.json()
-                        self.war_activity_data = data.get("war_activity_posts", [])
-                    else:
-                        self.war_activity_data = []
-            except aiohttp.ClientError:
-                self.war_activity_data = []
-
-        if not self.war_activity_data:
-            await ctx.send("No recent war activity found.")
-            return
-
-        embed = self.create_embed(self.current_page)
-        message = await ctx.send(embed=embed)
-        await message.add_reaction("⬅️")
-        await message.add_reaction("❌")
-        await message.add_reaction("➡️")
-
-        def check(reaction, user):
-            return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️", "❌"]
-
-        while True:
-            try:
-                reaction, user = await self.bot.wait_for("reaction_add", timeout=60.0, check=check)
-                if str(reaction.emoji) == "⬅️":
-                    self.current_page = max(self.current_page - 1, 0)
-                elif str(reaction.emoji) == "➡️":
-                    self.current_page = min(self.current_page + 1, len(self.war_activity_data) - 1)
-                elif str(reaction.emoji) == "❌":
-                    await message.delete()
-                    break
-
-                embed = self.create_embed(self.current_page)
-                await message.edit(embed=embed)
-                await message.remove_reaction(reaction, user)
-            except asyncio.TimeoutError:
-                break
-            except discord.NotFound:
-                break  # Exit the loop if the message is deleted
-            except discord.Forbidden:
-                break  # Exit the loop if the bot cannot remove reactions
 
     @ukraine.command(name="setchannel", description="Set the channel for war activity alerts.")
     @commands.has_permissions(manage_channels=True)
@@ -93,13 +40,10 @@ class WarActivity(commands.Cog):
                             await self.send_alerts(guild_id, new_posts)
                             new_last_alert_id = max(post["i"] for post in new_posts)
                             await self.config.guild_from_id(guild_id).last_alert_id.set(new_last_alert_id)
-                            self.war_activity_data = new_posts
-                        else:
-                            self.war_activity_data = []
                     else:
-                        self.war_activity_data = []
+                        new_posts = []
             except aiohttp.ClientError:
-                self.war_activity_data = []
+                new_posts = []
 
     async def send_alerts(self, guild_id, new_posts):
         alert_channel_id = await self.config.guild_from_id(guild_id).alert_channel_id()
@@ -109,9 +53,6 @@ class WarActivity(commands.Cog):
                 for post in new_posts:
                     embed = self.create_embed_from_post(post)
                     await channel.send(embed=embed)
-                # Ensure the last alert ID is updated after all posts are sent
-                if new_posts:
-                    await self.config.guild_from_id(guild_id).last_alert_id.set(max(post["i"] for post in new_posts))
 
     async def check_and_send_alerts_loop(self):
         await self.bot.wait_until_ready()
@@ -119,15 +60,6 @@ class WarActivity(commands.Cog):
             for guild in self.bot.guilds:
                 await self.fetch_war_activity(guild.id)
             await asyncio.sleep(120)  # Check every 2 minutes
-
-    def create_embed(self, page):
-        if not self.war_activity_data:
-            return discord.Embed(
-                title="Recent war activity",
-                description="No data available.",
-                colour=0xfffffe
-            )
-        return self.create_embed_from_post(self.war_activity_data[page])
 
     def create_embed_from_post(self, post):
         description_without_emoji = ''.join(char for char in post["me"] if char.isalnum() or char.isspace() or char in '.,!?')
@@ -139,3 +71,48 @@ class WarActivity(commands.Cog):
         embed.add_field(name="Source", value=post["su"], inline=False)
         embed.set_footer(text=f"Intel report")
         return embed
+
+    @commands.command(name="recent")
+    async def recent(self, ctx):
+        """Shows all recent war activity in a scrollable embed."""
+        guild_id = ctx.guild.id
+        headers = {
+            "User-Agent": "Привіт від BeeHive, слава Україні! (Discord bot)"
+        }
+        async with aiohttp.ClientSession(headers=headers) as session:
+            try:
+                async with session.get(self.war_activity_url) as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        posts = data.get("war_activity_posts", [])
+                        if posts:
+                            embeds = [self.create_embed_from_post(post) for post in posts]
+                            message = await ctx.send(embed=embeds[0])
+                            
+                            if len(embeds) > 1:
+                                await message.add_reaction("⬅️")
+                                await message.add_reaction("➡️")
+
+                                def check(reaction, user):
+                                    return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️"] and reaction.message.id == message.id
+
+                                i = 0
+                                while True:
+                                    try:
+                                        reaction, user = await self.bot.wait_for("reaction_add", timeout=60.0, check=check)
+                                        if str(reaction.emoji) == "➡️" and i < len(embeds) - 1:
+                                            i += 1
+                                            await message.edit(embed=embeds[i])
+                                        elif str(reaction.emoji) == "⬅️" and i > 0:
+                                            i -= 1
+                                            await message.edit(embed=embeds[i])
+                                        await message.remove_reaction(reaction, user)
+                                    except asyncio.TimeoutError:
+                                        break
+                        else:
+                            await ctx.send("No recent war activity found.")
+                    else:
+                        await ctx.send("Failed to fetch war activity.")
+            except aiohttp.ClientError:
+                await ctx.send("Error occurred while fetching war activity.")
+
