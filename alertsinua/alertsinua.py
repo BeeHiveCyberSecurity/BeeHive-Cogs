@@ -1,6 +1,6 @@
-import discord
-from redbot.core import commands, Config
-import aiohttp
+import discord #type: ignore
+from redbot.core import commands, Config #type: ignore
+import aiohttp #type: ignore
 import asyncio
 
 class WarActivity(commands.Cog):
@@ -16,11 +16,11 @@ class WarActivity(commands.Cog):
         self.war_activity_data = []
         self.current_page = 0
 
-    @commands.group(name="war", invoke_without_command=True)
-    async def war(self, ctx):
-        await ctx.send("Available subcommands: recent, setchannel")
+    @commands.group(name="ukraine", invoke_without_command=True)
+    async def ukraine(self, ctx):
+        """"""
 
-    @war.command(name="recent", description="Fetch and display recent war activity.")
+    @ukraine.command(name="recent", description="Fetch and display recent war activity.")
     async def recent(self, ctx):
         await self.fetch_war_activity(ctx.guild.id)
         if not self.war_activity_data:
@@ -53,7 +53,7 @@ class WarActivity(commands.Cog):
             except discord.Forbidden:
                 break  # Exit the loop if the bot cannot remove reactions
 
-    @war.command(name="setchannel", description="Set the channel for war activity alerts.")
+    @ukraine.command(name="setchannel", description="Set the channel for war activity alerts.")
     @commands.has_permissions(manage_channels=True)
     async def setchannel(self, ctx, channel: discord.TextChannel):
         await self.config.guild(ctx.guild).alert_channel_id.set(channel.id)
