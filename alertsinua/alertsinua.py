@@ -90,9 +90,9 @@ class WarActivity(commands.Cog):
                         last_alert_id = await self.config.guild_from_id(guild_id).last_alert_id()
                         new_posts = [post for post in data.get("war_activity_posts", []) if post["i"] > last_alert_id]
                         if new_posts:
+                            await self.send_alerts(guild_id, new_posts)
                             new_last_alert_id = max(post["i"] for post in new_posts)
                             await self.config.guild_from_id(guild_id).last_alert_id.set(new_last_alert_id)
-                            await self.send_alerts(guild_id, new_posts)
                             self.war_activity_data = new_posts
                         else:
                             self.war_activity_data = []
