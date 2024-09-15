@@ -42,15 +42,30 @@ class WarActivity(commands.Cog):
                 await message.remove_reaction(reaction, user)
             except asyncio.TimeoutError:
                 break
+            except discord.NotFound:
+                break  # Exit the loop if the message is deleted
+            except discord.Forbidden:
+                break  # Exit the loop if the bot cannot remove reactions
 
     async def fetch_war_activity(self):
         async with aiohttp.ClientSession() as session:
-            async with session.get(self.war_activity_url) as response:
-                if response.status == 200:
-                    data = await response.json()
-                    self.war_activity_data = data.get("war_activity_posts", [])
+            try:
+                async with session.get(self.war_activity_url) as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        self.war_activity_data = data.get("war_activity_posts", [])
+                    else:
+                        self.war_activity_data = []
+            except aiohttp.ClientError:
+                self.war_activity_data = []
 
     def create_embed(self, page):
+        if not self.war_activity_data:
+            return discord.Embed(
+                title="Recent war activity",
+                description="No data available.",
+                colour=0xfffffe
+            )
         post = self.war_activity_data[page]
         description_without_emoji = ''.join(char for char in post["me"] if char.isalnum() or char.isspace() or char in '.,!?')
         embed = discord.Embed(
