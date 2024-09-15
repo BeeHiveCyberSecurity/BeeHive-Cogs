@@ -91,9 +91,10 @@ class WarActivity(commands.Cog):
                             if len(embeds) > 1:
                                 await message.add_reaction("⬅️")
                                 await message.add_reaction("➡️")
+                                await message.add_reaction("❌")  # Add close reaction
 
                                 def check(reaction, user):
-                                    return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️"] and reaction.message.id == message.id
+                                    return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️", "❌"] and reaction.message.id == message.id
 
                                 i = 0
                                 while True:
@@ -105,6 +106,9 @@ class WarActivity(commands.Cog):
                                         elif str(reaction.emoji) == "⬅️" and i > 0:
                                             i -= 1
                                             await message.edit(embed=embeds[i])
+                                        elif str(reaction.emoji) == "❌":
+                                            await message.delete()
+                                            break
                                         await message.remove_reaction(reaction, user)
                                     except asyncio.TimeoutError:
                                         break
