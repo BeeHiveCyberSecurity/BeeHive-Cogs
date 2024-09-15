@@ -68,7 +68,6 @@ class WarActivity(commands.Cog):
             description=description_without_emoji,
             colour=0xfffffe
         )
-        embed.add_field(name="Source", value=post["su"], inline=False)
         embed.set_footer(text=f"Intel report")
         return embed
 
