@@ -93,7 +93,11 @@ class WarActivity(commands.Cog):
                             new_last_alert_id = max(post["i"] for post in new_posts)
                             await self.config.guild_from_id(guild_id).last_alert_id.set(new_last_alert_id)
                             await self.send_alerts(guild_id, new_posts)
-                    self.war_activity_data = new_posts if new_posts else []
+                            self.war_activity_data = new_posts
+                        else:
+                            self.war_activity_data = []
+                    else:
+                        self.war_activity_data = []
             except aiohttp.ClientError:
                 self.war_activity_data = []
 
@@ -105,7 +109,9 @@ class WarActivity(commands.Cog):
                 for post in new_posts:
                     embed = self.create_embed_from_post(post)
                     await channel.send(embed=embed)
-                    await self.config.guild_from_id(guild_id).last_alert_id.set(post["i"])
+                # Ensure the last alert ID is updated after all posts are sent
+                if new_posts:
+                    await self.config.guild_from_id(guild_id).last_alert_id.set(max(post["i"] for post in new_posts))
 
     async def check_and_send_alerts_loop(self):
         await self.bot.wait_until_ready()
