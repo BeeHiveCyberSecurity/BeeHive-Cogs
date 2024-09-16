@@ -43,14 +43,14 @@ class AbuseIPDB(commands.Cog):
                 if response.status == 200:
                     data = await response.json()
                     report = data['data']
-                    embed = discord.Embed(title=f"AbuseIPDB Report for {ip}", color=discord.Color.red())
-                    embed.add_field(name="IP Address", value=report['ipAddress'], inline=False)
-                    embed.add_field(name="Abuse Confidence Score", value=report['abuseConfidenceScore'], inline=False)
-                    embed.add_field(name="Country", value=f"{report['countryName']} ({report['countryCode']})", inline=False)
-                    embed.add_field(name="ISP", value=report['isp'], inline=False)
-                    embed.add_field(name="Domain", value=report['domain'], inline=False)
-                    embed.add_field(name="Total Reports", value=report['totalReports'], inline=False)
-                    embed.add_field(name="Last Reported At", value=report['lastReportedAt'], inline=False)
+                    embed = discord.Embed(title=f"AbuseIPDB Report for {ip}", color=0xfffffe
+                    embed.add_field(name="IP Address", value=report['ipAddress'], inline=True)
+                    embed.add_field(name="Abuse Confidence Score", value=report['abuseConfidenceScore'], inline=True)
+                    embed.add_field(name="Country", value=f"{report['countryName']} ({report['countryCode']})", inline=True)
+                    embed.add_field(name="ISP", value=report['isp'], inline=True)
+                    embed.add_field(name="Domain", value=report['domain'], inline=True)
+                    embed.add_field(name="Total Reports", value=report['totalReports'], inline=True)
+                    embed.add_field(name="Last Reported At", value=report['lastReportedAt'], inline=True)
                     if report['reports']:
                         latest_report = report['reports'][0]
                         embed.add_field(name="Latest Report", value=f"Reported At: {latest_report['reportedAt']}\nComment: {latest_report['comment']}", inline=False)
