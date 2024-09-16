@@ -1,9 +1,9 @@
 {
     "name": "AbuseIPDB",
     "author": ["adminelevation"],
-    "description": "A cog to interact with the AbuseIPDB API to check IP addresses for abuse reports.",
+    "description": "A cog to interact with the AbuseIPDB API to report and check IP addresses for abuse activities.",
     "short": "Check IP addresses against AbuseIPDB.",
     "requirements": [],
     "tags": ["abuseipdb", "ip", "security", "api"],
-    "install_msg": "Thank you for installing the AbuseIPDB cog. Use `[p]abuseipdbset setapikey <API_KEY>` to set your API key. Available commands:\n- `[p]abuseipdb report` to report an IP address.\n- `[p]abuseipdb list <IP>` to list all reports for an IP address.\n- `[p]abuseipdb check <IP>` to check details about an IP address.",
+    "install_msg": "Thank you for installing the AbuseIPDB cog. Use `[p]abuseipdbset setapikey <API_KEY>` to set your API key. Available commands:\n- `[p]abuseipdb report` to report an IP address.\n- `[p]abuseipdb list <IP>` to list all reports for an IP address.\n- `[p]abuseipdb check <IP>` to check details about an IP address."
 }
