@@ -71,8 +71,7 @@ class AbuseIPDB(commands.Cog):
                 "To report an IP address, you will need to provide the following information:\n"
                 "1. The IP address you want to report.\n"
                 "2. The categories of abuse (comma-separated).\n"
-                "3. A comment describing the abuse.\n"
-                "4. The timestamp of the abuse (e.g., 'YYYY-MM-DD HH:MM:SS', 'YYYY-MM-DDTHH:MM:SSZ', 'MM/DD/YYYY HH:MM:SS', or 'Month DD, YYYY HH:MM:SS').\n\n"
+                "3. A comment describing the abuse.\n\n"
                 "**Tips and Suggestions:**\n"
                 "- Make sure the IP address is correct.\n"
                 "- Provide detailed and accurate information in your comment.\n"
@@ -119,9 +118,7 @@ class AbuseIPDB(commands.Cog):
         if comment is None:
             return
 
-        timestamp = await get_user_input("Please enter the timestamp for the report (e.g., 'YYYY-MM-DD HH:MM:SS', 'YYYY-MM-DDTHH:MM:SSZ', 'MM/DD/YYYY HH:MM:SS', or 'Month DD, YYYY HH:MM:SS'):")
-        if timestamp is None:
-            return
+        timestamp = discord.utils.utcnow().strftime('%Y-%m-%d %H:%M:%S')
 
         abuseipdb_url = "https://api.abuseipdb.com/api/v2/report"
         headers = {
