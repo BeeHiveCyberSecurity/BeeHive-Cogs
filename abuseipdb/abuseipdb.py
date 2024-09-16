@@ -93,10 +93,12 @@ class AbuseIPDB(commands.Cog):
 
                     if len(embeds) > 1:
                         await message.add_reaction("⬅️")
+                        await message.add_reaction("❌")
                         await message.add_reaction("➡️")
+                        
 
                         def check(reaction, user):
-                            return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️"] and reaction.message.id == message.id
+                            return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️", "❌"] and reaction.message.id == message.id
 
                         current_page = 0
                         while True:
@@ -108,9 +110,12 @@ class AbuseIPDB(commands.Cog):
                                 elif str(reaction.emoji) == "⬅️" and current_page > 0:
                                     current_page -= 1
                                     await message.edit(embed=embeds[current_page])
+                                elif str(reaction.emoji) == "❌":
+                                    break
                                 await message.remove_reaction(reaction, user)
                             except asyncio.TimeoutError:
                                 break
+                        await message.clear_reactions()
                 else:
                     await ctx.send("Failed to fetch data from AbuseIPDB.")
 
