@@ -15,7 +15,8 @@ class AbuseIPDB(commands.Cog):
     @commands.group(name="abuseipdb")
     async def abuseipdb(self, ctx):
         """
-        AbuseIPDB tracks and manages IPs flagged for malicious activities, aiding in identifying security threats.
+        AbuseIPDB uses crowdsourced reports from administrators and analysts alike to track and manage IPs flagged for malicious activities, aiding in identifying security threats.
+
         Learn more at https://www.abuseipdb.com
         """
 
