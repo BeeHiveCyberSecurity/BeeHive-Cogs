@@ -44,7 +44,7 @@ class AbuseIPDB(commands.Cog):
                 description=prompt,
                 color=0xfffffe
             )
-            await ctx.send(embed=embed)
+            message = await ctx.send(embed=embed)
             try:
                 msg = await self.bot.wait_for('message', check=check, timeout=60)
                 if msg.content.lower() == "cancel":
@@ -54,7 +54,11 @@ class AbuseIPDB(commands.Cog):
                         color=0xff4545
                     )
                     await ctx.send(embed=cancel_embed)
+                    await message.delete()
+                    await msg.delete()
                     return None
+                await message.delete()
+                await msg.delete()
                 return msg.content
             except asyncio.TimeoutError:
                 timeout_embed = discord.Embed(
@@ -63,6 +67,7 @@ class AbuseIPDB(commands.Cog):
                     color=0xff4545
                 )
                 await ctx.send(embed=timeout_embed)
+                await message.delete()
                 return None
 
         embed = discord.Embed(
@@ -80,10 +85,11 @@ class AbuseIPDB(commands.Cog):
             ),
             color=0xfffffe
         )
-        await ctx.send(embed=embed)
+        message = await ctx.send(embed=embed)
 
         ip = await get_user_input("Please enter the IP address you want to report:")
         if ip is None:
+            await message.delete()
             return
 
         categories_table = (
@@ -113,12 +119,15 @@ class AbuseIPDB(commands.Cog):
         )
         categories = await get_user_input(f"Please enter the categories (comma-separated) for the report\n\n{categories_table}")
         if categories is None:
+            await message.delete()
             return
 
         comment = await get_user_input("Please enter a comment for the report")
         if comment is None:
+            await message.delete()
             return
 
+        await message.delete()
 
         abuseipdb_url = "https://api.abuseipdb.com/api/v2/report"
         headers = {
