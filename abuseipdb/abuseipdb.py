@@ -87,7 +87,7 @@ class AbuseIPDB(commands.Cog):
         )
         message = await ctx.send(embed=embed)
 
-        ip = await get_user_input("Please enter the IP address you want to report:")
+        ip = await get_user_input("Please respond in chat with the IPv4 or IPv6 that you'd like to create a report for.")
         if ip is None:
             await message.delete()
             return
