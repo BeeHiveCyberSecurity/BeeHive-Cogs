@@ -50,10 +50,14 @@ class AbuseIPDB(commands.Cog):
                     embed.add_field(name="ISP", value=report['isp'], inline=True)
                     embed.add_field(name="Domain", value=report['domain'], inline=True)
                     embed.add_field(name="Total reports", value=report['totalReports'], inline=True)
-                    embed.add_field(name="Last reported", value=f"<t:{int(discord.utils.parse_time(report['lastReportedAt']).timestamp())}:R>", inline=True)
+                    embed.add_field(name="Last reported", value=f"**<t:{int(discord.utils.parse_time(report['lastReportedAt']).timestamp())}:R>**", inline=True)
                     if report['reports']:
-                        latest_report = report['reports'][0]
-                        embed.add_field(name="Latest report", value=f"Reported At: <t:{int(discord.utils.parse_time(latest_report['reportedAt']).timestamp())}:R>\nComment: {latest_report['comment']}", inline=False)
+                        for i, rep in enumerate(report['reports'][:5]):
+                            embed.add_field(
+                                name=f"Report {i+1}",
+                                value=f'**<t:{int(discord.utils.parse_time(rep["reportedAt"]).timestamp())}:R>**, "{rep["comment"]}"',
+                                inline=False
+                            )
                     await ctx.send(embed=embed)
                 else:
                     await ctx.send("Failed to fetch data from AbuseIPDB.")
