@@ -1,6 +1,7 @@
 import discord #type: ignore
 from redbot.core import commands, Config #type: ignore
 import aiohttp #type: ignore
+import asyncio
 
 class AbuseIPDB(commands.Cog):
     def __init__(self, bot):
