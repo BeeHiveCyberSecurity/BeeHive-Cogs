@@ -83,9 +83,8 @@ class AbuseIPDB(commands.Cog):
                 "**3.** A **comment describing** the abuse.\n\n"
                 "### Tips and suggestions\n"
                 "- Make sure the IP address is correct.\n"
-                "- Provide detailed and accurate information in your comment, but be concise!.\n"
+                "- Provide detailed and accurate context as your comment.\n"
                 "- You can cancel the report at any time by typing `cancel`.\n"
-                "- If you'd like to report an IP for multiple reasons at once, use commas - eg, `19,21`"
             ),
             color=0xfffffe
         )
