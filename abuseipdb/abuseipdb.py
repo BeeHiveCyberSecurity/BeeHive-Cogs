@@ -23,7 +23,7 @@ class AbuseIPDB(commands.Cog):
         await ctx.send("API key set successfully.")
         
     @abuseipdb.command(name="reports", description="Check reports for an IP address against AbuseIPDB.")
-    async def reports(self, ctx, ip: str, page: int = 1, per_page: int = 25):
+    async def reports(self, ctx, ip: str):
         api_key = await self.config.guild(ctx.guild).api_key()
         if not api_key:
             await ctx.send("API key not set. Use the setapikey command to set it.")
@@ -36,8 +36,8 @@ class AbuseIPDB(commands.Cog):
         }
         params = {
             "ipAddress": ip,
-            "page": page,
-            "perPage": per_page
+            "page": 1,
+            "perPage": 100
         }
 
         reason_map = {
@@ -66,59 +66,68 @@ class AbuseIPDB(commands.Cog):
             23: "IoT Targeted"
         }
 
+        all_reports = []
         async with aiohttp.ClientSession(headers=headers) as session:
-            async with session.get(abuseipdb_url, params=params) as response:
-                if response.status == 200:
-                    data = await response.json()
-                    report_data = data['data']
-                    if not report_data['results']:
-                        await ctx.send(f"No reports found for IP address {ip}.")
+            while True:
+                async with session.get(abuseipdb_url, params=params) as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        report_data = data['data']
+                        if not report_data['results']:
+                            break
+                        all_reports.extend(report_data['results'])
+                        if len(report_data['results']) < params["perPage"]:
+                            break
+                        params["page"] += 1
+                    else:
+                        await ctx.send("Failed to fetch data from AbuseIPDB.")
                         return
 
-                    embeds = []
-                    for i, rep in enumerate(report_data['results']):
-                        categories = [reason_map.get(cat, f"Unknown ({cat})") for cat in rep["categories"]]
-                        embed = discord.Embed(title=f"AbuseIPDB reports for {ip}", color=0xfffffe)
-                        embed.set_footer(text=f"Total reports: {report_data['total']}")
-                        embed.add_field(
-                            name=f"Report {i+1}",
-                            value=f'**<t:{int(discord.utils.parse_time(rep["reportedAt"]).timestamp())}:R>**'
-                                  f'"{rep["comment"]}"\n'
-                                  f'Categories: {", ".join(categories)}\n'
-                                  f'Reported by user {rep["reporterId"]} in {rep["reporterCountryName"]}',
-                            inline=False
-                        )
-                        embeds.append(embed)
+        if not all_reports:
+            await ctx.send(f"No reports found for IP address {ip}.")
+            return
 
-                    message = await ctx.send(embed=embeds[0])
+        embeds = []
+        for i, rep in enumerate(all_reports):
+            categories = [reason_map.get(cat, f"Unknown ({cat})") for cat in rep["categories"]]
+            embed = discord.Embed(title=f"AbuseIPDB reports for {ip}", color=0xfffffe)
+            embed.set_footer(text=f"Total reports: {len(all_reports)}")
+            embed.add_field(
+                name=f"Report {i+1}",
+                value=f'**<t:{int(discord.utils.parse_time(rep["reportedAt"]).timestamp())}:R>**'
+                      f'"{rep["comment"]}"\n'
+                      f'Categories: {", ".join(categories)}\n'
+                      f'Reported by user {rep["reporterId"]} in {rep["reporterCountryName"]}',
+                inline=False
+            )
+            embeds.append(embed)
 
-                    if len(embeds) > 1:
-                        await message.add_reaction("⬅️")
-                        await message.add_reaction("❌")
-                        await message.add_reaction("➡️")
-                        
+        message = await ctx.send(embed=embeds[0])
 
-                        def check(reaction, user):
-                            return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️", "❌"] and reaction.message.id == message.id
+        if len(embeds) > 1:
+            await message.add_reaction("⬅️")
+            await message.add_reaction("❌")
+            await message.add_reaction("➡️")
 
-                        current_page = 0
-                        while True:
-                            try:
-                                reaction, user = await self.bot.wait_for("reaction_add", timeout=60.0, check=check)
-                                if str(reaction.emoji) == "➡️" and current_page < len(embeds) - 1:
-                                    current_page += 1
-                                    await message.edit(embed=embeds[current_page])
-                                elif str(reaction.emoji) == "⬅️" and current_page > 0:
-                                    current_page -= 1
-                                    await message.edit(embed=embeds[current_page])
-                                elif str(reaction.emoji) == "❌":
-                                    break
-                                await message.remove_reaction(reaction, user)
-                            except asyncio.TimeoutError:
-                                break
-                        await message.clear_reactions()
-                else:
-                    await ctx.send("Failed to fetch data from AbuseIPDB.")
+            def check(reaction, user):
+                return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️", "❌"] and reaction.message.id == message.id
+
+            current_page = 0
+            while True:
+                try:
+                    reaction, user = await self.bot.wait_for("reaction_add", timeout=60.0, check=check)
+                    if str(reaction.emoji) == "➡️" and current_page < len(embeds) - 1:
+                        current_page += 1
+                        await message.edit(embed=embeds[current_page])
+                    elif str(reaction.emoji) == "⬅️" and current_page > 0:
+                        current_page -= 1
+                        await message.edit(embed=embeds[current_page])
+                    elif str(reaction.emoji) == "❌":
+                        break
+                    await message.remove_reaction(reaction, user)
+                except asyncio.TimeoutError:
+                    break
+            await message.clear_reactions()
 
     @abuseipdb.command(name="check", description="Check an IP address against AbuseIPDB.")
     async def checkip(self, ctx, ip: str):
