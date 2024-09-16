@@ -21,7 +21,7 @@ class AbuseIPDB(commands.Cog):
         await self.config.guild(ctx.guild).api_key.set(api_key)
         await ctx.send("API key set successfully.")
 
-    @abuseipdb.command(name="checkip", description="Check an IP address against AbuseIPDB.")
+    @abuseipdb.command(name="check", description="Check an IP address against AbuseIPDB.")
     async def checkip(self, ctx, ip: str):
         api_key = await self.config.guild(ctx.guild).api_key()
         if not api_key:
@@ -34,14 +34,27 @@ class AbuseIPDB(commands.Cog):
             "Accept": "application/json"
         }
         params = {
-            "ipAddress": ip
+            "ipAddress": ip,
+            "verbose": ""
         }
 
         async with aiohttp.ClientSession(headers=headers) as session:
             async with session.get(abuseipdb_url, params=params) as response:
                 if response.status == 200:
                     data = await response.json()
-                    await ctx.send(f"IP Address: {ip}\nAbuse Confidence Score: {data['data']['abuseConfidenceScore']}")
+                    report = data['data']
+                    embed = discord.Embed(title=f"AbuseIPDB Report for {ip}", color=discord.Color.red())
+                    embed.add_field(name="IP Address", value=report['ipAddress'], inline=False)
+                    embed.add_field(name="Abuse Confidence Score", value=report['abuseConfidenceScore'], inline=False)
+                    embed.add_field(name="Country", value=f"{report['countryName']} ({report['countryCode']})", inline=False)
+                    embed.add_field(name="ISP", value=report['isp'], inline=False)
+                    embed.add_field(name="Domain", value=report['domain'], inline=False)
+                    embed.add_field(name="Total Reports", value=report['totalReports'], inline=False)
+                    embed.add_field(name="Last Reported At", value=report['lastReportedAt'], inline=False)
+                    if report['reports']:
+                        latest_report = report['reports'][0]
+                        embed.add_field(name="Latest Report", value=f"Reported At: {latest_report['reportedAt']}\nComment: {latest_report['comment']}", inline=False)
+                    await ctx.send(embed=embed)
                 else:
                     await ctx.send("Failed to fetch data from AbuseIPDB.")
 
