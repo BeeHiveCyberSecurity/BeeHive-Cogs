@@ -143,14 +143,35 @@ class AbuseIPDB(commands.Cog):
                         if response.status == 200:
                             ip_address = response_data["data"]["ipAddress"]
                             abuse_confidence_score = response_data["data"]["abuseConfidenceScore"]
-                            await ctx.send(f"IP Address {ip_address} reported successfully with an abuse confidence score of {abuse_confidence_score}.")
+                            embed = discord.Embed(
+                                title="Reported successfully",
+                                color=0x2bbd8e
+                            )
+                            embed.add_field(name="IP address", value=ip_address, inline=True)
+                            embed.add_field(name="Abuse confidence score", value=abuse_confidence_score, inline=True)
+                            await ctx.send(embed=embed)
                         else:
                             error_detail = response_data["errors"][0]["detail"]
-                            await ctx.send(f"Error reporting IP address: {error_detail}")
+                            embed = discord.Embed(
+                                title="Something went wrong",
+                                description=error_detail,
+                                color=0xff4545
+                            )
+                            await ctx.send(embed=embed)
                 except aiohttp.ClientError as e:
-                    await ctx.send(f"An error occurred while trying to report the IP address: {str(e)}")
+                    embed = discord.Embed(
+                        title="Client Error",
+                        description=f"An error occurred while trying to report the IP address: {str(e)}",
+                        color=0xff4545
+                    )
+                    await ctx.send(embed=embed)
                 except Exception as e:
-                    await ctx.send(f"An unexpected error occurred: {str(e)}")
+                    embed = discord.Embed(
+                        title="Unexpected Error",
+                        description=f"An unexpected error occurred: {str(e)}",
+                        color=0xff4545
+                    )
+                    await ctx.send(embed=embed)
 
     @abuseipdb.command(name="list", description="Check reports for an IP address against AbuseIPDB.")
     async def list(self, ctx, ip: str):
