@@ -118,7 +118,6 @@ class AbuseIPDB(commands.Cog):
         if comment is None:
             return
 
-        timestamp = discord.utils.utcnow().replace(microsecond=0).isoformat() + "Z"
 
         abuseipdb_url = "https://api.abuseipdb.com/api/v2/report"
         headers = {
@@ -129,7 +128,6 @@ class AbuseIPDB(commands.Cog):
             "ip": ip,
             "categories": categories,
             "comment": comment,
-            "timestamp": timestamp
         }
 
         async with aiohttp.ClientSession(headers=headers) as session:
