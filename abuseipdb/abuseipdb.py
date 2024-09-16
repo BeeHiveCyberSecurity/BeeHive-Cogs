@@ -78,10 +78,10 @@ class AbuseIPDB(commands.Cog):
             title="Before you get started, here's what you need to know",
             description=(
                 "To report an IP address, you will need to provide the following information:\n"
-                "1. The IP address you want to report.\n"
-                "2. The categories of abuse (comma-separated).\n"
-                "3. A comment describing the abuse.\n\n"
-                "**Tips and Suggestions:**\n"
+                "**1.** The **IP address** you want to report.\n"
+                "**2.** The **categories of abuse** (comma-separated).\n"
+                "**3.** A **comment describing** the abuse.\n\n"
+                "### Tips and suggestions\n"
                 "- Make sure the IP address is correct.\n"
                 "- Provide detailed and accurate information in your comment, but be concise!.\n"
                 "- You can cancel the report at any time by typing `cancel`.\n"
