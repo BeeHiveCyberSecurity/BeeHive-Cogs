@@ -24,6 +24,7 @@ class AbuseIPDB(commands.Cog):
     
     @abuseipdb.command(name="report", description="Report an IP address to AbuseIPDB.")
     async def report(self, ctx):
+        """Create a new IP abuse report"""
         api_key = await self.config.guild(ctx.guild).api_key()
         if not api_key:
             await ctx.send("API key not set. Use the setapikey command to set it.")
@@ -116,6 +117,7 @@ class AbuseIPDB(commands.Cog):
 
     @abuseipdb.command(name="list", description="Check reports for an IP address against AbuseIPDB.")
     async def list(self, ctx, ip: str):
+        """Show all reports for an IP"""
         api_key = await self.config.guild(ctx.guild).api_key()
         if not api_key:
             await ctx.send("API key not set. Use the setapikey command to set it.")
@@ -228,6 +230,7 @@ class AbuseIPDB(commands.Cog):
 
     @abuseipdb.command(name="check", description="Check an IP address against AbuseIPDB.")
     async def checkip(self, ctx, ip: str):
+        """See details about an IPv4 or IPv6"""
         api_key = await self.config.guild(ctx.guild).api_key()
         if not api_key:
             await ctx.send("API key not set. Use the setapikey command to set it.")
