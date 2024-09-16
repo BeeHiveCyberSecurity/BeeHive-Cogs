@@ -38,16 +38,48 @@ class AbuseIPDB(commands.Cog):
             return m.author == ctx.author and m.channel == ctx.channel
 
         async def get_user_input(prompt):
-            await ctx.send(prompt)
+            embed = discord.Embed(
+                title="Information needed...",
+                description=prompt,
+                color=0xfffffe
+            )
+            await ctx.send(embed=embed)
             try:
                 msg = await self.bot.wait_for('message', check=check, timeout=60)
                 if msg.content.lower() == "cancel":
-                    await ctx.send("Report cancelled.")
+                    cancel_embed = discord.Embed(
+                        title="Report cancelled",
+                        description="You have cancelled your report. Start a new report at any time using `[p]abuseipdb report`.",
+                        color=0xff4545
+                    )
+                    await ctx.send(embed=cancel_embed)
                     return None
                 return msg.content
             except asyncio.TimeoutError:
-                await ctx.send("You took too long to respond. Please try the command again.")
+                timeout_embed = discord.Embed(
+                    title="Timeout",
+                    description="You took too long to respond. Please try the command again.",
+                    color=0xff4545
+                )
+                await ctx.send(embed=timeout_embed)
                 return None
+
+        embed = discord.Embed(
+            title="AbuseIPDB Report Information",
+            description=(
+                "To report an IP address, you will need to provide the following information:\n"
+                "1. The IP address you want to report.\n"
+                "2. The categories of abuse (comma-separated).\n"
+                "3. A comment describing the abuse.\n"
+                "4. The timestamp of the abuse (e.g., YYYY-MM-DD HH:MM:SS or YYYY-MM-DDTHH:MM:SSZ).\n\n"
+                "**Tips and Suggestions:**\n"
+                "- Make sure the IP address is correct.\n"
+                "- Provide detailed and accurate information in your comment.\n"
+                "- You can cancel the report at any time by typing 'cancel'."
+            ),
+            color=0xfffffe
+        )
+        await ctx.send(embed=embed)
 
         ip = await get_user_input("Please enter the IP address you want to report:")
         if ip is None:
