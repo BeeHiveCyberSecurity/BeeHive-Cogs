@@ -13,6 +13,16 @@ class AbuseIPDB(commands.Cog):
         }
         self.config.register_guild(**default_guild)
 
+    @commands.group(name="abuseipdbset")
+    async def abuseipdbset(self, ctx):
+        "Configure the AbuseIPDB cog"
+
+    @abuseipdbset.command(name="setapikey", description="Set the API key for AbuseIPDB.")
+    @commands.admin_or_permissions()
+    async def setapikey(self, ctx, api_key: str):
+        await self.config.guild(ctx.guild).api_key.set(api_key)
+        await ctx.send("API key set successfully.")
+    
     @commands.group(name="abuseipdb")
     async def abuseipdb(self, ctx):
         """
@@ -20,12 +30,6 @@ class AbuseIPDB(commands.Cog):
 
         Learn more at https://www.abuseipdb.com
         """
-
-    @abuseipdb.command(name="setapikey", description="Set the API key for AbuseIPDB.")
-    @commands.admin_or_permissions()
-    async def setapikey(self, ctx, api_key: str):
-        await self.config.guild(ctx.guild).api_key.set(api_key)
-        await ctx.send("API key set successfully.")
     
     @abuseipdb.command(name="report", description="Report an IP address to AbuseIPDB.")
     async def report(self, ctx):
