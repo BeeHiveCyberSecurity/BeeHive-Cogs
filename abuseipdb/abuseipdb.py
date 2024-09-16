@@ -51,7 +51,7 @@ class AbuseIPDB(commands.Cog):
 
                     embeds = []
                     for i, rep in enumerate(report_data['results']):
-                        embed = discord.Embed(title=f"AbuseIPDB reports for {ip} (Page {page}/{report_data['lastPage']})", color=0xfffffe)
+                        embed = discord.Embed(title=f"AbuseIPDB reports for {ip}", color=0xfffffe)
                         embed.set_footer(text=f"Total reports: {report_data['total']}")
                         embed.add_field(
                             name=f"Report {i+1}",
