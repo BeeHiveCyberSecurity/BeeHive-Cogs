@@ -114,8 +114,8 @@ class AbuseIPDB(commands.Cog):
                 except Exception as e:
                     await ctx.send(f"An unexpected error occurred: {str(e)}")
 
-    @abuseipdb.command(name="reports", description="Check reports for an IP address against AbuseIPDB.")
-    async def reports(self, ctx, ip: str):
+    @abuseipdb.command(name="list", description="Check reports for an IP address against AbuseIPDB.")
+    async def list(self, ctx, ip: str):
         api_key = await self.config.guild(ctx.guild).api_key()
         if not api_key:
             await ctx.send("API key not set. Use the setapikey command to set it.")
