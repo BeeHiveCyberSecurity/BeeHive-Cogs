@@ -15,7 +15,7 @@ class AbuseIPDB(commands.Cog):
 
     @commands.group(name="abuseipdbset")
     async def abuseipdbset(self, ctx):
-        "Configure the AbuseIPDB cog"
+        """Configure the AbuseIPDB cog"""
 
     @abuseipdbset.command(name="setapikey", description="Set the API key for AbuseIPDB.")
     @commands.admin_or_permissions()
