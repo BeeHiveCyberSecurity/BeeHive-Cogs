@@ -26,7 +26,7 @@ class AbuseIPDB(commands.Cog):
     @commands.group(name="abuseipdb")
     async def abuseipdb(self, ctx):
         """
-        AbuseIPDB is a project dedicated to helping combat the spread of hackers, spammers, and abusive activity on the internet by providing a central blacklist for webmasters, system administrators, and other interested parties to report and find IP addresses that have been associated with malicious activity online.
+        AbuseIPDB is a project dedicated to helping combat the spread of hackers, spammers, and abusive activity on the internet by providing a central blacklist for webmasters, system administrators, and other interested parties to report IP's engaged in bad behavior.
 
         Learn more at https://www.abuseipdb.com
         """
