@@ -40,6 +40,32 @@ class AbuseIPDB(commands.Cog):
             "perPage": per_page
         }
 
+        reason_map = {
+            1: "DNS Compromise",
+            2: "DNS Poisoning",
+            3: "Fraud Orders",
+            4: "DDoS Attack",
+            5: "FTP Brute-Force",
+            6: "Ping of Death",
+            7: "Phishing",
+            8: "Fraud VoIP",
+            9: "Open Proxy",
+            10: "Web Spam",
+            11: "Email Spam",
+            12: "Blog Spam",
+            13: "VPN IP",
+            14: "Port Scan",
+            15: "Hacking",
+            16: "SQL Injection",
+            17: "Spoofing",
+            18: "Brute-Force",
+            19: "Bad Web Bot",
+            20: "Exploited Host",
+            21: "Web App Attack",
+            22: "SSH",
+            23: "IoT Targeted"
+        }
+
         async with aiohttp.ClientSession(headers=headers) as session:
             async with session.get(abuseipdb_url, params=params) as response:
                 if response.status == 200:
@@ -51,12 +77,13 @@ class AbuseIPDB(commands.Cog):
 
                     embeds = []
                     for i, rep in enumerate(report_data['results']):
+                        categories = [reason_map.get(cat, f"Unknown ({cat})") for cat in rep["categories"]]
                         embed = discord.Embed(title=f"AbuseIPDB reports for {ip}", color=0xfffffe)
                         embed.set_footer(text=f"Total reports: {report_data['total']}")
                         embed.add_field(
                             name=f"Report {i+1}",
                             value=f'**<t:{int(discord.utils.parse_time(rep["reportedAt"]).timestamp())}:R>**, "{rep["comment"]}"\n'
-                                  f'Categories: {", ".join(map(str, rep["categories"]))}\n'
+                                  f'Categories: {", ".join(categories)}\n'
                                   f'Reporter: {rep["reporterId"]} ({rep["reporterCountryName"]})',
                             inline=False
                         )
