@@ -154,6 +154,17 @@ Brand cogs are cogs we make that are intended to integrate other third party ser
 >These are made open-effort and open-source to extend the functionality of Red-DiscordBot, not to imbibe an endorsement of any one specific brand.
 >If you choose to use these in potentially sensitive environments, this is the disclaimer that indicates you do so at your own risk and liability.
 
+### [abuseipdb](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/abuseipdb)
+
+Integrate the AbuseIPDB API with your Red-DiscordBot to check and report IP addresses for abusive activity. This cog allows you to query the reputation of an IP address and report malicious IPs directly from your Discord server. `[p]abuseipdb`.
+
+```
+[p]cog install BeeHive-Cogs abuseipdb
+```
+```
+[p]load abuseipdb
+```
+
 ### [cloudflare](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/cloudflare)
 
 Utilize a multitude of advanced Cloudflare tools thru Discord, including the Cloudflare URL Scanner. For the bot owner, unlock the ability to interact with multiple Cloudflare products you utilize thru your Red-DiscordBot instance.
