@@ -21,7 +21,99 @@ class AbuseIPDB(commands.Cog):
     async def setapikey(self, ctx, api_key: str):
         await self.config.guild(ctx.guild).api_key.set(api_key)
         await ctx.send("API key set successfully.")
-        
+    
+    @abuseipdb.command(name="report", description="Report an IP address to AbuseIPDB.")
+    async def report(self, ctx):
+        api_key = await self.config.guild(ctx.guild).api_key()
+        if not api_key:
+            await ctx.send("API key not set. Use the setapikey command to set it.")
+            return
+
+        def check(m):
+            return m.author == ctx.author and m.channel == ctx.channel
+
+        async def get_user_input(prompt):
+            await ctx.send(prompt)
+            try:
+                msg = await self.bot.wait_for('message', check=check, timeout=60)
+                if msg.content.lower() == "cancel":
+                    await ctx.send("Report cancelled.")
+                    return None
+                return msg.content
+            except asyncio.TimeoutError:
+                await ctx.send("You took too long to respond. Please try the command again.")
+                return None
+
+        ip = await get_user_input("Please enter the IP address you want to report:")
+        if ip is None:
+            return
+
+        categories_table = (
+            "1: DNS Compromise\n"
+            "2: DNS Poisoning\n"
+            "3: Fraud Orders\n"
+            "4: DDoS Attack\n"
+            "5: FTP Brute-Force\n"
+            "6: Ping of Death\n"
+            "7: Phishing\n"
+            "8: Fraud VoIP\n"
+            "9: Open Proxy\n"
+            "10: Web Spam\n"
+            "11: Email Spam\n"
+            "12: Blog Spam\n"
+            "13: VPN IP\n"
+            "14: Port Scan\n"
+            "15: Hacking\n"
+            "16: SQL Injection\n"
+            "17: Spoofing\n"
+            "18: Brute-Force\n"
+            "19: Bad Web Bot\n"
+            "20: Exploited Host\n"
+            "21: Web App Attack\n"
+            "22: SSH\n"
+            "23: IoT Targeted"
+        )
+        categories = await get_user_input(f"Please enter the categories (comma-separated) for the report:\n{categories_table}")
+        if categories is None:
+            return
+
+        comment = await get_user_input("Please enter a comment for the report:")
+        if comment is None:
+            return
+
+        timestamp = await get_user_input("Please enter the timestamp for the report (e.g., YYYY-MM-DD HH:MM:SS or YYYY-MM-DDTHH:MM:SSZ):")
+        if timestamp is None:
+            return
+
+        abuseipdb_url = "https://api.abuseipdb.com/api/v2/report"
+        headers = {
+            "Key": api_key,
+            "Accept": "application/json"
+        }
+        data = {
+            "ip": ip,
+            "categories": categories,
+            "comment": comment,
+            "timestamp": timestamp
+        }
+
+        async with aiohttp.ClientSession(headers=headers) as session:
+            async with ctx.typing():
+                try:
+                    async with session.post(abuseipdb_url, data=data) as response:
+                        response_data = await response.json()
+                        if response.status == 200:
+                            ip_address = response_data["data"]["ipAddress"]
+                            abuse_confidence_score = response_data["data"]["abuseConfidenceScore"]
+                            await ctx.send(f"IP Address {ip_address} reported successfully with an abuse confidence score of {abuse_confidence_score}.")
+                        else:
+                            error_detail = response_data["errors"][0]["detail"]
+                            await ctx.send(f"Error reporting IP address: {error_detail}")
+                except aiohttp.ClientError as e:
+                    await ctx.send(f"An error occurred while trying to report the IP address: {str(e)}")
+                except Exception as e:
+                    await ctx.send(f"An unexpected error occurred: {str(e)}")
+
     @abuseipdb.command(name="reports", description="Check reports for an IP address against AbuseIPDB.")
     async def reports(self, ctx, ip: str):
         api_key = await self.config.guild(ctx.guild).api_key()
