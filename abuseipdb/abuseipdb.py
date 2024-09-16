@@ -118,7 +118,7 @@ class AbuseIPDB(commands.Cog):
         if comment is None:
             return
 
-        timestamp = discord.utils.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+        timestamp = discord.utils.utcnow().isoformat() + "Z"
 
         abuseipdb_url = "https://api.abuseipdb.com/api/v2/report"
         headers = {
