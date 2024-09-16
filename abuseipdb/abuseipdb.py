@@ -141,7 +141,7 @@ class AbuseIPDB(commands.Cog):
                             abuse_confidence_score = response_data["data"]["abuseConfidenceScore"]
                             embed = discord.Embed(
                                 title="Your report was successfully processed",
-                                description="Reports like yours help assist security analysts and sysadmins around the world who rely on AbuseIPDB"
+                                description="Reports like yours help assist security analysts and sysadmins around the world who rely on AbuseIPDB",
                                 color=0x2bbd8e
                             )
                             embed.add_field(name="IP address reported", value=ip_address, inline=True)
