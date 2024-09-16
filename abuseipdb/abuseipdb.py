@@ -82,9 +82,10 @@ class AbuseIPDB(commands.Cog):
                         embed.set_footer(text=f"Total reports: {report_data['total']}")
                         embed.add_field(
                             name=f"Report {i+1}",
-                            value=f'**<t:{int(discord.utils.parse_time(rep["reportedAt"]).timestamp())}:R>**, "{rep["comment"]}"\n'
+                            value=f'**<t:{int(discord.utils.parse_time(rep["reportedAt"]).timestamp())}:R>**'
+                                  f'"{rep["comment"]}"\n'
                                   f'Categories: {", ".join(categories)}\n'
-                                  f'Reporter: {rep["reporterId"]} ({rep["reporterCountryName"]})',
+                                  f'Reported by user {rep["reporterId"]} in {rep["reporterCountryName"]}',
                             inline=False
                         )
                         embeds.append(embed)
