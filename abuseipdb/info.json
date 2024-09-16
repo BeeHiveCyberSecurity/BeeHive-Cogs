@@ -5,5 +5,5 @@
     "short": "Check IP addresses against AbuseIPDB.",
     "requirements": [],
     "tags": ["abuseipdb", "ip", "security", "api"],
-    "install_msg": "Thank you for installing the AbuseIPDB cog. Use `[p]abuseipdb setapikey` to set your API key and `[p]abuseipdb checkip <IP>` to check an IP address."
+    "install_msg": "Thank you for installing the AbuseIPDB cog. Use `[p]abuseipdbset setapikey <API_KEY>` to set your API key. Available commands:\n- `[p]abuseipdb report` to report an IP address.\n- `[p]abuseipdb list <IP>` to list all reports for an IP address.\n- `[p]abuseipdb check <IP>` to check details about an IP address.",
 }
