@@ -16,7 +16,7 @@ class AbuseIPDB(commands.Cog):
         """Interact with the AbuseIPDB API"""
 
     @abuseipdb.command(name="setapikey", description="Set the API key for AbuseIPDB.")
-    @commands.has_permissions(manage_guild=True)
+    @commands.admin_or_permissions()
     async def setapikey(self, ctx, api_key: str):
         await self.config.guild(ctx.guild).api_key.set(api_key)
         await ctx.send("API key set successfully.")
