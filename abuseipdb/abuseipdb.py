@@ -15,7 +15,7 @@ class AbuseIPDB(commands.Cog):
     @commands.group(name="abuseipdb")
     async def abuseipdb(self, ctx):
         """
-        AbuseIPDB (Abuse IP Database) is an online resource designed to track and manage a collection of IP addresses that have been flagged for engaging in malicious activities. Its primary purpose is to assist network administrators, cybersecurity experts, and individuals in identifying and addressing potential security threats by providing detailed information on IP addresses associated with abusive or suspicious behavior.
+        AbuseIPDB tracks and manages IPs flagged for malicious activities, aiding in identifying security threats.
         Learn more at https://www.abuseipdb.com
         """
 
