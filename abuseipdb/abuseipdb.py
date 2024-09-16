@@ -43,7 +43,7 @@ class AbuseIPDB(commands.Cog):
                 if response.status == 200:
                     data = await response.json()
                     report = data['data']
-                    embed = discord.Embed(title=f"AbuseIPDB Report for {ip}", color=0xfffffe
+                    embed = discord.Embed(title=f"AbuseIPDB Report for {ip}", color=0xfffffe)
                     embed.add_field(name="IP Address", value=report['ipAddress'], inline=True)
                     embed.add_field(name="Abuse Confidence Score", value=report['abuseConfidenceScore'], inline=True)
                     embed.add_field(name="Country", value=f"{report['countryName']} ({report['countryCode']})", inline=True)
