@@ -66,7 +66,7 @@ class AbuseIPDB(commands.Cog):
                 return None
 
         embed = discord.Embed(
-            title="AbuseIPDB Report Information",
+            title="Before you get started, here's what you need to know",
             description=(
                 "To report an IP address, you will need to provide the following information:\n"
                 "1. The IP address you want to report.\n"
@@ -74,8 +74,9 @@ class AbuseIPDB(commands.Cog):
                 "3. A comment describing the abuse.\n\n"
                 "**Tips and Suggestions:**\n"
                 "- Make sure the IP address is correct.\n"
-                "- Provide detailed and accurate information in your comment.\n"
-                "- You can cancel the report at any time by typing 'cancel'."
+                "- Provide detailed and accurate information in your comment, but be concise!.\n"
+                "- You can cancel the report at any time by typing `cancel`.\n"
+                "- If you'd like to report an IP for multiple reasons at once, use commas - eg, `19,21`"
             ),
             color=0xfffffe
         )
@@ -86,35 +87,35 @@ class AbuseIPDB(commands.Cog):
             return
 
         categories_table = (
-            "1: DNS Compromise\n"
-            "2: DNS Poisoning\n"
-            "3: Fraud Orders\n"
-            "4: DDoS Attack\n"
-            "5: FTP Brute-Force\n"
-            "6: Ping of Death\n"
-            "7: Phishing\n"
-            "8: Fraud VoIP\n"
-            "9: Open Proxy\n"
-            "10: Web Spam\n"
-            "11: Email Spam\n"
-            "12: Blog Spam\n"
-            "13: VPN IP\n"
-            "14: Port Scan\n"
-            "15: Hacking\n"
-            "16: SQL Injection\n"
-            "17: Spoofing\n"
-            "18: Brute-Force\n"
-            "19: Bad Web Bot\n"
-            "20: Exploited Host\n"
-            "21: Web App Attack\n"
-            "22: SSH\n"
-            "23: IoT Targeted"
+            "**1** DNS Compromise\n"
+            "**2** DNS Poisoning\n"
+            "**3** Fraud Orders\n"
+            "**4** DDoS Attack\n"
+            "**5** FTP Brute-Force\n"
+            "**6** Ping of Death\n"
+            "**7** Phishing\n"
+            "**8** Fraud VoIP\n"
+            "**9** Open Proxy\n"
+            "**10** Web Spam\n"
+            "**11** Email Spam\n"
+            "**12** Blog Spam\n"
+            "**13** VPN IP\n"
+            "**14** Port Scan\n"
+            "**15** Hacking\n"
+            "**16** SQL Injection\n"
+            "**17** Spoofing\n"
+            "**18** Brute-Force\n"
+            "**19** Bad Web Bot\n"
+            "**20** Exploited Host\n"
+            "**21** Web App Attack\n"
+            "**22** SSH\n"
+            "**23** IoT Targeted"
         )
-        categories = await get_user_input(f"Please enter the categories (comma-separated) for the report:\n{categories_table}")
+        categories = await get_user_input(f"Please enter the categories (comma-separated) for the report\n\n{categories_table}")
         if categories is None:
             return
 
-        comment = await get_user_input("Please enter a comment for the report:")
+        comment = await get_user_input("Please enter a comment for the report")
         if comment is None:
             return
 
@@ -139,11 +140,12 @@ class AbuseIPDB(commands.Cog):
                             ip_address = response_data["data"]["ipAddress"]
                             abuse_confidence_score = response_data["data"]["abuseConfidenceScore"]
                             embed = discord.Embed(
-                                title="Reported successfully",
+                                title="Your report was successfully processed",
+                                description="Reports like yours help assist security analysts and sysadmins around the world who rely on AbuseIPDB"
                                 color=0x2bbd8e
                             )
-                            embed.add_field(name="IP address", value=ip_address, inline=True)
-                            embed.add_field(name="Abuse confidence score", value=abuse_confidence_score, inline=True)
+                            embed.add_field(name="IP address reported", value=ip_address, inline=True)
+                            embed.add_field(name="Updated abuse score", value=abuse_confidence_score, inline=True)
                             await ctx.send(embed=embed)
                         else:
                             error_detail = response_data["errors"][0]["detail"]
