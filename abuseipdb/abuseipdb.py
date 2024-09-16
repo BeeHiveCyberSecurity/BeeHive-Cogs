@@ -2,6 +2,7 @@ import discord #type: ignore
 from redbot.core import commands, Config #type: ignore
 import aiohttp #type: ignore
 import asyncio
+import ipaddress
 
 class AbuseIPDB(commands.Cog):
     def __init__(self, bot):
@@ -267,6 +268,14 @@ class AbuseIPDB(commands.Cog):
     @abuseipdb.command(name="check", description="Check an IP address against AbuseIPDB.")
     async def checkip(self, ctx, ip: str):
         """See details about an IPv4 or IPv6"""
+
+        # Validate IP address
+        try:
+            ipaddress.ip_address(ip)
+        except ValueError:
+            await ctx.send("Invalid IP address. Please provide a valid IPv4 or IPv6 address.")
+            return
+
         api_key = await self.config.guild(ctx.guild).api_key()
         if not api_key:
             await ctx.send("API key not set. Use the setapikey command to set it.")
