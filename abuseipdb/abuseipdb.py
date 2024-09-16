@@ -68,20 +68,25 @@ class AbuseIPDB(commands.Cog):
 
         all_reports = []
         async with aiohttp.ClientSession(headers=headers) as session:
-            while True:
-                async with session.get(abuseipdb_url, params=params) as response:
-                    if response.status == 200:
-                        data = await response.json()
-                        report_data = data['data']
-                        if not report_data['results']:
-                            break
-                        all_reports.extend(report_data['results'])
-                        if len(report_data['results']) < params["perPage"]:
-                            break
-                        params["page"] += 1
-                    else:
-                        await ctx.send("Failed to fetch data from AbuseIPDB.")
-                        return
+            async with session.get(abuseipdb_url, params=params) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    report_data = data['data']
+                    total_reports = report_data['total']
+                    pages = (total_reports // params["perPage"]) + (1 if total_reports % params["perPage"] != 0 else 0)
+                    
+                    for page in range(1, pages + 1):
+                        params["page"] = page
+                        async with session.get(abuseipdb_url, params=params) as page_response:
+                            if page_response.status == 200:
+                                page_data = await page_response.json()
+                                all_reports.extend(page_data['data']['results'])
+                            else:
+                                await ctx.send("Failed to fetch data from AbuseIPDB.")
+                                return
+                else:
+                    await ctx.send("Failed to fetch data from AbuseIPDB.")
+                    return
 
         if not all_reports:
             await ctx.send(f"No reports found for IP address {ip}.")
