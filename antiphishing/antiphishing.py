@@ -35,7 +35,7 @@ class AntiPhishing(commands.Cog):
             max_links=3,
             last_updated=None,
             webhook=None,
-            log_channel=None  # Added log_channel to the configuration
+            log_channel=None
         )
         self.config.register_member(caught=0)
         self.session = aiohttp.ClientSession()
