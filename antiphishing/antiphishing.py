@@ -19,7 +19,7 @@ class AntiPhishing(commands.Cog):
     Guard users from malicious links and phishing attempts with customizable protection options.
     """
 
-    __version__ = "1.5.9.5"
+    __version__ = "1.5.9.6"
     __last_updated__ = "September 17, 2024"
 
     def __init__(self, bot: Red):
@@ -151,11 +151,10 @@ class AntiPhishing(commands.Cog):
             title='Current settings',
             colour=0xfffffe,
         )
-        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/settings.png")
-        embed.add_field(name="Autoban threshold", value=f"{guild_data.get('autoban', 'Not set')}")
-        embed.add_field(name="Action", value=f"{guild_data.get('action', 'Not set').title()}")
-        embed.add_field(name="Security vendor", value=enrollment_status)
-        embed.add_field(name="Log channel", value=log_channel_status)
+        embed.add_field(name="Autoban threshold", value=f"{guild_data.get('autoban', 'Not set')}", inline=False)
+        embed.add_field(name="Action", value=f"{guild_data.get('action', 'Not set').title()}", inline=False)
+        embed.add_field(name="Security vendor", value=enrollment_status, inline=False)
+        embed.add_field(name="Log channel", value=log_channel_status, inline=False)
         await ctx.send(embed=embed)
         
     @commands.admin_or_permissions()
