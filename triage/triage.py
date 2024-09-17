@@ -34,7 +34,7 @@ class Triage(commands.Cog):
     @triage.command()
     async def setkey(self, ctx: Context, api_key: str):
         """Set the API key for tria.ge."""
-        await self.bot.set_shared_api_tokens("triage", {"api_key": api_key})
+        await self.bot.set_shared_api_tokens("triage", api_key=api_key)
         tokens = await self.bot.get_shared_api_tokens("triage")
         saved_key = tokens.get("api_key")
         if saved_key == api_key:
