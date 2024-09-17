@@ -1,4 +1,4 @@
-import hatchling.triage as triage_api  # type: ignore
+import hatching-triage as triage_api  # type: ignore
 import discord  # type: ignore
 import asyncio  # type: ignore
 from discord.ext import commands  # type: ignore
