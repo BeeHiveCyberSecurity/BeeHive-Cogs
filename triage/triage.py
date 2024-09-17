@@ -1,4 +1,4 @@
-import triage as triage_api  # type: ignore
+from triage import Client as triage_api  # Correcting the import to match usage
 import discord  # type: ignore
 import asyncio  # type: ignore
 from discord.ext import commands  # type: ignore
@@ -68,7 +68,7 @@ class Triage(commands.Cog):
             return
 
         if not self.triage_client:
-            self.triage_client = triage_api.Client(api_key)
+            self.triage_client = triage_api(api_key)  # Correcting the instantiation
 
         try:
             submission = await self.triage_client.submit_sample(file_data, interactive=interactive, password=password, timeout=timeout, network=network)
