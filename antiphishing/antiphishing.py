@@ -19,7 +19,7 @@ class AntiPhishing(commands.Cog):
     Guard users from malicious links and phishing attempts with customizable protection options.
     """
 
-    __version__ = "1.5.8.1"
+    __version__ = "1.5.9.0"
     __last_updated__ = "September 7, 2024"
 
     def __init__(self, bot: Red):
@@ -34,7 +34,8 @@ class AntiPhishing(commands.Cog):
             bans=0,
             max_links=3,
             last_updated=None,
-            webhook=None
+            webhook=None,
+            log_channel=None  # Added log_channel to the configuration
         )
         self.config.register_member(caught=0)
         self.session = aiohttp.ClientSession()
@@ -142,7 +143,9 @@ class AntiPhishing(commands.Cog):
         """
         guild_data = await self.config.guild(ctx.guild).all()
         webhook = guild_data.get('webhook', None)
+        log_channel_id = guild_data.get('log_channel', None)
         enrollment_status = "**Enrolled**" if webhook else "Not Enrolled"
+        log_channel_status = f"<#{log_channel_id}>" if log_channel_id else "Not Set"
         
         embed = discord.Embed(
             title='Current settings',
@@ -152,6 +155,7 @@ class AntiPhishing(commands.Cog):
         embed.add_field(name="Maximum links", value=f"{guild_data.get('max_links', 'Not set')}")
         embed.add_field(name="Action", value=f"{guild_data.get('action', 'Not set')}")
         embed.add_field(name="Enrollment status", value=enrollment_status)
+        embed.add_field(name="Log Channel", value=log_channel_status)
         await ctx.send(embed=embed)
         
     @commands.admin_or_permissions()
@@ -284,6 +288,20 @@ class AntiPhishing(commands.Cog):
         embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/notifications.png")
         await ctx.send(embed=embed)
 
+    @commands.admin_or_permissions()
+    @antiphishing.command()
+    async def logchannel(self, ctx: Context, channel: discord.TextChannel):
+        """
+        Set the logging channel where link detections will be sent.
+        """
+        await self.config.guild(ctx.guild).log_channel.set(channel.id)
+        embed = discord.Embed(
+            title='Settings changed',
+            description=f"The logging channel has been set to {channel.mention}.",
+            colour=0x2bbd8e,
+        )
+        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/check-circle.png")
+        await ctx.send(embed=embed)
 
     @tasks.loop(minutes=2)
     async def get_phishing_domains(self) -> None:
@@ -366,6 +384,22 @@ class AntiPhishing(commands.Cog):
             async with self.session.post(webhook_url, json={"embeds": [webhook_embed.to_dict()]}) as response:
                 if response.status not in [200, 204]:
                     print(f"Failed to send webhook: {response.status}")
+        
+        # Send URL to log channel if set
+        log_channel_id = await self.config.guild(message.guild).log_channel()
+        if log_channel_id:
+            log_channel = message.guild.get_channel(log_channel_id)
+            if log_channel:
+                redirect_chain_str = "\n".join(redirect_chain)
+                log_embed = discord.Embed(
+                    title="Dangerous URL detected",
+                    description=f"A URL was detected in the server **{message.guild.name}**.",
+                    color=0xff4545,
+                )
+                log_embed.add_field(name="User", value=message.author.mention)
+                log_embed.add_field(name="URL", value=domain)
+                log_embed.add_field(name="Redirect Chain", value=redirect_chain_str)
+                await log_channel.send(embed=log_embed)
         
         if action == "notify":
             if message.channel.permissions_for(message.guild.me).send_messages:
