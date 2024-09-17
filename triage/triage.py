@@ -44,7 +44,7 @@ class Triage(commands.Cog):
         """Submit a file for analysis to the tria.ge API."""
         api_key = await self.config.api_key()
         if not api_key:
-            embed = discord.Embed(title="Error", description="API key not set. Use `[p]triage set_api_key` to set it.", color=discord.Color.red())
+            embed = discord.Embed(title="Error", description="API key not set. Use `[p]triage setkey` to set it.", color=discord.Color.red())
             await ctx.send(embed=embed)
             return
 
@@ -87,6 +87,10 @@ class Triage(commands.Cog):
                                     embed = discord.Embed(title="Analysis Failed", description="Analysis failed.", color=discord.Color.red())
                                     await ctx.send(embed=embed)
                                     break
+                            else:
+                                embed = discord.Embed(title="Error", description=f"Failed to get analysis status. Status code: {status_response.status}", color=discord.Color.red())
+                                await ctx.send(embed=embed)
+                                break
                             await asyncio.sleep(10)  # Wait for 10 seconds before polling again
                 else:
                     embed = discord.Embed(title="Error", description=f"Failed to submit file. Status code: {response.status}", color=discord.Color.red())
