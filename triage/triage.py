@@ -102,6 +102,38 @@ class Triage(commands.Cog):
                                 if status_result['status'] == 'reported':
                                     embed = discord.Embed(title="Analysis Completed", description=f"Analysis completed. Report URL: {status_result['report_url']}", color=discord.Color.green())
                                     await ctx.send(embed=embed)
+                                    
+                                    # Fetching file overview
+                                    async with self.session.get(f"https://api.tria.ge/v0/samples/{analysis_id}/overview", headers=headers) as overview_response:
+                                        if overview_response.status == 200:
+                                            overview_result = await overview_response.json()
+                                            
+                                            # Extracting fields from OverviewAnalysis
+                                            score = overview_result.get('score', 'N/A')
+                                            family = ', '.join(overview_result.get('family', []))
+                                            tags = ', '.join(overview_result.get('tags', []))
+                                            
+                                            # Extracting fields from OverviewTarget
+                                            tasks = ', '.join(overview_result.get('tasks', []))
+                                            target_tags = ', '.join(overview_result.get('tags', []))
+                                            target_family = ', '.join(overview_result.get('family', []))
+                                            signatures = ', '.join([sig['name'] for sig in overview_result.get('signatures', [])])
+                                            iocs = overview_result.get('iocs', 'N/A')
+                                            
+                                            embed = discord.Embed(title="File Overview", color=discord.Color.blue())
+                                            embed.add_field(name="Score", value=score, inline=False)
+                                            embed.add_field(name="Family", value=family, inline=False)
+                                            embed.add_field(name="Tags", value=tags, inline=False)
+                                            embed.add_field(name="Tasks", value=tasks, inline=False)
+                                            embed.add_field(name="Target Tags", value=target_tags, inline=False)
+                                            embed.add_field(name="Target Family", value=target_family, inline=False)
+                                            embed.add_field(name="Signatures", value=signatures, inline=False)
+                                            embed.add_field(name="IOCs", value=iocs, inline=False)
+                                            
+                                            await ctx.send(embed=embed)
+                                        else:
+                                            embed = discord.Embed(title="Error", description=f"Failed to fetch file overview. Status code: {overview_response.status}", color=discord.Color.red())
+                                            await ctx.send(embed=embed)
                                     break
                                 elif status_result['status'] == 'failed':
                                     embed = discord.Embed(title="Analysis Failed", description="Analysis failed.", color=discord.Color.red())
