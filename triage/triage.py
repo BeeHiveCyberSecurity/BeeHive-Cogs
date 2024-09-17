@@ -5,7 +5,7 @@ from redbot.core import Config, commands  # type: ignore
 from redbot.core.bot import Red  # type: ignore
 from redbot.core.commands import Context  # type: ignore
 import io
-from triage import Client
+import triage
 
 class Triage(commands.Cog):
     """
