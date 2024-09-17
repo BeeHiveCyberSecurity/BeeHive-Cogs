@@ -19,8 +19,8 @@ class AntiPhishing(commands.Cog):
     Guard users from malicious links and phishing attempts with customizable protection options.
     """
 
-    __version__ = "1.5.9.1"
-    __last_updated__ = "September 16, 2024"
+    __version__ = "1.5.9.2"
+    __last_updated__ = "September 17, 2024"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -32,7 +32,7 @@ class AntiPhishing(commands.Cog):
             deletions=0,
             kicks=0,
             bans=0,
-            max_links=3,
+            autoban=3,
             last_updated=None,
             webhook=None,
             log_channel=None
@@ -144,7 +144,7 @@ class AntiPhishing(commands.Cog):
         guild_data = await self.config.guild(ctx.guild).all()
         webhook = guild_data.get('webhook', None)
         log_channel_id = guild_data.get('log_channel', None)
-        enrollment_status = "**Enrolled**" if webhook else "Not Enrolled"
+        enrollment_status = "**Connected**" if webhook else "Not connected"
         log_channel_status = f"<#{log_channel_id}>" if log_channel_id else "Not Set"
         
         embed = discord.Embed(
@@ -152,10 +152,10 @@ class AntiPhishing(commands.Cog):
             colour=0xfffffe,
         )
         embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/settings.png")
-        embed.add_field(name="Maximum links", value=f"{guild_data.get('max_links', 'Not set')}")
-        embed.add_field(name="Action", value=f"{guild_data.get('action', 'Not set').upper()}")
-        embed.add_field(name="Enrollment status", value=enrollment_status)
-        embed.add_field(name="Log Channel", value=log_channel_status)
+        embed.add_field(name="Autoban threshold", value=f"{guild_data.get('autoban', 'Not set')}")
+        embed.add_field(name="Action", value=f"{guild_data.get('action', 'Not set').title()}")
+        embed.add_field(name="Security vendor", value=enrollment_status)
+        embed.add_field(name="Log channel", value=log_channel_status)
         await ctx.send(embed=embed)
         
     @commands.admin_or_permissions()
@@ -265,24 +265,24 @@ class AntiPhishing(commands.Cog):
 
     @antiphishing.command()
     @commands.admin_or_permissions()
-    async def maxlinks(self, ctx: Context, max_links: int):
+    async def autoban(self, ctx: Context, autoban: int):
         """
-        Set the maximum number of malicious links a user can share before being banned.
+        Set the number of malicious links a user can share before being banned. Set to 0 to disable autoban.
         """
-        if max_links < 1:
+        if autoban < 0:
             embed = discord.Embed(
                 title='Error: Invalid number',
-                description="The maximum number of malicious links must be at least 1.",
+                description="The number of malicious links must be at least 0.",
                 colour=16729413,
             )
             embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle.png")
             await ctx.send(embed=embed)
             return
 
-        await self.config.guild(ctx.guild).max_links.set(max_links)
+        await self.config.guild(ctx.guild).autoban.set(autoban)
         embed = discord.Embed(
             title='Settings changed',
-            description=f"The maximum number of malicious links a user can share before being banned is now set to **{max_links}**.",
+            description=f"The number of malicious links a user can share before being banned is now set to **{autoban}**.",
             colour=0xffd966,
         )
         embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/notifications.png")
@@ -364,8 +364,8 @@ class AntiPhishing(commands.Cog):
             count = await self.config.guild(message.guild).caught()
             await self.config.guild(message.guild).caught.set(count + 1)
         member_count = await self.config.member(message.author).caught()
-        max_links = await self.config.guild(message.guild).max_links()
-        if member_count + 1 >= max_links:
+        autoban = await self.config.guild(message.guild).autoban()
+        if autoban > 0 and member_count + 1 >= autoban:
             action = "ban"
         await self.config.member(message.author).caught.set(member_count + 1)
         
