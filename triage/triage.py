@@ -1,4 +1,4 @@
-import aiohttp  # type: ignore
+import hatchling.triage as triage_api  # type: ignore
 import discord  # type: ignore
 import asyncio  # type: ignore
 from discord.ext import commands  # type: ignore
@@ -14,10 +14,11 @@ class Triage(commands.Cog):
     def __init__(self, bot: Red):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=1234567890)
-        self.session = aiohttp.ClientSession()
+        self.triage_client = None
 
     def cog_unload(self):
-        self.bot.loop.create_task(self.session.close())
+        if self.triage_client:
+            self.triage_client.close()
 
     async def red_delete_data_for_user(self, **kwargs):
         return
@@ -58,95 +59,64 @@ class Triage(commands.Cog):
             await ctx.send(embed=embed)
             return
 
-        data = {
-            "kind": "file",
-            "interactive": interactive,
-            "defaults": {
-                "timeout": timeout if timeout else 3600,
-                "network": network
-            }
-        }
-
         attachment = ctx.message.attachments[0]
         try:
             file_data = await attachment.read()
-            data["file"] = file_data.decode('latin1')  # Decode bytes to string
         except Exception as e:
             embed = discord.Embed(title="Error", description=f"An error occurred while reading the file: {e}", color=discord.Color.red())
             await ctx.send(embed=embed)
             return
 
-        if password:
-            data["password"] = password
-
-        headers = {
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json"
-        }
+        if not self.triage_client:
+            self.triage_client = triage_api.Client(api_key)
 
         try:
-            async with self.session.post("https://api.tria.ge/v0/samples", headers=headers, json=data) as response:
-                if response.status == 201:
-                    result = await response.json()
-                    analysis_id = result['id']
-                    embed = discord.Embed(title="Submission Successful", description=f"Submitted successfully. Analysis ID: {analysis_id}", color=discord.Color.green())
+            submission = await self.triage_client.submit_sample(file_data, interactive=interactive, password=password, timeout=timeout, network=network)
+            analysis_id = submission['id']
+            embed = discord.Embed(title="Submission Successful", description=f"Submitted successfully. Analysis ID: {analysis_id}", color=discord.Color.green())
+            await ctx.send(embed=embed)
+            
+            # Polling for analysis results
+            embed = discord.Embed(title="Analysis", description="Waiting for analysis to complete...", color=discord.Color.blue())
+            await ctx.send(embed=embed)
+            while True:
+                status_result = await self.triage_client.get_sample_status(analysis_id)
+                if status_result['status'] == 'reported':
+                    embed = discord.Embed(title="Analysis Completed", description=f"Analysis completed. Report URL: {status_result['report_url']}", color=discord.Color.green())
                     await ctx.send(embed=embed)
                     
-                    # Polling for analysis results
-                    embed = discord.Embed(title="Analysis", description="Waiting for analysis to complete...", color=discord.Color.blue())
+                    # Fetching file overview
+                    overview_result = await self.triage_client.get_sample_overview(analysis_id)
+                    
+                    # Extracting fields from OverviewAnalysis
+                    score = overview_result.get('score', 'N/A')
+                    family = ', '.join(overview_result.get('family', []))
+                    tags = ', '.join(overview_result.get('tags', []))
+                    
+                    # Extracting fields from OverviewTarget
+                    tasks = ', '.join(overview_result.get('tasks', []))
+                    target_tags = ', '.join(overview_result.get('tags', []))
+                    target_family = ', '.join(overview_result.get('family', []))
+                    signatures = ', '.join([sig['name'] for sig in overview_result.get('signatures', [])])
+                    iocs = overview_result.get('iocs', 'N/A')
+                    
+                    embed = discord.Embed(title="File Overview", color=discord.Color.blue())
+                    embed.add_field(name="Score", value=score, inline=False)
+                    embed.add_field(name="Family", value=family, inline=False)
+                    embed.add_field(name="Tags", value=tags, inline=False)
+                    embed.add_field(name="Tasks", value=tasks, inline=False)
+                    embed.add_field(name="Target Tags", value=target_tags, inline=False)
+                    embed.add_field(name="Target Family", value=target_family, inline=False)
+                    embed.add_field(name="Signatures", value=signatures, inline=False)
+                    embed.add_field(name="IOCs", value=iocs, inline=False)
+                    
                     await ctx.send(embed=embed)
-                    while True:
-                        async with self.session.get(f"https://api.tria.ge/v0/samples/{analysis_id}", headers=headers) as status_response:
-                            if status_response.status == 200:
-                                status_result = await status_response.json()
-                                if status_result['status'] == 'reported':
-                                    embed = discord.Embed(title="Analysis Completed", description=f"Analysis completed. Report URL: {status_result['report_url']}", color=discord.Color.green())
-                                    await ctx.send(embed=embed)
-                                    
-                                    # Fetching file overview
-                                    async with self.session.get(f"https://api.tria.ge/v0/samples/{analysis_id}/overview", headers=headers) as overview_response:
-                                        if overview_response.status == 200:
-                                            overview_result = await overview_response.json()
-                                            
-                                            # Extracting fields from OverviewAnalysis
-                                            score = overview_result.get('score', 'N/A')
-                                            family = ', '.join(overview_result.get('family', []))
-                                            tags = ', '.join(overview_result.get('tags', []))
-                                            
-                                            # Extracting fields from OverviewTarget
-                                            tasks = ', '.join(overview_result.get('tasks', []))
-                                            target_tags = ', '.join(overview_result.get('tags', []))
-                                            target_family = ', '.join(overview_result.get('family', []))
-                                            signatures = ', '.join([sig['name'] for sig in overview_result.get('signatures', [])])
-                                            iocs = overview_result.get('iocs', 'N/A')
-                                            
-                                            embed = discord.Embed(title="File Overview", color=discord.Color.blue())
-                                            embed.add_field(name="Score", value=score, inline=False)
-                                            embed.add_field(name="Family", value=family, inline=False)
-                                            embed.add_field(name="Tags", value=tags, inline=False)
-                                            embed.add_field(name="Tasks", value=tasks, inline=False)
-                                            embed.add_field(name="Target Tags", value=target_tags, inline=False)
-                                            embed.add_field(name="Target Family", value=target_family, inline=False)
-                                            embed.add_field(name="Signatures", value=signatures, inline=False)
-                                            embed.add_field(name="IOCs", value=iocs, inline=False)
-                                            
-                                            await ctx.send(embed=embed)
-                                        else:
-                                            embed = discord.Embed(title="Error", description=f"Failed to fetch file overview. Status code: {overview_response.status}", color=discord.Color.red())
-                                            await ctx.send(embed=embed)
-                                    break
-                                elif status_result['status'] == 'failed':
-                                    embed = discord.Embed(title="Analysis Failed", description="Analysis failed.", color=discord.Color.red())
-                                    await ctx.send(embed=embed)
-                                    break
-                            else:
-                                embed = discord.Embed(title="Error", description=f"Failed to get analysis status. Status code: {status_response.status}", color=discord.Color.red())
-                                await ctx.send(embed=embed)
-                                break
-                            await asyncio.sleep(10)  # Wait for 10 seconds before polling again
-                else:
-                    embed = discord.Embed(title="Error", description=f"Failed to submit. Status code: {response.status}", color=discord.Color.red())
+                    break
+                elif status_result['status'] == 'failed':
+                    embed = discord.Embed(title="Analysis Failed", description="Analysis failed.", color=discord.Color.red())
                     await ctx.send(embed=embed)
-        except aiohttp.ClientError as e:
+                    break
+                await asyncio.sleep(10)  # Wait for 10 seconds before polling again
+        except triage_api.TriageError as e:
             embed = discord.Embed(title="Error", description=f"An error occurred while submitting: {e}", color=discord.Color.red())
             await ctx.send(embed=embed)
