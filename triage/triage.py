@@ -5,9 +5,8 @@ from redbot.core import Config, commands  # type: ignore
 from redbot.core.bot import Red  # type: ignore
 from redbot.core.commands import Context  # type: ignore
 import io
-import triage
-from triage import Client as TriageClient  # Import the Client class from the triage module and alias it
 
+# Importing TriageClient within the method to prevent cyclical imports
 class Triage(commands.Cog):
     """
     Submit files for analysis to the tria.ge API.
@@ -70,6 +69,7 @@ class Triage(commands.Cog):
             return
 
         if not self.triage_client:
+            from triage import Client as TriageClient  # Importing here to prevent cyclical imports
             self.triage_client = TriageClient(api_key, root_url="https://api.tria.ge")
 
         try:
