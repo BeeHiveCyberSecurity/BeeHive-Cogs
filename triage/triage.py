@@ -4,7 +4,8 @@ from discord.ext import commands  # type: ignore
 from redbot.core import Config, commands  # type: ignore
 from redbot.core.bot import Red  # type: ignore
 from redbot.core.commands import Context  # type: ignore
-import triage  # Corrected import
+import io
+from triage import Client
 
 class Triage(commands.Cog):
     """
@@ -68,10 +69,11 @@ class Triage(commands.Cog):
             return
 
         if not self.triage_client:
-            self.triage_client = triage.TriageAPI(api_key)  # Correcting the instantiation
+            self.triage_client = Client(api_key, root_url="https://api.tria.ge")
 
         try:
-            submission = await self.triage_client.submit_sample(file_data, interactive=interactive, password=password, timeout=timeout, network=network)
+            file_stream = io.BytesIO(file_data)
+            submission = self.triage_client.submit_sample_file(attachment.filename, file_stream)
             analysis_id = submission['id']
             embed = discord.Embed(title="Submission Successful", description=f"Submitted successfully. Analysis ID: {analysis_id}", color=discord.Color.green())
             await ctx.send(embed=embed)
@@ -80,13 +82,13 @@ class Triage(commands.Cog):
             embed = discord.Embed(title="Analysis", description="Waiting for analysis to complete...", color=discord.Color.blue())
             await ctx.send(embed=embed)
             while True:
-                status_result = await self.triage_client.get_sample_status(analysis_id)
+                status_result = self.triage_client.get_sample_status(analysis_id)
                 if status_result['status'] == 'reported':
                     embed = discord.Embed(title="Analysis Completed", description=f"Analysis completed. Report URL: {status_result['report_url']}", color=discord.Color.green())
                     await ctx.send(embed=embed)
                     
                     # Fetching file overview
-                    overview_result = await self.triage_client.get_sample_overview(analysis_id)
+                    overview_result = self.triage_client.get_sample_overview(analysis_id)
                     
                     # Extracting fields from OverviewAnalysis
                     score = overview_result.get('score', 'N/A')
@@ -117,6 +119,6 @@ class Triage(commands.Cog):
                     await ctx.send(embed=embed)
                     break
                 await asyncio.sleep(10)  # Wait for 10 seconds before polling again
-        except triage.TriageError as e:
+        except Exception as e:
             embed = discord.Embed(title="Error", description=f"An error occurred while submitting: {e}", color=discord.Color.red())
             await ctx.send(embed=embed)
