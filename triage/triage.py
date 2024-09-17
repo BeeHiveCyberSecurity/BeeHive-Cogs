@@ -38,13 +38,13 @@ class Triage(commands.Cog):
         tokens = await self.bot.get_shared_api_tokens("triage")
         saved_key = tokens.get("api_key")
         if saved_key == api_key:
-            embed = discord.Embed(title="API Key Set", description="API key set successfully.", color=discord.Color.green())
+            await ctx.message.delete()
         else:
             embed = discord.Embed(title="Error", description="Failed to set API key. Please try again.", color=discord.Color.red())
-        await ctx.send(embed=embed)
+            await ctx.send(embed=embed)
 
     @triage.command()
-    async def submit(self, ctx: Context):
+    async def submit(self, ctx: Context, interactive: bool = False, password: str = None, timeout: int = None, network: str = "internet"):
         """Submit a file for analysis to the tria.ge API."""
         tokens = await self.bot.get_shared_api_tokens("triage")
         api_key = tokens.get("api_key")
@@ -58,24 +58,38 @@ class Triage(commands.Cog):
             await ctx.send(embed=embed)
             return
 
+        data = {
+            "kind": "file",
+            "interactive": interactive,
+            "defaults": {
+                "timeout": timeout if timeout else 3600,
+                "network": network
+            }
+        }
+
         attachment = ctx.message.attachments[0]
         try:
             file_data = await attachment.read()
+            data["file"] = file_data
         except Exception as e:
             embed = discord.Embed(title="Error", description=f"An error occurred while reading the file: {e}", color=discord.Color.red())
             await ctx.send(embed=embed)
             return
 
+        if password:
+            data["password"] = password
+
         headers = {
             "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/octet-stream"
+            "Content-Type": "application/json"
         }
+
         try:
-            async with self.session.post("https://api.tria.ge/v0/samples", headers=headers, data=file_data) as response:
+            async with self.session.post("https://api.tria.ge/v0/samples", headers=headers, json=data) as response:
                 if response.status == 201:
                     result = await response.json()
                     analysis_id = result['id']
-                    embed = discord.Embed(title="File Submitted", description=f"File submitted successfully. Analysis ID: {analysis_id}", color=discord.Color.green())
+                    embed = discord.Embed(title="Submission Successful", description=f"Submitted successfully. Analysis ID: {analysis_id}", color=discord.Color.green())
                     await ctx.send(embed=embed)
                     
                     # Polling for analysis results
@@ -99,8 +113,8 @@ class Triage(commands.Cog):
                                 break
                             await asyncio.sleep(10)  # Wait for 10 seconds before polling again
                 else:
-                    embed = discord.Embed(title="Error", description=f"Failed to submit file. Status code: {response.status}", color=discord.Color.red())
+                    embed = discord.Embed(title="Error", description=f"Failed to submit. Status code: {response.status}", color=discord.Color.red())
                     await ctx.send(embed=embed)
         except aiohttp.ClientError as e:
-            embed = discord.Embed(title="Error", description=f"An error occurred while submitting the file: {e}", color=discord.Color.red())
+            embed = discord.Embed(title="Error", description=f"An error occurred while submitting: {e}", color=discord.Color.red())
             await ctx.send(embed=embed)
