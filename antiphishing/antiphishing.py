@@ -280,10 +280,11 @@ class AntiPhishing(commands.Cog):
         )
         embed.add_field(name="About this cog", value="", inline=False)
         embed.add_field(
-            name="Version info",
-            value=f"You're running **v{self.__version__}**, released **{last_updated_str}**",
-            inline=False
+            name="Version",
+            value=f"You're running **v{self.__version__}**",
+            inline=True
         )
+        embed.add_field(name="Last updated", value=f"**{last_updated_str}**", inline=True)
         view = discord.ui.View()
         button = discord.ui.Button(label="Learn more about BeeHive", url="https://www.beehive.systems")
         view.add_item(button)
