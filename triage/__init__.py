@@ -1,5 +1,5 @@
-from .triage import Triage
+from . import triage
 
 async def setup(bot):
-    cog = Triage(bot)
+    cog = triage.Triage(bot)
     await bot.add_cog(cog)
