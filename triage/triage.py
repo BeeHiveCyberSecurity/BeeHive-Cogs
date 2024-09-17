@@ -1,10 +1,10 @@
-from triage import Client as triage_api  # Correcting the import to match usage
 import discord  # type: ignore
 import asyncio  # type: ignore
 from discord.ext import commands  # type: ignore
 from redbot.core import Config, commands  # type: ignore
 from redbot.core.bot import Red  # type: ignore
 from redbot.core.commands import Context  # type: ignore
+from .triage_client import Client as triage_api  # Correcting the import to avoid circular import
 
 class Triage(commands.Cog):
     """
