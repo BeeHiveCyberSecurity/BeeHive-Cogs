@@ -19,8 +19,8 @@ class AntiPhishing(commands.Cog):
     Guard users from malicious links and phishing attempts with customizable protection options.
     """
 
-    __version__ = "1.5.9.0"
-    __last_updated__ = "September 7, 2024"
+    __version__ = "1.5.9.1"
+    __last_updated__ = "September 16, 2024"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -153,7 +153,7 @@ class AntiPhishing(commands.Cog):
         )
         embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/settings.png")
         embed.add_field(name="Maximum links", value=f"{guild_data.get('max_links', 'Not set')}")
-        embed.add_field(name="Action", value=f"{guild_data.get('action', 'Not set')}")
+        embed.add_field(name="Action", value=f"{guild_data.get('action', 'Not set').upper()}")
         embed.add_field(name="Enrollment status", value=enrollment_status)
         embed.add_field(name="Log Channel", value=log_channel_status)
         await ctx.send(embed=embed)
