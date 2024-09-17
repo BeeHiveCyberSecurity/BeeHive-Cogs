@@ -4,7 +4,7 @@ from discord.ext import commands  # type: ignore
 from redbot.core import Config, commands  # type: ignore
 from redbot.core.bot import Red  # type: ignore
 from redbot.core.commands import Context  # type: ignore
-from .triage_client import Client as triage_api  # Correcting the import to avoid circular import
+import triage
 
 class Triage(commands.Cog):
     """
@@ -68,7 +68,7 @@ class Triage(commands.Cog):
             return
 
         if not self.triage_client:
-            self.triage_client = triage_api(api_key)  # Correcting the instantiation
+            self.triage_client = triage.TriageAPI(api_key)  # Correcting the instantiation
 
         try:
             submission = await self.triage_client.submit_sample(file_data, interactive=interactive, password=password, timeout=timeout, network=network)
@@ -95,8 +95,8 @@ class Triage(commands.Cog):
                     
                     # Extracting fields from OverviewTarget
                     tasks = ', '.join(overview_result.get('tasks', []))
-                    target_tags = ', '.join(overview_result.get('tags', []))
-                    target_family = ', '.join(overview_result.get('family', []))
+                    target_tags = ', '.join(overview_result.get('target_tags', []))  # Corrected key
+                    target_family = ', '.join(overview_result.get('target_family', []))  # Corrected key
                     signatures = ', '.join([sig['name'] for sig in overview_result.get('signatures', [])])
                     iocs = overview_result.get('iocs', 'N/A')
                     
@@ -117,6 +117,6 @@ class Triage(commands.Cog):
                     await ctx.send(embed=embed)
                     break
                 await asyncio.sleep(10)  # Wait for 10 seconds before polling again
-        except triage_api.TriageError as e:
+        except triage.TriageError as e:
             embed = discord.Embed(title="Error", description=f"An error occurred while submitting: {e}", color=discord.Color.red())
             await ctx.send(embed=embed)
