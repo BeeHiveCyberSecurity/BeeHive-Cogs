@@ -70,7 +70,7 @@ class Triage(commands.Cog):
         attachment = ctx.message.attachments[0]
         try:
             file_data = await attachment.read()
-            data["file"] = file_data
+            data["file"] = file_data.decode('latin1')  # Decode bytes to string
         except Exception as e:
             embed = discord.Embed(title="Error", description=f"An error occurred while reading the file: {e}", color=discord.Color.red())
             await ctx.send(embed=embed)
