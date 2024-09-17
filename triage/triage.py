@@ -14,7 +14,6 @@ class Triage(commands.Cog):
     def __init__(self, bot: Red):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=1234567890)
-        self.config.register_global(api_key=None)
         self.session = aiohttp.ClientSession()
 
     def cog_unload(self):
@@ -35,14 +34,20 @@ class Triage(commands.Cog):
     @triage.command()
     async def setkey(self, ctx: Context, api_key: str):
         """Set the API key for tria.ge."""
-        await self.config.api_key.set(api_key)
-        embed = discord.Embed(title="API Key Set", description="API key set successfully.", color=discord.Color.green())
+        await self.bot.set_shared_api_tokens("triage", {"api_key": api_key})
+        tokens = await self.bot.get_shared_api_tokens("triage")
+        saved_key = tokens.get("api_key")
+        if saved_key == api_key:
+            embed = discord.Embed(title="API Key Set", description="API key set successfully.", color=discord.Color.green())
+        else:
+            embed = discord.Embed(title="Error", description="Failed to set API key. Please try again.", color=discord.Color.red())
         await ctx.send(embed=embed)
 
     @triage.command()
     async def submit(self, ctx: Context):
         """Submit a file for analysis to the tria.ge API."""
-        api_key = await self.config.api_key()
+        tokens = await self.bot.get_shared_api_tokens("triage")
+        api_key = tokens.get("api_key")
         if not api_key:
             embed = discord.Embed(title="Error", description="API key not set. Use `[p]triage setkey` to set it.", color=discord.Color.red())
             await ctx.send(embed=embed)
