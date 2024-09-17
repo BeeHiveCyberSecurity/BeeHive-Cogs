@@ -1,10 +1,10 @@
 import aiohttp  # type: ignore
 import discord  # type: ignore
 import asyncio  # type: ignore
-from discord.ext import commands  # type: ignore
-from redbot.core import Config, commands  # type: ignore
-from redbot.core.bot import Red  # type: ignore
-from redbot.core.commands import Context  # type: ignore
+from discord.ext import commands  #type: ignore
+from redbot.core import Config, commands  #type: ignore
+from redbot.core.bot import Red #type: ignore
+from redbot.core.commands import Context  #type: ignore
 
 class Triage(commands.Cog):
     """
