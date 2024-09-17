@@ -29,13 +29,13 @@ class Triage(commands.Cog):
         pass
 
     @triage.command()
-    async def set_api_key(self, ctx: Context, api_key: str):
+    async def setkey(self, ctx: Context, api_key: str):
         """Set the API key for tria.ge."""
         await self.config.api_key.set(api_key)
         await ctx.send("API key set successfully.")
 
     @triage.command()
-    async def submit_file(self, ctx: Context, file_url: str):
+    async def submit(self, ctx: Context, file_url: str):
         """Submit a file for analysis to the tria.ge API."""
         api_key = await self.config.api_key()
         if not api_key:
