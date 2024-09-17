@@ -25,31 +25,39 @@ class Triage(commands.Cog):
 
     @commands.group()
     async def triage(self, ctx: Context):
-        """Commands for interacting with the tria.ge API."""
+        """
+        Tria.ge is a cybersecurity platform that leverages artificial intelligence to automate and enhance the process of triaging security alerts by analyzing and prioritizing threats based on their potential impact and relevance.
+
+        Learn more at https://tria.ge
+        """
         pass
 
     @triage.command()
     async def setkey(self, ctx: Context, api_key: str):
         """Set the API key for tria.ge."""
         await self.config.api_key.set(api_key)
-        await ctx.send("API key set successfully.")
+        embed = discord.Embed(title="API Key Set", description="API key set successfully.", color=discord.Color.green())
+        await ctx.send(embed=embed)
 
     @triage.command()
     async def submit(self, ctx: Context, file_url: str):
         """Submit a file for analysis to the tria.ge API."""
         api_key = await self.config.api_key()
         if not api_key:
-            await ctx.send("API key not set. Use `[p]triage set_api_key` to set it.")
+            embed = discord.Embed(title="Error", description="API key not set. Use `[p]triage set_api_key` to set it.", color=discord.Color.red())
+            await ctx.send(embed=embed)
             return
 
         try:
             async with self.session.get(file_url) as response:
                 if response.status != 200:
-                    await ctx.send("Failed to download the file.")
+                    embed = discord.Embed(title="Error", description="Failed to download the file.", color=discord.Color.red())
+                    await ctx.send(embed=embed)
                     return
                 file_data = await response.read()
         except aiohttp.ClientError as e:
-            await ctx.send(f"An error occurred while downloading the file: {e}")
+            embed = discord.Embed(title="Error", description=f"An error occurred while downloading the file: {e}", color=discord.Color.red())
+            await ctx.send(embed=embed)
             return
 
         headers = {
@@ -61,22 +69,28 @@ class Triage(commands.Cog):
                 if response.status == 201:
                     result = await response.json()
                     analysis_id = result['id']
-                    await ctx.send(f"File submitted successfully. Analysis ID: {analysis_id}")
+                    embed = discord.Embed(title="File Submitted", description=f"File submitted successfully. Analysis ID: {analysis_id}", color=discord.Color.green())
+                    await ctx.send(embed=embed)
                     
                     # Polling for analysis results
-                    await ctx.send("Waiting for analysis to complete...")
+                    embed = discord.Embed(title="Analysis", description="Waiting for analysis to complete...", color=discord.Color.blue())
+                    await ctx.send(embed=embed)
                     while True:
                         async with self.session.get(f"https://api.tria.ge/v0/samples/{analysis_id}", headers=headers) as status_response:
                             if status_response.status == 200:
                                 status_result = await status_response.json()
                                 if status_result['status'] == 'reported':
-                                    await ctx.send(f"Analysis completed. Report URL: {status_result['report_url']}")
+                                    embed = discord.Embed(title="Analysis Completed", description=f"Analysis completed. Report URL: {status_result['report_url']}", color=discord.Color.green())
+                                    await ctx.send(embed=embed)
                                     break
                                 elif status_result['status'] == 'failed':
-                                    await ctx.send("Analysis failed.")
+                                    embed = discord.Embed(title="Analysis Failed", description="Analysis failed.", color=discord.Color.red())
+                                    await ctx.send(embed=embed)
                                     break
                             await asyncio.sleep(10)  # Wait for 10 seconds before polling again
                 else:
-                    await ctx.send(f"Failed to submit file. Status code: {response.status}")
+                    embed = discord.Embed(title="Error", description=f"Failed to submit file. Status code: {response.status}", color=discord.Color.red())
+                    await ctx.send(embed=embed)
         except aiohttp.ClientError as e:
-            await ctx.send(f"An error occurred while submitting the file: {e}")
+            embed = discord.Embed(title="Error", description=f"An error occurred while submitting the file: {e}", color=discord.Color.red())
+            await ctx.send(embed=embed)
