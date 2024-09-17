@@ -4,13 +4,14 @@ from redbot.core import commands #type: ignore
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 
-class Ping(commands.Cog):  # Use Red's Cog class
+class Ping(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.executor = ThreadPoolExecutor(max_workers=1)
 
-    @commands.hybrid_command(name="ping", description="Displays the bot's latency and additional diagnostic information.")
+    @commands.hybrid_command(name="ping", description="Displays the bot's latency, download speed, and upload speed")
     async def ping(self, ctx: commands.Context):
+        """Displays the bot's latency, download speed, and upload speed"""
         await ctx.defer()
         ws_latency = round(self.bot.latency * 1000, 2)
 
