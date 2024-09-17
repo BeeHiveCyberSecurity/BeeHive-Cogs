@@ -19,8 +19,9 @@ class AntiPhishing(commands.Cog):
     Guard users from malicious links and phishing attempts with customizable protection options.
     """
 
-    __version__ = "1.5.9.6"
+    __version__ = "1.5.9.7"
     __last_updated__ = "September 17, 2024"
+    __quick_notes__ = "We've more than quadrupled the amount of domains on the provided blocklist"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -232,6 +233,7 @@ class AntiPhishing(commands.Cog):
         kicks = await self.config.guild(ctx.guild).kicks()
         bans = await self.config.guild(ctx.guild).bans()
         last_updated = self.__last_updated__
+        patch_notes = self.__quick_notes__
         total_domains = len(self.domains)
         
         s_caught = "s" if caught != 1 else ""
@@ -284,6 +286,7 @@ class AntiPhishing(commands.Cog):
             inline=True
         )
         embed.add_field(name="Last updated", value=f"**{last_updated_str}**", inline=True)
+        embed.add_field(name="Recent changes", value=f"*{patch_notes}*", inline=False)
         view = discord.ui.View()
         button = discord.ui.Button(label="Learn more about BeeHive", url="https://www.beehive.systems")
         view.add_item(button)
