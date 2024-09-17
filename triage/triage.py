@@ -73,7 +73,7 @@ class Triage(commands.Cog):
 
         try:
             file_stream = io.BytesIO(file_data)
-            submission = self.triage_client.submit_sample_file(attachment.filename, file_stream)
+            submission = await self.triage_client.submit_sample_file(attachment.filename, file_stream)
             analysis_id = submission['id']
             embed = discord.Embed(title="Submission Successful", description=f"Submitted successfully. Analysis ID: {analysis_id}", color=discord.Color.green())
             await ctx.send(embed=embed)
@@ -82,13 +82,13 @@ class Triage(commands.Cog):
             embed = discord.Embed(title="Analysis", description="Waiting for analysis to complete...", color=discord.Color.blue())
             await ctx.send(embed=embed)
             while True:
-                status_result = self.triage_client.get_sample_status(analysis_id)
+                status_result = await self.triage_client.get_sample_status(analysis_id)
                 if status_result['status'] == 'reported':
                     embed = discord.Embed(title="Analysis Completed", description=f"Analysis completed. Report URL: {status_result['report_url']}", color=discord.Color.green())
                     await ctx.send(embed=embed)
                     
                     # Fetching file overview
-                    overview_result = self.triage_client.get_sample_overview(analysis_id)
+                    overview_result = await self.triage_client.get_sample_overview(analysis_id)
                     
                     # Extracting fields from OverviewAnalysis
                     score = overview_result.get('score', 'N/A')
