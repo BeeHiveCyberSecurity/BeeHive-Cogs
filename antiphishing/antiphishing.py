@@ -19,7 +19,7 @@ class AntiPhishing(commands.Cog):
     Guard users from malicious links and phishing attempts with customizable protection options.
     """
 
-    __version__ = "1.5.9.4"
+    __version__ = "1.5.9.5"
     __last_updated__ = "September 17, 2024"
 
     def __init__(self, bot: Red):
@@ -249,33 +249,33 @@ class AntiPhishing(commands.Cog):
         )
         embed.add_field(name="Protection", value="", inline=False)
         embed.add_field(
-            name="Detected links",
-            value=f"Detected **`{caught}`** malicious link{s_caught} shared in chats",
-            inline=False
+            name="Detected",
+            value=f"**{caught}** malicious link{s_caught}",
+            inline=True
         )
         embed.add_field(
             name="Notifications",
-            value=f"Warned you of danger **`{notifications}`** time{s_notifications}",
-            inline=False
+            value=f"Warned you of danger **{notifications}** time{s_notifications}",
+            inline=True
         )
         embed.add_field(
             name="Deletions",
-            value=f"Removed **`{deletions}`** message{s_deletions} to protect the community",
-            inline=False
+            value=f"Removed **{deletions}** message{s_deletions}",
+            inline=True
         )
         embed.add_field(
             name="Kicks",
-            value=f"Removed a user from the server **`{kicks}`** time{s_kicks}",
-            inline=False
+            value=f"Kicked **{kicks}** user{s_kicks}",
+            inline=True
         )
         embed.add_field(
             name="Bans",
-            value=f"Delivered **`{bans}`** permanent ban{s_bans} for sharing dangerous links",
-            inline=False
+            value=f"Banned **{bans}** user{s_bans}",
+            inline=True
         )
         embed.add_field(
             name="Blocklist count",
-            value=f"Currently monitoring **`{total_domains}`** domains for malicious activity",
+            value=f"There are **{total_domains:,}** domains on the [BeeHive](https://www.beehive.systems) blocklist",
             inline=False
         )
         embed.add_field(name="About this cog", value="", inline=False)
