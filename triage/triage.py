@@ -40,7 +40,7 @@ class Triage(commands.Cog):
         await ctx.send(embed=embed)
 
     @triage.command()
-    async def submit(self, ctx: Context, file_url: str):
+    async def submit(self, ctx: Context):
         """Submit a file for analysis to the tria.ge API."""
         api_key = await self.config.api_key()
         if not api_key:
@@ -48,15 +48,16 @@ class Triage(commands.Cog):
             await ctx.send(embed=embed)
             return
 
+        if not ctx.message.attachments:
+            embed = discord.Embed(title="Error", description="No file attached. Please upload a file to submit.", color=discord.Color.red())
+            await ctx.send(embed=embed)
+            return
+
+        attachment = ctx.message.attachments[0]
         try:
-            async with self.session.get(file_url) as response:
-                if response.status != 200:
-                    embed = discord.Embed(title="Error", description="Failed to download the file.", color=discord.Color.red())
-                    await ctx.send(embed=embed)
-                    return
-                file_data = await response.read()
-        except aiohttp.ClientError as e:
-            embed = discord.Embed(title="Error", description=f"An error occurred while downloading the file: {e}", color=discord.Color.red())
+            file_data = await attachment.read()
+        except Exception as e:
+            embed = discord.Embed(title="Error", description=f"An error occurred while reading the file: {e}", color=discord.Color.red())
             await ctx.send(embed=embed)
             return
 
