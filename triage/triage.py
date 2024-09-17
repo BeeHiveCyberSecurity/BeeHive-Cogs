@@ -4,7 +4,7 @@ from discord.ext import commands  # type: ignore
 from redbot.core import Config, commands  # type: ignore
 from redbot.core.bot import Red  # type: ignore
 from redbot.core.commands import Context  # type: ignore
-from triage_api import TriageAPI, TriageError  # Corrected import
+import triage  # Corrected import
 
 class Triage(commands.Cog):
     """
@@ -68,7 +68,7 @@ class Triage(commands.Cog):
             return
 
         if not self.triage_client:
-            self.triage_client = TriageAPI(api_key)  # Correcting the instantiation
+            self.triage_client = triage.TriageAPI(api_key)  # Correcting the instantiation
 
         try:
             submission = await self.triage_client.submit_sample(file_data, interactive=interactive, password=password, timeout=timeout, network=network)
@@ -117,6 +117,6 @@ class Triage(commands.Cog):
                     await ctx.send(embed=embed)
                     break
                 await asyncio.sleep(10)  # Wait for 10 seconds before polling again
-        except TriageError as e:
+        except triage.TriageError as e:
             embed = discord.Embed(title="Error", description=f"An error occurred while submitting: {e}", color=discord.Color.red())
             await ctx.send(embed=embed)
