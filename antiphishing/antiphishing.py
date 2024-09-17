@@ -19,7 +19,7 @@ class AntiPhishing(commands.Cog):
     Guard users from malicious links and phishing attempts with customizable protection options.
     """
 
-    __version__ = "1.5.9.2"
+    __version__ = "1.5.9.3"
     __last_updated__ = "September 17, 2024"
 
     def __init__(self, bot: Red):
@@ -244,20 +244,46 @@ class AntiPhishing(commands.Cog):
         last_updated_str = f"{last_updated}"
         
         embed = discord.Embed(
-            title='Link protection statistics', 
-            description=(
-                f"Your server's never been safer...\n"
-                f"- Detected **`{caught}`** malicious link{s_caught} shared in chats\n"
-                f"- Warned you of danger **`{notifications}`** time{s_notifications}\n"
-                f"- Removed **`{deletions}`** message{s_deletions} to protect the community\n"
-                f"- Removed a user from the server **`{kicks}`** time{s_kicks}\n"
-                f"- Delivered **`{bans}`** permanent ban{s_bans} for sharing dangerous links\n"
-                f"- Currently monitoring **`{total_domains}`** domains for malicious activity\n\n"
-                f"You're running **v{self.__version__}**, released **{last_updated_str}**\n"
-            ), 
-            colour=16767334,
+            title='Link safety statistics', 
+            colour=0xfffffe,
         )
-        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/shield-checkmark.png")
+        embed.add_field(name="Protection", value="", inline=False)
+        embed.add_field(
+            name="Detected links",
+            value=f"Detected **`{caught}`** malicious link{s_caught} shared in chats",
+            inline=False
+        )
+        embed.add_field(
+            name="Notifications",
+            value=f"Warned you of danger **`{notifications}`** time{s_notifications}",
+            inline=False
+        )
+        embed.add_field(
+            name="Deletions",
+            value=f"Removed **`{deletions}`** message{s_deletions} to protect the community",
+            inline=False
+        )
+        embed.add_field(
+            name="Kicks",
+            value=f"Removed a user from the server **`{kicks}`** time{s_kicks}",
+            inline=False
+        )
+        embed.add_field(
+            name="Bans",
+            value=f"Delivered **`{bans}`** permanent ban{s_bans} for sharing dangerous links",
+            inline=False
+        )
+        embed.add_field(
+            name="Blocklist count",
+            value=f"Currently monitoring **`{total_domains}`** domains for malicious activity",
+            inline=False
+        )
+        embed.add_field(name="About this cog", value="", inline=False)
+        embed.add_field(
+            name="Version info",
+            value=f"You're running **v{self.__version__}**, released **{last_updated_str}**",
+            inline=False
+        )
         view = discord.ui.View()
         button = discord.ui.Button(label="Learn more about BeeHive", url="https://www.beehive.systems")
         view.add_item(button)
