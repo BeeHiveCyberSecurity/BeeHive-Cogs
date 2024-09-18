@@ -1,1 +1,14 @@
 
+{
+    "author": ["adminescalation", "escalateprivs"],
+    "description": "A cog to send server rules in an organized and visually appealing manner.",
+    "install_msg": "## :white_check_mark: Successfully installed Rules.\nEnsure your community stays informed and follows the rules.\n\nJoin our Discord! https://discord.gg/ckdzsm7mTs",
+    "name": "rules",
+    "short": "Send server rules",
+    "permissions": [
+        "embed_links"
+    ],
+    "min_bot_version": "3.5.0",
+    "requirements": []
+}
+
