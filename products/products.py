@@ -320,7 +320,7 @@ class Products(commands.Cog):
         """
         embed = discord.Embed(
             title="Disclaimer",
-            description="**[Sentri](https://www.beehive.systems/sentri)** is **a [BeeHive](https://www.beehive.systems) product**",
+            description="**[Sentri](https://www.beehive.systems/sentri)** is **a [BeeHive](https://www.beehive.systems) product**, and the owner of this community has chosen to entrust it with helping safeguard your time here.\n\nFor Sentri to function correctly, it needs to save, process, and analyze various types of information about what you're doing in this server, to determine whether you may be a threat. This is your, public warning, that Sentri will over time collect and store data about you.",
             colour=0xffd966
         )
         embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/shield-checkmark.png")
