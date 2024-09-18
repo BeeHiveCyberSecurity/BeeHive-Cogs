@@ -349,7 +349,7 @@ class Products(commands.Cog):
         )
         embed.add_field(
             name="Is my data ever shared?",
-            value="**No**, *but unexpected circumstances may apply*.\n\nBeeHive **may** disclose *Your Personal Data* in the **good faith belief** that such action is **unavoidable** to\n- Fulfill *our* legal obligations\n- Safeguard and uphold our rights and assets\n- Thwart or examine potential misconduct related to our services\n- Safeguard the personal safety of users or the public\n- Shield the us and our partners against legal accountability",
+            value="**No**, *but unexpected circumstances may apply*.\n\nBeeHive **may** disclose *Your Personal Data* in the **good faith belief** that such action is **unavoidable** to\n- Fulfill *our* legal obligations\n- Safeguard and uphold our rights and assets\n- Thwart or examine potential misconduct related to our services\n- Safeguard the personal safety of users or the public\n- Shield we and our partners against legal accountability",
             inline=False
         )
         embed.add_field(
