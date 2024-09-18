@@ -6,7 +6,7 @@ from redbot.core import commands, Config #type: ignore
 class InfoControl(commands.Cog):
     """Detect and remove potentially sensitive information from chat."""
     
-    __version__ = "1.0.7"
+    __version__ = "1.0.8"
 
     def __init__(self, bot):
         self.bot = bot
@@ -75,12 +75,6 @@ class InfoControl(commands.Cog):
     async def handle_message_deletion(self, message, key, guild_config):
         try:
             await message.delete()
-            embed = discord.Embed(
-                title="Message removed",
-                description=f"{message.author.mention}, your message contained a match for one or more potential categories and was removed as a precaution.",
-                color=0xff4545
-            )
-            await message.channel.send(embed=embed)
 
             log_channel_id = guild_config.get("log_channel")
             if log_channel_id:
@@ -250,8 +244,9 @@ class InfoControl(commands.Cog):
         
         if total_pages > 1:
             await message.add_reaction("⬅️")
-            await message.add_reaction("➡️")
             await message.add_reaction("❌")
+            await message.add_reaction("➡️")
+            
             
             def check(reaction, user):
                 return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️", "❌"] and reaction.message.id == message.id
