@@ -320,28 +320,36 @@ class Products(commands.Cog):
         """
         embed = discord.Embed(
             title="Disclaimer",
-            description="**[Sentri](https://www.beehive.systems/sentri)** is **a [BeeHive](https://www.beehive.systems) product**, and the owner of this community has chosen to entrust it with helping safeguard your time here.\n\nFor Sentri to function correctly, it needs to save, process, and analyze various types of information about what you're doing in this server, to determine whether you may be a threat. This is your, public warning, that Sentri will over time collect and store data about you.",
+            description="**[Sentri](https://www.beehive.systems/sentri)** is **a [BeeHive](https://www.beehive.systems) product**, and the owner of this community has chosen to entrust it with helping safeguard your time here.\n\nFor Sentri to function correctly, it needs to save, process, and analyze various types of information about what you're doing in this server to ensure others are safe.",
             colour=0xffd966
         )
         embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/shield-checkmark.png")
         embed.add_field(
             name="What kind of data is collected?",
             value=(
-                "Messages, activities, and any content sent in this server may be subject to monitoring. "
-                "This includes, but is not limited to:\n\n"
+                "Messages, activities, and any content sent in this server may be subject to collection, analysis, training, and archival."
+                "This includes, but is not limited to\n\n"
                 "- **Text Messages**: All text-based communication, including text channels, voice channel chats, threads, and commands\n"
                 "- **Images**: Any images or media files shared within the server.\n"
-                "- **Links**: URLs and hyperlinks shared in messages.\n"
-                "- **Voice Chats**: Audio data from voice channels may be monitored for abusive conduct.\n"
-                "- **User Activities**: Actions such as joining/leaving channels, role changes, and other interactions.\n\n"
-                "All collected data is handled in accordance with our privacy policy and is used solely for security and service improvement purposes."
+                "- **Links**: URLs and hyperlinks shared in messages, or the raw content of a domain extracted from message content.\n"
+                "- **Voice Chats**: Audio streams and voice channel engagement behaviors.\n"
+                "- **User Activities**: Actions such as joining/leaving channels, role changes, and other interactions.\n"
             ),
             inline=False
         )
         embed.add_field(
             name="How long is data stored for?",
-            value="For more information, please review our [Privacy Policy](https://www.beehive.systems/privacy-policy).",
+            value="Data stored attached to your user is stored forever, unless purged in a development or maintenance effort, or removed to comply with a data deletion request.",
             inline=False
+        )
+        embed.add_field(
+            name="Is my data ever sold?",
+            value="**No.** Customer data is never for sale - it's a principle we've been built on from the beginning, and refuse to compromise on.",
+            inline=False
+        )
+        embed.add_field(
+            name="Is my data ever shared?",
+            value="**No**, *but extentuating circumstances apply*.\n\nWe are proud to be a bastion of privacy and security in a hyper-digital age. That being said, there are exceptions we may elect to make to our, absolute silence regarding you.\n\nMore explicitly, BeeHive may disclose Your Personal Data in the good faith belief that such action is unavoidable to\n- Fulfill our legal obligations\n- Safeguard and uphold the Company's rights and assets\n- Thwart or examine potential misconduct related to the Service\n- Safeguard the personal safety of Service users and the general public\n- Shield against legal accountability"
         )
         view = discord.ui.View()
         view.add_item(discord.ui.Button(label="Terms of Service", url="https://www.beehive.systems/terms", style=discord.ButtonStyle.link, emoji="🔗"))
