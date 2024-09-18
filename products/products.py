@@ -327,7 +327,7 @@ class Products(commands.Cog):
         embed.add_field(
             name="What kind of data is collected?",
             value=(
-                "Messages, activities, and any content sent in this server may be subject to collection, analysis, training, and archival."
+                "Messages, activities, and any content sent in this server may be subject to collection, analysis, training, and archival. "
                 "This includes, but is not limited to\n"
                 "- **Messages**: All text-based communication, including text channels, voice channel chats, threads, and commands\n"
                 "- **Images**: Any images or media files shared within the server.\n"
