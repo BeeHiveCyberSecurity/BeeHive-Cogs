@@ -332,8 +332,7 @@ class Products(commands.Cog):
                 "- **Text Messages**: All text-based communication, including text channels, voice channel chats, threads, and commands\n"
                 "- **Images**: Any images or media files shared within the server.\n"
                 "- **Links**: URLs and hyperlinks shared in messages, or the raw content of a domain extracted from message content.\n"
-                "- **Voice Chats**: Audio streams and voice channel engagement behaviors.\n"
-                "- **User Activities**: Actions such as joining/leaving channels, role changes, and other interactions.\n"
+                "- **Actions**: Actions such as joining/leaving channels, role changes, and other interactions.\n"
             ),
             inline=False
         )
