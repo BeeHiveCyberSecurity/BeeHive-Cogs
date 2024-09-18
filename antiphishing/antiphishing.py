@@ -21,7 +21,7 @@ class AntiPhishing(commands.Cog):
 
     __version__ = "1.5.9.8"
     __last_updated__ = "September 17, 2024"
-    __quick_notes__ = "We've more than quadrupled the amount of domains on the provided blocklist"
+    __quick_notes__ = "We've more than quadrupled the amount of domains on the provided blocklist and fixed assorted bugs found"
 
     def __init__(self, bot: Red):
         self.bot = bot
