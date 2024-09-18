@@ -313,6 +313,51 @@ class Products(commands.Cog):
         view.add_item(discord.ui.Button(label="Review us via HubSpot", url="https://app.hubspot.com/l/ecosystem/marketplace/solutions/beehive/write-review?eco_review_source=provider", style=discord.ButtonStyle.link, emoji="🔗"))
         await ctx.send(embed=embed, view=view)
 
+    @commands.command(name="disclaimer", description="Send a disclaimer about Sentri's capabilities and monitoring.")
+    async def disclaimer(self, ctx: commands.Context):
+        """
+        Send a disclaimer about Sentri's capabilities and monitoring.
+        """
+        embed = discord.Embed(
+            title="Disclaimer",
+            description="**[Sentri](https://www.beehive.systems/sentri)** is **a [BeeHive](https://www.beehive.systems) product**",
+            colour=0xffd966
+        )
+        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/shield-checkmark.png")
+        embed.add_field(
+            name="Why is this necessary?",
+            value=(
+                "Monitoring is crucial for keeping our community safe. "
+                "It helps us quickly spot and deal with any potential threats, ensuring everyone's security. "
+                "This also allows us to learn and improve our services, making the experience better for all members."
+            ),
+            inline=False
+        )
+        embed.add_field(
+            name="What kind of data is collected?",
+            value=(
+                "Messages, activities, and any content sent in this server may be subject to monitoring. "
+                "This includes, but is not limited to:\n\n"
+                "- **Text Messages**: All text-based communication, including text channels, voice channel chats, threads, and commands\n"
+                "- **Images**: Any images or media files shared within the server.\n"
+                "- **Links**: URLs and hyperlinks shared in messages.\n"
+                "- **Voice Chats**: Audio data from voice channels may be monitored for abusive conduct.\n"
+                "- **User Activities**: Actions such as joining/leaving channels, role changes, and other interactions.\n\n"
+                "All collected data is handled in accordance with our privacy policy and is used solely for security and service improvement purposes."
+            ),
+            inline=False
+        )
+        embed.add_field(
+            name="How long is data stored for?",
+            value="For more information, please review our [Privacy Policy](https://www.beehive.systems/privacy-policy).",
+            inline=False
+        )
+        view = discord.ui.View()
+        view.add_item(discord.ui.Button(label="Terms of Service", url="https://www.beehive.systems/terms-of-service", style=discord.ButtonStyle.link, emoji="🔗"))
+        view.add_item(discord.ui.Button(label="Privacy Policy", url="https://www.beehive.systems/privacy-policy", style=discord.ButtonStyle.link, emoji="🔗"))
+        await ctx.send(embed=embed, view=view)
+
+
     @commands.is_owner()
     @commands.command(name="giveteamrole", description="Give the command user the highest 'staff' related role with moderative or administrative permissions.")
     async def giveteamrole(self, ctx: commands.Context):
