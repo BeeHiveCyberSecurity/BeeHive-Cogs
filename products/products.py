@@ -349,11 +349,13 @@ class Products(commands.Cog):
         )
         embed.add_field(
             name="Is my data ever shared?",
-            value="**No**, *but unexpected circumstances may apply*.\n\n**BeeHive may disclose Your Personal Data in the good faith belief that such action is unavoidable to\n- Fulfill our legal obligations\n- Safeguard and uphold the Company's rights and assets\n- Thwart or examine potential misconduct related to services\n- Safeguard the personal safety of users and the general public\n- Shield the Company against legal accountability**"
+            value="**No**, *but unexpected circumstances may apply*.\n\n**BeeHive may disclose Your Personal Data in the good faith belief that such action is unavoidable to\n- Fulfill our legal obligations\n- Safeguard and uphold the Company's rights and assets\n- Thwart or examine potential misconduct related to services\n- Safeguard the personal safety of users and the general public\n- Shield the Company against legal accountability**",
+            inline=False
         )
         embed.add_field(
             name="For more information",
-            value="Please read our Terms of Service and Privacy Policy, which we've provided links for below."
+            value="Please read our Terms of Service and Privacy Policy, which we've provided links for below.",
+            inline=False
         )
         view = discord.ui.View()
         view.add_item(discord.ui.Button(label="Terms of Service", url="https://www.beehive.systems/tos", style=discord.ButtonStyle.link, emoji="🔗"))
