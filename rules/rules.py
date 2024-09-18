@@ -17,9 +17,9 @@ class RulesCog(commands.Cog):
             "### Listen to the moderators and admins.\n> They are here to help maintain a safe and enjoyable environment. Follow their instructions and respect their decisions.",
             "### Do not share dangerous or malicious content.\n> This includes links to phishing sites, malware, or any other harmful material.",
             "### Do not share personal information.\n> Protect your privacy and the privacy of others by not sharing personal details such as addresses, phone numbers, or any other sensitive information.",
-            "### Staff have the final decision for all moderative actions.\n> Even if an action is not in clear violation of a rule, staff decisions are to be respected and followed.",
             "### Use appropriate usernames and avatars.\n> Usernames and avatars should not be offensive, inappropriate, or disruptive to the community.",
-            "### No self-promotion or advertising.\n> Do not promote your own content, services, or servers without permission from the moderators."
+            "### No self-promotion or advertising.\n> Do not promote your own content, services, or servers without permission from the moderators.",
+            "### Staff have the final decision for all moderative actions.\n> Even if an action is not in clear violation of a rule, staff decisions are to be respected and followed."
         ]
         for rule in rules:
             embed = discord.Embed(description=rule, color=0xfffffe)
