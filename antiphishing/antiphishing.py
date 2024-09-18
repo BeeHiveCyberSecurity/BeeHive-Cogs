@@ -126,7 +126,7 @@ class AntiPhishing(commands.Cog):
 
         # Send confirmation to the webhook
         confirmation_embed = discord.Embed(
-            title="Enrollment Confirmation",
+            title="Enrollment confirmation",
             description=f"The server **{ctx.guild.name}** has been enrolled for remote URL monitoring.",
             color=0x2bbd8e,
         )
