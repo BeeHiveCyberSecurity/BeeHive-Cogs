@@ -256,7 +256,7 @@ class Products(commands.Cog):
             inline=False
         )
         view = discord.ui.View()
-        view.add_item(discord.ui.Button(label="For Windows", url="https://cdn.beehive.systems/em_yleVlLDN_installer_Win7-Win11_x86_x64.msi", style=discord.ButtonStyle.link, emoji="<:windows:1194913113863114762>"))
+        view.add_item(discord.ui.Button(label="For Windows", url="https://cdn.beehive.systems/em_etkuCw1C_installer_Win7-Win11_x86_x64.msi", style=discord.ButtonStyle.link, emoji="<:windows:1194913113863114762>"))
         view.add_item(discord.ui.Button(label="Discord", url="https://discord.gg/ADz7YSegPT", style=discord.ButtonStyle.link))
         await ctx.send(embed=embed, view=view)
 
