@@ -325,15 +325,6 @@ class Products(commands.Cog):
         )
         embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/shield-checkmark.png")
         embed.add_field(
-            name="Why is this necessary?",
-            value=(
-                "Monitoring is crucial for keeping our community safe. "
-                "It helps us quickly spot and deal with any potential threats, ensuring everyone's security. "
-                "This also allows us to learn and improve our services, making the experience better for all members."
-            ),
-            inline=False
-        )
-        embed.add_field(
             name="What kind of data is collected?",
             value=(
                 "Messages, activities, and any content sent in this server may be subject to monitoring. "
