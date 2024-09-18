@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+import asyncio  # Ensure asyncio is imported
 
 class RulesCog(commands.Cog):
     def __init__(self, bot):
@@ -22,5 +23,5 @@ class RulesCog(commands.Cog):
         for rule in rules:
             embed = discord.Embed(description=rule, color=0xfffffe)
             await ctx.send(embed=embed)
-            await asyncio.sleep(2)  # Add a delay of 1 second between sending each rule
+            await asyncio.sleep(2)  # Add a delay of 2 seconds between sending each rule
 
