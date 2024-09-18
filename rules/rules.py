@@ -9,8 +9,8 @@ class RulesCog(commands.Cog):
     @commands.command(name='sendrules')
     async def send_rules(self, ctx):
         rules = [
-            "Be respectful to everyone. Treat all members with kindness and consideration. Personal attacks, harassment, and bullying will not be tolerated.",
-            "No spamming or flooding the chat. Avoid sending repetitive messages, excessive emojis, or large blocks of text that disrupt the flow of conversation.",
+            "### Be respectful to everyone.\n> Treat all members with kindness and consideration. Personal attacks, harassment, and bullying will not be tolerated.",
+            "### No spamming or flooding the chat.\n> Avoid sending repetitive messages, excessive emojis, or large blocks of text that disrupt the flow of conversation.",
             "No hate speech or offensive language. This includes any form of discrimination, racism, sexism, homophobia, or any other form of hate speech.",
             "Keep conversations in the appropriate channels. Use the designated channels for specific topics to keep discussions organized and relevant.",
             "Follow the Discord Community Guidelines. Ensure that your behavior and content comply with Discord's official guidelines, which can be found at https://discord.com/guidelines.",
