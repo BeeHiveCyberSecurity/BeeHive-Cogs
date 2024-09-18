@@ -19,7 +19,7 @@ class AntiPhishing(commands.Cog):
     Guard users from malicious links and phishing attempts with customizable protection options.
     """
 
-    __version__ = "1.5.9.7"
+    __version__ = "1.5.9.8"
     __last_updated__ = "September 17, 2024"
     __quick_notes__ = "We've more than quadrupled the amount of domains on the provided blocklist"
 
@@ -421,13 +421,13 @@ class AntiPhishing(commands.Cog):
             if log_channel:
                 redirect_chain_str = "\n".join(redirect_chain)
                 log_embed = discord.Embed(
-                    title="Dangerous URL detected",
-                    description=f"A URL was detected in the server **{message.guild.name}**.",
+                    title="Link safety",
+                    description=f"A known dangerous website or link was detected in **{message.guild.name}**'s chat.",
                     color=0xff4545,
                 )
-                log_embed.add_field(name="User", value=message.author.mention)
-                log_embed.add_field(name="URL", value=domain)
-                log_embed.add_field(name="Redirect Chain", value=redirect_chain_str)
+                log_embed.add_field(name="Sender", value=message.author.mention)
+                log_embed.add_field(name="Domain", value=domain)
+                log_embed.add_field(name="Redirects", value=redirect_chain_str)
                 await log_channel.send(embed=log_embed)
         
         if action == "notify":
