@@ -328,7 +328,7 @@ class Products(commands.Cog):
             name="What kind of data is collected?",
             value=(
                 "Messages, activities, and any content sent in this server may be subject to collection, analysis, training, and archival."
-                "This includes, but is not limited to\n\n"
+                "This includes, but is not limited to\n"
                 "- **Text Messages**: All text-based communication, including text channels, voice channel chats, threads, and commands\n"
                 "- **Images**: Any images or media files shared within the server.\n"
                 "- **Links**: URLs and hyperlinks shared in messages, or the raw content of a domain extracted from message content.\n"
@@ -351,7 +351,7 @@ class Products(commands.Cog):
             value="**No**, *but extentuating circumstances apply*.\n**BeeHive may disclose Your Personal Data in the good faith belief that such action is unavoidable to\n- Fulfill our legal obligations\n- Safeguard and uphold the Company's rights and assets\n- Thwart or examine potential misconduct related to the Service\n- Safeguard the personal safety of Service users and the general public\n- Shield against legal accountability**"
         )
         view = discord.ui.View()
-        view.add_item(discord.ui.Button(label="Terms of Service", url="https://www.beehive.systems/terms", style=discord.ButtonStyle.link, emoji="🔗"))
+        view.add_item(discord.ui.Button(label="Terms of Service", url="https://www.beehive.systems/tos", style=discord.ButtonStyle.link, emoji="🔗"))
         view.add_item(discord.ui.Button(label="Privacy Policy", url="https://www.beehive.systems/privacy", style=discord.ButtonStyle.link, emoji="🔗"))
         await ctx.send(embed=embed, view=view)
 
