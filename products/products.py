@@ -353,8 +353,8 @@ class Products(commands.Cog):
             inline=False
         )
         view = discord.ui.View()
-        view.add_item(discord.ui.Button(label="Terms of Service", url="https://www.beehive.systems/terms-of-service", style=discord.ButtonStyle.link, emoji="🔗"))
-        view.add_item(discord.ui.Button(label="Privacy Policy", url="https://www.beehive.systems/privacy-policy", style=discord.ButtonStyle.link, emoji="🔗"))
+        view.add_item(discord.ui.Button(label="Terms of Service", url="https://www.beehive.systems/terms", style=discord.ButtonStyle.link, emoji="🔗"))
+        view.add_item(discord.ui.Button(label="Privacy Policy", url="https://www.beehive.systems/privacy", style=discord.ButtonStyle.link, emoji="🔗"))
         await ctx.send(embed=embed, view=view)
 
 
