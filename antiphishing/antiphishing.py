@@ -19,9 +19,9 @@ class AntiPhishing(commands.Cog):
     Guard users from malicious links and phishing attempts with customizable protection options.
     """
 
-    __version__ = "1.5.9.8"
-    __last_updated__ = "September 17, 2024"
-    __quick_notes__ = "We've more than quadrupled the amount of domains on the provided blocklist and fixed assorted bugs found"
+    __version__ = "1.5.9.9"
+    __last_updated__ = "September 18, 2024"
+    __quick_notes__ = "We've more than quadrupled the amount of domains on the provided blocklist, adjusted notification appearance and function, and fixed assorted bugs found"
 
     def __init__(self, bot: Red):
         self.bot = bot
