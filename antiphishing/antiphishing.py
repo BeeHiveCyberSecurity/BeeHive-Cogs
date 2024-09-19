@@ -460,8 +460,9 @@ class AntiPhishing(commands.Cog):
                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/warning.png")
                     embed.timestamp = datetime.datetime.utcnow()
                     if mod_mentions:
-                        await message.channel.send(content=mod_mentions, allowed_mentions=discord.AllowedMentions(roles=True))
-                    await message.reply(embed=embed)
+                        await message.channel.send(content=mod_mentions, embed=embed, allowed_mentions=discord.AllowedMentions(roles=True))
+                    else:
+                        await message.reply(embed=embed)
                     
                 notifications = await self.config.guild(message.guild).notifications()
                 await self.config.guild(message.guild).notifications.set(notifications + 1)
