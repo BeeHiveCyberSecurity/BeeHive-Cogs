@@ -38,39 +38,35 @@ class QotD(commands.Cog):
             await ctx.send_help(ctx.command)
 
     @qotd.command()
-    async def list_categories(self, ctx):
-        """List all available question categories"""
+    async def list(self, ctx):
+        """List all available question categories and their status"""
+        enabled_categories = await self.config.guild(ctx.guild).enabled_categories()
+        embed = discord.Embed(title="Question Categories", color=discord.Color.blue())
+        
         if self.categories:
-            category_list = "\n".join(self.categories.keys())
-            await ctx.send(f"Available categories:\n{category_list}")
+            for category in self.categories.keys():
+                status = "Enabled" if category in enabled_categories else "Disabled"
+                embed.add_field(name=category, value=status, inline=False)
+            await ctx.send(embed=embed)
         else:
             await ctx.send("No categories available.")
 
     @qotd.command()
-    async def enable_category(self, ctx, category: str):
-        """Enable a question category"""
+    async def toggle(self, ctx, category: str):
+        """Toggle a question category"""
         if category in self.categories:
             async with self.config.guild(ctx.guild).enabled_categories() as enabled_categories:
-                if category not in enabled_categories:
+                if category in enabled_categories:
+                    enabled_categories.remove(category)
+                    await ctx.send(f"Category disabled: {category}")
+                else:
                     enabled_categories.append(category)
                     await ctx.send(f"Category enabled: {category}")
-                else:
-                    await ctx.send(f"Category already enabled: {category}")
         else:
             await ctx.send("Invalid category.")
 
     @qotd.command()
-    async def disable_category(self, ctx, category: str):
-        """Disable a question category"""
-        async with self.config.guild(ctx.guild).enabled_categories() as enabled_categories:
-            if category in enabled_categories:
-                enabled_categories.remove(category)
-                await ctx.send(f"Category disabled: {category}")
-            else:
-                await ctx.send("Category not enabled.")
-
-    @qotd.command()
-    async def list_enabled(self, ctx):
+    async def enabled(self, ctx):
         """List all enabled question categories"""
         enabled_categories = await self.config.guild(ctx.guild).enabled_categories()
         if enabled_categories:
