@@ -1,0 +1,9 @@
+{
+    "name": "qotd",
+    "author": ["adminelevation"],
+    "description": "A cog that provides a question of the day feature for your Discord server.",
+    "install_msg": "Thank you for installing the Question of the Day cog. Use `[p]qotd` to get started.",
+    "short": "Question of the Day",
+    "requirements": [],
+    "tags": ["fun", "questions", "engagement"]
+}

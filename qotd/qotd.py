@@ -1,8 +1,9 @@
 import discord
 from redbot.core import commands, Config
 import random
-import os
 import json
+import os
+from redbot.core.data_manager import bundled_data_path
 
 class QotD(commands.Cog):
     """Question of the Day Cog"""
@@ -15,7 +16,7 @@ class QotD(commands.Cog):
             "current_question": None
         }
         self.config.register_guild(**default_guild)
-        self.data_path = os.path.join(os.path.dirname(__file__), "data")
+        self.data_path = bundled_data_path(self)
         self.categories = self.load_categories()
 
     def load_categories(self):
@@ -104,6 +105,4 @@ class QotD(commands.Cog):
         else:
             await ctx.send("No question has been asked yet.")
 
-def setup(bot):
-    bot.add_cog(QotD(bot))
 
