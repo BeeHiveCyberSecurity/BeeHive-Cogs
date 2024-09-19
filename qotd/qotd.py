@@ -98,8 +98,9 @@ class QotD(commands.Cog):
         
         if self.categories:
             for category in self.categories.keys():
+                capitalized_category = category.capitalize()
                 status = "Enabled" if category in enabled_categories else "Disabled"
-                embed.add_field(name=category, value=status, inline=False)
+                embed.add_field(name=capitalized_category, value=status, inline=False)
             await ctx.send(embed=embed)
         else:
             await ctx.send(embed=discord.Embed(
