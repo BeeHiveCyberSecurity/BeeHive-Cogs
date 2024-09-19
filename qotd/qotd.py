@@ -94,9 +94,11 @@ class QotD(commands.Cog):
     async def list(self, ctx):
         """List all available question categories and their status"""
         enabled_categories = await self.config.guild(ctx.guild).enabled_categories()
-        embed = discord.Embed(title="Question Categories", color=0xfffffe)
+        embed = discord.Embed(title="Question categories", color=0xfffffe)
         
         if self.categories:
+            total_questions = sum(len(questions) for questions in self.categories.values())
+            embed.description = f"There are **{total_questions}** questions available"
             for category in self.categories.keys():
                 capitalized_category = category.capitalize()
                 status = "Enabled" if category in enabled_categories else "Disabled"
