@@ -84,7 +84,7 @@ class TikTokLiveCog(commands.Cog):
                     if chat_log_channel:
                         chat_messages = "\n".join(self.chat_logs[guild_id])
                         embed = discord.Embed(
-                            title=f"Chat Log for @{user}",
+                            title=f"Recent chats for @{user}",
                             description=chat_messages,
                             color=discord.Color.blue()
                         )
