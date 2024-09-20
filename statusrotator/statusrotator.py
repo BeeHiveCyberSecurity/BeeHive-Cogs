@@ -8,9 +8,9 @@ class StatusRotator(commands.Cog):
         self.config = Config.get_conf(self, identifier=1234567890)
         self.status_task = self.bot.loop.create_task(self.change_status())
         self.statuses = [
-            lambda: f"Serving {len(self.bot.guilds)} servers",
-            lambda: f"Serving {len(self.bot.users)} users",
-            lambda: f"Uptime: {self.get_uptime()}",
+            ("watching", lambda: f"Serving {len(self.bot.guilds)} servers"),
+            ("watching", lambda: f"Serving {len(self.bot.users)} users"),
+            ("playing", lambda: f"Uptime: {self.get_uptime()}"),
         ]
 
     def cog_unload(self):
@@ -19,8 +19,14 @@ class StatusRotator(commands.Cog):
     async def change_status(self):
         await self.bot.wait_until_ready()
         while not self.bot.is_closed():
-            for status in self.statuses:
-                await self.bot.change_presence(activity=discord.CustomActivity(name=f"{status}" ,emoji='🖥️'))
+            for activity_type, status in self.statuses:
+                if activity_type == "watching":
+                    activity = discord.Activity(type=discord.ActivityType.watching, name=status())
+                elif activity_type == "listening":
+                    activity = discord.Activity(type=discord.ActivityType.listening, name=status())
+                elif activity_type == "playing":
+                    activity = discord.Game(name=status())
+                await self.bot.change_presence(activity=activity)
                 await asyncio.sleep(60)  # Change status every 60 seconds
 
     def get_uptime(self):
