@@ -11,7 +11,7 @@ class StatusRotator(commands.Cog):
         self.status_task = self.bot.loop.create_task(self.change_status())
         self.statuses = [
             ("watching", lambda: f"over {len(self.bot.guilds)} servers"),
-            ("watching", lambda: f"over {len(self.bot.users)} users"),
+            ("watching", lambda: f"over {len(self.bot.users):,} users"),
         ]
         self.blocked_domains_count = 0
         self.antiphishing_status_enabled = False
