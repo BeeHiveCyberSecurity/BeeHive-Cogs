@@ -63,11 +63,13 @@ class TikTokLiveCog(commands.Cog):
 
     @commands.guild_only()
     @commands.group()
+    @commands.admin_or_permissions(manage_guild=True)
     async def tiktokset(self, ctx):
         """TikTok live stream settings commands."""
         pass
 
     @tiktokset.command()
+    @commands.admin_or_permissions(manage_guild=True)
     async def add(self, ctx, user: str):
         async with self.config.guild(ctx.guild).tiktok_users() as tiktok_users:
             if user not in tiktok_users:
@@ -99,6 +101,7 @@ class TikTokLiveCog(commands.Cog):
                 await ctx.send(embed=embed)
 
     @tiktokset.command()
+    @commands.admin_or_permissions(manage_guild=True)
     async def remove(self, ctx, user: str):
         async with self.config.guild(ctx.guild).tiktok_users() as tiktok_users:
             if user in tiktok_users:
@@ -121,6 +124,7 @@ class TikTokLiveCog(commands.Cog):
                 await ctx.send(embed=embed)
 
     @tiktokset.command()
+    @commands.admin_or_permissions(manage_guild=True)
     async def channel(self, ctx, channel: discord.TextChannel):
         await self.config.guild(ctx.guild).alert_channel.set(channel.id)
         embed = discord.Embed(
@@ -131,6 +135,7 @@ class TikTokLiveCog(commands.Cog):
         await ctx.send(embed=embed)
 
     @tiktokset.command()
+    @commands.admin_or_permissions(manage_guild=True)
     async def role(self, ctx, role: discord.Role):
         await self.config.guild(ctx.guild).alert_role.set(role.id)
         embed = discord.Embed(
@@ -141,6 +146,7 @@ class TikTokLiveCog(commands.Cog):
         await ctx.send(embed=embed)
 
     @tiktokset.command()
+    @commands.admin_or_permissions(manage_guild=True)
     async def settings(self, ctx):
         guild_id = ctx.guild.id
         tiktok_users = await self.config.guild(ctx.guild).tiktok_users()
