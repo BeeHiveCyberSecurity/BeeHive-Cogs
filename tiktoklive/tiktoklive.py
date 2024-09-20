@@ -293,7 +293,7 @@ class TikTokLiveCog(commands.Cog):
         except Exception as e:
             await ctx.send(f"Failed to download video: {e}")
 
-    @tiktoklive.command()
+    @tiktokliveset.command()
     async def auto(self, ctx):
         """Toggle automatic downloading of TikTok videos."""
         current_setting = await self.config.guild(ctx.guild).auto_download()
