@@ -124,12 +124,14 @@ class QotD(commands.Cog):
             async with self.config.guild(ctx.guild).enabled_categories() as enabled_categories:
                 if category in enabled_categories:
                     enabled_categories.remove(category)
+                    await self.config.guild(ctx.guild).enabled_categories.set(enabled_categories)
                     await ctx.send(embed=discord.Embed(
                         description=f"Category disabled: {category}",
                         color=0xfffffe
                     ))
                 else:
                     enabled_categories.append(category)
+                    await self.config.guild(ctx.guild).enabled_categories.set(enabled_categories)
                     await ctx.send(embed=discord.Embed(
                         description=f"Category enabled: {category}",
                         color=0xfffffe
@@ -248,5 +250,6 @@ class QotD(commands.Cog):
         if current_question and current_question in message.content:
             async with self.config.guild(message.guild).response_count() as response_count:
                 response_count += 1
+                await self.config.guild(message.guild).response_count.set(response_count)
 
 
