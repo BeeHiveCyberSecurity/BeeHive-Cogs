@@ -1,10 +1,10 @@
 {
     "name": "tiktoklive",
     "author": ["adminelevation"],
-    "description": "A cog for monitoring TikTok live streams and sending alerts to Discord channels.",
+    "description": "A cog for monitoring TikTok live streams and sending alerts and chat logs to Discord channels.",
     "short": "Monitor TikTok live streams.",
     "requirements": ["TikTokLive"],
     "tags": ["tiktok", "live", "alerts", "discord"],
-    "install_msg": "Thank you for installing the TikTokLive cog. Use `[p]help TikTokLive` to get started.",
-    "end_user_data_statement": "This cog stores Discord server IDs and TikTok usernames for the purpose of monitoring live streams. No other personal data is stored."
+    "install_msg": "Thank you for installing the TikTokLive cog. Use `[p]tiktokset` to get started.",
+    "end_user_data_statement": "This cog stores Discord server IDs, TikTok messages, and TikTok usernames for the purpose of monitoring live streams. No other personal data is stored."
 }
