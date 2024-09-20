@@ -5,6 +5,8 @@ from TikTokLive.client.logger import LogLevel #type: ignore
 from TikTokLive.events import ConnectEvent, CommentEvent #type: ignore
 import discord #type: ignore
 import logging
+import yt_dlp
+import os
 
 class TikTokLiveCog(commands.Cog):
     def __init__(self, bot):
@@ -142,7 +144,7 @@ class TikTokLiveCog(commands.Cog):
             await self.config.guild(ctx.guild).tiktok_user.set(None)  # Save persistently
             if ctx.guild.id in self.clients:
                 await self.clients[ctx.guild.id].close()
-                del self.clients[ctx.guild.id]
+                del self.clients[guild.id]
             embed = discord.Embed(
                 title="Creator removed",
                 description=f"TikTok user {user} removed for this server.",
@@ -249,6 +251,23 @@ class TikTokLiveCog(commands.Cog):
                 color=discord.Color.red()
             )
             await ctx.send(embed=embed)
+
+    @tiktoklive.command()
+    async def download(self, ctx, url: str):
+        """Download a TikTok video and send it in the channel."""
+        ydl_opts = {
+            'format': 'best',
+            'outtmpl': 'downloads/%(title)s.%(ext)s',
+        }
+        try:
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                info_dict = ydl.extract_info(url, download=True)
+                video_title = info_dict.get('title', 'video')
+                video_path = ydl.prepare_filename(info_dict)
+                await ctx.send(f"Downloaded video: {video_title}", file=discord.File(video_path))
+                os.remove(video_path)  # Clean up the downloaded file after sending
+        except Exception as e:
+            await ctx.send(f"Failed to download video: {e}")
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild):
