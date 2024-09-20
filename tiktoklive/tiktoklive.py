@@ -303,6 +303,16 @@ class TikTokLiveCog(commands.Cog):
         await ctx.send(f"Automatic downloading of TikTok videos has been {status}.")
 
     @commands.Cog.listener()
+    async def on_message(self, message):
+        if message.author.bot:
+            return
+
+        guild_id = message.guild.id
+        auto_download = await self.config.guild_from_id(guild_id).auto_download()
+        if auto_download and "tiktok.com" in message.content:
+            await self.download_video(message.channel, message.content)
+
+    @commands.Cog.listener()
     async def on_guild_join(self, guild):
         user = await self.config.guild(guild).tiktok_user()
         if user:
