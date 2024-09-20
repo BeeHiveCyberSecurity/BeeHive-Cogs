@@ -283,8 +283,8 @@ class TikTokLiveCog(commands.Cog):
                     color=0x2bbd8e
                 )
                 embed.add_field(name="Caption", value=clean_title, inline=False)
-                embed.add_field(name="Uploader", value=f"[{video_uploader}](https://www.tiktok.com/@{video_uploader})", inline=False)
-                embed.add_field(name="Duration", value=f"{video_duration} seconds", inline=False)
+                embed.add_field(name="Uploader", value=f"[{video_uploader}](https://www.tiktok.com/@{video_uploader})", inline=True)
+                embed.add_field(name="Duration", value=f"{video_duration} seconds", inline=True)
                 if hashtags:
                     embed.add_field(name="Hashtags", value=' '.join(hashtags), inline=False)
                 
