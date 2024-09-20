@@ -32,9 +32,9 @@ class StatusRotator(commands.Cog):
                 await asyncio.sleep(120)  # Change status every 120 seconds
 
     def get_blocked_domains_count(self):
-        antiphishing_cog = self.bot.get_cog("AntiPhishing")
+        antiphishing_cog = self.bot.get_cog("antiphishing")
         if antiphishing_cog:
-            return len(antiphishing_cog.blocked_domains)
+            return len(antiphishing_cog.domains)
         return 0
 
     @commands.Cog.listener()
