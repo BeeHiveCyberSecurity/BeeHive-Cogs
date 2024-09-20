@@ -31,9 +31,9 @@ class TikTokLiveCog(commands.Cog):
                 if channel:
                     role_mention = f"<@&{role_id}>" if role_id else ""
                     embed = discord.Embed(
-                        title="TikTok Live Alert",
+                        title="A creator just went live",
                         description=f"@{event.unique_id} is now live on TikTok!",
-                        color=discord.Color.green()
+                        color=0x2bbd8e
                     )
                     view = discord.ui.View()
                     button = discord.ui.Button(
