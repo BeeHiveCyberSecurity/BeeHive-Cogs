@@ -93,6 +93,7 @@ class TikTokLiveCog(commands.Cog):
         users = await self.config.guild(guild).tiktok_users()
         for user in users:
             await self.initialize_client(guild.id, user)
+            await asyncio.sleep(5)  # Wait 5 seconds between initializing clients to avoid rate limiting
 
     @commands.Cog.listener()
     async def on_guild_remove(self, guild):
