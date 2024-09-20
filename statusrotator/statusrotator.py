@@ -12,10 +12,9 @@ class StatusRotator(commands.Cog):
             ("watching", lambda: f"over {len(self.bot.guilds)} servers"),
             ("watching", lambda: f"over {len(self.bot.users)} users"),
         ]
-        self.antiphishing_enabled = "antiphishing" in bot.cogs
         self.blocked_domains_count = 0
 
-        if self.antiphishing_enabled:
+        if "antiphishing" in bot.cogs:
             self.bot.loop.create_task(self.enable_antiphishing_on_startup())
 
     def cog_unload(self):
@@ -59,23 +58,8 @@ class StatusRotator(commands.Cog):
     @statusrotator.command()
     async def status(self, ctx):
         """Show what cog integrations are active"""
-        antiphishing_status = "enabled" if self.antiphishing_enabled else "disabled"
+        antiphishing_status = "enabled" if "antiphishing" in self.bot.cogs else "disabled"
         await ctx.send(f"Antiphishing integration is {antiphishing_status}.")
-
-    @statusrotator.command()
-    async def enable_antiphishing(self, ctx):
-        """Enable antiphishing integration"""
-        self.antiphishing_enabled = True
-        await self.fetch_blocked_domains_count()
-        self.statuses.append(("watching", lambda: f"for {self.blocked_domains_count} bad domains"))
-        await ctx.send("Antiphishing integration enabled and status updated.")
-
-    @statusrotator.command()
-    async def disable_antiphishing(self, ctx):
-        """Disable antiphishing integration"""
-        self.antiphishing_enabled = False
-        self.statuses = [status for status in self.statuses if "bad domains" not in status[1]()]
-        await ctx.send("Antiphishing integration disabled and status updated.")
 
     @commands.Cog.listener()
     async def on_ready(self):
