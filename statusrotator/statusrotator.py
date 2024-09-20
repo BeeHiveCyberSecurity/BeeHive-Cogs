@@ -58,7 +58,7 @@ class StatusRotator(commands.Cog):
 
     async def enable_antiphishing_status(self):
         await self.fetch_blocked_domains_count()
-        self.statuses.append(("watching", lambda: f"for {self.blocked_domains_count} bad domains"))
+        self.statuses.append(("watching", lambda: f"for {self.blocked_domains_count:,} bad domains"))
 
     @commands.group()
     async def statusrotator(self, ctx):
