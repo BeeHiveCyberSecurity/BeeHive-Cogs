@@ -21,7 +21,8 @@ class QotD(commands.Cog):
             "qotd_channel": None,
             "qotd_time": "12:00",
             "qotd_timezone": "UTC",
-            "mention_role": None
+            "mention_role": None,
+            "last_asked": None
         }
         self.config.register_guild(**default_guild)
         self.data_path = bundled_data_path(self)
@@ -49,6 +50,7 @@ class QotD(commands.Cog):
                 qotd_timezone = pytz.timezone(qotd_timezone_str)
                 qotd_time = datetime.strptime(qotd_time_str, "%H:%M").time()
                 qotd_channel_id = await self.config.guild(guild).qotd_channel()
+                last_asked = await self.config.guild(guild).last_asked()
                 if qotd_channel_id:
                     qotd_channel = guild.get_channel(qotd_channel_id)
                     if qotd_channel:
@@ -56,8 +58,10 @@ class QotD(commands.Cog):
                         next_qotd = qotd_timezone.localize(next_qotd).astimezone(pytz.utc)
                         if now > next_qotd:
                             next_qotd += timedelta(days=1)
-                        await asyncio.sleep((next_qotd - now).total_seconds())
-                        await self.ask_daily_question(qotd_channel)
+                        if not last_asked or (now - datetime.fromisoformat(last_asked)).total_seconds() >= 86400:
+                            await asyncio.sleep((next_qotd - now).total_seconds())
+                            await self.ask_daily_question(qotd_channel)
+                            await self.config.guild(guild).last_asked.set(now.isoformat())
             await asyncio.sleep(60)
 
     async def ask_daily_question(self, channel):
@@ -253,5 +257,4 @@ class QotD(commands.Cog):
             async with self.config.guild(message.guild).response_count() as response_count:
                 response_count += 1
                 await self.config.guild(message.guild).response_count.set(response_count)
-
 
