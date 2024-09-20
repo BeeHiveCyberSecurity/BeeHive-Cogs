@@ -74,7 +74,7 @@ class QotD(commands.Cog):
                 response_count = await self.config.guild(guild).response_count()
                 embed = discord.Embed(
                     title="Question of the Day",
-                    description=f"Yesterday's question received {response_count} responses.\n\nQuestion: {question}",
+                    description=f"Yesterday's question received **{response_count}** responses.\n\nToday's question is... **{question}**",
                     color=0xfffffe
                 )
                 message_content = f"{mention_role.mention}" if mention_role else ""
