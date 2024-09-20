@@ -4,6 +4,7 @@ from TikTokLive import TikTokLiveClient
 from TikTokLive.client.logger import LogLevel
 from TikTokLive.events import ConnectEvent
 import discord
+import logging
 
 class TikTokLiveCog(commands.Cog):
     def __init__(self, bot):
@@ -14,7 +15,7 @@ class TikTokLiveCog(commands.Cog):
 
     async def initialize_client(self, guild_id, user):
         client = TikTokLiveClient(unique_id=user)
-        client.logger.setLevel(LogLevel.INFO)
+        client.logger.setLevel(logging.INFO)  # Use logging.INFO instead of LogLevel.INFO
         if guild_id not in self.clients:
             self.clients[guild_id] = []
         self.clients[guild_id].append(client)
