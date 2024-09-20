@@ -384,7 +384,7 @@ class TikTokLiveCog(commands.Cog):
     async def auto(self, ctx):
         """Toggle automatic reposting of TikTok links."""
         auto_repost = await self.config.guild(ctx.guild).auto_repost()
-        await self.config.guild(ctx.guild).auto_repost.set(!auto_repost)
+        await self.config.guild(ctx.guild).auto_repost.set(not auto_repost)
         await ctx.send(
             f"Automatic reposting of TikTok links is now {'enabled' if not auto_repost else 'disabled'}."
         )
@@ -412,7 +412,7 @@ class TikTokLiveCog(commands.Cog):
     async def reply(self, ctx):
         """Toggle replying to TikTok links."""
         reply = await self.config.guild(ctx.guild).reply()
-        await self.config.guild(ctx.guild).reply.set(!reply)
+        await self.config.guild(ctx.guild).reply.set(not reply)
         delete = await self.config.guild(ctx.guild).delete()
         if delete:
             await ctx.send("Replying cannot be enabled while deleting messages is enabled.")
@@ -426,7 +426,7 @@ class TikTokLiveCog(commands.Cog):
     async def delete(self, ctx):
         """Toggle deleting messages with TikTok links."""
         delete = await self.config.guild(ctx.guild).delete()
-        await self.config.guild(ctx.guild).delete.set(!delete)
+        await self.config.guild(ctx.guild).delete.set(not delete)
         reply = await self.config.guild(ctx.guild).reply()
         if reply:
             await ctx.send("Deleting messages cannot be enabled while replying is enabled.")
