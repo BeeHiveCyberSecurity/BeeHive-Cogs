@@ -263,8 +263,19 @@ class TikTokLiveCog(commands.Cog):
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 info_dict = ydl.extract_info(url, download=True)
                 video_title = info_dict.get('title', 'video')
+                video_uploader = info_dict.get('uploader', 'unknown')
+                video_duration = info_dict.get('duration', 0)
                 video_path = ydl.prepare_filename(info_dict)
-                await ctx.send(f"Downloaded video: {video_title}", file=discord.File(video_path))
+                
+                embed = discord.Embed(
+                    title="Downloaded successfully",
+                    color=0x2bbd8e
+                )
+                embed.add_field(name="Title", value=video_title, inline=False)
+                embed.add_field(name="Uploader", value=video_uploader, inline=False)
+                embed.add_field(name="Duration", value=f"{video_duration} seconds", inline=False)
+                
+                await ctx.send(embed=embed, file=discord.File(video_path))
                 os.remove(video_path)  # Clean up the downloaded file after sending
         except Exception as e:
             await ctx.send(f"Failed to download video: {e}")
