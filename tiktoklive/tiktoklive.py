@@ -119,14 +119,18 @@ class TikTokLiveCog(commands.Cog):
                         self.chat_logs[guild_id] = []
 
     def extract_info_and_convert(self, url: str) -> "tuple[dict, BytesIO]":
-        with self.ytdl as ytdl:
-            info = ytdl.extract_info(url, download=True)
-            if info is None:
-                raise Exception("Failed to extract video info")
-        video_id = info["id"]
-        return info, self.convert_video(
-            f"{self.path}/{video_id}.mp4", f"{self.path}/{video_id}_conv.mp4"
-        )
+        try:
+            with self.ytdl as ytdl:
+                info = ytdl.extract_info(url, download=True)
+                if info is None:
+                    raise Exception("Failed to extract video info")
+            video_id = info["id"]
+            return info, self.convert_video(
+                f"{self.path}/{video_id}.mp4", f"{self.path}/{video_id}_conv.mp4"
+            )
+        except Exception as e:
+            log.error(f"Error in extract_info_and_convert: {e}")
+            raise
 
     async def dl_tiktok(
         self, channel, url, *, message=None, reply=True, delete=False, suppress=True
@@ -137,41 +141,50 @@ class TikTokLiveCog(commands.Cog):
             log.error(f"Error downloading TikTok video: {e}")
             return
         video_id = info["id"]
-        if message is None:
-            await channel.send(
-                file=discord.File(video, filename=video_id + ".mp4"),
-                content=f'Video from <{url}>\n{info["title"]}',
-            )
-        else:
-            if reply:
-                if suppress:
-                    if message.guild.me.guild_permissions.manage_messages:
-                        await message.edit(suppress=True)
-                await message.reply(
-                    file=discord.File(video, filename=video_id + ".mp4"),
-                    content=f'Video from <{url}>\n{info["title"]}',
-                )
-            elif delete:
-                await message.delete()
+        try:
+            if message is None:
                 await channel.send(
                     file=discord.File(video, filename=video_id + ".mp4"),
                     content=f'Video from <{url}>\n{info["title"]}',
                 )
-        log.debug(f"Reposted TikTok video from {url}")
-
-        # delete the video
-        os.remove(f"{self.path}/{video_id}.mp4")
-        os.remove(f"{self.path}/{video_id}_conv.mp4")
+            else:
+                if reply:
+                    if suppress and message.guild.me.guild_permissions.manage_messages:
+                        await message.edit(suppress=True)
+                    await message.reply(
+                        file=discord.File(video, filename=video_id + ".mp4"),
+                        content=f'Video from <{url}>\n{info["title"]}',
+                    )
+                elif delete:
+                    await message.delete()
+                    await channel.send(
+                        file=discord.File(video, filename=video_id + ".mp4"),
+                        content=f'Video from <{url}>\n{info["title"]}',
+                    )
+            log.debug(f"Reposted TikTok video from {url}")
+        except Exception as e:
+            log.error(f"Error sending TikTok video: {e}")
+        finally:
+            # delete the video
+            try:
+                os.remove(f"{self.path}/{video_id}.mp4")
+                os.remove(f"{self.path}/{video_id}_conv.mp4")
+            except Exception as e:
+                log.error(f"Error deleting video files: {e}")
 
     def convert_video(self, video_path, conv_path):
-        # convert the video to h264 codec
-        os.system(
-            f"ffmpeg -i {video_path} -c:v libx264 -c:a aac -strict experimental {conv_path} -hide_banner -loglevel error"
-        )
-        with open(conv_path, "rb") as f:
-            video = BytesIO(f.read())
-            video.seek(0)
-        return video
+        try:
+            # convert the video to h264 codec
+            os.system(
+                f"ffmpeg -i {video_path} -c:v libx264 -c:a aac -strict experimental {conv_path} -hide_banner -loglevel error"
+            )
+            with open(conv_path, "rb") as f:
+                video = BytesIO(f.read())
+                video.seek(0)
+            return video
+        except Exception as e:
+            log.error(f"Error converting video: {e}")
+            raise
 
     @commands.command()
     async def tiktok(self, ctx, url: str):
