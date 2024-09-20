@@ -3,6 +3,8 @@ import discord
 import asyncio
 import aiohttp
 import json
+from collections import deque
+from datetime import datetime, timedelta
 
 class StatusRotator(commands.Cog):
     def __init__(self, bot):
@@ -16,7 +18,9 @@ class StatusRotator(commands.Cog):
         self.statuses = [
             ("watching", lambda: f"over {len(self.bot.guilds)} servers"),
             ("watching", lambda: f"over {len(self.bot.users):,} users"),
+            ("watching", self.get_message_count_status)
         ]
+        self.message_log = deque()
         self.bot.loop.create_task(self.load_settings())
 
     async def load_settings(self):
@@ -70,6 +74,12 @@ class StatusRotator(commands.Cog):
         await self.fetch_blocked_domains_count()
         self.statuses.append(("watching", lambda: f"for {self.blocked_domains_count:,} bad domains"))
 
+    def get_message_count_status(self):
+        now = datetime.utcnow()
+        five_minutes_ago = now - timedelta(minutes=5)
+        self.message_log = deque([timestamp for timestamp in self.message_log if timestamp > five_minutes_ago])
+        return f"{len(self.message_log)} msgs / 5 minutes"
+
     @commands.group()
     async def statusrotator(self, ctx):
         """StatusRotator command group"""
@@ -97,6 +107,12 @@ class StatusRotator(commands.Cog):
                 await ctx.send("Antiphishing status has been disabled.")
         else:
             await ctx.send(f"Unknown integration: {integration}")
+
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        if message.author.bot:
+            return
+        self.message_log.append(datetime.utcnow())
 
     @commands.Cog.listener()
     async def on_ready(self):
