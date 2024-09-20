@@ -12,6 +12,7 @@ class TikTokLiveCog(commands.Cog):
         self.config = Config.get_conf(self, identifier=1234567890)
         self.config.register_guild(tiktok_users=[], alert_channel=None, alert_role=None)
         self.clients = {}
+        self.live_status = {}  # Dictionary to keep track of live status
 
     async def initialize_client(self, guild_id, user):
         client = TikTokLiveClient(unique_id=user)
@@ -36,16 +37,23 @@ class TikTokLiveCog(commands.Cog):
                     )
                     await channel.send(content=role_mention, embed=embed, allowed_mentions=discord.AllowedMentions(roles=True))
 
-        self.bot.loop.create_task(self.check_loop(guild_id, client))
+        self.bot.loop.create_task(self.check_loop(guild_id, client, user))
 
-    async def check_loop(self, guild_id, client):
+    async def check_loop(self, guild_id, client, user):
         while True:
-            if not await client.is_live():
+            is_live = await client.is_live()
+            if not is_live:
                 client.logger.info("Client is currently not live. Checking again in 60 seconds.")
+                self.live_status[user] = False  # Update live status
                 await asyncio.sleep(60)
             else:
-                client.logger.info("Requested client is live!")
-                await client.connect()
+                if not self.live_status.get(user, False):  # Only send alert if user was not previously live
+                    client.logger.info("Requested client is live!")
+                    await client.connect()
+                    self.live_status[user] = True  # Update live status
+                else:
+                    client.logger.info("Client is still live. No new alert sent.")
+                await asyncio.sleep(60)  # Check again in 60 seconds
 
     @commands.guild_only()
     @commands.group()
@@ -97,7 +105,7 @@ class TikTokLiveCog(commands.Cog):
                 tiktok_users.remove(user)
                 await self.config.guild(ctx.guild).tiktok_users.set(tiktok_users)  # Save persistently
                 if ctx.guild.id in self.clients:
-                    self.clients[ctx.guild.id] = [client for client in self.clients[ctx.guild.id] if client.unique_id != user]
+                    self.clients[ctx.guild.id] = [client for client in self.clients[guild_id] if client.unique_id != user]
                 embed = discord.Embed(
                     title="TikTok User Removed",
                     description=f"TikTok user {user} removed for this server.",
