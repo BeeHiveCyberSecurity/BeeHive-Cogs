@@ -192,7 +192,7 @@ class TikTokLiveCog(commands.Cog):
                         await ctx.send(embed=embed)
                     return
         embed = discord.Embed(
-            title="User Not Followed",
+            title="User not followed",
             description=f"TikTok user {user} is not being followed in this server.",
             color=discord.Color.red()
         )
