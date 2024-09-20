@@ -91,7 +91,7 @@ class StatusRotator(commands.Cog):
 
     def get_latency_status(self):
         latency = self.bot.latency * 1000  # Convert to milliseconds
-        return f"Response latency is {latency:.2f}ms"
+        return f"Response latency {latency:.2f}ms"
 
     @commands.group()
     async def statusrotator(self, ctx):
