@@ -304,7 +304,7 @@ class TikTokLiveCog(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if message.author.bot:
+        if message.author.bot or message.guild is None:
             return
 
         guild_id = message.guild.id
