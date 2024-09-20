@@ -8,13 +8,22 @@ class StatusRotator(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=1234567890)
+        self.config.register_global(
+            antiphishing_status_enabled=False,
+            blocked_domains_count=0
+        )
         self.status_task = self.bot.loop.create_task(self.change_status())
         self.statuses = [
             ("watching", lambda: f"over {len(self.bot.guilds)} servers"),
             ("watching", lambda: f"over {len(self.bot.users):,} users"),
         ]
-        self.blocked_domains_count = 0
-        self.antiphishing_status_enabled = False
+        self.bot.loop.create_task(self.load_settings())
+
+    async def load_settings(self):
+        self.antiphishing_status_enabled = await self.config.antiphishing_status_enabled()
+        self.blocked_domains_count = await self.config.blocked_domains_count()
+        if self.antiphishing_status_enabled:
+            await self.enable_antiphishing_status()
 
     def cog_unload(self):
         self.status_task.cancel()
@@ -55,6 +64,7 @@ class StatusRotator(commands.Cog):
             except aiohttp.ClientError as e:
                 print(f"Client error while fetching blocklist: {e}")
                 self.blocked_domains_count = 0
+        await self.config.blocked_domains_count.set(self.blocked_domains_count)
 
     async def enable_antiphishing_status(self):
         await self.fetch_blocked_domains_count()
@@ -78,6 +88,7 @@ class StatusRotator(commands.Cog):
         """Toggle different integrations like antiphishing"""
         if integration.lower() == "antiphishing":
             self.antiphishing_status_enabled = not self.antiphishing_status_enabled
+            await self.config.antiphishing_status_enabled.set(self.antiphishing_status_enabled)
             if self.antiphishing_status_enabled:
                 self.bot.loop.create_task(self.enable_antiphishing_status())
                 await ctx.send("Antiphishing status has been enabled.")
