@@ -57,7 +57,7 @@ class TikTokLiveCog(commands.Cog):
         pass
 
     @tiktokset.command()
-    async def add_user(self, ctx, user: str):
+    async def add(self, ctx, user: str):
         async with self.config.guild(ctx.guild).tiktok_users() as tiktok_users:
             if user not in tiktok_users:
                 tiktok_users.append(user)
@@ -72,7 +72,7 @@ class TikTokLiveCog(commands.Cog):
                 await ctx.send(f"TikTok user {user} is already being followed.")
 
     @tiktokset.command()
-    async def remove_user(self, ctx, user: str):
+    async def remove(self, ctx, user: str):
         async with self.config.guild(ctx.guild).tiktok_users() as tiktok_users:
             if user in tiktok_users:
                 tiktok_users.remove(user)
@@ -88,7 +88,7 @@ class TikTokLiveCog(commands.Cog):
                 await ctx.send(f"TikTok user {user} is not being followed.")
 
     @tiktokset.command()
-    async def set_alert_channel(self, ctx, channel: discord.TextChannel):
+    async def channel(self, ctx, channel: discord.TextChannel):
         await self.config.guild(ctx.guild).alert_channel.set(channel.id)
         embed = discord.Embed(
             title="Alert Channel Set",
