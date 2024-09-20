@@ -208,9 +208,14 @@ class QotD(commands.Cog):
     @qotd.command()
     async def settime(self, ctx, time_str: str, timezone_str: str = "UTC"):
         """Set the time and timezone for daily QotD (HH:MM in 24-hour format and timezone)"""
+        known_timezones = [
+            "UTC", "US/Eastern", "US/Central", "US/Mountain", "US/Pacific",
+            "Europe/London", "Europe/Paris", "Asia/Tokyo", "Australia/Sydney"
+        ]
         try:
             datetime.strptime(time_str, "%H:%M")
-            pytz.timezone(timezone_str)  # Validate timezone
+            if timezone_str not in known_timezones:
+                raise pytz.UnknownTimeZoneError
             await self.config.guild(ctx.guild).qotd_time.set(time_str)
             await self.config.guild(ctx.guild).qotd_timezone.set(timezone_str)
             await ctx.send(embed=discord.Embed(
@@ -219,7 +224,7 @@ class QotD(commands.Cog):
             ))
         except (ValueError, pytz.UnknownTimeZoneError):
             await ctx.send(embed=discord.Embed(
-                description="Invalid time or timezone format. Please use HH:MM in 24-hour format and a valid timezone.",
+                description="Invalid time or timezone format. Please use HH:MM in 24-hour format and a valid timezone from the following list: " + ", ".join(known_timezones),
                 color=0xfffffe
             ))
 
