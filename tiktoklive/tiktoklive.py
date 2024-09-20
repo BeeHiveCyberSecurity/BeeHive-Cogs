@@ -1,48 +1,19 @@
 import asyncio
-import os
-import re
-from io import BytesIO
-from redbot.core import commands, Config, data_manager
-from TikTokLive import TikTokLiveClient
-from TikTokLive.client.logger import LogLevel
-from TikTokLive.events import ConnectEvent, CommentEvent
-import discord
+from redbot.core import commands, Config #type: ignore
+from TikTokLive import TikTokLiveClient #type: ignore
+from TikTokLive.client.logger import LogLevel #type: ignore
+from TikTokLive.events import ConnectEvent, CommentEvent #type: ignore
+import discord #type: ignore
 import logging
-from yt_dlp import YoutubeDL
-from concurrent.futures import ThreadPoolExecutor
-from redbot.core.utils.chat_formatting import humanize_list
-
-log = logging.getLogger("red.tiktoklive")
 
 class TikTokLiveCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=1234567890)
-        self.config.register_guild(
-            tiktok_user=None, alert_channel=None, alert_role=None, chat_log_channel=None,
-            auto_repost=False, channels=[], interval=0, reply=True, delete=False, suppress=True
-        )
+        self.config.register_guild(tiktok_user=None, alert_channel=None, alert_role=None, chat_log_channel=None)
         self.clients = {}
         self.live_status = {}  # Dictionary to keep track of live status
         self.chat_logs = {}  # Dictionary to store chat logs
-        self.path = data_manager.cog_data_path(self)
-        self.pattern = re.compile(
-            r"^.*https:\/\/(?:m|www|vm)?\.?tiktok\.com\/((?:.*\b(?:(?:usr|v|embed|user|video)\/|\?shareId=|\&item_id=)(\d+))|\w+)"
-        )
-        self.cache = {}
-        self.ytdl_opts = {
-            "format": "best",
-            "outtmpl": str(self.path / "%(id)s.%(ext)s"),
-            "quiet": True,
-            "default_search": "auto",
-            "verbose": False,
-            "no_warnings": True,
-        }
-        self.ytdl = YoutubeDL(self.ytdl_opts)
-        self.executor = ThreadPoolExecutor()
-
-    async def initialize(self):
-        self.cache = await self.config.all_guilds()
 
     async def initialize_client(self, guild_id, user):
         client = TikTokLiveClient(unique_id=user)
@@ -86,7 +57,7 @@ class TikTokLiveCog(commands.Cog):
             try:
                 is_live = await client.is_live()
                 if not is_live:
-                    client.logger.info("Client is currently not live. Checking again in 90 seconds.")
+                    client.logger.info("Client is currently not live. Checking again in 60 seconds.")
                     self.live_status[user] = False  # Update live status
                     await asyncio.sleep(90)
                 else:
@@ -96,7 +67,7 @@ class TikTokLiveCog(commands.Cog):
                         self.live_status[user] = True  # Update live status
                     else:
                         client.logger.info("Client is still live. No new alert sent.")
-                    await asyncio.sleep(90)  # Check again in 90 seconds
+                    await asyncio.sleep(90)  # Check again in 60 seconds
             except Exception as e:
                 client.logger.error(f"Error in check_loop: {e}")
                 await asyncio.sleep(90)  # Wait before retrying
@@ -117,104 +88,6 @@ class TikTokLiveCog(commands.Cog):
                         )
                         await chat_log_channel.send(embed=embed)
                         self.chat_logs[guild_id] = []
-
-    def extract_info_and_convert(self, url: str) -> "tuple[dict, BytesIO]":
-        try:
-            with self.ytdl as ytdl:
-                info = ytdl.extract_info(url, download=True)
-                if info is None:
-                    raise Exception("Failed to extract video info")
-            video_id = info["id"]
-            return info, self.convert_video(
-                f"{self.path}/{video_id}.mp4", f"{self.path}/{video_id}_conv.mp4"
-            )
-        except Exception as e:
-            log.error(f"Error in extract_info_and_convert: {e}")
-            raise
-
-    async def dl_tiktok(
-        self, channel, url, *, message=None, reply=True, delete=False, suppress=True
-    ):
-        try:
-            info, video = await self.bot.loop.run_in_executor(self.executor, self.extract_info_and_convert, url)
-        except Exception as e:
-            log.error(f"Error downloading TikTok video: {e}")
-            return
-        video_id = info["id"]
-        try:
-            if message is None:
-                await channel.send(
-                    file=discord.File(video, filename=video_id + ".mp4"),
-                    content=f'Video from <{url}>\n{info["title"]}',
-                )
-            else:
-                if reply:
-                    if suppress and message.guild.me.guild_permissions.manage_messages:
-                        await message.edit(suppress=True)
-                    await message.reply(
-                        file=discord.File(video, filename=video_id + ".mp4"),
-                        content=f'Video from <{url}>\n{info["title"]}',
-                    )
-                elif delete:
-                    await message.delete()
-                    await channel.send(
-                        file=discord.File(video, filename=video_id + ".mp4"),
-                        content=f'Video from <{url}>\n{info["title"]}',
-                    )
-            log.debug(f"Reposted TikTok video from {url}")
-        except Exception as e:
-            log.error(f"Error sending TikTok video: {e}")
-        finally:
-            # delete the video
-            try:
-                os.remove(f"{self.path}/{video_id}.mp4")
-                os.remove(f"{self.path}/{video_id}_conv.mp4")
-            except Exception as e:
-                log.error(f"Error deleting video files: {e}")
-
-    def convert_video(self, video_path, conv_path):
-        try:
-            # convert the video to h264 codec
-            os.system(
-                f"ffmpeg -i {video_path} -c:v libx264 -c:a aac -strict experimental {conv_path} -hide_banner -loglevel error"
-            )
-            with open(conv_path, "rb") as f:
-                video = BytesIO(f.read())
-                video.seek(0)
-            return video
-        except Exception as e:
-            log.error(f"Error converting video: {e}")
-            raise
-
-    @commands.command()
-    async def tiktok(self, ctx, url: str):
-        """Download and repost a TikTok video."""
-        async with ctx.typing():
-            await self.dl_tiktok(ctx.channel, url)
-
-    @commands.Cog.listener()
-    async def on_message(self, message):
-        if message.author.bot:
-            return
-        if not message.guild:
-            return
-        if not self.cache.get(message.guild.id, {}).get("auto_repost", False):
-            return
-        channels = self.cache.get(message.guild.id, {}).get("channels", [])
-        if message.channel.id not in channels:
-            return
-        link = re.match(self.pattern, message.content)
-        if link:
-            log.debug(link)
-            link = link.group(0)
-            await self.dl_tiktok(
-                message.channel,
-                link,
-                message=message,
-                reply=self.cache.get(message.guild.id, {}).get("reply", True),
-                delete=self.cache.get(message.guild.id, {}).get("delete", False),
-                suppress=self.cache.get(message.guild.id, {}).get("suppress", True),
-            )
 
     @commands.guild_only()
     @commands.group()
@@ -388,64 +261,4 @@ class TikTokLiveCog(commands.Cog):
         if guild.id in self.clients:
             await self.clients[guild.id].close()
             del self.clients[guild.id]
-
-    @commands.group()
-    async def tiktokset(self, ctx):
-        """Settings for TikTokReposter."""
-
-    @tiktokset.command()
-    async def auto(self, ctx):
-        """Toggle automatic reposting of TikTok links."""
-        auto_repost = await self.config.guild(ctx.guild).auto_repost()
-        await self.config.guild(ctx.guild).auto_repost.set(not auto_repost)
-        await ctx.send(
-            f"Automatic reposting of TikTok links is now {'enabled' if not auto_repost else 'disabled'}."
-        )
-        await self.initialize()
-
-    @tiktokset.command()
-    async def channel(self, ctx, channel: discord.TextChannel = None):
-        """Add or remove a channel to repost TikTok links."""
-        channel = channel or ctx.channel
-        channels = await self.config.guild(ctx.guild).channels()
-        if channel.id in channels:
-            channels.remove(channel.id)
-            await ctx.send(
-                f"{channel.mention} removed from the list of channels to repost TikTok links."
-            )
-        else:
-            channels.append(channel.id)
-            await ctx.send(
-                f"{channel.mention} added to the list of channels to repost TikTok links."
-            )
-        await self.config.guild(ctx.guild).channels.set(channels)
-        await self.initialize()
-
-    @tiktokset.command()
-    async def reply(self, ctx):
-        """Toggle replying to TikTok links."""
-        reply = await self.config.guild(ctx.guild).reply()
-        await self.config.guild(ctx.guild).reply.set(not reply)
-        delete = await self.config.guild(ctx.guild).delete()
-        if delete:
-            await ctx.send("Replying cannot be enabled while deleting messages is enabled.")
-            return
-        await ctx.send(
-            f"Replying to TikTok links is now {'enabled' if not reply else 'disabled'}."
-        )
-        await self.initialize()
-
-    @tiktokset.command()
-    async def delete(self, ctx):
-        """Toggle deleting messages with TikTok links."""
-        delete = await self.config.guild(ctx.guild).delete()
-        await self.config.guild(ctx.guild).delete.set(not delete)
-        reply = await self.config.guild(ctx.guild).reply()
-        if reply:
-            await ctx.send("Deleting messages cannot be enabled while replying is enabled.")
-            return
-        await ctx.send(
-            f"Deleting messages with TikTok links is now {'enabled' if not delete else 'disabled'}."
-        )
-        await self.initialize()
 
