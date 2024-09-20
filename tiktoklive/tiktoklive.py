@@ -2,7 +2,7 @@ import asyncio
 from redbot.core import commands, Config #type: ignore
 from TikTokLive import TikTokLiveClient #type: ignore
 from TikTokLive.client.logger import LogLevel #type: ignore
-from TikTokLive.events import ConnectEvent #type: ignore
+from TikTokLive.events import ConnectEvent, CommentEvent #type: ignore
 import discord #type: ignore
 import logging
 
@@ -10,9 +10,10 @@ class TikTokLiveCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=1234567890)
-        self.config.register_guild(tiktok_users=[], alert_channel=None, alert_role=None)
+        self.config.register_guild(tiktok_users=[], alert_channel=None, alert_role=None, chat_log_channel=None)
         self.clients = {}
         self.live_status = {}  # Dictionary to keep track of live status
+        self.chat_logs = {}  # Dictionary to store chat logs
 
     async def initialize_client(self, guild_id, user):
         client = TikTokLiveClient(unique_id=user)
@@ -44,7 +45,14 @@ class TikTokLiveCog(commands.Cog):
                     view.add_item(button)
                     await channel.send(content=role_mention, embed=embed, view=view, allowed_mentions=discord.AllowedMentions(roles=True))
 
+        @client.on(CommentEvent)
+        async def on_comment(event: CommentEvent):
+            if guild_id not in self.chat_logs:
+                self.chat_logs[guild_id] = []
+            self.chat_logs[guild_id].append(f"{event.user.uniqueId}: {event.comment}")
+
         self.bot.loop.create_task(self.check_loop(guild_id, client, user))
+        self.bot.loop.create_task(self.chat_log_loop(guild_id, user))
 
     async def check_loop(self, guild_id, client, user):
         while True:
@@ -65,6 +73,23 @@ class TikTokLiveCog(commands.Cog):
             except Exception as e:
                 client.logger.error(f"Error in check_loop: {e}")
                 await asyncio.sleep(90)  # Wait before retrying
+
+    async def chat_log_loop(self, guild_id, user):
+        while True:
+            await asyncio.sleep(30)
+            if guild_id in self.chat_logs and self.chat_logs[guild_id]:
+                chat_log_channel_id = await self.config.guild_from_id(guild_id).chat_log_channel()
+                if chat_log_channel_id:
+                    chat_log_channel = self.bot.get_channel(chat_log_channel_id)
+                    if chat_log_channel:
+                        chat_messages = "\n".join(self.chat_logs[guild_id])
+                        embed = discord.Embed(
+                            title=f"Chat Log for @{user}",
+                            description=chat_messages,
+                            color=discord.Color.blue()
+                        )
+                        await chat_log_channel.send(embed=embed)
+                        self.chat_logs[guild_id] = []
 
     @commands.guild_only()
     @commands.group()
@@ -162,14 +187,28 @@ class TikTokLiveCog(commands.Cog):
 
     @tiktokset.command()
     @commands.admin_or_permissions(manage_guild=True)
+    async def chatlogchannel(self, ctx, channel: discord.TextChannel):
+        """Set the chat log channel for TikTok live notifications."""
+        await self.config.guild(ctx.guild).chat_log_channel.set(channel.id)
+        embed = discord.Embed(
+            title="Chat Log Channel Set",
+            description=f"Chat log channel set to {channel.mention} for this server.",
+            color=discord.Color.blue()
+        )
+        await ctx.send(embed=embed)
+
+    @tiktokset.command()
+    @commands.admin_or_permissions(manage_guild=True)
     async def settings(self, ctx):
         """Show the current TikTok live stream settings."""
         guild_id = ctx.guild.id
         tiktok_users = await self.config.guild(ctx.guild).tiktok_users()
         alert_channel_id = await self.config.guild(ctx.guild).alert_channel()
         alert_role_id = await self.config.guild(ctx.guild).alert_role()
+        chat_log_channel_id = await self.config.guild(ctx.guild).chat_log_channel()
         alert_channel = self.bot.get_channel(alert_channel_id) if alert_channel_id else None
         alert_role = ctx.guild.get_role(alert_role_id) if alert_role_id else None
+        chat_log_channel = self.bot.get_channel(chat_log_channel_id) if chat_log_channel_id else None
 
         embed = discord.Embed(
             title="Current TikTok Settings",
@@ -182,6 +221,7 @@ class TikTokLiveCog(commands.Cog):
             embed.add_field(name="TikTok Users", value="None", inline=False)
         embed.add_field(name="Alert Channel", value=alert_channel.mention if alert_channel else "None", inline=False)
         embed.add_field(name="Alert Role", value=alert_role.mention if alert_role else "None", inline=False)
+        embed.add_field(name="Chat Log Channel", value=chat_log_channel.mention if chat_log_channel else "None", inline=False)
 
         await ctx.send(embed=embed)
 
