@@ -35,7 +35,14 @@ class TikTokLiveCog(commands.Cog):
                         description=f"@{event.unique_id} is now live on TikTok!",
                         color=discord.Color.green()
                     )
-                    await channel.send(content=role_mention, embed=embed, allowed_mentions=discord.AllowedMentions(roles=True))
+                    view = discord.ui.View()
+                    button = discord.ui.Button(
+                        label="Watch Live",
+                        url=f"https://www.tiktok.com/@{event.unique_id}/live",
+                        style=discord.ButtonStyle.url
+                    )
+                    view.add_item(button)
+                    await channel.send(content=role_mention, embed=embed, view=view, allowed_mentions=discord.AllowedMentions(roles=True))
 
         self.bot.loop.create_task(self.check_loop(guild_id, client, user))
 
