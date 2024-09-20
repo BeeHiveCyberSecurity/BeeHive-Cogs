@@ -72,9 +72,11 @@ class StatusRotator(commands.Cog):
 
     def get_message_count_status(self):
         now = datetime.utcnow()
-        five_minutes_ago = now - timedelta(minutes=5)
-        self.message_log = deque([timestamp for timestamp in self.message_log if timestamp > five_minutes_ago])
-        return f"Analyzing {len(self.message_log)} msgs / 5 minutes"
+        one_minute_ago = now - timedelta(minutes=1)
+        self.message_log = deque([timestamp for timestamp in self.message_log if timestamp > one_minute_ago])
+        message_count = len(self.message_log)
+        message_text = "message" if message_count == 1 else "messages"
+        return f"Analyzing {message_count} {message_text} every minute"
 
     @commands.group()
     async def statusrotator(self, ctx):
