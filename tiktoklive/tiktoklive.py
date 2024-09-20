@@ -37,7 +37,7 @@ class TikTokLiveCog(commands.Cog):
                     )
                     view = discord.ui.View()
                     button = discord.ui.Button(
-                        label="Watch Live",
+                        label="Watch now",
                         url=f"https://www.tiktok.com/@{event.unique_id}/live",
                         style=discord.ButtonStyle.url
                     )
