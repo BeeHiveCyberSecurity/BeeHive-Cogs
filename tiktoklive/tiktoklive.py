@@ -10,7 +10,7 @@ class TikTokLiveCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=1234567890)
-        self.config.register_guild(tiktok_users=[], alert_channel=None)
+        self.config.register_guild(tiktok_users=[], alert_channel=None, alert_role=None)
         self.clients = {}
 
     async def initialize_client(self, guild_id, user):
@@ -24,15 +24,17 @@ class TikTokLiveCog(commands.Cog):
         async def on_connect(event: ConnectEvent):
             client.logger.info(f"Connected to @{event.unique_id}!")
             channel_id = await self.config.guild_from_id(guild_id).alert_channel()
+            role_id = await self.config.guild_from_id(guild_id).alert_role()
             if channel_id:
                 channel = self.bot.get_channel(channel_id)
                 if channel:
+                    role_mention = f"<@&{role_id}>" if role_id else ""
                     embed = discord.Embed(
                         title="TikTok Live Alert",
                         description=f"@{event.unique_id} is now live on TikTok!",
                         color=discord.Color.green()
                     )
-                    await channel.send(embed=embed)
+                    await channel.send(content=role_mention, embed=embed, allowed_mentions=discord.AllowedMentions(roles=True))
 
         self.bot.loop.create_task(self.check_loop(guild_id, client))
 
@@ -98,6 +100,16 @@ class TikTokLiveCog(commands.Cog):
         embed = discord.Embed(
             title="Alert Channel Set",
             description=f"Alert channel set to {channel.mention} for this server.",
+            color=discord.Color.blue()
+        )
+        await ctx.send(embed=embed)
+
+    @tiktokset.command()
+    async def role(self, ctx, role: discord.Role):
+        await self.config.guild(ctx.guild).alert_role.set(role.id)
+        embed = discord.Embed(
+            title="Alert Role Set",
+            description=f"Alert role set to {role.mention} for this server.",
             color=discord.Color.blue()
         )
         await ctx.send(embed=embed)
