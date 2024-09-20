@@ -12,7 +12,7 @@ class TikTokLiveCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=1234567890)
-        self.config.register_guild(tiktok_user=None, alert_channel=None, alert_role=None, chat_log_channel=None)
+        self.config.register_guild(tiktok_user=None, alert_channel=None, alert_role=None, chat_log_channel=None, auto_download=False)
         self.clients = {}
         self.live_status = {}  # Dictionary to keep track of live status
         self.chat_logs = {}  # Dictionary to store chat logs
@@ -204,6 +204,7 @@ class TikTokLiveCog(commands.Cog):
         alert_channel_id = await self.config.guild(ctx.guild).alert_channel()
         alert_role_id = await self.config.guild(ctx.guild).alert_role()
         chat_log_channel_id = await self.config.guild(ctx.guild).chat_log_channel()
+        auto_download = await self.config.guild(ctx.guild).auto_download()
         alert_channel = self.bot.get_channel(alert_channel_id) if alert_channel_id else None
         alert_role = ctx.guild.get_role(alert_role_id) if alert_role_id else None
         chat_log_channel = self.bot.get_channel(chat_log_channel_id) if chat_log_channel_id else None
@@ -220,6 +221,7 @@ class TikTokLiveCog(commands.Cog):
         embed.add_field(name="Alert Channel", value=alert_channel.mention if alert_channel else "None", inline=False)
         embed.add_field(name="Alert Role", value=alert_role.mention if alert_role else "None", inline=False)
         embed.add_field(name="Chat Log Channel", value=chat_log_channel.mention if chat_log_channel else "None", inline=False)
+        embed.add_field(name="Auto Download", value="Enabled" if auto_download else "Disabled", inline=False)
 
         await ctx.send(embed=embed)
 
@@ -255,6 +257,10 @@ class TikTokLiveCog(commands.Cog):
     @tiktoklive.command()
     async def download(self, ctx, url: str):
         """Download a TikTok video and send it in the channel."""
+        await self.download_video(ctx, url)
+
+    async def download_video(self, ctx, url: str):
+        """Helper function to download a TikTok video and send it in the channel."""
         ydl_opts = {
             'format': 'best',
             'outtmpl': '/tmp/%(title)s.%(ext)s',  # Use a temporary directory
@@ -277,7 +283,7 @@ class TikTokLiveCog(commands.Cog):
                     color=0x2bbd8e
                 )
                 embed.add_field(name="Caption", value=clean_title, inline=False)
-                embed.add_field(name="Uploader", value=video_uploader, inline=False)
+                embed.add_field(name="Uploader", value=f"[{video_uploader}](https://www.tiktok.com/@{video_uploader})", inline=False)
                 embed.add_field(name="Duration", value=f"{video_duration} seconds", inline=False)
                 if hashtags:
                     embed.add_field(name="Hashtags", value=' '.join(hashtags), inline=False)
@@ -286,6 +292,15 @@ class TikTokLiveCog(commands.Cog):
                 os.remove(video_path)  # Clean up the downloaded file after sending
         except Exception as e:
             await ctx.send(f"Failed to download video: {e}")
+
+    @tiktoklive.command()
+    async def auto(self, ctx):
+        """Toggle automatic downloading of TikTok videos."""
+        current_setting = await self.config.guild(ctx.guild).auto_download()
+        new_setting = not current_setting
+        await self.config.guild(ctx.guild).auto_download.set(new_setting)
+        status = "enabled" if new_setting else "disabled"
+        await ctx.send(f"Automatic downloading of TikTok videos has been {status}.")
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild):
