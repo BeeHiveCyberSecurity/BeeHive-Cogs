@@ -37,15 +37,18 @@ class StatusRotator(commands.Cog):
     async def fetch_blocked_domains_count(self):
         url = "https://www.beehive.systems/hubfs/blocklist/blocklist.json"
         async with aiohttp.ClientSession() as session:
-            async with session.get(url) as response:
-                if response.status == 200:
-                    data = await response.json()
-                    if isinstance(data, list):
-                        self.blocked_domains_count = len(data)
+            try:
+                async with session.get(url) as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        if isinstance(data, list):
+                            self.blocked_domains_count = len(data)
+                        else:
+                            self.blocked_domains_count = 0
                     else:
                         self.blocked_domains_count = 0
-                else:
-                    self.blocked_domains_count = 0
+            except aiohttp.ClientError:
+                self.blocked_domains_count = 0
 
     async def enable_antiphishing_on_startup(self):
         await self.fetch_blocked_domains_count()
