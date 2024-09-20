@@ -6,6 +6,7 @@ import os
 from redbot.core.data_manager import bundled_data_path
 from datetime import datetime, time, timedelta
 import asyncio
+import pytz
 
 class QotD(commands.Cog):
     """Question of the Day Cog"""
@@ -18,7 +19,8 @@ class QotD(commands.Cog):
             "current_question": None,
             "response_count": 0,
             "qotd_channel": None,
-            "qotd_time": "12:00"
+            "qotd_time": "12:00",
+            "qotd_timezone": "UTC"
         }
         self.config.register_guild(**default_guild)
         self.data_path = bundled_data_path(self)
@@ -39,16 +41,19 @@ class QotD(commands.Cog):
     async def schedule_daily_question(self):
         await self.bot.wait_until_ready()
         while not self.bot.is_closed():
-            now = datetime.now()
+            now = datetime.now(pytz.utc)
             for guild in self.bot.guilds:
                 qotd_time_str = await self.config.guild(guild).qotd_time()
+                qotd_timezone_str = await self.config.guild(guild).qotd_timezone()
+                qotd_timezone = pytz.timezone(qotd_timezone_str)
                 qotd_time = datetime.strptime(qotd_time_str, "%H:%M").time()
                 qotd_channel_id = await self.config.guild(guild).qotd_channel()
                 if qotd_channel_id:
                     qotd_channel = guild.get_channel(qotd_channel_id)
                     if qotd_channel:
                         next_qotd = datetime.combine(now.date(), qotd_time)
-                        if now.time() > qotd_time:
+                        next_qotd = qotd_timezone.localize(next_qotd).astimezone(pytz.utc)
+                        if now > next_qotd:
                             next_qotd += timedelta(days=1)
                         await asyncio.sleep((next_qotd - now).total_seconds())
                         await self.ask_daily_question(qotd_channel)
@@ -201,18 +206,20 @@ class QotD(commands.Cog):
         ))
 
     @qotd.command()
-    async def settime(self, ctx, time_str: str):
-        """Set the time for daily QotD (HH:MM in 24-hour format)"""
+    async def settime(self, ctx, time_str: str, timezone_str: str = "UTC"):
+        """Set the time and timezone for daily QotD (HH:MM in 24-hour format and timezone)"""
         try:
             datetime.strptime(time_str, "%H:%M")
+            pytz.timezone(timezone_str)  # Validate timezone
             await self.config.guild(ctx.guild).qotd_time.set(time_str)
+            await self.config.guild(ctx.guild).qotd_timezone.set(timezone_str)
             await ctx.send(embed=discord.Embed(
-                description=f"QotD time set to {time_str}",
+                description=f"QotD time set to {time_str} in timezone {timezone_str}",
                 color=0xfffffe
             ))
-        except ValueError:
+        except (ValueError, pytz.UnknownTimeZoneError):
             await ctx.send(embed=discord.Embed(
-                description="Invalid time format. Please use HH:MM in 24-hour format.",
+                description="Invalid time or timezone format. Please use HH:MM in 24-hour format and a valid timezone.",
                 color=0xfffffe
             ))
 
