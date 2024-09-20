@@ -19,7 +19,8 @@ class StatusRotator(commands.Cog):
             lambda: f"Guarding {len(self.bot.guilds)} servers",
             lambda: f"Moderating {len(self.bot.users):,} users",
             self.get_message_count_status,
-            self.get_uptime_status  # New status added here
+            self.get_uptime_status,  # New status added here
+            self.get_latency_status  # Another unique status added here
         ]
         self.message_log = deque()
         self.bot.loop.create_task(self.load_settings())
@@ -87,6 +88,10 @@ class StatusRotator(commands.Cog):
         hours, remainder = divmod(remainder, 3600)
         minutes, _ = divmod(remainder, 60)
         return f"Online for {int(days)}d {int(hours)}h {int(minutes)}m"
+
+    def get_latency_status(self):
+        latency = self.bot.latency * 1000  # Convert to milliseconds
+        return f"Response latency is {latency:.2f}ms"
 
     @commands.group()
     async def statusrotator(self, ctx):
