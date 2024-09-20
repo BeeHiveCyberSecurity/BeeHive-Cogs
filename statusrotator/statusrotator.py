@@ -16,8 +16,8 @@ class StatusRotator(commands.Cog):
         )
         self.status_task = self.bot.loop.create_task(self.change_status())
         self.statuses = [
-            lambda: f"watching over {len(self.bot.guilds)} servers",
-            lambda: f"watching over {len(self.bot.users):,} users",
+            lambda: f"Guarding {len(self.bot.guilds)} servers",
+            lambda: f"Moderating {len(self.bot.users):,} users",
             self.get_message_count_status
         ]
         self.message_log = deque()
@@ -68,13 +68,13 @@ class StatusRotator(commands.Cog):
 
     async def enable_antiphishing_status(self):
         await self.fetch_blocked_domains_count()
-        self.statuses.append(lambda: f"watching for {self.blocked_domains_count:,} bad domains")
+        self.statuses.append(lambda: f"Screening for {self.blocked_domains_count:,} bad domains")
 
     def get_message_count_status(self):
         now = datetime.utcnow()
         five_minutes_ago = now - timedelta(minutes=5)
         self.message_log = deque([timestamp for timestamp in self.message_log if timestamp > five_minutes_ago])
-        return f"watching {len(self.message_log)} msgs / 5 minutes"
+        return f"Analyzing {len(self.message_log)} msgs / 5 minutes"
 
     @commands.group()
     async def statusrotator(self, ctx):
