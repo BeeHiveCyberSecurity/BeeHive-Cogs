@@ -279,11 +279,11 @@ class TikTokLiveCog(commands.Cog):
                 clean_title = ' '.join(word for word in video_title.split() if not word.startswith('#'))
                 
                 embed = discord.Embed(
-                    title="Downloaded successfully",
+                    title="Here's that TikTok",
                     color=0x2bbd8e
                 )
                 embed.add_field(name="Caption", value=clean_title, inline=False)
-                embed.add_field(name="Uploader", value=f"[{video_uploader}](https://www.tiktok.com/@{video_uploader})", inline=True)
+                embed.add_field(name="Creator", value=f"[{video_uploader}](https://www.tiktok.com/@{video_uploader})", inline=True)
                 embed.add_field(name="Duration", value=f"{video_duration} seconds", inline=True)
                 if hashtags:
                     embed.add_field(name="Hashtags", value=' '.join(hashtags), inline=False)
