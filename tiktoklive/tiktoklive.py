@@ -61,13 +61,17 @@ class TikTokLiveCog(commands.Cog):
         async with self.config.guild(ctx.guild).tiktok_users() as tiktok_users:
             if user not in tiktok_users:
                 tiktok_users.append(user)
-                await self.initialize_client(ctx.guild.id, user)
-                embed = discord.Embed(
-                    title="TikTok User Added",
-                    description=f"TikTok user {user} added for this server.",
-                    color=discord.Color.blue()
-                )
-                await ctx.send(embed=embed)
+                try:
+                    await self.initialize_client(ctx.guild.id, user)
+                    embed = discord.Embed(
+                        title="TikTok User Added",
+                        description=f"TikTok user {user} added for this server.",
+                        color=discord.Color.blue()
+                    )
+                    await ctx.send(embed=embed)
+                except Exception as e:
+                    tiktok_users.remove(user)
+                    await ctx.send(f"Failed to add TikTok user {user}: {e}")
             else:
                 await ctx.send(f"TikTok user {user} is already being followed.")
 
