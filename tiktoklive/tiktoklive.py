@@ -64,6 +64,7 @@ class TikTokLiveCog(commands.Cog):
         async with self.config.guild(ctx.guild).tiktok_users() as tiktok_users:
             if user not in tiktok_users:
                 tiktok_users.append(user)
+                await self.config.guild(ctx.guild).tiktok_users.set(tiktok_users)  # Save persistently
                 try:
                     await self.initialize_client(ctx.guild.id, user)
                     embed = discord.Embed(
@@ -74,6 +75,7 @@ class TikTokLiveCog(commands.Cog):
                     await ctx.send(embed=embed)
                 except Exception as e:
                     tiktok_users.remove(user)
+                    await self.config.guild(ctx.guild).tiktok_users.set(tiktok_users)  # Save persistently
                     await ctx.send(f"Failed to add TikTok user {user}: {e}")
             else:
                 await ctx.send(f"TikTok user {user} is already being followed.")
@@ -83,6 +85,7 @@ class TikTokLiveCog(commands.Cog):
         async with self.config.guild(ctx.guild).tiktok_users() as tiktok_users:
             if user in tiktok_users:
                 tiktok_users.remove(user)
+                await self.config.guild(ctx.guild).tiktok_users.set(tiktok_users)  # Save persistently
                 if ctx.guild.id in self.clients:
                     self.clients[ctx.guild.id] = [client for client in self.clients[ctx.guild.id] if client.unique_id != user]
                 embed = discord.Embed(
@@ -112,6 +115,25 @@ class TikTokLiveCog(commands.Cog):
             description=f"Alert role set to {role.mention} for this server.",
             color=discord.Color.blue()
         )
+        await ctx.send(embed=embed)
+
+    @tiktokset.command()
+    async def settings(self, ctx):
+        guild_id = ctx.guild.id
+        tiktok_users = await self.config.guild(ctx.guild).tiktok_users()
+        alert_channel_id = await self.config.guild(ctx.guild).alert_channel()
+        alert_role_id = await self.config.guild(ctx.guild).alert_role()
+        alert_channel = self.bot.get_channel(alert_channel_id) if alert_channel_id else None
+        alert_role = ctx.guild.get_role(alert_role_id) if alert_role_id else None
+
+        embed = discord.Embed(
+            title="Current TikTok Settings",
+            color=discord.Color.blue()
+        )
+        embed.add_field(name="TikTok Users", value=", ".join(tiktok_users) if tiktok_users else "None", inline=False)
+        embed.add_field(name="Alert Channel", value=alert_channel.mention if alert_channel else "None", inline=False)
+        embed.add_field(name="Alert Role", value=alert_role.mention if alert_role else "None", inline=False)
+
         await ctx.send(embed=embed)
 
     @tiktok.command()
