@@ -1,12 +1,12 @@
-import discord
-from redbot.core import commands, Config
+import discord #type: ignore
+from redbot.core import commands, Config #type: ignore
 import random
 import json
 import os
-from redbot.core.data_manager import bundled_data_path
+from redbot.core.data_manager import bundled_data_path #type: ignore
 from datetime import datetime, time, timedelta
 import asyncio
-import pytz
+import pytz #type: ignore
 
 class QotD(commands.Cog):
     """Question of the Day Cog"""
