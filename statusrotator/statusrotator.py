@@ -16,9 +16,9 @@ class StatusRotator(commands.Cog):
         )
         self.status_task = self.bot.loop.create_task(self.change_status())
         self.statuses = [
-            ("watching", lambda: f"over {len(self.bot.guilds)} servers"),
-            ("watching", lambda: f"over {len(self.bot.users):,} users"),
-            ("watching", self.get_message_count_status)
+            lambda: f"watching over {len(self.bot.guilds)} servers",
+            lambda: f"watching over {len(self.bot.users):,} users",
+            self.get_message_count_status
         ]
         self.message_log = deque()
         self.bot.loop.create_task(self.load_settings())
@@ -35,13 +35,9 @@ class StatusRotator(commands.Cog):
     async def change_status(self):
         await self.bot.wait_until_ready()
         while not self.bot.is_closed():
-            for activity_type, status in self.statuses:
-                if activity_type == "watching":
-                    activity = discord.Activity(type=discord.ActivityType.watching, name=status())
-                elif activity_type == "listening":
-                    activity = discord.Activity(type=discord.ActivityType.listening, name=status())
-                elif activity_type == "playing":
-                    activity = discord.Game(name=status())
+            for status in self.statuses:
+                text = status()
+                activity = discord.CustomActivity(name=text)
                 await self.bot.change_presence(activity=activity)
                 await asyncio.sleep(120)  # Change status every 120 seconds
 
@@ -72,13 +68,13 @@ class StatusRotator(commands.Cog):
 
     async def enable_antiphishing_status(self):
         await self.fetch_blocked_domains_count()
-        self.statuses.append(("watching", lambda: f"for {self.blocked_domains_count:,} bad domains"))
+        self.statuses.append(lambda: f"watching for {self.blocked_domains_count:,} bad domains")
 
     def get_message_count_status(self):
         now = datetime.utcnow()
         five_minutes_ago = now - timedelta(minutes=5)
         self.message_log = deque([timestamp for timestamp in self.message_log if timestamp > five_minutes_ago])
-        return f"{len(self.message_log)} msgs / 5 minutes"
+        return f"watching {len(self.message_log)} msgs / 5 minutes"
 
     @commands.group()
     async def statusrotator(self, ctx):
@@ -103,7 +99,7 @@ class StatusRotator(commands.Cog):
                 self.bot.loop.create_task(self.enable_antiphishing_status())
                 await ctx.send("Antiphishing status has been enabled.")
             else:
-                self.statuses = [status for status in self.statuses if "bad domains" not in status[1]()]
+                self.statuses = [status for status in self.statuses if "bad domains" not in status()]
                 await ctx.send("Antiphishing status has been disabled.")
         else:
             await ctx.send(f"Unknown integration: {integration}")
