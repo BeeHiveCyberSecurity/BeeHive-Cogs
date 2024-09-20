@@ -91,18 +91,18 @@ class TikTokLiveCog(commands.Cog):
 
     @commands.guild_only()
     @commands.group()
-    async def tiktok(self, ctx):
+    async def tiktoklive(self, ctx):
         """TikTok live stream commands."""
         pass
 
     @commands.guild_only()
     @commands.group()
     @commands.admin_or_permissions(manage_guild=True)
-    async def tiktokset(self, ctx):
+    async def tiktokliveset(self, ctx):
         """TikTok live stream settings commands."""
         pass
 
-    @tiktokset.command()
+    @tiktokliveset.command()
     @commands.admin_or_permissions(manage_guild=True)
     async def add(self, ctx, user: str):
         """Add a TikTok user to follow for live alerts."""
@@ -133,7 +133,7 @@ class TikTokLiveCog(commands.Cog):
             )
             await ctx.send(embed=embed)
 
-    @tiktokset.command()
+    @tiktokliveset.command()
     @commands.admin_or_permissions(manage_guild=True)
     async def remove(self, ctx, user: str):
         """Remove a TikTok user from the follow list."""
@@ -157,7 +157,7 @@ class TikTokLiveCog(commands.Cog):
             )
             await ctx.send(embed=embed)
 
-    @tiktokset.command()
+    @tiktokliveset.command()
     @commands.admin_or_permissions(manage_guild=True)
     async def channel(self, ctx, channel: discord.TextChannel):
         """Set the alert channel for TikTok live notifications."""
@@ -169,7 +169,7 @@ class TikTokLiveCog(commands.Cog):
         )
         await ctx.send(embed=embed)
 
-    @tiktokset.command()
+    @tiktokliveset.command()
     @commands.admin_or_permissions(manage_guild=True)
     async def role(self, ctx, role: discord.Role):
         """Set the alert role for TikTok live notifications."""
@@ -181,7 +181,7 @@ class TikTokLiveCog(commands.Cog):
         )
         await ctx.send(embed=embed)
 
-    @tiktokset.command()
+    @tiktokliveset.command()
     @commands.admin_or_permissions(manage_guild=True)
     async def chatlog(self, ctx, channel: discord.TextChannel):
         """Set the chat log channel for TikTok live notifications."""
@@ -193,7 +193,7 @@ class TikTokLiveCog(commands.Cog):
         )
         await ctx.send(embed=embed)
 
-    @tiktokset.command()
+    @tiktokliveset.command()
     @commands.admin_or_permissions(manage_guild=True)
     async def settings(self, ctx):
         """Show the current TikTok live stream settings."""
@@ -221,7 +221,7 @@ class TikTokLiveCog(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    @tiktok.command()
+    @tiktoklive.command()
     async def check(self, ctx, user: str):
         """Check if a TikTok user is currently live."""
         guild_id = ctx.guild.id
