@@ -20,7 +20,8 @@ class QotD(commands.Cog):
             "response_count": 0,
             "qotd_channel": None,
             "qotd_time": "12:00",
-            "qotd_timezone": "UTC"
+            "qotd_timezone": "UTC",
+            "mention_role": None
         }
         self.config.register_guild(**default_guild)
         self.data_path = bundled_data_path(self)
@@ -62,6 +63,8 @@ class QotD(commands.Cog):
     async def ask_daily_question(self, channel):
         guild = channel.guild
         enabled_categories = await self.config.guild(guild).enabled_categories()
+        mention_role_id = await self.config.guild(guild).mention_role()
+        mention_role = guild.get_role(mention_role_id) if mention_role_id else None
         if enabled_categories:
             questions = []
             for category in enabled_categories:
@@ -74,7 +77,9 @@ class QotD(commands.Cog):
                     description=f"Yesterday's question received {response_count} responses.\n\nQuestion: {question}",
                     color=0xfffffe
                 )
-                await channel.send(embed=embed)
+                message_content = f"{mention_role.mention}" if mention_role else ""
+                allowed_mentions = discord.AllowedMentions(roles=True) if mention_role else None
+                await channel.send(content=message_content, embed=embed, allowed_mentions=allowed_mentions)
                 await self.config.guild(guild).response_count.set(0)
                 await self.config.guild(guild).current_question.set(question)
             else:
@@ -227,6 +232,15 @@ class QotD(commands.Cog):
                 description="Invalid time or timezone format. Please use HH:MM in 24-hour format and a valid timezone from the following list: " + ", ".join(known_timezones),
                 color=0xfffffe
             ))
+
+    @qotd.command()
+    async def setrole(self, ctx, role: discord.Role):
+        """Set the role to be mentioned for daily QotD"""
+        await self.config.guild(ctx.guild).mention_role.set(role.id)
+        await ctx.send(embed=discord.Embed(
+            description=f"QotD mention role set to {role.mention}",
+            color=0xfffffe
+        ))
 
     @commands.Cog.listener()
     async def on_message(self, message):
