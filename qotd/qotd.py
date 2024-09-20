@@ -66,9 +66,8 @@ class QotD(commands.Cog):
         mention_role_id = await self.config.guild(guild).mention_role()
         mention_role = guild.get_role(mention_role_id) if mention_role_id else None
         if enabled_categories:
-            questions = []
-            for category in enabled_categories:
-                questions.extend(self.categories.get(category, []))
+            category = random.choice(enabled_categories)
+            questions = self.categories.get(category, [])
             if questions:
                 question = random.choice(questions)
                 response_count = await self.config.guild(guild).response_count()
@@ -84,7 +83,7 @@ class QotD(commands.Cog):
                 await self.config.guild(guild).current_question.set(question)
             else:
                 await channel.send(embed=discord.Embed(
-                    description="No questions available in the enabled categories.",
+                    description="No questions available in the selected category.",
                     color=0xfffffe
                 ))
         else:
@@ -163,9 +162,8 @@ class QotD(commands.Cog):
         """Ask a random question of the day from enabled categories"""
         enabled_categories = await self.config.guild(ctx.guild).enabled_categories()
         if enabled_categories:
-            questions = []
-            for category in enabled_categories:
-                questions.extend(self.categories.get(category, []))
+            category = random.choice(enabled_categories)
+            questions = self.categories.get(category, [])
             if questions:
                 question = random.choice(questions)
                 await self.config.guild(ctx.guild).current_question.set(question)
@@ -176,7 +174,7 @@ class QotD(commands.Cog):
                 ))
             else:
                 await ctx.send(embed=discord.Embed(
-                    description="No questions available in the enabled categories.",
+                    description="No questions available in the selected category.",
                     color=0xfffffe
                 ))
         else:
