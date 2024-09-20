@@ -12,6 +12,8 @@ class StatusRotator(commands.Cog):
             ("watching", lambda: f"Serving {len(self.bot.users)} users"),
             ("playing", lambda: f"Uptime: {self.get_uptime()}"),
         ]
+        if self.bot.get_cog("AntiPhishing"):
+            self.statuses.append(("watching", lambda: f"for {self.get_blocked_domains_count()} bad domains"))
 
     def cog_unload(self):
         self.status_task.cancel()
@@ -34,6 +36,12 @@ class StatusRotator(commands.Cog):
         hours, remainder = divmod(int(delta.total_seconds()), 3600)
         minutes, seconds = divmod(remainder, 60)
         return f"{hours}h {minutes}m {seconds}s"
+
+    def get_blocked_domains_count(self):
+        antiphishing_cog = self.bot.get_cog("AntiPhishing")
+        if antiphishing_cog:
+            return len(antiphishing_cog.blocked_domains)
+        return 0
 
     @commands.Cog.listener()
     async def on_ready(self):
