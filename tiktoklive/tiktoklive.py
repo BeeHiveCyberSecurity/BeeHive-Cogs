@@ -10,7 +10,7 @@ class TikTokLiveCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=1234567890)
-        self.config.register_guild(tiktok_users=[], alert_channel=None, alert_role=None, chat_log_channel=None)
+        self.config.register_guild(tiktok_user=None, alert_channel=None, alert_role=None, chat_log_channel=None)
         self.clients = {}
         self.live_status = {}  # Dictionary to keep track of live status
         self.chat_logs = {}  # Dictionary to store chat logs
@@ -18,9 +18,7 @@ class TikTokLiveCog(commands.Cog):
     async def initialize_client(self, guild_id, user):
         client = TikTokLiveClient(unique_id=user)
         client.logger.setLevel(logging.INFO)  # Use logging.INFO instead of LogLevel.INFO
-        if guild_id not in self.clients:
-            self.clients[guild_id] = []
-        self.clients[guild_id].append(client)
+        self.clients[guild_id] = client
 
         @client.on(ConnectEvent)
         async def on_connect(event: ConnectEvent):
@@ -108,10 +106,9 @@ class TikTokLiveCog(commands.Cog):
     @commands.admin_or_permissions(manage_guild=True)
     async def add(self, ctx, user: str):
         """Add a TikTok user to follow for live alerts."""
-        async with self.config.guild(ctx.guild).tiktok_users() as tiktok_users:
-            if user not in tiktok_users:
-                tiktok_users.append(user)
-                await self.config.guild(ctx.guild).tiktok_users.set(tiktok_users)  # Save persistently
+        async with self.config.guild(ctx.guild).tiktok_user() as tiktok_user:
+            if tiktok_user is None:
+                await self.config.guild(ctx.guild).tiktok_user.set(user)  # Save persistently
                 try:
                     await self.initialize_client(ctx.guild.id, user)
                     embed = discord.Embed(
@@ -121,8 +118,7 @@ class TikTokLiveCog(commands.Cog):
                     )
                     await ctx.send(embed=embed)
                 except Exception as e:
-                    tiktok_users.remove(user)
-                    await self.config.guild(ctx.guild).tiktok_users.set(tiktok_users)  # Save persistently
+                    await self.config.guild(ctx.guild).tiktok_user.set(None)  # Save persistently
                     embed = discord.Embed(
                         title="Error",
                         description=f"Failed to add TikTok user {user}: {e}",
@@ -132,7 +128,7 @@ class TikTokLiveCog(commands.Cog):
             else:
                 embed = discord.Embed(
                     title="Creator already followed",
-                    description=f"TikTok user {user} is already being followed.",
+                    description=f"TikTok user {tiktok_user} is already being followed. Remove them first to add a new user.",
                     color=discord.Color.orange()
                 )
                 await ctx.send(embed=embed)
@@ -141,12 +137,12 @@ class TikTokLiveCog(commands.Cog):
     @commands.admin_or_permissions(manage_guild=True)
     async def remove(self, ctx, user: str):
         """Remove a TikTok user from the follow list."""
-        async with self.config.guild(ctx.guild).tiktok_users() as tiktok_users:
-            if user in tiktok_users:
-                tiktok_users.remove(user)
-                await self.config.guild(ctx.guild).tiktok_users.set(tiktok_users)  # Save persistently
+        async with self.config.guild(ctx.guild).tiktok_user() as tiktok_user:
+            if tiktok_user == user:
+                await self.config.guild(ctx.guild).tiktok_user.set(None)  # Save persistently
                 if ctx.guild.id in self.clients:
-                    self.clients[ctx.guild.id] = [client for client in self.clients[ctx.guild.id] if client.unique_id != user]
+                    await self.clients[ctx.guild.id].close()
+                    del self.clients[ctx.guild.id]
                 embed = discord.Embed(
                     title="Creator removed",
                     description=f"TikTok user {user} removed for this server.",
@@ -202,7 +198,7 @@ class TikTokLiveCog(commands.Cog):
     async def settings(self, ctx):
         """Show the current TikTok live stream settings."""
         guild_id = ctx.guild.id
-        tiktok_users = await self.config.guild(ctx.guild).tiktok_users()
+        tiktok_user = await self.config.guild(ctx.guild).tiktok_user()
         alert_channel_id = await self.config.guild(ctx.guild).alert_channel()
         alert_role_id = await self.config.guild(ctx.guild).alert_role()
         chat_log_channel_id = await self.config.guild(ctx.guild).chat_log_channel()
@@ -214,11 +210,11 @@ class TikTokLiveCog(commands.Cog):
             title="Current TikTok settings",
             color=0xfffffe
         )
-        if tiktok_users:
-            user_links = [f"[{user}](https://www.tiktok.com/@{user})" for user in tiktok_users]
-            embed.add_field(name="TikTok Users", value=", ".join(user_links), inline=False)
+        if tiktok_user:
+            user_link = f"[{tiktok_user}](https://www.tiktok.com/@{tiktok_user})"
+            embed.add_field(name="TikTok User", value=user_link, inline=False)
         else:
-            embed.add_field(name="TikTok Users", value="None", inline=False)
+            embed.add_field(name="TikTok User", value="None", inline=False)
         embed.add_field(name="Alert Channel", value=alert_channel.mention if alert_channel else "None", inline=False)
         embed.add_field(name="Alert Role", value=alert_role.mention if alert_role else "None", inline=False)
         embed.add_field(name="Chat Log Channel", value=chat_log_channel.mention if chat_log_channel else "None", inline=False)
@@ -229,43 +225,40 @@ class TikTokLiveCog(commands.Cog):
     async def check(self, ctx, user: str):
         """Check if a TikTok user is currently live."""
         guild_id = ctx.guild.id
-        if guild_id in self.clients:
-            for client in self.clients[guild_id]:
-                if client.unique_id == user:
-                    is_live = await client.is_live()
-                    if is_live:
-                        embed = discord.Embed(
-                            title="User Live",
-                            description=f"TikTok user {user} is currently live!",
-                            color=discord.Color.green()
-                        )
-                        await ctx.send(embed=embed)
-                    else:
-                        embed = discord.Embed(
-                            title="User Not Live",
-                            description=f"TikTok user {user} is not live at the moment.",
-                            color=discord.Color.orange()
-                        )
-                        await ctx.send(embed=embed)
-                    return
-        embed = discord.Embed(
-            title="User not followed",
-            description=f"TikTok user {user} is not being followed in this server.",
-            color=discord.Color.red()
-        )
-        await ctx.send(embed=embed)
+        if guild_id in self.clients and self.clients[guild_id].unique_id == user:
+            client = self.clients[guild_id]
+            is_live = await client.is_live()
+            if is_live:
+                embed = discord.Embed(
+                    title="User Live",
+                    description=f"TikTok user {user} is currently live!",
+                    color=discord.Color.green()
+                )
+                await ctx.send(embed=embed)
+            else:
+                embed = discord.Embed(
+                    title="User Not Live",
+                    description=f"TikTok user {user} is not live at the moment.",
+                    color=discord.Color.orange()
+                )
+                await ctx.send(embed=embed)
+        else:
+            embed = discord.Embed(
+                title="User not followed",
+                description=f"TikTok user {user} is not being followed in this server.",
+                color=discord.Color.red()
+            )
+            await ctx.send(embed=embed)
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild):
-        users = await self.config.guild(guild).tiktok_users()
-        for user in users:
+        user = await self.config.guild(guild).tiktok_user()
+        if user:
             await self.initialize_client(guild.id, user)
-            await asyncio.sleep(5)  # Wait 5 seconds between initializing clients to avoid rate limiting
 
     @commands.Cog.listener()
     async def on_guild_remove(self, guild):
         if guild.id in self.clients:
-            for client in self.clients[guild.id]:
-                await client.close()
+            await self.clients[guild.id].close()
             del self.clients[guild.id]
 
