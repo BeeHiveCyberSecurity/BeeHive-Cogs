@@ -76,9 +76,19 @@ class TikTokLiveCog(commands.Cog):
                 except Exception as e:
                     tiktok_users.remove(user)
                     await self.config.guild(ctx.guild).tiktok_users.set(tiktok_users)  # Save persistently
-                    await ctx.send(f"Failed to add TikTok user {user}: {e}")
+                    embed = discord.Embed(
+                        title="Error",
+                        description=f"Failed to add TikTok user {user}: {e}",
+                        color=discord.Color.red()
+                    )
+                    await ctx.send(embed=embed)
             else:
-                await ctx.send(f"TikTok user {user} is already being followed.")
+                embed = discord.Embed(
+                    title="User Already Followed",
+                    description=f"TikTok user {user} is already being followed.",
+                    color=discord.Color.orange()
+                )
+                await ctx.send(embed=embed)
 
     @tiktokset.command()
     async def remove(self, ctx, user: str):
@@ -95,7 +105,12 @@ class TikTokLiveCog(commands.Cog):
                 )
                 await ctx.send(embed=embed)
             else:
-                await ctx.send(f"TikTok user {user} is not being followed.")
+                embed = discord.Embed(
+                    title="User Not Followed",
+                    description=f"TikTok user {user} is not being followed.",
+                    color=discord.Color.orange()
+                )
+                await ctx.send(embed=embed)
 
     @tiktokset.command()
     async def channel(self, ctx, channel: discord.TextChannel):
@@ -144,11 +159,26 @@ class TikTokLiveCog(commands.Cog):
                 if client.unique_id == user:
                     is_live = await client.is_live()
                     if is_live:
-                        await ctx.send(f"TikTok user {user} is currently live!")
+                        embed = discord.Embed(
+                            title="User Live",
+                            description=f"TikTok user {user} is currently live!",
+                            color=discord.Color.green()
+                        )
+                        await ctx.send(embed=embed)
                     else:
-                        await ctx.send(f"TikTok user {user} is not live at the moment.")
+                        embed = discord.Embed(
+                            title="User Not Live",
+                            description=f"TikTok user {user} is not live at the moment.",
+                            color=discord.Color.orange()
+                        )
+                        await ctx.send(embed=embed)
                     return
-        await ctx.send(f"TikTok user {user} is not being followed in this server.")
+        embed = discord.Embed(
+            title="User Not Followed",
+            description=f"TikTok user {user} is not being followed in this server.",
+            color=discord.Color.red()
+        )
+        await ctx.send(embed=embed)
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild):
