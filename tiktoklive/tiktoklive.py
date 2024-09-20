@@ -106,56 +106,56 @@ class TikTokLiveCog(commands.Cog):
     @commands.admin_or_permissions(manage_guild=True)
     async def add(self, ctx, user: str):
         """Add a TikTok user to follow for live alerts."""
-        async with self.config.guild(ctx.guild).tiktok_user() as tiktok_user:
-            if tiktok_user is None:
-                await self.config.guild(ctx.guild).tiktok_user.set(user)  # Save persistently
-                try:
-                    await self.initialize_client(ctx.guild.id, user)
-                    embed = discord.Embed(
-                        title="Creator followed",
-                        description=f"TikTok user {user} added for this server.",
-                        color=discord.Color.blue()
-                    )
-                    await ctx.send(embed=embed)
-                except Exception as e:
-                    await self.config.guild(ctx.guild).tiktok_user.set(None)  # Save persistently
-                    embed = discord.Embed(
-                        title="Error",
-                        description=f"Failed to add TikTok user {user}: {e}",
-                        color=discord.Color.red()
-                    )
-                    await ctx.send(embed=embed)
-            else:
+        tiktok_user = await self.config.guild(ctx.guild).tiktok_user()
+        if tiktok_user is None:
+            await self.config.guild(ctx.guild).tiktok_user.set(user)  # Save persistently
+            try:
+                await self.initialize_client(ctx.guild.id, user)
                 embed = discord.Embed(
-                    title="Creator already followed",
-                    description=f"TikTok user {tiktok_user} is already being followed. Remove them first to add a new user.",
-                    color=discord.Color.orange()
+                    title="Creator followed",
+                    description=f"TikTok user {user} added for this server.",
+                    color=discord.Color.blue()
                 )
                 await ctx.send(embed=embed)
+            except Exception as e:
+                await self.config.guild(ctx.guild).tiktok_user.set(None)  # Save persistently
+                embed = discord.Embed(
+                    title="Error",
+                    description=f"Failed to add TikTok user {user}: {e}",
+                    color=discord.Color.red()
+                )
+                await ctx.send(embed=embed)
+        else:
+            embed = discord.Embed(
+                title="Creator already followed",
+                description=f"TikTok user {tiktok_user} is already being followed. Remove them first to add a new user.",
+                color=discord.Color.orange()
+            )
+            await ctx.send(embed=embed)
 
     @tiktokset.command()
     @commands.admin_or_permissions(manage_guild=True)
     async def remove(self, ctx, user: str):
         """Remove a TikTok user from the follow list."""
-        async with self.config.guild(ctx.guild).tiktok_user() as tiktok_user:
-            if tiktok_user == user:
-                await self.config.guild(ctx.guild).tiktok_user.set(None)  # Save persistently
-                if ctx.guild.id in self.clients:
-                    await self.clients[ctx.guild.id].close()
-                    del self.clients[ctx.guild.id]
-                embed = discord.Embed(
-                    title="Creator removed",
-                    description=f"TikTok user {user} removed for this server.",
-                    color=discord.Color.red()
-                )
-                await ctx.send(embed=embed)
-            else:
-                embed = discord.Embed(
-                    title="Creator not followed",
-                    description=f"TikTok user {user} is not being followed.",
-                    color=discord.Color.orange()
-                )
-                await ctx.send(embed=embed)
+        tiktok_user = await self.config.guild(ctx.guild).tiktok_user()
+        if tiktok_user == user:
+            await self.config.guild(ctx.guild).tiktok_user.set(None)  # Save persistently
+            if ctx.guild.id in self.clients:
+                await self.clients[ctx.guild.id].close()
+                del self.clients[ctx.guild.id]
+            embed = discord.Embed(
+                title="Creator removed",
+                description=f"TikTok user {user} removed for this server.",
+                color=discord.Color.red()
+            )
+            await ctx.send(embed=embed)
+        else:
+            embed = discord.Embed(
+                title="Creator not followed",
+                description=f"TikTok user {user} is not being followed.",
+                color=discord.Color.orange()
+            )
+            await ctx.send(embed=embed)
 
     @tiktokset.command()
     @commands.admin_or_permissions(manage_guild=True)
