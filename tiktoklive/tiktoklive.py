@@ -115,7 +115,7 @@ class TikTokLiveCog(commands.Cog):
                 try:
                     await self.initialize_client(ctx.guild.id, user)
                     embed = discord.Embed(
-                        title="TikTok User Added",
+                        title="Creator followed",
                         description=f"TikTok user {user} added for this server.",
                         color=discord.Color.blue()
                     )
@@ -131,7 +131,7 @@ class TikTokLiveCog(commands.Cog):
                     await ctx.send(embed=embed)
             else:
                 embed = discord.Embed(
-                    title="User Already Followed",
+                    title="Creator already followed",
                     description=f"TikTok user {user} is already being followed.",
                     color=discord.Color.orange()
                 )
@@ -148,14 +148,14 @@ class TikTokLiveCog(commands.Cog):
                 if ctx.guild.id in self.clients:
                     self.clients[ctx.guild.id] = [client for client in self.clients[ctx.guild.id] if client.unique_id != user]
                 embed = discord.Embed(
-                    title="TikTok User Removed",
+                    title="Creator removed",
                     description=f"TikTok user {user} removed for this server.",
                     color=discord.Color.red()
                 )
                 await ctx.send(embed=embed)
             else:
                 embed = discord.Embed(
-                    title="User Not Followed",
+                    title="Creator not followed",
                     description=f"TikTok user {user} is not being followed.",
                     color=discord.Color.orange()
                 )
