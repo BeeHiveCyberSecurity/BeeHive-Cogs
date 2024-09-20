@@ -12,6 +12,8 @@ from yt_dlp import YoutubeDL
 from concurrent.futures import ThreadPoolExecutor
 from redbot.core.utils.chat_formatting import humanize_list
 
+log = logging.getLogger("red.tiktoklive")
+
 class TikTokLiveCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -84,7 +86,7 @@ class TikTokLiveCog(commands.Cog):
             try:
                 is_live = await client.is_live()
                 if not is_live:
-                    client.logger.info("Client is currently not live. Checking again in 60 seconds.")
+                    client.logger.info("Client is currently not live. Checking again in 90 seconds.")
                     self.live_status[user] = False  # Update live status
                     await asyncio.sleep(90)
                 else:
@@ -94,7 +96,7 @@ class TikTokLiveCog(commands.Cog):
                         self.live_status[user] = True  # Update live status
                     else:
                         client.logger.info("Client is still live. No new alert sent.")
-                    await asyncio.sleep(90)  # Check again in 60 seconds
+                    await asyncio.sleep(90)  # Check again in 90 seconds
             except Exception as e:
                 client.logger.error(f"Error in check_loop: {e}")
                 await asyncio.sleep(90)  # Wait before retrying
@@ -382,7 +384,7 @@ class TikTokLiveCog(commands.Cog):
     async def auto(self, ctx):
         """Toggle automatic reposting of TikTok links."""
         auto_repost = await self.config.guild(ctx.guild).auto_repost()
-        await self.config.guild(ctx.guild).auto_repost.set(not auto_repost)
+        await self.config.guild(ctx.guild).auto_repost.set(!auto_repost)
         await ctx.send(
             f"Automatic reposting of TikTok links is now {'enabled' if not auto_repost else 'disabled'}."
         )
@@ -410,7 +412,7 @@ class TikTokLiveCog(commands.Cog):
     async def reply(self, ctx):
         """Toggle replying to TikTok links."""
         reply = await self.config.guild(ctx.guild).reply()
-        await self.config.guild(ctx.guild).reply.set(not reply)
+        await self.config.guild(ctx.guild).reply.set(!reply)
         delete = await self.config.guild(ctx.guild).delete()
         if delete:
             await ctx.send("Replying cannot be enabled while deleting messages is enabled.")
@@ -424,7 +426,7 @@ class TikTokLiveCog(commands.Cog):
     async def delete(self, ctx):
         """Toggle deleting messages with TikTok links."""
         delete = await self.config.guild(ctx.guild).delete()
-        await self.config.guild(ctx.guild).delete.set(not delete)
+        await self.config.guild(ctx.guild).delete.set(!delete)
         reply = await self.config.guild(ctx.guild).reply()
         if reply:
             await ctx.send("Deleting messages cannot be enabled while replying is enabled.")
