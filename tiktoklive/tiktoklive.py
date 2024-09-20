@@ -163,7 +163,11 @@ class TikTokLiveCog(commands.Cog):
             title="Current TikTok Settings",
             color=discord.Color.blue()
         )
-        embed.add_field(name="TikTok Users", value=", ".join(tiktok_users) if tiktok_users else "None", inline=False)
+        if tiktok_users:
+            user_links = [f"[{user}](https://www.tiktok.com/@{user})" for user in tiktok_users]
+            embed.add_field(name="TikTok Users", value=", ".join(user_links), inline=False)
+        else:
+            embed.add_field(name="TikTok Users", value="None", inline=False)
         embed.add_field(name="Alert Channel", value=alert_channel.mention if alert_channel else "None", inline=False)
         embed.add_field(name="Alert Role", value=alert_role.mention if alert_role else "None", inline=False)
 
