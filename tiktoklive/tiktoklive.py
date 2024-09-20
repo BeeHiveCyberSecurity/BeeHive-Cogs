@@ -187,7 +187,7 @@ class TikTokLiveCog(commands.Cog):
 
     @tiktokset.command()
     @commands.admin_or_permissions(manage_guild=True)
-    async def chatlogchannel(self, ctx, channel: discord.TextChannel):
+    async def chatlog(self, ctx, channel: discord.TextChannel):
         """Set the chat log channel for TikTok live notifications."""
         await self.config.guild(ctx.guild).chat_log_channel.set(channel.id)
         embed = discord.Embed(
