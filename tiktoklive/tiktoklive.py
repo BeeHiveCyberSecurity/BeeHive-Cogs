@@ -167,7 +167,7 @@ class TikTokLiveCog(commands.Cog):
         """Set the alert channel for TikTok live notifications."""
         await self.config.guild(ctx.guild).alert_channel.set(channel.id)
         embed = discord.Embed(
-            title="Alert Channel Set",
+            title="Alert channel set",
             description=f"Alert channel set to {channel.mention} for this server.",
             color=discord.Color.blue()
         )
@@ -179,9 +179,9 @@ class TikTokLiveCog(commands.Cog):
         """Set the alert role for TikTok live notifications."""
         await self.config.guild(ctx.guild).alert_role.set(role.id)
         embed = discord.Embed(
-            title="Alert Role Set",
+            title="Alert/notification role set",
             description=f"Alert role set to {role.mention} for this server.",
-            color=discord.Color.blue()
+            color=0x2bbd8e
         )
         await ctx.send(embed=embed)
 
@@ -191,9 +191,9 @@ class TikTokLiveCog(commands.Cog):
         """Set the chat log channel for TikTok live notifications."""
         await self.config.guild(ctx.guild).chat_log_channel.set(channel.id)
         embed = discord.Embed(
-            title="Chat Log Channel Set",
+            title="Chat log set",
             description=f"Chat log channel set to {channel.mention} for this server.",
-            color=discord.Color.blue()
+            color=0x2bbd8e
         )
         await ctx.send(embed=embed)
 
@@ -211,8 +211,8 @@ class TikTokLiveCog(commands.Cog):
         chat_log_channel = self.bot.get_channel(chat_log_channel_id) if chat_log_channel_id else None
 
         embed = discord.Embed(
-            title="Current TikTok Settings",
-            color=discord.Color.blue()
+            title="Current TikTok settings",
+            color=0xfffffe
         )
         if tiktok_users:
             user_links = [f"[{user}](https://www.tiktok.com/@{user})" for user in tiktok_users]
