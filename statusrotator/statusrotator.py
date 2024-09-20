@@ -20,7 +20,7 @@ class StatusRotator(commands.Cog):
         await self.bot.wait_until_ready()
         while not self.bot.is_closed():
             for status in self.statuses:
-                await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.custom, name=status()))
+                await self.bot.change_presence(activity=discord.CustomActivity(name=f"{status}" ,emoji='🖥️'))
                 await asyncio.sleep(60)  # Change status every 60 seconds
 
     def get_uptime(self):
