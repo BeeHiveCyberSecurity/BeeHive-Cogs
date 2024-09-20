@@ -45,8 +45,19 @@ class TikTokLiveCog(commands.Cog):
                 await client.connect()
 
     @commands.guild_only()
-    @commands.command()
-    async def add_tiktok_user(self, ctx, user: str):
+    @commands.group()
+    async def tiktok(self, ctx):
+        """TikTok live stream commands."""
+        pass
+
+    @commands.guild_only()
+    @commands.group()
+    async def tiktokset(self, ctx):
+        """TikTok live stream settings commands."""
+        pass
+
+    @tiktok.command()
+    async def add_user(self, ctx, user: str):
         async with self.config.guild(ctx.guild).tiktok_users() as tiktok_users:
             if user not in tiktok_users:
                 tiktok_users.append(user)
@@ -60,9 +71,8 @@ class TikTokLiveCog(commands.Cog):
             else:
                 await ctx.send(f"TikTok user {user} is already being followed.")
 
-    @commands.guild_only()
-    @commands.command()
-    async def remove_tiktok_user(self, ctx, user: str):
+    @tiktok.command()
+    async def remove_user(self, ctx, user: str):
         async with self.config.guild(ctx.guild).tiktok_users() as tiktok_users:
             if user in tiktok_users:
                 tiktok_users.remove(user)
@@ -77,8 +87,7 @@ class TikTokLiveCog(commands.Cog):
             else:
                 await ctx.send(f"TikTok user {user} is not being followed.")
 
-    @commands.guild_only()
-    @commands.command()
+    @tiktokset.command()
     async def set_alert_channel(self, ctx, channel: discord.TextChannel):
         await self.config.guild(ctx.guild).alert_channel.set(channel.id)
         embed = discord.Embed(
@@ -87,6 +96,20 @@ class TikTokLiveCog(commands.Cog):
             color=discord.Color.blue()
         )
         await ctx.send(embed=embed)
+
+    @tiktok.command()
+    async def check_live(self, ctx, user: str):
+        guild_id = ctx.guild.id
+        if guild_id in self.clients:
+            for client in self.clients[guild_id]:
+                if client.unique_id == user:
+                    is_live = await client.is_live()
+                    if is_live:
+                        await ctx.send(f"TikTok user {user} is currently live!")
+                    else:
+                        await ctx.send(f"TikTok user {user} is not live at the moment.")
+                    return
+        await ctx.send(f"TikTok user {user} is not being followed in this server.")
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild):
