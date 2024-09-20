@@ -82,6 +82,7 @@ class TikTokLiveCog(commands.Cog):
     @tiktokset.command()
     @commands.admin_or_permissions(manage_guild=True)
     async def add(self, ctx, user: str):
+        """Add a TikTok user to follow for live alerts."""
         async with self.config.guild(ctx.guild).tiktok_users() as tiktok_users:
             if user not in tiktok_users:
                 tiktok_users.append(user)
@@ -114,6 +115,7 @@ class TikTokLiveCog(commands.Cog):
     @tiktokset.command()
     @commands.admin_or_permissions(manage_guild=True)
     async def remove(self, ctx, user: str):
+        """Remove a TikTok user from the follow list."""
         async with self.config.guild(ctx.guild).tiktok_users() as tiktok_users:
             if user in tiktok_users:
                 tiktok_users.remove(user)
@@ -137,6 +139,7 @@ class TikTokLiveCog(commands.Cog):
     @tiktokset.command()
     @commands.admin_or_permissions(manage_guild=True)
     async def channel(self, ctx, channel: discord.TextChannel):
+        """Set the alert channel for TikTok live notifications."""
         await self.config.guild(ctx.guild).alert_channel.set(channel.id)
         embed = discord.Embed(
             title="Alert Channel Set",
@@ -148,6 +151,7 @@ class TikTokLiveCog(commands.Cog):
     @tiktokset.command()
     @commands.admin_or_permissions(manage_guild=True)
     async def role(self, ctx, role: discord.Role):
+        """Set the alert role for TikTok live notifications."""
         await self.config.guild(ctx.guild).alert_role.set(role.id)
         embed = discord.Embed(
             title="Alert Role Set",
@@ -159,6 +163,7 @@ class TikTokLiveCog(commands.Cog):
     @tiktokset.command()
     @commands.admin_or_permissions(manage_guild=True)
     async def settings(self, ctx):
+        """Show the current TikTok live stream settings."""
         guild_id = ctx.guild.id
         tiktok_users = await self.config.guild(ctx.guild).tiktok_users()
         alert_channel_id = await self.config.guild(ctx.guild).alert_channel()
@@ -182,6 +187,7 @@ class TikTokLiveCog(commands.Cog):
 
     @tiktok.command()
     async def check(self, ctx, user: str):
+        """Check if a TikTok user is currently live."""
         guild_id = ctx.guild.id
         if guild_id in self.clients:
             for client in self.clients[guild_id]:
