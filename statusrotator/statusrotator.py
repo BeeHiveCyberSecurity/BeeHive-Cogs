@@ -11,7 +11,8 @@ class StatusRotator(commands.Cog):
             ("watching", lambda: f"over {len(self.bot.guilds)} servers"),
             ("watching", lambda: f"over {len(self.bot.users)} users"),
         ]
-        if self.bot.get_cog("AntiPhishing"):
+        antiphishing_cog = self.bot.get_cog("antiphishing")
+        if antiphishing_cog and antiphishing_cog.__module__ == "BeeHive-Cogs.antiphishing.antiphishing":
             self.statuses.append(("watching", lambda: f"for {self.get_blocked_domains_count()} bad domains"))
 
     def cog_unload(self):
