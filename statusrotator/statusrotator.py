@@ -16,8 +16,8 @@ class StatusRotator(commands.Cog):
         )
         self.status_task = self.bot.loop.create_task(self.change_status())
         self.statuses = [
-            lambda: f"Guarding {len(self.bot.guilds)} servers",
-            lambda: f"Moderating {len(self.bot.users):,} users",
+            lambda: f"Guarding {len(self.bot.guilds)} server{'s' if len(self.bot.guilds) != 1 else ''}",
+            lambda: f"Moderating {len(self.bot.users):,} user{'s' if len(self.bot.users) != 1 else ''}",
             self.get_message_count_status,
             self.get_uptime_status,  # New status added here
             self.get_latency_status  # Another unique status added here
