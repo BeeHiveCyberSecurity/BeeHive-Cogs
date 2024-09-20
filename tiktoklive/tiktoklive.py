@@ -56,7 +56,7 @@ class TikTokLiveCog(commands.Cog):
         """TikTok live stream settings commands."""
         pass
 
-    @tiktok.command()
+    @tiktokset.command()
     async def add_user(self, ctx, user: str):
         async with self.config.guild(ctx.guild).tiktok_users() as tiktok_users:
             if user not in tiktok_users:
@@ -71,7 +71,7 @@ class TikTokLiveCog(commands.Cog):
             else:
                 await ctx.send(f"TikTok user {user} is already being followed.")
 
-    @tiktok.command()
+    @tiktokset.command()
     async def remove_user(self, ctx, user: str):
         async with self.config.guild(ctx.guild).tiktok_users() as tiktok_users:
             if user in tiktok_users:
@@ -98,7 +98,7 @@ class TikTokLiveCog(commands.Cog):
         await ctx.send(embed=embed)
 
     @tiktok.command()
-    async def check_live(self, ctx, user: str):
+    async def check(self, ctx, user: str):
         guild_id = ctx.guild.id
         if guild_id in self.clients:
             for client in self.clients[guild_id]:
