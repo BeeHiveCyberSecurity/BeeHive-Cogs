@@ -291,7 +291,7 @@ class TikTokLiveCog(commands.Cog):
                 await ctx.send(embed=embed, file=discord.File(video_path))
                 os.remove(video_path)  # Clean up the downloaded file after sending
         except Exception as e:
-            await ctx.send(f"Failed to download video: {e}")
+            pass
 
     @tiktokliveset.command()
     async def auto(self, ctx):
