@@ -1,9 +1,9 @@
 import asyncio
-from redbot.core import commands, Config
-from TikTokLive import TikTokLiveClient
-from TikTokLive.client.logger import LogLevel
-from TikTokLive.events import ConnectEvent
-import discord
+from redbot.core import commands, Config #type: ignore
+from TikTokLive import TikTokLiveClient #type: ignore
+from TikTokLive.client.logger import LogLevel #type: ignore
+from TikTokLive.events import ConnectEvent #type: ignore
+import discord #type: ignore
 import logging
 
 class TikTokLiveCog(commands.Cog):
