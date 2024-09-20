@@ -311,6 +311,8 @@ class TikTokLiveCog(commands.Cog):
         auto_download = await self.config.guild_from_id(guild_id).auto_download()
         if auto_download and "tiktok.com" in message.content:
             await self.download_video(message.channel, message.content)
+            # Delete the URL from the message content
+            await message.delete()
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild):
