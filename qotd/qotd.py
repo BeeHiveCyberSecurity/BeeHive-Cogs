@@ -87,8 +87,6 @@ class QotD(commands.Cog):
     @commands.group()
     async def qotd(self, ctx):
         """Question of the Day commands"""
-        if ctx.invoked_subcommand is None:
-            await ctx.send_help(ctx.command)
 
     @qotd.command()
     async def list(self, ctx):
