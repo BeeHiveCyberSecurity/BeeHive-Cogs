@@ -18,10 +18,12 @@ class StatusRotator(commands.Cog):
         self.statuses = [
             lambda: f"Guarding {len(self.bot.guilds)} servers",
             lambda: f"Moderating {len(self.bot.users):,} users",
-            self.get_message_count_status
+            self.get_message_count_status,
+            self.get_uptime_status  # New status added here
         ]
         self.message_log = deque()
         self.bot.loop.create_task(self.load_settings())
+        self.start_time = datetime.utcnow()  # Track bot start time
 
     async def load_settings(self):
         self.antiphishing_status_enabled = await self.config.antiphishing_status_enabled()
@@ -77,6 +79,14 @@ class StatusRotator(commands.Cog):
         message_count = len(self.message_log)
         message_text = "message" if message_count == 1 else "messages"
         return f"Analyzing {message_count} {message_text} every minute"
+
+    def get_uptime_status(self):
+        now = datetime.utcnow()
+        uptime = now - self.start_time
+        days, remainder = divmod(uptime.total_seconds(), 86400)
+        hours, remainder = divmod(remainder, 3600)
+        minutes, _ = divmod(remainder, 60)
+        return f"Online for {int(days)}d {int(hours)}h {int(minutes)}m"
 
     @commands.group()
     async def statusrotator(self, ctx):
