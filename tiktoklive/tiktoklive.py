@@ -267,13 +267,20 @@ class TikTokLiveCog(commands.Cog):
                 video_duration = info_dict.get('duration', 0)
                 video_path = ydl.prepare_filename(info_dict)
                 
+                # Extract hashtags from the title
+                hashtags = [word for word in video_title.split() if word.startswith('#')]
+                # Remove hashtags from the title
+                clean_title = ' '.join(word for word in video_title.split() if not word.startswith('#'))
+                
                 embed = discord.Embed(
                     title="Downloaded successfully",
                     color=0x2bbd8e
                 )
-                embed.add_field(name="Title", value=video_title, inline=False)
+                embed.add_field(name="Caption", value=clean_title, inline=False)
                 embed.add_field(name="Uploader", value=video_uploader, inline=False)
                 embed.add_field(name="Duration", value=f"{video_duration} seconds", inline=False)
+                if hashtags:
+                    embed.add_field(name="Hashtags", value=' '.join(hashtags), inline=False)
                 
                 await ctx.send(embed=embed, file=discord.File(video_path))
                 os.remove(video_path)  # Clean up the downloaded file after sending
