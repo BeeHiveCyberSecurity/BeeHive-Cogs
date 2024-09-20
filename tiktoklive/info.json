@@ -3,7 +3,7 @@
     "author": ["adminelevation"],
     "description": "A cog for monitoring TikTok live streams and sending alerts and chat logs to Discord channels.",
     "short": "Monitor TikTok live streams.",
-    "requirements": ["TikTokLive"],
+    "requirements": ["TikTokLive", "yt_dlp"],
     "tags": ["tiktok", "live", "alerts", "discord"],
     "install_msg": "Thank you for installing the TikTokLive cog. Use `[p]tiktokset` to get started.",
     "end_user_data_statement": "This cog stores Discord server IDs, TikTok messages, and TikTok usernames for the purpose of monitoring live streams. No other personal data is stored."
