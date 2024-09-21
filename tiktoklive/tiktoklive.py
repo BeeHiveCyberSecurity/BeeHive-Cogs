@@ -245,9 +245,9 @@ class TikTokLiveCog(commands.Cog):
                 
                 embed = discord.Embed(
                     title="Here's that TikTok",
+                    description=clean_title,
                     color=0xfffffe
                 )
-                embed.add_field(name="Caption", value=clean_title, inline=False)
                 embed.add_field(name="Creator", value=f"[{video_uploader}](https://www.tiktok.com/@{video_uploader})", inline=True)
                 embed.add_field(name="Duration", value=f"{video_duration} seconds", inline=True)
                 if hashtags:
