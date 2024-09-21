@@ -50,6 +50,8 @@ class TikTokLiveCog(commands.Cog):
             if guild_id not in self.chat_logs:
                 self.chat_logs[guild_id] = []
             self.chat_logs[guild_id].append(f"{event.user.uniqueId}: {event.comment}")
+            # Log the comment to ensure it's being captured
+            client.logger.info(f"Comment logged: {event.user.uniqueId}: {event.comment}")
 
         self.bot.loop.create_task(self.check_loop(guild_id, client, user))
         self.bot.loop.create_task(self.chat_log_loop(guild_id, user))
@@ -90,6 +92,10 @@ class TikTokLiveCog(commands.Cog):
                         )
                         await chat_log_channel.send(embed=embed)
                         self.chat_logs[guild_id] = []
+                    else:
+                        logging.error(f"Chat log channel not found for guild {guild_id}")
+                else:
+                    logging.error(f"Chat log channel ID not set for guild {guild_id}")
 
     @commands.guild_only()
     @commands.group()
