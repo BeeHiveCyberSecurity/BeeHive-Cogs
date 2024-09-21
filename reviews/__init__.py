@@ -1,4 +1,5 @@
 from .reviews import ReviewsCog
+from redbot.core.bot import Red
 
 
 async def setup(bot: Red):
