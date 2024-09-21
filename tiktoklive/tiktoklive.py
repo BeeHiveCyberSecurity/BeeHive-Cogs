@@ -144,7 +144,7 @@ class TikTokLiveCog(commands.Cog):
             await self.config.guild(ctx.guild).tiktok_user.set(None)  # Save persistently
             if ctx.guild.id in self.clients:
                 await self.clients[ctx.guild.id].close()
-                del self.clients[guild.id]
+                del self.clients[ctx.guild.id]
             embed = discord.Embed(
                 title="Creator removed",
                 description=f"TikTok user {user} removed for this server.",
@@ -325,4 +325,5 @@ class TikTokLiveCog(commands.Cog):
         if guild.id in self.clients:
             await self.clients[guild.id].close()
             del self.clients[guild.id]
+        await self.config.clear_all_members(guild)
 
