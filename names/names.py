@@ -1,5 +1,5 @@
 import discord
-from redbot.core import commands, Config, checks
+from redbot.core import commands, Config
 import asyncio
 
 class NicknameManagement(commands.Cog):
@@ -123,10 +123,6 @@ class NicknameManagement(commands.Cog):
                     purified_nickname = ''.join(c for c in member.name if c in allowed_characters)
                     purified_nickname = purified_nickname[:max_length]
 
-                if not purified_nickname.isalnum():
-                    purified_nickname = ''.join(c for c in purified_nickname if c.isalnum())
-                    purified_nickname = purified_nickname[:max_length]
-
                 removed_characters = set(original_nickname) - set(purified_nickname)
                 for char in removed_characters:
                     if char in character_removal_count:
@@ -172,12 +168,13 @@ class NicknameManagement(commands.Cog):
                 if not purified_nickname:
                     purified_nickname = ''.join(c for c in after.name if c in allowed_characters)
                     purified_nickname = purified_nickname[:guild_settings["max_length"]]
-                try:
-                    await after.edit(nick=purified_nickname, reason="Nickname auto-purified on update")
-                except discord.Forbidden:
-                    pass
-                except discord.HTTPException:
-                    pass
+                if after.display_name != purified_nickname:
+                    try:
+                        await after.edit(nick=purified_nickname, reason="Nickname auto-purified on update")
+                    except discord.Forbidden:
+                        pass
+                    except discord.HTTPException:
+                        pass
 
     async def on_member_join(self, member):
         guild_settings = await self.config.guild(member.guild).all()
@@ -188,12 +185,13 @@ class NicknameManagement(commands.Cog):
             if not purified_nickname:
                 purified_nickname = ''.join(c for c in member.name if c in allowed_characters)
                 purified_nickname = purified_nickname[:guild_settings["max_length"]]
-            try:
-                await member.edit(nick=purified_nickname, reason="Nickname auto-purified on join")
-            except discord.Forbidden:
-                pass
-            except discord.HTTPException:
-                pass
+            if member.display_name != purified_nickname:
+                try:
+                    await member.edit(nick=purified_nickname, reason="Nickname auto-purified on join")
+                except discord.Forbidden:
+                    pass
+                except discord.HTTPException:
+                    pass
 
     async def cleanup_nicknames(self):
         await self.bot.wait_until_ready()

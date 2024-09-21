@@ -21,6 +21,7 @@ class Invites(commands.Cog):
         self.config.register_guild(**default_guild)
         self.invites = {}
         self.milestones = [1, 2, 3, 4, 5, 10, 15, 20]
+        self.announcement_channel = None
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -316,3 +317,4 @@ class Invites(commands.Cog):
                 await message.remove_reaction(reaction, user)
             except asyncio.TimeoutError:
                 break
+        await message.clear_reactions()

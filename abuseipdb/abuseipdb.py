@@ -144,10 +144,10 @@ class AbuseIPDB(commands.Cog):
             "comment": comment,
         }
 
-        async with aiohttp.ClientSession(headers=headers) as session:
+        async with aiohttp.ClientSession() as session:
             async with ctx.typing():
                 try:
-                    async with session.post(abuseipdb_url, data=data) as response:
+                    async with session.post(abuseipdb_url, headers=headers, data=data) as response:
                         response_data = await response.json()
                         if response.status == 200:
                             ip_address = response_data["data"]["ipAddress"]
@@ -229,9 +229,9 @@ class AbuseIPDB(commands.Cog):
         }
 
         all_reports = []
-        async with aiohttp.ClientSession(headers=headers) as session:
+        async with aiohttp.ClientSession() as session:
             async with ctx.typing():
-                async with session.get(abuseipdb_url, params=params) as response:
+                async with session.get(abuseipdb_url, headers=headers, params=params) as response:
                     if response.status == 200:
                         data = await response.json()
                         report_data = data['data']
@@ -240,7 +240,7 @@ class AbuseIPDB(commands.Cog):
                         
                         for page in range(1, pages + 1):
                             params["page"] = page
-                            async with session.get(abuseipdb_url, params=params) as page_response:
+                            async with session.get(abuseipdb_url, headers=headers, params=params) as page_response:
                                 if page_response.status == 200:
                                     page_data = await page_response.json()
                                     all_reports.extend(page_data['data']['results'])
@@ -322,8 +322,8 @@ class AbuseIPDB(commands.Cog):
             "verbose": ""
         }
 
-        async with aiohttp.ClientSession(headers=headers) as session:
-            async with session.get(abuseipdb_url, params=params) as response:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(abuseipdb_url, headers=headers, params=params) as response:
                 if response.status == 200:
                     data = await response.json()
                     report = data['data']

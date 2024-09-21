@@ -168,6 +168,3 @@ class Disclaimers(commands.Cog):
             finally:
                 await message.clear_reactions()
 
-async def setup(bot: Red):
-    await bot.add_cog(Disclaimers(bot))
-

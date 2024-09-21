@@ -1,5 +1,3 @@
-from redbot.core.bot import Red #type: ignore
-
 from .reviews import ReviewsCog
 
 

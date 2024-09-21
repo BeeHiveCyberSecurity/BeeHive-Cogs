@@ -315,6 +315,4 @@ class ReviewsCog(commands.Cog):
             embed.add_field(name="Rating", value=rating, inline=False)
             await ctx.send(embed=embed)
 
-def setup(bot):
-    bot.add_cog(ReviewsCog(bot))
 

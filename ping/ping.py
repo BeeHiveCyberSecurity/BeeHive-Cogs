@@ -1,6 +1,6 @@
-import discord  #type: ignore
-import speedtest  #type: ignore
-from redbot.core import commands #type: ignore
+import discord  # type: ignore
+import speedtest  # type: ignore
+from redbot.core import commands  # type: ignore
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 
@@ -8,6 +8,7 @@ class Ping(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.executor = ThreadPoolExecutor(max_workers=1)
+        self.latency_history = []
 
     @commands.hybrid_command(name="ping", description="Displays the bot's latency, download speed, and upload speed")
     async def ping(self, ctx: commands.Context):
@@ -15,8 +16,6 @@ class Ping(commands.Cog):
         await ctx.defer()
         ws_latency = round(self.bot.latency * 1000, 2)
 
-        if not hasattr(self, 'latency_history'):
-            self.latency_history = []
         self.latency_history.append(ws_latency)
         if len(self.latency_history) > 5:
             self.latency_history.pop(0)
