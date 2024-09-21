@@ -70,10 +70,12 @@ class QotD(commands.Cog):
         mention_role_id = await self.config.guild(guild).mention_role()
         mention_role = guild.get_role(mention_role_id) if mention_role_id else None
         if enabled_categories:
-            category = random.choice(enabled_categories)
-            questions = self.categories.get(category, [])
-            if questions:
-                question = random.choice(questions)
+            all_questions = []
+            for category in enabled_categories:
+                questions = self.categories.get(category, [])
+                all_questions.extend(questions)
+            if all_questions:
+                question = random.choice(all_questions)
                 response_count = await self.config.guild(guild).response_count()
                 embed = discord.Embed(
                     title="Question of the Day",
@@ -87,7 +89,7 @@ class QotD(commands.Cog):
                 await self.config.guild(guild).current_question.set(question)
             else:
                 await channel.send(embed=discord.Embed(
-                    description="No questions available in the selected category.",
+                    description="No questions available in the enabled categories.",
                     color=0xfffffe
                 ))
         else:
@@ -168,10 +170,12 @@ class QotD(commands.Cog):
         """Ask a random question of the day from enabled categories"""
         enabled_categories = await self.config.guild(ctx.guild).enabled_categories()
         if enabled_categories:
-            category = random.choice(enabled_categories)
-            questions = self.categories.get(category, [])
-            if questions:
-                question = random.choice(questions)
+            all_questions = []
+            for category in enabled_categories:
+                questions = self.categories.get(category, [])
+                all_questions.extend(questions)
+            if all_questions:
+                question = random.choice(all_questions)
                 await self.config.guild(ctx.guild).current_question.set(question)
                 await ctx.send(embed=discord.Embed(
                     title="Question of the Day",
@@ -180,7 +184,7 @@ class QotD(commands.Cog):
                 ))
             else:
                 await ctx.send(embed=discord.Embed(
-                    description="No questions available in the selected category.",
+                    description="No questions available in the enabled categories.",
                     color=0xfffffe
                 ))
         else:
