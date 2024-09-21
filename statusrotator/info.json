@@ -3,6 +3,6 @@
     "description": "A cog that rotates the bot's status message periodically.",
     "install_msg": "Thank you for installing StatusRotator. Use `[p]help StatusRotator` to see available commands.",
     "short": "Rotates bot status",
-    "requirements": [],
+    "requirements": ["aiohttp"],
     "tags": ["status", "rotation", "utility"]
 }

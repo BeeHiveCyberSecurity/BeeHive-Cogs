@@ -2,7 +2,6 @@ from redbot.core import commands, Config #type: ignore
 import discord #type: ignore
 import asyncio
 import aiohttp #type: ignore
-import json
 from collections import deque
 from datetime import datetime, timedelta
 
