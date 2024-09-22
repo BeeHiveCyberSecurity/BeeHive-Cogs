@@ -61,7 +61,7 @@ class QotD(commands.Cog):
                         if not last_asked or (now - datetime.fromisoformat(last_asked)).total_seconds() >= 86400:
                             await asyncio.sleep((next_qotd - now).total_seconds())
                             await self.ask_daily_question(qotd_channel)
-                            await self.config.guild(guild).last_asked.set(now.isoformat())
+                            await self.config.guild(guild).last_asked.set(next_qotd.isoformat())
             await asyncio.sleep(60)
 
     async def ask_daily_question(self, channel):
