@@ -11,7 +11,7 @@ import os
 class TikTokLiveCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.config = Config.get_conf(self, identifier=1234567890)
+        self.config = Config.get_conf(self, identifier=11111111111111)
         self.config.register_guild(tiktok_user=None, alert_channel=None, alert_role=None, auto_download=False)
         self.clients = {}
         self.live_status = {}  # Dictionary to keep track of live status
@@ -56,7 +56,7 @@ class TikTokLiveCog(commands.Cog):
             try:
                 is_live = await client.is_live()
                 if not is_live:
-                    client.logger.info("Client is currently not live. Checking again in 60 seconds.")
+                    client.logger.info("Client is currently not live. Checking again in 90 seconds.")
                     self.live_status[user] = False  # Update live status
                     await asyncio.sleep(90)
                 else:
@@ -66,7 +66,7 @@ class TikTokLiveCog(commands.Cog):
                         self.live_status[user] = True  # Update live status
                     else:
                         client.logger.info("Client is still live. No new alert sent.")
-                    await asyncio.sleep(90)  # Check again in 60 seconds
+                    await asyncio.sleep(90)  # Check again in 90 seconds
             except Exception as e:
                 client.logger.error(f"Error in check_loop: {e}")
                 await asyncio.sleep(90)  # Wait before retrying
@@ -256,7 +256,7 @@ class TikTokLiveCog(commands.Cog):
                 await ctx.send(embed=embed, file=discord.File(video_path))
                 os.remove(video_path)  # Clean up the downloaded file after sending
         except Exception as e:
-            pass
+            await ctx.send(f"Failed to download video: {e}")
 
     @tiktokliveset.command()
     async def auto(self, ctx):
