@@ -256,6 +256,9 @@ class QotD(commands.Cog):
             return
         if message.guild is None:
             return
+        qotd_channel_id = await self.config.guild(message.guild).qotd_channel()
+        if message.channel.id != qotd_channel_id:
+            return
         current_question = await self.config.guild(message.guild).current_question()
         if current_question:
             response_count = await self.config.guild(message.guild).response_count()
