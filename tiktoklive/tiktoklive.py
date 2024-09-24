@@ -5,7 +5,7 @@ from TikTokLive.client.logger import LogLevel #type: ignore
 from TikTokLive.events import ConnectEvent, CommentEvent #type: ignore
 import discord #type: ignore
 import logging
-import yt_dlp
+import yt_dlp #type: ignore
 import os
 
 class TikTokLiveCog(commands.Cog):
@@ -14,11 +14,11 @@ class TikTokLiveCog(commands.Cog):
         self.config = Config.get_conf(self, identifier=11111111111111)
         self.config.register_guild(tiktok_user=None, alert_channel=None, alert_role=None, auto_download=False)
         self.clients = {}
-        self.live_status = {}  # Dictionary to keep track of live status
+        self.live_status = {}
 
     async def initialize_client(self, guild_id, user):
         client = TikTokLiveClient(unique_id=user)
-        client.logger.setLevel(logging.INFO)  # Use logging.INFO instead of LogLevel.INFO
+        client.logger.setLevel(logging.INFO)
         self.clients[guild_id] = client
 
         @client.on(ConnectEvent)
