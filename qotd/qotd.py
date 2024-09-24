@@ -257,7 +257,7 @@ class QotD(commands.Cog):
         if message.guild is None:
             return
         current_question = await self.config.guild(message.guild).current_question()
-        if current_question and current_question in message.content:
+        if current_question:
             async with self.config.guild(message.guild).response_count() as response_count:
                 response_count += 1
                 await self.config.guild(message.guild).response_count.set(response_count)
