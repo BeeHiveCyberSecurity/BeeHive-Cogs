@@ -495,6 +495,7 @@ class Weather(commands.Cog):
                             "Rip Current Statement": ":ocean:",
                             "Mandatory evacuation order": ":person_running:",
                             "Air Quality Alert": ":face_in_clouds:",
+                            "Coastal Flood Warning": ":beach_umbrella:",
                             # Add more event types and corresponding emojis as needed
                         }
                         event_transformations = {
