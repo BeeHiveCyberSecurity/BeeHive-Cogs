@@ -465,6 +465,7 @@ class Weather(commands.Cog):
                             "Tornado Warning": ":cloud_tornado:",
                             "Severe Thunderstorm Warning": ":thunder_cloud_rain:",
                             "Flood Warning": ":ocean:",
+                            "Flood Watch": ":ocean:",
                             "Heat Advisory": ":desert:",
                             "Special Weather Statement": ":information_source:",
                             "Winter Storm Warning": ":cloud_snow:",
