@@ -321,9 +321,9 @@ class Skysearch(commands.Cog):
 
             embed.add_field(name="This data appears in the following commands", value="`aircraft callsign` `aircraft icao` `aircraft reg` `aircraft squawk` `aircraft type` `aircraft radius` `aircraft pia` `aircraft mil` `aircraft ladd` `aircraft export`", inline=False)
 
-            embed.add_field(name="Law enforcement aircraft", value="`{:,} tagged`".format(len(self.law_enforcement_icao_set)), inline=True)
-            embed.add_field(name="Military & government aircraft", value="`{:,} tagged`".format(len(self.military_icao_set)), inline=True)
-            embed.add_field(name="Medical aircraft", value="`{:,} tagged`".format(len(self.medical_icao_set)), inline=True)
+            embed.add_field(name="Law enforcement aircraft", value="**{:,}** tagged".format(len(self.law_enforcement_icao_set)), inline=True)
+            embed.add_field(name="Military & government aircraft", value="**{:,}** tagged".format(len(self.military_icao_set)), inline=True)
+            embed.add_field(name="Medical aircraft", value="**{:,}** tagged".format(len(self.medical_icao_set)), inline=True)
             embed.add_field(name="Media aircraft", value="`{:,} known`".format(len(self.newsagency_icao_set)), inline=True)
             embed.add_field(name="Damaged aircraft", value="`{:,} known`".format(len(self.global_prior_known_accident_set)), inline=True)
             embed.add_field(name="Wartime aircraft", value="`{:,} observed`".format(len(self.ukr_conflict_set)), inline=True)
