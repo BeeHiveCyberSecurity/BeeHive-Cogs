@@ -28,7 +28,7 @@ class InfoControl(commands.Cog):
                 "iban": r"\b[A-Z]{2}\d{2}[A-Z0-9]{1,30}\b",
                 "mac_address": r"\b([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})\b",
                 "bitcoin_address": r"\b[13][a-km-zA-HJ-NP-Z1-9]{25,34}\b",
-                "drivers_license": r"\b[A-Z]{1,2}\d{1,14}\b",
+                "drivers_license": r"\b[A-Z]{2}-\d{1,14}\b",
                 "vin": r"\b[A-HJ-NPR-Z0-9]{17}\b",
                 "ssn_alternative": r"\b\d{3}[-\s]?\d{2}[-\s]?\d{4}\b",
                 "phone_alternative": r"\b\(\d{3}\)\s?\d{3}[-.\s]?\d{4}\b",
