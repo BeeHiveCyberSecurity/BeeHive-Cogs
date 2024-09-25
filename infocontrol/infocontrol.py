@@ -44,7 +44,7 @@ class InfoControl(commands.Cog):
         self.config.register_guild(**self.default_guild)
 
     @commands.Cog.listener()
-    async def on_message(self, message):
+    async def on_message_without_command(self, message):
         if message.author.bot or not message.guild:
             return
 
