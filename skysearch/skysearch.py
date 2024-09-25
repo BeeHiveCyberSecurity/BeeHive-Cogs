@@ -307,23 +307,19 @@ class Skysearch(commands.Cog):
                 else:
                     raise aiohttp.ClientError(f"API responded with status code: {response.status}")
 
-            stats_fields = {
-                "beast": {"name": "Beast", "value": "`{} feeders`"},
-                "mlat": {"name": "MLAT", "value": "`{} feeders`"},
-                "other": {"name": "Other Freq's", "value": "`{} feeders`"},
-                "aircraft": {"name": "Aircraft tracked right now", "value": "`{} aircraft`"}
-            }
-
             embed = discord.Embed(title="SkySearch Statistics", description="Consolidated statistics and data sources for SkySearch.", color=0xfffffe)
             embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/airplane.png")
 
-            for key, field in stats_fields.items():
-                if key in data:
-                    name = field["name"]
-                    value = field["value"].format("{:,}".format(data[key]))
-                    embed.add_field(name=name, value=value, inline=True)
+            if "beast" in data:
+                embed.add_field(name="Beast", value="**{}** feeders".format("{:,}".format(data["beast"])), inline=True)
+            if "mlat" in data:
+                embed.add_field(name="MLAT", value="**{}** feeders".format("{:,}".format(data["mlat"])), inline=True)
+            if "other" in data:
+                embed.add_field(name="Other Freq's", value="**{}** feeders".format("{:,}".format(data["other"])), inline=True)
+            if "aircraft" in data:
+                embed.add_field(name="Aircraft tracked right now", value="**{}** aircraft".format("{:,}".format(data["aircraft"])), inline=False)
 
-            embed.add_field(name="Appears in", value="`aircraft callsign` `aircraft icao` `aircraft reg` `aircraft squawk` `aircraft type` `aircraft radius` `aircraft pia` `aircraft mil` `aircraft ladd` `aircraft export`", inline=False)
+            embed.add_field(name="This data appears in the following commands", value="`aircraft callsign` `aircraft icao` `aircraft reg` `aircraft squawk` `aircraft type` `aircraft radius` `aircraft pia` `aircraft mil` `aircraft ladd` `aircraft export`", inline=False)
 
             embed.add_field(name="Law enforcement aircraft", value="`{:,} tagged`".format(len(self.law_enforcement_icao_set)), inline=True)
             embed.add_field(name="Military & government aircraft", value="`{:,} tagged`".format(len(self.military_icao_set)), inline=True)
@@ -334,11 +330,11 @@ class Skysearch(commands.Cog):
             embed.add_field(name="Utility aircraft", value="`{:,} spotted`".format(len(self.agri_utility_set)), inline=True)
             embed.add_field(name="Balloons", value="`{:,} known`".format(len(self.balloons_icao_set)), inline=True)
             embed.add_field(name="Suspicious aircraft", value="`{:,} identifiers`".format(len(self.suspicious_icao_set)), inline=True)
-            embed.add_field(name="Appears in", value="`aircraft callsign` `aircraft icao` `aircraft reg` `aircraft squawk` `aircraft type` `aircraft radius` `aircraft pia` `aircraft mil` `aircraft ladd`", inline=False)
-
-            embed.add_field(name="Photography", value="Photos are powered by community contributions at [planespotters.net](https://www.planespotters.net/)", inline=False)
-            embed.add_field(name="Airport data", value="Airport data is powered by the [airport-data.com](https://airport-data.com/) API service", inline=False)
-            embed.add_field(name="Runway data", value="Runway data is powered by the [airportdb.io](https://airportdb.io) API service", inline=False)
+            embed.add_field(name="This data appears in the following commands", value="`aircraft callsign` `aircraft icao` `aircraft reg` `aircraft squawk` `aircraft type` `aircraft radius` `aircraft pia` `aircraft mil` `aircraft ladd`", inline=False)
+            embed.add_field(name="Other services", value="Additional data used in this cog is shown below", inline=False)
+            embed.add_field(name="Photography", value="Photos are powered by community contributions at [planespotters.net](https://www.planespotters.net/)", inline=True)
+            embed.add_field(name="Airport data", value="Airport data is powered by the [airport-data.com](https://airport-data.com/) API service", inline=True)
+            embed.add_field(name="Runway data", value="Runway data is powered by the [airportdb.io](https://airportdb.io) API service", inline=True)
             embed.add_field(name="Mapping and imagery", value="Mapping and ground imagery powered by [Google Maps](https://maps.google.com) and the [Maps Static API](https://developers.google.com/maps/documentation/maps-static)", inline=False)
 
             await ctx.send(embed=embed)
