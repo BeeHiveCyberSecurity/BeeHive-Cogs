@@ -310,7 +310,7 @@ class Weather(commands.Cog):
                 color=0xff4545
             )
             issue_button = discord.ui.Button(
-                label="Open an Issue",
+                label="Open an issue",
                 url="https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/issues/new?assignees=&labels=enhancement%2C+good+first+issue&projects=&template=location-review.md&title=%28Location+review%29",
                 style=discord.ButtonStyle.link
             )
@@ -485,7 +485,8 @@ class Weather(commands.Cog):
                             "Severe Weather Statement": ":cloud_with_lightning_and_rain:",
                             "Special Marine Warning": ":anchor:",
                             "Storm Surge Warning": ":ocean:",
-                            "Tropical Storm Warning": ":tropical_storm:",
+                            "Tropical Storm Warning": ":thunder_cloud_rain:",
+                            "Tropical Cyclone Statement": ":cyclone:",
                             "Volcano Warning": ":volcano:",
                             "Flash Flood Warning": ":ocean:",
                             "Frost Advisory": ":snowflake:",
