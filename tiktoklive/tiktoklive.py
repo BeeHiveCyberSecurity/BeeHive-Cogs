@@ -242,12 +242,14 @@ class TikTokLiveCog(commands.Cog):
                     description=clean_title,
                     color=0xfffffe
                 )
-                embed.add_field(name="Creator", value=f"[{video_uploader}](https://www.tiktok.com/@{video_uploader})", inline=True)
                 embed.add_field(name="Duration", value=f"{video_duration} seconds", inline=True)
                 if hashtags:
                     embed.add_field(name="Hashtags", value=' '.join(hashtags), inline=False)
                 
-                await ctx.send(embed=embed, file=discord.File(video_path))
+                view = discord.ui.View()
+                view.add_item(discord.ui.Button(label="Visit the creator", url=f"https://www.tiktok.com/@{video_uploader}"))
+                
+                await ctx.send(embed=embed, file=discord.File(video_path), view=view)
                 os.remove(video_path)  # Clean up the downloaded file after sending
         except Exception as e:
             await ctx.send(f"Failed to download video: {e}")
