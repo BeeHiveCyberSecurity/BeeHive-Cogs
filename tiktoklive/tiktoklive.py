@@ -253,6 +253,8 @@ class TikTokLiveCog(commands.Cog):
         try:
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 info_dict = ydl.extract_info(url, download=True)
+                if 'formats' not in info_dict:
+                    raise ValueError("No formats found. The video may contain graphic material and require login to view.")
                 video_title = info_dict.get('title', 'video')
                 video_uploader = info_dict.get('uploader', 'unknown')
                 video_duration = info_dict.get('duration', 0)
@@ -277,6 +279,8 @@ class TikTokLiveCog(commands.Cog):
 
                 await ctx.send(embed=embed, file=discord.File(video_path), view=view)
                 os.remove(video_path)  # Clean up the downloaded file after sending
+        except ValueError as ve:
+            await ctx.send(f"Failed to download video: {ve}")
         except Exception as e:
             await ctx.send(f"Failed to download video: {e}")
 
