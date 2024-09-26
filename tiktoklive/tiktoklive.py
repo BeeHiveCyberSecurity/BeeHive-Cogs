@@ -55,18 +55,17 @@ class TikTokLiveCog(commands.Cog):
         while True:
             try:
                 is_live = await client.is_live()
-                if not is_live:
-                    client.logger.info("Client is currently not live. Checking again in 90 seconds.")
-                    self.live_status[user] = False  # Update live status
-                    await asyncio.sleep(90)
-                else:
+                if is_live:
                     if not self.live_status.get(user, False):  # Only send alert if user was not previously live
                         client.logger.info("Requested client is live!")
                         self.live_status[user] = True  # Update live status
                         await client.connect()
                     else:
                         client.logger.info("Client is still live. No new alert sent.")
-                    await asyncio.sleep(90)  # Check again in 90 seconds
+                else:
+                    client.logger.info("Client is currently not live. Checking again in 90 seconds.")
+                    self.live_status[user] = False  # Update live status
+                await asyncio.sleep(90)  # Check again in 90 seconds
             except Exception as e:
                 client.logger.error(f"Error in check_loop: {e}")
                 await asyncio.sleep(90)  # Wait before retrying
