@@ -274,7 +274,7 @@ class TikTokLiveCog(commands.Cog):
 
         guild_id = message.guild.id
         auto_download = await self.config.guild_from_id(guild_id).auto_download()
-        if auto_download and "tiktok.com" in message.content:
+        if auto_download and "tiktok.com/t/" in message.content:
             # Truncate the message content to prevent "file name too long" error
             truncated_content = message.content[:255]
             await self.download_video(message.channel, truncated_content)
