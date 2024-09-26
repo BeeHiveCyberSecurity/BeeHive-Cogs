@@ -44,11 +44,6 @@ class TikTokLiveCog(commands.Cog):
                     view.add_item(button)
                     await channel.send(content=role_mention, embed=embed, view=view, allowed_mentions=discord.AllowedMentions(roles=True))
 
-        @client.on(CommentEvent)
-        async def on_comment(event: CommentEvent):
-            # Log the comment to ensure it's being captured
-            client.logger.info(f"Comment logged: {event.user.uniqueId}: {event.comment}")
-
         self.bot.loop.create_task(self.check_loop(guild_id, client, user))
 
     async def check_loop(self, guild_id, client, user):
@@ -292,4 +287,15 @@ class TikTokLiveCog(commands.Cog):
             await self.clients[guild.id].close()
             del self.clients[guild.id]
         await self.config.clear_all_members(guild)
+
+    async def cog_load(self):
+        for guild in self.bot.guilds:
+            user = await self.config.guild(guild).tiktok_user()
+            if user:
+                await self.initialize_client(guild.id, user)
+
+    async def cog_unload(self):
+        for client in self.clients.values():
+            await client.close()
+        self.clients.clear()
 
