@@ -1,12 +1,14 @@
 import asyncio
-from redbot.core import commands, Config #type: ignore
-from TikTokLive import TikTokLiveClient #type: ignore
-from TikTokLive.client.logger import LogLevel #type: ignore
-from TikTokLive.events import ConnectEvent, CommentEvent #type: ignore
-import discord #type: ignore
 import logging
-import yt_dlp #type: ignore
 import os
+
+import discord  # type: ignore
+import yt_dlp  # type: ignore
+from redbot.core import commands, Config  # type: ignore
+from TikTokLive import TikTokLiveClient  # type: ignore
+from TikTokLive.client.logger import LogLevel  # type: ignore
+from TikTokLive.events import ConnectEvent, CommentEvent  # type: ignore
+
 
 class TikTokLiveCog(commands.Cog):
     def __init__(self, bot):
@@ -24,33 +26,36 @@ class TikTokLiveCog(commands.Cog):
 
             @client.on(ConnectEvent)
             async def on_connect(event: ConnectEvent):
-                try:
-                    client.logger.info(f"Connected to @{event.unique_id}!")
-                    channel_id = await self.config.guild_from_id(guild_id).alert_channel()
-                    role_id = await self.config.guild_from_id(guild_id).alert_role()
-                    if channel_id:
-                        channel = self.bot.get_channel(channel_id)
-                        if channel:
-                            role_mention = f"<@&{role_id}>" if role_id else ""
-                            embed = discord.Embed(
-                                title="A creator just went live",
-                                description=f"@{event.unique_id} is now live on TikTok!",
-                                color=0x2bbd8e
-                            )
-                            view = discord.ui.View()
-                            button = discord.ui.Button(
-                                label="Watch now",
-                                url=f"https://www.tiktok.com/@{event.unique_id}/live",
-                                style=discord.ButtonStyle.url
-                            )
-                            view.add_item(button)
-                            await channel.send(content=role_mention, embed=embed, view=view, allowed_mentions=discord.AllowedMentions(roles=True))
-                except Exception as e:
-                    client.logger.error(f"Error in on_connect: {e}")
+                await self.handle_connect_event(event, guild_id, client)
 
             self.bot.loop.create_task(self.check_loop(guild_id, client, user))
         except Exception as e:
             logging.error(f"Error initializing client for guild {guild_id} and user {user}: {e}")
+
+    async def handle_connect_event(self, event, guild_id, client):
+        try:
+            client.logger.info(f"Connected to @{event.unique_id}!")
+            channel_id = await self.config.guild_from_id(guild_id).alert_channel()
+            role_id = await self.config.guild_from_id(guild_id).alert_role()
+            if channel_id:
+                channel = self.bot.get_channel(channel_id)
+                if channel:
+                    role_mention = f"<@&{role_id}>" if role_id else ""
+                    embed = discord.Embed(
+                        title="A creator just went live",
+                        description=f"@{event.unique_id} is now live on TikTok!",
+                        color=0x2bbd8e
+                    )
+                    view = discord.ui.View()
+                    button = discord.ui.Button(
+                        label="Watch now",
+                        url=f"https://www.tiktok.com/@{event.unique_id}/live",
+                        style=discord.ButtonStyle.url
+                    )
+                    view.add_item(button)
+                    await channel.send(content=role_mention, embed=embed, view=view, allowed_mentions=discord.AllowedMentions(roles=True))
+        except Exception as e:
+            client.logger.error(f"Error in on_connect: {e}")
 
     async def check_loop(self, guild_id, client, user):
         while True:
@@ -252,12 +257,12 @@ class TikTokLiveCog(commands.Cog):
                 video_uploader = info_dict.get('uploader', 'unknown')
                 video_duration = info_dict.get('duration', 0)
                 video_path = ydl.prepare_filename(info_dict)
-                
+
                 # Extract hashtags from the title
                 hashtags = [word for word in video_title.split() if word.startswith('#')]
                 # Remove hashtags from the title
                 clean_title = ' '.join(word for word in video_title.split() if not word.startswith('#'))
-                
+
                 embed = discord.Embed(
                     title="Here's that TikTok",
                     description=clean_title,
@@ -266,10 +271,10 @@ class TikTokLiveCog(commands.Cog):
                 embed.add_field(name="Duration", value=f"{video_duration} seconds", inline=True)
                 if hashtags:
                     embed.add_field(name="Hashtags", value=' '.join(hashtags), inline=False)
-                
+
                 view = discord.ui.View()
                 view.add_item(discord.ui.Button(label="Visit the creator", url=f"https://www.tiktok.com/@{video_uploader}"))
-                
+
                 await ctx.send(embed=embed, file=discord.File(video_path), view=view)
                 os.remove(video_path)  # Clean up the downloaded file after sending
         except Exception as e:
@@ -289,7 +294,7 @@ class TikTokLiveCog(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if (message.author.bot or message.guild is None):
+        if message.author.bot or message.guild is None:
             return
 
         try:
