@@ -17,34 +17,40 @@ class TikTokLiveCog(commands.Cog):
         self.live_status = {}
 
     async def initialize_client(self, guild_id, user):
-        client = TikTokLiveClient(unique_id=user)
-        client.logger.setLevel(logging.INFO)
-        self.clients[guild_id] = client
+        try:
+            client = TikTokLiveClient(unique_id=user)
+            client.logger.setLevel(logging.INFO)
+            self.clients[guild_id] = client
 
-        @client.on(ConnectEvent)
-        async def on_connect(event: ConnectEvent):
-            client.logger.info(f"Connected to @{event.unique_id}!")
-            channel_id = await self.config.guild_from_id(guild_id).alert_channel()
-            role_id = await self.config.guild_from_id(guild_id).alert_role()
-            if channel_id:
-                channel = self.bot.get_channel(channel_id)
-                if channel:
-                    role_mention = f"<@&{role_id}>" if role_id else ""
-                    embed = discord.Embed(
-                        title="A creator just went live",
-                        description=f"@{event.unique_id} is now live on TikTok!",
-                        color=0x2bbd8e
-                    )
-                    view = discord.ui.View()
-                    button = discord.ui.Button(
-                        label="Watch now",
-                        url=f"https://www.tiktok.com/@{event.unique_id}/live",
-                        style=discord.ButtonStyle.url
-                    )
-                    view.add_item(button)
-                    await channel.send(content=role_mention, embed=embed, view=view, allowed_mentions=discord.AllowedMentions(roles=True))
+            @client.on(ConnectEvent)
+            async def on_connect(event: ConnectEvent):
+                try:
+                    client.logger.info(f"Connected to @{event.unique_id}!")
+                    channel_id = await self.config.guild_from_id(guild_id).alert_channel()
+                    role_id = await self.config.guild_from_id(guild_id).alert_role()
+                    if channel_id:
+                        channel = self.bot.get_channel(channel_id)
+                        if channel:
+                            role_mention = f"<@&{role_id}>" if role_id else ""
+                            embed = discord.Embed(
+                                title="A creator just went live",
+                                description=f"@{event.unique_id} is now live on TikTok!",
+                                color=0x2bbd8e
+                            )
+                            view = discord.ui.View()
+                            button = discord.ui.Button(
+                                label="Watch now",
+                                url=f"https://www.tiktok.com/@{event.unique_id}/live",
+                                style=discord.ButtonStyle.url
+                            )
+                            view.add_item(button)
+                            await channel.send(content=role_mention, embed=embed, view=view, allowed_mentions=discord.AllowedMentions(roles=True))
+                except Exception as e:
+                    client.logger.error(f"Error in on_connect: {e}")
 
-        self.bot.loop.create_task(self.check_loop(guild_id, client, user))
+            self.bot.loop.create_task(self.check_loop(guild_id, client, user))
+        except Exception as e:
+            logging.error(f"Error initializing client for guild {guild_id} and user {user}: {e}")
 
     async def check_loop(self, guild_id, client, user):
         while True:
@@ -117,7 +123,10 @@ class TikTokLiveCog(commands.Cog):
         if tiktok_user == user:
             await self.config.guild(ctx.guild).tiktok_user.set(None)  # Save persistently
             if ctx.guild.id in self.clients:
-                await self.clients[ctx.guild.id].close()
+                try:
+                    await self.clients[ctx.guild.id].close()
+                except Exception as e:
+                    logging.error(f"Error closing client for guild {ctx.guild.id}: {e}")
                 del self.clients[ctx.guild.id]
             embed = discord.Embed(
                 title="Creator removed",
@@ -137,81 +146,93 @@ class TikTokLiveCog(commands.Cog):
     @commands.admin_or_permissions(manage_guild=True)
     async def channel(self, ctx, channel: discord.TextChannel):
         """Set the alert channel for TikTok live notifications."""
-        await self.config.guild(ctx.guild).alert_channel.set(channel.id)
-        embed = discord.Embed(
-            title="Alert channel set",
-            description=f"Alert channel set to {channel.mention} for this server.",
-            color=discord.Color.blue()
-        )
-        await ctx.send(embed=embed)
+        try:
+            await self.config.guild(ctx.guild).alert_channel.set(channel.id)
+            embed = discord.Embed(
+                title="Alert channel set",
+                description=f"Alert channel set to {channel.mention} for this server.",
+                color=discord.Color.blue()
+            )
+            await ctx.send(embed=embed)
+        except Exception as e:
+            await ctx.send(f"Failed to set alert channel: {e}")
 
     @tiktokliveset.command()
     @commands.admin_or_permissions(manage_guild=True)
     async def role(self, ctx, role: discord.Role):
         """Set the alert role for TikTok live notifications."""
-        await self.config.guild(ctx.guild).alert_role.set(role.id)
-        embed = discord.Embed(
-            title="Alert/notification role set",
-            description=f"Alert role set to {role.mention} for this server.",
-            color=0x2bbd8e
-        )
-        await ctx.send(embed=embed)
+        try:
+            await self.config.guild(ctx.guild).alert_role.set(role.id)
+            embed = discord.Embed(
+                title="Alert/notification role set",
+                description=f"Alert role set to {role.mention} for this server.",
+                color=0x2bbd8e
+            )
+            await ctx.send(embed=embed)
+        except Exception as e:
+            await ctx.send(f"Failed to set alert role: {e}")
 
     @tiktokliveset.command()
     @commands.admin_or_permissions(manage_guild=True)
     async def settings(self, ctx):
         """Show the current TikTok live stream settings."""
-        guild_id = ctx.guild.id
-        tiktok_user = await self.config.guild(ctx.guild).tiktok_user()
-        alert_channel_id = await self.config.guild(ctx.guild).alert_channel()
-        alert_role_id = await self.config.guild(ctx.guild).alert_role()
-        auto_download = await self.config.guild(ctx.guild).auto_download()
-        alert_channel = self.bot.get_channel(alert_channel_id) if alert_channel_id else None
-        alert_role = ctx.guild.get_role(alert_role_id) if alert_role_id else None
+        try:
+            guild_id = ctx.guild.id
+            tiktok_user = await self.config.guild(ctx.guild).tiktok_user()
+            alert_channel_id = await self.config.guild(ctx.guild).alert_channel()
+            alert_role_id = await self.config.guild(ctx.guild).alert_role()
+            auto_download = await self.config.guild(ctx.guild).auto_download()
+            alert_channel = self.bot.get_channel(alert_channel_id) if alert_channel_id else None
+            alert_role = ctx.guild.get_role(alert_role_id) if alert_role_id else None
 
-        embed = discord.Embed(
-            title="Current TikTok settings",
-            color=0xfffffe
-        )
-        if tiktok_user:
-            user_link = f"[{tiktok_user}](https://www.tiktok.com/@{tiktok_user})"
-            embed.add_field(name="TikTok User", value=user_link, inline=False)
-        else:
-            embed.add_field(name="TikTok User", value="None", inline=False)
-        embed.add_field(name="Alert Channel", value=alert_channel.mention if alert_channel else "None", inline=False)
-        embed.add_field(name="Alert Role", value=alert_role.mention if alert_role else "None", inline=False)
-        embed.add_field(name="Auto Download", value="Enabled" if auto_download else "Disabled", inline=False)
+            embed = discord.Embed(
+                title="Current TikTok settings",
+                color=0xfffffe
+            )
+            if tiktok_user:
+                user_link = f"[{tiktok_user}](https://www.tiktok.com/@{tiktok_user})"
+                embed.add_field(name="TikTok User", value=user_link, inline=False)
+            else:
+                embed.add_field(name="TikTok User", value="None", inline=False)
+            embed.add_field(name="Alert Channel", value=alert_channel.mention if alert_channel else "None", inline=False)
+            embed.add_field(name="Alert Role", value=alert_role.mention if alert_role else "None", inline=False)
+            embed.add_field(name="Auto Download", value="Enabled" if auto_download else "Disabled", inline=False)
 
-        await ctx.send(embed=embed)
+            await ctx.send(embed=embed)
+        except Exception as e:
+            await ctx.send(f"Failed to retrieve settings: {e}")
 
     @tiktoklive.command()
     async def check(self, ctx, user: str):
         """Check if a TikTok user is currently live."""
-        guild_id = ctx.guild.id
-        if guild_id in self.clients and self.clients[guild_id].unique_id == user:
-            client = self.clients[guild_id]
-            is_live = await client.is_live()
-            if is_live:
-                embed = discord.Embed(
-                    title="User Live",
-                    description=f"TikTok user {user} is currently live!",
-                    color=discord.Color.green()
-                )
-                await ctx.send(embed=embed)
+        try:
+            guild_id = ctx.guild.id
+            if guild_id in self.clients and self.clients[guild_id].unique_id == user:
+                client = self.clients[guild_id]
+                is_live = await client.is_live()
+                if is_live:
+                    embed = discord.Embed(
+                        title="User Live",
+                        description=f"TikTok user {user} is currently live!",
+                        color=discord.Color.green()
+                    )
+                    await ctx.send(embed=embed)
+                else:
+                    embed = discord.Embed(
+                        title="User Not Live",
+                        description=f"TikTok user {user} is not live at the moment.",
+                        color=discord.Color.orange()
+                    )
+                    await ctx.send(embed=embed)
             else:
                 embed = discord.Embed(
-                    title="User Not Live",
-                    description=f"TikTok user {user} is not live at the moment.",
-                    color=discord.Color.orange()
+                    title="User not followed",
+                    description=f"TikTok user {user} is not being followed in this server.",
+                    color=discord.Color.red()
                 )
                 await ctx.send(embed=embed)
-        else:
-            embed = discord.Embed(
-                title="User not followed",
-                description=f"TikTok user {user} is not being followed in this server.",
-                color=discord.Color.red()
-            )
-            await ctx.send(embed=embed)
+        except Exception as e:
+            await ctx.send(f"Failed to check live status: {e}")
 
     @tiktoklive.command()
     async def download(self, ctx, url: str):
@@ -257,47 +278,65 @@ class TikTokLiveCog(commands.Cog):
     @tiktokliveset.command()
     async def auto(self, ctx):
         """Toggle automatic downloading of TikTok videos."""
-        current_setting = await self.config.guild(ctx.guild).auto_download()
-        new_setting = not current_setting
-        await self.config.guild(ctx.guild).auto_download.set(new_setting)
-        status = "enabled" if new_setting else "disabled"
-        await ctx.send(f"Automatic downloading of TikTok videos has been {status}.")
+        try:
+            current_setting = await self.config.guild(ctx.guild).auto_download()
+            new_setting = not current_setting
+            await self.config.guild(ctx.guild).auto_download.set(new_setting)
+            status = "enabled" if new_setting else "disabled"
+            await ctx.send(f"Automatic downloading of TikTok videos has been {status}.")
+        except Exception as e:
+            await ctx.send(f"Failed to toggle automatic downloading: {e}")
 
     @commands.Cog.listener()
     async def on_message(self, message):
         if (message.author.bot or message.guild is None):
             return
 
-        guild_id = message.guild.id
-        auto_download = await self.config.guild_from_id(guild_id).auto_download()
-        if auto_download and "https://www.tiktok.com/t/" in message.content:
-            # Truncate the message content to prevent "file name too long" error
-            truncated_content = message.content[:255]
-            await self.download_video(message.channel, truncated_content)
-            # Delete the URL from the message content
-            await message.delete()
+        try:
+            guild_id = message.guild.id
+            auto_download = await self.config.guild_from_id(guild_id).auto_download()
+            if auto_download and "https://www.tiktok.com/t/" in message.content:
+                # Truncate the message content to prevent "file name too long" error
+                truncated_content = message.content[:255]
+                await self.download_video(message.channel, truncated_content)
+                # Delete the URL from the message content
+                await message.delete()
+        except Exception as e:
+            logging.error(f"Error in on_message: {e}")
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild):
-        user = await self.config.guild(guild).tiktok_user()
-        if user:
-            await self.initialize_client(guild.id, user)
-
-    @commands.Cog.listener()
-    async def on_guild_remove(self, guild):
-        if guild.id in self.clients:
-            await self.clients[guild.id].close()
-            del self.clients[guild.id]
-        await self.config.clear_all_members(guild)
-
-    async def cog_load(self):
-        for guild in self.bot.guilds:
+        try:
             user = await self.config.guild(guild).tiktok_user()
             if user:
                 await self.initialize_client(guild.id, user)
+        except Exception as e:
+            logging.error(f"Error in on_guild_join: {e}")
+
+    @commands.Cog.listener()
+    async def on_guild_remove(self, guild):
+        try:
+            if guild.id in self.clients:
+                await self.clients[guild.id].close()
+                del self.clients[guild.id]
+            await self.config.clear_all_members(guild)
+        except Exception as e:
+            logging.error(f"Error in on_guild_remove: {e}")
+
+    async def cog_load(self):
+        try:
+            for guild in self.bot.guilds:
+                user = await self.config.guild(guild).tiktok_user()
+                if user:
+                    await self.initialize_client(guild.id, user)
+        except Exception as e:
+            logging.error(f"Error in cog_load: {e}")
 
     async def cog_unload(self):
-        for client in self.clients.values():
-            await client.close()
-        self.clients.clear()
+        try:
+            for client in self.clients.values():
+                await client.close()
+            self.clients.clear()
+        except Exception as e:
+            logging.error(f"Error in cog_unload: {e}")
 
