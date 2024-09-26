@@ -228,7 +228,7 @@ class TikTokLiveCog(commands.Cog):
         """Helper function to download a TikTok video and send it in the channel."""
         ydl_opts = {
             'format': 'best',
-            'outtmpl': '/tmp/%(title)s.%(ext)s',  # Use a temporary directory
+            'outtmpl': '/tmp/%(id)s.%(ext)s',  # Use a temporary directory and unique ID to avoid long file names
         }
         try:
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
