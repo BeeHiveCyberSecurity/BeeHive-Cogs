@@ -62,8 +62,8 @@ class TikTokLiveCog(commands.Cog):
                 else:
                     if not self.live_status.get(user, False):  # Only send alert if user was not previously live
                         client.logger.info("Requested client is live!")
-                        await client.connect()
                         self.live_status[user] = True  # Update live status
+                        await client.connect()
                     else:
                         client.logger.info("Client is still live. No new alert sent.")
                     await asyncio.sleep(90)  # Check again in 90 seconds
@@ -269,7 +269,7 @@ class TikTokLiveCog(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if message.author.bot or message.guild is None:
+        if (message.author.bot or message.guild is None):
             return
 
         guild_id = message.guild.id
