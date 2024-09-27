@@ -345,7 +345,10 @@ class TikTokLiveCog(commands.Cog):
     async def cog_unload(self):
         try:
             for client in self.clients.values():
-                await client.close()
+                if hasattr(client, 'close') and callable(getattr(client, 'close')):
+                    await client.close()
+                else:
+                    logging.error(f"Client for guild {client.unique_id} does not have a close method.")
             self.clients.clear()
         except Exception as e:
             logging.error(f"Error in cog_unload: {e}")
