@@ -69,7 +69,8 @@ class TikTokLiveCog(commands.Cog):
                     else:
                         client.logger.info("Client is still live. No new alert sent.")
                 else:
-                    client.logger.info("Client is currently not live. Checking again in 90 seconds.")
+                    if self.live_status.get(user, False):  # Only log if the user was previously live
+                        client.logger.info("Client is currently not live. Checking again in 90 seconds.")
                     self.live_status[user] = False  # Update live status
                 await asyncio.sleep(90)  # Check again in 90 seconds
             except Exception as e:
