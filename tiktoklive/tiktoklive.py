@@ -197,12 +197,12 @@ class TikTokLiveCog(commands.Cog):
             )
             if tiktok_user:
                 user_link = f"[{tiktok_user}](https://www.tiktok.com/@{tiktok_user})"
-                embed.add_field(name="TikTok User", value=user_link, inline=False)
+                embed.add_field(name="TikTok user", value=user_link, inline=False)
             else:
-                embed.add_field(name="TikTok User", value="None", inline=False)
-            embed.add_field(name="Alert Channel", value=alert_channel.mention if alert_channel else "None", inline=False)
-            embed.add_field(name="Alert Role", value=alert_role.mention if alert_role else "None", inline=False)
-            embed.add_field(name="Auto Download", value="Enabled" if auto_download else "Disabled", inline=False)
+                embed.add_field(name="TikTok user", value="None", inline=False)
+            embed.add_field(name="Alert channel", value=alert_channel.mention if alert_channel else "None", inline=False)
+            embed.add_field(name="Alert role", value=alert_role.mention if alert_role else "None", inline=False)
+            embed.add_field(name="Auto download", value="Enabled" if auto_download else "Disabled", inline=False)
 
             await ctx.send(embed=embed)
         except Exception as e:
