@@ -1564,9 +1564,9 @@ class Cloudflare(commands.Cog):
                     if "inherited_from" in result:
                         embed.add_field(name="Inherited From", value=f"**`{result['inherited_from']}`**", inline=False)
                     if "inherited_risk_types" in result:
-                        embed.add_field(name="Inherited Risk Types", value=", ".join([f"**`{risk}`**" for risk in result["inherited_risk_types"]]), inline=False)
+                        embed.add_field(name="Inherited Risk Types", value=", ".join([f"**`{risk['name']}`**" for risk in result["inherited_risk_types"]]), inline=False)
                     if "risk_types" in result:
-                        embed.add_field(name="Risk Types", value=", ".join([f"**`{risk}`**" for risk in result["risk_types"]]), inline=False)
+                        embed.add_field(name="Risk Types", value=", ".join([f"**`{risk['name']}`**" for risk in result["risk_types"]]), inline=False)
 
                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/globe.png")
                     await ctx.send(embed=embed)
