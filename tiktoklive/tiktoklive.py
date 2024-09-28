@@ -272,14 +272,6 @@ class TikTokLiveCog(commands.Cog):
                 if hashtags:
                     embed.add_field(name="Hashtags", value=' '.join(hashtags), inline=False)
 
-                # Check for the specific URL format and add a warning if detected
-                if "https://vt.tiktok.com/" in url:
-                    embed.add_field(
-                        name="Warning",
-                        value="The sharer of this video may be using a cracked version of TikTok which could carry security risks. Please be cautious.",
-                        inline=False
-                    )
-
                 view = discord.ui.View()
                 view.add_item(discord.ui.Button(label="Visit the creator", url=f"https://www.tiktok.com/@{video_uploader}"))
 
@@ -310,7 +302,11 @@ class TikTokLiveCog(commands.Cog):
         try:
             guild_id = message.guild.id
             auto_download = await self.config.guild_from_id(guild_id).auto_download()
-            if auto_download and ("https://www.tiktok.com/t/" in message.content or "https://vt.tiktok.com/" in message.content):
+            if auto_download and (
+                "https://www.tiktok.com/t/" in message.content or 
+                "https://vt.tiktok.com/" in message.content or 
+                "https://vm.tiktok.com/" in message.content
+            ):
                 # Truncate the message content to prevent "file name too long" error
                 truncated_content = message.content[:255]
                 await self.download_video(message.channel, truncated_content)
