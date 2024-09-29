@@ -476,6 +476,7 @@ class Weather(commands.Cog):
                             "Tsunami Warning": ":ocean:",
                             "Earthquake Warning": ":earth_americas:",
                             "Blizzard Warning": ":snowflake:",
+                            "Freeze Warning": ":snowflake:",
                             "Dust Storm Warning": ":dash:",
                             "Extreme Cold Warning": ":cold_face:",
                             "Extreme Heat Warning": ":hot_face:",
