@@ -20,9 +20,9 @@ class StatusRotator(commands.Cog):
             lambda: f"Watching over {len(self.bot.guilds)} server{'s' if len(self.bot.guilds) != 1 else ''}",
             lambda: f"Moderating {len(self.bot.users):,} user{'s' if len(self.bot.users) != 1 else ''}",
             self.get_message_count_status,
+            self.get_hyperlink_count_status,
             self.get_uptime_status,
-            self.get_latency_status,
-            self.get_hyperlink_count_status  # New status for hyperlink count
+            self.get_latency_status
         ]
         if self.bot.user.id == 1152805502116429929:
             self.statuses.append(lambda: "beehive.systems/sentri")
