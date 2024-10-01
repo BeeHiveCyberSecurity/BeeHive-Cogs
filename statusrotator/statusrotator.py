@@ -4,6 +4,7 @@ import asyncio
 import aiohttp #type: ignore
 from collections import deque
 from datetime import datetime, timedelta
+import re
 
 class StatusRotator(commands.Cog):
     def __init__(self, bot):
@@ -20,9 +21,11 @@ class StatusRotator(commands.Cog):
             lambda: f"Moderating {len(self.bot.users):,} user{'s' if len(self.bot.users) != 1 else ''}",
             self.get_message_count_status,
             self.get_uptime_status,
-            self.get_latency_status  
+            self.get_latency_status,
+            self.get_hyperlink_count_status  # New status for hyperlink count
         ]
         self.message_log = deque()
+        self.hyperlink_log = deque()  # Log for hyperlinks
         self.bot.loop.create_task(self.load_settings())
         self.start_time = datetime.utcnow()
         self.presence_states = [discord.Status.online, discord.Status.idle, discord.Status.dnd]
@@ -97,6 +100,14 @@ class StatusRotator(commands.Cog):
         latency = self.bot.latency * 1000  # Convert to milliseconds
         return f"Response latency {latency:.2f}ms"
 
+    def get_hyperlink_count_status(self):
+        now = datetime.utcnow()
+        five_minutes_ago = now - timedelta(minutes=5)
+        self.hyperlink_log = deque([timestamp for timestamp in self.hyperlink_log if timestamp > five_minutes_ago])
+        hyperlink_count = len(self.hyperlink_log)
+        hyperlink_text = "hyperlink" if hyperlink_count == 1 else "hyperlinks"
+        return f"Scanned {hyperlink_count} {hyperlink_text} in the last 5 minutes"
+
     @commands.group()
     async def statusrotator(self, ctx):
         """StatusRotator command group"""
@@ -130,6 +141,9 @@ class StatusRotator(commands.Cog):
         if message.author.bot:
             return
         self.message_log.append(datetime.utcnow())
+        # Check for hyperlinks in the message
+        if re.search(r'http[s]?://', message.content):
+            self.hyperlink_log.append(datetime.utcnow())
 
     @commands.Cog.listener()
     async def on_ready(self):
