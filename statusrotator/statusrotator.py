@@ -133,11 +133,11 @@ class StatusRotator(commands.Cog):
             await self.config.antiphishing_status_enabled.set(self.antiphishing_status_enabled)
             if self.antiphishing_status_enabled:
                 self.bot.loop.create_task(self.enable_antiphishing_status())
-                embed = discord.Embed(description="Antiphishing status has been enabled.", color=discord.Color.green())
+                embed = discord.Embed(description="Antiphishing status has been enabled.", color=0x2bbd8e)
                 await ctx.send(embed=embed)
             else:
                 self.statuses = [status for status in self.statuses if "bad domains" not in status()]
-                embed = discord.Embed(description="Antiphishing status has been disabled.", color=discord.Color.red())
+                embed = discord.Embed(description="Antiphishing status has been disabled.", color=0xff4545)
                 await ctx.send(embed=embed)
         else:
             embed = discord.Embed(description=f"Unknown integration: {integration}", color=discord.Color.orange())
