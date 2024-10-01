@@ -5,5 +5,6 @@
     "install_msg": "Thank you for installing the Question of the Day cog. Use `[p]qotd` to get started.",
     "short": "Question of the Day",
     "requirements": [],
-    "tags": ["fun", "questions", "engagement"]
+    "tags": ["fun", "questions", "engagement"],
+    "end_user_data_statement": "This cog stores the channel ID, time, timezone, role ID, enabled categories, current question, response count, and last asked time for the QotD feature. No other user data is stored."
 }
