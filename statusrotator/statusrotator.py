@@ -105,7 +105,7 @@ class StatusRotator(commands.Cog):
         five_minutes_ago = now - timedelta(minutes=5)
         self.hyperlink_log = deque([timestamp for timestamp in self.hyperlink_log if timestamp > five_minutes_ago])
         hyperlink_count = len(self.hyperlink_log)
-        hyperlink_text = "hyperlink" if hyperlink_count == 1 else "hyperlinks"
+        hyperlink_text = "link" if hyperlink_count == 1 else "links"
         return f"Scanned {hyperlink_count} {hyperlink_text} in the last 5 minutes"
 
     @commands.group()
