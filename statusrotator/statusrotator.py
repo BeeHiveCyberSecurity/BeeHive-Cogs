@@ -24,6 +24,8 @@ class StatusRotator(commands.Cog):
             self.get_latency_status,
             self.get_hyperlink_count_status  # New status for hyperlink count
         ]
+        if self.bot.user.id == 1152805502116429929:
+            self.statuses.append(lambda: "beehive.systems/sentri")
         self.message_log = deque()
         self.hyperlink_log = deque()  # Log for hyperlinks
         self.bot.loop.create_task(self.load_settings())
