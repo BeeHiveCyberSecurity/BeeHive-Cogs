@@ -264,3 +264,4 @@ class FotD(commands.Cog):
             response_count = await self.config.guild(message.guild).response_count()
             response_count += 1
             await self.config.guild(message.guild).response_count.set(response_count)
+
