@@ -114,14 +114,18 @@ class StatusRotator(commands.Cog):
         pass
 
     @statusrotator.command()
+    @commands.has_permissions(administrator=True)
     async def status(self, ctx):
         """Show what cog integrations are active"""
         antiphishing_status = "enabled" if self.antiphishing_status_enabled else "disabled"
-        await ctx.send(f"Antiphishing status is {antiphishing_status}.")
+        embed = discord.Embed(title="StatusRotator Integrations", color=discord.Color.blue())
+        embed.add_field(name="Antiphishing Status", value=antiphishing_status, inline=False)
         if self.antiphishing_status_enabled:
-            await ctx.send(f"Blocked domains count: {self.blocked_domains_count}")
+            embed.add_field(name="Blocked Domains Count", value=str(self.blocked_domains_count), inline=False)
+        await ctx.send(embed=embed)
 
     @statusrotator.command()
+    @commands.has_permissions(administrator=True)
     async def toggle(self, ctx, integration: str):
         """Toggle different integrations like antiphishing"""
         if integration.lower() == "antiphishing":
@@ -129,12 +133,15 @@ class StatusRotator(commands.Cog):
             await self.config.antiphishing_status_enabled.set(self.antiphishing_status_enabled)
             if self.antiphishing_status_enabled:
                 self.bot.loop.create_task(self.enable_antiphishing_status())
-                await ctx.send("Antiphishing status has been enabled.")
+                embed = discord.Embed(description="Antiphishing status has been enabled.", color=discord.Color.green())
+                await ctx.send(embed=embed)
             else:
                 self.statuses = [status for status in self.statuses if "bad domains" not in status()]
-                await ctx.send("Antiphishing status has been disabled.")
+                embed = discord.Embed(description="Antiphishing status has been disabled.", color=discord.Color.red())
+                await ctx.send(embed=embed)
         else:
-            await ctx.send(f"Unknown integration: {integration}")
+            embed = discord.Embed(description=f"Unknown integration: {integration}", color=discord.Color.orange())
+            await ctx.send(embed=embed)
 
     @commands.Cog.listener()
     async def on_message(self, message):
