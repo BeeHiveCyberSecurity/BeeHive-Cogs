@@ -76,16 +76,14 @@ class FotD(commands.Cog):
                 all_facts.extend(facts)
             if all_facts:
                 fact = random.choice(all_facts)
-                response_count = await self.config.guild(guild).response_count()
                 embed = discord.Embed(
                     title="Fact of the Day",
-                    description=f"Yesterday's fact received **{response_count}** responses.\n\nToday's fact is... **{fact}**",
+                    description=f"Today's fact is... **{fact}**",
                     color=0xfffffe
                 )
                 message_content = f"{mention_role.mention}" if mention_role else ""
                 allowed_mentions = discord.AllowedMentions(roles=True) if mention_role else None
                 await channel.send(content=message_content, embed=embed, allowed_mentions=allowed_mentions)
-                await self.config.guild(guild).response_count.set(0)
                 await self.config.guild(guild).current_fact.set(fact)
             else:
                 await channel.send(embed=discord.Embed(
@@ -261,7 +259,5 @@ class FotD(commands.Cog):
             return
         current_fact = await self.config.guild(message.guild).current_fact()
         if current_fact:
-            response_count = await self.config.guild(message.guild).response_count()
-            response_count += 1
-            await self.config.guild(message.guild).response_count.set(response_count)
+            return
 
