@@ -19,12 +19,12 @@ class StatusRotator(commands.Cog):
             lambda: f"Guarding {len(self.bot.guilds)} server{'s' if len(self.bot.guilds) != 1 else ''}",
             lambda: f"Moderating {len(self.bot.users):,} user{'s' if len(self.bot.users) != 1 else ''}",
             self.get_message_count_status,
-            self.get_uptime_status,  # New status added here
-            self.get_latency_status  # Another unique status added here
+            self.get_uptime_status,
+            self.get_latency_status  
         ]
         self.message_log = deque()
         self.bot.loop.create_task(self.load_settings())
-        self.start_time = datetime.utcnow()  # Track bot start time
+        self.start_time = datetime.utcnow()
         self.presence_states = [discord.Status.online, discord.Status.idle, discord.Status.dnd]
         self.current_presence_index = 0
 
