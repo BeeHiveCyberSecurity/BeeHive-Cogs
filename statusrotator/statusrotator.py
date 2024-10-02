@@ -51,7 +51,7 @@ class StatusRotator(commands.Cog):
                 presence_state = self.presence_states[self.current_presence_index]
                 await self.bot.change_presence(activity=activity, status=presence_state)
                 self.current_presence_index = (self.current_presence_index + 1) % len(self.presence_states)
-                await asyncio.sleep(120)  # Change status every 120 seconds
+                await asyncio.sleep(240)  # Change status every 240 seconds
 
     async def fetch_blocked_domains_count(self):
         url = "https://www.beehive.systems/hubfs/blocklist/blocklist.json"
