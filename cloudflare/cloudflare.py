@@ -1581,8 +1581,8 @@ class Cloudflare(commands.Cog):
                         embed.add_field(name="Risk Types", value=", ".join([f"**`{risk['name']}`**" for risk in result["risk_types"]]), inline=False)
 
                     # Add blocklist status
-                    blocklist_status = "Yes" if is_blocked else "No"
-                    embed.add_field(name="On BeeHive Blocklist", value=f"**`{blocklist_status}`**", inline=False)
+                    blocklist_status = ":white_check_mark: Yes" if is_blocked else ":x: No"
+                    embed.add_field(name="On BeeHive Blocklist", value=f"**{blocklist_status}**", inline=False)
 
                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/globe.png")
                     await ctx.send(embed=embed)
