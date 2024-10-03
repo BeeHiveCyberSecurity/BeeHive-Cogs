@@ -1131,7 +1131,7 @@ class Cloudflare(commands.Cog):
         """
         # Define registrar lists
         abuse_friendly_registrars = {"NameCheap, Inc.", "Spaceship"}
-        undetermined_registrars = {"", ""}
+        undetermined_registrars = {"Dynadot Inc", ""}
         not_receptive_registrars = {"", ""}
 
         api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
@@ -1207,7 +1207,7 @@ class Cloudflare(commands.Cog):
                 elif registrar_name in not_receptive_registrars:
                     abuse_status = "This registrar is known to refuse, ignore, or otherwise fail to engage with abuse reports"
                 else:
-                    abuse_status = "Unknown"
+                    abuse_status = "We don't have enough information about this registrar's abuse handling practices"
 
                 page = add_field_to_page(page, "Abuse Report Status", f"`{abuse_status}`")
 
