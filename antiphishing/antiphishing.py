@@ -19,7 +19,7 @@ class AntiPhishing(commands.Cog):
     Guard users from malicious links and phishing attempts with customizable protection options.
     """
 
-    __version__ = "1.6.0.0"
+    __version__ = "1.6.0.1"
     __last_updated__ = "October 2nd, 2024"
     __quick_notes__ = "We've added a new `timeout` punishment to automatically time a user out for a predetermined amount of time if they share a known dangerous link."
 
@@ -33,6 +33,7 @@ class AntiPhishing(commands.Cog):
             deletions=0,
             kicks=0,
             bans=0,
+            timeouts=0,  # Added timeout statistic
             autoban=3,
             last_updated=None,
             webhook=None,
@@ -237,6 +238,7 @@ class AntiPhishing(commands.Cog):
         deletions = await self.config.guild(ctx.guild).deletions()
         kicks = await self.config.guild(ctx.guild).kicks()
         bans = await self.config.guild(ctx.guild).bans()
+        timeouts = await self.config.guild(ctx.guild).timeouts()  # Added timeout statistic retrieval
         last_updated = self.__last_updated__
         patch_notes = self.__quick_notes__
         total_domains = len(self.domains)
@@ -246,6 +248,7 @@ class AntiPhishing(commands.Cog):
         s_deletions = "s" if deletions != 1 else ""
         s_kicks = "s" if kicks != 1 else ""
         s_bans = "s" if bans != 1 else ""
+        s_timeouts = "s" if timeouts != 1 else ""  # Added pluralization for timeouts
         
         last_updated_str = f"{last_updated}"
         
@@ -277,6 +280,11 @@ class AntiPhishing(commands.Cog):
         embed.add_field(
             name="Bans",
             value=f"Banned **{bans}** user{s_bans}",
+            inline=True
+        )
+        embed.add_field(
+            name="Timeouts",
+            value=f"Timed out **{timeouts}** user{s_timeouts}",  # Added timeout statistic display
             inline=True
         )
         embed.add_field(
@@ -525,6 +533,9 @@ class AntiPhishing(commands.Cog):
                     # Timeout the user for 10 minutes
                     timeout_duration = datetime.timedelta(minutes=30)
                     await message.author.timeout_for(timeout_duration, reason="Shared a known dangerous link")
+
+                timeouts = await self.config.guild(message.guild).timeouts()  # Retrieve current timeout count
+                await self.config.guild(message.guild).timeouts.set(timeouts + 1)  # Increment timeout count
 
     @commands.Cog.listener()
     async def on_message_edit(self, before: discord.Message, after: discord.Message):
