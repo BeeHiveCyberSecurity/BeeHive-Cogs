@@ -19,15 +19,20 @@ class NicknameManagement(commands.Cog):
         self.bot.loop.create_task(self.cleanup_nicknames())
 
     @commands.guild_only()
-    @commands.admin()
+    @commands.has_permissions(manage_nicknames=True)
     @commands.group()
     async def nickname(self, ctx):
         """Group command for nickname management."""
         pass
 
     @nickname.command()
+    @commands.has_permissions(manage_nicknames=True)
     async def purify(self, ctx, member: discord.Member):
         """Purify a member's nickname to allowed characters only."""
+        if not ctx.guild.me.guild_permissions.manage_nicknames:
+            await ctx.send("I do not have permission to manage nicknames.")
+            return
+
         guild_settings = await self.config.guild(ctx.guild).all()
         allowed_characters = guild_settings["allowed_characters"]
         purified_nickname = ''.join(c for c in member.display_name if c in allowed_characters)
@@ -46,8 +51,13 @@ class NicknameManagement(commands.Cog):
             await ctx.send(f"An error occurred: {e}")
 
     @nickname.command()
+    @commands.has_permissions(manage_nicknames=True)
     async def normalize(self, ctx, member: discord.Member):
         """Normalize a member's nickname to a standard format."""
+        if not ctx.guild.me.guild_permissions.manage_nicknames:
+            await ctx.send("I do not have permission to manage nicknames.")
+            return
+
         guild_settings = await self.config.guild(ctx.guild).all()
         allowed_characters = guild_settings["allowed_characters"]
         normalized_nickname = ''.join(c for c in member.display_name if c in allowed_characters).title()
@@ -66,18 +76,21 @@ class NicknameManagement(commands.Cog):
             await ctx.send(f"An error occurred: {e}")
 
     @nickname.command()
+    @commands.has_permissions(administrator=True)
     async def allowedchars(self, ctx, *, characters: str):
         """Set the allowed characters for nicknames."""
         await self.config.guild(ctx.guild).allowed_characters.set(characters)
         await ctx.send(f"Allowed characters set to: {characters}")
 
     @nickname.command()
+    @commands.has_permissions(administrator=True)
     async def maxlength(self, ctx, length: int):
         """Set the maximum length for nicknames."""
         await self.config.guild(ctx.guild).max_length.set(length)
         await ctx.send(f"Maximum nickname length set to: {length}")
 
     @nickname.command()
+    @commands.has_permissions(administrator=True)
     async def autopurify(self, ctx, enable: bool):
         """Enable or disable auto-purification of nicknames."""
         await self.config.guild(ctx.guild).auto_purify.set(enable)
@@ -85,8 +98,13 @@ class NicknameManagement(commands.Cog):
         await ctx.send(f"Auto-purification has been {status}.")
 
     @nickname.command()
+    @commands.has_permissions(manage_nicknames=True)
     async def cleanup(self, ctx):
         """Clean up all pre-existing nicknames in the server slowly to prevent rate limits."""
+        if not ctx.guild.me.guild_permissions.manage_nicknames:
+            await ctx.send("I do not have permission to manage nicknames.")
+            return
+
         await ctx.send("Starting nickname cleanup. This may take a while...")
         guild_settings = await self.config.guild(ctx.guild).all()
         allowed_characters = guild_settings["allowed_characters"]
