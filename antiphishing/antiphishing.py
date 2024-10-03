@@ -19,9 +19,9 @@ class AntiPhishing(commands.Cog):
     Guard users from malicious links and phishing attempts with customizable protection options.
     """
 
-    __version__ = "1.5.9.9"
-    __last_updated__ = "September 18, 2024"
-    __quick_notes__ = "We've more than quadrupled the amount of domains on the provided blocklist, adjusted notification appearance and function, and fixed assorted bugs found"
+    __version__ = "1.6.0.0"
+    __last_updated__ = "October 2nd, 2024"
+    __quick_notes__ = "We've added a new `timeout` punishment to automatically time a user out for a predetermined amount of time if they share a known dangerous link."
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -170,8 +170,9 @@ class AntiPhishing(commands.Cog):
         **`delete`** - Deletes the message
         **`kick`** - Delete message and kick sender
         **`ban`** - Delete message and ban sender (recommended)
+        **`timeout`** - Temporarily mute the user
         """
-        valid_actions = ["ignore", "notify", "delete", "kick", "ban"]
+        valid_actions = ["ignore", "notify", "delete", "kick", "ban", "timeout"]
         if action not in valid_actions:
             embed = discord.Embed(
                 title='Error: Invalid action',
@@ -181,7 +182,8 @@ class AntiPhishing(commands.Cog):
                     "`notify` - Alerts in channel when malicious links detected (default)\n"
                     "`delete` - Deletes the message\n"
                     "`kick` - Delete message and kick sender\n"
-                    "`ban` - Delete message and ban sender (recommended)\n\n"
+                    "`ban` - Delete message and ban sender (recommended)\n"
+                    "`timeout` - Temporarily mute the user\n\n"
                     "Retry that command with one of the above options."
                 ),
                 colour=16729413,
@@ -196,14 +198,16 @@ class AntiPhishing(commands.Cog):
             "notify": "Malicious links will now trigger a **notification** in the channel when detected.",
             "delete": "Malicious links will now be **deleted** from conversation when detected.",
             "kick": "Malicious links will be **deleted** and the sender will be **kicked** when detected.",
-            "ban": "Malicious links will be **deleted** and the sender will be **banned** when detected."
+            "ban": "Malicious links will be **deleted** and the sender will be **banned** when detected.",
+            "timeout": "Malicious links will result in the user being **temporarily muted**."
         }
         colours = {
             "ignore": 0xffd966,  # Yellow
             "notify": 0xffd966,  # Yellow
             "delete": 0xff4545,  # Red
             "kick": 0xff4545,  # Red
-            "ban": 0xff4545  # Red
+            "ban": 0xff4545,  # Red
+            "timeout": 0xffd966  # Yellow
         }
         
         thumbnail_urls = {
@@ -211,7 +215,8 @@ class AntiPhishing(commands.Cog):
             "notify": "https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/notifications.png",
             "delete": "https://www.beehive.systems/hubfs/Icon%20Packs/Red/trash.png",
             "kick": "https://www.beehive.systems/hubfs/Icon%20Packs/Red/footsteps.png",
-            "ban": "https://www.beehive.systems/hubfs/Icon%20Packs/Red/ban.png"
+            "ban": "https://www.beehive.systems/hubfs/Icon%20Packs/Red/ban.png",
+            "timeout": "https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/clock.png"
         }
 
         description = descriptions[action]
@@ -507,6 +512,19 @@ class AntiPhishing(commands.Cog):
 
                 bans = await self.config.guild(message.guild).bans()
                 await self.config.guild(message.guild).bans.set(bans + 1)
+        elif action == "timeout":
+            if message.channel.permissions_for(message.guild.me).moderate_members:
+                with contextlib.suppress(discord.NotFound):
+                    await message.delete()
+                    if (
+                        message.author.top_role >= message.guild.me.top_role
+                        or message.author == message.guild.owner
+                    ):
+                        return
+
+                    # Timeout the user for 10 minutes
+                    timeout_duration = datetime.timedelta(minutes=30)
+                    await message.author.timeout_for(timeout_duration, reason="Shared a known dangerous link")
 
     @commands.Cog.listener()
     async def on_message_edit(self, before: discord.Message, after: discord.Message):
