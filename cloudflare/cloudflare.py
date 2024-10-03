@@ -1468,7 +1468,7 @@ class Cloudflare(commands.Cog):
                 button = discord.ui.Button(label="Registrant", url=whois_info["registrant_referral_url"])
                 view.add_item(button)
             if "registrar_referral_url" in whois_info:
-                button = discord.ui.Button(label="Registrar", url=whois_info["registrar_referral_url"])
+                button = discord.ui.Button(label="Visit registrar", url=whois_info["registrar_referral_url"])
                 view.add_item(button)
             if "technical_referral_url" in whois_info:
                 button = discord.ui.Button(label="Technical", url=whois_info["technical_referral_url"])
@@ -1511,7 +1511,7 @@ class Cloudflare(commands.Cog):
 
     @intel.command(name="domain")
     async def querydomain(self, ctx, domain: str):
-        """Query Cloudflare API for domain intelligence."""
+        """Query Cloudflare API for domain intelligence and check blocklist status."""
         
         # Check if the input is an IP address
         try:
@@ -1521,6 +1521,18 @@ class Cloudflare(commands.Cog):
             return
         except ValueError:
             pass  # Not an IP address, continue with query
+
+        # Fetch the blocklist from the web
+        blocklist_url = "https://www.beehive.systems/hubfs/blocklist/blocklist.json"
+        async with self.session.get(blocklist_url) as blocklist_response:
+            if blocklist_response.status == 200:
+                blocklist = await blocklist_response.json()
+            else:
+                embed = discord.Embed(title="Error", description="Failed to fetch the blocklist.", color=0xff4545)
+                await ctx.send(embed=embed)
+                return
+        
+        is_blocked = domain in blocklist
 
         api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
         email = api_tokens.get("email")
@@ -1567,6 +1579,10 @@ class Cloudflare(commands.Cog):
                         embed.add_field(name="Inherited Risk Types", value=", ".join([f"**`{risk['name']}`**" for risk in result["inherited_risk_types"]]), inline=False)
                     if "risk_types" in result:
                         embed.add_field(name="Risk Types", value=", ".join([f"**`{risk['name']}`**" for risk in result["risk_types"]]), inline=False)
+
+                    # Add blocklist status
+                    blocklist_status = "Yes" if is_blocked else "No"
+                    embed.add_field(name="On BeeHive Blocklist", value=f"**`{blocklist_status}`**", inline=False)
 
                     embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/globe.png")
                     await ctx.send(embed=embed)
