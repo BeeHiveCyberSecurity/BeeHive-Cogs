@@ -304,16 +304,13 @@ class TikTokLiveCog(commands.Cog):
         try:
             guild_id = message.guild.id
             auto_download = await self.config.guild_from_id(guild_id).auto_download()
-            if auto_download and (
-                "https://www.tiktok.com/t/" in message.content or 
-                "https://vt.tiktok.com/" in message.content or 
-                "https://vm.tiktok.com/" in message.content
-            ):
-                # Truncate the message content to prevent "file name too long" error
-                truncated_content = message.content[:255]
-                await self.download_video(message.channel, truncated_content)
-                # Delete the URL from the message content
-                await message.delete()
+            if auto_download:
+                # Check for complete TikTok URLs
+                urls = [word for word in message.content.split() if word.startswith("https://www.tiktok.com/") or word.startswith("https://vt.tiktok.com/") or word.startswith("https://vm.tiktok.com/")]
+                for url in urls:
+                    await self.download_video(message.channel, url)
+                if urls:
+                    await message.delete()
         except Exception as e:
             logging.error(f"Error in on_message: {e}")
 
