@@ -1200,7 +1200,8 @@ class Cloudflare(commands.Cog):
                 # Determine abuse report status
                 registrar_name = whois_info['registrar']
                 if registrar_name in abuse_friendly_registrars:
-                    abuse_status = "This registrar is known receptive and helpful to abuse reports"
+                    abuse_contact_email = whois_info.get('abuse_contact_email', 'N/A')
+                    abuse_status = f"This registrar is known receptive and helpful to abuse reports. You can report abuse to: {abuse_contact_email}"
                 elif registrar_name in undetermined_registrars:
                     abuse_status = "We don't have enough history with this registrar to determine how helpful they are with abuse reports"
                 elif registrar_name in not_receptive_registrars:
