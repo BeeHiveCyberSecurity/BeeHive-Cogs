@@ -1194,13 +1194,13 @@ class Cloudflare(commands.Cog):
                 return page
 
             if "registrar" in whois_info:
-                registrar_value = f"**`{whois_info['registrar']}`**"
+                registrar_value = f"`{whois_info['registrar']}`"
                 page = add_field_to_page(page, "Registrar", registrar_value)
 
                 # Determine abuse report status
                 registrar_name = whois_info['registrar']
                 if registrar_name in abuse_friendly_registrars:
-                    abuse_contact_email = whois_info.get('abuse_contact_email', 'N/A')
+                    abuse_contact_email = whois_info.get('registrar_email', 'N/A')
                     abuse_status = f"This registrar is known receptive and helpful to abuse reports. You can report abuse to: {abuse_contact_email}"
                 elif registrar_name in undetermined_registrars:
                     abuse_status = "We don't have enough history with this registrar to determine how helpful they are with abuse reports"
@@ -1209,7 +1209,7 @@ class Cloudflare(commands.Cog):
                 else:
                     abuse_status = "Unknown"
 
-                page = add_field_to_page(page, "Abuse Report Status", f"**`{abuse_status}`**")
+                page = add_field_to_page(page, "Abuse Report Status", f"`{abuse_status}`")
 
             # Add other fields as before
             if "administrative_city" in whois_info:
