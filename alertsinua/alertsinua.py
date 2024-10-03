@@ -40,10 +40,8 @@ class WarActivity(commands.Cog):
                             await self.send_alerts(guild_id, new_posts)
                             new_last_alert_id = max(post["i"] for post in new_posts)
                             await self.config.guild_from_id(guild_id).last_alert_id.set(new_last_alert_id)
-                    else:
-                        new_posts = []
-            except aiohttp.ClientError:
-                new_posts = []
+            except aiohttp.ClientError as e:
+                print(f"Error fetching war activity: {e}")
 
     async def send_alerts(self, guild_id, new_posts):
         alert_channel_id = await self.config.guild_from_id(guild_id).alert_channel_id()
@@ -116,6 +114,6 @@ class WarActivity(commands.Cog):
                             await ctx.send("No recent war activity found.")
                     else:
                         await ctx.send("Failed to fetch war activity.")
-            except aiohttp.ClientError:
-                await ctx.send("Error occurred while fetching war activity.")
+            except aiohttp.ClientError as e:
+                await ctx.send(f"Error occurred while fetching war activity: {e}")
 
