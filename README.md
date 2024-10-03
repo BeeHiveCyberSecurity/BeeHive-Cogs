@@ -1,4 +1,6 @@
 # Welcome to BeeHive-Cogs
+![GitHub Issues or Pull Requests](https://img.shields.io/github/issues/BeeHiveCyberSecurity/BeeHive-Cogs)
+
 > Enjoy these cogs? Please consider [supporting them financially](https://donate.stripe.com/eVag0y2kI9BI36McNa) with a donation of any amount to help keep them maintained.
 
 ## About this repo
