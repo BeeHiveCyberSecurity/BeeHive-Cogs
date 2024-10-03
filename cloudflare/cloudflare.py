@@ -1129,6 +1129,11 @@ class Cloudflare(commands.Cog):
         """
         Query WHOIS information for a given domain.
         """
+        # Define registrar lists
+        abuse_friendly_registrars = {"NameCheap, Inc.", "Spaceship"}
+        undetermined_registrars = {"", ""}
+        not_receptive_registrars = {"", ""}
+
         api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
         email = api_tokens.get("email")
         api_key = api_tokens.get("api_key")
@@ -1188,6 +1193,24 @@ class Cloudflare(commands.Cog):
                     field_count = 0
                 return page
 
+            if "registrar" in whois_info:
+                registrar_value = f"**`{whois_info['registrar']}`**"
+                page = add_field_to_page(page, "Registrar", registrar_value)
+
+                # Determine abuse report status
+                registrar_name = whois_info['registrar']
+                if registrar_name in abuse_friendly_registrars:
+                    abuse_status = "This registrar is known receptive and helpful to abuse reports"
+                elif registrar_name in undetermined_registrars:
+                    abuse_status = "We don't have enough history with this registrar to determine how helpful they are with abuse reports"
+                elif registrar_name in not_receptive_registrars:
+                    abuse_status = "This registrar is known to refuse, ignore, or otherwise fail to engage with abuse reports"
+                else:
+                    abuse_status = "Unknown"
+
+                page = add_field_to_page(page, "Abuse Report Status", f"**`{abuse_status}`**")
+
+            # Add other fields as before
             if "administrative_city" in whois_info:
                 administrative_city_value = f"**`{whois_info['administrative_city']}`**"
                 page = add_field_to_page(page, "Administrative City", administrative_city_value)
@@ -1357,9 +1380,6 @@ class Cloudflare(commands.Cog):
             if "registrant_street" in whois_info:
                 registrant_street = f"**`{whois_info['registrant_street']}`**"
                 page = add_field_to_page(page, "Registrant Street", registrant_street)
-            if "registrar" in whois_info:
-                registrar_value = f"**`{whois_info['registrar']}`**"
-                page = add_field_to_page(page, "Registrar", registrar_value)
             if "registrar_city" in whois_info:
                 registrar_city = f"**`{whois_info['registrar_city']}`**"
                 page = add_field_to_page(page, "Registrar City", registrar_city)
