@@ -1130,7 +1130,7 @@ class Cloudflare(commands.Cog):
         Query WHOIS information for a given domain.
         """
         # Define registrar lists
-        abuse_friendly_registrars = {"NameCheap, Inc.", "Spaceship"}
+        abuse_friendly_registrars = {"NameCheap, Inc.", "Spaceship", "Namecheap"}
         undetermined_registrars = {"Dynadot Inc", ""}
         not_receptive_registrars = {"", ""}
 
@@ -1207,41 +1207,41 @@ class Cloudflare(commands.Cog):
                 elif registrar_name in not_receptive_registrars:
                     abuse_status = "This registrar is known to refuse, ignore, or otherwise fail to engage with abuse reports"
                 else:
-                    abuse_status = "We don't have enough information about this registrar's abuse handling practices"
+                    abuse_status = "We don't have enough history with this registrar to determine how helpful they are with abuse reports"
 
                 page = add_field_to_page(page, "Abuse Report Status", f"`{abuse_status}`")
 
             # Add other fields as before
             if "administrative_city" in whois_info:
                 administrative_city_value = f"**`{whois_info['administrative_city']}`**"
-                page = add_field_to_page(page, "Administrative City", administrative_city_value)
+                page = add_field_to_page(page, "Admin city", administrative_city_value)
             if "administrative_country" in whois_info:
                 administrative_country_value = f"**`{whois_info['administrative_country']}`**"
-                page = add_field_to_page(page, "Administrative Country", administrative_country_value)
+                page = add_field_to_page(page, "Admin country", administrative_country_value)
             if "administrative_email" in whois_info:
                 administrative_email_value = f"**`{whois_info['administrative_email']}`**"
-                page = add_field_to_page(page, "Administrative Email", administrative_email_value)
+                page = add_field_to_page(page, "Admin email", administrative_email_value)
             if "administrative_fax" in whois_info:
                 administrative_fax_value = f"**`{whois_info['administrative_fax']}`**"
-                page = add_field_to_page(page, "Administrative Fax", administrative_fax_value)
+                page = add_field_to_page(page, "Admin fax", administrative_fax_value)
             if "administrative_fax_ext" in whois_info:
                 administrative_fax_ext_value = f"**`{whois_info['administrative_fax_ext']}`**"
-                page = add_field_to_page(page, "Administrative Fax Ext", administrative_fax_ext_value)
+                page = add_field_to_page(page, "Admin fax ext", administrative_fax_ext_value)
             if "administrative_id" in whois_info:
                 administrative_id_value = f"**`{whois_info['administrative_id']}`**"
-                page = add_field_to_page(page, "Administrative ID", administrative_id_value)
+                page = add_field_to_page(page, "Admin ID", administrative_id_value)
             if "administrative_name" in whois_info:
                 administrative_name_value = f"**`{whois_info['administrative_name']}`**"
-                page = add_field_to_page(page, "Administrative Name", administrative_name_value)
+                page = add_field_to_page(page, "Admin name", administrative_name_value)
             if "administrative_org" in whois_info:
                 administrative_org_value = f"**`{whois_info['administrative_org']}`**"
-                page = add_field_to_page(page, "Administrative Org", administrative_org_value)
+                page = add_field_to_page(page, "Admin org", administrative_org_value)
             if "administrative_phone" in whois_info:
                 administrative_phone_value = f"**`{whois_info['administrative_phone']}`**"
-                page = add_field_to_page(page, "Administrative Phone", administrative_phone_value)
+                page = add_field_to_page(page, "Admin phone", administrative_phone_value)
             if "administrative_phone_ext" in whois_info:
                 administrative_phone_ext_value = f"**`{whois_info['administrative_phone_ext']}`**"
-                page = add_field_to_page(page, "Administrative Phone Ext", administrative_phone_ext_value)
+                page = add_field_to_page(page, "Admin phone ext", administrative_phone_ext_value)
             if "administrative_postal_code" in whois_info:
                 administrative_postal_code_value = f"**`{whois_info['administrative_postal_code']}`**"
                 page = add_field_to_page(page, "Administrative Postal Code", administrative_postal_code_value)
