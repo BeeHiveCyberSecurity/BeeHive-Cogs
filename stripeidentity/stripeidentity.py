@@ -245,12 +245,12 @@ class StripeIdentity(commands.Cog):
         except Exception as e:
             await self.send_embed(ctx, f":x: **An unexpected error occurred**\n`{str(e)}`", discord.Color(0xff4545))
 
-    @commands.command(name="identitycheck")
+    @commands.command(name="idcheck")
     @commands.guild_only()
     @checks.admin_or_permissions(manage_guild=True)
     async def identity_check(self, ctx: commands.Context, user: discord.Member):
         """
-        Perform a biometric verification of a Discord user's identity.
+        Perform a biometric verification of a Discord user's real-life identity.
         """
         await ctx.message.delete()
         async with ctx.typing():
@@ -361,7 +361,7 @@ class StripeIdentity(commands.Cog):
                         verification_channel = self.bot.get_channel(self.verification_channel_id)
                         result_embed = discord.Embed(title="Identity Verification Result", color=discord.Color.blue())
                         result_embed.add_field(name="User", value=f"{user} ({user.id})", inline=False)
-                        result_embed.add_field(name="Document Status", value=session.last_verification_report.document.status, inline=False)
+                        result_embed.add_field(name="Document status", value=session.last_verification_report.document.status, inline=False)
                         result_embed.add_field(name="Name", value=session.last_verification_report.document.name, inline=False)
                         result_embed.add_field(name="DOB", value=session.last_verification_report.document.dob, inline=False)
                         result_embed.add_field(name="Address", value=session.last_verification_report.document.address, inline=False)
