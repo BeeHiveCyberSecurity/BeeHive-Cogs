@@ -186,8 +186,8 @@ class StripeIdentity(commands.Cog):
                 session = stripe.identity.VerificationSession.retrieve(session_id)
                 if session.status == 'requires_input' and session.last_error:
                     for event in session.last_error:
-                        if event.code in ['consent_declined', 'device_unsupported', 'under_supported_age', 'phone_otp_declined', 'email_verification_declined']:
-                            return event.code, session
+                        if event['code'] in ['consent_declined', 'device_unsupported', 'under_supported_age', 'phone_otp_declined', 'email_verification_declined']:
+                            return event['code'], session
                 return session.status, session
 
             for _ in range(15):  # Check every minute for 15 minutes
@@ -203,33 +203,30 @@ class StripeIdentity(commands.Cog):
                     break
                 elif status == 'verified':
                     verification_channel = self.bot.get_channel(self.verification_channel_id)
-                    if verification_channel:
-                        dob = datetime.fromisoformat(session.last_verification_report.document.dob)
-                        age = (datetime.utcnow() - dob).days // 365
-                        if age < 18:
-                            dm_embed = discord.Embed(
-                                title="Underage user detected",
-                                description=(
-                                    "You are under 18 and cannot be verified.\n\n"
-                                    "You may return once you are 18 years of age or older...\n\n"
-                                    "**If you have any questions, please contact a staff member.**"
-                                ),
-                                color=discord.Color(0xff4545)
-                            )
-                            await user.send(embed=dm_embed)
-                        else:
-                            age_verified_role = ctx.guild.get_role(self.age_verified_role_id)
-                            if age_verified_role:
-                                await user.add_roles(age_verified_role, reason="Age verified as 18+")
-                            result_embed = discord.Embed(title="Age Verification Result", color=discord.Color(0x2BBD8E))
-                            result_embed.add_field(name="User", value=f"{user} ({user.id})", inline=False)
-                            result_embed.add_field(name="Age", value=str(age), inline=False)
-                            await verification_channel.send(embed=result_embed)
+                    dob = datetime.fromisoformat(session.last_verification_report.document.dob)
+                    age = (datetime.utcnow() - dob).days // 365
+                    if age < 18:
+                        dm_embed = discord.Embed(
+                            title="Underage user detected",
+                            description=(
+                                "You are under 18 and cannot be verified.\n\n"
+                                "You may return once you are 18 years of age or older...\n\n"
+                                "**If you have any questions, please contact a staff member.**"
+                            ),
+                            color=discord.Color(0xff4545)
+                        )
+                        await user.send(embed=dm_embed)
                     else:
+                        age_verified_role = ctx.guild.get_role(self.age_verified_role_id)
+                        if age_verified_role:
+                            await user.add_roles(age_verified_role, reason="Age verified as 18+")
                         result_embed = discord.Embed(title="Age Verification Result", color=discord.Color(0x2BBD8E))
                         result_embed.add_field(name="User", value=f"{user} ({user.id})", inline=False)
                         result_embed.add_field(name="Age", value=str(age), inline=False)
-                        await ctx.send(embed=result_embed)
+                        if verification_channel:
+                            await verification_channel.send(embed=result_embed)
+                        else:
+                            await ctx.send(embed=result_embed)
                     break
             else:
                 dm_embed = discord.Embed(
