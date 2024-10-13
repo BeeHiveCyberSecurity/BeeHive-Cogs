@@ -380,9 +380,9 @@ class StripeIdentity(commands.Cog):
                 await ctx.send(embed=embed)
 
     @commands.guild_only()
-    @commands.command(name="pendingverifications")
+    @commands.command(name="pending")
     @checks.admin_or_permissions(manage_guild=True)
-    async def pending_verifications(self, ctx):
+    async def pending(self, ctx):
         """Show all pending verifications for users in the guild."""
         pending_sessions = await self.config.pending_verification_sessions.all()
         guild_member_ids = {member.id for member in ctx.guild.members}
