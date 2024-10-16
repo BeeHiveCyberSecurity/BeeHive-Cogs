@@ -442,13 +442,13 @@ class StripeIdentity(commands.Cog):
             return
 
         embed = discord.Embed(description="Please choose the type of verification you would like to proceed with:", color=0xfffffe)
-        view = discord.ui.View()
+        view = discord.ui.View(timeout=None)  # Set timeout to None for persistence
         view.add_item(discord.ui.Button(label="Verify by ID number (US)", url=id_number_session.url, style=discord.ButtonStyle.link))
         view.add_item(discord.ui.Button(label="Verify by document (International)", url=document_session.url, style=discord.ButtonStyle.link))
         await ctx.send(embed=embed, view=view)
 
         completion_embed = discord.Embed(description="Click the button below once you have finished verifying and been told to return here.", color=discord.Color.blue())
-        completion_view = discord.ui.View()
+        completion_view = discord.ui.View(timeout=None)  # Set timeout to None for persistence
         completion_view.add_item(discord.ui.Button(label="Completed", style=discord.ButtonStyle.green, custom_id="completed_button"))
         await ctx.send(embed=completion_embed, view=completion_view)
 
@@ -470,7 +470,6 @@ class StripeIdentity(commands.Cog):
                 else:
                     await interaction.response.send_message("Verification not completed yet. Please try again later.", ephemeral=True)
 
-        self.bot.add_view(completion_view)
         self.bot.add_listener(handle_verification_completion, "on_interaction")
         
     async def check_verification_status(self, session_id):
