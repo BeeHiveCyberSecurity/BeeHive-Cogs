@@ -436,6 +436,10 @@ class StripeIdentity(commands.Cog):
             embed = discord.Embed(description=f"Failed to create a verification session: {e.user_message}", color=discord.Color(0xff4545))
             await ctx.send(embed=embed)
             return
+        except AttributeError as e:
+            embed = discord.Embed(description="An internal error occurred while processing your request. Please try again later.", color=discord.Color(0xff4545))
+            await ctx.send(embed=embed)
+            return
 
         embed = discord.Embed(description="Please choose the type of verification you would like to proceed with:", color=0xfffffe)
         view = discord.ui.View()
@@ -476,4 +480,3 @@ class StripeIdentity(commands.Cog):
             return session.status
         except stripe.error.StripeError as e:
             return None
-
