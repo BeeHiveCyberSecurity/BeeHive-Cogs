@@ -78,7 +78,8 @@ class Ping(commands.Cog):
             async with session.get("https://discordstatus.com/api/v2/status.json") as response:
                 if response.status == 200:
                     data = await response.json()
-                    last_updated = int(data['page']['updated_at'].timestamp())
+                    last_updated_str = data['page']['updated_at']
+                    last_updated = int(datetime.datetime.fromisoformat(last_updated_str.replace('Z', '+00:00')).timestamp())
                     return data['status']['indicator'] != 'none', data['status']['description'], last_updated
                 else:
                     return False, "Unable to fetch Discord status", 0
