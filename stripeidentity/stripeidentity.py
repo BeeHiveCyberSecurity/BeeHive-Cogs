@@ -378,6 +378,9 @@ class StripeIdentity(commands.Cog):
             except discord.HTTPException as e:
                 embed = discord.Embed(description=f"Failed to send DM to {user.display_name}: {e.text}", color=discord.Color(0xff4545))
                 await ctx.send(embed=embed)
+            except AttributeError as e:
+                embed = discord.Embed(description=f"An unexpected error occurred: {str(e)}", color=discord.Color(0xff4545))
+                await ctx.send(embed=embed)
 
     @commands.guild_only()
     @commands.command(name="pending")
