@@ -292,7 +292,7 @@ class StripeIdentity(commands.Cog):
                 decline_button = discord.ui.Button(label="Decline verification", style=discord.ButtonStyle.danger)
                 async def decline_verification(interaction: discord.Interaction):
                     if interaction.user.id == user.id:
-                        await interaction.response.send_message(f"You have declined the verification and have been banned from {ctx.guild.name}.", ephemeral=True)
+                        await interaction.response.send_message(f"You have declined the verification.", ephemeral=True)
                         await ctx.guild.ban(user, reason="User declined identity verification")
                         await self.config.pending_verification_sessions.clear_raw(str(user.id))
                 decline_button.callback = decline_verification

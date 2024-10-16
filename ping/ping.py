@@ -34,10 +34,6 @@ class Ping(commands.Cog):
         embed = discord.Embed(title=embed_title, description=embed_description, color=embed_color)
         embed.add_field(name="Latency information", value="", inline=False)
         embed.add_field(name="Network & transit", value=f"**{avg_latency}ms**", inline=True)
-        if discord_status:
-            embed.add_field(name="Discord Status", value=f"**Issues Detected**: {discord_description}", inline=False)
-        else:
-            embed.add_field(name="Discord Status", value="**All Systems Operational**", inline=False)
         initial_message = await ctx.send(embed=embed)
 
         # Run speedtest in the background
@@ -68,6 +64,12 @@ class Ping(commands.Cog):
         embed.add_field(name="Speedtest results", value="", inline=False)
         embed.add_field(name="Bot download", value=f"**{download_speed} Mbps**", inline=True)
         embed.add_field(name="Bot upload", value=f"**{upload_speed} Mbps**", inline=True)
+        
+        # Add Discord status to the final embed
+        if discord_status:
+            embed.add_field(name="Discord status", value=f":warning: **Issues have been reported**: {discord_description}", inline=False)
+        else:
+            embed.add_field(name="Discord status", value=":white_check_mark: **No outages reported**", inline=False)
 
         await initial_message.edit(embed=embed)
 
