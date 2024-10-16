@@ -430,7 +430,7 @@ class StripeIdentity(commands.Cog):
             document_session = stripe.identity.VerificationSession.create(
                 type='document',
                 metadata={'user_id': str(ctx.author.id)},
-                document={'allowed_types': ['driving_license', 'passport', 'id_card']}
+                options={'document': {'allowed_types': ['driving_license', 'passport', 'id_card']}}
             )
         except stripe.error.StripeError as e:
             embed = discord.Embed(description=f"Failed to create a verification session: {e.user_message}", color=discord.Color(0xff4545))
