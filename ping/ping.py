@@ -70,7 +70,7 @@ class Ping(commands.Cog):
         if discord_status:
             embed.add_field(name="Discord status", value=f":warning: **Issues have been reported** as of **<t:{last_updated}:R>**", inline=False)
         else:
-            embed.add_field(name="Discord status", value=f":white_check_mark: **No outages reported** as of **<t:{last_updated}:R>**", inline=False)
+            embed.add_field(name="Discord status", value=f":white_check_mark: **All services operational** as of **<t:{last_updated}:R>**", inline=False)
 
         await initial_message.edit(embed=embed)
 
