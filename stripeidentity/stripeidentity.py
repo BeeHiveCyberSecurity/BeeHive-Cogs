@@ -418,51 +418,44 @@ class StripeIdentity(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.guild_only()
-    @commands.command(name="verifyme")
-    async def verifyme(self, ctx):
-        """Allows a user to self-verify their age/ID."""
-            
-        async def handle_interaction(interaction):
-            if interaction.user != ctx.author:
-                return await interaction.response.send_message("This button is not for you.", ephemeral=True)
-                
-            if interaction.custom_id == "yes_button":
-                try:
-                    session = stripe.identity.VerificationSession.create(
-                        type='id_number',
-                        metadata={'user_id': str(ctx.author.id)}
-                    )
-                    embed = discord.Embed(description=f"ID number verification session created. Please complete the verification using this link: {session.url}", color=discord.Color.green())
-                    await ctx.send(embed=embed)
-                except stripe.error.StripeError as e:
-                    embed = discord.Embed(description=f"Failed to create an ID number verification session: {e.user_message}", color=discord.Color(0xff4545))
-                    await ctx.send(embed=embed)
-            elif interaction.custom_id == "no_button":
-                try:
-                    session = stripe.identity.VerificationSession.create(
-                        type='document',
-                        metadata={'user_id': str(ctx.author.id)},
-                        document={'allowed_types': ['driving_license', 'passport', 'id_card']}
-                    )
-                    embed = discord.Embed(description=f"Document verification session created. Please complete the verification using this link: {session.url}", color=discord.Color.green())
-                    await ctx.send(embed=embed)
-                except stripe.error.StripeError as e:
-                    embed = discord.Embed(description=f"Failed to create a document verification session: {e.user_message}", color=discord.Color(0xff4545))
-                    await ctx.send(embed=embed)
-            await interaction.response.defer()
+    @commands.command(name="attest")
+    async def attest(self, ctx):
+        """Allows a user to self-attest their government issued ID for analysis"""
+        
+        try:
+            id_number_session = stripe.identity.VerificationSession.create(
+                type='id_number',
+                metadata={'user_id': str(ctx.author.id)}
+            )
+            document_session = stripe.identity.VerificationSession.create(
+                type='document',
+                metadata={'user_id': str(ctx.author.id)},
+                document={'allowed_types': ['driving_license', 'passport', 'id_card']}
+            )
+        except stripe.error.StripeError as e:
+            embed = discord.Embed(description=f"Failed to create a verification session: {e.user_message}", color=discord.Color(0xff4545))
+            await ctx.send(embed=embed)
+            return
+
+        embed = discord.Embed(description="Please choose the type of verification you would like to proceed with:", color=discord.Color.blue())
+        view = discord.ui.View()
+        view.add_item(discord.ui.Button(label="ID Number Verification", url=id_number_session.url, style=discord.ButtonStyle.link))
+        view.add_item(discord.ui.Button(label="Document Verification", url=document_session.url, style=discord.ButtonStyle.link))
+        await ctx.send(embed=embed, view=view)
+
+        completion_embed = discord.Embed(description="Click the button below once you have finished verifying and been told to return here.", color=discord.Color.blue())
+        completion_view = discord.ui.View()
+        completion_view.add_item(discord.ui.Button(label="Completed", style=discord.ButtonStyle.green, custom_id="completed_button"))
+        await ctx.send(embed=completion_embed, view=completion_view)
 
         async def handle_verification_completion(interaction):
             if interaction.user != ctx.author:
                 return await interaction.response.send_message("This button is not for you.", ephemeral=True)
             
             if interaction.custom_id == "completed_button":
-                try:
-                    session_id = interaction.message.embeds[0].description.split("session: ")[1]
-                except IndexError:
-                    return await interaction.response.send_message("Invalid session ID in the message.", ephemeral=True)
-                
-                verification_status = await self.check_verification_status(session_id)
-                if verification_status == "verified":
+                verification_status_id = await self.check_verification_status(id_number_session.id)
+                verification_status_doc = await self.check_verification_status(document_session.id)
+                if verification_status_id == "verified" or verification_status_doc == "verified":
                     age_verification_role = discord.utils.get(ctx.guild.roles, name="Age Verified")
                     id_verification_role = discord.utils.get(ctx.guild.roles, name="ID Verified")
                     if age_verification_role:
@@ -472,20 +465,6 @@ class StripeIdentity(commands.Cog):
                     await interaction.response.send_message("Verification completed and roles assigned.", ephemeral=True)
                 else:
                     await interaction.response.send_message("Verification not completed yet. Please try again later.", ephemeral=True)
-
-        embed = discord.Embed(description="Do you have a United States issued ID?", color=discord.Color.blue())
-        view = discord.ui.View()
-        view.add_item(discord.ui.Button(label="Yes", style=discord.ButtonStyle.green, custom_id="yes_button"))
-        view.add_item(discord.ui.Button(label="No", style=discord.ButtonStyle.red, custom_id="no_button"))
-        await ctx.send(embed=embed, view=view)
-
-        self.bot.add_view(view)
-        self.bot.add_listener(handle_interaction, "on_interaction")
-
-        completion_embed = discord.Embed(description="Click the button below once you have finished verifying and been told to return here.", color=discord.Color.blue())
-        completion_view = discord.ui.View()
-        completion_view.add_item(discord.ui.Button(label="Completed", style=discord.ButtonStyle.green, custom_id="completed_button"))
-        await ctx.send(embed=completion_embed, view=completion_view)
 
         self.bot.add_view(completion_view)
         self.bot.add_listener(handle_verification_completion, "on_interaction")
