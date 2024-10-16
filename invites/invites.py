@@ -309,7 +309,8 @@ class Invites(commands.Cog):
                     i -= 1
                 elif str(reaction.emoji) == "❌":
                     await message.delete()
-                    break
+                    # return instead of breaking so we don't try to clear reactions on a message that no longer exists
+                    return
 
                 i = i % len(pages)
 
