@@ -3,6 +3,7 @@ import speedtest  # type: ignore
 from redbot.core import commands  # type: ignore
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
+import aiohttp
 
 class Ping(commands.Cog):
     def __init__(self, bot):
@@ -21,10 +22,22 @@ class Ping(commands.Cog):
             self.latency_history.pop(0)
         avg_latency = round(sum(self.latency_history) / len(self.latency_history), 2)
 
+        # Pre-fill variables for embed
+        embed_color = discord.Color(0xfffffe)
+        embed_title = "Evaluating connection"
+        embed_description = "Please wait while we gather the speedtest results."
+
+        # Check for Discord status
+        discord_status, discord_description = await self.check_discord_status()
+
         # Send initial response with latency information
-        embed = discord.Embed(title="Evaluating connection", description="Please wait while we gather the speedtest results.", color=discord.Color(0xfffffe))
+        embed = discord.Embed(title=embed_title, description=embed_description, color=embed_color)
         embed.add_field(name="Latency information", value="", inline=False)
         embed.add_field(name="Network & transit", value=f"**{avg_latency}ms**", inline=True)
+        if discord_status:
+            embed.add_field(name="Discord Status", value=f"**Issues Detected**: {discord_description}", inline=False)
+        else:
+            embed.add_field(name="Discord Status", value="**All Systems Operational**", inline=False)
         initial_message = await ctx.send(embed=embed)
 
         # Run speedtest in the background
@@ -57,6 +70,15 @@ class Ping(commands.Cog):
         embed.add_field(name="Bot upload", value=f"**{upload_speed} Mbps**", inline=True)
 
         await initial_message.edit(embed=embed)
+
+    async def check_discord_status(self):
+        async with aiohttp.ClientSession() as session:
+            async with session.get("https://discordstatus.com/api/v2/status.json") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    return data['status']['indicator'] != 'none', data['status']['description']
+                else:
+                    return False, "Unable to fetch Discord status"
 
     def run_speedtest(self):
         st = speedtest.Speedtest(secure=True)
