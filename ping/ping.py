@@ -28,7 +28,7 @@ class Ping(commands.Cog):
         embed_description = "Please wait while we gather the speedtest results."
 
         # Check for Discord status
-        discord_status, discord_description = await self.check_discord_status()
+        discord_status, discord_description, last_updated = await self.check_discord_status()
 
         # Send initial response with latency information
         embed = discord.Embed(title=embed_title, description=embed_description, color=embed_color)
@@ -67,9 +67,9 @@ class Ping(commands.Cog):
         
         # Add Discord status to the final embed
         if discord_status:
-            embed.add_field(name="Discord status", value=f":warning: **Issues have been reported**: {discord_description}", inline=False)
+            embed.add_field(name="Discord status", value=f":warning: **Issues have been reported**: {discord_description}\nLast updated: <t:{last_updated}:R>", inline=False)
         else:
-            embed.add_field(name="Discord status", value=":white_check_mark: **No outages reported**", inline=False)
+            embed.add_field(name="Discord status", value=f":white_check_mark: **No outages reported**\nLast updated: <t:{last_updated}:R>", inline=False)
 
         await initial_message.edit(embed=embed)
 
@@ -78,9 +78,10 @@ class Ping(commands.Cog):
             async with session.get("https://discordstatus.com/api/v2/status.json") as response:
                 if response.status == 200:
                     data = await response.json()
-                    return data['status']['indicator'] != 'none', data['status']['description']
+                    last_updated = int(data['page']['updated_at'].timestamp())
+                    return data['status']['indicator'] != 'none', data['status']['description'], last_updated
                 else:
-                    return False, "Unable to fetch Discord status"
+                    return False, "Unable to fetch Discord status", 0
 
     def run_speedtest(self):
         st = speedtest.Speedtest(secure=True)
