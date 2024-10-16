@@ -60,7 +60,7 @@ class Ping(commands.Cog):
         embed = discord.Embed(title=embed_title, description=embed_description, color=embed_color)
         embed.add_field(name="Latency information", value="", inline=False)
         embed.add_field(name="Host", value=f"**{ping}ms**", inline=True)
-        embed.add_field(name="Network/Transit", value=f"**{avg_latency}ms**", inline=True)
+        embed.add_field(name="Network and transit", value=f"**{avg_latency}ms**", inline=True)
         embed.add_field(name="Speedtest results", value="", inline=False)
         embed.add_field(name="Bot download", value=f"**{download_speed} Mbps**", inline=True)
         embed.add_field(name="Bot upload", value=f"**{upload_speed} Mbps**", inline=True)
