@@ -437,10 +437,10 @@ class StripeIdentity(commands.Cog):
             await ctx.send(embed=embed)
             return
 
-        embed = discord.Embed(description="Please choose the type of verification you would like to proceed with:", color=discord.Color.blue())
+        embed = discord.Embed(description="Please choose the type of verification you would like to proceed with:", color=0xfffffe)
         view = discord.ui.View()
-        view.add_item(discord.ui.Button(label="ID Number Verification", url=id_number_session.url, style=discord.ButtonStyle.link))
-        view.add_item(discord.ui.Button(label="Document Verification", url=document_session.url, style=discord.ButtonStyle.link))
+        view.add_item(discord.ui.Button(label="Verify by ID number (US)", url=id_number_session.url, style=discord.ButtonStyle.link))
+        view.add_item(discord.ui.Button(label="Verify by document (International)", url=document_session.url, style=discord.ButtonStyle.link))
         await ctx.send(embed=embed, view=view)
 
         completion_embed = discord.Embed(description="Click the button below once you have finished verifying and been told to return here.", color=discord.Color.blue())
@@ -450,7 +450,7 @@ class StripeIdentity(commands.Cog):
 
         async def handle_verification_completion(interaction):
             if interaction.user != ctx.author:
-                return await interaction.response.send_message("This button is not for you.", ephemeral=True)
+                return await interaction.response.send_message("This button is not for you, nosey fuck.", ephemeral=True)
             
             if interaction.custom_id == "completed_button":
                 verification_status_id = await self.check_verification_status(id_number_session.id)
