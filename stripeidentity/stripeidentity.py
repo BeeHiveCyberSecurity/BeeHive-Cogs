@@ -335,6 +335,11 @@ class StripeIdentity(commands.Cog):
                         result_embed = discord.Embed(title="Identity Verification Result", color=discord.Color.blue())
                         result_embed.add_field(name="User", value=f"{user} ({user.id})", inline=False)
                         result_embed.add_field(name="Document Status", value=session.last_verification_report.document.status, inline=False)
+                        result_embed.add_field(name="Name", value=session.last_verification_report.document.name, inline=False)
+                        result_embed.add_field(name="DOB", value=session.last_verification_report.document.dob, inline=False)
+                        result_embed.add_field(name="Address", value=session.last_verification_report.document.address, inline=False)
+                        if hasattr(session, 'risk_insights'):
+                            result_embed.add_field(name="Risk Insights", value=str(session.risk_insights), inline=False)
                         if verification_channel:
                             await verification_channel.send(embed=result_embed)
                         else:
