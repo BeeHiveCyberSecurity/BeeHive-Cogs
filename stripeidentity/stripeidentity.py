@@ -462,18 +462,21 @@ class StripeIdentity(commands.Cog):
                 return await interaction.response.send_message("This button is not for you, nosey fuck.", ephemeral=True)
             
             if interaction.custom_id == "completed_button":
-                verification_status_id = await self.check_verification_status(id_number_session.id)
-                verification_status_doc = await self.check_verification_status(document_session.id)
-                if verification_status_id == "verified" or verification_status_doc == "verified":
-                    age_verification_role = discord.utils.get(ctx.guild.roles, name="Age Verified")
-                    id_verification_role = discord.utils.get(ctx.guild.roles, name="ID Verified")
-                    if age_verification_role:
-                        await ctx.author.add_roles(age_verification_role)
-                    if id_verification_role:
-                        await ctx.author.add_roles(id_verification_role)
-                    await interaction.response.send_message("Verification completed and roles assigned.", ephemeral=True)
-                else:
-                    await interaction.response.send_message("Verification not completed yet. Please try again later.", ephemeral=True)
+                try:
+                    verification_status_id = await self.check_verification_status(id_number_session.id)
+                    verification_status_doc = await self.check_verification_status(document_session.id)
+                    if verification_status_id == "verified" or verification_status_doc == "verified":
+                        age_verification_role = discord.utils.get(ctx.guild.roles, name="Age Verified")
+                        id_verification_role = discord.utils.get(ctx.guild.roles, name="ID Verified")
+                        if age_verification_role:
+                            await ctx.author.add_roles(age_verification_role)
+                        if id_verification_role:
+                            await ctx.author.add_roles(id_verification_role)
+                        await interaction.response.send_message("Verification completed and roles assigned.", ephemeral=True)
+                    else:
+                        await interaction.response.send_message("Verification not completed yet. Please try again later.", ephemeral=True)
+                except Exception as e:
+                    await interaction.response.send_message(f"An error occurred while checking verification status: {str(e)}", ephemeral=True)
 
         self.bot.add_listener(handle_verification_completion, "on_interaction")
         
