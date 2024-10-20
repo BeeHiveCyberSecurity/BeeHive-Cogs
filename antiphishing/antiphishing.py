@@ -19,9 +19,9 @@ class AntiPhishing(commands.Cog):
     Guard users from malicious links and phishing attempts with customizable protection options.
     """
 
-    __version__ = "1.6.0.1"
-    __last_updated__ = "October 2nd, 2024"
-    __quick_notes__ = "We've added a new `timeout` punishment to automatically time a user out for a predetermined amount of time if they share a known dangerous link."
+    __version__ = "1.6.1.1"
+    __last_updated__ = "October 20nd, 2024"
+    __quick_notes__ = "We've optimized various functionality to improve blocklist update performance"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -347,7 +347,7 @@ class AntiPhishing(commands.Cog):
 
     @tasks.loop(minutes=2)
     async def get_phishing_domains(self) -> None:
-        domains = []
+        domains = set()  # Use a set to automatically handle duplicates
 
         headers = {
             "X-Identity": f"BeeHive AntiPhishing v{self.__version__} (https://www.beehive.systems/)",
@@ -360,7 +360,7 @@ class AntiPhishing(commands.Cog):
             if request.status == 200:
                 try:
                     data = await request.json()
-                    domains.extend(data)
+                    domains.update(data)  # Add domains to the set
                 except Exception as e:
                     print(f"Error parsing JSON from Sinking Yachts: {e}")
             else:
@@ -373,14 +373,14 @@ class AntiPhishing(commands.Cog):
                 try:
                     data = await request.json()
                     if isinstance(data, list):
-                        domains.extend(data)
+                        domains.update(data)  # Add domains to the set
                     else:
                         print("Unexpected data format received from blocklist.")
                 except Exception as e:
                     print(f"Error parsing JSON from blocklist: {e}")
             else:
                 print(f"Failed to fetch blocklist, status code: {request.status}")
-        self.domains = list(set(domains))
+        self.domains = list(domains)  # Convert set back to list
 
     async def follow_redirects(self, url: str) -> List[str]:
         """
