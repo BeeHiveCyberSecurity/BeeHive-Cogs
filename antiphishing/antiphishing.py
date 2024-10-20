@@ -33,7 +33,7 @@ class AntiPhishing(commands.Cog):
             deletions=0,
             kicks=0,
             bans=0,
-            timeouts=0,  # Added timeout statistic
+            timeouts=0,
             autoban=3,
             last_updated=None,
             webhook=None,
@@ -238,7 +238,7 @@ class AntiPhishing(commands.Cog):
         deletions = await self.config.guild(ctx.guild).deletions()
         kicks = await self.config.guild(ctx.guild).kicks()
         bans = await self.config.guild(ctx.guild).bans()
-        timeouts = await self.config.guild(ctx.guild).timeouts()  # Added timeout statistic retrieval
+        timeouts = await self.config.guild(ctx.guild).timeouts()
         last_updated = self.__last_updated__
         patch_notes = self.__quick_notes__
         total_domains = len(self.domains)
@@ -248,7 +248,7 @@ class AntiPhishing(commands.Cog):
         s_deletions = "s" if deletions != 1 else ""
         s_kicks = "s" if kicks != 1 else ""
         s_bans = "s" if bans != 1 else ""
-        s_timeouts = "s" if timeouts != 1 else ""  # Added pluralization for timeouts
+        s_timeouts = "s" if timeouts != 1 else ""
         
         last_updated_str = f"{last_updated}"
         
@@ -284,7 +284,7 @@ class AntiPhishing(commands.Cog):
         )
         embed.add_field(
             name="Timeouts",
-            value=f"Timed out **{timeouts}** user{s_timeouts}",  # Added timeout statistic display
+            value=f"Timed out **{timeouts}** user{s_timeouts}",
             inline=True
         )
         embed.add_field(
@@ -347,7 +347,7 @@ class AntiPhishing(commands.Cog):
 
     @tasks.loop(minutes=2)
     async def get_phishing_domains(self) -> None:
-        domains = set()  # Use a set to automatically handle duplicates
+        domains = set()
 
         headers = {
             "X-Identity": f"BeeHive AntiPhishing v{self.__version__} (https://www.beehive.systems/)",
@@ -360,7 +360,7 @@ class AntiPhishing(commands.Cog):
             if request.status == 200:
                 try:
                     data = await request.json()
-                    domains.update(data)  # Add domains to the set
+                    domains.update(data)
                 except Exception as e:
                     print(f"Error parsing JSON from Sinking Yachts: {e}")
             else:
@@ -373,14 +373,14 @@ class AntiPhishing(commands.Cog):
                 try:
                     data = await request.json()
                     if isinstance(data, list):
-                        domains.update(data)  # Add domains to the set
+                        domains.update(data)
                     else:
                         print("Unexpected data format received from blocklist.")
                 except Exception as e:
                     print(f"Error parsing JSON from blocklist: {e}")
             else:
                 print(f"Failed to fetch blocklist, status code: {request.status}")
-        self.domains = list(domains)  # Convert set back to list
+        self.domains = list(domains)
 
     async def follow_redirects(self, url: str) -> List[str]:
         """
@@ -411,7 +411,6 @@ class AntiPhishing(commands.Cog):
             action = "ban"
         await self.config.member(message.author).caught.set(member_count + 1)
         
-        # Send URL to webhook if enrolled
         webhook_url = await self.config.guild(message.guild).webhook()
         if webhook_url:
             redirect_chain_str = "\n".join(redirect_chain)
@@ -427,7 +426,6 @@ class AntiPhishing(commands.Cog):
                 if response.status not in [200, 204]:
                     print(f"Failed to send webhook: {response.status}")
         
-        # Send URL to log channel if set
         log_channel_id = await self.config.guild(message.guild).log_channel()
         if log_channel_id:
             log_channel = message.guild.get_channel(log_channel_id)
@@ -448,12 +446,11 @@ class AntiPhishing(commands.Cog):
                 with contextlib.suppress(discord.NotFound):
                     mod_roles = await self.bot.get_mod_roles(message.guild)
                     mod_mentions = " ".join(role.mention for role in mod_roles) if mod_roles else ""
-                    
-                    # Determine the status of each domain in the redirect chain
+                
                     redirect_chain_status = []
                     for url in redirect_chain:
                         try:
-                            domain = urlparse(url).netloc  # Extract domain from URL
+                            domain = urlparse(url).netloc
                             status = "Malicious" if domain in self.domains else "Unknown"
                             redirect_chain_status.append(f"{url} ({status})")
                         except IndexError:
