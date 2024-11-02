@@ -216,14 +216,14 @@ class AbuseIPDB(commands.Cog):
             return
 
         leaderboard_embed = discord.Embed(
-            title="Top 10 Reporters in the Last 30 Days",
-            color=0x00ff00
+            title="Top 10 IP reporters",
+            color=0xfffffe
         )
 
         for rank, (user_id, count) in enumerate(top_reporters, start=1):
             user = self.bot.get_user(int(user_id))
             username = user.name if user else "Unknown User"
-            leaderboard_embed.add_field(name=f"#{rank} {username}", value=f"{count} reports", inline=False)
+            leaderboard_embed.add_field(name=f"Rank {rank}", value=f"{username}, with {count} reports", inline=True)
 
         await ctx.send(embed=leaderboard_embed)
 
