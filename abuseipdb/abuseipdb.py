@@ -91,7 +91,7 @@ class AbuseIPDB(commands.Cog):
             color=0xfffffe
         )
         message = await ctx.send(embed=embed)
-        await asyncio.sleep(1)
+        await asyncio.sleep(2)
 
         ip = await get_user_input("Please respond in chat with the IPv4 or IPv6 that you'd like to create a report for.")
         if ip is None:
