@@ -223,7 +223,8 @@ class AbuseIPDB(commands.Cog):
         for rank, (user_id, count) in enumerate(top_reporters, start=1):
             user = self.bot.get_user(int(user_id))
             username = f"<@{user_id}>" if user else "Unknown User"
-            leaderboard_embed.add_field(name=f"Rank {rank}", value=f"{username}, with {count} reports", inline=True)
+            report_word = "report" if count == 1 else "reports"
+            leaderboard_embed.add_field(name=f"Rank {rank}", value=f"{username}, with {count} {report_word}", inline=True)
 
         await ctx.send(embed=leaderboard_embed)
 
