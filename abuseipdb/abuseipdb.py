@@ -334,7 +334,13 @@ class AbuseIPDB(commands.Cog):
                     embed.add_field(name="ISP", value=report['isp'], inline=True)
                     embed.add_field(name="Domain", value=report['domain'], inline=True)
                     embed.add_field(name="Total reports", value=report['totalReports'], inline=True)
-                    embed.add_field(name="Last reported", value=f"**<t:{int(discord.utils.parse_time(report['lastReportedAt']).timestamp())}:R>**", inline=True)
+                    
+                    last_reported_at = report.get('lastReportedAt')
+                    if last_reported_at:
+                        embed.add_field(name="Last reported", value=f"**<t:{int(discord.utils.parse_time(last_reported_at).timestamp())}:R>**", inline=True)
+                    else:
+                        embed.add_field(name="Last reported", value="No reports available", inline=True)
+                    
                     if report['reports']:
                         for i, rep in enumerate(report['reports'][:5]):
                             embed.add_field(
