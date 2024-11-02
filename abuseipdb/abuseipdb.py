@@ -3,13 +3,15 @@ from redbot.core import commands, Config #type: ignore
 import aiohttp #type: ignore
 import asyncio
 import ipaddress
+from datetime import datetime, timedelta
 
 class AbuseIPDB(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=9876543210)
         default_guild = {
-            "api_key": None
+            "api_key": None,
+            "reports": {}
         }
         self.config.register_guild(**default_guild)
 
@@ -160,6 +162,15 @@ class AbuseIPDB(commands.Cog):
                             embed.add_field(name="IP address reported", value=ip_address, inline=True)
                             embed.add_field(name="Updated abuse score", value=abuse_confidence_score, inline=True)
                             await ctx.send(embed=embed)
+
+                            # Track the report
+                            async with self.config.guild(ctx.guild).reports() as reports:
+                                user_id = str(ctx.author.id)
+                                now = datetime.utcnow().timestamp()
+                                if user_id not in reports:
+                                    reports[user_id] = []
+                                reports[user_id].append(now)
+
                         else:
                             error_detail = response_data["errors"][0]["detail"]
                             embed = discord.Embed(
@@ -182,6 +193,39 @@ class AbuseIPDB(commands.Cog):
                         color=0xff4545
                     )
                     await ctx.send(embed=embed)
+
+    @abuseipdb.command(name="leaderboard", description="Show the top 10 reporters over the last 30 days.")
+    async def leaderboard(self, ctx):
+        """Show the top 10 reporters over the last 30 days"""
+        reports = await self.config.guild(ctx.guild).reports()
+        now = datetime.utcnow().timestamp()
+        thirty_days_ago = now - timedelta(days=30).total_seconds()
+
+        # Count reports in the last 30 days
+        report_counts = {}
+        for user_id, timestamps in reports.items():
+            count = sum(1 for timestamp in timestamps if timestamp >= thirty_days_ago)
+            if count > 0:
+                report_counts[user_id] = count
+
+        # Sort and get top 10
+        top_reporters = sorted(report_counts.items(), key=lambda x: x[1], reverse=True)[:10]
+
+        if not top_reporters:
+            await ctx.send("No reports have been made in the last 30 days.")
+            return
+
+        leaderboard_embed = discord.Embed(
+            title="Top 10 Reporters in the Last 30 Days",
+            color=0x00ff00
+        )
+
+        for rank, (user_id, count) in enumerate(top_reporters, start=1):
+            user = self.bot.get_user(int(user_id))
+            username = user.name if user else "Unknown User"
+            leaderboard_embed.add_field(name=f"#{rank} {username}", value=f"{count} reports", inline=False)
+
+        await ctx.send(embed=leaderboard_embed)
 
     @abuseipdb.command(name="list", description="Check reports for an IP address against AbuseIPDB.")
     async def list(self, ctx, ip: str):
