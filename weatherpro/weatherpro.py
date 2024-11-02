@@ -1299,7 +1299,7 @@ class Weather(commands.Cog):
         else:
             embed = discord.Embed(
                 title="Weather profile updated",
-                description="Your zip code has been set. This is the location that will now be used in the future for your weather queries. For privacy reasons, the zip code is not displayed here. Use the `weatherset profile` command in a DM to see your saved settings.",
+                description="Your zip code has been set. This is the location that will now be used in the future for your weather queries. For privacy reasons, the zip code is not displayed here. Use the `weather profile` command in a DM to see your saved settings.",
                 color=0x2bbd8e
             )
             await ctx.send(embed=embed)
