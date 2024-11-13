@@ -21,17 +21,12 @@ class Invites(commands.Cog):
         self.config.register_guild(**default_guild)
         self.invites = {}
         self.milestones = [1, 2, 3, 4, 5, 10, 15, 20]
-        self.announcement_channel = None
 
     @commands.Cog.listener()
     async def on_ready(self):
         for guild in self.bot.guilds:
             try:
                 self.invites[guild.id] = await guild.invites()
-                # Load announcement channel from config on bot ready
-                channel_id = await self.config.guild(guild).announcement_channel()
-                if channel_id:
-                    self.announcement_channel = guild.get_channel(channel_id)
             except Exception as e:
                 print(f"Failed to fetch invites for guild {guild.id}: {e}")
 
@@ -46,13 +41,14 @@ class Invites(commands.Cog):
             for invite in invites_before:
                 if invite.uses < self.get_invite_uses(invites_after, invite.code):
                     inviter = invite.inviter
-                    if inviter.id == self.DISBOARD_BOT_ID:
+                    if inviter and inviter.id == self.DISBOARD_BOT_ID:
                         print(f"Invite by Disboard bot ignored for guild {guild.id}")
                         return
-                    await self.update_invites(guild, inviter)
-                    await self.announce_invite(guild, member, inviter)
-                    await self.check_rewards(guild, inviter)
-                    await self.check_milestones(guild, inviter)
+                    if inviter:
+                        await self.update_invites(guild, inviter)
+                        await self.announce_invite(guild, member, inviter)
+                        await self.check_rewards(guild, inviter)
+                        await self.check_milestones(guild, inviter)
                     break
 
             # Update member growth
@@ -76,13 +72,15 @@ class Invites(commands.Cog):
 
     async def announce_invite(self, guild, member, inviter):
         try:
-            if self.announcement_channel:
+            channel_id = await self.config.guild(guild).announcement_channel()
+            announcement_channel = guild.get_channel(channel_id) if channel_id else None
+            if announcement_channel:
                 embed = discord.Embed(
                     title="New Member Joined",
                     description=f"{member.mention} joined using {inviter.mention}'s invite!",
                     color=discord.Color.from_str("#2bbd8e")
                 )
-                await self.announcement_channel.send(embed=embed)
+                await announcement_channel.send(embed=embed)
         except Exception as e:
             print(f"Failed to announce invite in guild {guild.id}: {e}")
 
@@ -140,7 +138,6 @@ class Invites(commands.Cog):
     async def announcechannel(self, ctx, channel: discord.TextChannel):
         """Set the announcement channel for invites."""
         await self.config.guild(ctx.guild).announcement_channel.set(channel.id)
-        self.announcement_channel = channel  # Update the announcement channel immediately
         embed = discord.Embed(
             title="Announcement Channel Set",
             description=f"Announcement channel set to {channel.mention}",
@@ -281,7 +278,7 @@ class Invites(commands.Cog):
                 color=discord.Color.from_str("#2bbd8e")
             )
             embed.add_field(name="Invite Code", value=f"**`{invite.code}`**", inline=True)
-            embed.add_field(name="Inviter", value=f"{inviter.mention}", inline=True)
+            embed.add_field(name="Inviter", value=f"{inviter.mention if inviter else 'Unknown'}", inline=True)
             embed.add_field(name="Uses", value=f"**`{uses}`**", inline=True)
             pages.append(embed)
 
