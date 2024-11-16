@@ -321,9 +321,9 @@ class TikTokLiveCog(commands.Cog):
             if auto_download:
                 # Check for complete TikTok URLs
                 urls = [word for word in message.content.split() if word.startswith("https://www.tiktok.com/") or word.startswith("https://vt.tiktok.com/") or word.startswith("https://vm.tiktok.com/")]
-                for url in urls:
-                    await self.download_video(message.channel, url)
                 if urls:
+                    # Only process the first TikTok URL found
+                    await self.download_video(message.channel, urls[0])
                     await message.delete()
         except Exception as e:
             logging.error(f"Error in on_message: {e}")
