@@ -98,6 +98,21 @@ class ReportsPro(commands.Cog):
                 }
                 await self.config.guild(ctx.guild).reports.set(reports)
 
+                # Send the report to the reports channel
+                if reports_channel:
+                    report_message = discord.Embed(
+                        title="New User Report",
+                        color=discord.Color.red(),
+                        description=f"**Reported User:** {member.mention} ({member.id})\n"
+                                    f"**Reported By:** {ctx.author.mention}\n"
+                                    f"**Reason:** {selected_reason}\n"
+                                    f"**Timestamp:** {ctx.message.created_at.replace(tzinfo=timezone.utc).isoformat()}"
+                    )
+                    try:
+                        await reports_channel.send(embed=report_message)
+                    except discord.Forbidden:
+                        await ctx.send("I do not have permission to send messages in the reports channel.")
+
         # Create a view and add the dropdown
         view = discord.ui.View()
         view.add_item(ReportDropdown())
