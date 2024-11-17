@@ -94,8 +94,12 @@ class ReportsPro(commands.Cog):
 
             async def callback(self, interaction: discord.Interaction):
                 selected_reason = self.values[0]
-                selected_description = next(description for reason, description in report_reasons if reason == selected_reason)
+                selected_description = next((description for reason, description in report_reasons if reason == selected_reason), None)
                 
+                if selected_description is None:
+                    await interaction.response.send_message("Invalid selection. Please try again.", ephemeral=True)
+                    return
+
                 # Update the embed with the selected reason and description
                 self.report_embed.add_field(name="Selected Reason", value=f"{selected_reason}: {selected_description}", inline=False)
                 await interaction.response.edit_message(embed=self.report_embed, view=self.view)
@@ -203,7 +207,7 @@ class ReportsPro(commands.Cog):
             reported_user = ctx.guild.get_member(report_info['reported_user'])
             reporter = ctx.guild.get_member(report_info['reporter'])
 
-            if member and reported_user != member:
+            if member and (not reported_user or reported_user != member):
                 continue
 
             embed.add_field(
