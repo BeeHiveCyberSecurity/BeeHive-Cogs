@@ -90,11 +90,11 @@ class ReportsPro(commands.Cog):
                 # Store the report in the config
                 reports = await self.config.guild(ctx.guild).reports()
                 report_id = len(reports) + 1
-                reports[report_id] = {
+                reports[str(report_id)] = {
                     "reported_user": member.id,
                     "reporter": ctx.author.id,
                     "reason": selected_reason,
-                    "timestamp": ctx.message.created_at.replace(tzinfo=timezone.utc).isoformat()
+                    "timestamp": datetime.now(timezone.utc).isoformat()
                 }
                 await self.config.guild(ctx.guild).reports.set(reports)
 
@@ -106,7 +106,7 @@ class ReportsPro(commands.Cog):
                         description=f"**Reported User:** {member.mention} ({member.id})\n"
                                     f"**Reported By:** {ctx.author.mention}\n"
                                     f"**Reason:** {selected_reason}\n"
-                                    f"**Timestamp:** {ctx.message.created_at.replace(tzinfo=timezone.utc).isoformat()}"
+                                    f"**Timestamp:** {datetime.now(timezone.utc).isoformat()}"
                     )
                     try:
                         await reports_channel.send(embed=report_message)
