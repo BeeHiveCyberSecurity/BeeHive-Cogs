@@ -80,12 +80,11 @@ class ReportsPro(commands.Cog):
 
         # Create a dropdown menu for report reasons
         class ReportDropdown(discord.ui.Select):
-            def __init__(self, config, ctx, member, reports_channel, report_embed):
+            def __init__(self, config, ctx, member, reports_channel):
                 self.config = config
                 self.ctx = ctx
                 self.member = member
                 self.reports_channel = reports_channel
-                self.report_embed = report_embed
                 options = [
                     discord.SelectOption(label=reason, description=description)
                     for reason, description in report_reasons
@@ -94,32 +93,12 @@ class ReportsPro(commands.Cog):
 
             async def callback(self, interaction: discord.Interaction):
                 selected_reason = self.values[0]
-                selected_description = next((description for reason, description in report_reasons if reason == selected_reason), None)
-                
-                if selected_description is None:
-                    await interaction.response.send_message("Invalid selection. Please try again.", ephemeral=True)
-                    return
-
-                # Update the embed with the selected reason and description
-                self.report_embed.add_field(name="Selected Reason", value=f"{selected_reason}: {selected_description}", inline=False)
-                await interaction.response.edit_message(embed=self.report_embed, view=self.view)
-
-                # Enable the submit button
-                self.view.submit_button.disabled = False
-
-        # Create a submit button
-        class SubmitButton(discord.ui.Button):
-            def __init__(self, config, ctx, member, reports_channel):
-                super().__init__(label="Submit", style=discord.ButtonStyle.grey, disabled=True)
-                self.config = config
-                self.ctx = ctx
-                self.member = member
-                self.reports_channel = reports_channel
-
-            async def callback(self, interaction: discord.Interaction):
-                # Change button color to green
-                self.style = discord.ButtonStyle.green
-                await interaction.response.edit_message(view=self.view)
+                embed = discord.Embed(
+                    title="Report submitted",
+                    color=discord.Color.from_rgb(43, 189, 142),
+                    description=f"Report submitted for {self.member.mention} with reason: {selected_reason}"
+                )
+                await interaction.response.send_message(embed=embed)
 
                 # Store the report in the config
                 try:
@@ -128,7 +107,7 @@ class ReportsPro(commands.Cog):
                     reports[str(report_id)] = {
                         "reported_user": self.member.id,
                         "reporter": self.ctx.author.id,
-                        "reason": self.view.dropdown.values[0],
+                        "reason": selected_reason,
                         "timestamp": datetime.now(timezone.utc).isoformat()
                     }
                     await self.config.guild(self.ctx.guild).reports.set(reports)
@@ -137,7 +116,7 @@ class ReportsPro(commands.Cog):
                     return
 
                 # Capture chat history
-                chat_history = await self.ctx.cog.capture_chat_history(self.ctx.guild, self.member)
+                chat_history = await self.capture_chat_history(self.ctx.guild, self.member)
 
                 # Send the report to the reports channel
                 if self.reports_channel:
@@ -146,7 +125,7 @@ class ReportsPro(commands.Cog):
                         color=discord.Color.red(),
                         description=f"**Reported User:** {self.member.mention} ({self.member.id})\n"
                                     f"**Reported By:** {self.ctx.author.mention}\n"
-                                    f"**Reason:** {self.view.dropdown.values[0]}\n"
+                                    f"**Reason:** {selected_reason}\n"
                                     f"**Timestamp:** {datetime.now(timezone.utc).isoformat()}"
                     )
                     try:
@@ -159,14 +138,9 @@ class ReportsPro(commands.Cog):
                     except Exception as e:
                         await self.ctx.send(f"An error occurred while sending the report: {e}")
 
-        # Create a view and add the dropdown and submit button
+        # Create a view and add the dropdown
         view = discord.ui.View()
-        dropdown = ReportDropdown(self.config, ctx, member, reports_channel, report_embed)
-        submit_button = SubmitButton(self.config, ctx, member, reports_channel)
-        view.add_item(dropdown)
-        view.add_item(submit_button)
-        view.dropdown = dropdown
-        view.submit_button = submit_button
+        view.add_item(ReportDropdown(self.config, ctx, member, reports_channel))
 
         try:
             await ctx.send(embed=report_embed, view=view)
