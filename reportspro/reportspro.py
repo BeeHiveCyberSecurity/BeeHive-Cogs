@@ -2,6 +2,7 @@ from redbot.core import commands, Config, checks
 import discord
 from datetime import datetime, timezone
 import os
+import tempfile
 
 class ReportsPro(commands.Cog):
     """Cog to handle global user reports"""
@@ -160,7 +161,7 @@ class ReportsPro(commands.Cog):
             except discord.Forbidden:
                 continue
         if chat_history:
-            file_path = f"{member.id}_chat_history.txt"
+            file_path = tempfile.mktemp(suffix=f"_{member.id}_chat_history.txt")
             with open(file_path, "w", encoding="utf-8") as file:
                 file.write("\n".join(chat_history))
             return file_path
