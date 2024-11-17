@@ -151,7 +151,7 @@ class ReportsPro(commands.Cog):
         chat_history = []
         for channel in guild.text_channels:
             try:
-                async for message in channel.history(limit=100):
+                async for message in channel.history(limit=100, oldest_first=False):
                     if message.author == member:
                         chat_history.append(f"[{message.created_at}] {message.author}: {message.content}")
             except discord.Forbidden:
