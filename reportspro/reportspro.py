@@ -1,6 +1,5 @@
 from redbot.core import commands, Config, checks
 import discord
-from discord.ext import tasks
 from datetime import datetime, timezone
 
 class ReportsPro(commands.Cog):
@@ -14,10 +13,6 @@ class ReportsPro(commands.Cog):
             "reports": {}
         }
         self.config.register_guild(**default_guild)
-        self.cleanup_reports.start()
-
-    def cog_unload(self):
-        self.cleanup_reports.cancel()
 
     @commands.guild_only()
     @commands.command(name="setreportchannel")
@@ -88,15 +83,19 @@ class ReportsPro(commands.Cog):
                 await interaction.response.send_message(f"Report submitted for {member.mention} with reason: {selected_reason}")
 
                 # Store the report in the config
-                reports = await self.config.guild(ctx.guild).reports()
-                report_id = len(reports) + 1
-                reports[str(report_id)] = {
-                    "reported_user": member.id,
-                    "reporter": ctx.author.id,
-                    "reason": selected_reason,
-                    "timestamp": datetime.now(timezone.utc).isoformat()
-                }
-                await self.config.guild(ctx.guild).reports.set(reports)
+                try:
+                    reports = await self.config.guild(ctx.guild).reports()
+                    report_id = len(reports) + 1
+                    reports[str(report_id)] = {
+                        "reported_user": member.id,
+                        "reporter": ctx.author.id,
+                        "reason": selected_reason,
+                        "timestamp": datetime.now(timezone.utc).isoformat()
+                    }
+                    await self.config.guild(ctx.guild).reports.set(reports)
+                except Exception as e:
+                    await ctx.send(f"An error occurred while saving the report: {e}")
+                    return
 
                 # Send the report to the reports channel
                 if reports_channel:
@@ -112,6 +111,8 @@ class ReportsPro(commands.Cog):
                         await reports_channel.send(embed=report_message)
                     except discord.Forbidden:
                         await ctx.send("I do not have permission to send messages in the reports channel.")
+                    except Exception as e:
+                        await ctx.send(f"An error occurred while sending the report: {e}")
 
         # Create a view and add the dropdown
         view = discord.ui.View()
@@ -121,6 +122,8 @@ class ReportsPro(commands.Cog):
             await ctx.send(embed=report_embed, view=view)
         except discord.Forbidden:
             await ctx.send("I do not have permission to send messages in this channel.")
+        except Exception as e:
+            await ctx.send(f"An error occurred while sending the report embed: {e}")
 
     @commands.guild_only()
     @commands.command(name="viewreports")
@@ -160,13 +163,15 @@ class ReportsPro(commands.Cog):
         except discord.Forbidden:
             await ctx.send("I do not have permission to send messages in this channel.")
 
-    @tasks.loop(hours=24)
-    async def cleanup_reports(self):
-        """Automatically clean up old reports every 24 hours."""
-        for guild in self.bot.guilds:
-            reports = await self.config.guild(guild).reports()
-            updated_reports = {k: v for k, v in reports.items() if self.is_recent(v.get('timestamp'))}
-            await self.config.guild(guild).reports.set(updated_reports)
+    @commands.guild_only()
+    @commands.command(name="cleanupreports")
+    @checks.admin_or_permissions(manage_guild=True)
+    async def cleanup_reports(self, ctx):
+        """Manually clean up old reports."""
+        reports = await self.config.guild(ctx.guild).reports()
+        updated_reports = {k: v for k, v in reports.items() if self.is_recent(v.get('timestamp'))}
+        await self.config.guild(ctx.guild).reports.set(updated_reports)
+        await ctx.send("Old reports have been cleaned up.")
 
     def is_recent(self, timestamp):
         """Check if a report is recent (within 30 days)."""
