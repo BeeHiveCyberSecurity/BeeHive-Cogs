@@ -31,7 +31,7 @@ class ReportsPro(commands.Cog):
         reports_channel = ctx.guild.get_channel(reports_channel_id)
         channel_mention = reports_channel.mention if reports_channel else "Not Set"
         
-        embed = discord.Embed(title="Current Settings", color=discord.Color.green())
+        embed = discord.Embed(title="Current Settings", color=discord.Color.from_rgb(43, 189, 142))
         embed.add_field(name="Reports Channel", value=channel_mention, inline=False)
         
         try:
@@ -89,7 +89,12 @@ class ReportsPro(commands.Cog):
 
             async def callback(self, interaction: discord.Interaction):
                 selected_reason = self.values[0]
-                await interaction.response.send_message(f"Report submitted for {self.member.mention} with reason: {selected_reason}")
+                embed = discord.Embed(
+                    title="Report submitted",
+                    color=discord.Color.from_rgb(43, 189, 142),
+                    description=f"Report submitted for {self.member.mention} with reason: {selected_reason}"
+                )
+                await interaction.response.send_message(embed=embed)
 
                 # Store the report in the config
                 try:
