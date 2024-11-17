@@ -1,6 +1,7 @@
 from redbot.core import commands, Config, checks
 import discord
 from datetime import datetime, timezone
+import os
 
 class ReportsPro(commands.Cog):
     """Cog to handle global user reports"""
@@ -128,6 +129,7 @@ class ReportsPro(commands.Cog):
                         await self.reports_channel.send(embed=report_message)
                         if chat_history:
                             await self.reports_channel.send(file=discord.File(chat_history, filename=f"{self.member.id}_chat_history.txt"))
+                            os.remove(chat_history)  # Clean up the file after sending
                     except discord.Forbidden:
                         await self.ctx.send("I do not have permission to send messages in the reports channel.")
                     except Exception as e:
@@ -155,9 +157,10 @@ class ReportsPro(commands.Cog):
             except discord.Forbidden:
                 continue
         if chat_history:
-            with open(f"{member.id}_chat_history.txt", "w", encoding="utf-8") as file:
+            file_path = f"{member.id}_chat_history.txt"
+            with open(file_path, "w", encoding="utf-8") as file:
                 file.write("\n".join(chat_history))
-            return f"{member.id}_chat_history.txt"
+            return file_path
         return None
 
     @commands.guild_only()
