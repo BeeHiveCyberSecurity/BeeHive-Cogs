@@ -81,12 +81,13 @@ class ReportsPro(commands.Cog):
 
         # Create a dropdown menu for report reasons
         class ReportDropdown(discord.ui.Select):
-            def __init__(self, config, ctx, member, reports_channel, capture_chat_history):
+            def __init__(self, config, ctx, member, reports_channel, capture_chat_history, report_message):
                 self.config = config
                 self.ctx = ctx
                 self.member = member
                 self.reports_channel = reports_channel
                 self.capture_chat_history = capture_chat_history
+                self.report_message = report_message
                 options = [
                     discord.SelectOption(label=reason, description=description)
                     for reason, description in report_reasons
@@ -146,16 +147,16 @@ class ReportsPro(commands.Cog):
                 else:
                     await interaction.response.send_message("Reports channel is not accessible. Please contact an admin.", ephemeral=True)
 
+                # Delete the report embed message
+                try:
+                    await self.report_message.delete()
+                except discord.Forbidden:
+                    await interaction.response.send_message("I do not have permission to delete messages in this channel.", ephemeral=True)
+
         # Create a view and add the dropdown
         view = discord.ui.View()
-        view.add_item(ReportDropdown(self.config, ctx, member, reports_channel, self.capture_chat_history))
-
-        try:
-            await ctx.send(embed=report_embed, view=view, ephemeral=True)
-        except discord.Forbidden:
-            await ctx.send("I do not have permission to send messages in this channel.", ephemeral=True)
-        except Exception as e:
-            await ctx.send(f"An error occurred while sending the report embed: {e}", ephemeral=True)
+        report_message = await ctx.send(embed=report_embed, view=view, ephemeral=True)
+        view.add_item(ReportDropdown(self.config, ctx, member, reports_channel, self.capture_chat_history, report_message))
 
     async def capture_chat_history(self, guild, member):
         """Capture the chat history of a member across all channels."""
