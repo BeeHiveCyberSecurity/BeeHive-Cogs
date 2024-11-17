@@ -43,7 +43,17 @@ class ReportsPro(commands.Cog):
                         f"**Reason:** {reason}"
         )
         await reports_channel.send(embed=report_embed)
-        await ctx.send(f"Thank you for your report. The moderators have been notified.")
+        await ctx.send("Thank you for your report. The moderators have been notified.")
+
+        # Store the report in the config
+        reports = await self.config.guild(ctx.guild).reports()
+        report_id = len(reports) + 1
+        reports[report_id] = {
+            "reported_user": member.id,  # Store user ID instead of mention
+            "reporter": ctx.author.id,   # Store reporter ID instead of mention
+            "reason": reason
+        }
+        await self.config.guild(ctx.guild).reports.set(reports)
 
     @commands.guild_only()
     @commands.command(name="viewreports")
@@ -57,10 +67,12 @@ class ReportsPro(commands.Cog):
 
         embed = discord.Embed(title="User Reports", color=discord.Color.blue())
         for report_id, report_info in reports.items():
+            reported_user = ctx.guild.get_member(report_info['reported_user'])
+            reporter = ctx.guild.get_member(report_info['reporter'])
             embed.add_field(
                 name=f"Report ID: {report_id}",
-                value=f"**Reported User:** {report_info['reported_user']}\n"
-                      f"**Reported By:** {report_info['reporter']}\n"
+                value=f"**Reported User:** {reported_user.mention if reported_user else 'Unknown User'}\n"
+                      f"**Reported By:** {reporter.mention if reporter else 'Unknown Reporter'}\n"
                       f"**Reason:** {report_info['reason']}",
                 inline=False
             )
@@ -73,6 +85,3 @@ class ReportsPro(commands.Cog):
         """Clear all reports in the guild."""
         await self.config.guild(ctx.guild).reports.set({})
         await ctx.send("All reports have been cleared.")
-
-def setup(bot):
-    bot.add_cog(ReportsPro(bot))

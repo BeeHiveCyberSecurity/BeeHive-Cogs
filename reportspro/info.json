@@ -1,0 +1,12 @@
+{
+    "name": "reportspro",
+    "author": ["adminelevation"],
+    "description": "A Discord bot cog to handle user reports within a guild.",
+    "install_msg": "Thank you for installing ReportsPro. Use `[p]help reportspro` to get started.",
+    "short": "User reporting system for Discord guilds.",
+    "requirements": [],
+    "tags": ["reports", "moderation", "discord"],
+    "min_bot_version": "3.5.0",
+    "hidden": false,
+    "disabled": false
+}
