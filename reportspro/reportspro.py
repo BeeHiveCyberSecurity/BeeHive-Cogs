@@ -117,7 +117,11 @@ class ReportsPro(commands.Cog):
                     return
 
                 # Capture chat history
-                chat_history = await self.capture_chat_history(self.ctx.guild, self.member)
+                try:
+                    chat_history = await self.capture_chat_history(self.ctx.guild, self.member)
+                except Exception as e:
+                    await interaction.response.send_message(f"An error occurred while capturing chat history: {e}", ephemeral=True)
+                    return
 
                 # Send the report to the reports channel
                 if self.reports_channel:
@@ -160,11 +164,18 @@ class ReportsPro(commands.Cog):
                         chat_history.append(f"[{message.created_at}] {message.author}: {message.content}")
             except discord.Forbidden:
                 continue
+            except Exception as e:
+                print(f"An error occurred while accessing channel {channel.name}: {e}")
+                continue
         if chat_history:
-            file_path = tempfile.mktemp(suffix=f"_{member.id}_chat_history.txt")
-            with open(file_path, "w", encoding="utf-8") as file:
-                file.write("\n".join(chat_history))
-            return file_path
+            try:
+                file_path = tempfile.mktemp(suffix=f"_{member.id}_chat_history.txt")
+                with open(file_path, "w", encoding="utf-8") as file:
+                    file.write("\n".join(chat_history))
+                return file_path
+            except Exception as e:
+                print(f"An error occurred while writing chat history to file: {e}")
+                return None
         return None
 
     @commands.guild_only()
