@@ -61,12 +61,17 @@ class ReportsPro(commands.Cog):
                         f"Please select a reason for the report from the dropdown below."
         )
 
-        # Define report reasons
+        # Define report reasons with descriptions
         report_reasons = [
-            "Harassment",
-            "Spam",
-            "Inappropriate Content",
-            "Other"
+            ("Harassment", "Unwanted behavior that causes distress or discomfort."),
+            ("Spam", "Repeated or irrelevant messages disrupting the chat."),
+            ("Inappropriate Content", "Content that is offensive or not suitable for the community."),
+            ("Cheating", "Unfair advantage or breaking the rules of the game."),
+            ("Impersonation", "Pretending to be someone else without permission."),
+            ("Hate Speech", "Speech that attacks or discriminates against a group."),
+            ("Discord ToS Violation", "Actions that violate Discord's Terms of Service."),
+            ("Discord Community Guidelines Violation", "Actions that violate Discord's Community Guidelines."),
+            ("Other", "Any other reason not listed.")
         ]
 
         # Create a dropdown menu for report reasons
@@ -77,8 +82,8 @@ class ReportsPro(commands.Cog):
                 self.member = member
                 self.reports_channel = reports_channel
                 options = [
-                    discord.SelectOption(label=reason, description=f"Report for {reason}")
-                    for reason in report_reasons
+                    discord.SelectOption(label=reason, description=description)
+                    for reason, description in report_reasons
                 ]
                 super().__init__(placeholder="Choose a report reason...", min_values=1, max_values=1, options=options)
 
