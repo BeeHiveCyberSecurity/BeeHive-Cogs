@@ -142,6 +142,8 @@ class ReportsPro(commands.Cog):
                         await interaction.response.send_message("I do not have permission to send messages in the reports channel.", ephemeral=True)
                     except Exception as e:
                         await interaction.response.send_message(f"An error occurred while sending the report: {e}", ephemeral=True)
+                else:
+                    await interaction.response.send_message("Reports channel is not accessible. Please contact an admin.", ephemeral=True)
 
         # Create a view and add the dropdown
         view = discord.ui.View()
@@ -154,19 +156,18 @@ class ReportsPro(commands.Cog):
         except Exception as e:
             await ctx.send(f"An error occurred while sending the report embed: {e}", ephemeral=True)
 
-    async def capture_chat_history(self, guild, member):
-        """Capture the chat history of a member across all channels."""
+    async def capture_chat_history(self, channel, member):
+        """Capture the chat history of a member in the specified channel."""
         chat_history = []
-        for channel in guild.text_channels:
-            try:
-                async for message in channel.history(limit=100, oldest_first=False):
-                    if message.author == member:
-                        chat_history.append(f"[{message.created_at}] {message.author}: {message.content}")
-            except discord.Forbidden:
-                continue
-            except Exception as e:
-                print(f"An error occurred while accessing channel {channel.name}: {e}")
-                continue
+        try:
+            async for message in channel.history(limit=100, oldest_first=False):
+                if message.author == member:
+                    chat_history.append(f"[{message.created_at}] {message.author}: {message.content}")
+        except discord.Forbidden:
+            print(f"Access to channel {channel.name} is forbidden.")
+        except Exception as e:
+            print(f"An error occurred while accessing channel {channel.name}: {e}")
+
         if chat_history:
             try:
                 file_path = tempfile.mktemp(suffix=f"_{member.id}_chat_history.txt")
