@@ -1,4 +1,4 @@
 from .reportspro import ReportsPro
 
-def setup(bot):
+async def setup(bot):
     bot.add_cog(ReportsPro(bot))
