@@ -29,7 +29,7 @@ class ReportsPro(commands.Cog):
 
     @commands.guild_only()
     @commands.command(name="report")
-    async def report_user(self, ctx, member: discord.Member, *, reason: str):
+    async def report_user(self, ctx, member: discord.Member):
         """Report a user for inappropriate behavior."""
         reports_channel_id = await self.config.guild(ctx.guild).reports_channel()
         if not reports_channel_id:
@@ -41,29 +41,54 @@ class ReportsPro(commands.Cog):
             await ctx.send("Reports channel is not accessible. Please contact an admin.")
             return
 
+        # Create an embed with report types
         report_embed = discord.Embed(
-            title="New user report",
+            title="Report User",
             color=discord.Color.red(),
             description=f"**Reported User:** {member.mention} ({member.id})\n"
-                        f"**Reported By:** {ctx.author.mention} ({ctx.author.id})\n"
-                        f"**Reason:** {reason}"
+                        f"Please select a reason for the report from the dropdown below."
         )
-        try:
-            await reports_channel.send(embed=report_embed)
-            await ctx.send("Thank you for your report. The moderators have been notified.")
-        except discord.Forbidden:
-            await ctx.send("I do not have permission to send messages in the reports channel.")
 
-        # Store the report in the config
-        reports = await self.config.guild(ctx.guild).reports()
-        report_id = len(reports) + 1
-        reports[report_id] = {
-            "reported_user": member.id,
-            "reporter": ctx.author.id,
-            "reason": reason,
-            "timestamp": ctx.message.created_at.replace(tzinfo=timezone.utc).isoformat()
-        }
-        await self.config.guild(ctx.guild).reports.set(reports)
+        # Define report reasons
+        report_reasons = [
+            "Harassment",
+            "Spam",
+            "Inappropriate Content",
+            "Other"
+        ]
+
+        # Create a dropdown menu for report reasons
+        class ReportDropdown(discord.ui.Select):
+            def __init__(self):
+                options = [
+                    discord.SelectOption(label=reason, description=f"Report for {reason}")
+                    for reason in report_reasons
+                ]
+                super().__init__(placeholder="Choose a report reason...", min_values=1, max_values=1, options=options)
+
+            async def callback(self, interaction: discord.Interaction):
+                selected_reason = self.values[0]
+                await interaction.response.send_message(f"Report submitted for {member.mention} with reason: {selected_reason}")
+
+                # Store the report in the config
+                reports = await self.config.guild(ctx.guild).reports()
+                report_id = len(reports) + 1
+                reports[report_id] = {
+                    "reported_user": member.id,
+                    "reporter": ctx.author.id,
+                    "reason": selected_reason,
+                    "timestamp": ctx.message.created_at.replace(tzinfo=timezone.utc).isoformat()
+                }
+                await self.config.guild(ctx.guild).reports.set(reports)
+
+        # Create a view and add the dropdown
+        view = discord.ui.View()
+        view.add_item(ReportDropdown())
+
+        try:
+            await ctx.send(embed=report_embed, view=view)
+        except discord.Forbidden:
+            await ctx.send("I do not have permission to send messages in this channel.")
 
     @commands.guild_only()
     @commands.command(name="viewreports")
@@ -115,5 +140,8 @@ class ReportsPro(commands.Cog):
         """Check if a report is recent (within 30 days)."""
         if not timestamp:
             return False
-        report_time = datetime.fromisoformat(timestamp).replace(tzinfo=timezone.utc)
-        return (datetime.now(timezone.utc) - report_time).days < 30
+        try:
+            report_time = datetime.fromisoformat(timestamp).replace(tzinfo=timezone.utc)
+            return (datetime.now(timezone.utc) - report_time).days < 30
+        except ValueError:
+            return False
