@@ -1,5 +1,6 @@
 from redbot.core import commands, Config, checks
 import discord
+from discord.ext import tasks
 
 class ReportsPro(commands.Cog):
     """Cog to handle global user reports"""
@@ -12,6 +13,10 @@ class ReportsPro(commands.Cog):
             "reports": {}
         }
         self.config.register_guild(**default_guild)
+        self.cleanup_reports.start()
+
+    def cog_unload(self):
+        self.cleanup_reports.cancel()
 
     @commands.guild_only()
     @commands.command(name="setreportchannel")
@@ -36,7 +41,7 @@ class ReportsPro(commands.Cog):
             return
 
         report_embed = discord.Embed(
-            title="New User Report",
+            title="New user report",
             color=discord.Color.red(),
             description=f"**Reported User:** {member.mention} ({member.id})\n"
                         f"**Reported By:** {ctx.author.mention} ({ctx.author.id})\n"
@@ -49,15 +54,16 @@ class ReportsPro(commands.Cog):
         reports = await self.config.guild(ctx.guild).reports()
         report_id = len(reports) + 1
         reports[report_id] = {
-            "reported_user": member.id,  # Store user ID instead of mention
-            "reporter": ctx.author.id,   # Store reporter ID instead of mention
-            "reason": reason
+            "reported_user": member.id,
+            "reporter": ctx.author.id,
+            "reason": reason,
+            "timestamp": ctx.message.created_at.isoformat()
         }
         await self.config.guild(ctx.guild).reports.set(reports)
 
     @commands.guild_only()
     @commands.command(name="viewreports")
-    @checks.admin_or_permissions(manage_guild=True)
+    @checks.admin_or_permissions()
     async def view_reports(self, ctx):
         """View all reports in the guild."""
         reports = await self.config.guild(ctx.guild).reports()
@@ -73,7 +79,8 @@ class ReportsPro(commands.Cog):
                 name=f"Report ID: {report_id}",
                 value=f"**Reported User:** {reported_user.mention if reported_user else 'Unknown User'}\n"
                       f"**Reported By:** {reporter.mention if reporter else 'Unknown Reporter'}\n"
-                      f"**Reason:** {report_info['reason']}",
+                      f"**Reason:** {report_info['reason']}\n"
+                      f"**Timestamp:** {report_info.get('timestamp', 'Unknown')}",
                 inline=False
             )
         await ctx.send(embed=embed)
@@ -85,3 +92,18 @@ class ReportsPro(commands.Cog):
         """Clear all reports in the guild."""
         await self.config.guild(ctx.guild).reports.set({})
         await ctx.send("All reports have been cleared.")
+
+    @tasks.loop(hours=24)
+    async def cleanup_reports(self):
+        """Automatically clean up old reports every 24 hours."""
+        for guild in self.bot.guilds:
+            reports = await self.config.guild(guild).reports()
+            updated_reports = {k: v for k, v in reports.items() if self.is_recent(v.get('timestamp'))}
+            await self.config.guild(guild).reports.set(updated_reports)
+
+    def is_recent(self, timestamp):
+        """Check if a report is recent (within 30 days)."""
+        if not timestamp:
+            return False
+        report_time = discord.utils.parse_time(timestamp)
+        return (discord.utils.utcnow() - report_time).days < 30
