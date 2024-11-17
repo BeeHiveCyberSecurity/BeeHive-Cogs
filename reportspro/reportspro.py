@@ -81,11 +81,12 @@ class ReportsPro(commands.Cog):
 
         # Create a dropdown menu for report reasons
         class ReportDropdown(discord.ui.Select):
-            def __init__(self, config, ctx, member, reports_channel):
+            def __init__(self, config, ctx, member, reports_channel, capture_chat_history):
                 self.config = config
                 self.ctx = ctx
                 self.member = member
                 self.reports_channel = reports_channel
+                self.capture_chat_history = capture_chat_history
                 options = [
                     discord.SelectOption(label=reason, description=description)
                     for reason, description in report_reasons
@@ -147,7 +148,7 @@ class ReportsPro(commands.Cog):
 
         # Create a view and add the dropdown
         view = discord.ui.View()
-        view.add_item(ReportDropdown(self.config, ctx, member, reports_channel))
+        view.add_item(ReportDropdown(self.config, ctx, member, reports_channel, self.capture_chat_history))
 
         try:
             await ctx.send(embed=report_embed, view=view, ephemeral=True)
