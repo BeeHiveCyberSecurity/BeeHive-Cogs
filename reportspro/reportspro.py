@@ -169,8 +169,8 @@ class ReportsPro(commands.Cog):
     @commands.guild_only()
     @commands.command(name="viewreports")
     @checks.admin_or_permissions()
-    async def view_reports(self, ctx):
-        """View all reports in the guild."""
+    async def view_reports(self, ctx, member: discord.Member = None):
+        """View all reports in the guild or reports for a specific user."""
         reports = await self.config.guild(ctx.guild).reports()
         if not reports:
             await ctx.send("There are no reports in this guild.")
@@ -180,6 +180,10 @@ class ReportsPro(commands.Cog):
         for report_id, report_info in reports.items():
             reported_user = ctx.guild.get_member(report_info['reported_user'])
             reporter = ctx.guild.get_member(report_info['reporter'])
+
+            if member and reported_user != member:
+                continue
+
             embed.add_field(
                 name=f"Report ID: {report_id}",
                 value=f"**Reported User:** {reported_user.mention if reported_user else 'Unknown User'}\n"
