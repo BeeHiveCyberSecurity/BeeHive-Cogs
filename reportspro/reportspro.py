@@ -1,6 +1,7 @@
 from redbot.core import commands, Config, checks
 import discord
 from discord.ext import tasks
+from datetime import datetime, timezone
 
 class ReportsPro(commands.Cog):
     """Cog to handle global user reports"""
@@ -57,7 +58,7 @@ class ReportsPro(commands.Cog):
             "reported_user": member.id,
             "reporter": ctx.author.id,
             "reason": reason,
-            "timestamp": ctx.message.created_at.isoformat()
+            "timestamp": ctx.message.created_at.replace(tzinfo=timezone.utc).isoformat()
         }
         await self.config.guild(ctx.guild).reports.set(reports)
 
@@ -105,5 +106,5 @@ class ReportsPro(commands.Cog):
         """Check if a report is recent (within 30 days)."""
         if not timestamp:
             return False
-        report_time = discord.utils.parse_time(timestamp)
-        return (discord.utils.utcnow() - report_time).days < 30
+        report_time = datetime.fromisoformat(timestamp).replace(tzinfo=timezone.utc)
+        return (datetime.now(timezone.utc) - report_time).days < 30
