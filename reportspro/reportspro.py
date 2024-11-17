@@ -71,7 +71,11 @@ class ReportsPro(commands.Cog):
 
         # Create a dropdown menu for report reasons
         class ReportDropdown(discord.ui.Select):
-            def __init__(self):
+            def __init__(self, config, ctx, member, reports_channel):
+                self.config = config
+                self.ctx = ctx
+                self.member = member
+                self.reports_channel = reports_channel
                 options = [
                     discord.SelectOption(label=reason, description=f"Report for {reason}")
                     for reason in report_reasons
@@ -80,43 +84,43 @@ class ReportsPro(commands.Cog):
 
             async def callback(self, interaction: discord.Interaction):
                 selected_reason = self.values[0]
-                await interaction.response.send_message(f"Report submitted for {member.mention} with reason: {selected_reason}")
+                await interaction.response.send_message(f"Report submitted for {self.member.mention} with reason: {selected_reason}")
 
                 # Store the report in the config
                 try:
-                    reports = await self.config.guild(ctx.guild).reports()
+                    reports = await self.config.guild(self.ctx.guild).reports()
                     report_id = len(reports) + 1
                     reports[str(report_id)] = {
-                        "reported_user": member.id,
-                        "reporter": ctx.author.id,
+                        "reported_user": self.member.id,
+                        "reporter": self.ctx.author.id,
                         "reason": selected_reason,
                         "timestamp": datetime.now(timezone.utc).isoformat()
                     }
-                    await self.config.guild(ctx.guild).reports.set(reports)
+                    await self.config.guild(self.ctx.guild).reports.set(reports)
                 except Exception as e:
-                    await ctx.send(f"An error occurred while saving the report: {e}")
+                    await self.ctx.send(f"An error occurred while saving the report: {e}")
                     return
 
                 # Send the report to the reports channel
-                if reports_channel:
+                if self.reports_channel:
                     report_message = discord.Embed(
                         title="New User Report",
                         color=discord.Color.red(),
-                        description=f"**Reported User:** {member.mention} ({member.id})\n"
-                                    f"**Reported By:** {ctx.author.mention}\n"
+                        description=f"**Reported User:** {self.member.mention} ({self.member.id})\n"
+                                    f"**Reported By:** {self.ctx.author.mention}\n"
                                     f"**Reason:** {selected_reason}\n"
                                     f"**Timestamp:** {datetime.now(timezone.utc).isoformat()}"
                     )
                     try:
-                        await reports_channel.send(embed=report_message)
+                        await self.reports_channel.send(embed=report_message)
                     except discord.Forbidden:
-                        await ctx.send("I do not have permission to send messages in the reports channel.")
+                        await self.ctx.send("I do not have permission to send messages in the reports channel.")
                     except Exception as e:
-                        await ctx.send(f"An error occurred while sending the report: {e}")
+                        await self.ctx.send(f"An error occurred while sending the report: {e}")
 
         # Create a view and add the dropdown
         view = discord.ui.View()
-        view.add_item(ReportDropdown())
+        view.add_item(ReportDropdown(self.config, ctx, member, reports_channel))
 
         try:
             await ctx.send(embed=report_embed, view=view)
