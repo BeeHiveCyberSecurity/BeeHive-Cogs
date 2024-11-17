@@ -2,4 +2,4 @@ from .reportspro import ReportsPro
 
 async def setup(bot):
     cog = ReportsPro(bot)
-    bot.add_cog(cog)
+    await bot.add_cog(cog)

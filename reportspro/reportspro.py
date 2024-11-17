@@ -48,8 +48,11 @@ class ReportsPro(commands.Cog):
                         f"**Reported By:** {ctx.author.mention} ({ctx.author.id})\n"
                         f"**Reason:** {reason}"
         )
-        await reports_channel.send(embed=report_embed)
-        await ctx.send("Thank you for your report. The moderators have been notified.")
+        try:
+            await reports_channel.send(embed=report_embed)
+            await ctx.send("Thank you for your report. The moderators have been notified.")
+        except discord.Forbidden:
+            await ctx.send("I do not have permission to send messages in the reports channel.")
 
         # Store the report in the config
         reports = await self.config.guild(ctx.guild).reports()
@@ -84,7 +87,10 @@ class ReportsPro(commands.Cog):
                       f"**Timestamp:** {report_info.get('timestamp', 'Unknown')}",
                 inline=False
             )
-        await ctx.send(embed=embed)
+        try:
+            await ctx.send(embed=embed)
+        except discord.Forbidden:
+            await ctx.send("I do not have permission to send messages in this channel.")
 
     @commands.guild_only()
     @commands.command(name="clearreports")
@@ -92,7 +98,10 @@ class ReportsPro(commands.Cog):
     async def clear_reports(self, ctx):
         """Clear all reports in the guild."""
         await self.config.guild(ctx.guild).reports.set({})
-        await ctx.send("All reports have been cleared.")
+        try:
+            await ctx.send("All reports have been cleared.")
+        except discord.Forbidden:
+            await ctx.send("I do not have permission to send messages in this channel.")
 
     @tasks.loop(hours=24)
     async def cleanup_reports(self):
