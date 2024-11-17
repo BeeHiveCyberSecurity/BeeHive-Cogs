@@ -16,24 +16,27 @@ class ReportsPro(commands.Cog):
         self.config.register_guild(**default_guild)
 
     @commands.guild_only()
-    @commands.command(name="setreportchannel")
+    @commands.group(name="reportset", invoke_without_command=True)
     @checks.admin_or_permissions()
+    async def reportset(self, ctx):
+        """Group command for report settings."""
+        await ctx.send_help(ctx.command)
+
+    @reportset.command(name="channel")
     async def set_report_channel(self, ctx, channel: discord.TextChannel):
         """Set the channel where reports will be sent."""
         await self.config.guild(ctx.guild).reports_channel.set(channel.id)
         await ctx.send(f"Reports channel set to {channel.mention}")
 
-    @commands.guild_only()
-    @commands.command(name="viewsettings")
-    @checks.admin_or_permissions()
+    @reportset.command(name="view")
     async def view_settings(self, ctx):
         """View the current settings for the guild."""
         reports_channel_id = await self.config.guild(ctx.guild).reports_channel()
         reports_channel = ctx.guild.get_channel(reports_channel_id)
         channel_mention = reports_channel.mention if reports_channel else "Not Set"
         
-        embed = discord.Embed(title="Current Settings", color=discord.Color.from_rgb(43, 189, 142))
-        embed.add_field(name="Reports Channel", value=channel_mention, inline=False)
+        embed = discord.Embed(title="Current reporting settings", color=discord.Color.from_rgb(43, 189, 142))
+        embed.add_field(name="Log channel", value=channel_mention, inline=False)
         
         try:
             await ctx.send(embed=embed)
