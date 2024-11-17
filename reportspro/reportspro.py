@@ -111,6 +111,9 @@ class ReportsPro(commands.Cog):
                     await self.ctx.send(f"An error occurred while saving the report: {e}")
                     return
 
+                # Capture chat history
+                chat_history = await self.capture_chat_history(self.ctx.guild, self.member)
+
                 # Send the report to the reports channel
                 if self.reports_channel:
                     report_message = discord.Embed(
@@ -123,6 +126,8 @@ class ReportsPro(commands.Cog):
                     )
                     try:
                         await self.reports_channel.send(embed=report_message)
+                        if chat_history:
+                            await self.reports_channel.send(file=discord.File(chat_history, filename=f"{self.member.id}_chat_history.txt"))
                     except discord.Forbidden:
                         await self.ctx.send("I do not have permission to send messages in the reports channel.")
                     except Exception as e:
@@ -138,6 +143,22 @@ class ReportsPro(commands.Cog):
             await ctx.send("I do not have permission to send messages in this channel.")
         except Exception as e:
             await ctx.send(f"An error occurred while sending the report embed: {e}")
+
+    async def capture_chat_history(self, guild, member):
+        """Capture the chat history of a member across all channels."""
+        chat_history = []
+        for channel in guild.text_channels:
+            try:
+                async for message in channel.history(limit=100):
+                    if message.author == member:
+                        chat_history.append(f"[{message.created_at}] {message.author}: {message.content}")
+            except discord.Forbidden:
+                continue
+        if chat_history:
+            with open(f"{member.id}_chat_history.txt", "w", encoding="utf-8") as file:
+                file.write("\n".join(chat_history))
+            return f"{member.id}_chat_history.txt"
+        return None
 
     @commands.guild_only()
     @commands.command(name="viewreports")
