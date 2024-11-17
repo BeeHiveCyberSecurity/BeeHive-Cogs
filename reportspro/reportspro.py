@@ -45,17 +45,17 @@ class ReportsPro(commands.Cog):
             await ctx.send("I do not have permission to send messages in this channel.")
 
     @commands.guild_only()
-    @commands.command(name="report")
-    async def report_user(self, ctx, member: discord.Member):
+    @commands.slash_command(name="report")
+    async def report_user(self, interaction: discord.Interaction, member: discord.Member):
         """Report a user for inappropriate behavior."""
-        reports_channel_id = await self.config.guild(ctx.guild).reports_channel()
+        reports_channel_id = await self.config.guild(interaction.guild).reports_channel()
         if not reports_channel_id:
-            await ctx.send("Reports channel is not set. Please contact an admin.")
+            await interaction.response.send_message("Reports channel is not set. Please contact an admin.", ephemeral=True)
             return
 
-        reports_channel = ctx.guild.get_channel(reports_channel_id)
+        reports_channel = interaction.guild.get_channel(reports_channel_id)
         if not reports_channel:
-            await ctx.send("Reports channel is not accessible. Please contact an admin.")
+            await interaction.response.send_message("Reports channel is not accessible. Please contact an admin.", ephemeral=True)
             return
 
         # Create an embed with report types
@@ -81,9 +81,9 @@ class ReportsPro(commands.Cog):
 
         # Create a dropdown menu for report reasons
         class ReportDropdown(discord.ui.Select):
-            def __init__(self, config, ctx, member, reports_channel):
+            def __init__(self, config, interaction, member, reports_channel):
                 self.config = config
-                self.ctx = ctx
+                self.interaction = interaction
                 self.member = member
                 self.reports_channel = reports_channel
                 options = [
@@ -99,25 +99,25 @@ class ReportsPro(commands.Cog):
                     color=discord.Color.from_rgb(43, 189, 142),
                     description=f"Report submitted for {self.member.mention} with reason: {selected_reason}"
                 )
-                await interaction.response.send_message(embed=embed)
+                await interaction.response.send_message(embed=embed, ephemeral=True)
 
                 # Store the report in the config
                 try:
-                    reports = await self.config.guild(self.ctx.guild).reports()
+                    reports = await self.config.guild(self.interaction.guild).reports()
                     report_id = len(reports) + 1
                     reports[str(report_id)] = {
                         "reported_user": self.member.id,
-                        "reporter": self.ctx.author.id,
+                        "reporter": self.interaction.user.id,
                         "reason": selected_reason,
                         "timestamp": datetime.now(timezone.utc).isoformat()
                     }
-                    await self.config.guild(self.ctx.guild).reports.set(reports)
+                    await self.config.guild(self.interaction.guild).reports.set(reports)
                 except Exception as e:
-                    await self.ctx.send(f"An error occurred while saving the report: {e}")
+                    await self.interaction.response.send_message(f"An error occurred while saving the report: {e}", ephemeral=True)
                     return
 
                 # Capture chat history
-                chat_history = await self.capture_chat_history(self.ctx.guild, self.member)
+                chat_history = await self.capture_chat_history(self.interaction.guild, self.member)
 
                 # Send the report to the reports channel
                 if self.reports_channel:
@@ -125,7 +125,7 @@ class ReportsPro(commands.Cog):
                         title="New User Report",
                         color=discord.Color.red(),
                         description=f"**Reported User:** {self.member.mention} ({self.member.id})\n"
-                                    f"**Reported By:** {self.ctx.author.mention}\n"
+                                    f"**Reported By:** {self.interaction.user.mention}\n"
                                     f"**Reason:** {selected_reason}\n"
                                     f"**Timestamp:** {datetime.now(timezone.utc).isoformat()}"
                     )
@@ -135,20 +135,20 @@ class ReportsPro(commands.Cog):
                             await self.reports_channel.send(file=discord.File(chat_history, filename=f"{self.member.id}_chat_history.txt"))
                             os.remove(chat_history)  # Clean up the file after sending
                     except discord.Forbidden:
-                        await self.ctx.send("I do not have permission to send messages in the reports channel.")
+                        await self.interaction.response.send_message("I do not have permission to send messages in the reports channel.", ephemeral=True)
                     except Exception as e:
-                        await self.ctx.send(f"An error occurred while sending the report: {e}")
+                        await self.interaction.response.send_message(f"An error occurred while sending the report: {e}", ephemeral=True)
 
         # Create a view and add the dropdown
         view = discord.ui.View()
-        view.add_item(ReportDropdown(self.config, ctx, member, reports_channel))
+        view.add_item(ReportDropdown(self.config, interaction, member, reports_channel))
 
         try:
-            await ctx.send(embed=report_embed, view=view)
+            await interaction.response.send_message(embed=report_embed, view=view, ephemeral=True)
         except discord.Forbidden:
-            await ctx.send("I do not have permission to send messages in this channel.")
+            await interaction.response.send_message("I do not have permission to send messages in this channel.", ephemeral=True)
         except Exception as e:
-            await ctx.send(f"An error occurred while sending the report embed: {e}")
+            await interaction.response.send_message(f"An error occurred while sending the report embed: {e}", ephemeral=True)
 
     async def capture_chat_history(self, guild, member):
         """Capture the chat history of a member across all channels."""
