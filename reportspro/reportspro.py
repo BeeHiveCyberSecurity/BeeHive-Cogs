@@ -20,7 +20,7 @@ class ReportsPro(commands.Cog):
 
     @commands.guild_only()
     @commands.command(name="setreportchannel")
-    @checks.admin_or_permissions(manage_guild=True)
+    @checks.admin_or_permissions()
     async def set_report_channel(self, ctx, channel: discord.TextChannel):
         """Set the channel where reports will be sent."""
         await self.config.guild(ctx.guild).reports_channel.set(channel.id)
