@@ -156,18 +156,19 @@ class ReportsPro(commands.Cog):
         except Exception as e:
             await ctx.send(f"An error occurred while sending the report embed: {e}", ephemeral=True)
 
-    async def capture_chat_history(self, channel, member):
-        """Capture the chat history of a member in the specified channel."""
+    async def capture_chat_history(self, guild, member):
+        """Capture the chat history of a member across all channels."""
         chat_history = []
-        try:
-            async for message in channel.history(limit=100, oldest_first=False):
-                if message.author == member:
-                    chat_history.append(f"[{message.created_at}] {message.author}: {message.content}")
-        except discord.Forbidden:
-            print(f"Access to channel {channel.name} is forbidden.")
-        except Exception as e:
-            print(f"An error occurred while accessing channel {channel.name}: {e}")
-
+        for channel in guild.text_channels:
+            try:
+                async for message in channel.history(limit=100, oldest_first=False):
+                    if message.author == member:
+                        chat_history.append(f"[{message.created_at}] {message.author}: {message.content}")
+            except discord.Forbidden:
+                continue
+            except Exception as e:
+                print(f"An error occurred while accessing channel {channel.name}: {e}")
+                continue
         if chat_history:
             try:
                 file_path = tempfile.mktemp(suffix=f"_{member.id}_chat_history.txt")
