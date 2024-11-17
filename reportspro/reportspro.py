@@ -28,6 +28,23 @@ class ReportsPro(commands.Cog):
         await ctx.send(f"Reports channel set to {channel.mention}")
 
     @commands.guild_only()
+    @commands.command(name="viewsettings")
+    @checks.admin_or_permissions()
+    async def view_settings(self, ctx):
+        """View the current settings for the guild."""
+        reports_channel_id = await self.config.guild(ctx.guild).reports_channel()
+        reports_channel = ctx.guild.get_channel(reports_channel_id)
+        channel_mention = reports_channel.mention if reports_channel else "Not Set"
+        
+        embed = discord.Embed(title="Current Settings", color=discord.Color.green())
+        embed.add_field(name="Reports Channel", value=channel_mention, inline=False)
+        
+        try:
+            await ctx.send(embed=embed)
+        except discord.Forbidden:
+            await ctx.send("I do not have permission to send messages in this channel.")
+
+    @commands.guild_only()
     @commands.command(name="report")
     async def report_user(self, ctx, member: discord.Member):
         """Report a user for inappropriate behavior."""
