@@ -76,9 +76,9 @@ class ReportsPro(commands.Cog):
             ("Inappropriate Content", "Content that is offensive or not suitable for the community."),
             ("Impersonation", "Pretending to be someone else without permission."),
             ("Hate Speech", "Speech that attacks or discriminates against a group."),
-            ("Discord ToS Violation", "Actions that violate Discord's Terms of Service."),
-            ("Discord Community Guidelines Violation", "Actions that violate Discord's Community Guidelines."),
-            ("Other", "Any other reason not listed.")
+            ("Terms of Service", "Actions that violate Discord's Terms of Service."),
+            ("Community Guidelines", "Actions that violate Discord's Community Guidelines."),
+            ("Other", "Any other reason not listed but reasonably applicable.")
         ]
 
         # Create a dropdown menu for report reasons
