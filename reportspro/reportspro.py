@@ -29,7 +29,12 @@ class ReportsPro(commands.Cog):
     async def set_report_channel(self, ctx, channel: discord.TextChannel):
         """Set the channel where reports will be sent."""
         await self.config.guild(ctx.guild).reports_channel.set(channel.id)
-        await ctx.send(f"Reports channel set to {channel.mention}")
+        embed = discord.Embed(
+            title="Reports Channel Set",
+            description=f"Reports channel set to {channel.mention}",
+            color=discord.Color.green()
+        )
+        await ctx.send(embed=embed)
 
     @reportset.command(name="view")
     async def view_settings(self, ctx):
@@ -44,7 +49,12 @@ class ReportsPro(commands.Cog):
         try:
             await ctx.send(embed=embed)
         except discord.Forbidden:
-            await ctx.send("I do not have permission to send messages in this channel.")
+            embed = discord.Embed(
+                title="Permission Error",
+                description="I do not have permission to send messages in this channel.",
+                color=discord.Color.red()
+            )
+            await ctx.send(embed=embed)
 
     @commands.guild_only()
     @commands.command(name="report")
@@ -52,12 +62,22 @@ class ReportsPro(commands.Cog):
         """Report a user for inappropriate behavior."""
         reports_channel_id = await self.config.guild(ctx.guild).reports_channel()
         if not reports_channel_id:
-            await ctx.send("Reports channel is not set. Please contact an admin.", ephemeral=True)
+            embed = discord.Embed(
+                title="Error",
+                description="Reports channel is not set. Please contact an admin.",
+                color=discord.Color.red()
+            )
+            await ctx.send(embed=embed, ephemeral=True)
             return
 
         reports_channel = ctx.guild.get_channel(reports_channel_id)
         if not reports_channel:
-            await ctx.send("Reports channel is not accessible. Please contact an admin.", ephemeral=True)
+            embed = discord.Embed(
+                title="Error",
+                description="Reports channel is not accessible. Please contact an admin.",
+                color=discord.Color.red()
+            )
+            await ctx.send(embed=embed, ephemeral=True)
             return
 
         # Create an embed with report types
@@ -122,14 +142,24 @@ class ReportsPro(commands.Cog):
                     }
                     await self.config.guild(self.ctx.guild).reports.set(reports)
                 except Exception as e:
-                    await interaction.response.send_message(f"An error occurred while saving the report: {e}", ephemeral=True)
+                    embed = discord.Embed(
+                        title="Error",
+                        description=f"An error occurred while saving the report: {e}",
+                        color=discord.Color.red()
+                    )
+                    await interaction.response.send_message(embed=embed, ephemeral=True)
                     return
 
                 # Capture chat history
                 try:
                     chat_history = await self.capture_chat_history(self.ctx.guild, self.member)
                 except Exception as e:
-                    await interaction.response.send_message(f"An error occurred while capturing chat history: {e}", ephemeral=True)
+                    embed = discord.Embed(
+                        title="Error",
+                        description=f"An error occurred while capturing chat history: {e}",
+                        color=discord.Color.red()
+                    )
+                    await interaction.response.send_message(embed=embed, ephemeral=True)
                     return
 
                 # Count existing reports against the user by reason
@@ -157,11 +187,26 @@ class ReportsPro(commands.Cog):
                             await self.reports_channel.send(file=discord.File(chat_history, filename=f"{self.member.id}_chat_history.txt"))
                             os.remove(chat_history)  # Clean up the file after sending
                     except discord.Forbidden:
-                        await interaction.response.send_message("I do not have permission to send messages in the reports channel.", ephemeral=True)
+                        embed = discord.Embed(
+                            title="Permission Error",
+                            description="I do not have permission to send messages in the reports channel.",
+                            color=discord.Color.red()
+                        )
+                        await interaction.response.send_message(embed=embed, ephemeral=True)
                     except Exception as e:
-                        await interaction.response.send_message(f"An error occurred while sending the report: {e}", ephemeral=True)
+                        embed = discord.Embed(
+                            title="Error",
+                            description=f"An error occurred while sending the report: {e}",
+                            color=discord.Color.red()
+                        )
+                        await interaction.response.send_message(embed=embed, ephemeral=True)
                 else:
-                    await interaction.response.send_message("Reports channel is not accessible. Please contact an admin.", ephemeral=True)
+                    embed = discord.Embed(
+                        title="Error",
+                        description="Reports channel is not accessible. Please contact an admin.",
+                        color=discord.Color.red()
+                    )
+                    await interaction.response.send_message(embed=embed, ephemeral=True)
 
         # Create a view and add the dropdown
         view = discord.ui.View()
@@ -170,9 +215,19 @@ class ReportsPro(commands.Cog):
         try:
             await ctx.send(embed=report_embed, view=view, ephemeral=True)
         except discord.Forbidden:
-            await ctx.send("I do not have permission to send messages in this channel.", ephemeral=True)
+            embed = discord.Embed(
+                title="Permission Error",
+                description="I do not have permission to send messages in this channel.",
+                color=discord.Color.red()
+            )
+            await ctx.send(embed=embed, ephemeral=True)
         except Exception as e:
-            await ctx.send(f"An error occurred while sending the report embed: {e}", ephemeral=True)
+            embed = discord.Embed(
+                title="Error",
+                description=f"An error occurred while sending the report embed: {e}",
+                color=discord.Color.red()
+            )
+            await ctx.send(embed=embed, ephemeral=True)
 
     async def capture_chat_history(self, guild, member):
         """Capture the chat history of a member across all channels."""
@@ -205,7 +260,12 @@ class ReportsPro(commands.Cog):
         """View all reports in the guild or reports for a specific user."""
         reports = await self.config.guild(ctx.guild).reports()
         if not reports:
-            await ctx.send("There are no reports in this guild.")
+            embed = discord.Embed(
+                title="No Reports",
+                description="There are no reports in this guild.",
+                color=discord.Color.orange()
+            )
+            await ctx.send(embed=embed)
             return
 
         # Filter reports for a specific member if provided
@@ -215,7 +275,12 @@ class ReportsPro(commands.Cog):
         ]
 
         if not filtered_reports:
-            await ctx.send("There are no reports for the specified user.")
+            embed = discord.Embed(
+                title="No Reports",
+                description="There are no reports for the specified user.",
+                color=discord.Color.orange()
+            )
+            await ctx.send(embed=embed)
             return
 
         # Create a list of embeds, one for each report
@@ -288,9 +353,19 @@ class ReportsPro(commands.Cog):
         """Clear all reports in the guild."""
         await self.config.guild(ctx.guild).reports.set({})
         try:
-            await ctx.send("All reports have been cleared.")
+            embed = discord.Embed(
+                title="Reports Cleared",
+                description="All reports have been cleared.",
+                color=discord.Color.green()
+            )
+            await ctx.send(embed=embed)
         except discord.Forbidden:
-            await ctx.send("I do not have permission to send messages in this channel.")
+            embed = discord.Embed(
+                title="Permission Error",
+                description="I do not have permission to send messages in this channel.",
+                color=discord.Color.red()
+            )
+            await ctx.send(embed=embed)
 
     @commands.guild_only()
     @commands.command(name="cleanupreports")
@@ -300,7 +375,12 @@ class ReportsPro(commands.Cog):
         reports = await self.config.guild(ctx.guild).reports()
         updated_reports = {k: v for k, v in reports.items() if self.is_recent(v.get('timestamp'))}
         await self.config.guild(ctx.guild).reports.set(updated_reports)
-        await ctx.send("Old reports have been cleaned up.")
+        embed = discord.Embed(
+            title="Reports Cleaned",
+            description="Old reports have been cleaned up.",
+            color=discord.Color.green()
+        )
+        await ctx.send(embed=embed)
 
     def is_recent(self, timestamp):
         """Check if a report is recent (within 30 days)."""
@@ -321,7 +401,12 @@ class ReportsPro(commands.Cog):
         report = reports.get(str(report_id))
 
         if not report:
-            await ctx.send("Report not found.")
+            embed = discord.Embed(
+                title="Report Not Found",
+                description="Report not found.",
+                color=discord.Color.red()
+            )
+            await ctx.send(embed=embed)
             return
 
         reported_user = ctx.guild.get_member(report['reported_user'])
@@ -358,7 +443,12 @@ class ReportsPro(commands.Cog):
                     reaction, _ = await self.ctx.bot.wait_for('reaction_add', timeout=60.0, check=check)
                     return str(reaction.emoji)
                 except asyncio.TimeoutError:
-                    await self.ctx.send("You took too long to respond.")
+                    embed = discord.Embed(
+                        title="Timeout",
+                        description="You took too long to respond.",
+                        color=discord.Color.red()
+                    )
+                    await self.ctx.send(embed=embed)
                     return None
 
             async def handle_report(self):
@@ -368,7 +458,12 @@ class ReportsPro(commands.Cog):
                 message = await self.ask_question(self.ctx, question, emoji_meanings)
                 emoji = await self.handle_reaction(message, emoji_meanings)
                 if emoji is None or emoji_meanings[emoji] == "No":
-                    await self.ctx.send("Please review all facts before proceeding.")
+                    embed = discord.Embed(
+                        title="Investigation Required",
+                        description="Please review all facts before proceeding.",
+                        color=discord.Color.orange()
+                    )
+                    await self.ctx.send(embed=embed)
                     return
                 self.answers.append(emoji_meanings[emoji])
 
@@ -378,7 +473,12 @@ class ReportsPro(commands.Cog):
                 message = await self.ask_question(self.ctx, question, emoji_meanings)
                 emoji = await self.handle_reaction(message, emoji_meanings)
                 if emoji is None or emoji_meanings[emoji] == "Invalid":
-                    await self.ctx.send("The report has been deemed invalid. No further action will be taken.")
+                    embed = discord.Embed(
+                        title="Report Invalid",
+                        description="The report has been deemed invalid. No further action will be taken.",
+                        color=discord.Color.orange()
+                    )
+                    await self.ctx.send(embed=embed)
                     return
                 self.answers.append(emoji_meanings[emoji])
 
@@ -399,31 +499,71 @@ class ReportsPro(commands.Cog):
                     try:
                         await self.reported_user.send("You have received a warning due to a report against you.")
                     except discord.Forbidden:
-                        await self.ctx.send("Could not send a warning to the reported user.")
+                        embed = discord.Embed(
+                            title="Warning Error",
+                            description="Could not send a warning to the reported user.",
+                            color=discord.Color.red()
+                        )
+                        await self.ctx.send(embed=embed)
                 elif action == "Timeout" and self.reported_user:
                     try:
                         await self.reported_user.timeout(duration=86400)  # Timeout for 24 hours
-                        await self.ctx.send(f"{self.reported_user.mention} has been timed out for 24 hours.")
+                        embed = discord.Embed(
+                            title="User Timed Out",
+                            description=f"{self.reported_user.mention} has been timed out for 24 hours.",
+                            color=discord.Color.green()
+                        )
+                        await self.ctx.send(embed=embed)
                     except discord.Forbidden:
-                        await self.ctx.send("Could not timeout the reported user.")
+                        embed = discord.Embed(
+                            title="Timeout Error",
+                            description="Could not timeout the reported user.",
+                            color=discord.Color.red()
+                        )
+                        await self.ctx.send(embed=embed)
                 elif action == "Ban" and self.reported_user:
                     try:
                         await self.reported_user.ban(reason="Report handled and deemed valid.")
-                        await self.ctx.send(f"{self.reported_user.mention} has been banned.")
+                        embed = discord.Embed(
+                            title="User Banned",
+                            description=f"{self.reported_user.mention} has been banned.",
+                            color=discord.Color.green()
+                        )
+                        await self.ctx.send(embed=embed)
                     except discord.Forbidden:
-                        await self.ctx.send("Could not ban the reported user.")
+                        embed = discord.Embed(
+                            title="Ban Error",
+                            description="Could not ban the reported user.",
+                            color=discord.Color.red()
+                        )
+                        await self.ctx.send(embed=embed)
 
                 if self.reporter:
                     try:
-                        await self.reporter.send(
-                            f"The report you submitted earlier has been reviewed by a staff member. "
-                            f"After careful consideration, the report was deemed {self.answers[1]}. "
-                            f"As a result, the following action has been taken against the reported user: {action}."
+                        embed = discord.Embed(
+                            title="An update on your earlier report",
+                            description=(
+                                f"The report you submitted earlier has been reviewed by a staff member. "
+                                f"After careful consideration, the report was deemed {self.answers[1]}. "
+                                f"As a result, the following action has been taken against the reported user: {action}."
+                            ),
+                            color=discord.Color.blue()
                         )
+                        await self.reporter.send(embed=embed)
                     except discord.Forbidden:
-                        await self.ctx.send("Could not send a DM to the reporter.")
+                        embed = discord.Embed(
+                            title="DM Error",
+                            description="Could not send a DM to the reporter.",
+                            color=discord.Color.red()
+                        )
+                        await self.ctx.send(embed=embed)
 
-                await self.ctx.send(f"Report {self.report_id} has been handled. Action: {action}.")
+                embed = discord.Embed(
+                    title="Report Handled",
+                    description=f"Report {self.report_id} has been handled. Action: {action}.",
+                    color=discord.Color.green()
+                )
+                await self.ctx.send(embed=embed)
                 self.stop()
 
         view = HandleReportView(ctx, report_id, reporter, reported_user)
