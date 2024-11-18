@@ -190,6 +190,7 @@ class ReportsPro(commands.Cog):
                     report_message.add_field(name="Reporter", value=self.ctx.author.mention, inline=True)
                     report_message.add_field(name="Reporter ID", value=f"`{self.ctx.author.id}`", inline=True)
                     report_message.add_field(name="Time", value=f"<t:{int(datetime.now(timezone.utc).timestamp())}:R>", inline=True)
+                    report_message.add_field(name="Date", value=f"<t:{int(datetime.now(timezone.utc).timestamp())}:D>", inline=True)
                     report_message.add_field(name="Reason", value=f"**{selected_reason}**\n*{selected_description}*", inline=False)
                     
                     # Add a summary of existing report counts by reason
