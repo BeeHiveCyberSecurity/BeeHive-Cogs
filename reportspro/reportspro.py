@@ -64,7 +64,7 @@ class ReportsPro(commands.Cog):
         report_embed = discord.Embed(
             title=f"Report a user to the moderators of {ctx.guild.name}",
             color=discord.Color.from_rgb(255, 69, 69),
-            description=f"**You're reporting {member.mention} ({member.id})**\n"
+            description=f"**You're reporting {member.mention} ({member.id})**\n\n"
                         f"Please select a reason for the report from the dropdown below."
         )
 
@@ -72,6 +72,7 @@ class ReportsPro(commands.Cog):
         report_reasons = [
             ("Harassment", "Unwanted behavior that causes distress or discomfort."),
             ("Spam", "Repeated or irrelevant messages disrupting the chat."),
+            ("Advertising", "Unwanted or non-consensual advertising or promotion."),
             ("Inappropriate Content", "Content that is offensive or not suitable for the community."),
             ("Impersonation", "Pretending to be someone else without permission."),
             ("Hate Speech", "Speech that attacks or discriminates against a group."),
