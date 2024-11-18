@@ -220,7 +220,7 @@ class ReportsPro(commands.Cog):
                     mention_text = mention_role.mention if mention_role else ""
 
                     try:
-                        await self.reports_channel.send(content=mention_text, embed=report_message)
+                        await self.reports_channel.send(content=mention_text, embed=report_message, allowed_mentions=discord.AllowedMentions(roles=True))
                         if chat_history:
                             await self.reports_channel.send(file=discord.File(chat_history, filename=f"{self.member.id}_chat_history.txt"))
                             os.remove(chat_history)  # Clean up the file after sending
