@@ -362,18 +362,34 @@ class ReportsPro(commands.Cog):
                     return None
 
             async def handle_report(self):
-                questions = [
-                    ("Have you reviewed and investigated all facts of the matter?", {"✅": "Yes", "❌": "No"}),
-                    ("Do you believe the report, including its evidence and reason, is valid?", {"✅": "Valid", "❌": "Invalid"}),
-                    ("What action should be taken against the reported user?", {"⚠️": "Warning", "⏲️": "Timeout", "🔨": "Ban"})
-                ]
+                # Initial question to confirm investigation
+                question = "Have you reviewed and investigated all facts of the matter?"
+                emoji_meanings = {"✅": "Yes", "❌": "No"}
+                message = await self.ask_question(self.ctx, question, emoji_meanings)
+                emoji = await self.handle_reaction(message, emoji_meanings)
+                if emoji is None or emoji_meanings[emoji] == "No":
+                    await self.ctx.send("Please review all facts before proceeding.")
+                    return
+                self.answers.append(emoji_meanings[emoji])
 
-                for question, emoji_meanings in questions:
-                    message = await self.ask_question(self.ctx, question, emoji_meanings)
-                    emoji = await self.handle_reaction(message, emoji_meanings)
-                    if emoji is None:
-                        return
-                    self.answers.append(emoji_meanings[emoji])
+                # Question to determine validity of the report
+                question = "Do you believe the report, including its evidence and reason, is valid?"
+                emoji_meanings = {"✅": "Valid", "❌": "Invalid"}
+                message = await self.ask_question(self.ctx, question, emoji_meanings)
+                emoji = await self.handle_reaction(message, emoji_meanings)
+                if emoji is None or emoji_meanings[emoji] == "Invalid":
+                    await self.ctx.send("The report has been deemed invalid. No further action will be taken.")
+                    return
+                self.answers.append(emoji_meanings[emoji])
+
+                # Final question to decide action
+                question = "What action should be taken against the reported user?"
+                emoji_meanings = {"⚠️": "Warning", "⏲️": "Timeout", "🔨": "Ban"}
+                message = await self.ask_question(self.ctx, question, emoji_meanings)
+                emoji = await self.handle_reaction(message, emoji_meanings)
+                if emoji is None:
+                    return
+                self.answers.append(emoji_meanings[emoji])
 
                 await self.finalize()
 
