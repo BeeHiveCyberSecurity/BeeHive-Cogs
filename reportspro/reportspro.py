@@ -142,7 +142,7 @@ class ReportsPro(commands.Cog):
                         color=discord.Color.from_rgb(255, 69, 69)
                     )
                     report_message.add_field(name="Offender", value=f"{self.member.mention} ({self.member.id})", inline=False)
-                    report_message.add_field(name="Victim", value=self.ctx.author.mention, inline=False)
+                    report_message.add_field(name="Reporter", value=self.ctx.author.mention, inline=False)
                     report_message.add_field(name="Reason", value=f"{selected_reason}: {selected_description}", inline=False)
                     report_message.add_field(name="Time", value=f"<t:{int(datetime.now(timezone.utc).timestamp())}:R>", inline=False)
                     
@@ -337,26 +337,42 @@ class ReportsPro(commands.Cog):
                 self.reported_user = reported_user
                 self.answers = []
 
+            async def send_embed_with_buttons(self, interaction, title, description, buttons):
+                embed = discord.Embed(title=title, description=description, color=discord.Color.blue())
+                await interaction.response.send_message(embed=embed, view=buttons, ephemeral=True)
+
             @discord.ui.button(label="Reviewed Facts", style=discord.ButtonStyle.primary)
             async def reviewed_facts(self, interaction: discord.Interaction, button: discord.ui.Button):
                 self.answers.append("yes")
-                await interaction.response.send_message("Have you reviewed and investigated all facts of the matter?", ephemeral=True)
                 button.disabled = True
-                await interaction.message.edit(view=self)
+                await self.send_embed_with_buttons(
+                    interaction,
+                    "Reviewed Facts",
+                    "Have you reviewed and investigated all facts of the matter?",
+                    self
+                )
 
             @discord.ui.button(label="Valid", style=discord.ButtonStyle.success)
             async def valid_report(self, interaction: discord.Interaction, button: discord.ui.Button):
                 self.answers.append("valid")
-                await interaction.response.send_message("Do you believe the report, including its evidence and reason, is valid?", ephemeral=True)
                 button.disabled = True
-                await interaction.message.edit(view=self)
+                await self.send_embed_with_buttons(
+                    interaction,
+                    "Valid Report",
+                    "Do you believe the report, including its evidence and reason, is valid?",
+                    self
+                )
 
             @discord.ui.button(label="Invalid", style=discord.ButtonStyle.danger)
             async def invalid_report(self, interaction: discord.Interaction, button: discord.ui.Button):
                 self.answers.append("invalid")
-                await interaction.response.send_message("Do you believe the report, including its evidence and reason, is invalid?", ephemeral=True)
                 button.disabled = True
-                await interaction.message.edit(view=self)
+                await self.send_embed_with_buttons(
+                    interaction,
+                    "Invalid Report",
+                    "Do you believe the report, including its evidence and reason, is invalid?",
+                    self
+                )
 
             @discord.ui.button(label="Warning", style=discord.ButtonStyle.secondary)
             async def warning(self, interaction: discord.Interaction, button: discord.ui.Button):
