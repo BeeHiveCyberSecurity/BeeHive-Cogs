@@ -186,9 +186,9 @@ class ReportsPro(commands.Cog):
                     )
                     report_message.add_field(name="Report ID", value=f"```{report_id}```", inline=False)
                     report_message.add_field(name="Offender", value=f"{self.member.mention}", inline=True)
-                    report_message.add_field(name="Offender ID", value=f"{self.member.id}", inline=True)
+                    report_message.add_field(name="Offender ID", value=f"`{self.member.id}`", inline=True)
                     report_message.add_field(name="Reporter", value=self.ctx.author.mention, inline=True)
-                    report_message.add_field(name="Reporter ID", value=self.ctx.author.id, inline=True)
+                    report_message.add_field(name="Reporter ID", value=f"`{self.ctx.author.id}`", inline=True)
                     report_message.add_field(name="Time", value=f"<t:{int(datetime.now(timezone.utc).timestamp())}:R>", inline=True)
                     report_message.add_field(name="Reason", value=f"**{selected_reason}**\n*{selected_description}*", inline=False)
                     
