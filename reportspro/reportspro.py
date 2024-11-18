@@ -556,11 +556,12 @@ class ReportsPro(commands.Cog):
                         embed = discord.Embed(
                             title="An update on your earlier report",
                             description=(
-                                f"The report you submitted earlier has been reviewed by a staff member. "
-                                f"After careful consideration, the report was deemed {self.answers[1]}. "
-                                f"As a result, the following action has been taken against the reported user: {action}."
+                                f"The report you submitted earlier `{self.report_id}` "
+                                f"has been reviewed by a staff member. After careful consideration, "
+                                f"the report was deemed {self.answers[1]}. As a result, the following "
+                                f"action has been taken against the reported user: {action}."
                             ),
-                            color=discord.Color.blue()
+                            color=discord.Color.from_rgb(255, 255, 254)
                         )
                         await self.reporter.send(embed=embed)
                     except discord.Forbidden:
