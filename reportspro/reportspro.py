@@ -131,9 +131,9 @@ class ReportsPro(commands.Cog):
                     title="Report created",
                     color=discord.Color.from_rgb(43, 189, 142),
                     description=(
-                        f"Report created for {self.member.mention} with reason: {selected_reason}\n\n"
+                        f"You reported {self.member.mention} for **{selected_reason}**\n"
                         f"Your report ID is: `{report_id}`. If we send you any updates on your report, "
-                        f"we'll reference this ID.\n\n"
+                        f"we'll reference this ID.\n"
                         "The bot will attempt to automatically capture chat evidence from recent conversations "
                         "to assist in the investigation of your report. Your messages will be included in this. "
                     )
