@@ -5,6 +5,8 @@ import os
 import tempfile
 import asyncio
 from collections import Counter
+import random
+import string
 
 class ReportsPro(commands.Cog):
     """Cog to handle global user reports"""
@@ -132,8 +134,10 @@ class ReportsPro(commands.Cog):
                 # Store the report in the config
                 try:
                     reports = await self.config.guild(self.ctx.guild).reports()
-                    report_id = len(reports) + 1
-                    reports[str(report_id)] = {
+                    report_id = ''.join(random.choices(string.ascii_letters + string.digits, k=4))
+                    while report_id in reports:
+                        report_id = ''.join(random.choices(string.ascii_letters + string.digits, k=4))
+                    reports[report_id] = {
                         "reported_user": self.member.id,
                         "reporter": self.ctx.author.id,
                         "reason": selected_reason,
@@ -171,7 +175,7 @@ class ReportsPro(commands.Cog):
                         title="A user in the server was reported",
                         color=discord.Color.from_rgb(255, 69, 69)
                     )
-                    report_message.add_field(name="Report ID", value=str(report_id), inline=False)
+                    report_message.add_field(name="Report ID", value=report_id, inline=False)
                     report_message.add_field(name="Offender", value=f"{self.member.mention} ({self.member.id})", inline=False)
                     report_message.add_field(name="Reporter", value=self.ctx.author.mention, inline=False)
                     report_message.add_field(name="Reason", value=f"{selected_reason}: {selected_description}", inline=False)
@@ -396,10 +400,10 @@ class ReportsPro(commands.Cog):
     @commands.guild_only()
     @commands.command(name="handlereport")
     @checks.admin_or_permissions(manage_guild=True)
-    async def handle_report(self, ctx, report_id: int):
+    async def handle_report(self, ctx, report_id: str):
         """Handle a report by its ID."""
         reports = await self.config.guild(ctx.guild).reports()
-        report = reports.get(str(report_id))
+        report = reports.get(report_id)
 
         if not report:
             embed = discord.Embed(
