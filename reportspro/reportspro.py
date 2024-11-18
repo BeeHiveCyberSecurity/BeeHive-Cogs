@@ -343,8 +343,8 @@ class ReportsPro(commands.Cog):
                     description=question,
                     color=discord.Color.blue()
                 )
-                for emoji, meaning in emoji_meanings.items():
-                    embed.add_field(name=emoji, value=meaning, inline=False)
+                emoji_list = "\n".join([f"{emoji}: {meaning}" for emoji, meaning in emoji_meanings.items()])
+                embed.add_field(name="Options", value=emoji_list, inline=False)
                 message = await ctx.send(embed=embed)
                 for emoji in emoji_meanings.keys():
                     await message.add_reaction(emoji)
