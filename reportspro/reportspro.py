@@ -37,7 +37,7 @@ class ReportsPro(commands.Cog):
         reports_channel = ctx.guild.get_channel(reports_channel_id)
         channel_mention = reports_channel.mention if reports_channel else "Not Set"
         
-        embed = discord.Embed(title="Current reporting settings", color=discord.Color.from_rgb(43, 189, 142))
+        embed = discord.Embed(title="Current reporting settings", color=discord.Color.from_rgb(255, 255, 254))
         embed.add_field(name="Log channel", value=channel_mention, inline=False)
         
         try:
@@ -61,8 +61,8 @@ class ReportsPro(commands.Cog):
 
         # Create an embed with report types
         report_embed = discord.Embed(
-            title="Report User",
-            color=discord.Color.red(),
+            title="Report a user to moderators",
+            color=discord.Color.from_rgb(255, 69, 69),
             description=f"**You're reporting {member.mention} ({member.id})**\n"
                         f"Please select a reason for the report from the dropdown below."
         )
@@ -132,7 +132,7 @@ class ReportsPro(commands.Cog):
                 if self.reports_channel:
                     report_message = discord.Embed(
                         title="New User Report",
-                        color=discord.Color.red()
+                        color=discord.Color.from_rgb(255, 69, 69)
                     )
                     report_message.add_field(name="Reported User", value=f"{self.member.mention} ({self.member.id})", inline=False)
                     report_message.add_field(name="Reported By", value=self.ctx.author.mention, inline=False)
@@ -211,7 +211,7 @@ class ReportsPro(commands.Cog):
             reported_user = ctx.guild.get_member(report_info['reported_user'])
             reporter = ctx.guild.get_member(report_info['reporter'])
 
-            embed = discord.Embed(title=f"Report ID: {report_id}", color=discord.Color.blue())
+            embed = discord.Embed(title=f"Report ID: {report_id}", color=discord.Color.from_rgb(255, 255, 254))
             embed.add_field(
                 name="Reported User",
                 value=reported_user.mention if reported_user else 'Unknown User',
