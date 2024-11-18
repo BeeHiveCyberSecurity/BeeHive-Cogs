@@ -181,14 +181,16 @@ class ReportsPro(commands.Cog):
                 # Send the report to the reports channel
                 if self.reports_channel:
                     report_message = discord.Embed(
-                        title="A user in the server was reported",
+                        title="A report is waiting to be handled...",
                         color=discord.Color.from_rgb(255, 69, 69)
                     )
-                    report_message.add_field(name="Report ID", value=f"`{report_id}`", inline=False)
-                    report_message.add_field(name="Offender", value=f"{self.member.mention} ({self.member.id})", inline=False)
-                    report_message.add_field(name="Reporter", value=self.ctx.author.mention, inline=False)
-                    report_message.add_field(name="Reason", value=f"{selected_reason}: {selected_description}", inline=False)
-                    report_message.add_field(name="Time", value=f"<t:{int(datetime.now(timezone.utc).timestamp())}:R>", inline=False)
+                    report_message.add_field(name="Report ID", value=f"```{report_id}```", inline=False)
+                    report_message.add_field(name="Offender", value=f"{self.member.mention}", inline=True)
+                    report_message.add_field(name="Offender ID", value=f"{self.member.id}", inline=True)
+                    report_message.add_field(name="Reporter", value=self.ctx.author.mention, inline=True)
+                    report_message.add_field(name="Reporter ID", value=self.ctx.author.id, inline=True)
+                    report_message.add_field(name="Time", value=f"<t:{int(datetime.now(timezone.utc).timestamp())}:R>", inline=True)
+                    report_message.add_field(name="Reason", value=f"**{selected_reason}**\n*{selected_description}*", inline=False)
                     
                     # Add a summary of existing report counts by reason
                     if reason_counts:
