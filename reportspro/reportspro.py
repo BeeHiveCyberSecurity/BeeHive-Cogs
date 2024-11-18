@@ -134,7 +134,7 @@ class ReportsPro(commands.Cog):
                         f"Report created for {self.member.mention} with reason: {selected_reason}\n\n"
                         f"Your report ID is: `{report_id}`. If we send you any updates on your report, "
                         f"we'll reference this ID.\n\n"
-                        "Sentri will attempt to automatically capture chat evidence from recent conversations "
+                        "We'll attempt to automatically capture chat evidence from recent conversations "
                         "to assist in the investigation of your report. Your messages will be included in this. "
                     )
                 )
