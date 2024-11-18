@@ -16,7 +16,8 @@ class ReportsPro(commands.Cog):
         self.config = Config.get_conf(self, identifier=1234567890, force_registration=True)
         default_guild = {
             "reports_channel": None,
-            "reports": {}
+            "reports": {},
+            "mention_role": None
         }
         self.config.register_guild(**default_guild)
 
@@ -38,15 +39,31 @@ class ReportsPro(commands.Cog):
         )
         await ctx.send(embed=embed)
 
+    @reportset.command(name="mention")
+    async def set_mention_role(self, ctx, role: discord.Role):
+        """Set the role to be mentioned when new reports are sent."""
+        await self.config.guild(ctx.guild).mention_role.set(role.id)
+        embed = discord.Embed(
+            title="Mention Role Set",
+            description=f"Role {role.mention} will be mentioned for new reports.",
+            color=discord.Color.green()
+        )
+        await ctx.send(embed=embed)
+
     @reportset.command(name="view")
     async def view_settings(self, ctx):
         """View the current settings for the guild."""
         reports_channel_id = await self.config.guild(ctx.guild).reports_channel()
         reports_channel = ctx.guild.get_channel(reports_channel_id)
         channel_mention = reports_channel.mention if reports_channel else "Not Set"
+
+        mention_role_id = await self.config.guild(ctx.guild).mention_role()
+        mention_role = ctx.guild.get_role(mention_role_id)
+        role_mention = mention_role.mention if mention_role else "Not Set"
         
         embed = discord.Embed(title="Current reporting settings", color=discord.Color.from_rgb(255, 255, 254))
         embed.add_field(name="Log channel", value=channel_mention, inline=False)
+        embed.add_field(name="Mention Role", value=role_mention, inline=False)
         
         try:
             await ctx.send(embed=embed)
@@ -198,8 +215,12 @@ class ReportsPro(commands.Cog):
                         summary = "\n".join(f"**{reason}** x**{count}**" for reason, count in reason_counts.items())
                         report_message.add_field(name="Pre-existing reports", value=summary, inline=False)
 
+                    mention_role_id = await self.config.guild(self.ctx.guild).mention_role()
+                    mention_role = ctx.guild.get_role(mention_role_id)
+                    mention_text = mention_role.mention if mention_role else ""
+
                     try:
-                        await self.reports_channel.send(embed=report_message)
+                        await self.reports_channel.send(content=mention_text, embed=report_message)
                         if chat_history:
                             await self.reports_channel.send(file=discord.File(chat_history, filename=f"{self.member.id}_chat_history.txt"))
                             os.remove(chat_history)  # Clean up the file after sending
