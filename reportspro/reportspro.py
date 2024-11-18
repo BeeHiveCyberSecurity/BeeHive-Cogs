@@ -171,6 +171,7 @@ class ReportsPro(commands.Cog):
                         title="A user in the server was reported",
                         color=discord.Color.from_rgb(255, 69, 69)
                     )
+                    report_message.add_field(name="Report ID", value=str(report_id), inline=False)
                     report_message.add_field(name="Offender", value=f"{self.member.mention} ({self.member.id})", inline=False)
                     report_message.add_field(name="Reporter", value=self.ctx.author.mention, inline=False)
                     report_message.add_field(name="Reason", value=f"{selected_reason}: {selected_description}", inline=False)
