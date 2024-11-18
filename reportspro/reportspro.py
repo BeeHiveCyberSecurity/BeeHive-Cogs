@@ -132,7 +132,7 @@ class ReportsPro(commands.Cog):
                     color=discord.Color.from_rgb(43, 189, 142),
                     description=(
                         f"Report created for {self.member.mention} with reason: {selected_reason}\n\n"
-                        f"Your report ID is: {report_id}. If we send you any updates on your report, "
+                        f"Your report ID is: `{report_id}`. If we send you any updates on your report, "
                         f"we'll reference this ID.\n\n"
                         "Sentri will attempt to automatically capture chat evidence from recent conversations "
                         "to assist in the investigation of your report. Your messages will be included in this. "
@@ -184,7 +184,7 @@ class ReportsPro(commands.Cog):
                         title="A user in the server was reported",
                         color=discord.Color.from_rgb(255, 69, 69)
                     )
-                    report_message.add_field(name="Report ID", value=report_id, inline=False)
+                    report_message.add_field(name="Report ID", value=f"`{report_id}`", inline=False)
                     report_message.add_field(name="Offender", value=f"{self.member.mention} ({self.member.id})", inline=False)
                     report_message.add_field(name="Reporter", value=self.ctx.author.mention, inline=False)
                     report_message.add_field(name="Reason", value=f"{selected_reason}: {selected_description}", inline=False)
@@ -303,7 +303,7 @@ class ReportsPro(commands.Cog):
             reported_user = ctx.guild.get_member(int(report_info['reported_user']))
             reporter = ctx.guild.get_member(int(report_info['reporter']))
 
-            embed = discord.Embed(title=f"Report ID: {report_id}", color=discord.Color.from_rgb(255, 255, 254))
+            embed = discord.Embed(title=f"Report {report_id}", color=discord.Color.from_rgb(255, 255, 254))
             embed.add_field(
                 name="Reported User",
                 value=reported_user.mention if reported_user else 'Unknown User',
