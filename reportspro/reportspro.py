@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 import os
 import tempfile
 import asyncio
+from collections import Counter
 
 class ReportsPro(commands.Cog):
     """Cog to handle global user reports"""
@@ -95,6 +96,7 @@ class ReportsPro(commands.Cog):
 
             async def callback(self, interaction: discord.Interaction):
                 selected_reason = self.values[0]
+                selected_description = next(description for reason, description in report_reasons if reason == selected_reason)
                 embed = discord.Embed(
                     title="Report submitted",
                     color=discord.Color.from_rgb(43, 189, 142),
@@ -114,6 +116,7 @@ class ReportsPro(commands.Cog):
                         "reported_user": self.member.id,
                         "reporter": self.ctx.author.id,
                         "reason": selected_reason,
+                        "description": selected_description,
                         "timestamp": datetime.now(timezone.utc).isoformat()
                     }
                     await self.config.guild(self.ctx.guild).reports.set(reports)
@@ -128,6 +131,9 @@ class ReportsPro(commands.Cog):
                     await interaction.response.send_message(f"An error occurred while capturing chat history: {e}", ephemeral=True)
                     return
 
+                # Count existing reports against the user by reason
+                reason_counts = Counter(report['reason'] for report in reports.values() if report['reported_user'] == self.member.id)
+
                 # Send the report to the reports channel
                 if self.reports_channel:
                     report_message = discord.Embed(
@@ -136,8 +142,14 @@ class ReportsPro(commands.Cog):
                     )
                     report_message.add_field(name="Reported User", value=f"{self.member.mention} ({self.member.id})", inline=False)
                     report_message.add_field(name="Reported By", value=self.ctx.author.mention, inline=False)
-                    report_message.add_field(name="Reason", value=selected_reason, inline=False)
+                    report_message.add_field(name="Reason", value=f"{selected_reason}: {selected_description}", inline=False)
                     report_message.add_field(name="Timestamp", value=datetime.now(timezone.utc).isoformat(), inline=False)
+                    
+                    # Add a summary of existing report counts by reason
+                    if reason_counts:
+                        summary = "\n".join(f"{reason}: {count} reports" for reason, count in reason_counts.items())
+                        report_message.add_field(name="Existing Reports Summary", value=summary, inline=False)
+
                     try:
                         await self.reports_channel.send(embed=report_message)
                         if chat_history:
@@ -224,7 +236,7 @@ class ReportsPro(commands.Cog):
             )
             embed.add_field(
                 name="Reason",
-                value=report_info['reason'],
+                value=f"{report_info['reason']}: {report_info.get('description', 'No description available')}",
                 inline=False
             )
             embed.add_field(
