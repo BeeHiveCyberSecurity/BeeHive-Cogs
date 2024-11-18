@@ -143,7 +143,7 @@ class ReportsPro(commands.Cog):
                     report_message.add_field(name="Reported User", value=f"{self.member.mention} ({self.member.id})", inline=False)
                     report_message.add_field(name="Reported By", value=self.ctx.author.mention, inline=False)
                     report_message.add_field(name="Reason", value=f"{selected_reason}: {selected_description}", inline=False)
-                    report_message.add_field(name="Timestamp", value=datetime.now(timezone.utc).isoformat(), inline=False)
+                    report_message.add_field(name="Timestamp", value=f"<t:{int(datetime.now(timezone.utc).timestamp())}:R>", inline=False)
                     
                     # Add a summary of existing report counts by reason
                     if reason_counts:
@@ -241,7 +241,7 @@ class ReportsPro(commands.Cog):
             )
             embed.add_field(
                 name="Timestamp",
-                value=report_info.get('timestamp', 'Unknown'),
+                value=f"<t:{int(datetime.fromisoformat(report_info.get('timestamp', '1970-01-01T00:00:00+00:00')).timestamp())}:R>",
                 inline=False
             )
             embeds.append(embed)
