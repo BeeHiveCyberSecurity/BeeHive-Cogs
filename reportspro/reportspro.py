@@ -62,7 +62,7 @@ class ReportsPro(commands.Cog):
 
         # Create an embed with report types
         report_embed = discord.Embed(
-            title="Report a user to moderators",
+            title=f"Report a user to the moderators of {ctx.guild.name}",
             color=discord.Color.from_rgb(255, 69, 69),
             description=f"**You're reporting {member.mention} ({member.id})**\n"
                         f"Please select a reason for the report from the dropdown below."
