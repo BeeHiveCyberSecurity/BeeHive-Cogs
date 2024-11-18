@@ -337,89 +337,78 @@ class ReportsPro(commands.Cog):
                 self.reported_user = reported_user
                 self.answers = []
 
-            async def send_embed_with_buttons(self, interaction, title, description, buttons):
-                embed = discord.Embed(title=title, description=description, color=discord.Color.blue())
-                await interaction.response.send_message(embed=embed, view=buttons, ephemeral=True)
-
-            @discord.ui.button(label="Reviewed Facts", style=discord.ButtonStyle.primary)
-            async def reviewed_facts(self, interaction: discord.Interaction, button: discord.ui.Button):
-                self.answers.append("yes")
-                button.disabled = True
-                await self.send_embed_with_buttons(
-                    interaction,
-                    "Reviewed Facts",
-                    "Have you reviewed and investigated all facts of the matter?",
-                    self
+            async def ask_question(self, ctx, question, emoji_meanings):
+                embed = discord.Embed(
+                    title="Report Handling",
+                    description=question,
+                    color=discord.Color.blue()
                 )
+                for emoji, meaning in emoji_meanings.items():
+                    embed.add_field(name=emoji, value=meaning, inline=False)
+                message = await ctx.send(embed=embed)
+                for emoji in emoji_meanings.keys():
+                    await message.add_reaction(emoji)
+                return message
 
-            @discord.ui.button(label="Valid", style=discord.ButtonStyle.success)
-            async def valid_report(self, interaction: discord.Interaction, button: discord.ui.Button):
-                self.answers.append("valid")
-                button.disabled = True
-                await self.send_embed_with_buttons(
-                    interaction,
-                    "Valid Report",
-                    "Do you believe the report, including its evidence and reason, is valid?",
-                    self
-                )
+            async def handle_reaction(self, message, emoji_meanings):
+                def check(reaction, user):
+                    return user == self.ctx.author and str(reaction.emoji) in emoji_meanings
 
-            @discord.ui.button(label="Invalid", style=discord.ButtonStyle.danger)
-            async def invalid_report(self, interaction: discord.Interaction, button: discord.ui.Button):
-                self.answers.append("invalid")
-                button.disabled = True
-                await self.send_embed_with_buttons(
-                    interaction,
-                    "Invalid Report",
-                    "Do you believe the report, including its evidence and reason, is invalid?",
-                    self
-                )
+                try:
+                    reaction, _ = await self.ctx.bot.wait_for('reaction_add', timeout=60.0, check=check)
+                    return str(reaction.emoji)
+                except asyncio.TimeoutError:
+                    await self.ctx.send("You took too long to respond.")
+                    return None
 
-            @discord.ui.button(label="Warning", style=discord.ButtonStyle.secondary)
-            async def warning(self, interaction: discord.Interaction, button: discord.ui.Button):
-                self.answers.append("warning")
-                if self.reported_user:
+            async def handle_report(self):
+                questions = [
+                    ("Have you reviewed and investigated all facts of the matter?", {"✅": "Yes", "❌": "No"}),
+                    ("Do you believe the report, including its evidence and reason, is valid?", {"✅": "Valid", "❌": "Invalid"}),
+                    ("What action should be taken against the reported user?", {"⚠️": "Warning", "⏲️": "Timeout", "🔨": "Ban"})
+                ]
+
+                for question, emoji_meanings in questions:
+                    message = await self.ask_question(self.ctx, question, emoji_meanings)
+                    emoji = await self.handle_reaction(message, emoji_meanings)
+                    if emoji is None:
+                        return
+                    self.answers.append(emoji_meanings[emoji])
+
+                await self.finalize()
+
+            async def finalize(self):
+                action = self.answers[2]
+                if action == "Warning" and self.reported_user:
                     try:
                         await self.reported_user.send("You have received a warning due to a report against you.")
                     except discord.Forbidden:
                         await self.ctx.send("Could not send a warning to the reported user.")
-                await self.finalize(interaction)
-
-            @discord.ui.button(label="Timeout", style=discord.ButtonStyle.secondary)
-            async def timeout(self, interaction: discord.Interaction, button: discord.ui.Button):
-                self.answers.append("timeout")
-                if self.reported_user:
+                elif action == "Timeout" and self.reported_user:
                     try:
                         await self.reported_user.timeout(duration=86400)  # Timeout for 24 hours
                         await self.ctx.send(f"{self.reported_user.mention} has been timed out for 24 hours.")
                     except discord.Forbidden:
                         await self.ctx.send("Could not timeout the reported user.")
-                await self.finalize(interaction)
-
-            @discord.ui.button(label="Ban", style=discord.ButtonStyle.secondary)
-            async def ban(self, interaction: discord.Interaction, button: discord.ui.Button):
-                self.answers.append("ban")
-                if self.reported_user:
+                elif action == "Ban" and self.reported_user:
                     try:
                         await self.reported_user.ban(reason="Report handled and deemed valid.")
                         await self.ctx.send(f"{self.reported_user.mention} has been banned.")
                     except discord.Forbidden:
                         await self.ctx.send("Could not ban the reported user.")
-                await self.finalize(interaction)
 
-            async def finalize(self, interaction: discord.Interaction):
-                # Send a DM to the reporter
                 if self.reporter:
                     try:
                         await self.reporter.send(
                             f"The report you submitted earlier has been reviewed by a staff member. "
                             f"After careful consideration, the report was deemed {self.answers[1]}. "
-                            f"As a result, the following action has been taken against the reported user: {self.answers[2].capitalize()}."
+                            f"As a result, the following action has been taken against the reported user: {action}."
                         )
                     except discord.Forbidden:
                         await self.ctx.send("Could not send a DM to the reporter.")
 
-                await self.ctx.send(f"Report {self.report_id} has been handled. Action: {self.answers[2].capitalize()}.")
+                await self.ctx.send(f"Report {self.report_id} has been handled. Action: {action}.")
                 self.stop()
 
         view = HandleReportView(ctx, report_id, reporter, reported_user)
-        await ctx.send("Please handle the report using the buttons below:", view=view)
+        await view.handle_report()
