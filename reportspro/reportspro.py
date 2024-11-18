@@ -132,12 +132,12 @@ class ReportsPro(commands.Cog):
                 if self.reports_channel:
                     report_message = discord.Embed(
                         title="New User Report",
-                        color=discord.Color.red(),
-                        description=f"**Reported User:** {self.member.mention} ({self.member.id})\n"
-                                    f"**Reported By:** {self.ctx.author.mention}\n"
-                                    f"**Reason:** {selected_reason}\n"
-                                    f"**Timestamp:** {datetime.now(timezone.utc).isoformat()}"
+                        color=discord.Color.red()
                     )
+                    report_message.add_field(name="Reported User", value=f"{self.member.mention} ({self.member.id})", inline=False)
+                    report_message.add_field(name="Reported By", value=self.ctx.author.mention, inline=False)
+                    report_message.add_field(name="Reason", value=selected_reason, inline=False)
+                    report_message.add_field(name="Timestamp", value=datetime.now(timezone.utc).isoformat(), inline=False)
                     try:
                         await self.reports_channel.send(embed=report_message)
                         if chat_history:
