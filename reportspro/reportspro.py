@@ -338,28 +338,28 @@ class ReportsPro(commands.Cog):
                 self.answers = []
 
             @discord.ui.button(label="Reviewed Facts", style=discord.ButtonStyle.primary)
-            async def reviewed_facts(self, button: discord.ui.Button, interaction: discord.Interaction):
+            async def reviewed_facts(self, interaction: discord.Interaction, button: discord.ui.Button):
                 self.answers.append("yes")
                 await interaction.response.send_message("Have you reviewed and investigated all facts of the matter?", ephemeral=True)
                 button.disabled = True
                 await interaction.message.edit(view=self)
 
             @discord.ui.button(label="Valid", style=discord.ButtonStyle.success)
-            async def valid_report(self, button: discord.ui.Button, interaction: discord.Interaction):
+            async def valid_report(self, interaction: discord.Interaction, button: discord.ui.Button):
                 self.answers.append("valid")
                 await interaction.response.send_message("Do you believe the report, including its evidence and reason, is valid?", ephemeral=True)
                 button.disabled = True
                 await interaction.message.edit(view=self)
 
             @discord.ui.button(label="Invalid", style=discord.ButtonStyle.danger)
-            async def invalid_report(self, button: discord.ui.Button, interaction: discord.Interaction):
+            async def invalid_report(self, interaction: discord.Interaction, button: discord.ui.Button):
                 self.answers.append("invalid")
                 await interaction.response.send_message("Do you believe the report, including its evidence and reason, is invalid?", ephemeral=True)
                 button.disabled = True
                 await interaction.message.edit(view=self)
 
             @discord.ui.button(label="Warning", style=discord.ButtonStyle.secondary)
-            async def warning(self, button: discord.ui.Button, interaction: discord.Interaction):
+            async def warning(self, interaction: discord.Interaction, button: discord.ui.Button):
                 self.answers.append("warning")
                 if self.reported_user:
                     try:
@@ -369,7 +369,7 @@ class ReportsPro(commands.Cog):
                 await self.finalize(interaction)
 
             @discord.ui.button(label="Timeout", style=discord.ButtonStyle.secondary)
-            async def timeout(self, button: discord.ui.Button, interaction: discord.Interaction):
+            async def timeout(self, interaction: discord.Interaction, button: discord.ui.Button):
                 self.answers.append("timeout")
                 if self.reported_user:
                     try:
@@ -380,7 +380,7 @@ class ReportsPro(commands.Cog):
                 await self.finalize(interaction)
 
             @discord.ui.button(label="Ban", style=discord.ButtonStyle.secondary)
-            async def ban(self, button: discord.ui.Button, interaction: discord.Interaction):
+            async def ban(self, interaction: discord.Interaction, button: discord.ui.Button):
                 self.answers.append("ban")
                 if self.reported_user:
                     try:
