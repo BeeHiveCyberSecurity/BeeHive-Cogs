@@ -3,6 +3,7 @@ import discord
 from datetime import datetime, timezone
 import os
 import tempfile
+import asyncio
 
 class ReportsPro(commands.Cog):
     """Cog to handle global user reports"""
@@ -194,26 +195,73 @@ class ReportsPro(commands.Cog):
             await ctx.send("There are no reports in this guild.")
             return
 
-        embed = discord.Embed(title="User Reports", color=discord.Color.blue())
-        for report_id, report_info in reports.items():
+        # Filter reports for a specific member if provided
+        filtered_reports = [
+            (report_id, report_info) for report_id, report_info in reports.items()
+            if not member or (ctx.guild.get_member(report_info['reported_user']) == member)
+        ]
+
+        if not filtered_reports:
+            await ctx.send("There are no reports for the specified user.")
+            return
+
+        # Create a list of embeds, one for each report
+        embeds = []
+        for report_id, report_info in filtered_reports:
             reported_user = ctx.guild.get_member(report_info['reported_user'])
             reporter = ctx.guild.get_member(report_info['reporter'])
 
-            if member and (not reported_user or reported_user != member):
-                continue
-
+            embed = discord.Embed(title=f"Report ID: {report_id}", color=discord.Color.blue())
             embed.add_field(
-                name=f"Report ID: {report_id}",
-                value=f"**Reported User:** {reported_user.mention if reported_user else 'Unknown User'}\n"
-                      f"**Reported By:** {reporter.mention if reporter else 'Unknown Reporter'}\n"
-                      f"**Reason:** {report_info['reason']}\n"
-                      f"**Timestamp:** {report_info.get('timestamp', 'Unknown')}",
+                name="Reported User",
+                value=reported_user.mention if reported_user else 'Unknown User',
                 inline=False
             )
-        try:
-            await ctx.send(embed=embed)
-        except discord.Forbidden:
-            await ctx.send("I do not have permission to send messages in this channel.")
+            embed.add_field(
+                name="Reported By",
+                value=reporter.mention if reporter else 'Unknown Reporter',
+                inline=False
+            )
+            embed.add_field(
+                name="Reason",
+                value=report_info['reason'],
+                inline=False
+            )
+            embed.add_field(
+                name="Timestamp",
+                value=report_info.get('timestamp', 'Unknown'),
+                inline=False
+            )
+            embeds.append(embed)
+
+        # Function to handle pagination
+        async def send_paginated_embeds(ctx, embeds):
+            current_page = 0
+            message = await ctx.send(embed=embeds[current_page])
+
+            # Add reaction controls
+            await message.add_reaction("⬅️")
+            await message.add_reaction("➡️")
+
+            def check(reaction, user):
+                return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️"] and reaction.message.id == message.id
+
+            while True:
+                try:
+                    reaction, user = await self.bot.wait_for('reaction_add', timeout=60.0, check=check)
+
+                    if str(reaction.emoji) == "➡️" and current_page < len(embeds) - 1:
+                        current_page += 1
+                        await message.edit(embed=embeds[current_page])
+                    elif str(reaction.emoji) == "⬅️" and current_page > 0:
+                        current_page -= 1
+                        await message.edit(embed=embeds[current_page])
+
+                    await message.remove_reaction(reaction, user)
+                except asyncio.TimeoutError:
+                    break
+
+        await send_paginated_embeds(ctx, embeds)
 
     @commands.guild_only()
     @commands.command(name="clearreports")
