@@ -120,6 +120,13 @@ class ReportsPro(commands.Cog):
             async def callback(self, interaction: discord.Interaction):
                 selected_reason = self.values[0]
                 selected_description = next(description for reason, description in report_reasons if reason == selected_reason)
+                
+                # Generate a unique report ID
+                reports = await self.config.guild(self.ctx.guild).reports()
+                report_id = ''.join(random.choices(string.ascii_letters + string.digits, k=4))
+                while report_id in reports:
+                    report_id = ''.join(random.choices(string.ascii_letters + string.digits, k=4))
+                
                 embed = discord.Embed(
                     title="Report created",
                     color=discord.Color.from_rgb(43, 189, 142),
@@ -139,13 +146,9 @@ class ReportsPro(commands.Cog):
 
                 # Store the report in the config
                 try:
-                    reports = await self.config.guild(self.ctx.guild).reports()
-                    report_id = ''.join(random.choices(string.ascii_letters + string.digits, k=4))
-                    while report_id in reports:
-                        report_id = ''.join(random.choices(string.ascii_letters + string.digits, k=4))
                     reports[report_id] = {
-                        "reported_user": self.member.id,
-                        "reporter": self.ctx.author.id,
+                        "reported_user": str(self.member.id),
+                        "reporter": str(self.ctx.author.id),
                         "reason": selected_reason,
                         "description": selected_description,
                         "timestamp": datetime.now(timezone.utc).isoformat()
@@ -173,7 +176,7 @@ class ReportsPro(commands.Cog):
                     return
 
                 # Count existing reports against the user by reason
-                reason_counts = Counter(report['reason'] for report in reports.values() if report['reported_user'] == self.member.id)
+                reason_counts = Counter(report['reason'] for report in reports.values() if report['reported_user'] == str(self.member.id))
 
                 # Send the report to the reports channel
                 if self.reports_channel:
@@ -282,7 +285,7 @@ class ReportsPro(commands.Cog):
         # Filter reports for a specific member if provided
         filtered_reports = [
             (report_id, report_info) for report_id, report_info in reports.items()
-            if not member or (ctx.guild.get_member(report_info['reported_user']) == member)
+            if not member or (str(report_info['reported_user']) == str(member.id))
         ]
 
         if not filtered_reports:
@@ -297,8 +300,8 @@ class ReportsPro(commands.Cog):
         # Create a list of embeds, one for each report
         embeds = []
         for report_id, report_info in filtered_reports:
-            reported_user = ctx.guild.get_member(report_info['reported_user'])
-            reporter = ctx.guild.get_member(report_info['reporter'])
+            reported_user = ctx.guild.get_member(int(report_info['reported_user']))
+            reporter = ctx.guild.get_member(int(report_info['reporter']))
 
             embed = discord.Embed(title=f"Report ID: {report_id}", color=discord.Color.from_rgb(255, 255, 254))
             embed.add_field(
@@ -420,8 +423,8 @@ class ReportsPro(commands.Cog):
             await ctx.send(embed=embed)
             return
 
-        reported_user = ctx.guild.get_member(report['reported_user'])
-        reporter = ctx.guild.get_member(report['reporter'])
+        reported_user = ctx.guild.get_member(int(report['reported_user']))
+        reporter = ctx.guild.get_member(int(report['reporter']))
 
         # Create a view for handling the report
         class HandleReportView(discord.ui.View):
