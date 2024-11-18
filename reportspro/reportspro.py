@@ -121,9 +121,15 @@ class ReportsPro(commands.Cog):
                 selected_reason = self.values[0]
                 selected_description = next(description for reason, description in report_reasons if reason == selected_reason)
                 embed = discord.Embed(
-                    title="Report submitted",
+                    title="Report created",
                     color=discord.Color.from_rgb(43, 189, 142),
-                    description=f"Report submitted for {self.member.mention} with reason: {selected_reason}"
+                    description=(
+                        f"Report created for {self.member.mention} with reason: {selected_reason}\n\n"
+                        f"Your report ID is: {report_id}. If we send you any updates on your report, "
+                        f"we'll reference this ID.\n\n"
+                        "Sentri will attempt to automatically capture chat evidence from recent conversations "
+                        "to assist in the investigation of your report. Your messages will be included in this. "
+                    )
                 )
                 await interaction.response.send_message(embed=embed, ephemeral=True)
 
