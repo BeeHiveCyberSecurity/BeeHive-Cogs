@@ -137,18 +137,18 @@ class ReportsPro(commands.Cog):
                 # Send the report to the reports channel
                 if self.reports_channel:
                     report_message = discord.Embed(
-                        title="New User Report",
+                        title="A user in the server was reported",
                         color=discord.Color.from_rgb(255, 69, 69)
                     )
-                    report_message.add_field(name="Reported User", value=f"{self.member.mention} ({self.member.id})", inline=False)
-                    report_message.add_field(name="Reported By", value=self.ctx.author.mention, inline=False)
+                    report_message.add_field(name="Offender", value=f"{self.member.mention} ({self.member.id})", inline=False)
+                    report_message.add_field(name="Victim", value=self.ctx.author.mention, inline=False)
                     report_message.add_field(name="Reason", value=f"{selected_reason}: {selected_description}", inline=False)
-                    report_message.add_field(name="Timestamp", value=f"<t:{int(datetime.now(timezone.utc).timestamp())}:R>", inline=False)
+                    report_message.add_field(name="Time", value=f"<t:{int(datetime.now(timezone.utc).timestamp())}:R>", inline=False)
                     
                     # Add a summary of existing report counts by reason
                     if reason_counts:
-                        summary = "\n".join(f"{reason}: {count} reports" for reason, count in reason_counts.items())
-                        report_message.add_field(name="Existing Reports Summary", value=summary, inline=False)
+                        summary = "\n".join(f"**{reason}** x**{count}**" for reason, count in reason_counts.items())
+                        report_message.add_field(name="Pre-existing reports", value=summary, inline=False)
 
                     try:
                         await self.reports_channel.send(embed=report_message)
