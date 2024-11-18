@@ -311,3 +311,99 @@ class ReportsPro(commands.Cog):
             return (datetime.now(timezone.utc) - report_time).days < 30
         except ValueError:
             return False
+
+    @commands.guild_only()
+    @commands.command(name="handlereport")
+    @checks.admin_or_permissions(manage_guild=True)
+    async def handle_report(self, ctx, report_id: int):
+        """Handle a report by its ID."""
+        reports = await self.config.guild(ctx.guild).reports()
+        report = reports.get(str(report_id))
+
+        if not report:
+            await ctx.send("Report not found.")
+            return
+
+        reported_user = ctx.guild.get_member(report['reported_user'])
+        reporter = ctx.guild.get_member(report['reporter'])
+
+        # Create a view for handling the report
+        class HandleReportView(discord.ui.View):
+            def __init__(self, ctx, report_id, reporter, reported_user):
+                super().__init__()
+                self.ctx = ctx
+                self.report_id = report_id
+                self.reporter = reporter
+                self.reported_user = reported_user
+                self.answers = []
+
+            @discord.ui.button(label="Reviewed Facts", style=discord.ButtonStyle.primary)
+            async def reviewed_facts(self, button: discord.ui.Button, interaction: discord.Interaction):
+                self.answers.append("yes")
+                await interaction.response.send_message("Have you reviewed and investigated all facts of the matter?", ephemeral=True)
+                button.disabled = True
+                await interaction.message.edit(view=self)
+
+            @discord.ui.button(label="Valid", style=discord.ButtonStyle.success)
+            async def valid_report(self, button: discord.ui.Button, interaction: discord.Interaction):
+                self.answers.append("valid")
+                await interaction.response.send_message("Do you believe the report, including its evidence and reason, is valid?", ephemeral=True)
+                button.disabled = True
+                await interaction.message.edit(view=self)
+
+            @discord.ui.button(label="Invalid", style=discord.ButtonStyle.danger)
+            async def invalid_report(self, button: discord.ui.Button, interaction: discord.Interaction):
+                self.answers.append("invalid")
+                await interaction.response.send_message("Do you believe the report, including its evidence and reason, is invalid?", ephemeral=True)
+                button.disabled = True
+                await interaction.message.edit(view=self)
+
+            @discord.ui.button(label="Warning", style=discord.ButtonStyle.secondary)
+            async def warning(self, button: discord.ui.Button, interaction: discord.Interaction):
+                self.answers.append("warning")
+                if self.reported_user:
+                    try:
+                        await self.reported_user.send("You have received a warning due to a report against you.")
+                    except discord.Forbidden:
+                        await self.ctx.send("Could not send a warning to the reported user.")
+                await self.finalize(interaction)
+
+            @discord.ui.button(label="Timeout", style=discord.ButtonStyle.secondary)
+            async def timeout(self, button: discord.ui.Button, interaction: discord.Interaction):
+                self.answers.append("timeout")
+                if self.reported_user:
+                    try:
+                        await self.reported_user.timeout(duration=86400)  # Timeout for 24 hours
+                        await self.ctx.send(f"{self.reported_user.mention} has been timed out for 24 hours.")
+                    except discord.Forbidden:
+                        await self.ctx.send("Could not timeout the reported user.")
+                await self.finalize(interaction)
+
+            @discord.ui.button(label="Ban", style=discord.ButtonStyle.secondary)
+            async def ban(self, button: discord.ui.Button, interaction: discord.Interaction):
+                self.answers.append("ban")
+                if self.reported_user:
+                    try:
+                        await self.reported_user.ban(reason="Report handled and deemed valid.")
+                        await self.ctx.send(f"{self.reported_user.mention} has been banned.")
+                    except discord.Forbidden:
+                        await self.ctx.send("Could not ban the reported user.")
+                await self.finalize(interaction)
+
+            async def finalize(self, interaction: discord.Interaction):
+                # Send a DM to the reporter
+                if self.reporter:
+                    try:
+                        await self.reporter.send(
+                            f"The report you submitted earlier has been reviewed by a staff member. "
+                            f"After careful consideration, the report was deemed {self.answers[1]}. "
+                            f"As a result, the following action has been taken against the reported user: {self.answers[2].capitalize()}."
+                        )
+                    except discord.Forbidden:
+                        await self.ctx.send("Could not send a DM to the reporter.")
+
+                await self.ctx.send(f"Report {self.report_id} has been handled. Action: {self.answers[2].capitalize()}.")
+                self.stop()
+
+        view = HandleReportView(ctx, report_id, reporter, reported_user)
+        await ctx.send("Please handle the report using the buttons below:", view=view)
