@@ -479,6 +479,8 @@ class ReportsPro(commands.Cog):
                         color=discord.Color.orange()
                     )
                     await self.ctx.send(embed=embed)
+                    self.answers.append("Invalid")
+                    await self.finalize()
                     return
                 self.answers.append(emoji_meanings[emoji])
 
@@ -494,7 +496,7 @@ class ReportsPro(commands.Cog):
                 await self.finalize()
 
             async def finalize(self):
-                action = self.answers[2]
+                action = self.answers[2] if len(self.answers) > 2 else "No action"
                 if action == "Warning" and self.reported_user:
                     try:
                         await self.reported_user.send("You have received a warning due to a report against you.")
