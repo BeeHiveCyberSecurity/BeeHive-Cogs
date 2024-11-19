@@ -282,10 +282,9 @@ class ReportsPro(commands.Cog):
                 continue
         if chat_history:
             try:
-                file_path = tempfile.mktemp(suffix=f"_{member.id}_chat_history.txt")
-                with open(file_path, "w", encoding="utf-8") as file:
-                    file.write("\n".join(chat_history))
-                return file_path
+                with tempfile.NamedTemporaryFile(delete=False, suffix=f"_{member.id}_chat_history.txt", mode='w', encoding='utf-8') as temp_file:
+                    temp_file.write("\n".join(chat_history))
+                    return temp_file.name
             except Exception as e:
                 print(f"An error occurred while writing chat history to file: {e}")
                 return None
