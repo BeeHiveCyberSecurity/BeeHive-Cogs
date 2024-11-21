@@ -1727,13 +1727,15 @@ class Cloudflare(commands.Cog):
                 data = await response.json()
                 if data["success"] and data["result"]:
                     result = data["result"][0]
-                    embed = discord.Embed(title=f"Domain history for {domain}", color=0x2BBD8E)
-                    
-                    if "domain" in result:
-                        embed.add_field(name="Domain", value=f"**`{result['domain']}`**", inline=False)
-                    if "categorizations" in result:
-                        categorizations = result["categorizations"]
-                        for categorization in categorizations:
+                    categorizations = result.get("categorizations", [])
+                    pages = [categorizations[i:i + 5] for i in range(0, len(categorizations), 5)]
+                    current_page = 0
+
+                    def create_embed(page):
+                        embed = discord.Embed(title=f"Domain history for {domain}", color=0x2BBD8E)
+                        if "domain" in result:
+                            embed.add_field(name="Domain", value=f"**`{result['domain']}`**", inline=False)
+                        for categorization in page:
                             categories = ", ".join([f"**`{category['name']}`**" for category in categorization["categories"]])
                             embed.add_field(name="Categories", value=categories, inline=True)
                             if "start" in categorization:
@@ -1742,8 +1744,44 @@ class Cloudflare(commands.Cog):
                             if "end" in categorization:
                                 end_timestamp = discord.utils.format_dt(discord.utils.parse_time(categorization['end']), style='R')
                                 embed.add_field(name="Ending", value=f"**{end_timestamp}**", inline=True)
-                    embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/globe.png")
-                    await ctx.send(embed=embed)
+                        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/globe.png")
+                        return embed
+
+                    message = await ctx.send(embed=create_embed(pages[current_page]))
+
+                    if len(pages) > 1:
+                        await message.add_reaction("◀️")
+                        await message.add_reaction("❌")
+                        await message.add_reaction("▶️")
+
+                        def check(reaction, user):
+                            return user == ctx.author and str(reaction.emoji) in ["◀️", "❌", "▶️"] and reaction.message.id == message.id
+
+                        while True:
+                            try:
+                                reaction, user = await self.bot.wait_for("reaction_add", timeout=30.0, check=check)
+
+                                if str(reaction.emoji) == "▶️" and current_page < len(pages) - 1:
+                                    current_page += 1
+                                    await message.edit(embed=create_embed(pages[current_page]))
+                                    await message.remove_reaction(reaction, user)
+
+                                elif str(reaction.emoji) == "◀️" and current_page > 0:
+                                    current_page -= 1
+                                    await message.edit(embed=create_embed(pages[current_page]))
+                                    await message.remove_reaction(reaction, user)
+
+                                elif str(reaction.emoji) == "❌":
+                                    await message.delete()
+                                    break
+
+                            except asyncio.TimeoutError:
+                                break
+
+                        try:
+                            await message.clear_reactions()
+                        except discord.Forbidden:
+                            pass
                 else:
                     embed = discord.Embed(title="No data available", description="There is no domain history available for this domain. Please try this query again later, as results are subject to update.", color=0xff4545)
                     await ctx.send(embed=embed)
