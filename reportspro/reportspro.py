@@ -291,8 +291,13 @@ class ReportsPro(commands.Cog):
         return None
 
     @commands.guild_only()
-    @commands.command(name="viewreports")
+    @commands.group(name="reports", invoke_without_command=True)
     @checks.admin_or_permissions()
+    async def reports(self, ctx):
+        """Group command for managing reports."""
+        await ctx.send_help(ctx.command)
+
+    @reports.command(name="view")
     async def view_reports(self, ctx, member: discord.Member = None):
         """View all reports in the guild or reports for a specific user."""
         reports = await self.config.guild(ctx.guild).reports()
@@ -383,8 +388,7 @@ class ReportsPro(commands.Cog):
 
         await send_paginated_embeds(ctx, embeds)
 
-    @commands.guild_only()
-    @commands.command(name="clearreports")
+    @reports.command(name="clear")
     @checks.admin_or_permissions(manage_guild=True)
     async def clear_reports(self, ctx):
         """Clear all reports in the guild."""
@@ -404,8 +408,7 @@ class ReportsPro(commands.Cog):
             )
             await ctx.send(embed=embed)
 
-    @commands.guild_only()
-    @commands.command(name="cleanupreports")
+    @reports.command(name="cleanup")
     @checks.admin_or_permissions(manage_guild=True)
     async def cleanup_reports(self, ctx):
         """Manually clean up old reports."""
@@ -429,8 +432,7 @@ class ReportsPro(commands.Cog):
         except ValueError:
             return False
 
-    @commands.guild_only()
-    @commands.command(name="handlereport")
+    @reports.command(name="handle")
     @checks.admin_or_permissions(manage_guild=True)
     async def handle_report(self, ctx, report_id: str):
         """Handle a report by its ID."""
