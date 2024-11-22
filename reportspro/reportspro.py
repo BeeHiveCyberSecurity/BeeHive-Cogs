@@ -34,7 +34,7 @@ class ReportsPro(commands.Cog):
         await self.config.guild(ctx.guild).reports_channel.set(channel.id)
         embed = discord.Embed(
             title="Reports Channel Set",
-            description=f"Reports channel set to {channel.mention}",
+            description=f"The reports will now be sent to {channel.mention}.",
             color=discord.Color.green()
         )
         await ctx.send(embed=embed)
@@ -45,7 +45,7 @@ class ReportsPro(commands.Cog):
         await self.config.guild(ctx.guild).mention_role.set(role.id)
         embed = discord.Embed(
             title="Mention Role Set",
-            description=f"Role {role.mention} will be mentioned for new reports.",
+            description=f"The role {role.mention} will be notified for new reports.",
             color=discord.Color.green()
         )
         await ctx.send(embed=embed)
@@ -61,8 +61,8 @@ class ReportsPro(commands.Cog):
         mention_role = ctx.guild.get_role(mention_role_id)
         role_mention = mention_role.mention if mention_role else "Not Set"
         
-        embed = discord.Embed(title="Current reporting settings", color=discord.Color.from_rgb(255, 255, 254))
-        embed.add_field(name="Log channel", value=channel_mention, inline=False)
+        embed = discord.Embed(title="Current Reporting Settings", color=discord.Color.from_rgb(255, 255, 254))
+        embed.add_field(name="Log Channel", value=channel_mention, inline=False)
         embed.add_field(name="Mention Role", value=role_mention, inline=False)
         
         try:
@@ -70,7 +70,7 @@ class ReportsPro(commands.Cog):
         except discord.Forbidden:
             embed = discord.Embed(
                 title="Permission Error",
-                description="I do not have permission to send messages in this channel.",
+                description="I can't send messages in this channel. Please check my permissions.",
                 color=discord.Color.red()
             )
             await ctx.send(embed=embed)
@@ -83,7 +83,7 @@ class ReportsPro(commands.Cog):
         if not reports_channel_id:
             embed = discord.Embed(
                 title="Error",
-                description="Reports channel is not set. Please contact an admin.",
+                description="The reports channel hasn't been set up yet. Please contact an admin.",
                 color=discord.Color.red()
             )
             await ctx.send(embed=embed, ephemeral=True)
@@ -93,7 +93,7 @@ class ReportsPro(commands.Cog):
         if not reports_channel:
             embed = discord.Embed(
                 title="Error",
-                description="Reports channel is not accessible. Please contact an admin.",
+                description="I can't access the reports channel. Please contact an admin.",
                 color=discord.Color.red()
             )
             await ctx.send(embed=embed, ephemeral=True)
@@ -101,10 +101,10 @@ class ReportsPro(commands.Cog):
 
         # Create an embed with report types
         report_embed = discord.Embed(
-            title=f"Report a user to the moderators of {ctx.guild.name}",
+            title=f"Report a User to the Moderators of {ctx.guild.name}",
             color=discord.Color.from_rgb(255, 69, 69),
             description=f"**You're reporting {member.mention} ({member.id})**\n\n"
-                        f"Please select a reason for the report from the dropdown below."
+                        f"Please choose a reason for the report from the dropdown below."
         )
 
         # Define report reasons with descriptions and emojis
@@ -145,14 +145,13 @@ class ReportsPro(commands.Cog):
                     report_id = ''.join(random.choices(string.ascii_letters + string.digits, k=4))
                 
                 embed = discord.Embed(
-                    title="Report created",
+                    title="Report Created",
                     color=discord.Color.from_rgb(43, 189, 142),
                     description=(
-                        f"You reported {self.member.mention} for **{selected_reason}**\n\n"
-                        f"Your report ID is `{report_id}`.\n\nIf we send you any updates on your report, "
-                        f"we'll reference this ID.\n\n"
-                        "The bot will attempt to automatically capture chat evidence from recent conversations "
-                        "to assist in the investigation of your report. Your messages will be included in this. "
+                        f"You have reported {self.member.mention} for **{selected_reason}**.\n\n"
+                        f"Your report ID is `{report_id}`. We'll use this ID for any updates on your report.\n\n"
+                        "The bot will try to automatically gather chat evidence from recent conversations "
+                        "to help with the investigation. Your messages will be included in this."
                     )
                 )
                 await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -174,7 +173,7 @@ class ReportsPro(commands.Cog):
                 except Exception as e:
                     embed = discord.Embed(
                         title="Error",
-                        description=f"An error occurred while saving the report: {e}",
+                        description=f"Something went wrong while saving the report: {e}",
                         color=discord.Color.red()
                     )
                     await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -186,7 +185,7 @@ class ReportsPro(commands.Cog):
                 except Exception as e:
                     embed = discord.Embed(
                         title="Error",
-                        description=f"An error occurred while capturing chat history: {e}",
+                        description=f"Something went wrong while capturing chat history: {e}",
                         color=discord.Color.red()
                     )
                     await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -198,7 +197,7 @@ class ReportsPro(commands.Cog):
                 # Send the report to the reports channel
                 if self.reports_channel:
                     report_message = discord.Embed(
-                        title="A report is waiting to be handled...",
+                        title="A New Report Needs Attention",
                         color=discord.Color.from_rgb(255, 69, 69)
                     )
                     report_message.add_field(name="Report ID", value=f"```{report_id}```", inline=False)
@@ -213,7 +212,7 @@ class ReportsPro(commands.Cog):
                     # Add a summary of existing report counts by reason
                     if reason_counts:
                         summary = "\n".join(f"**{reason}** x**{count}**" for reason, count in reason_counts.items())
-                        report_message.add_field(name="Pre-existing reports", value=summary, inline=False)
+                        report_message.add_field(name="Previous Reports", value=summary, inline=False)
 
                     mention_role_id = await self.config.guild(self.ctx.guild).mention_role()
                     mention_role = ctx.guild.get_role(mention_role_id)
@@ -227,21 +226,21 @@ class ReportsPro(commands.Cog):
                     except discord.Forbidden:
                         embed = discord.Embed(
                             title="Permission Error",
-                            description="I do not have permission to send messages in the reports channel.",
+                            description="I can't send messages in the reports channel. Please check my permissions.",
                             color=discord.Color.red()
                         )
                         await interaction.response.send_message(embed=embed, ephemeral=True)
                     except Exception as e:
                         embed = discord.Embed(
                             title="Error",
-                            description=f"An error occurred while sending the report: {e}",
+                            description=f"Something went wrong while sending the report: {e}",
                             color=discord.Color.red()
                         )
                         await interaction.response.send_message(embed=embed, ephemeral=True)
                 else:
                     embed = discord.Embed(
                         title="Error",
-                        description="Reports channel is not accessible. Please contact an admin.",
+                        description="I can't access the reports channel. Please contact an admin.",
                         color=discord.Color.red()
                     )
                     await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -255,14 +254,14 @@ class ReportsPro(commands.Cog):
         except discord.Forbidden:
             embed = discord.Embed(
                 title="Permission Error",
-                description="I do not have permission to send messages in this channel.",
+                description="I can't send messages in this channel. Please check my permissions.",
                 color=discord.Color.red()
             )
             await ctx.send(embed=embed, ephemeral=True)
         except Exception as e:
             embed = discord.Embed(
                 title="Error",
-                description=f"An error occurred while sending the report embed: {e}",
+                description=f"Something went wrong while sending the report embed: {e}",
                 color=discord.Color.red()
             )
             await ctx.send(embed=embed, ephemeral=True)
@@ -403,7 +402,7 @@ class ReportsPro(commands.Cog):
         except discord.Forbidden:
             embed = discord.Embed(
                 title="Permission Error",
-                description="I do not have permission to send messages in this channel.",
+                description="I can't send messages in this channel. Please check my permissions.",
                 color=discord.Color.red()
             )
             await ctx.send(embed=embed)
@@ -420,6 +419,34 @@ class ReportsPro(commands.Cog):
             description="Old reports have been cleaned up.",
             color=discord.Color.green()
         )
+        await ctx.send(embed=embed)
+
+    @reports.command(name="stats")
+    @checks.admin_or_permissions(manage_guild=True)
+    async def report_stats(self, ctx):
+        """View statistics about all reports."""
+        reports = await self.config.guild(ctx.guild).reports()
+        if not reports:
+            embed = discord.Embed(
+                title="No Reports",
+                description="There are no reports in this guild.",
+                color=discord.Color.orange()
+            )
+            await ctx.send(embed=embed)
+            return
+
+        total_reports = len(reports)
+        reason_counts = Counter(report['reason'] for report in reports.values())
+        most_common_reason = reason_counts.most_common(1)[0] if reason_counts else ("None", 0)
+
+        embed = discord.Embed(
+            title="Report Statistics",
+            color=discord.Color.blue()
+        )
+        embed.add_field(name="Total Reports", value=total_reports, inline=False)
+        embed.add_field(name="Most Common Reason", value=f"{most_common_reason[0]} ({most_common_reason[1]} times)", inline=False)
+        embed.add_field(name="Reason Breakdown", value="\n".join(f"{reason}: {count}" for reason, count in reason_counts.items()), inline=False)
+
         await ctx.send(embed=embed)
 
     def is_recent(self, timestamp):
@@ -442,7 +469,7 @@ class ReportsPro(commands.Cog):
         if not report:
             embed = discord.Embed(
                 title="Report Not Found",
-                description="Report not found.",
+                description="We couldn't find a report with that ID.",
                 color=discord.Color.red()
             )
             await ctx.send(embed=embed)
@@ -484,7 +511,7 @@ class ReportsPro(commands.Cog):
                 except asyncio.TimeoutError:
                     embed = discord.Embed(
                         title="Timeout",
-                        description="You took too long to respond.",
+                        description="You took too long to respond. Please try again.",
                         color=discord.Color.red()
                     )
                     await self.ctx.send(embed=embed)
@@ -499,7 +526,7 @@ class ReportsPro(commands.Cog):
                 if emoji is None or emoji_meanings[emoji] == "No":
                     embed = discord.Embed(
                         title="Investigation Required",
-                        description="Please review all facts before proceeding.",
+                        description="Please make sure to review all facts before proceeding.",
                         color=discord.Color.orange()
                     )
                     await self.ctx.send(embed=embed)
@@ -514,7 +541,7 @@ class ReportsPro(commands.Cog):
                 if emoji is None or emoji_meanings[emoji] == "Invalid":
                     embed = discord.Embed(
                         title="Report Invalid",
-                        description="The report has been deemed invalid. No further action will be taken.",
+                        description="The report has been marked as invalid. No further action will be taken.",
                         color=discord.Color.orange()
                     )
                     await self.ctx.send(embed=embed)
@@ -542,7 +569,7 @@ class ReportsPro(commands.Cog):
                     except discord.Forbidden:
                         embed = discord.Embed(
                             title="Warning Error",
-                            description="Could not send a warning to the reported user.",
+                            description="I couldn't send a warning to the reported user.",
                             color=discord.Color.red()
                         )
                         await self.ctx.send(embed=embed)
@@ -558,7 +585,7 @@ class ReportsPro(commands.Cog):
                     except discord.Forbidden:
                         embed = discord.Embed(
                             title="Timeout Error",
-                            description="Could not timeout the reported user.",
+                            description="I couldn't timeout the reported user.",
                             color=discord.Color.red()
                         )
                         await self.ctx.send(embed=embed)
@@ -574,7 +601,7 @@ class ReportsPro(commands.Cog):
                     except discord.Forbidden:
                         embed = discord.Embed(
                             title="Ban Error",
-                            description="Could not ban the reported user.",
+                            description="I couldn't ban the reported user.",
                             color=discord.Color.red()
                         )
                         await self.ctx.send(embed=embed)
@@ -582,9 +609,9 @@ class ReportsPro(commands.Cog):
                 if self.reporter:
                     try:
                         embed = discord.Embed(
-                            title="An update on your earlier report",
+                            title="Update on Your Report",
                             description=(
-                                f"The report you submitted earlier `{self.report_id}` "
+                                f"The report you submitted with ID `{self.report_id}` "
                                 f"has been reviewed by a staff member. After careful consideration, "
                                 f"the report was deemed {self.answers[1]}. As a result, the following "
                                 f"action has been taken against the reported user: {action}."
@@ -595,7 +622,7 @@ class ReportsPro(commands.Cog):
                     except discord.Forbidden:
                         embed = discord.Embed(
                             title="DM Error",
-                            description="Could not send a DM to the reporter.",
+                            description="I couldn't send a DM to the reporter.",
                             color=discord.Color.red()
                         )
                         await self.ctx.send(embed=embed)
