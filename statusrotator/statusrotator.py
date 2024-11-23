@@ -84,11 +84,11 @@ class StatusRotator(commands.Cog):
 
     def get_message_count_status(self):
         now = datetime.utcnow()
-        one_minute_ago = now - timedelta(minutes=1)
-        self.message_log = deque([timestamp for timestamp in self.message_log if timestamp > one_minute_ago])
+        one_day_ago = now - timedelta(days=1)
+        self.message_log = deque([timestamp for timestamp in self.message_log if timestamp > one_day_ago])
         message_count = len(self.message_log)
         message_text = "message" if message_count == 1 else "messages"
-        return f"Analyzing {message_count} {message_text} every minute"
+        return f"Screened {message_count} {message_text} in the last 24 hours"
 
     def get_uptime_status(self):
         now = datetime.utcnow()
@@ -104,11 +104,11 @@ class StatusRotator(commands.Cog):
 
     def get_hyperlink_count_status(self):
         now = datetime.utcnow()
-        five_minutes_ago = now - timedelta(minutes=5)
-        self.hyperlink_log = deque([timestamp for timestamp in self.hyperlink_log if timestamp > five_minutes_ago])
+        one_day_ago = now - timedelta(days=1)
+        self.hyperlink_log = deque([timestamp for timestamp in self.hyperlink_log if timestamp > one_day_ago])
         hyperlink_count = len(self.hyperlink_log)
         hyperlink_text = "link" if hyperlink_count == 1 else "links"
-        return f"Scanned {hyperlink_count} {hyperlink_text} in the last 5 minutes"
+        return f"Scanned {hyperlink_count} {hyperlink_text} in the last 24 hours"
 
     @commands.group()
     async def statusrotator(self, ctx):
