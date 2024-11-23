@@ -17,7 +17,7 @@ class StatusRotator(commands.Cog):
         self.status_task = self.bot.loop.create_task(self.change_status())
         self.statuses = [
             lambda: f"{len(self.bot.guilds)} server{'s' if len(self.bot.guilds) == 1 else 's'} | {len(self.bot.users):,} user{'s' if len(self.bot.users) == 1 else 's'}" + (" | beehive.systems" if self.bot.user.id == 1152805502116429929 else ""),
-            lambda: f"Watching over {len(self.bot.guilds)} server{'s' if len(self.bot.guilds) != 1 else ''}",
+            lambda: f"On guard in {len(self.bot.guilds)} server{'s' if len(self.bot.guilds) != 1 else ''}",
             lambda: f"Moderating {len(self.bot.users):,} user{'s' if len(self.bot.users) != 1 else ''}",
             self.get_message_count_status,
             self.get_hyperlink_count_status,
@@ -55,7 +55,7 @@ class StatusRotator(commands.Cog):
 
     async def fetch_blocked_domains_count(self):
         url = "https://www.beehive.systems/hubfs/blocklist/blocklist.json"
-        headers = {"User-Agent": "Mozilla/5.0"}
+        headers = {"User-Agent": "statusrotator (github.com/beehivecybersecurity/beehive-cogs)"}
         async with aiohttp.ClientSession() as session:
             try:
                 async with session.get(url, headers=headers) as response:
