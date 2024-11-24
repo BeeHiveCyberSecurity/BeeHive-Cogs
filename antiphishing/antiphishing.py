@@ -38,7 +38,8 @@ class AntiPhishing(commands.Cog):
             last_updated=None,
             webhook=None,
             log_channel=None,
-            timeout_duration=30  # Default timeout duration in minutes
+            timeout_duration=30,  # Default timeout duration in minutes
+            staff_role=None  # Configurable staff role mention
         )
         self.config.register_member(caught=0)
         self.session = aiohttp.ClientSession()
@@ -147,8 +148,10 @@ class AntiPhishing(commands.Cog):
         guild_data = await self.config.guild(ctx.guild).all()
         webhook = guild_data.get('webhook', None)
         log_channel_id = guild_data.get('log_channel', None)
+        staff_role_id = guild_data.get('staff_role', None)
         enrollment_status = "**Connected**" if webhook else "Not connected"
         log_channel_status = f"<#{log_channel_id}>" if log_channel_id else "Not Set"
+        staff_role_status = f"<@&{staff_role_id}>" if staff_role_id else "Not Set"
         
         embed = discord.Embed(
             title='Current settings',
@@ -158,6 +161,7 @@ class AntiPhishing(commands.Cog):
         embed.add_field(name="Action", value=f"{guild_data.get('action', 'Not set').title()}", inline=False)
         embed.add_field(name="Security vendor", value=enrollment_status, inline=False)
         embed.add_field(name="Log channel", value=log_channel_status, inline=False)
+        embed.add_field(name="Staff Role", value=staff_role_status, inline=False)
         embed.add_field(name="Timeout Duration", value=f"{guild_data.get('timeout_duration', 30)} minutes", inline=False)
         await ctx.send(embed=embed)
         
@@ -349,6 +353,21 @@ class AntiPhishing(commands.Cog):
 
     @commands.admin_or_permissions()
     @antiphishing.command()
+    async def staffrole(self, ctx: Context, role: discord.Role):
+        """
+        Set the staff role to be mentioned in log channel messages.
+        """
+        await self.config.guild(ctx.guild).staff_role.set(role.id)
+        embed = discord.Embed(
+            title='Settings changed',
+            description=f"The staff role has been set to {role.mention}.",
+            colour=0x2bbd8e,
+        )
+        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/check-circle.png")
+        await ctx.send(embed=embed)
+
+    @commands.admin_or_permissions()
+    @antiphishing.command()
     async def timeoutduration(self, ctx: Context, minutes: int):
         """
         Set the timeout duration in minutes for users who share malicious links.
@@ -454,6 +473,7 @@ class AntiPhishing(commands.Cog):
                     print(f"Failed to send webhook: {response.status}")
         
         log_channel_id = await self.config.guild(message.guild).log_channel()
+        staff_role_id = await self.config.guild(message.guild).staff_role()
         if log_channel_id:
             log_channel = message.guild.get_channel(log_channel_id)
             if log_channel:
@@ -466,7 +486,8 @@ class AntiPhishing(commands.Cog):
                 log_embed.add_field(name="Sender", value=message.author.mention)
                 log_embed.add_field(name="Domain", value=domain)
                 log_embed.add_field(name="Redirects", value=redirect_chain_str)
-                await log_channel.send(embed=log_embed)
+                staff_mention = f"<@&{staff_role_id}>" if staff_role_id else ""
+                await log_channel.send(content=staff_mention, embed=log_embed, allowed_mentions=discord.AllowedMentions(roles=True))
         
         if action == "notify":
             if message.channel.permissions_for(message.guild.me).send_messages:
@@ -499,7 +520,7 @@ class AntiPhishing(commands.Cog):
                     if mod_mentions:
                         await message.channel.send(content=mod_mentions, embed=embed, allowed_mentions=discord.AllowedMentions(roles=True))
                     else:
-                        await message.reply(embed=embed)
+                        await message.reply(embed=embed, allowed_mentions=discord.AllowedMentions.none())
                     
                 notifications = await self.config.guild(message.guild).notifications()
                 await self.config.guild(message.guild).notifications.set(notifications + 1)
