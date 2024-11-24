@@ -19,9 +19,9 @@ class AntiPhishing(commands.Cog):
     Guard users from malicious links and phishing attempts with customizable protection options.
     """
 
-    __version__ = "1.6.1.1"
-    __last_updated__ = "October 20nd, 2024"
-    __quick_notes__ = "We've optimized various functionality to improve blocklist update performance"
+    __version__ = "1.6.2.0"
+    __last_updated__ = "November 23rd 2024"
+    __quick_notes__ = "Added a customizable timeout duration"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -37,7 +37,8 @@ class AntiPhishing(commands.Cog):
             autoban=3,
             last_updated=None,
             webhook=None,
-            log_channel=None
+            log_channel=None,
+            timeout_duration=30  # Default timeout duration in minutes
         )
         self.config.register_member(caught=0)
         self.session = aiohttp.ClientSession()
@@ -157,6 +158,7 @@ class AntiPhishing(commands.Cog):
         embed.add_field(name="Action", value=f"{guild_data.get('action', 'Not set').title()}", inline=False)
         embed.add_field(name="Security vendor", value=enrollment_status, inline=False)
         embed.add_field(name="Log channel", value=log_channel_status, inline=False)
+        embed.add_field(name="Timeout Duration", value=f"{guild_data.get('timeout_duration', 30)} minutes", inline=False)
         await ctx.send(embed=embed)
         
     @commands.admin_or_permissions()
@@ -166,12 +168,12 @@ class AntiPhishing(commands.Cog):
         Choose the action that occurs when a user sends a phishing scam.
 
         Options:
-        **`ignore`** - Disables phishing protection
-        **`notify`** - Alerts in channel when malicious links detected (default)
-        **`delete`** - Deletes the message
-        **`kick`** - Delete message and kick sender
-        **`ban`** - Delete message and ban sender (recommended)
-        **`timeout`** - Temporarily mute the user
+        **`ignore`** - Disables phishing protection **(Not recommended)**
+        **`notify`** - Alerts in channel when malicious links detected **(Default)**
+        **`delete`** - Deletes the message silently
+        **`kick`** - Deletes message and kicks sender
+        **`ban`** - Deletes message and bans sender
+        **`timeout`** - Delete message and temporarily time the user out **(Recommended)**
         """
         valid_actions = ["ignore", "notify", "delete", "kick", "ban", "timeout"]
         if action not in valid_actions:
@@ -179,12 +181,12 @@ class AntiPhishing(commands.Cog):
                 title='Error: Invalid action',
                 description=(
                     "You provided an invalid action. You are able to choose any of the following actions to occur when a malicious link is detected...\n\n"
-                    "`ignore` - Disables phishing protection\n"
-                    "`notify` - Alerts in channel when malicious links detected (default)\n"
-                    "`delete` - Deletes the message\n"
-                    "`kick` - Delete message and kick sender\n"
-                    "`ban` - Delete message and ban sender (recommended)\n"
-                    "`timeout` - Temporarily mute the user\n\n"
+                    "**`ignore`** - Disables phishing protection **(Not recommended)**\n"
+                    "**`notify`** - Alerts in channel when malicious links detected **(Default)**\n"
+                    "**`delete`** - Deletes the message\n"
+                    "**`kick`** - Delete message and kick sender\n"
+                    "**`ban`** - Delete message and ban sender\n"
+                    "**`timeout`** - Delete message and temporarily time the user out **(Recommended)**\n\n"
                     "Retry that command with one of the above options."
                 ),
                 colour=16729413,
@@ -343,6 +345,31 @@ class AntiPhishing(commands.Cog):
             colour=0x2bbd8e,
         )
         embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/check-circle.png")
+        await ctx.send(embed=embed)
+
+    @commands.admin_or_permissions()
+    @antiphishing.command()
+    async def timeoutduration(self, ctx: Context, minutes: int):
+        """
+        Set the timeout duration in minutes for users who share malicious links.
+        """
+        if minutes < 1:
+            embed = discord.Embed(
+                title='Error: Invalid duration',
+                description="The timeout duration must be at least 1 minute.",
+                colour=16729413,
+            )
+            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle.png")
+            await ctx.send(embed=embed)
+            return
+
+        await self.config.guild(ctx.guild).timeout_duration.set(minutes)
+        embed = discord.Embed(
+            title='Settings changed',
+            description=f"The timeout duration is now set to **{minutes}** minutes.",
+            colour=0xffd966,
+        )
+        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/clock.png")
         await ctx.send(embed=embed)
 
     @tasks.loop(minutes=2)
@@ -527,8 +554,9 @@ class AntiPhishing(commands.Cog):
                     ):
                         return
 
-                    # Timeout the user for 10 minutes
-                    timeout_duration = datetime.timedelta(minutes=30)
+                    # Timeout the user for a customizable duration
+                    timeout_duration_minutes = await self.config.guild(message.guild).timeout_duration()
+                    timeout_duration = datetime.timedelta(minutes=timeout_duration_minutes)
                     await message.author.timeout_for(timeout_duration, reason="Shared a known dangerous link")
 
                 timeouts = await self.config.guild(message.guild).timeouts()  # Retrieve current timeout count
@@ -585,7 +613,7 @@ class AntiPhishing(commands.Cog):
                 domain = urlparse(domain_url).netloc
                 if domain in self.domains:
                     await self.handle_phishing(message, domain, domains_to_check)
-                    # return  # Removed premature return to handle all links
+                    # return
 
 
 
