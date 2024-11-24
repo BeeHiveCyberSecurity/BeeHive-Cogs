@@ -89,9 +89,7 @@ class AntiPhishing(commands.Cog):
     @antiphishing.command()
     async def enroll(self, ctx: Context, webhook: str):
         """
-        Enroll your server into remote URL monitoring by providing a webhook URL.
-        
-        The webhook will be used to send detected URLs to a security provider for monitoring.
+        Enable vendor monitoring
         """
         if not webhook.startswith("http://") and not webhook.startswith("https://"):
             embed = discord.Embed(
