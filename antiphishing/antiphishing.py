@@ -143,7 +143,7 @@ class AntiPhishing(commands.Cog):
     @antiphishing.command()
     async def settings(self, ctx: Context):
         """
-        Show the current antiphishing settings.
+        Show current settings
         """
         guild_data = await self.config.guild(ctx.guild).all()
         webhook = guild_data.get('webhook', None)
@@ -169,7 +169,7 @@ class AntiPhishing(commands.Cog):
     @antiphishing.command()
     async def action(self, ctx: Context, action: str):
         """
-        Choose the action that occurs when a user sends a phishing scam.
+        Customize enforcement
 
         Options:
         **`ignore`** - Disables phishing protection **(Not recommended)**
@@ -237,7 +237,7 @@ class AntiPhishing(commands.Cog):
     @antiphishing.command()
     async def stats(self, ctx: Context):
         """
-        Check protection statistics for this server
+        Check statistics
         """
         caught = await self.config.guild(ctx.guild).caught()
         notifications = await self.config.guild(ctx.guild).notifications()
@@ -315,7 +315,7 @@ class AntiPhishing(commands.Cog):
     @commands.admin_or_permissions()
     async def autoban(self, ctx: Context, autoban: int):
         """
-        Set the number of malicious links a user can share before being banned. Set to 0 to disable autoban.
+        Configure an independent autoban
         """
         if autoban < 0:
             embed = discord.Embed(
@@ -340,7 +340,7 @@ class AntiPhishing(commands.Cog):
     @antiphishing.command()
     async def logchannel(self, ctx: Context, channel: discord.TextChannel):
         """
-        Set the logging channel where link detections will be sent.
+        Set logging channel
         """
         await self.config.guild(ctx.guild).log_channel.set(channel.id)
         embed = discord.Embed(
@@ -355,7 +355,7 @@ class AntiPhishing(commands.Cog):
     @antiphishing.command()
     async def staffrole(self, ctx: Context, role: discord.Role):
         """
-        Set the staff role to be mentioned in log channel messages.
+        Set responder role
         """
         await self.config.guild(ctx.guild).staff_role.set(role.id)
         embed = discord.Embed(
@@ -370,7 +370,7 @@ class AntiPhishing(commands.Cog):
     @antiphishing.command()
     async def timeoutduration(self, ctx: Context, minutes: int):
         """
-        Set the timeout duration in minutes for users who share malicious links.
+        Set timeout duration
         """
         if minutes < 1:
             embed = discord.Embed(
