@@ -18,7 +18,9 @@ class WatchDuty(commands.Cog):
             for role in guild.roles:
                 if guild.me.top_role > role:  # Check if the bot has permission to edit the role
                     # Deny the permission to mention everyone, here, and roles
-                    await role.edit(permissions=role.permissions.update(mention_everyone=False))
+                    new_permissions = role.permissions
+                    new_permissions.update(mention_everyone=False)
+                    await role.edit(permissions=new_permissions)
                     roles_modified += 1
 
         await ctx.send(f"Mass mentions have been disabled for {roles_modified} roles.")
@@ -31,7 +33,9 @@ class WatchDuty(commands.Cog):
             for role in guild.roles:
                 if guild.me.top_role > role:  # Check if the bot has permission to edit the role
                     # Deny the permission to use external apps
-                    await role.edit(permissions=role.permissions.update(use_external_apps=False))
+                    new_permissions = role.permissions
+                    new_permissions.update(use_external_apps=False)
+                    await role.edit(permissions=new_permissions)
                     roles_modified += 1
 
         await ctx.send(f"External apps have been disabled for {roles_modified} roles.")
