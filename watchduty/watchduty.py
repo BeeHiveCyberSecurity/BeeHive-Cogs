@@ -5,10 +5,11 @@ class WatchDuty(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.group(name="watchduty")
+    @commands.group(name="watchduty", invoke_without_command=True)
     @commands.has_permissions(administrator=True)
     async def watchduty_group(self, ctx):
         """Base command for WatchDuty settings."""
+        await ctx.send_help(ctx.command)
 
     @watchduty_group.command(name="massmentions")
     async def disable_mass_mentions(self, ctx):
