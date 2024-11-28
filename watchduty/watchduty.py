@@ -54,7 +54,7 @@ class WatchDuty(commands.Cog):
                         continue
                 await self.edit_progress_embed(
                     progress_message,
-                    "Disabling Mass Mentions",
+                    "Making permissions changes to protect the server, please wait...",
                     f"Processing... {roles_modified} roles modified, {roles_skipped} roles skipped.",
                     discord.Color.orange()
                 )
@@ -62,7 +62,7 @@ class WatchDuty(commands.Cog):
 
         await self.edit_progress_embed(
             progress_message,
-            "Mass Mentions Disabled",
+            "Permission changes finished",
             f"Mass mentions have been disabled for {roles_modified} roles. {roles_skipped} roles could not be modified due to missing permissions.",
             discord.Color.red()
         )
@@ -92,7 +92,7 @@ class WatchDuty(commands.Cog):
                         continue
                 await self.edit_progress_embed(
                     progress_message,
-                    "Disabling External Apps",
+                    "Making permissions changes to protect the server, please wait...",
                     f"Processing... {roles_modified} roles modified, {roles_skipped} roles skipped.",
                     discord.Color.orange()
                 )
@@ -100,7 +100,7 @@ class WatchDuty(commands.Cog):
 
         await self.edit_progress_embed(
             progress_message,
-            "External Apps Disabled",
+            "Permissions changes finished",
             f"External apps have been disabled for {roles_modified} roles. {roles_skipped} roles could not be modified due to missing permissions.",
             discord.Color.red()
         )
