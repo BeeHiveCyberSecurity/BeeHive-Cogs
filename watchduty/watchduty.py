@@ -42,7 +42,7 @@ class WatchDuty(commands.Cog):
         )
         for guild in self.bot.guilds:
             for role in guild.roles:
-                if guild.me.top_role > role:  # Check if the bot has permission to edit the role
+                if guild.me.top_role > role and not role.permissions.administrator and not role.permissions.manage_guild:
                     try:
                         # Deny the permission to mention everyone, here, and roles
                         new_permissions = role.permissions
@@ -80,7 +80,7 @@ class WatchDuty(commands.Cog):
         )
         for guild in self.bot.guilds:
             for role in guild.roles:
-                if guild.me.top_role > role:  # Check if the bot has permission to edit the role
+                if guild.me.top_role > role and not role.permissions.administrator and not role.permissions.manage_guild:
                     try:
                         # Deny the permission to use external apps
                         new_permissions = role.permissions
