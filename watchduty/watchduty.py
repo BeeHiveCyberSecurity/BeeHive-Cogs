@@ -34,6 +34,7 @@ class WatchDuty(commands.Cog):
         """Disable the ability to use mass mentions in the server."""
         roles_modified = 0
         roles_skipped = 0
+        roles_ignored = 0
         progress_message = await self.update_progress_embed(
             ctx,
             "Disabling Mass Mentions",
@@ -52,10 +53,12 @@ class WatchDuty(commands.Cog):
                     except discord.errors.Forbidden:
                         roles_skipped += 1
                         continue
+                else:
+                    roles_ignored += 1
                 await self.edit_progress_embed(
                     progress_message,
                     "Making permissions changes to protect the server, please wait...",
-                    f"Processing... {roles_modified} roles modified, {roles_skipped} roles skipped.",
+                    f"Processing... {roles_modified} roles modified, {roles_skipped} roles skipped, {roles_ignored} roles ignored.",
                     discord.Color.orange()
                 )
                 await asyncio.sleep(3)  # Respect rate limits
@@ -63,7 +66,7 @@ class WatchDuty(commands.Cog):
         await self.edit_progress_embed(
             progress_message,
             "Permission changes finished",
-            f"Mass mentions have been disabled for {roles_modified} roles. {roles_skipped} roles could not be modified due to missing permissions.",
+            f"Mass mentions have been disabled for {roles_modified} roles. {roles_skipped} roles could not be modified due to missing permissions. {roles_ignored} roles were ignored.",
             discord.Color.red()
         )
 
@@ -72,6 +75,7 @@ class WatchDuty(commands.Cog):
         """Disable the ability to use external apps in the server."""
         roles_modified = 0
         roles_skipped = 0
+        roles_ignored = 0
         progress_message = await self.update_progress_embed(
             ctx,
             "Disabling External Apps",
@@ -90,10 +94,12 @@ class WatchDuty(commands.Cog):
                     except discord.errors.Forbidden:
                         roles_skipped += 1
                         continue
+                else:
+                    roles_ignored += 1
                 await self.edit_progress_embed(
                     progress_message,
                     "Making permissions changes to protect the server, please wait...",
-                    f"Processing... {roles_modified} roles modified, {roles_skipped} roles skipped.",
+                    f"Processing... {roles_modified} roles modified, {roles_skipped} roles skipped, {roles_ignored} roles ignored.",
                     discord.Color.orange()
                 )
                 await asyncio.sleep(1)  # Respect rate limits
@@ -101,7 +107,7 @@ class WatchDuty(commands.Cog):
         await self.edit_progress_embed(
             progress_message,
             "Permissions changes finished",
-            f"External apps have been disabled for {roles_modified} roles. {roles_skipped} roles could not be modified due to missing permissions.",
+            f"External apps have been disabled for {roles_modified} roles. {roles_skipped} roles could not be modified due to missing permissions. {roles_ignored} roles were ignored.",
             discord.Color.red()
         )
 
