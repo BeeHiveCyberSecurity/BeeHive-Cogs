@@ -1,5 +1,5 @@
 import discord
-from discord.ext import commands
+from redbot.core import commands
 
 class WatchDuty(commands.Cog):
     def __init__(self, bot):
@@ -43,5 +43,5 @@ class WatchDuty(commands.Cog):
 
         await ctx.send(f"External apps have been {status}.")
 
-def setup(bot):
-    bot.add_cog(WatchDuty(bot))
+async def setup(bot):
+    await bot.add_cog(WatchDuty(bot))
