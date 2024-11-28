@@ -4,11 +4,14 @@ from redbot.core import commands
 class WatchDuty(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.mass_mentions_disabled = False
-        self.external_apps_disabled = False
 
-    @commands.command(name="toggle_mass_mentions")
+    @commands.group(name="watchduty", invoke_without_command=True)
     @commands.has_permissions(administrator=True)
+    async def watchduty_group(self, ctx):
+        """Base command for WatchDuty settings."""
+        await ctx.send("Use subcommands to configure WatchDuty settings.")
+
+    @watchduty_group.command(name="massmentions")
     async def toggle_mass_mentions(self, ctx):
         """Toggle the ability to use mass mentions in the server."""
         self.mass_mentions_disabled = not self.mass_mentions_disabled
@@ -25,8 +28,7 @@ class WatchDuty(commands.Cog):
 
         await ctx.send(f"Mass mentions have been {status}.")
 
-    @commands.command(name="toggle_external_apps")
-    @commands.has_permissions(administrator=True)
+    @watchduty_group.command(name="externalapps")
     async def toggle_external_apps(self, ctx):
         """Toggle the ability to use external apps in the server."""
         self.external_apps_disabled = not self.external_apps_disabled
