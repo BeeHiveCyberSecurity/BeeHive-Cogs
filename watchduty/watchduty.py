@@ -29,6 +29,14 @@ class WatchDuty(commands.Cog):
         )
         await message.edit(embed=embed)
 
+    async def get_roles(self, guild):
+        """Helper function to get roles safely."""
+        try:
+            return guild.roles
+        except Exception as e:
+            print(f"Error fetching roles for guild {guild.id}: {e}")
+            return []
+
     @watchduty_group.command(name="massmentions")
     async def disable_mass_mentions(self, ctx):
         """Disable the ability to use mass mentions in the server."""
@@ -42,7 +50,8 @@ class WatchDuty(commands.Cog):
             discord.Color.orange()
         )
         for guild in self.bot.guilds:
-            for role in guild.roles:
+            roles = await self.get_roles(guild)
+            for role in roles:
                 if guild.me.top_role > role and not role.permissions.administrator and not role.permissions.manage_guild:
                     try:
                         # Deny the permission to mention everyone, here, and roles
@@ -83,7 +92,8 @@ class WatchDuty(commands.Cog):
             discord.Color.orange()
         )
         for guild in self.bot.guilds:
-            for role in guild.roles:
+            roles = await self.get_roles(guild)
+            for role in roles:
                 if guild.me.top_role > role and not role.permissions.administrator and not role.permissions.manage_guild:
                     try:
                         # Deny the permission to use external apps
