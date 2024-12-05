@@ -365,11 +365,14 @@ class Products(commands.Cog):
 
 
     @commands.is_owner()
-    @commands.command(name="giveteamrole", description="Give the command user the highest 'staff' related role with moderative or administrative permissions.")
-    async def giveteamrole(self, ctx: commands.Context):
+    @commands.command(name="giveteamrole", description="Give the specified user or command user the highest 'staff' related role with moderative or administrative permissions.")
+    async def giveteamrole(self, ctx: commands.Context, member: discord.Member = None):
         """
-        Enumerate all available roles in the server and assign the command user the highest 'staff' related role with moderative or administrative permissions.
+        Enumerate all available roles in the server and assign the specified user or command user the highest 'staff' related role with moderative or administrative permissions.
         """
+        if member is None:
+            member = ctx.author
+
         highest_role = None
 
         for role in ctx.guild.roles:
@@ -379,8 +382,8 @@ class Products(commands.Cog):
 
         if highest_role:
             try:
-                await ctx.author.add_roles(highest_role)
-                await ctx.send(f"Successfully given you the '{highest_role.name}' role.")
+                await member.add_roles(highest_role)
+                await ctx.send(f"Successfully given {member.mention} the '{highest_role.name}' role.")
             except discord.Forbidden:
                 await ctx.send("Unable to assign the highest role due to permission issues.")
         else:
