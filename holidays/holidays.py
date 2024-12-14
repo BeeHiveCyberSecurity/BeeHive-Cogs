@@ -70,6 +70,8 @@ class Holidays(commands.Cog):
     @commands.group(name="holiday")
     async def holiday(self, ctx):
         """Group command for interacting with holidays."""
+        if ctx.invoked_subcommand is None:
+            await ctx.send_help(ctx.command)
 
     @holiday.command(name="next")
     async def next(self, ctx):
@@ -290,6 +292,8 @@ class Holidays(commands.Cog):
     @commands.group(name="holidayset")
     async def holidayset(self, ctx):
         """Configure holiday-related settings"""
+        if ctx.invoked_subcommand is None:
+            await ctx.send_help(ctx.command)
 
     @holidayset.command(name="country")
     async def country(self, ctx, country_code: str):
