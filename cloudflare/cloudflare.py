@@ -1123,15 +1123,15 @@ class Cloudflare(commands.Cog):
     @commands.group(invoke_without_command=False)
     async def intel(self, ctx):
         """
-        Flex security intelligence powered by Cloudflare's Global Network to assist in your investigations.
+        Flex security intelligence powered by Cloudflare's global distributed network to assist in your investigations.
         
-        Learn more at https://www.cloudflare.com/application-services/products/cloudforceone/
+        Learn more at [cloudflare.com](<https://cloudflare.com/application-services/products/cloudforceone/>)
         """
 
     @intel.command(name="whois")
     async def whois(self, ctx, domain: str):
         """
-        Query WHOIS information for a given domain.
+        View available WHOIS info
         """
         # Define registrar lists
         abuse_friendly_registrars = {"NameCheap, Inc.", "Spaceship", "Namecheap"}
@@ -1536,7 +1536,7 @@ class Cloudflare(commands.Cog):
 
     @intel.command(name="domain")
     async def querydomain(self, ctx, domain: str):
-        """Query Cloudflare API for domain intelligence and check blocklist status."""
+        """View information about a domain"""
         
         # Check if the input is an IP address
         try:
@@ -1620,7 +1620,7 @@ class Cloudflare(commands.Cog):
 
     @intel.command(name="ip")
     async def queryip(self, ctx, ip: str):
-        """Query intelligence on a public IP address."""
+        """View information about an IP address"""
 
         api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
         email = api_tokens.get("email")
@@ -1694,7 +1694,7 @@ class Cloudflare(commands.Cog):
     @intel.command(name="domainhistory")
     async def domainhistory(self, ctx, domain: str):
         """
-        Fetch and display category and domain history.
+        View information about a domain's history
         """
         # Check if the input is an IP address
         try:
@@ -1799,7 +1799,7 @@ class Cloudflare(commands.Cog):
     @intel.command(name="asn")
     async def asnintel(self, ctx, asn: int):
         """
-        Fetch and display ASN intelligence from Cloudflare.
+        View information about an ASN
         """
         api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
         email = api_tokens.get("email")
@@ -1854,7 +1854,7 @@ class Cloudflare(commands.Cog):
     @intel.command(name="subnets")
     async def asnsubnets(self, ctx, asn: int):
         """
-        Fetch and display ASN subnets intelligence from Cloudflare.
+        View information for ASN subnets
         """
         api_tokens = await self.bot.get_shared_api_tokens("cloudflare")
         email = api_tokens.get("email")
