@@ -246,13 +246,12 @@ class Products(commands.Cog):
         """
         embed = discord.Embed(
             title="BeeHive Endpoint Manager",
-            description="Before we can assist you remotely, you'll need to download and install our **Service Agent**.\n### We use this agent to...\n- **Remotely connect and control your device on request**\n- **Read diagnostic information about your device**\n- **Remotely orchestrate repairs and security operations**\n**and more...**\n\nWhile our software is installed on your system, information about you and your device, including any telemetry we collect, will be guarded subject to our **[Terms of Service](https://www.beehive.systems/tos)**, and **[Privacy Policy](https://www.beehive.systems/privacy)**.\n\nTo learn more about how we secure your private information, please visit our **[Trust Center](https://trust.beehive.systems)**",
+            description="Before we can assist you remotely, you'll need to download and install our **Endpoint Manager**.\n### We use this agent to...\n- **Remotely connect and control your device on request**\n- **Read diagnostic information about your device**\n- **Remotely orchestrate repairs and security operations**\n**and more...**\n\nWhile our software is installed on your system, information about you and your device, including any telemetry we collect, will be guarded subject to our **[Terms of Service](https://www.beehive.systems/tos)**, and **[Privacy Policy](https://www.beehive.systems/privacy)**.\n\nTo learn more about how we secure your private information, please visit our **[Trust Center](https://trust.beehive.systems)**",
             colour=0xfffffe
         )
-        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/shield-checkmark.png")
         embed.add_field(
             name="Instructions",
-            value="**1.** Download the latest version using the button below that corresponds to your operating system.\n\n**2.** Run the downloaded file as administrator.\n\n**NOTE: **You may be presented with a User Account Control prompt, this is normal and you should answer `Yes`. The Service Agent will install silently and automatically.",
+            value="**1.** Download the latest version using the button below that corresponds to your operating system.\n\n**2.** Run the downloaded file as administrator.\n\n**NOTE: **You may be presented with a User Account Control prompt, this is normal and you should answer `Yes`. The agent will install silently and automatically.",
             inline=False
         )
         view = discord.ui.View()
