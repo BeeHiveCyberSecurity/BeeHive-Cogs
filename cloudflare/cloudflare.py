@@ -1125,7 +1125,7 @@ class Cloudflare(commands.Cog):
         """
         Flex security intelligence powered by Cloudflare's global distributed network to assist in your investigations.
         
-        Learn more at [cloudflare.com](<https://cloudflare.com/application-services/products/cloudforceone/>)
+        Learn more at [cloudflare.com](<https://www.cloudflare.com/application-services/products/cloudforceone/>)
         """
 
     @intel.command(name="whois")
