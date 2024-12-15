@@ -1124,6 +1124,7 @@ class Cloudflare(commands.Cog):
     async def intel(self, ctx):
         """
         Flex security intelligence powered by Cloudflare's Global Network to assist in your investigations.
+        
         Learn more at https://www.cloudflare.com/application-services/products/cloudforceone/
         """
 
