@@ -30,7 +30,7 @@ class AbuseIPDB(commands.Cog):
         """
         AbuseIPDB is a project to help combat the spread of hackers, spammers, and abusive activity on the internet by providing a central blacklist for webmasters, system administrators, and other interested parties to report IP's engaged in bad behavior.
 
-        Learn more at https://www.abuseipdb.com
+        Learn more at [abuseipdb.com](<https://www.abuseipdb.com>)
         """
     
     @abuseipdb.command(name="report", description="Report an IP address to AbuseIPDB.")
