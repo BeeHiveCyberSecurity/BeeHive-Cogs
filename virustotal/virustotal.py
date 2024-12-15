@@ -26,7 +26,11 @@ class VirusTotal(commands.Cog):
 
     @commands.group(name="virustotal", invoke_without_command=True)
     async def virustotal(self, ctx):
-        """VirusTotal is a free online service that analyzes files and URLs to detect viruses, malware, and other security threats. Learn more at https://www.virustotal.com"""
+        """
+        VirusTotal is a free online service that analyzes files and URLs to detect viruses, malware, and other security threats.
+        
+        Learn more at [virustotal.com](<https://www.virustotal.com>)
+        """
         await ctx.send_help(ctx.command)
 
     @checks.admin_or_permissions(manage_guild=True)
