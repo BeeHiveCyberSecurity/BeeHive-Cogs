@@ -245,7 +245,7 @@ class Products(commands.Cog):
         Show an embed containing instructions to download and install the service agent for remote assistance
         """
         embed = discord.Embed(
-            title="Download the BeeHive Service Agent",
+            title="BeeHive Endpoint Manager",
             description="Before we can assist you remotely, you'll need to download and install our **Service Agent**.\n### We use this agent to...\n- **Remotely connect and control your device on request**\n- **Read diagnostic information about your device**\n- **Remotely orchestrate repairs and security operations**\n**and more...**\n\nWhile our software is installed on your system, information about you and your device, including any telemetry we collect, will be guarded subject to our **[Terms of Service](https://www.beehive.systems/tos)**, and **[Privacy Policy](https://www.beehive.systems/privacy)**.\n\nTo learn more about how we secure your private information, please visit our **[Trust Center](https://trust.beehive.systems)**",
             colour=0xfffffe
         )

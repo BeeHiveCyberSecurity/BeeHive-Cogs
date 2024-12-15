@@ -1122,7 +1122,10 @@ class Cloudflare(commands.Cog):
 
     @commands.group(invoke_without_command=False)
     async def intel(self, ctx):
-        """Cloudforce One packages the vital aspects of modern threat intelligence and operations to make organizations smarter, more responsive, and more secure. Learn more at https://www.cloudflare.com/application-services/products/cloudforceone/"""
+        """
+        Flex security intelligence powered by Cloudflare's Global Network to assist in your investigations.
+        Learn more at https://www.cloudflare.com/application-services/products/cloudforceone/
+        """
 
     @intel.command(name="whois")
     async def whois(self, ctx, domain: str):
