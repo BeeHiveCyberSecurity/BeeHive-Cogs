@@ -1123,7 +1123,7 @@ class Cloudflare(commands.Cog):
     @commands.group(invoke_without_command=False)
     async def intel(self, ctx):
         """
-        Flex security & network intelligence powered by Cloudflare's global distributed network to assist in your investigations.
+        Utilize security & network intelligence powered by Cloudflare's global distributed network to assist in your investigations.
         
         Learn more at [cloudflare.com](<https://www.cloudflare.com/application-services/products/cloudforceone/>)
         """
