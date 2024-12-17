@@ -1,6 +1,6 @@
-import discord #type: ignore
-from redbot.core import commands, Config #type: ignore
-import aiohttp #type: ignore
+import discord  # type: ignore
+from redbot.core import commands, Config  # type: ignore
+import aiohttp  # type: ignore
 import asyncio
 
 class WarActivity(commands.Cog):
@@ -40,6 +40,8 @@ class WarActivity(commands.Cog):
                             await self.send_alerts(guild_id, new_posts)
                             new_last_alert_id = max(post["i"] for post in new_posts)
                             await self.config.guild_from_id(guild_id).last_alert_id.set(new_last_alert_id)
+                    else:
+                        print(f"Failed to fetch war activity: HTTP {response.status}")
             except aiohttp.ClientError as e:
                 print(f"Error fetching war activity: {e}")
 
@@ -50,7 +52,10 @@ class WarActivity(commands.Cog):
             if channel:
                 for post in new_posts:
                     embed = self.create_embed_from_post(post)
-                    await channel.send(embed=embed)
+                    try:
+                        await channel.send(embed=embed)
+                    except discord.HTTPException as e:
+                        print(f"Failed to send alert: {e}")
 
     async def check_and_send_alerts_loop(self):
         await self.bot.wait_until_ready()
@@ -66,7 +71,7 @@ class WarActivity(commands.Cog):
             description=description_without_emoji,
             colour=0xfffffe
         )
-        embed.set_footer(text=f"✨ Machine translated from Ukrainian, accuracy may vary.")
+        embed.set_footer(text="✨ Machine translated from Ukrainian, accuracy may vary.")
         return embed
 
     @ukraine.command(name="recent")
@@ -113,7 +118,7 @@ class WarActivity(commands.Cog):
                         else:
                             await ctx.send("No recent war activity found.")
                     else:
-                        await ctx.send("Failed to fetch war activity.")
+                        await ctx.send(f"Failed to fetch war activity: HTTP {response.status}")
             except aiohttp.ClientError as e:
                 await ctx.send(f"Error occurred while fetching war activity: {e}")
 
