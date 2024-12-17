@@ -66,7 +66,7 @@ class WarActivity(commands.Cog):
             description=description_without_emoji,
             colour=0xfffffe
         )
-        embed.set_footer(text=f"Intel report")
+        embed.set_footer(text=f"Machine translated from Ukrainian, accuracy may vary.")
         return embed
 
     @ukraine.command(name="recent")
