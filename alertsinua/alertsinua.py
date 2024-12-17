@@ -116,9 +116,9 @@ class WarActivity(commands.Cog):
                                     except asyncio.TimeoutError:
                                         break
                         else:
-                            await ctx.send("No recent war activity found.")
+                            await ctx.send("No recent intelligence reports found.")
                     else:
-                        await ctx.send(f"Failed to fetch war activity: HTTP {response.status}")
+                        await ctx.send(f"Failed to fetch intelligence: HTTP {response.status}")
             except aiohttp.ClientError as e:
-                await ctx.send(f"Error occurred while fetching war activity: {e}")
+                await ctx.send(f"Error occurred while fetching intelligence: {e}")
 
