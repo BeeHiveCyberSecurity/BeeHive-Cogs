@@ -67,7 +67,7 @@ class WarActivity(commands.Cog):
     def create_embed_from_post(self, post):
         description_without_emoji = ''.join(char for char in post["me"] if char.isalnum() or char.isspace() or char in '.,!?')
         embed = discord.Embed(
-            title="Recent war activity",
+            title="From the battlefield",
             description=description_without_emoji,
             colour=0xfffffe
         )
