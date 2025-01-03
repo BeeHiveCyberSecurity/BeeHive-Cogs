@@ -318,16 +318,15 @@ class Products(commands.Cog):
         Send a disclaimer about Sentri's capabilities and monitoring.
         """
         embed = discord.Embed(
-            title="Disclaimer",
+            title="Privacy disclaimer",
             description="**[Sentri](https://www.beehive.systems/sentri)** is **a [BeeHive](https://www.beehive.systems) product**, and the owner of this community has chosen to entrust it with helping safeguard your time here.\n\nFor Sentri to function correctly, it needs to collect and process data about you.",
             colour=0xfffffe
         )
-        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/shield-checkmark.png")
         embed.add_field(
             name="What kind of data is collected?",
             value=(
                 "Messages, activities, and any content sent in this server may be subject to collection, analysis, training, and archival."
-                "This includes, but is not limited to\n"
+                "This includes, but is not limited to \n"
                 "- **Messages**\n*All text-based communication, including text channels, voice channel chats, threads, and commands*\n"
                 "- **Images**\n*Any images or media files shared within the server.*\n"
                 "- **Links**\n*URLs and hyperlinks shared in messages, or the raw content of a domain extracted from message content.*\n"
