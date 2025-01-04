@@ -355,12 +355,13 @@ class Products(commands.Cog):
         embed.add_field(
             name="Is My Data Ever Shared?",
             value=(
-                "**No**, *but unexpected circumstances may apply*.\n\n"
-                "BeeHive **may** disclose *Your Personal Data* in an absolute and unbiased **good faith belief** that such action is **unavoidable** to:\n"
+                "**No**, *but unexpected circumstances may apply*.\n"
+                "BeeHive **may** disclose *Your Personal Data* in an **absolute** and **unbiased** **good faith belief** that such action is **unavoidable** to:\n"
                 "- Fulfill *our* legal obligations\n"
                 "- Safeguard and uphold our rights and assets\n"
                 "- Thwart or examine potential misconduct related to our services, or the services of our partners\n"
-                "- Safeguard the personal safety of users or the public"
+                "- Safeguard the personal safety of users or the public\n"
+                "- Respond to an immediate qualified danger against life, limb, or property"
             ),
             inline=False
         )
@@ -371,6 +372,11 @@ class Products(commands.Cog):
                 "and/or criminal activity observed or detected, we'll forget about you on an annual basis. Anything we collect about you in the meantime, "
                 "we'll share with nobody."
             ),
+            inline=False
+        )
+        embed.add_field(
+            name="Control Optional Data",
+            value="You can process your own data deletion requests without assistance.\nUse `!mydata 3rdparty` to see what each module stores about you.\nUse `!mydata forgetme` to request a deletion.\nNote that if you ask Sentri to forget important information about you - it will - and certain features you've configured or rely on may stop working correctly. Use caution.",
             inline=False
         )
         view = discord.ui.View()
