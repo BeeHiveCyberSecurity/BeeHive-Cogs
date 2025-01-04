@@ -349,25 +349,24 @@ class Products(commands.Cog):
         )
         embed.add_field(
             name="Is My Data Ever Sold?",
-            value="**No.**\n*Customer data is never for sale.*",
+            value="**No.** Customer data is never for sale.",
             inline=False
         )
         embed.add_field(
             name="Is My Data Ever Shared?",
             value=(
-                "**No**, *but unexpected circumstances may apply*.\n"
-                "BeeHive **may** disclose *Your Personal Data* in an **absolute** and **unbiased** **good faith belief** that such action is **unavoidable** to:\n"
-                "- Fulfill *our* legal obligations\n"
+                "**No**, *but unexpected circumstances may apply*. BeeHive **may** disclose *Your Personal Data* in an **absolute** and **unbiased** **good faith belief** that such action is **unavoidable** to:\n"
+                "- Fulfill *our* **legal** obligations\n"
                 "- Safeguard and uphold our rights and assets\n"
-                "- Thwart or examine potential misconduct related to our services, or the services of our partners\n"
-                "- Safeguard the personal safety of users or the public\n"
-                "- Respond to an immediate qualified danger against life, limb, or property"
+                "- Thwart or examine *potential* misconduct related to our services, **or** the services of our partners\n"
+                "- Safeguard the general computing public\n"
+                "- Respond to an immediate qualified danger against life, person, or property"
             ),
             inline=False
         )
         embed.add_field(
             name="Control Optional Data",
-            value="You can process your own data deletion requests without assistance.\n- Use `!mydata 3rdparty` to see what each module stores about you.\n- Use `!mydata forgetme` to request a deletion.\n\nDeleting data can cause features of Sentri you've configured to stop working properly, use caution.",
+            value="You can process your own data deletion requests without assistance.\n\n- Use `!mydata 3rdparty` to see what each module stores about you.\n- Use `!mydata forgetme` to request a deletion.\n\nDeleting data can cause features of Sentri you've configured to stop working properly, use caution.",
             inline=False
         )
         view = discord.ui.View()
