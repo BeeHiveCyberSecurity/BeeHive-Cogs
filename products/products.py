@@ -366,17 +366,8 @@ class Products(commands.Cog):
             inline=False
         )
         embed.add_field(
-            name="In Summary",
-            value=(
-                "Provided we're not placed in a position where we must acknowledge and/or disclose data collected about you due to abusive "
-                "and/or criminal activity observed or detected, we'll forget about you on an annual basis. Anything we collect about you in the meantime, "
-                "we'll share with nobody."
-            ),
-            inline=False
-        )
-        embed.add_field(
             name="Control Optional Data",
-            value="You can process your own data deletion requests without assistance.\nUse `!mydata 3rdparty` to see what each module stores about you.\nUse `!mydata forgetme` to request a deletion.\nNote that if you ask Sentri to forget important information about you - it will - and certain features you've configured or rely on may stop working correctly. Use caution.",
+            value="You can process your own data deletion requests without assistance.\n- Use `!mydata 3rdparty` to see what each module stores about you.\n- Use `!mydata forgetme` to request a deletion.\n\nDeleting data can cause features of Sentri you've configured to stop working properly, use caution.",
             inline=False
         )
         view = discord.ui.View()
