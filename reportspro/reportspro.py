@@ -195,8 +195,8 @@ class ReportsPro(commands.Cog):
                 # Send the report to the reports channel
                 if self.reports_channel:
                     report_message = discord.Embed(
-                        title="A New Report Needs Attention",
-                        color=discord.Color.from_rgb(255, 69, 69)
+                        title="A new report was filed",
+                        color=0xff4545
                     )
                     report_message.add_field(name="Report ID", value=f"```{report_id}```", inline=False)
                     report_message.add_field(name="Offender", value=f"{self.member.mention}", inline=True)
@@ -210,7 +210,7 @@ class ReportsPro(commands.Cog):
                     # Add a summary of existing report counts by reason
                     if reason_counts:
                         summary = "\n".join(f"**{reason}** x**{count}**" for reason, count in reason_counts.items())
-                        report_message.add_field(name="Previous Reports", value=summary, inline=False)
+                        report_message.add_field(name="Previous reports", value=summary, inline=False)
 
                     mention_role_id = await self.config.guild(self.ctx.guild).mention_role()
                     mention_role = ctx.guild.get_role(mention_role_id)
@@ -223,7 +223,7 @@ class ReportsPro(commands.Cog):
                             os.remove(chat_history)  # Clean up the file after sending
                     except discord.Forbidden:
                         embed = discord.Embed(
-                            title="Permission Error",
+                            title="Permission error",
                             description="I can't send messages in the reports channel. Please check my permissions.",
                             color=discord.Color.red()
                         )
@@ -619,16 +619,16 @@ class ReportsPro(commands.Cog):
                         await self.reporter.send(embed=embed)
                     except discord.Forbidden:
                         embed = discord.Embed(
-                            title="DM Error",
-                            description="I couldn't send a DM to the reporter.",
+                            title="Couldn't send report update",
+                            description="I couldn't send a DM to the reporter to update them on this report, you may need to reach out manually to the user if you're inclined.",
                             color=discord.Color.red()
                         )
                         await self.ctx.send(embed=embed)
 
                 embed = discord.Embed(
-                    title="Report Handled",
+                    title="Report handled",
                     description=f"Report {self.report_id} has been handled. Action: {action}.",
-                    color=discord.Color.green()
+                    color=0x2bbd8e
                 )
                 await self.ctx.send(embed=embed)
                 self.stop()
