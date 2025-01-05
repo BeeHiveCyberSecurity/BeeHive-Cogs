@@ -145,13 +145,11 @@ class ReportsPro(commands.Cog):
                     report_id = ''.join(random.choices(string.ascii_letters + string.digits, k=4))
                 
                 embed = discord.Embed(
-                    title="Report Created",
-                    color=discord.Color.from_rgb(43, 189, 142),
+                    title="Report created",
+                    color=0xfffffe,
                     description=(
                         f"You have reported {self.member.mention} for **{selected_reason}**.\n\n"
-                        f"Your report ID is `{report_id}`. We'll use this ID for any updates on your report.\n\n"
-                        "The bot will try to automatically gather chat evidence from recent conversations "
-                        "to help with the investigation. Your messages will be included in this."
+                        f"Your report ID is `{report_id}`. We'll use this ID for any updates on your report.\n\nPlease ensure your Direct Messages are open if you'd like updates on this report."
                     )
                 )
                 await interaction.response.send_message(embed=embed, ephemeral=True)
