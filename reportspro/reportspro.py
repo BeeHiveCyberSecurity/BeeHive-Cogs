@@ -627,7 +627,7 @@ class ReportsPro(commands.Cog):
 
                 embed = discord.Embed(
                     title="Report handled",
-                    description=f"Report {self.report_id} has been handled. Action: {action}.",
+                    description=f"Report {self.report_id} has been handled.\nAction: {action}.",
                     color=0x2bbd8e
                 )
                 await self.ctx.send(embed=embed)
