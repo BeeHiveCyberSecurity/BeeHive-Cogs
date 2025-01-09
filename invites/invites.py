@@ -214,8 +214,8 @@ class Invites(commands.Cog):
             await ctx.send(embed=embed)
 
     @invites.command()
-    async def growthchart(self, ctx):
-        """Show the overall member growth of the server as a graph."""
+    async def chart(self, ctx):
+        """graph the server's growth"""
         growth = await self.config.guild(ctx.guild).member_growth()
         if not growth:
             await ctx.send("No member growth data available.")
@@ -249,9 +249,9 @@ class Invites(commands.Cog):
 
         plt.figure(figsize=(10, 5))
         plt.plot_date([datetime.strptime(date, "%Y-%m-%d") for date in dates], member_counts, marker='o', linestyle='-')
-        plt.title('Server Member Growth')
+        plt.title('Server member growth')
         plt.xlabel('Date')
-        plt.ylabel('Member Count')
+        plt.ylabel('Member count')
         
         # Display fewer date labels to reduce cramping
         max_labels = 10
@@ -286,7 +286,7 @@ class Invites(commands.Cog):
                 title="Invite stats",
                 color=discord.Color.from_str("#2bbd8e")
             )
-            embed.add_field(name="Invite Code", value=f"**`{invite.code}`**", inline=True)
+            embed.add_field(name="Invite code", value=f"**`{invite.code}`**", inline=True)
             embed.add_field(name="Inviter", value=f"{inviter.mention if inviter else 'Unknown'}", inline=True)
             embed.add_field(name="Uses", value=f"**`{uses}`**", inline=True)
             pages.append(embed)
