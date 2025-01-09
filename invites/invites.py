@@ -100,7 +100,7 @@ class Invites(commands.Cog):
                             description=f"Congratulations! You've been awarded the {role.name} role for inviting {count} members!",
                             color=discord.Color.from_str("#2bbd8e")
                         )
-                        await inviter.send(embed=embed)
+                        await self.announce_reward(guild, inviter, embed)
         except Exception as e:
             print(f"Failed to check rewards for inviter {inviter.id} in guild {guild.id}: {e}")
 
@@ -123,9 +123,18 @@ class Invites(commands.Cog):
                 embed.add_field(name="Inviter", value=inviter.mention, inline=False)
                 embed.add_field(name="Next Milestone", value=f"{invite_count + 10} invites", inline=False)
                 embed.set_footer(text="Thank you for your contributions!")
-                await inviter.send(embed=embed)
+                await self.announce_reward(guild, inviter, embed)
         except Exception as e:
             print(f"Failed to check milestones for inviter {inviter.id} in guild {guild.id}: {e}")
+
+    async def announce_reward(self, guild, inviter, embed):
+        try:
+            channel_id = await self.config.guild(guild).announcement_channel()
+            announcement_channel = guild.get_channel(channel_id) if channel_id else None
+            if announcement_channel:
+                await announcement_channel.send(embed=embed)
+        except Exception as e:
+            print(f"Failed to announce reward in guild {guild.id}: {e}")
 
     @commands.guild_only()
     @commands.admin()
