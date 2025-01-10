@@ -19,8 +19,8 @@ class AntiPhishing(commands.Cog):
     Guard users from malicious links and phishing attempts with customizable protection options.
     """
 
-    __version__ = "1.6.3.0"
-    __last_updated__ = "November 23rd 2024"
+    __version__ = "1.6.3.1"
+    __last_updated__ = "January 10th, 2025"
     __quick_notes__ = "Added a customizable timeout duration and staff role mentions"
 
     def __init__(self, bot: Red):
@@ -77,7 +77,61 @@ class AntiPhishing(commands.Cog):
                 return list(set(links))
         return None
 
-                        
+
+    @commands.admin_or_permissions()
+    @antiphishing.command()
+    async def scan(self, ctx: Context):
+        """
+        Scan the last 500 links in each channel against the blocklist.
+        """
+        blocklist = set(self.domains)  # Assuming self.domains contains the blocklist
+        channels = ctx.guild.text_channels
+        bad_links = []
+        total_links_checked = 0
+
+        embed = discord.Embed(
+            title='Antiphishing Scan',
+            description='Scanning channels for malicious links...',
+            colour=0x3498db
+        )
+        message = await ctx.send(embed=embed)
+
+        for channel in channels:
+            try:
+                async for message in channel.history(limit=500):
+                    links = self.get_links(message.content)
+                    if links:
+                        total_links_checked += len(links)
+                        for link in links:
+                            if link in blocklist:
+                                bad_links.append((channel.name, message.jump_url, link))
+            except discord.Forbidden:
+                continue  # Skip channels where the bot doesn't have permission to read history
+
+            # Update progress
+            embed.description = f'Scanning channels for malicious links...\n\nChecked {total_links_checked} links so far.'
+            await message.edit(embed=embed)
+
+        # Final results
+        if bad_links:
+            description = f"Found {len(bad_links)} malicious links:\n"
+            for channel_name, jump_url, link in bad_links:
+                description += f"- Channel: {channel_name}, [Message]({jump_url}), Link: {link}\n"
+            embed = discord.Embed(
+                title='Antiphishing Scan Results',
+                description=description,
+                colour=0xe74c3c
+            )
+        else:
+            embed = discord.Embed(
+                title='Antiphishing Scan Results',
+                description='No malicious links found.',
+                colour=0x2ecc71
+            )
+
+        await message.edit(embed=embed)
+
+                       
     @commands.group()
     @commands.guild_only()
     async def antiphishing(self, ctx: Context):
