@@ -77,6 +77,12 @@ class AntiPhishing(commands.Cog):
                 return list(set(links))
         return None
 
+    @commands.group()
+    @commands.guild_only()
+    async def antiphishing(self, ctx: Context):
+        """
+        Configurable options to help keep known malicious links out of your community's conversations.
+        """
 
     @commands.admin_or_permissions()
     @antiphishing.command()
@@ -131,13 +137,6 @@ class AntiPhishing(commands.Cog):
 
         await message.edit(embed=embed)
 
-                       
-    @commands.group()
-    @commands.guild_only()
-    async def antiphishing(self, ctx: Context):
-        """
-        Configurable options to help keep known malicious links out of your community's conversations.
-        """
 
     @commands.admin_or_permissions()
     @antiphishing.command()
