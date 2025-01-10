@@ -5,6 +5,7 @@ from typing import List, Optional
 from urllib.parse import urlparse
 import aiohttp  # type: ignore
 import discord  # type: ignore
+import asyncio
 from discord.ext import tasks  # type: ignore
 from redbot.core import Config, commands, modlog  # type: ignore
 from redbot.core.bot import Red  # type: ignore
