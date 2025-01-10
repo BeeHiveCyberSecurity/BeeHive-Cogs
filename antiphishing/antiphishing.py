@@ -100,7 +100,7 @@ class AntiPhishing(commands.Cog):
             description='Scanning channels for malicious links...',
             colour=0x3498db
         )
-        message = await ctx.send(embed=embed)
+        progress_message = await ctx.send(embed=embed)
 
         for channel in channels:
             try:
@@ -116,7 +116,10 @@ class AntiPhishing(commands.Cog):
 
             # Update progress
             embed.description = f'Scanning channels for malicious links...\n\nChecked {total_links_checked} links so far.'
-            await message.edit(embed=embed)
+            try:
+                await progress_message.edit(embed=embed)
+            except discord.Forbidden:
+                pass  # Handle the case where the bot cannot edit the message
 
         # Final results
         if bad_links:
@@ -135,7 +138,10 @@ class AntiPhishing(commands.Cog):
                 colour=0x2ecc71
             )
 
-        await message.edit(embed=embed)
+        try:
+            await progress_message.edit(embed=embed)
+        except discord.Forbidden:
+            await ctx.send(embed=embed)  # Send a new message if editing is not possible
 
 
     @commands.admin_or_permissions()
