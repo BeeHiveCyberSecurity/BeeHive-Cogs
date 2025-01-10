@@ -89,7 +89,7 @@ class AntiPhishing(commands.Cog):
     @antiphishing.command()
     async def scan(self, ctx: Context):
         """
-        Scan the last 500 links in each channel against the blocklist.
+        Scan recent messages for dangerous links
         """
         blocklist = set(self.domains)  # Assuming self.domains contains the blocklist
         channels = ctx.guild.text_channels
@@ -107,7 +107,7 @@ class AntiPhishing(commands.Cog):
 
         for channel in channels:
             try:
-                async for message in channel.history(limit=500):
+                async for message in channel.history(limit=150):
                     links = self.get_links(message.content)
                     if links:
                         total_links_checked += len(links)
