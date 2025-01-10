@@ -120,7 +120,7 @@ class AntiPhishing(commands.Cog):
 
             # Update progress every 10 seconds
             elapsed_time = (discord.utils.utcnow() - start_time).total_seconds()
-            if elapsed_time % 10 < 1:
+            if int(elapsed_time) % 10 == 0:
                 time_str = self.format_elapsed_time(elapsed_time)
                 embed.description = (
                     f'Starting a scan for malicious links, this may take a short while to complete.\n'
@@ -171,10 +171,10 @@ class AntiPhishing(commands.Cog):
         hours, minutes = divmod(minutes, 60)
         time_components = []
         if hours:
-            time_components.append(f"{hours} hour(s)")
+            time_components.append(f"{hours} hour{'s' if hours != 1 else ''}")
         if minutes:
-            time_components.append(f"{minutes} minute(s)")
-        time_components.append(f"{seconds} second(s)")
+            time_components.append(f"{minutes} minute{'s' if minutes != 1 else ''}")
+        time_components.append(f"{seconds} second{'s' if seconds != 1 else ''}")
         return " ".join(time_components)
 
 
