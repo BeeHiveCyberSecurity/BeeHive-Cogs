@@ -114,7 +114,7 @@ class AntiPhishing(commands.Cog):
                         for link in links:
                             if link in blocklist:
                                 bad_links.append((channel.name, message.jump_url, link))
-                    await asyncio.sleep(0.1)  # Add a small delay to avoid hitting rate limits
+                    await asyncio.sleep(1)  # Add a small delay to avoid hitting rate limits
             except discord.Forbidden:
                 continue  # Skip channels where the bot doesn't have permission to read history
 
