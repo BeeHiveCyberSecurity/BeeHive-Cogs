@@ -96,10 +96,11 @@ class AntiPhishing(commands.Cog):
         total_links_checked = 0
 
         embed = discord.Embed(
-            title='Antiphishing Scan',
+            title='Scan started',
             description='Scanning channels for malicious links...',
-            colour=0x3498db
+            colour=0xfffffe
         )
+        embed.set_thumbnail(url='https://i.imgur.com/ZP7UnDZ.gif')
         progress_message = await ctx.send(embed=embed)
 
         for channel in channels:
