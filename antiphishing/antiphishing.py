@@ -89,7 +89,7 @@ class AntiPhishing(commands.Cog):
     @antiphishing.command()
     async def scan(self, ctx: Context):
         """
-        Scan recent messages for dangerous links
+        Scan the last 500 links in each channel against the blocklist.
         """
         blocklist = set(self.domains)  # Assuming self.domains contains the blocklist
         channels = ctx.guild.text_channels
@@ -107,20 +107,20 @@ class AntiPhishing(commands.Cog):
 
         for channel in channels:
             try:
-                async for message in channel.history(limit=150):
+                async for message in channel.history(limit=500):
                     links = self.get_links(message.content)
                     if links:
                         total_links_checked += len(links)
                         for link in links:
                             if link in blocklist:
                                 bad_links.append((channel.name, message.jump_url, link))
-                    await asyncio.sleep(5)  # Increased delay to avoid hitting rate limits
+                    await asyncio.sleep(0.1)  # Add a small delay to avoid hitting rate limits
             except discord.Forbidden:
                 continue  # Skip channels where the bot doesn't have permission to read history
 
-            # Update progress every 15 seconds
+            # Update progress every 10 seconds
             elapsed_time = (discord.utils.utcnow() - start_time).total_seconds()
-            if int(elapsed_time) % 15 == 0:
+            if int(elapsed_time) % 10 == 0:
                 time_str = self.format_elapsed_time(elapsed_time)
                 embed.description = (
                     f'Starting a scan for malicious links, this may take a short while to complete.\n'
@@ -132,7 +132,7 @@ class AntiPhishing(commands.Cog):
                 except discord.Forbidden:
                     pass  # Handle the case where the bot cannot edit the message
 
-            await asyncio.sleep(5)  # Increased delay between channel scans to be gentle on rate limits
+            await asyncio.sleep(1)  # Add a delay between channel scans to be gentle on rate limits
 
         # Final results
         elapsed_time = (discord.utils.utcnow() - start_time).total_seconds()
