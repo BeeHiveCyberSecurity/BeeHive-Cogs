@@ -43,8 +43,8 @@ class AntiPhishing(commands.Cog):
         )
         self.config.register_member(caught=0)
         self.session = aiohttp.ClientSession()
-        self.bot.loop.create_task(self.get_phishing_domains())
         self.domains = []
+        self.bot.loop.create_task(self.get_phishing_domains())
 
     def cog_unload(self):
         self.bot.loop.create_task(self.session.close())
@@ -470,32 +470,39 @@ class AntiPhishing(commands.Cog):
             "User-Agent": f"BeeHive AntiPhishing v{self.__version__} (https://www.beehive.systems/)"
         }
 
-        async with self.session.get(
-            "https://phish.sinking.yachts/v2/all", headers=headers
-        ) as request:
-            if request.status == 200:
-                try:
-                    data = await request.json()
-                    domains.update(data)
-                except Exception as e:
-                    print(f"Error parsing JSON from Sinking Yachts: {e}")
-            else:
-                print(f"Failed to fetch Sinking Yachts blacklist, status code: {request.status}")
-
-        async with self.session.get(
-            "https://www.beehive.systems/hubfs/blocklist/blocklist.json", headers=headers
-        ) as request:
-            if request.status == 200:
-                try:
-                    data = await request.json()
-                    if isinstance(data, list):
+        try:
+            async with self.session.get(
+                "https://phish.sinking.yachts/v2/all", headers=headers
+            ) as request:
+                if request.status == 200:
+                    try:
+                        data = await request.json()
                         domains.update(data)
-                    else:
-                        print("Unexpected data format received from blocklist.")
-                except Exception as e:
-                    print(f"Error parsing JSON from blocklist: {e}")
-            else:
-                print(f"Failed to fetch blocklist, status code: {request.status}")
+                    except Exception as e:
+                        print(f"Error parsing JSON from Sinking Yachts: {e}")
+                else:
+                    print(f"Failed to fetch Sinking Yachts blacklist, status code: {request.status}")
+        except aiohttp.ClientError as e:
+            print(f"Network error while fetching Sinking Yachts blacklist: {e}")
+
+        try:
+            async with self.session.get(
+                "https://www.beehive.systems/hubfs/blocklist/blocklist.json", headers=headers
+            ) as request:
+                if request.status == 200:
+                    try:
+                        data = await request.json()
+                        if isinstance(data, list):
+                            domains.update(data)
+                        else:
+                            print("Unexpected data format received from blocklist.")
+                    except Exception as e:
+                        print(f"Error parsing JSON from blocklist: {e}")
+                else:
+                    print(f"Failed to fetch blocklist, status code: {request.status}")
+        except aiohttp.ClientError as e:
+            print(f"Network error while fetching blocklist: {e}")
+
         self.domains = list(domains)
 
     async def follow_redirects(self, url: str) -> List[str]:
@@ -511,6 +518,8 @@ class AntiPhishing(commands.Cog):
                 urls.append(str(response.url))
                 for history in response.history:
                     urls.append(str(history.url))
+        except aiohttp.ClientError as e:
+            print(f"Network error while following redirects: {e}")
         except Exception as e:
             print(f"Error following redirects: {e}")
         return urls
@@ -538,9 +547,12 @@ class AntiPhishing(commands.Cog):
             webhook_embed.add_field(name="User", value=message.author.mention)
             webhook_embed.add_field(name="URL", value=domain)
             webhook_embed.add_field(name="Redirect Chain", value=redirect_chain_str)
-            async with self.session.post(webhook_url, json={"embeds": [webhook_embed.to_dict()]}) as response:
-                if response.status not in [200, 204]:
-                    print(f"Failed to send webhook: {response.status}")
+            try:
+                async with self.session.post(webhook_url, json={"embeds": [webhook_embed.to_dict()]}) as response:
+                    if response.status not in [200, 204]:
+                        print(f"Failed to send webhook: {response.status}")
+            except aiohttp.ClientError as e:
+                print(f"Network error while sending webhook: {e}")
         
         log_channel_id = await self.config.guild(message.guild).log_channel()
         staff_role_id = await self.config.guild(message.guild).staff_role()
