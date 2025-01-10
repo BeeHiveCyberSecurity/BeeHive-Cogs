@@ -97,7 +97,7 @@ class AntiPhishing(commands.Cog):
 
         embed = discord.Embed(
             title='Scan started',
-            description='Scanning channels for malicious links...',
+            description='Starting a scan for malicious links, this may take a short while to complete.',
             colour=0xfffffe
         )
         embed.set_thumbnail(url='https://i.imgur.com/ZP7UnDZ.gif')
@@ -116,7 +116,7 @@ class AntiPhishing(commands.Cog):
                 continue  # Skip channels where the bot doesn't have permission to read history
 
             # Update progress
-            embed.description = f'Scanning channels for malicious links...\n\nChecked {total_links_checked} links so far.'
+            embed.description = f'Starting a scan for malicious links, this may take a short while to complete.\n\Scanned **{total_links_checked}** links so far.'
             try:
                 await progress_message.edit(embed=embed)
             except discord.Forbidden:
@@ -124,19 +124,19 @@ class AntiPhishing(commands.Cog):
 
         # Final results
         if bad_links:
-            description = f"Found {len(bad_links)} malicious links:\n"
+            description = f"Found {len(bad_links)} dangerous links:\n"
             for channel_name, jump_url, link in bad_links:
                 description += f"- Channel: {channel_name}, [Message]({jump_url}), Link: {link}\n"
             embed = discord.Embed(
-                title='Antiphishing Scan Results',
+                title='Scan completed',
                 description=description,
-                colour=0xe74c3c
+                colour=0xff4545
             )
         else:
             embed = discord.Embed(
-                title='Antiphishing Scan Results',
-                description='No malicious links found.',
-                colour=0x2ecc71
+                title='Scan completed',
+                description='No dangerous links were found - hooray! :tada:',
+                colour=0x2bbd8e
             )
 
         try:
