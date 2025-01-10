@@ -121,12 +121,11 @@ class AntiPhishing(commands.Cog):
             # Update progress every 10 seconds
             elapsed_time = (discord.utils.utcnow() - start_time).total_seconds()
             if elapsed_time % 10 < 1:
-                estimated_time = len(channels) * 5  # Estimate 5 seconds per channel
+                time_str = self.format_elapsed_time(elapsed_time)
                 embed.description = (
                     f'Starting a scan for malicious links, this may take a short while to complete.\n'
                     f'Scanned **{total_links_checked}** links so far.\n'
-                    f'Time elapsed: **{int(elapsed_time)}** seconds.\n'
-                    f'Estimated time remaining: **{max(0, estimated_time - int(elapsed_time))}** seconds.'
+                    f'Time elapsed: **{time_str}**.'
                 )
                 try:
                     await progress_message.edit(embed=embed)
@@ -136,6 +135,8 @@ class AntiPhishing(commands.Cog):
             await asyncio.sleep(1)  # Add a delay between channel scans to be gentle on rate limits
 
         # Final results
+        elapsed_time = (discord.utils.utcnow() - start_time).total_seconds()
+        time_str = self.format_elapsed_time(elapsed_time)
         if bad_links:
             description = f"Found {len(bad_links)} dangerous links:\n"
             for channel_name, jump_url, link in bad_links:
@@ -152,10 +153,29 @@ class AntiPhishing(commands.Cog):
                 colour=0x2bbd8e
             )
 
+        # Add scan statistics
+        embed.add_field(name="Total Links Checked", value=total_links_checked)
+        embed.add_field(name="Total Dangerous Links Found", value=len(bad_links))
+        embed.add_field(name="Total Time Elapsed", value=time_str)
+
         try:
             await progress_message.edit(embed=embed)
         except discord.Forbidden:
             await ctx.send(embed=embed)  # Send a new message if editing is not possible
+
+    def format_elapsed_time(self, elapsed_seconds: float) -> str:
+        """
+        Format elapsed time into a human-readable string.
+        """
+        minutes, seconds = divmod(int(elapsed_seconds), 60)
+        hours, minutes = divmod(minutes, 60)
+        time_components = []
+        if hours:
+            time_components.append(f"{hours} hour(s)")
+        if minutes:
+            time_components.append(f"{minutes} minute(s)")
+        time_components.append(f"{seconds} second(s)")
+        return " ".join(time_components)
 
 
     @commands.admin_or_permissions()
