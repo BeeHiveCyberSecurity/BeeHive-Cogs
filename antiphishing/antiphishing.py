@@ -154,9 +154,9 @@ class AntiPhishing(commands.Cog):
             )
 
         # Add scan statistics
-        embed.add_field(name="Total Links Checked", value=total_links_checked)
-        embed.add_field(name="Total Dangerous Links Found", value=len(bad_links))
-        embed.add_field(name="Total Time Elapsed", value=time_str)
+        embed.add_field(name="Links checked", value=total_links_checked)
+        embed.add_field(name="Dangerous links found", value=len(bad_links))
+        embed.add_field(name="Time elapsed", value=time_str)
 
         try:
             await progress_message.edit(embed=embed)
