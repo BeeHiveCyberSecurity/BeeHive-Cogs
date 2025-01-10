@@ -94,6 +94,7 @@ class AntiPhishing(commands.Cog):
         channels = ctx.guild.text_channels
         bad_links = []
         total_links_checked = 0
+        start_time = discord.utils.utcnow()
 
         embed = discord.Embed(
             title='Scan started',
@@ -115,12 +116,20 @@ class AntiPhishing(commands.Cog):
             except discord.Forbidden:
                 continue  # Skip channels where the bot doesn't have permission to read history
 
-            # Update progress
-            embed.description = f'Starting a scan for malicious links, this may take a short while to complete.\n\Scanned **{total_links_checked}** links so far.'
-            try:
-                await progress_message.edit(embed=embed)
-            except discord.Forbidden:
-                pass  # Handle the case where the bot cannot edit the message
+            # Update progress every 10 seconds
+            elapsed_time = (discord.utils.utcnow() - start_time).total_seconds()
+            if elapsed_time % 10 < 1:
+                estimated_time = len(channels) * 5  # Estimate 5 seconds per channel
+                embed.description = (
+                    f'Starting a scan for malicious links, this may take a short while to complete.\n'
+                    f'Scanned **{total_links_checked}** links so far.\n'
+                    f'Time elapsed: **{int(elapsed_time)}** seconds.\n'
+                    f'Estimated time remaining: **{max(0, estimated_time - int(elapsed_time))}** seconds.'
+                )
+                try:
+                    await progress_message.edit(embed=embed)
+                except discord.Forbidden:
+                    pass  # Handle the case where the bot cannot edit the message
 
         # Final results
         if bad_links:
