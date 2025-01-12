@@ -106,6 +106,8 @@ class AntiPhishing(commands.Cog):
         progress_message = await ctx.send(embed=embed)
 
         for channel in channels:
+            if not channel.permissions_for(ctx.guild.me).read_messages:
+                continue  # Skip channels where the bot doesn't have permission to read messages
             try:
                 async for message in channel.history(limit=500):
                     links = self.get_links(message.content)
