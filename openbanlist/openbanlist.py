@@ -105,7 +105,7 @@ class OpenBanList(commands.Cog):
             return
 
         for member in guild.members:
-            if str(member.id) in banlist_data:
+            if any(member.id == int(ban_info["reported_id"]) for ban_info in banlist_data.values()):
                 try:
                     if action == "kick":
                         await member.kick(reason="User is on the global banlist.")
@@ -126,9 +126,9 @@ class OpenBanList(commands.Cog):
                 log_channel_id = await self.config.guild(guild).log_channel()
                 log_channel = guild.get_channel(log_channel_id)
 
-                if str(member.id) in banlist_data:
+                if any(member.id == int(ban_info["reported_id"]) for ban_info in banlist_data.values()):
                     action = await self.config.guild(guild).action()
-                    ban_info = banlist_data[str(member.id)]
+                    ban_info = next(ban_info for ban_info in banlist_data.values() if member.id == int(ban_info["reported_id"]))
                     try:
                         if action == "kick":
                             await member.kick(reason="User is on the global banlist.")
