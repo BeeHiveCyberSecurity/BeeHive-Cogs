@@ -110,6 +110,9 @@ class OpenBanList(commands.Cog):
                     embed.add_field(name="Reporter ID", value=ban_info.get("reporter_id", "Unknown"), inline=False)
                     embed.add_field(name="Approver ID", value=ban_info.get("approver_id", "Unknown"), inline=False)
                     embed.add_field(name="Appealable", value=str(ban_info.get("appealable", False)), inline=False)
+                    evidence = ban_info.get("proof")
+                    if evidence:
+                        embed.add_field(name="Evidence", value=evidence, inline=False)
                 else:
                     embed = discord.Embed(
                         title="Banlist Check",
@@ -184,6 +187,9 @@ class OpenBanList(commands.Cog):
                         embed.add_field(name="Reporter ID", value=ban_info.get("reporter_id", "Unknown"), inline=False)
                         embed.add_field(name="Approver ID", value=ban_info.get("approver_id", "Unknown"), inline=False)
                         embed.add_field(name="Appealable", value=str(ban_info.get("appealable", False)), inline=False)
+                        evidence = ban_info.get("proof")
+                        if evidence:
+                            embed.add_field(name="Evidence", value=evidence, inline=False)
                         await log_channel.send(embed=embed)
                 else:
                     if log_channel:
