@@ -56,7 +56,10 @@ class VanityGuard(commands.Cog):
             await ctx.send("This server does not have a vanity URL feature.")
             return
 
-        current_vanity = guild.vanity_url_code
+        # Use await vanity_invite() to fetch the currently set vanity
+        vanity_invite = await guild.vanity_invite()
+        current_vanity = vanity_invite.code if vanity_invite else None
+
         if current_vanity is None:
             await ctx.send("This server does not currently have a vanity URL set.")
             return
@@ -78,14 +81,20 @@ class VanityGuard(commands.Cog):
         if not await self.config.guild(after).enabled():
             return
 
-        if before.vanity_url_code != after.vanity_url_code:
+        # Use await vanity_invite() to fetch the currently set vanity
+        before_vanity_invite = await before.vanity_invite()
+        after_vanity_invite = await after.vanity_invite()
+        before_vanity_code = before_vanity_invite.code if before_vanity_invite else None
+        after_vanity_code = after_vanity_invite.code if after_vanity_invite else None
+
+        if before_vanity_code != after_vanity_code:
             protected_vanity = await self.config.guild(after).vanity_url()
-            if protected_vanity and after.vanity_url_code != protected_vanity:
+            if protected_vanity and after_vanity_code != protected_vanity:
                 # Notify the server owner or take action
                 owner = after.owner
                 if owner:
                     try:
-                        await owner.send(f"Warning: The vanity URL has changed! Current: {after.vanity_url_code}, Expected: {protected_vanity}")
+                        await owner.send(f"Warning: The vanity URL has changed! Current: {after_vanity_code}, Expected: {protected_vanity}")
                     except discord.Forbidden:
                         pass
 
