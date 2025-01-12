@@ -37,29 +37,54 @@ class OpenBanList(commands.Cog):
     async def enable(self, ctx):
         """Enable the global banlist protection."""
         await self.config.guild(ctx.guild).enabled.set(True)
-        await ctx.send("Global banlist protection has been enabled.")
+        embed = discord.Embed(
+            title="Banlist Enabled",
+            description="Global banlist protection has been enabled.",
+            color=discord.Color.green()
+        )
+        await ctx.send(embed=embed)
 
     @banlist.command()
     async def disable(self, ctx):
         """Disable the global banlist protection."""
         await self.config.guild(ctx.guild).enabled.set(False)
-        await ctx.send("Global banlist protection has been disabled.")
+        embed = discord.Embed(
+            title="Banlist Disabled",
+            description="Global banlist protection has been disabled.",
+            color=discord.Color.red()
+        )
+        await ctx.send(embed=embed)
 
     @banlist.command()
     async def action(self, ctx, action: str):
         """Set the action to take against users on the banlist."""
         valid_actions = ["kick", "ban", "none"]
         if action not in valid_actions:
-            await ctx.send(f"Invalid action. Choose from: {', '.join(valid_actions)}")
+            embed = discord.Embed(
+                title="Invalid Action",
+                description=f"Invalid action. Choose from: {', '.join(valid_actions)}",
+                color=discord.Color.orange()
+            )
+            await ctx.send(embed=embed)
             return
         await self.config.guild(ctx.guild).action.set(action)
-        await ctx.send(f"Action for users on the banlist set to: {action}")
+        embed = discord.Embed(
+            title="Action Set",
+            description=f"Action for users on the banlist set to: {action}",
+            color=discord.Color.green()
+        )
+        await ctx.send(embed=embed)
 
     @banlist.command()
     async def logchannel(self, ctx, channel: discord.TextChannel):
         """Set the logging channel for banlist actions."""
         await self.config.guild(ctx.guild).log_channel.set(channel.id)
-        await ctx.send(f"Logging channel set to {channel.mention}.")
+        embed = discord.Embed(
+            title="Log Channel Set",
+            description=f"Logging channel set to {channel.mention}.",
+            color=discord.Color.green()
+        )
+        await ctx.send(embed=embed)
 
     async def update_banlist_periodically(self):
         while True:
