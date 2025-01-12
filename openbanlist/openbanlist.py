@@ -2,6 +2,7 @@ from redbot.core import commands, Config
 import discord
 import aiohttp
 import asyncio
+from collections import Counter
 
 class OpenBanList(commands.Cog):
     """
@@ -123,6 +124,26 @@ class OpenBanList(commands.Cog):
                         description=f"User ID {user_id} is not on the banlist.",
                         color=discord.Color.green()
                     )
+                await ctx.send(embed=embed)
+
+    @banlist.command()
+    async def stats(self, ctx):
+        """Show statistics about the banlist."""
+        async with self.session.get(self.banlist_url) as response:
+            if response.status == 200:
+                banlist_data = await response.json()
+                total_banned = len(banlist_data)
+                ban_reasons = [ban_info.get("ban_reason", "No reason provided") for ban_info in banlist_data.values()]
+                reason_counts = Counter(ban_reasons)
+                top_reasons = reason_counts.most_common(5)
+
+                embed = discord.Embed(
+                    title="Banlist Statistics",
+                    description=f"Total users banned: {total_banned}",
+                    color=discord.Color.blue()
+                )
+                for reason, count in top_reasons:
+                    embed.add_field(name=reason, value=f"{count} times", inline=False)
                 await ctx.send(embed=embed)
 
     async def update_banlist_periodically(self):
