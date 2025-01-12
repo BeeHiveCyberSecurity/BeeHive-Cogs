@@ -459,3 +459,23 @@ class Products(commands.Cog):
             await ctx.send("Unable to update the role icon due to permission issues.")
         except discord.HTTPException as e:
             await ctx.send(f"Failed to update the role icon: {e}")
+
+    
+    @commands.has_permissions(manage_roles=True)
+    @commands.command(name="updaterolecolor", description="Update a role's color with the specified hex color code.")
+    async def updaterolecolor(self, ctx: commands.Context, role: discord.Role, color: str):
+        """
+        Update a role's color with the specified hex color code.
+        """
+        if not color.startswith("#") or len(color) != 7:
+            await ctx.send("Please provide a valid hex color code (e.g., #FF5733).")
+            return
+
+        try:
+            new_color = discord.Color(int(color[1:], 16))
+            await role.edit(color=new_color)
+            await ctx.send(f"Successfully updated the color for the role '{role.name}' to {color}.")
+        except discord.Forbidden:
+            await ctx.send("Unable to update the role color due to permission issues.")
+        except discord.HTTPException as e:
+            await ctx.send(f"Failed to update the role color: {e}")
