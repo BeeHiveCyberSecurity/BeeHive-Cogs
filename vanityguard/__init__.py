@@ -1,4 +1,4 @@
 from .vanityguard import VanityGuard
 
-def setup(bot):
+async def setup(bot):
     bot.add_cog(VanityGuard(bot))
