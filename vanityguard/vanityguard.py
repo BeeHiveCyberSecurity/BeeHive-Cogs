@@ -51,17 +51,26 @@ class VanityGuard(commands.Cog):
             await ctx.send("Vanity URL protection is currently disabled.")
             return
 
+        # Check if the server has a vanity URL feature
+        if not guild.features or "VANITY_URL" not in guild.features:
+            await ctx.send("This server does not have a vanity URL feature.")
+            return
+
         current_vanity = guild.vanity_url_code
+        if current_vanity is None:
+            await ctx.send("This server does not currently have a vanity URL set.")
+            return
+
         protected_vanity = await self.config.guild(guild).vanity_url()  # Fetch the protected vanity from config
 
         if protected_vanity is None:
-            await ctx.send("No vanity URL is currently set.")
+            await ctx.send("No vanity URL is currently set in the protection settings.")
             return
 
         if current_vanity == protected_vanity:
-            await ctx.send("The vanity URL is correctly set.")
+            await ctx.send(f"The vanity URL is correctly set to: discord.gg/{current_vanity}")
         else:
-            await ctx.send(f"Warning: The vanity URL has changed! Current: {current_vanity}, Expected: {protected_vanity}")
+            await ctx.send(f"Warning: The vanity URL has changed! Current: discord.gg/{current_vanity}, Expected: discord.gg/{protected_vanity}")
 
     @commands.Cog.listener()
     async def on_guild_update(self, before, after):
