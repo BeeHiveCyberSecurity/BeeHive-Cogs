@@ -4,7 +4,11 @@ import aiohttp
 import asyncio
 
 class OpenBanList(commands.Cog):
-    """A cog to manage a global banlist."""
+    """
+    OpenBanlist is a project aimed at cataloging malicious Discord users and working to keep them out of servers in a united fashion.
+    
+    For more information or to report a user, please visit [openbanlist.cc](<https://openbanlist.cc>)
+    """
 
     def __init__(self, bot):
         self.bot = bot
