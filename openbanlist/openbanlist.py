@@ -86,6 +86,35 @@ class OpenBanList(commands.Cog):
         )
         await ctx.send(embed=embed)
 
+    @banlist.command()
+    async def check(self, ctx, user_id: int = None):
+        """Check if a user is on the global banlist."""
+        if user_id is None:
+            user_id = ctx.author.id
+
+        async with self.session.get(self.banlist_url) as response:
+            if response.status == 200:
+                banlist_data = await response.json()
+                ban_info = next((ban_info for ban_info in banlist_data.values() if int(ban_info["reported_id"]) == user_id), None)
+                
+                if ban_info:
+                    embed = discord.Embed(
+                        title="Banlist Check",
+                        description=f"User ID {user_id} is on the banlist.",
+                        color=discord.Color.red()
+                    )
+                    embed.add_field(name="Ban Reason", value=ban_info.get("ban_reason", "No reason provided"), inline=False)
+                    embed.add_field(name="Reporter ID", value=ban_info.get("reporter_id", "Unknown"), inline=False)
+                    embed.add_field(name="Approver ID", value=ban_info.get("approver_id", "Unknown"), inline=False)
+                    embed.add_field(name="Appealable", value=str(ban_info.get("appealable", False)), inline=False)
+                else:
+                    embed = discord.Embed(
+                        title="Banlist Check",
+                        description=f"User ID {user_id} is not on the banlist.",
+                        color=discord.Color.green()
+                    )
+                await ctx.send(embed=embed)
+
     async def update_banlist_periodically(self):
         while True:
             await self.update_banlist()
