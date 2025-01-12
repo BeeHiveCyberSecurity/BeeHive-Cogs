@@ -14,10 +14,10 @@ class VanityGuard(commands.Cog):
 
     @commands.guild_only()
     @commands.admin_or_permissions(manage_guild=True)
-    @commands.group()
+    @commands.group(invoke_without_command=True)
     async def vanityguard(self, ctx):
         """Commands for managing the vanity URL protection."""
-        pass
+        await ctx.send_help(ctx.command)
 
     @vanityguard.command()
     async def check(self, ctx):
