@@ -98,7 +98,7 @@ class VanityGuard(commands.Cog):
         await ctx.send(embed=embed)
 
     @vanityguard.command()
-    async def setaction(self, ctx, action: str):
+    async def action(self, ctx, action: str):
         """Set the action to take against users who tamper with the vanity URL."""
         valid_actions = ["timeout", "kick", "ban", "strip_roles", "none"]
         if action not in valid_actions:
