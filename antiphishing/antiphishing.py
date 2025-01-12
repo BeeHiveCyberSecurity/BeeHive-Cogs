@@ -182,9 +182,9 @@ class AntiPhishing(commands.Cog):
 
     @commands.admin_or_permissions()
     @antiphishing.command()
-    async def enroll(self, ctx: Context, webhook: str):
+    async def alerthook(self, ctx: Context, webhook: str):
         """
-        Enable vendor monitoring
+        Set an alert webhook. Useful if you manage multiple servers and want to consolidate link safety alerts.
         """
         if not webhook.startswith("http://") and not webhook.startswith("https://"):
             embed = discord.Embed(
@@ -252,7 +252,7 @@ class AntiPhishing(commands.Cog):
         )
         embed.add_field(name="Autoban threshold", value=f"{guild_data.get('autoban', 'Not set')}", inline=False)
         embed.add_field(name="Action", value=f"{guild_data.get('action', 'Not set').title()}", inline=False)
-        embed.add_field(name="Security vendor", value=enrollment_status, inline=False)
+        embed.add_field(name="Alert hook", value=enrollment_status, inline=False)
         embed.add_field(name="Log channel", value=log_channel_status, inline=False)
         embed.add_field(name="Staff Role", value=staff_role_status, inline=False)
         embed.add_field(name="Timeout Duration", value=f"{guild_data.get('timeout_duration', 30)} minutes", inline=False)
