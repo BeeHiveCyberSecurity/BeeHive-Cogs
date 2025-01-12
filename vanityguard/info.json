@@ -1,0 +1,8 @@
+{
+    "author": "adminelevation",
+    "description": "A cog to protect the server's vanity URL from unauthorized changes.",
+    "install_msg": "Thank you for installing VanityGuard! Use `[p]vanityguard` to get started.",
+    "short": "Protect your server's vanity URL.",
+    "requirements": [],
+    "tags": ["utility", "vanity", "protection"]
+}
