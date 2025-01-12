@@ -24,7 +24,7 @@ class VanityGuard(commands.Cog):
         """Check if the vanity URL is still set correctly."""
         guild = ctx.guild
         current_vanity = guild.vanity_url_code
-        protected_vanity = current_vanity  # Assume the current vanity is the one to protect
+        protected_vanity = await self.config.guild(guild).vanity_url()  # Fetch the protected vanity from config
 
         if protected_vanity is None:
             await ctx.send("No vanity URL is currently set.")
