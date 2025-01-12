@@ -29,7 +29,11 @@ class OpenBanList(commands.Cog):
     @commands.guild_only()
     @commands.group(invoke_without_command=True)
     async def banlist(self, ctx):
-        """Commands for managing the global banlist."""
+        """
+        OpenBanlist is a project aimed at cataloging malicious Discord users and working to keep them out of servers in a united fashion.
+    
+        For more information or to report a user, please visit [openbanlist.cc](<https://openbanlist.cc>)
+        """
         await ctx.send_help(ctx.command)
 
     @commands.admin_or_permissions(manage_guild=True)
