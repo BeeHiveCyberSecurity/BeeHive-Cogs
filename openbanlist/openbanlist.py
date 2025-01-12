@@ -138,12 +138,12 @@ class OpenBanList(commands.Cog):
                 top_reasons = reason_counts.most_common(5)
 
                 embed = discord.Embed(
-                    title="Banlist Statistics",
-                    description=f"Total users banned: {total_banned}",
-                    color=discord.Color.blue()
+                    title="OpenBanlist stats",
+                    description=f"There are **{total_banned}** active global bans",
+                    color=0xfffffe
                 )
                 for reason, count in top_reasons:
-                    embed.add_field(name=reason, value=f"{count} times", inline=False)
+                    embed.add_field(name=reason, value=f"**{count}** users", inline=False)
                 await ctx.send(embed=embed)
 
     async def update_banlist_periodically(self):
