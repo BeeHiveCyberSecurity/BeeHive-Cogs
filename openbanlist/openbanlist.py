@@ -27,12 +27,12 @@ class OpenBanList(commands.Cog):
         self.bot.loop.create_task(self.session.close())
 
     @commands.guild_only()
-    @commands.admin_or_permissions(manage_guild=True)
     @commands.group(invoke_without_command=True)
     async def banlist(self, ctx):
         """Commands for managing the global banlist."""
         await ctx.send_help(ctx.command)
 
+    @commands.admin_or_permissions(manage_guild=True)
     @banlist.command()
     async def enable(self, ctx):
         """Enable the global banlist protection."""
@@ -44,6 +44,7 @@ class OpenBanList(commands.Cog):
         )
         await ctx.send(embed=embed)
 
+    @commands.admin_or_permissions(manage_guild=True)
     @banlist.command()
     async def disable(self, ctx):
         """Disable the global banlist protection."""
@@ -55,6 +56,7 @@ class OpenBanList(commands.Cog):
         )
         await ctx.send(embed=embed)
 
+    @commands.admin_or_permissions(manage_guild=True)
     @banlist.command()
     async def action(self, ctx, action: str):
         """Set the action to take against users on the banlist."""
@@ -75,8 +77,9 @@ class OpenBanList(commands.Cog):
         )
         await ctx.send(embed=embed)
 
+    @commands.admin_or_permissions(manage_guild=True)
     @banlist.command()
-    async def logchannel(self, ctx, channel: discord.TextChannel):
+    async def logs(self, ctx, channel: discord.TextChannel):
         """Set the logging channel for banlist actions."""
         await self.config.guild(ctx.guild).log_channel.set(channel.id)
         embed = discord.Embed(
