@@ -8,7 +8,6 @@ class VanityGuard(commands.Cog):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=1234567890)
         default_guild = {
-            "vanity_url": None,
             "enabled": True,
             "auto_revert": False
         }
@@ -24,8 +23,16 @@ class VanityGuard(commands.Cog):
     @vanityguard.command()
     async def enable(self, ctx):
         """Enable the vanity URL protection."""
-        await self.config.guild(ctx.guild).enabled.set(True)
-        await ctx.send("Vanity URL protection has been enabled.")
+        guild = ctx.guild
+        await self.config.guild(guild).enabled.set(True)
+        # Set the current vanity URL as the protected one
+        vanity_invite = await guild.vanity_invite()
+        current_vanity = vanity_invite.code if vanity_invite else None
+        if current_vanity:
+            await self.config.guild(guild).vanity_url.set(current_vanity)
+            await ctx.send(f"Vanity URL protection has been enabled for: discord.gg/{current_vanity}")
+        else:
+            await ctx.send("Vanity URL protection has been enabled, but no vanity URL is currently set.")
 
     @vanityguard.command()
     async def disable(self, ctx):
@@ -65,10 +72,6 @@ class VanityGuard(commands.Cog):
             return
 
         protected_vanity = await self.config.guild(guild).vanity_url()  # Fetch the protected vanity from config
-
-        if protected_vanity is None:
-            await ctx.send("No vanity URL is currently set in the protection settings.")
-            return
 
         if current_vanity == protected_vanity:
             await ctx.send(f"The vanity URL is correctly set to: discord.gg/{current_vanity}")
