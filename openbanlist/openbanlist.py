@@ -19,7 +19,7 @@ class OpenBanList(commands.Cog):
             "log_channel": None  # Default log channel is None
         }
         self.config.register_guild(**default_guild)
-        self.banlist_url = "https://www.beehive.systems/hubfs/banlist/banlist.json"
+        self.banlist_url = "https://openbanlist.cc/data/banlist.json"
         self.session = aiohttp.ClientSession()
         self.bot.loop.create_task(self.update_banlist_periodically())
 
