@@ -223,7 +223,7 @@ class OpenBanList(commands.Cog):
                 else:
                     if log_channel:
                         embed = discord.Embed(
-                            title="Join screened",
+                            title="🗒️ Join screened",
                             description=f"**{member.mention}** joined and no active ban was found on the banlist.",
                             color=0x2bbd8e
                         )
