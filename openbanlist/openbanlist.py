@@ -227,5 +227,5 @@ class OpenBanList(commands.Cog):
                             description=f"**{member.mention}** joined and no active ban was found on the banlist.",
                             color=0x2bbd8e
                         )
-                        embed.add_field(name="User ID", value=f"{member.id}", inline=False)
+                        embed.add_field(name="User ID", value=f"```{member.id}```", inline=False)
                         await log_channel.send(embed=embed)
