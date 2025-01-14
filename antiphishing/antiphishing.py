@@ -628,7 +628,6 @@ class AntiPhishing(commands.Cog):
                         title="Dangerous link detected!",
                         description=(
                             f"Don't click any links in this message, and ask a staff member to remove this message for community safety.\n\n"
-                            f"**Link trajectory**\n{redirect_chain_str}"
                         ),
                         color=0xff4545,
                     )
