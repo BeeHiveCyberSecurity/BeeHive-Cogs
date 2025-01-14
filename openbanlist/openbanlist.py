@@ -223,8 +223,8 @@ class OpenBanList(commands.Cog):
                 else:
                     if log_channel:
                         embed = discord.Embed(
-                            title="🗒️ Join screened",
-                            description=f"**{member.mention}** joined and no active ban was found on the banlist.",
+                            title="User join screened",
+                            description=f"**{member.mention}** joined the server, and no active ban was found on the banlist.",
                             color=0x2bbd8e
                         )
                         embed.add_field(name="User ID", value=f"```{member.id}```", inline=False)
