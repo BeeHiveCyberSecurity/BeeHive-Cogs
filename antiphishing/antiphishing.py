@@ -484,7 +484,7 @@ class AntiPhishing(commands.Cog):
         embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/clock.png")
         await ctx.send(embed=embed)
 
-    @tasks.loop(minutes=5)
+    @tasks.loop(minutes=15)
     async def get_phishing_domains(self) -> None:
         domains = set()
 
