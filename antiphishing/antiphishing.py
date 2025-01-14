@@ -484,7 +484,7 @@ class AntiPhishing(commands.Cog):
         embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/clock.png")
         await ctx.send(embed=embed)
 
-    @tasks.loop(minutes=2)
+    @tasks.loop(minutes=5)
     async def get_phishing_domains(self) -> None:
         domains = set()
 
@@ -527,6 +527,18 @@ class AntiPhishing(commands.Cog):
             print(f"Network error while fetching blocklist: {e}")
 
         self.domains = list(domains)
+
+        # Send "Definitions updated" message to log channel if set
+        for guild in self.bot.guilds:
+            log_channel_id = await self.config.guild(guild).log_channel()
+            log_channel = guild.get_channel(log_channel_id)
+            if log_channel:
+                embed = discord.Embed(
+                    title="Definitions updated",
+                    description="The phishing domains list has been updated.",
+                    color=0x2bbd8e
+                )
+                await log_channel.send(embed=embed)
 
     async def follow_redirects(self, url: str) -> List[str]:
         """
