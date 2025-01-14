@@ -170,9 +170,9 @@ class OpenBanList(commands.Cog):
             if any(member.id == int(ban_info["reported_id"]) for ban_info in banlist_data.values()):
                 try:
                     if action == "kick":
-                        await member.kick(reason="User is on the global banlist.")
+                        await member.kick(reason="Active ban detected on OpenBanlist")
                     elif action == "ban":
-                        await member.ban(reason="User is on the global banlist.")
+                        await member.ban(reason="Active ban detected on OpenBanlist")
                 except discord.Forbidden:
                     pass
 
@@ -193,10 +193,10 @@ class OpenBanList(commands.Cog):
                     ban_info = next(ban_info for ban_info in banlist_data.values() if member.id == int(ban_info["reported_id"]))
                     try:
                         if action == "kick":
-                            await member.kick(reason="User is on the global banlist.")
+                            await member.kick(reason="Active ban detected on OpenBanlist")
                             action_taken = "kicked"
                         elif action == "ban":
-                            await member.ban(reason="User is on the global banlist.")
+                            await member.ban(reason="Active ban detected on OpenBanlist")
                             action_taken = "banned"
                         else:
                             action_taken = "none"
@@ -205,26 +205,26 @@ class OpenBanList(commands.Cog):
 
                     if log_channel:
                         embed = discord.Embed(
-                            title="Banlist Alert",
-                            description=f"User {member.mention} ({member.id}) joined and is on the banlist.",
-                            color=discord.Color.red()
+                            title="Banlist match found",
+                            description=f"{member.mention} ({member.id}) joined and is actively listed on OpenBanlist.",
+                            color=0xff4545
                         )
-                        embed.add_field(name="Action Taken", value=action_taken, inline=False)
-                        embed.add_field(name="Ban Reason", value=ban_info.get("ban_reason", "No reason provided"), inline=False)
+                        embed.add_field(name="Action taken", value=action_taken, inline=False)
+                        embed.add_field(name="Ban reason", value=ban_info.get("ban_reason", "No reason provided"), inline=False)
                         embed.add_field(name="Reporter ID", value=ban_info.get("reporter_id", "Unknown"), inline=False)
                         embed.add_field(name="Approver ID", value=ban_info.get("approver_id", "Unknown"), inline=False)
                         embed.add_field(name="Appealable", value=str(ban_info.get("appealable", False)), inline=False)
                         evidence = ban_info.get("evidence")
                         if evidence:
                             embed.add_field(name="Evidence", value=evidence, inline=False)
-                        embed.add_field(name="Report Date", value=str(ban_info.get("report_date", "Unknown")), inline=False)
-                        embed.add_field(name="Ban Date", value=str(ban_info.get("ban_date", "Unknown")), inline=False)
+                        embed.add_field(name="Report date", value=str(ban_info.get("report_date", "Unknown")), inline=False)
+                        embed.add_field(name="Ban date", value=str(ban_info.get("ban_date", "Unknown")), inline=False)
                         await log_channel.send(embed=embed)
                 else:
                     if log_channel:
                         embed = discord.Embed(
-                            title="Member Joined",
-                            description=f"User {member.mention} ({member.id}) joined and is not on the banlist.",
-                            color=discord.Color.green()
+                            title="Member screened",
+                            description=f"{member.mention} ({member.id}) joined and no ban was found on the banlist.",
+                            color=0x2bbd8e
                         )
                         await log_channel.send(embed=embed)
