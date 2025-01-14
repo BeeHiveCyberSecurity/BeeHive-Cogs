@@ -596,13 +596,13 @@ class AntiPhishing(commands.Cog):
             if log_channel:
                 redirect_chain_str = "\n".join(redirect_chain)
                 log_embed = discord.Embed(
-                    title="Link safety",
-                    description=f"A known dangerous website or link was detected in **{message.guild.name}**'s chat.",
+                    title="Malicious link detected",
+                    description=f"{message.author.mention} sent a dangerous link in {message.channel.mention}",
                     color=0xff4545,
                 )
-                log_embed.add_field(name="Sender", value=message.author.mention)
-                log_embed.add_field(name="Domain", value=domain)
-                log_embed.add_field(name="Redirects", value=redirect_chain_str)
+                log_embed.add_field(name="User ID", value=f"```{message.author.id}```", inline=False)
+                log_embed.add_field(name="Domain", value=f"```{domain}```", inline=False)
+                log_embed.add_field(name="Redirects", value=f"```{redirect_chain_str}```", inline=False)
                 staff_mention = f"<@&{staff_role_id}>" if staff_role_id else ""
                 await log_channel.send(content=staff_mention, embed=log_embed, allowed_mentions=discord.AllowedMentions(roles=True))
         
