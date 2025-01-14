@@ -1,10 +1,13 @@
 import discord
-from redbot.core import commands
-import asyncio  # Ensure asyncio is imported
+from redbot.core import commands, Config
+import asyncio
 
 class RulesCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.config = Config.get_conf(self, identifier=1234567890)
+        default_guild = {"acceptance_role_id": None}
+        self.config.register_guild(**default_guild)
 
     @commands.command(name='sendrules')
     async def send_rules(self, ctx):
@@ -24,5 +27,43 @@ class RulesCog(commands.Cog):
         for rule in rules:
             embed = discord.Embed(description=rule, color=0xfffffe)
             await ctx.send(embed=embed)
-            await asyncio.sleep(2)  # Add a delay of 2 seconds between sending each rule
+            await asyncio.sleep(2)
+
+    @commands.command(name='setacceptancerole')
+    @commands.has_permissions(manage_roles=True)
+    async def set_acceptance_role(self, ctx, role: discord.Role):
+        """Set the role to be given when a user accepts the rules."""
+        await self.config.guild(ctx.guild).acceptance_role_id.set(role.id)
+        await ctx.send(f"Acceptance role set to: {role.name}")
+
+    @commands.command(name='sendacceptmsg')
+    async def send_accept_message(self, ctx):
+        """Send a message for users to accept the rules."""
+        acceptance_role_id = await self.config.guild(ctx.guild).acceptance_role_id()
+        if acceptance_role_id is None:
+            await ctx.send("Acceptance role not set. Use the setacceptancerole command first.")
+            return
+
+        embed = discord.Embed(
+            description="By reacting, you indicate you've read and agree to the rules.",
+            color=0xfffffe
+        )
+        message = await ctx.send(embed=embed)
+        await message.add_reaction("✅")
+
+        def check(reaction, user):
+            return (
+                str(reaction.emoji) == "✅"
+                and reaction.message.id == message.id
+                and not user.bot
+            )
+
+        while True:
+            try:
+                reaction, user = await self.bot.wait_for('reaction_add', check=check)
+                role = ctx.guild.get_role(acceptance_role_id)
+                if role:
+                    await user.add_roles(role)
+            except asyncio.TimeoutError:
+                break
 
