@@ -120,14 +120,30 @@ class Invites(commands.Cog):
         pass
 
     @invites.command()
-    async def announcechannel(self, ctx, channel: discord.TextChannel):
-        """Set the announcement channel for invites."""
-        await self.config.guild(ctx.guild).announcement_channel.set(channel.id)
-        embed = discord.Embed(
-            title="Announcement Channel Set",
-            description=f"Announcement channel set to {channel.mention}",
-            color=discord.Color.from_str("#2bbd8e")
-        )
+    async def announcechannel(self, ctx, channel: str):
+        """Set the announcement channel for invites. Use 'none' to clear the channel."""
+        if channel.lower() == "none":
+            await self.config.guild(ctx.guild).announcement_channel.clear()
+            embed = discord.Embed(
+                title="Announcement Channel Cleared",
+                description="The announcement channel has been cleared.",
+                color=discord.Color.from_str("#ff4545")
+            )
+        else:
+            channel_obj = discord.utils.get(ctx.guild.text_channels, mention=channel) or discord.utils.get(ctx.guild.text_channels, name=channel)
+            if channel_obj:
+                await self.config.guild(ctx.guild).announcement_channel.set(channel_obj.id)
+                embed = discord.Embed(
+                    title="Announcement Channel Set",
+                    description=f"Announcement channel set to {channel_obj.mention}",
+                    color=discord.Color.from_str("#2bbd8e")
+                )
+            else:
+                embed = discord.Embed(
+                    title="Channel Not Found",
+                    description="The specified channel could not be found.",
+                    color=discord.Color.from_str("#ff4545")
+                )
         await ctx.send(embed=embed)
 
     @invites.command()
