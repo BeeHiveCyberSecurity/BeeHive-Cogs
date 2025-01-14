@@ -575,7 +575,7 @@ class AntiPhishing(commands.Cog):
         if webhook_url:
             redirect_chain_str = "\n".join(redirect_chain)
             webhook_embed = discord.Embed(
-                title="Malicious URL detected",
+                title="Malicious link detected",
                 description=f"A URL was detected in the server **{message.guild.name}**.",
                 color=0xffd966,
             )
