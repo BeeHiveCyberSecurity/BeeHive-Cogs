@@ -195,6 +195,7 @@ class NicknameManagement(commands.Cog):
                         pass
 
     async def on_member_join(self, member):
+        await asyncio.sleep(300)  # Wait for 5 minutes before attempting to change the nickname
         guild_settings = await self.config.guild(member.guild).all()
         if guild_settings["auto_purify"]:
             allowed_characters = guild_settings["allowed_characters"]
