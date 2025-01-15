@@ -747,10 +747,10 @@ class AntiPhishing(commands.Cog):
         for url in links:
             domains_to_check = await self.follow_redirects(url)
             for domain_url in domains_to_check:
-                domain = urlparse(domain_url).netloc
-                if domain in self.domains:
+                domain = urlparse(domain_url).netloc.lower()  # Ensure domain comparison is case-insensitive
+                if domain in (d.lower() for d in self.domains):  # Compare against lowercased domains
                     await self.handle_phishing(message, domain, domains_to_check)
-                    # return
+                    return
 
 
 
