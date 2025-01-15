@@ -315,7 +315,7 @@ class Products(commands.Cog):
         """
         Send a disclaimer about Sentri's capabilities and monitoring.
         """
-        embed = discord.Embed(
+        privacy_embed = discord.Embed(
             title="Privacy disclaimer",
             description=(
                 "**[Sentri](https://www.beehive.systems/sentri)** is a **[BeeHive](https://www.beehive.systems) product**. "
@@ -324,7 +324,7 @@ class Products(commands.Cog):
             ),
             colour=0xfffffe
         )
-        embed.add_field(
+        privacy_embed.add_field(
             name="What data can bots access?",
             value=(
                 "Bots have access to a variety of information provided to them by the Discord API."
@@ -338,7 +338,7 @@ class Products(commands.Cog):
             ),
             inline=False
         )
-        embed.add_field(
+        privacy_embed.add_field(
             name="How long is data stored for?",
             value=(
                 "Data collected will be stored for up to **1 year**, a cyclical period beginning **January 1** of a calendar year "
@@ -346,26 +346,46 @@ class Products(commands.Cog):
             ),
             inline=False
         )
-        embed.add_field(
+        privacy_embed.add_field(
             name="Is my data ever sold?",
             value="No",
             inline=False
         )
-        embed.add_field(
+        privacy_embed.add_field(
             name="What is data used for?",
             value="Data we collect and signals we aggregate from it help us make our products and services better.",
             inline=False
         )
-        embed.add_field(
-            name="What about AI features & training?",
-            value="Sentri offers select AI-driven integrations to improve the mod and admin experience at-scale.\n- At-rest, no messages or data collected about you is provided to an AI provider.\n- The content of messages is not used as training data or source data.\n- We may use limited, anonymous statistics alongside AI to better understand your usage and requirement in-service.\n- Moderators and administrators may select to use AI features to better understand your behavior and actions in the server through strictly controlled, built-in functions.\n- If you utilize AI features (like Quick Query) that rely on an AI provider, the content of your command or invoking message may be sent to the AI provider in order to fulfil your query.\n- When users, mods, or admins use an AI feature that reaches out to a 3rd party AI provider, we pass along a flag with the request that asks the provider not to train their AI systems off of your requests.\n- We have no material way to confirm that they will not do so.\n- You're not required to engage in available AI features."
-        )
-        embed.add_field(
+        privacy_embed.add_field(
             name="Control stored data",
             value="You can process your own data deletion requests without assistance.\n\n- Use `!mydata 3rdparty` to see what each module stores about you.\n- Use `!mydata forgetme` to request a deletion.",
             inline=False
         )
-        await ctx.send(embed=embed)
+
+        ai_embed = discord.Embed(
+            title="AI Disclaimer",
+            description=(
+                "Sentri offers select AI-driven integrations to improve the mod and admin experience at-scale."
+            ),
+            colour=0xfffffe
+        )
+        ai_embed.add_field(
+            name="AI Features & Training",
+            value=(
+                "- At-rest, no messages or data collected about you is provided to an AI provider.\n"
+                "- The content of messages is not used as training data or source data.\n"
+                "- We may use limited, anonymous statistics alongside AI to better understand your usage and requirement in-service.\n"
+                "- Moderators and administrators may select to use AI features to better understand your behavior and actions in the server through strictly controlled, built-in functions.\n"
+                "- If you utilize AI features (like Quick Query) that rely on an AI provider, the content of your command or invoking message may be sent to the AI provider in order to fulfil your query.\n"
+                "- When users, mods, or admins use an AI feature that reaches out to a 3rd party AI provider, we pass along a flag with the request that asks the provider not to train their AI systems off of the request.\n"
+                "- We have no material way to confirm that they will not do so.\n"
+                "- You're not required to engage in available AI features."
+            ),
+            inline=False
+        )
+
+        await ctx.send(embed=privacy_embed)
+        await ctx.send(embed=ai_embed)
 
 
     @commands.is_owner()
