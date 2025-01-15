@@ -316,7 +316,7 @@ class Products(commands.Cog):
         Send a disclaimer about Sentri's capabilities and monitoring.
         """
         embed = discord.Embed(
-            title="Privacy Disclaimer",
+            title="Privacy disclaimer",
             description=(
                 "**[Sentri](https://www.beehive.systems/sentri)** is a **[BeeHive](https://www.beehive.systems) product**. "
                 "The owner of this community has chosen to entrust it with helping safeguard your time here.\n\n"
@@ -358,7 +358,7 @@ class Products(commands.Cog):
         )
         embed.add_field(
             name="What about AI features & training?",
-            value="At-rest, no messages or data collected about you is provided to an AI provider. If you utilize AI features (like Quick Query) that rely on an AI provider, the content of your command or invoking message may be sent to the AI provider in order to fulfil your query. When you use an AI feature that reaches out to a 3rd party AI provider, we pass along a flag with the request that asks the provider not to train their AI systems off of your requests; however, we have no material way to confirm that they will not do so. You're not required to engage in available 3rd party AI features."
+            value="Sentri offers select AI-driven integrations to improve the mod and admin experience at-scale.\n- At-rest, no messages or data collected about you is provided to an AI provider.\n- The content of messages is not used as training data or source data.\n- We may use limited, anonymous statistics alongside AI to better understand your usage and requirement in-service.\n- Moderators and administrators may select to use AI features to better understand your behavior and actions in the server through strictly controlled, built-in functions.\n- If you utilize AI features (like Quick Query) that rely on an AI provider, the content of your command or invoking message may be sent to the AI provider in order to fulfil your query.\n- When users, mods, or admins use an AI feature that reaches out to a 3rd party AI provider, we pass along a flag with the request that asks the provider not to train their AI systems off of your requests.\n- We have no material way to confirm that they will not do so.\n- You're not required to engage in available AI features."
         )
         embed.add_field(
             name="Control stored data",
