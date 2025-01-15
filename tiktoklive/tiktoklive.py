@@ -1,4 +1,3 @@
-import asyncio
 import logging
 import os
 
@@ -6,8 +5,7 @@ import discord  # type: ignore
 import yt_dlp  # type: ignore
 from redbot.core import commands, Config  # type: ignore
 from TikTokLive import TikTokLiveClient  # type: ignore
-from TikTokLive.client.logger import LogLevel  # type: ignore
-from TikTokLive.events import ConnectEvent, CommentEvent  # type: ignore
+from TikTokLive.events import ConnectEvent  # type: ignore
 
 
 class TikTokLiveCog(commands.Cog):
@@ -16,7 +14,6 @@ class TikTokLiveCog(commands.Cog):
         self.config = Config.get_conf(self, identifier=11111111111111)
         self.config.register_guild(tiktok_user=None, alert_channel=None, alert_role=None, auto_download=False)
         self.clients = {}
-        self.live_status = {}
 
     async def initialize_client(self, guild_id, user):
         try:
@@ -28,7 +25,6 @@ class TikTokLiveCog(commands.Cog):
             async def on_connect(event: ConnectEvent):
                 await self.handle_connect_event(event, guild_id, client)
 
-            self.bot.loop.create_task(self.check_loop(guild_id, client, user))
         except Exception as e:
             logging.error(f"Error initializing client for guild {guild_id} and user {user}: {e}")
 
@@ -56,25 +52,6 @@ class TikTokLiveCog(commands.Cog):
                     await channel.send(content=role_mention, embed=embed, view=view, allowed_mentions=discord.AllowedMentions(roles=True))
         except Exception as e:
             client.logger.error(f"Error in on_connect: {e}")
-
-    async def check_loop(self, guild_id, client, user):
-        while True:
-            try:
-                is_live = await client.is_live()
-                previous_status = self.live_status.get(user, False)
-                if is_live and not previous_status:
-                    client.logger.info("Requested client is live!")
-                    self.live_status[user] = True  # Update live status
-                    await client.connect()
-                elif not is_live and previous_status:
-                    client.logger.info("Client is currently not live. Checking again in 90 seconds.")
-                    self.live_status[user] = False  # Update live status
-                elif is_live and previous_status:
-                    client.logger.info("Client is still live. Checking again in 90 seconds.")
-                await asyncio.sleep(90)  # Check again in 90 seconds
-            except Exception as e:
-                client.logger.error(f"Error in check_loop: {e}")
-                await asyncio.sleep(90)  # Wait before retrying
 
     @commands.guild_only()
     @commands.group()
@@ -206,38 +183,6 @@ class TikTokLiveCog(commands.Cog):
             await ctx.send(embed=embed)
         except Exception as e:
             await ctx.send(f"Failed to retrieve settings: {e}")
-
-    @tiktoklive.command()
-    async def check(self, ctx, user: str):
-        """Check if a TikTok user is currently live."""
-        try:
-            guild_id = ctx.guild.id
-            if guild_id in self.clients and self.clients[guild_id].unique_id == user:
-                client = self.clients[guild_id]
-                is_live = await client.is_live()
-                if is_live:
-                    embed = discord.Embed(
-                        title="User Live",
-                        description=f"TikTok user {user} is currently live!",
-                        color=discord.Color.green()
-                    )
-                    await ctx.send(embed=embed)
-                else:
-                    embed = discord.Embed(
-                        title="User Not Live",
-                        description=f"TikTok user {user} is not live at the moment.",
-                        color=discord.Color.orange()
-                    )
-                    await ctx.send(embed=embed)
-            else:
-                embed = discord.Embed(
-                    title="User not followed",
-                    description=f"TikTok user {user} is not being followed in this server.",
-                    color=discord.Color.red()
-                )
-                await ctx.send(embed=embed)
-        except Exception as e:
-            await ctx.send(f"Failed to check live status: {e}")
 
     @tiktoklive.command()
     async def download(self, ctx, url: str):
