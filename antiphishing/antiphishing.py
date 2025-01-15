@@ -114,7 +114,9 @@ class AntiPhishing(commands.Cog):
                     if links:
                         total_links_checked += len(links)
                         for link in links:
-                            if link in blocklist:
+                            parsed_url = urlparse(link)
+                            domain = parsed_url.netloc.lower()
+                            if any(domain.endswith(blocked_domain) for blocked_domain in self.domains):
                                 bad_links.append((channel.name, message.jump_url, link))
                     await asyncio.sleep(1)  # Add a small delay to avoid hitting rate limits
             except discord.Forbidden:
@@ -725,7 +727,7 @@ class AntiPhishing(commands.Cog):
             domains_to_check = await self.follow_redirects(url)
             for domain_url in domains_to_check:
                 domain = urlparse(domain_url).netloc
-                if domain in self.domains:
+                if any(domain.endswith(blocked_domain) for blocked_domain in self.domains):
                     await self.handle_phishing(after, domain, domains_to_check)
                     return
 
@@ -748,7 +750,7 @@ class AntiPhishing(commands.Cog):
             domains_to_check = await self.follow_redirects(url)
             for domain_url in domains_to_check:
                 domain = urlparse(domain_url).netloc.lower()  # Ensure domain comparison is case-insensitive
-                if domain in (d.lower() for d in self.domains):  # Compare against lowercased domains
+                if any(domain.endswith(blocked_domain.lower()) for blocked_domain in self.domains):  # Compare against lowercased domains
                     await self.handle_phishing(message, domain, domains_to_check)
                     return
 
