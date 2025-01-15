@@ -9,6 +9,7 @@ class RulesCog(commands.Cog):
         default_guild = {"acceptance_role_id": None}
         self.config.register_guild(**default_guild)
 
+    @commands.admin_or_permissions()
     @commands.command(name='sendrules')
     async def send_rules(self, ctx):
         rules = [
@@ -22,6 +23,7 @@ class RulesCog(commands.Cog):
             "### Do not share personal information.\n> Protect your privacy and the privacy of others by not sharing personal details such as addresses, phone numbers, or any other sensitive information.",
             "### Use appropriate usernames and avatars.\n> Usernames and avatars should not be offensive, inappropriate, or disruptive to the community.",
             "### No self-promotion or advertising.\n> Do not promote your own content, services, or servers without permission from the moderators.",
+            "### No excessive shitposting.\n> Keep the content meaningful and avoid posting low-effort or irrelevant content excessively.",
             "### Staff have the final decision for all moderative actions.\n> Even if an action is not in clear violation of a rule, staff decisions are to be respected and followed."
         ]
         for rule in rules:
