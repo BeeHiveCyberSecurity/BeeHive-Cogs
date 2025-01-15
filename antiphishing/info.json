@@ -8,5 +8,8 @@
         "embed_links"
     ],
     "short": "Screen for malicious links in your server",
-    "min_bot_version": "3.5.0"
+    "min_bot_version": "3.5.0",
+    "requirements": [
+        "tldextract"
+    ]
 }
