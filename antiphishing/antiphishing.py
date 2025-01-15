@@ -10,6 +10,7 @@ from discord.ext import tasks  # type: ignore
 from redbot.core import Config, commands, modlog  # type: ignore
 from redbot.core.bot import Red  # type: ignore
 from redbot.core.commands import Context  # type: ignore
+import tldextract
 
 URL_REGEX_PATTERN = re.compile(
     r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,6}\b)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
@@ -114,9 +115,9 @@ class AntiPhishing(commands.Cog):
                     if links:
                         total_links_checked += len(links)
                         for link in links:
-                            parsed_url = urlparse(link)
-                            domain = parsed_url.netloc.lower()
-                            if any(domain.endswith(blocked_domain) for blocked_domain in self.domains):
+                            extracted = tldextract.extract(link)
+                            domain = f"{extracted.domain}.{extracted.suffix}".lower()
+                            if any(domain == blocked_domain for blocked_domain in self.domains):
                                 bad_links.append((channel.name, message.jump_url, link))
                     await asyncio.sleep(1)  # Add a small delay to avoid hitting rate limits
             except discord.Forbidden:
@@ -617,7 +618,8 @@ class AntiPhishing(commands.Cog):
                     redirect_chain_status = []
                     for url in redirect_chain:
                         try:
-                            domain = urlparse(url).netloc
+                            extracted = tldextract.extract(url)
+                            domain = f"{extracted.domain}.{extracted.suffix}"
                             status = "Malicious" if domain in self.domains else "Unknown"
                             redirect_chain_status.append(f"{url} ({status})")
                         except IndexError:
@@ -726,8 +728,9 @@ class AntiPhishing(commands.Cog):
         for url in links:
             domains_to_check = await self.follow_redirects(url)
             for domain_url in domains_to_check:
-                domain = urlparse(domain_url).netloc
-                if any(domain.endswith(blocked_domain) for blocked_domain in self.domains):
+                extracted = tldextract.extract(domain_url)
+                domain = f"{extracted.domain}.{extracted.suffix}"
+                if any(domain == blocked_domain for blocked_domain in self.domains):
                     await self.handle_phishing(after, domain, domains_to_check)
                     return
 
@@ -749,8 +752,9 @@ class AntiPhishing(commands.Cog):
         for url in links:
             domains_to_check = await self.follow_redirects(url)
             for domain_url in domains_to_check:
-                domain = urlparse(domain_url).netloc.lower()  # Ensure domain comparison is case-insensitive
-                if any(domain.endswith(blocked_domain.lower()) for blocked_domain in self.domains):  # Compare against lowercased domains
+                extracted = tldextract.extract(domain_url)
+                domain = f"{extracted.domain}.{extracted.suffix}".lower()  # Ensure domain comparison is case-insensitive
+                if any(domain == blocked_domain.lower() for blocked_domain in self.domains):  # Compare against lowercased domains
                     await self.handle_phishing(message, domain, domains_to_check)
                     return
 
