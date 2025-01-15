@@ -352,6 +352,15 @@ class Products(commands.Cog):
             inline=False
         )
         embed.add_field(
+            name="What is data used for?",
+            value="Data we collect and signals we aggregate from it help us make our products and services better.",
+            inline=False
+        )
+        embed.add_field(
+            name="What about AI features & training?",
+            value="At-rest, no messages or data collected about you is provided to an AI provider. If you utilize AI features (like Quick Query) that rely on an AI provider, the content of your command or invoking message may be sent to the AI provider in order to fulfil your query. When you use an AI feature that reaches out to a 3rd party AI provider, we pass along a flag with the request that asks the provider not to train their AI systems off of your requests; however, we have no material way to confirm that they will not do so. You're not required to engage in available 3rd party AI features."
+        )
+        embed.add_field(
             name="Control stored data",
             value="You can process your own data deletion requests without assistance.\n\n- Use `!mydata 3rdparty` to see what each module stores about you.\n- Use `!mydata forgetme` to request a deletion.",
             inline=False
