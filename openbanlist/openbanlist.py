@@ -118,8 +118,16 @@ class OpenBanList(commands.Cog):
                     evidence = ban_info.get("evidence")
                     if evidence:
                         embed.add_field(name="Evidence", value=evidence, inline=False)
-                    embed.add_field(name="Report Date", value=str(ban_info.get("report_date", "Unknown")), inline=False)
-                    embed.add_field(name="Ban Date", value=str(ban_info.get("ban_date", "Unknown")), inline=False)
+                    report_date = ban_info.get("report_date", "Unknown")
+                    ban_date = ban_info.get("ban_date", "Unknown")
+                    if report_date != "Unknown":
+                        embed.add_field(name="Report Date", value=f"<t:{report_date}:F>", inline=False)
+                    else:
+                        embed.add_field(name="Report Date", value="Unknown", inline=False)
+                    if ban_date != "Unknown":
+                        embed.add_field(name="Ban Date", value=f"<t:{ban_date}:F>", inline=False)
+                    else:
+                        embed.add_field(name="Ban Date", value="Unknown", inline=False)
                 else:
                     embed = discord.Embed(
                         title="Banlist Check",
@@ -217,8 +225,16 @@ class OpenBanList(commands.Cog):
                         evidence = ban_info.get("evidence")
                         if evidence:
                             embed.add_field(name="Evidence", value=evidence, inline=False)
-                        embed.add_field(name="Report date", value=str(ban_info.get("report_date", "Unknown")), inline=False)
-                        embed.add_field(name="Ban date", value=str(ban_info.get("ban_date", "Unknown")), inline=False)
+                        report_date = ban_info.get("report_date", "Unknown")
+                        ban_date = ban_info.get("ban_date", "Unknown")
+                        if report_date != "Unknown":
+                            embed.add_field(name="Report date", value=f"<t:{report_date}:F>", inline=False)
+                        else:
+                            embed.add_field(name="Report date", value="Unknown", inline=False)
+                        if ban_date != "Unknown":
+                            embed.add_field(name="Ban date", value=f"<t:{ban_date}:F>", inline=False)
+                        else:
+                            embed.add_field(name="Ban date", value="Unknown", inline=False)
                         await log_channel.send(embed=embed)
                 else:
                     if log_channel:
