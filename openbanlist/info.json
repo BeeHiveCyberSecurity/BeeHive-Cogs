@@ -4,5 +4,5 @@
     "install_msg": "Thank you for installing the OpenBanList cog. Use `[p]help banlist` to get started.",
     "short": "Global Banlist Management",
     "tags": ["banlist", "moderation", "discord"],
-    "end_user_data_statement": "This cog stores data about users who are on the global banlist, including their Discord IDs and ban reasons. This data is used solely for moderation purposes."
+    "end_user_data_statement": "This cog stores no user data. This cog stores configuration data. Data about users who are on the global banlist, including their Discord IDs and ban reasons, are stored by OpenBanlist. This data is used solely for moderation and safety purposes."
 }
