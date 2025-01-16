@@ -385,7 +385,8 @@ class Products(commands.Cog):
         )
         ai_embed.add_field(
             name="AI Providers",
-            value="Depending on the feature and use case, Sentri may utilize a variety of models and providers, including but not limited to...\n- OpenAI\n`gpt-4o` `gpt-4` `o1-mini` `o1-preview`"
+            value="Depending on the feature and use case, Sentri may utilize a variety of models and providers, including but not limited to...\n- OpenAI\n`gpt-4o` `gpt-4` `o1-mini` `o1-preview`",
+            inline=False
         )
 
         await ctx.send(embed=privacy_embed)
