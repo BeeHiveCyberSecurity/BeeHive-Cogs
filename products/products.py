@@ -376,7 +376,6 @@ class Products(commands.Cog):
                 "- We may generate and use limited, anonymized statistics, measures, and values from your message content and later process those statistics, measures, and values using AI tools to improve our products and services to better serve you.\n"
                 "- Moderators and administrators may choose to use AI features to better understand your behavior and actions in the server through strictly controlled, predefined AI functions.\n"
                 "- If you utilize AI features (like Quick Query) that rely on an AI provider, the content of your command or invoking message may be sent to the AI provider in order to fulfil your query.\n"
-                "- When users, mods, or admins use an AI feature that reaches out to a 3rd party AI provider, we pass along a flag with the request that asks the provider not to train their AI systems off of the request.\n"
                 "- We have no material way to confirm that they will not do so.\n"
                 "- You're not required to use AI features."
             ),
@@ -384,7 +383,7 @@ class Products(commands.Cog):
         )
         ai_embed.add_field(
             name="AI Providers",
-            value="Depending on the feature and use case, Sentri may utilize a variety of models and providers, including but not limited to...\n- OpenAI\n`gpt-4o` `gpt-4` `o1-mini` `o1-preview`",
+            value="When users, mods, or admins use an AI feature that reaches out to a 3rd party AI provider, we pass along a flag with the request that asks the provider not to train their AI systems off of the request. Depending on the feature and use case, Sentri may utilize a variety of models and providers, including but not limited to...\n- OpenAI\n`gpt-4o` `gpt-4` `o1-mini` `o1-preview`",
             inline=False
         )
 
