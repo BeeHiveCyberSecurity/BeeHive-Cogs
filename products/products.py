@@ -376,8 +376,7 @@ class Products(commands.Cog):
                 "- We may generate and use limited, anonymized statistics, measures, and values from your message content and later process those statistics, measures, and values using AI tools to improve our products and services to better serve you.\n"
                 "- Moderators and administrators may choose to use AI features to better understand your behavior and actions in the server through strictly controlled, predefined AI functions.\n"
                 "- If you utilize AI features (like Quick Query) that rely on an AI provider, the content of your command or invoking message may be sent to the AI provider in order to fulfil your query.\n"
-                "- We have no material way to confirm that they will not do so.\n"
-                "- You're not required to use AI features."
+                "- You're not required to use AI features. Non-AI alternative functionality exists for all commands and features."
             ),
             inline=False
         )
