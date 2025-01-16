@@ -341,8 +341,7 @@ class Products(commands.Cog):
         privacy_embed.add_field(
             name="How long is data stored for?",
             value=(
-                "Data collected will be stored for up to **1 year**, a cyclical period beginning **January 1** of a calendar year "
-                "and ending the **last day of December**."
+                "Data collected will be stored for as long as you are present in a server shared with Sentri."
             ),
             inline=False
         )
