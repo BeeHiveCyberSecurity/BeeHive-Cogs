@@ -362,7 +362,7 @@ class Products(commands.Cog):
         )
 
         ai_embed = discord.Embed(
-            title="AI Disclaimer",
+            title="AI disclaimer",
             description=(
                 "Sentri offers select AI-driven integrations to improve the mod and admin experience at-scale."
             ),
