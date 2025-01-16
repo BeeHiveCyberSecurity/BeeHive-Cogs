@@ -531,17 +531,18 @@ class AntiPhishing(commands.Cog):
 
         self.domains = list(domains)
 
-        # Send "Definitions updated" message to log channel if set
+        # Send "Definitions updated" message to each individual log channel if set
         for guild in self.bot.guilds:
             log_channel_id = await self.config.guild(guild).log_channel()
-            log_channel = guild.get_channel(log_channel_id)
-            if log_channel:
-                embed = discord.Embed(
-                    title="Definitions updated",
-                    description="The phishing domains list has been updated.",
-                    color=0x2bbd8e
-                )
-                await log_channel.send(embed=embed)
+            if log_channel_id:
+                log_channel = guild.get_channel(log_channel_id)
+                if log_channel:
+                    embed = discord.Embed(
+                        title="Definitions updated",
+                        description="The phishing domains list has been updated.",
+                        color=0x2bbd8e
+                    )
+                    await log_channel.send(embed=embed)
 
     async def follow_redirects(self, url: str) -> List[str]:
         """
