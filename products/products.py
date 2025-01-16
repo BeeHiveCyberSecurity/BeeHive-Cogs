@@ -382,7 +382,7 @@ class Products(commands.Cog):
         )
         ai_embed.add_field(
             name="AI Providers",
-            value="When users, mods, or admins use an AI feature that reaches out to a 3rd party AI provider, we pass along a flag with the request that asks the provider not to train their AI systems off of the request. Depending on the feature and use case, Sentri may utilize a variety of models and providers, including but not limited to...\n- OpenAI\n`gpt-4o` `gpt-4` `o1-mini` `o1-preview`",
+            value="When users, mods, or admins use an AI feature that reaches out to a 3rd party AI provider, we pass along a flag with the request that asks the provider not to train their AI systems off of the request. Depending on the feature and use case, Sentri may utilize a variety of models and providers, including but not limited to...\n- **OpenAI**\n`gpt-3.5-turbo` `gpt-4` `gpt-4-turbo` `gpt-4-turbo-preview` `gpt-4-1106-preview` `gpt-4-0125-preview` `gpt-4-turbo-2024-04-09` `gpt-4o` `gpt-4o-2024-05-13` `gpt-4o-mini` `gpt-4o-mini-2024-07-18` `gpt-4o-2024-08-06` `gpt-4o-2024-11-20` `chatgpt-4o-latest` `o1` `o1-2024-12-17` `o1-preview` `o1-preview-2024-09-12` `o1-mini` `o1-mini-2024-09-12`\n- **Google**\n`perspective` `gemini-1.5-pro` `gemini-1.5-flash`",
             inline=False
         )
 
