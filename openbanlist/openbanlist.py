@@ -228,4 +228,5 @@ class OpenBanList(commands.Cog):
                             color=0x2bbd8e
                         )
                         embed.add_field(name="User ID", value=f"```{member.id}```", inline=False)
+                        embed.set_footer(text="Powered by OpenBanlist | openbanlist.cc")
                         await log_channel.send(embed=embed)
