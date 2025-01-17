@@ -1,5 +1,5 @@
 {
-    "author": "adminelevation",
+    "author": ["adminelevation"],
     "description": "A cog to manage a global banlist for Discord servers.",
     "install_msg": "Thank you for installing the OpenBanList cog. Use `[p]help banlist` to get started.",
     "short": "Global Banlist Management",
