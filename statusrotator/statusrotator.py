@@ -30,8 +30,6 @@ class StatusRotator(commands.Cog):
         self.hyperlink_log = deque()  # Log for hyperlinks
         self.bot.loop.create_task(self.load_settings())
         self.start_time = datetime.utcnow()
-        self.presence_states = [discord.Status.online, discord.Status.idle, discord.Status.dnd]
-        self.current_presence_index = 0
 
     async def load_settings(self):
         self.antiphishing_status_enabled = await self.config.antiphishing_status_enabled()
@@ -48,9 +46,7 @@ class StatusRotator(commands.Cog):
             for status in self.statuses:
                 text = status()
                 activity = discord.CustomActivity(name=text)
-                presence_state = self.presence_states[self.current_presence_index]
-                await self.bot.change_presence(activity=activity, status=presence_state)
-                self.current_presence_index = (self.current_presence_index + 1) % len(self.presence_states)
+                await self.bot.change_presence(activity=activity)
                 await asyncio.sleep(300)  # Change status every 300 seconds
 
     async def fetch_blocked_domains_count(self):
