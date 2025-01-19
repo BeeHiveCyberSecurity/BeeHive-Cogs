@@ -113,9 +113,9 @@ class OpenBanList(commands.Cog):
                         description=f"## Uh oh! <@{user_id}> is listed in the **[OpenBanlist](https://openbanlist.cc)**",
                         color=0xff4545
                     )
-                    embed.add_field(name="Banned for", value=ban_info.get("ban_reason", "No reason provided"), inline=True)
-                    embed.add_field(name="Reported by", value=f"<@{ban_info.get('reporter_id', 'Unknown')}>\n(`{ban_info.get('reporter_id', 'Unknown')}`)", inline=True)
-                    embed.add_field(name="Approved by", value=f"<@{ban_info.get('approver_id', 'Unknown')}>\n(`{ban_info.get('approver_id', 'Unknown')}`)", inline=True)
+                    embed.add_field(name="Banned for", value=ban_info.get("ban_reason", "No reason provided yet, check back soon"), inline=True)
+                    embed.add_field(name="Reported by", value=f"<@{ban_info.get('reporter_id', 'Unknown')}>\n`{ban_info.get('reporter_id', 'Unknown')}`", inline=True)
+                    embed.add_field(name="Approved by", value=f"<@{ban_info.get('approver_id', 'Unknown')}>\n`{ban_info.get('approver_id', 'Unknown')}`", inline=True)
                     appealable_status = ":white_check_mark: **Yes**" if ban_info.get("appealable", False) else ":x: **Not eligible**"
                     embed.add_field(name="Can be appealed?", value=appealable_status, inline=True)
                     evidence = ban_info.get("evidence")
