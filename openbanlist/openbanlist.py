@@ -76,9 +76,9 @@ class OpenBanList(commands.Cog):
             return
         await self.config.guild(ctx.guild).action.set(action)
         embed = discord.Embed(
-            title="Action Set",
+            title="OpenBanlist action set",
             description=f"Action for users on the banlist set to: {action}",
-            color=discord.Color.green()
+            color=0x2bbd8e
         )
         await ctx.send(embed=embed)
 
