@@ -95,10 +95,12 @@ class OpenBanList(commands.Cog):
         await ctx.send(embed=embed)
 
     @banlist.command()
-    async def check(self, ctx, user_id: int = None):
+    async def check(self, ctx, user: discord.User = None):
         """Check if a user is on the global banlist."""
-        if user_id is None:
+        if user is None:
             user_id = ctx.author.id
+        else:
+            user_id = user.id
 
         async with self.session.get(self.banlist_url) as response:
             if response.status == 200:
