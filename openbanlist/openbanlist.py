@@ -109,31 +109,31 @@ class OpenBanList(commands.Cog):
                 
                 if ban_info:
                     embed = discord.Embed(
-                        title="Banlist check",
-                        description=f"User ID {user_id} is on the banlist.",
-                        color=discord.Color.red()
+                        title="OpenBanlist check",
+                        description=f"### Uh oh! <@{user_id}> is listed in the **[OpenBanlist](https://openbanlist.cc)**",
+                        color=0xff4545
                     )
                     embed.add_field(name="Ban Reason", value=ban_info.get("ban_reason", "No reason provided"), inline=True)
                     embed.add_field(name="Reporter", value=f"<@{ban_info.get('reporter_id', 'Unknown')}>\n(`{ban_info.get('reporter_id', 'Unknown')}`)", inline=True)
                     embed.add_field(name="Approver", value=f"<@{ban_info.get('approver_id', 'Unknown')}>\n(`{ban_info.get('approver_id', 'Unknown')}`)", inline=True)
                     appealable_status = ":white_check_mark: **Yes**" if ban_info.get("appealable", False) else ":x: **No**"
-                    embed.add_field(name="Appealable", value=appealable_status, inline=False)
+                    embed.add_field(name="Appealable", value=appealable_status, inline=True)
                     evidence = ban_info.get("evidence")
                     if evidence:
                         embed.set_image(url=evidence)
                     report_date = ban_info.get("report_date", "Unknown")
                     ban_date = ban_info.get("ban_date", "Unknown")
                     if report_date != "Unknown":
-                        embed.add_field(name="Report Date", value=f"<t:{report_date}:F>", inline=False)
+                        embed.add_field(name="Report Date", value=f"<t:{report_date}:F>", inline=True)
                     else:
-                        embed.add_field(name="Report Date", value="Unknown", inline=False)
+                        embed.add_field(name="Report Date", value="Unknown", inline=True)
                     if ban_date != "Unknown":
-                        embed.add_field(name="Ban Date", value=f"<t:{ban_date}:F>", inline=False)
+                        embed.add_field(name="Ban Date", value=f"<t:{ban_date}:F>", inline=True)
                     else:
-                        embed.add_field(name="Ban Date", value="Unknown", inline=False)
+                        embed.add_field(name="Ban Date", value="Unknown", inline=True)
                 else:
                     embed = discord.Embed(
-                        title="Banlist Check",
+                        title="OpenBanlist check",
                         description=f"User ID {user_id} is not on the banlist.",
                         color=discord.Color.green()
                     )
