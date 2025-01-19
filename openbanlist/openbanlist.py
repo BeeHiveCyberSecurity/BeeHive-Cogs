@@ -110,7 +110,7 @@ class OpenBanList(commands.Cog):
                 if ban_info:
                     embed = discord.Embed(
                         title="OpenBanlist check",
-                        description=f"### Uh oh! <@{user_id}> is listed in the **[OpenBanlist](https://openbanlist.cc)**",
+                        description=f"## Uh oh! <@{user_id}> is listed in the **[OpenBanlist](https://openbanlist.cc)**",
                         color=0xff4545
                     )
                     embed.add_field(name="Banned for", value=ban_info.get("ban_reason", "No reason provided"), inline=True)
