@@ -117,7 +117,7 @@ class OpenBanList(commands.Cog):
                     embed.add_field(name="Appealable", value=str(ban_info.get("appealable", False)), inline=False)
                     evidence = ban_info.get("evidence")
                     if evidence:
-                        embed.add_field(name="Evidence", value=evidence, inline=False)
+                        embed.set_image(url=evidence)
                     report_date = ban_info.get("report_date", "Unknown")
                     ban_date = ban_info.get("ban_date", "Unknown")
                     if report_date != "Unknown":
@@ -224,7 +224,7 @@ class OpenBanList(commands.Cog):
                         embed.add_field(name="Appealable", value=str(ban_info.get("appealable", False)), inline=False)
                         evidence = ban_info.get("evidence")
                         if evidence:
-                            embed.add_field(name="Evidence", value=evidence, inline=False)
+                            embed.set_image(url=evidence)
                         report_date = ban_info.get("report_date", "Unknown")
                         ban_date = ban_info.get("ban_date", "Unknown")
                         if report_date != "Unknown":
