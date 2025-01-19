@@ -113,9 +113,9 @@ class OpenBanList(commands.Cog):
                         description=f"### Uh oh! <@{user_id}> is listed in the **[OpenBanlist](https://openbanlist.cc)**",
                         color=0xff4545
                     )
-                    embed.add_field(name="Ban Reason", value=ban_info.get("ban_reason", "No reason provided"), inline=True)
-                    embed.add_field(name="Reporter", value=f"<@{ban_info.get('reporter_id', 'Unknown')}>\n(`{ban_info.get('reporter_id', 'Unknown')}`)", inline=True)
-                    embed.add_field(name="Approver", value=f"<@{ban_info.get('approver_id', 'Unknown')}>\n(`{ban_info.get('approver_id', 'Unknown')}`)", inline=True)
+                    embed.add_field(name="Banned for", value=ban_info.get("ban_reason", "No reason provided"), inline=True)
+                    embed.add_field(name="Reported by", value=f"<@{ban_info.get('reporter_id', 'Unknown')}>\n(`{ban_info.get('reporter_id', 'Unknown')}`)", inline=True)
+                    embed.add_field(name="Approved by", value=f"<@{ban_info.get('approver_id', 'Unknown')}>\n(`{ban_info.get('approver_id', 'Unknown')}`)", inline=True)
                     appealable_status = ":white_check_mark: **Yes**" if ban_info.get("appealable", False) else ":x: **No**"
                     embed.add_field(name="Able to appeal?", value=appealable_status, inline=True)
                     evidence = ban_info.get("evidence")
@@ -124,11 +124,11 @@ class OpenBanList(commands.Cog):
                     report_date = ban_info.get("report_date", "Unknown")
                     ban_date = ban_info.get("ban_date", "Unknown")
                     if report_date != "Unknown":
-                        embed.add_field(name="Report Date", value=f"<t:{report_date}:F>", inline=True)
+                        embed.add_field(name="Reported on", value=f"<t:{report_date}:f>", inline=True)
                     else:
                         embed.add_field(name="Report Date", value="Unknown", inline=True)
                     if ban_date != "Unknown":
-                        embed.add_field(name="Ban Date", value=f"<t:{ban_date}:F>", inline=True)
+                        embed.add_field(name="Added to database", value=f"<t:{ban_date}:f>", inline=True)
                     else:
                         embed.add_field(name="Ban Date", value="Unknown", inline=True)
                 else:
