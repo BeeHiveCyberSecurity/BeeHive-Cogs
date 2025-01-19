@@ -113,7 +113,7 @@ class OpenBanList(commands.Cog):
                         description=f"User ID {user_id} is on the banlist.",
                         color=discord.Color.red()
                     )
-                    embed.add_field(name="Ban Reason", value=ban_info.get("ban_reason", "No reason provided"), inline=False)
+                    embed.add_field(name="Ban Reason", value=ban_info.get("ban_reason", "No reason provided"), inline=True)
                     embed.add_field(name="Reporter", value=f"<@{ban_info.get('reporter_id', 'Unknown')}>\n(`{ban_info.get('reporter_id', 'Unknown')}`)", inline=True)
                     embed.add_field(name="Approver", value=f"<@{ban_info.get('approver_id', 'Unknown')}>\n(`{ban_info.get('approver_id', 'Unknown')}`)", inline=True)
                     appealable_status = ":white_check_mark: **Yes**" if ban_info.get("appealable", False) else ":x: **No**"
