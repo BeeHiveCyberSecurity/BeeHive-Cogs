@@ -109,7 +109,7 @@ class OpenBanList(commands.Cog):
                 
                 if ban_info:
                     embed = discord.Embed(
-                        title="Banlist Check",
+                        title="Banlist check",
                         description=f"User ID {user_id} is on the banlist.",
                         color=discord.Color.red()
                     )

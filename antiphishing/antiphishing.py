@@ -632,7 +632,7 @@ class AntiPhishing(commands.Cog):
                     embed = discord.Embed(
                         title="Dangerous link detected!",
                         description=(
-                            f"Don't click any links in this message, and ask a staff member to remove this message for community safety.\n\n"
+                            f"This is a known malicious website. This website may contain malware or spyware, be a phishing lure, or otherwise attempt to convince you to hand over personal data or payment information. You should avoid visiting this website to safeguard your device and private information, and alert a staff member that this message appeared!"
                         ),
                         color=0xff4545,
                     )
