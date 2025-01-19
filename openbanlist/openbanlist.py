@@ -114,8 +114,8 @@ class OpenBanList(commands.Cog):
                         color=discord.Color.red()
                     )
                     embed.add_field(name="Ban Reason", value=ban_info.get("ban_reason", "No reason provided"), inline=False)
-                    embed.add_field(name="Reporter", value=f"<@{ban_info.get('reporter_id', 'Unknown')}>", inline=False)
-                    embed.add_field(name="Approver", value=f"<@{ban_info.get('approver_id', 'Unknown')}>", inline=True)
+                    embed.add_field(name="Reporter", value=f"<@{ban_info.get('reporter_id', 'Unknown')}>\n(`{ban_info.get('reporter_id', 'Unknown')}`)", inline=True)
+                    embed.add_field(name="Approver", value=f"<@{ban_info.get('approver_id', 'Unknown')}>\n(`{ban_info.get('approver_id', 'Unknown')}`)", inline=True)
                     embed.add_field(name="Appealable", value=str(ban_info.get("appealable", False)), inline=False)
                     evidence = ban_info.get("evidence")
                     if evidence:
