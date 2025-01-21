@@ -205,9 +205,29 @@ class OpenBanList(commands.Cog):
                     ban_info = next(ban_info for ban_info in banlist_data.values() if member.id == int(ban_info["reported_id"]))
                     try:
                         if action == "kick":
+                            try:
+                                embed = discord.Embed(
+                                    title="You're unable to join this server",
+                                    description="You have been removed from the server due to an active ban on OpenBanlist.",
+                                    color=0xff4545
+                                )
+                                embed.add_field(name="Appeal", value="To appeal, please visit [openbanlist.cc/appeal](https://openbanlist.cc/appeal).", inline=False)
+                                await member.send(embed=embed)
+                            except discord.Forbidden:
+                                pass
                             await member.kick(reason="Active ban detected on OpenBanlist")
                             action_taken = "kicked"
                         elif action == "ban":
+                            try:
+                                embed = discord.Embed(
+                                    title="You're unable to join this server",
+                                    description="You have been banned from the server due to an active ban on OpenBanlist.",
+                                    color=0xff4545
+                                )
+                                embed.add_field(name="Appeal", value="To appeal, please visit [openbanlist.cc/appeal](https://openbanlist.cc/appeal).", inline=False)
+                                await member.send(embed=embed)
+                            except discord.Forbidden:
+                                pass
                             await member.ban(reason="Active ban detected on OpenBanlist")
                             action_taken = "banned"
                         else:
