@@ -311,8 +311,8 @@ class StripeIdentity(commands.Cog):
                     session = stripe.identity.VerificationSession.retrieve(session_id)
                     if session.status == 'requires_input' and session.last_error:
                         for event in session.last_error:
-                            if event['code'] in ['consent_declined', 'device_unsupported', 'under_supported_age', 'phone_otp_declined', 'email_verification_declined']:
-                                return event['code'], session
+                            if event.get('code') in ['consent_declined', 'device_unsupported', 'under_supported_age', 'phone_otp_declined', 'email_verification_declined']:
+                                return event.get('code'), session
                     return session.status, session
 
                 for _ in range(15):  # Check every minute for 15 minutes
