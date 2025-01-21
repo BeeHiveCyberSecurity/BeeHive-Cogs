@@ -114,6 +114,7 @@ class OpenBanList(commands.Cog):
                         color=0xff4545
                     )
                     embed.add_field(name="Banned for", value=ban_info.get("ban_reason", "No reason provided yet, check back soon"), inline=True)
+                    embed.add_field(name="Context", value=ban_info.get("context", "No context provided"), inline=False)
                     embed.add_field(name="Reported by", value=f"<@{ban_info.get('reporter_id', 'Unknown')}>\n`{ban_info.get('reporter_id', 'Unknown')}`", inline=True)
                     embed.add_field(name="Approved by", value=f"<@{ban_info.get('approver_id', 'Unknown')}>\n`{ban_info.get('approver_id', 'Unknown')}`", inline=True)
                     appealable_status = ":white_check_mark: **Yes**" if ban_info.get("appealable", False) else ":x: **Not eligible**"
@@ -222,6 +223,7 @@ class OpenBanList(commands.Cog):
                         )
                         embed.add_field(name="Action taken", value=action_taken, inline=False)
                         embed.add_field(name="Ban reason", value=ban_info.get("ban_reason", "No reason provided"), inline=False)
+                        embed.add_field(name="Context", value=ban_info.get("context", "No context provided"), inline=False)
                         embed.add_field(name="Reporter ID", value=ban_info.get("reporter_id", "Unknown"), inline=False)
                         embed.add_field(name="Approver ID", value=ban_info.get("approver_id", "Unknown"), inline=False)
                         embed.add_field(name="Appealable", value=str(ban_info.get("appealable", False)), inline=False)
