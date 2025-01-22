@@ -255,6 +255,7 @@ class StripeIdentity(commands.Cog):
         await ctx.message.delete()
         async with ctx.typing():
             try:
+                # Create a verification session
                 verification_session = stripe.identity.VerificationSession.create(
                     type='document',
                     metadata={
@@ -272,7 +273,11 @@ class StripeIdentity(commands.Cog):
                         },
                     }
                 )
-                await self.config.pending_verification_sessions.set_raw(str(user.id), value=verification_session.id)
+
+                # Store the session ID for the user
+                await self.config.pending_verification_sessions.set_raw(str(user.id), value=verification_session['id'])
+
+                # Prepare the DM embed
                 dm_embed = discord.Embed(
                     title="Identity verification required",
                     description=(
@@ -287,37 +292,47 @@ class StripeIdentity(commands.Cog):
                     color=discord.Color(0xff4545)
                 )
                 dm_embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/id-card.png")
+
+                # Create the view with buttons
                 view = discord.ui.View()
-                view.add_item(discord.ui.Button(label="Start verification", url=f"{verification_session.url}", style=discord.ButtonStyle.link, emoji="<:globe:1196807971674533968>"))
+                view.add_item(discord.ui.Button(label="Start verification", url=verification_session['url'], style=discord.ButtonStyle.link, emoji="<:globe:1196807971674533968>"))
                 decline_button = discord.ui.Button(label="Decline verification", style=discord.ButtonStyle.danger)
+
+                # Define the decline verification callback
                 async def decline_verification(interaction: discord.Interaction):
                     if interaction.user.id == user.id:
                         await interaction.response.send_message(f"You have declined the verification.", ephemeral=True)
                         await ctx.guild.ban(user, reason="User declined identity verification")
                         await self.config.pending_verification_sessions.clear_raw(str(user.id))
+
                 decline_button.callback = decline_verification
                 view.add_item(decline_button)
+
+                # Send the DM to the user
                 try:
                     dm_message = await user.send(embed=dm_embed, view=view)
                 except discord.Forbidden:
                     await self.send_embed(ctx, f":x: **Failed to send DM to {user.display_name}**. They might have DMs disabled.", discord.Color(0xff4545))
                     return
 
+                # Notify the context that the verification session is open
                 await self.send_embed(ctx, f"A verification session is now open. I've sent {user.mention} a message with details on how to continue.\n**If they don't verify, I'll ban them within 15 minutes.**", discord.Color(0x2BBD8E))
 
+                # Function to check the verification status
                 async def check_verification_status(session_id):
                     if await self.config.pending_verification_sessions.get_raw(str(user.id), default=None) != session_id:
                         return 'cancelled', None
                     session = stripe.identity.VerificationSession.retrieve(session_id)
-                    if session.status == 'requires_input' and session.last_error:
-                        for event in session.last_error:
+                    if session['status'] == 'requires_input' and session['last_error']:
+                        for event in session['last_error']:
                             if event['code'] in ['consent_declined', 'device_unsupported', 'under_supported_age', 'phone_otp_declined', 'email_verification_declined']:
                                 return event['code'], session
-                    return session.status, session
+                    return session['status'], session
 
-                for _ in range(15):  # Check every minute for 15 minutes
+                # Check the verification status every minute for 15 minutes
+                for _ in range(15):
                     await asyncio.sleep(60)
-                    status, session = await check_verification_status(verification_session.id)
+                    status, session = await check_verification_status(verification_session['id'])
                     if status == 'cancelled':
                         await self.send_embed(ctx, f"Identity verification for {user.display_name} has been cancelled.", discord.Color.orange())
                         break
@@ -334,19 +349,19 @@ class StripeIdentity(commands.Cog):
                         verification_channel = self.bot.get_channel(self.verification_channel_id)
                         result_embed = discord.Embed(title="Identity Verification Result", color=discord.Color.blue())
                         result_embed.add_field(name="User", value=f"{user} ({user.id})", inline=False)
-                        result_embed.add_field(name="Document Status", value=session.last_verification_report.document.status, inline=False)
-                        result_embed.add_field(name="Name", value=session.last_verification_report.document.name, inline=False)
-                        result_embed.add_field(name="DOB", value=session.last_verification_report.document.dob, inline=False)
-                        result_embed.add_field(name="Address", value=session.last_verification_report.document.address, inline=False)
-                        if hasattr(session, 'risk_insights'):
-                            result_embed.add_field(name="Risk Insights", value=str(session.risk_insights), inline=False)
+                        result_embed.add_field(name="Document Status", value=session['last_verification_report']['document']['status'], inline=False)
+                        result_embed.add_field(name="Name", value=session['last_verification_report']['document']['name'], inline=False)
+                        result_embed.add_field(name="DOB", value=session['last_verification_report']['document']['dob'], inline=False)
+                        result_embed.add_field(name="Address", value=session['last_verification_report']['document']['address'], inline=False)
+                        if 'risk_insights' in session:
+                            result_embed.add_field(name="Risk Insights", value=str(session['risk_insights']), inline=False)
                         if verification_channel:
                             await verification_channel.send(embed=result_embed)
                         else:
                             await ctx.send(embed=result_embed)
                         break
                 else:
-                    status, session = await check_verification_status(verification_session.id)
+                    status, session = await check_verification_status(verification_session['id'])
                     if status == 'cancelled':
                         await self.send_embed(ctx, f"Identity verification for {user.display_name} has been cancelled.", discord.Color.orange())
                     elif status in ['consent_declined', 'device_unsupported', 'under_supported_age', 'phone_otp_declined', 'email_verification_declined']:
@@ -358,7 +373,7 @@ class StripeIdentity(commands.Cog):
                             color=discord.Color(0xff4545)
                         )
                         await dm_message.edit(embed=dm_embed)
-                        stripe.identity.VerificationSession.cancel(verification_session.id)
+                        stripe.identity.VerificationSession.cancel(verification_session['id'])
                     else:
                         id_verified_role = ctx.guild.get_role(self.id_verified_role_id)
                         if id_verified_role:
@@ -366,12 +381,12 @@ class StripeIdentity(commands.Cog):
                         verification_channel = self.bot.get_channel(self.verification_channel_id)
                         result_embed = discord.Embed(title="Identity Verification Result", color=discord.Color.blue())
                         result_embed.add_field(name="User", value=f"{user} ({user.id})", inline=False)
-                        result_embed.add_field(name="Document status", value=session.last_verification_report.document.status, inline=False)
-                        result_embed.add_field(name="Name", value=session.last_verification_report.document.name, inline=False)
-                        result_embed.add_field(name="DOB", value=session.last_verification_report.document.dob, inline=False)
-                        result_embed.add_field(name="Address", value=session.last_verification_report.document.address, inline=False)
-                        if hasattr(session, 'risk_insights'):
-                            result_embed.add_field(name="Risk Insights", value=str(session.risk_insights), inline=False)
+                        result_embed.add_field(name="Document status", value=session['last_verification_report']['document']['status'], inline=False)
+                        result_embed.add_field(name="Name", value=session['last_verification_report']['document']['name'], inline=False)
+                        result_embed.add_field(name="DOB", value=session['last_verification_report']['document']['dob'], inline=False)
+                        result_embed.add_field(name="Address", value=session['last_verification_report']['document']['address'], inline=False)
+                        if 'risk_insights' in session:
+                            result_embed.add_field(name="Risk Insights", value=str(session['risk_insights']), inline=False)
                         if verification_channel:
                             await verification_channel.send(embed=result_embed)
                         else:
