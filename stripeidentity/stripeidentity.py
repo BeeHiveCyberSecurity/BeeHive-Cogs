@@ -159,7 +159,7 @@ class StripeIdentity(commands.Cog):
                     "### Please ensure you have one of the following documents:\n- **State ID**\n- **Driver's License**\n- **Driver's Permit**\n- **Passport**\n"
                     "### You will also need to:\n- **Provide a valid email address**\n- **Take a series of selfies in a well-lit area**\n- **Submit the identity document mentioned above for biometric matching and analysis**\n\n"
                     "Upon completing the verification, your personal information will be handled according to the following legal agreements:\n- **[BeeHive Terms of Service](<https://www.beehive.systems/tos>)**\n- **[BeeHive Privacy Policy](https://www.beehive.systems/privacy)**\n- **[Stripe Privacy Policy](https://stripe.com/privacy)**\n- **[Stripe Consumer Terms of Service](https://stripe.com/legal/consumer)**\n\n"
-                    "Should you choose not to provide your personal information, you can opt out of the verification process by selecting the option below. This action will result in your immediate removal from the server. If no action is taken within **15 minutes**, you will be automatically removed from the server."
+                    "Should you choose not to provide your personal information, you can opt out of the verification process by selecting the option below. This action will result in your immediate removal from the server."
                 ),
                 color=discord.Color(0xff4545)
             )
@@ -181,63 +181,6 @@ class StripeIdentity(commands.Cog):
                 return
 
             await self.send_embed(ctx, f":white_check_mark: **`AGE` verification session created for {user.mention}. They've been sent instructions on how to continue.**", discord.Color(0x2BBD8E))
-
-            async def check_verification_status(session_id):
-                session = stripe.identity.VerificationSession.retrieve(session_id)
-                if session.status == 'requires_input' and session.last_error:
-                    for event in session.last_error:
-                        if event['code'] in ['consent_declined', 'device_unsupported', 'under_supported_age', 'phone_otp_declined', 'email_verification_declined']:
-                            return event['code'], session
-                return session.status, session
-
-            for _ in range(15):  # Check every minute for 15 minutes
-                await asyncio.sleep(60)
-                status, session = await check_verification_status(verification_session.id)
-                if isinstance(status, str) and status in ['consent_declined', 'device_unsupported', 'under_supported_age', 'phone_otp_declined', 'email_verification_declined']:
-                    await self.send_embed(ctx, f":x: **Verification failed due to `{status.replace('_', ' ')}`**", discord.Color(0xff4545))
-                    await user.send(f":x: **Verification failed due to `{status.replace('_', ' ')}`**")
-                    break
-                elif status == 'abandoned':
-                    await self.send_embed(ctx, f":x: **Verification session for {user.display_name} has been abandoned.**", discord.Color(0xff4545))
-                    await user.send(f":x: **Verification session for {user.display_name} has been abandoned.**")
-                    break
-                elif status == 'verified':
-                    verification_channel = self.bot.get_channel(self.verification_channel_id)
-                    dob = datetime.fromisoformat(session.last_verification_report.document.dob)
-                    age = (datetime.utcnow() - dob).days // 365
-                    if age < 18:
-                        dm_embed = discord.Embed(
-                            title="Underage user detected",
-                            description=(
-                                "You are under 18 and cannot be verified.\n\n"
-                                "You may return once you are 18 years of age or older...\n\n"
-                                "**If you have any questions, please contact a staff member.**"
-                            ),
-                            color=discord.Color(0xff4545)
-                        )
-                        await user.send(embed=dm_embed)
-                    else:
-                        age_verified_role = ctx.guild.get_role(self.age_verified_role_id)
-                        if age_verified_role:
-                            await user.add_roles(age_verified_role, reason="Age verified as 18+")
-                        result_embed = discord.Embed(title="Age Verification Result", color=discord.Color(0x2BBD8E))
-                        result_embed.add_field(name="User", value=f"{user} ({user.id})", inline=False)
-                        result_embed.add_field(name="Age", value=str(age), inline=False)
-                        if verification_channel:
-                            await verification_channel.send(embed=result_embed)
-                        else:
-                            await ctx.send(embed=result_embed)
-                    break
-            else:
-                dm_embed = discord.Embed(
-                    title="Verification failure",
-                    description=f"Verification was not completed in time. Please try again.",
-                    color=discord.Color(0xff4545)
-                )
-                await user.send(embed=dm_embed)
-                await self.send_embed(ctx, f":x: **Verification for {user.display_name} was not completed in time.**", discord.Color(0xff4545))
-                stripe.identity.VerificationSession.cancel(verification_session.id)  # Cancel the session if not completed
-            await self.config.pending_verification_sessions.clear_raw(str(user.id))
         except stripe.error.StripeError as e:
             await self.send_embed(ctx, f":x: **Failed to create a verification session**\n`{e.user_message}`", discord.Color(0xff4545))
         except discord.HTTPException as e:
@@ -287,7 +230,7 @@ class StripeIdentity(commands.Cog):
                         "### Please ensure you have one of the following documents:\n- **State ID**\n- **Driver's License**\n- **Driver's Permit**\n- **Passport**\n"
                         "### You will also need to:\n- **Provide a valid email address**\n- **Take a series of selfies in a well-lit area**\n- **Submit the identity document mentioned above for biometric matching and analysis**\n\n"
                         "Upon completing the verification, your personal information will be handled according to the following legal agreements:\n- **[BeeHive Terms of Service](<https://www.beehive.systems/tos>)**\n- **[BeeHive Privacy Policy](https://www.beehive.systems/privacy)**\n- **[Stripe Privacy Policy](https://stripe.com/privacy)**\n- **[Stripe Consumer Terms of Service](https://stripe.com/legal/consumer)**\n\n"
-                        "Should you choose not to provide your personal information, you can opt out of the verification process by selecting the option below. This action will result in your immediate removal from the server. If no action is taken within **15 minutes**, you will be automatically removed from the server."
+                        "Should you choose not to provide your personal information, you can opt out of the verification process by selecting the option below. This action will result in your immediate removal from the server."
                     ),
                     color=discord.Color(0xff4545)
                 )
@@ -316,82 +259,7 @@ class StripeIdentity(commands.Cog):
                     return
 
                 # Notify the context that the verification session is open
-                await self.send_embed(ctx, f"A verification session is now open. I've sent {user.mention} a message with details on how to continue.\n**If they don't verify, I'll ban them within 15 minutes.**", discord.Color(0x2BBD8E))
-
-                # Function to check the verification status
-                async def check_verification_status(session_id):
-                    if await self.config.pending_verification_sessions.get_raw(str(user.id), default=None) != session_id:
-                        return 'cancelled', None
-                    session = stripe.identity.VerificationSession.retrieve(session_id)
-                    if session['status'] == 'requires_input' and session['last_error']:
-                        for event in session['last_error']:
-                            if event['code'] in ['consent_declined', 'device_unsupported', 'under_supported_age', 'phone_otp_declined', 'email_verification_declined']:
-                                return event['code'], session
-                    return session['status'], session
-
-                # Check the verification status every minute for 15 minutes
-                for _ in range(15):
-                    await asyncio.sleep(60)
-                    status, session = await check_verification_status(verification_session['id'])
-                    if status == 'cancelled':
-                        await self.send_embed(ctx, f"Identity verification for {user.display_name} has been cancelled.", discord.Color.orange())
-                        break
-                    elif status in ['consent_declined', 'device_unsupported', 'under_supported_age', 'phone_otp_declined', 'email_verification_declined']:
-                        await self.send_embed(ctx, f"Identity verification failed due to {status.replace('_', ' ')}.", discord.Color(0xff4545))
-                        break
-                    elif status == 'abandoned':
-                        await self.send_embed(ctx, f":x: **Verification session for {user.display_name} has been abandoned.**", discord.Color(0xff4545))
-                        break
-                    elif status == 'verified':
-                        id_verified_role = ctx.guild.get_role(self.id_verified_role_id)
-                        if id_verified_role:
-                            await user.add_roles(id_verified_role, reason="Identity verified")
-                        verification_channel = self.bot.get_channel(self.verification_channel_id)
-                        result_embed = discord.Embed(title="Identity Verification Result", color=discord.Color.blue())
-                        result_embed.add_field(name="User", value=f"{user} ({user.id})", inline=False)
-                        result_embed.add_field(name="Document Status", value=session['last_verification_report']['document']['status'], inline=False)
-                        result_embed.add_field(name="Name", value=session['last_verification_report']['document']['name'], inline=False)
-                        result_embed.add_field(name="DOB", value=session['last_verification_report']['document']['dob'], inline=False)
-                        result_embed.add_field(name="Address", value=session['last_verification_report']['document']['address'], inline=False)
-                        if 'risk_insights' in session:
-                            result_embed.add_field(name="Risk Insights", value=str(session['risk_insights']), inline=False)
-                        if verification_channel:
-                            await verification_channel.send(embed=result_embed)
-                        else:
-                            await ctx.send(embed=result_embed)
-                        break
-                else:
-                    status, session = await check_verification_status(verification_session['id'])
-                    if status == 'cancelled':
-                        await self.send_embed(ctx, f"Identity verification for {user.display_name} has been cancelled.", discord.Color.orange())
-                    elif status in ['consent_declined', 'device_unsupported', 'under_supported_age', 'phone_otp_declined', 'email_verification_declined']:
-                        await self.send_embed(ctx, f"Identity verification failed due to {status.replace('_', ' ')}.", discord.Color(0xff4545))
-                    elif status != 'verified':
-                        dm_embed = discord.Embed(
-                            title="Verification failed",
-                            description=f"Identity verification for {ctx.guild.name} was not completed in time.",
-                            color=discord.Color(0xff4545)
-                        )
-                        await dm_message.edit(embed=dm_embed)
-                        stripe.identity.VerificationSession.cancel(verification_session['id'])
-                    else:
-                        id_verified_role = ctx.guild.get_role(self.id_verified_role_id)
-                        if id_verified_role:
-                            await user.add_roles(id_verified_role, reason="Identity verified")
-                        verification_channel = self.bot.get_channel(self.verification_channel_id)
-                        result_embed = discord.Embed(title="Identity Verification Result", color=discord.Color.blue())
-                        result_embed.add_field(name="User", value=f"{user} ({user.id})", inline=False)
-                        result_embed.add_field(name="Document status", value=session['last_verification_report']['document']['status'], inline=False)
-                        result_embed.add_field(name="Name", value=session['last_verification_report']['document']['name'], inline=False)
-                        result_embed.add_field(name="DOB", value=session['last_verification_report']['document']['dob'], inline=False)
-                        result_embed.add_field(name="Address", value=session['last_verification_report']['document']['address'], inline=False)
-                        if 'risk_insights' in session:
-                            result_embed.add_field(name="Risk Insights", value=str(session['risk_insights']), inline=False)
-                        if verification_channel:
-                            await verification_channel.send(embed=result_embed)
-                        else:
-                            await ctx.send(embed=result_embed)
-                await self.config.pending_verification_sessions.set_raw(str(user.id), value=None)
+                await self.send_embed(ctx, f"A verification session is now open. I've sent {user.mention} a message with details on how to continue.", discord.Color(0x2BBD8E))
             except stripe.error.StripeError as e:
                 embed = discord.Embed(description=f"Failed to create an identity verification session: {e.user_message}", color=discord.Color(0xff4545))
                 await ctx.send(embed=embed)
@@ -404,104 +272,3 @@ class StripeIdentity(commands.Cog):
             except Exception as e:
                 embed = discord.Embed(description=f"An unexpected error occurred: {str(e)}", color=discord.Color(0xff4545))
                 await ctx.send(embed=embed)
-
-    @commands.guild_only()
-    @commands.command(name="pending")
-    @checks.admin_or_permissions(manage_guild=True)
-    async def pending(self, ctx):
-        """Show all pending verifications for users in the guild."""
-        pending_sessions = await self.config.pending_verification_sessions.all()
-        guild_member_ids = {member.id for member in ctx.guild.members}
-        pending_guild_sessions = {user_id: session_info for user_id, session_info in pending_sessions.items() if int(user_id) in guild_member_ids}
-
-        if not pending_guild_sessions:
-            embed = discord.Embed(description="There are no pending verification sessions for users in this guild.", color=discord.Color.orange())
-            await ctx.send(embed=embed)
-            return
-
-        embed = discord.Embed(title="Pending Verification Sessions", color=discord.Color.blue())
-        for user_id, session_info in pending_guild_sessions.items():
-            member = ctx.guild.get_member(int(user_id))
-            if member is None:
-                continue  # Skip if the member is not found in the guild
-            if session_info is not None:
-                # Assuming session_info is a timestamp string, parse it into a datetime object
-                try:
-                    start_time = datetime.fromisoformat(session_info)
-                    time_remaining = start_time + timedelta(minutes=15) - datetime.now()
-                    if time_remaining.total_seconds() > 0:
-                        formatted_time_remaining = discord.utils.format_dt(start_time + timedelta(minutes=15), style='R')
-                        embed.add_field(name=f"User: {member.display_name} (ID: {user_id})", value=f"Time remaining: {formatted_time_remaining}", inline=False)
-                    else:
-                        embed.add_field(name=f"User: {member.display_name} (ID: {user_id})", value="Verification session expired.", inline=False)
-                except ValueError:
-                    embed.add_field(name=f"User: {member.display_name} (ID: {user_id})", value="Invalid session start time.", inline=False)
-            else:
-                embed.add_field(name=f"User: {member.display_name} (ID: {user_id})", value="Session info not available.", inline=False)
-        await ctx.send(embed=embed)
-
-    @commands.guild_only()
-    @commands.command(name="attest")
-    async def attest(self, ctx):
-        """Allows a user to self-attest their government issued ID for analysis"""
-        
-        try:
-            id_number_session = stripe.identity.VerificationSession.create(
-                type='id_number',
-                metadata={'user_id': str(ctx.author.id)}
-            )
-            document_session = stripe.identity.VerificationSession.create(
-                type='document',
-                metadata={'user_id': str(ctx.author.id)},
-                options={'document': {'allowed_types': ['driving_license', 'passport', 'id_card']}}
-            )
-        except stripe.error.StripeError as e:
-            embed = discord.Embed(description=f"Failed to create a verification session: {e.user_message}", color=discord.Color(0xff4545))
-            await ctx.send(embed=embed)
-            return
-        except AttributeError as e:
-            embed = discord.Embed(description="An internal error occurred while processing your request. Please try again later.", color=discord.Color(0xff4545))
-            await ctx.send(embed=embed)
-            return
-
-        embed = discord.Embed(description="Please choose the type of verification you would like to proceed with", color=0xfffffe)
-        view = discord.ui.View(timeout=None)  # Set timeout to None for persistence
-        view.add_item(discord.ui.Button(label="Verify by ID number (US)", url=id_number_session.url, style=discord.ButtonStyle.link))
-        view.add_item(discord.ui.Button(label="Verify by document (International)", url=document_session.url, style=discord.ButtonStyle.link))
-        await ctx.send(embed=embed, view=view)
-
-        completion_embed = discord.Embed(description="Click the button below once you have finished verifying and been told to return here.", color=discord.Color.blue())
-        completion_view = discord.ui.View(timeout=None)  # Set timeout to None for persistence
-        completion_view.add_item(discord.ui.Button(label="I'm all done", style=discord.ButtonStyle.green, custom_id="completed_button"))
-        await ctx.send(embed=completion_embed, view=completion_view)
-
-        async def handle_verification_completion(interaction):
-            if interaction.user != ctx.author:
-                return await interaction.response.send_message("This button is not for you, nosey fuck.", ephemeral=True)
-            
-            if interaction.custom_id == "completed_button":
-                try:
-                    verification_status_id = await self.check_verification_status(id_number_session.id)
-                    verification_status_doc = await self.check_verification_status(document_session.id)
-                    if verification_status_id == "verified" or verification_status_doc == "verified":
-                        age_verification_role = discord.utils.get(ctx.guild.roles, name="Age Verified")
-                        id_verification_role = discord.utils.get(ctx.guild.roles, name="ID Verified")
-                        if age_verification_role:
-                            await ctx.author.add_roles(age_verification_role)
-                        if id_verification_role:
-                            await ctx.author.add_roles(id_verification_role)
-                        await interaction.response.send_message("Verification completed and roles assigned.", ephemeral=True)
-                    else:
-                        await interaction.response.send_message("Verification not completed yet. Please try again later.", ephemeral=True)
-                except Exception as e:
-                    await interaction.response.send_message(f"An error occurred while checking verification status: {str(e)}", ephemeral=True)
-
-        self.bot.add_listener(handle_verification_completion, "on_interaction")
-        
-    async def check_verification_status(self, session_id):
-        """Check the verification status of a session."""
-        try:
-            session = stripe.identity.VerificationSession.retrieve(session_id)
-            return session.status
-        except stripe.error.StripeError as e:
-            return None
