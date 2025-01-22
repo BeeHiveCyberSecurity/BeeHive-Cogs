@@ -13,8 +13,7 @@ class StripeIdentity(commands.Cog):
             stripe_api_key="",
             verification_channel=None,
             age_verified_role=None,
-            id_verified_role=None,
-            pending_verification_sessions={}
+            id_verified_role=None
         )
 
     async def initialize(self):
@@ -75,24 +74,9 @@ class StripeIdentity(commands.Cog):
     @checks.admin_or_permissions(manage_guild=True)
     async def cancel_verification(self, ctx: commands.Context, user: discord.Member):
         """
-        Cancel a pending verification session for a user and remove it from the list of sessions.
+        Cancel a pending verification session for a user.
         """
-        session_id = await self.config.pending_verification_sessions.get_raw(str(user.id), default=None)
-        if session_id:
-            try:
-                verification_session = stripe.identity.VerificationSession.retrieve(session_id)
-                if verification_session.status == "requires_input":
-                    stripe.identity.VerificationSession.cancel(session_id)
-                    await self.config.pending_verification_sessions.clear_raw(str(user.id))
-                    await self.send_embed(ctx, f"Verification session for {user.display_name} has been canceled and removed.", discord.Color(0x2BBD8E))
-                else:
-                    await self.send_embed(ctx, f"Verification session for {user.display_name} cannot be canceled as it is already {verification_session.status}.", discord.Color.orange())
-            except stripe.error.StripeError as e:
-                await self.send_embed(ctx, f"Failed to cancel the verification session: {e.user_message}", discord.Color.red())
-            except Exception as e:
-                await self.send_embed(ctx, f"An unexpected error occurred: {str(e)}", discord.Color.red())
-        else:
-            await self.send_embed(ctx, f"No pending verification session found for {user.display_name}.", discord.Color.orange())
+        await self.send_embed(ctx, f"No pending verification session found for {user.display_name}.", discord.Color.orange())
 
     @commands.is_owner()
     @commands.guild_only()
@@ -101,8 +85,6 @@ class StripeIdentity(commands.Cog):
         """
         Bypass the verification process for a user.
         """
-        await self.config.pending_verification_sessions.clear_raw(str(user.id))
-        
         age_verified_role_id = await self.config.age_verified_role()
         id_verified_role_id = await self.config.id_verified_role()
         
@@ -149,7 +131,6 @@ class StripeIdentity(commands.Cog):
                     },
                 }
             )
-            await self.config.pending_verification_sessions.set_raw(str(user.id), value=verification_session.id)
             dm_embed = discord.Embed(
                 title="Age verification requested",
                 description=(
@@ -165,13 +146,12 @@ class StripeIdentity(commands.Cog):
             )
             dm_embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/id-card.png")
             view = discord.ui.View()
-            view.add_item(discord.ui.Button(label="Start verification", url=f"{verification_session.url}", style=discord.ButtonStyle.link, emoji="<:globe:1196807971674533968>"))
+            view.add_item(discord.ui.Button(label="Start verification", url=verification_session.url, style=discord.ButtonStyle.link, emoji="<:globe:1196807971674533968>"))
             
             decline_button = discord.ui.Button(label="Decline verification", style=discord.ButtonStyle.danger)
             async def decline_verification(interaction: discord.Interaction):
                 if interaction.user.id == user.id:
                     await interaction.response.send_message(f"You have declined the verification.", ephemeral=True)
-                    await self.config.pending_verification_sessions.clear_raw(str(user.id))
             decline_button.callback = decline_verification
             view.add_item(decline_button)
             try:
@@ -217,9 +197,6 @@ class StripeIdentity(commands.Cog):
                     }
                 )
 
-                # Store the session ID for the user
-                await self.config.pending_verification_sessions.set_raw(str(user.id), value=verification_session['id'])
-
                 # Prepare the DM embed
                 dm_embed = discord.Embed(
                     title="Identity verification required",
@@ -238,7 +215,7 @@ class StripeIdentity(commands.Cog):
 
                 # Create the view with buttons
                 view = discord.ui.View()
-                view.add_item(discord.ui.Button(label="Start verification", url=verification_session['url'], style=discord.ButtonStyle.link, emoji="<:globe:1196807971674533968>"))
+                view.add_item(discord.ui.Button(label="Start verification", url=verification_session.url, style=discord.ButtonStyle.link, emoji="<:globe:1196807971674533968>"))
                 decline_button = discord.ui.Button(label="Decline verification", style=discord.ButtonStyle.danger)
 
                 # Define the decline verification callback
@@ -246,7 +223,6 @@ class StripeIdentity(commands.Cog):
                     if interaction.user.id == user.id:
                         await interaction.response.send_message(f"You have declined the verification.", ephemeral=True)
                         await ctx.guild.ban(user, reason="User declined identity verification")
-                        await self.config.pending_verification_sessions.clear_raw(str(user.id))
 
                 decline_button.callback = decline_verification
                 view.add_item(decline_button)
@@ -265,9 +241,6 @@ class StripeIdentity(commands.Cog):
                 await ctx.send(embed=embed)
             except discord.HTTPException as e:
                 embed = discord.Embed(description=f"Failed to send DM to {user.display_name}: {e.text}", color=discord.Color(0xff4545))
-                await ctx.send(embed=embed)
-            except AttributeError as e:
-                embed = discord.Embed(description=f"An unexpected error occurred: {str(e)}", color=discord.Color(0xff4545))
                 await ctx.send(embed=embed)
             except Exception as e:
                 embed = discord.Embed(description=f"An unexpected error occurred: {str(e)}", color=discord.Color(0xff4545))
