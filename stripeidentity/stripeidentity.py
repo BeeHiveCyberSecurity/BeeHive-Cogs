@@ -165,6 +165,8 @@ class StripeIdentity(commands.Cog):
             await self.send_embed(ctx, f":x: **Failed to create a verification session**\n`{e.user_message}`", discord.Color(0xff4545))
         except discord.HTTPException as e:
             await self.send_embed(ctx, f":x: **Failed to send DM to {user.display_name}**\n`{e.text}`", discord.Color(0xff4545))
+        except AttributeError as e:
+            await self.send_embed(ctx, f":x: **An attribute error occurred**\n`{str(e)}`", discord.Color(0xff4545))
         except Exception as e:
             await self.send_embed(ctx, f":x: **An unexpected error occurred**\n`{str(e)}`", discord.Color(0xff4545))
 
@@ -241,6 +243,9 @@ class StripeIdentity(commands.Cog):
                 await ctx.send(embed=embed)
             except discord.HTTPException as e:
                 embed = discord.Embed(description=f"Failed to send DM to {user.display_name}: {e.text}", color=discord.Color(0xff4545))
+                await ctx.send(embed=embed)
+            except AttributeError as e:
+                embed = discord.Embed(description=f"An attribute error occurred: {str(e)}", color=discord.Color(0xff4545))
                 await ctx.send(embed=embed)
             except Exception as e:
                 embed = discord.Embed(description=f"An unexpected error occurred: {str(e)}", color=discord.Color(0xff4545))
