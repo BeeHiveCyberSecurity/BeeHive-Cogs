@@ -230,7 +230,7 @@ class StripeIdentity(commands.Cog):
                         "### Please ensure you have one of the following documents:\n- **State ID**\n- **Driver's License**\n- **Driver's Permit**\n- **Passport**\n"
                         "### You will also need to:\n- **Provide a valid email address**\n- **Take a series of selfies in a well-lit area**\n- **Submit the identity document mentioned above for biometric matching and analysis**\n\n"
                         "Upon completing the verification, your personal information will be handled according to the following legal agreements:\n- **[BeeHive Terms of Service](<https://www.beehive.systems/tos>)**\n- **[BeeHive Privacy Policy](https://www.beehive.systems/privacy)**\n- **[Stripe Privacy Policy](https://stripe.com/privacy)**\n- **[Stripe Consumer Terms of Service](https://stripe.com/legal/consumer)**\n\n"
-                        "Should you choose not to provide your personal information, you can opt out of the verification process by selecting the option below. This action will result in your immediate removal from the server."
+                        "Should you choose not to provide your personal information, you can opt out of the verification process by selecting the option below."
                     ),
                     color=discord.Color(0xff4545)
                 )
