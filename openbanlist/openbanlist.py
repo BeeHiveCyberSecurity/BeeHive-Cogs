@@ -120,8 +120,20 @@ class OpenBanList(commands.Cog):
                     appealable_status = ":white_check_mark: **Yes**" if ban_info.get("appealable", False) else ":x: **Not eligible**"
                     embed.add_field(name="Can be appealed?", value=appealable_status, inline=True)
                     if ban_info.get("appealed", False):
-                        embed.add_field(name="Appeal Status", value=ban_info.get("appeal_status", "Pending"), inline=True)
-                        embed.add_field(name="Appeal Details", value=ban_info.get("appeal_details", "No details provided"), inline=False)
+                        appeal_verdict = ban_info.get("appeal_verdict", "")
+                        if not appeal_verdict:
+                            appeal_status = "Pending"
+                        elif appeal_verdict == "accepted":
+                            appeal_status = "Accepted"
+                        elif appeal_verdict == "denied":
+                            appeal_status = "Denied"
+                        else:
+                            appeal_status = "Unknown"
+                        embed.add_field(name="Appeal Status", value=appeal_status, inline=True)
+                        embed.add_field(name="Appeal Verdict", value=ban_info.get("appeal_verdict", "No verdict provided"), inline=False)
+                        appeal_reason = ban_info.get("appeal_reason", "")
+                        if appeal_reason:
+                            embed.add_field(name="Appeal Reason", value=appeal_reason, inline=False)
                     evidence = ban_info.get("evidence", "")
                     if evidence:
                         embed.set_image(url=evidence)
@@ -251,8 +263,20 @@ class OpenBanList(commands.Cog):
                         embed.add_field(name="Approver ID", value=ban_info.get("approver_id", "Unknown"), inline=False)
                         embed.add_field(name="Appealable", value=str(ban_info.get("appealable", False)), inline=False)
                         if ban_info.get("appealed", False):
-                            embed.add_field(name="Appeal Status", value=ban_info.get("appeal_status", "Pending"), inline=True)
-                            embed.add_field(name="Appeal Details", value=ban_info.get("appeal_details", "No details provided"), inline=False)
+                            appeal_verdict = ban_info.get("appeal_verdict", "")
+                            if not appeal_verdict:
+                                appeal_status = "Pending"
+                            elif appeal_verdict == "accepted":
+                                appeal_status = "Accepted"
+                            elif appeal_verdict == "denied":
+                                appeal_status = "Denied"
+                            else:
+                                appeal_status = "Unknown"
+                            embed.add_field(name="Appeal Status", value=appeal_status, inline=True)
+                            embed.add_field(name="Appeal Verdict", value=ban_info.get("appeal_verdict", "No verdict provided"), inline=False)
+                            appeal_reason = ban_info.get("appeal_reason", "")
+                            if appeal_reason:
+                                embed.add_field(name="Appeal Reason", value=appeal_reason, inline=False)
                         evidence = ban_info.get("evidence", "")
                         if evidence:
                             embed.set_image(url=evidence)
