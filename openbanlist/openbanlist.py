@@ -119,7 +119,10 @@ class OpenBanList(commands.Cog):
                     embed.add_field(name="Approved by", value=f"<@{ban_info.get('approver_id', 'Unknown')}>\n`{ban_info.get('approver_id', 'Unknown')}`", inline=True)
                     appealable_status = ":white_check_mark: **Yes**" if ban_info.get("appealable", False) else ":x: **Not eligible**"
                     embed.add_field(name="Can be appealed?", value=appealable_status, inline=True)
-                    evidence = ban_info.get("evidence")
+                    if ban_info.get("appealed", False):
+                        embed.add_field(name="Appeal Status", value=ban_info.get("appeal_status", "Pending"), inline=True)
+                        embed.add_field(name="Appeal Details", value=ban_info.get("appeal_details", "No details provided"), inline=False)
+                    evidence = ban_info.get("evidence", "")
                     if evidence:
                         embed.set_image(url=evidence)
                     report_date = ban_info.get("report_date", "Unknown")
@@ -247,7 +250,10 @@ class OpenBanList(commands.Cog):
                         embed.add_field(name="Reporter ID", value=ban_info.get("reporter_id", "Unknown"), inline=False)
                         embed.add_field(name="Approver ID", value=ban_info.get("approver_id", "Unknown"), inline=False)
                         embed.add_field(name="Appealable", value=str(ban_info.get("appealable", False)), inline=False)
-                        evidence = ban_info.get("evidence")
+                        if ban_info.get("appealed", False):
+                            embed.add_field(name="Appeal Status", value=ban_info.get("appeal_status", "Pending"), inline=True)
+                            embed.add_field(name="Appeal Details", value=ban_info.get("appeal_details", "No details provided"), inline=False)
+                        evidence = ban_info.get("evidence", "")
                         if evidence:
                             embed.set_image(url=evidence)
                         report_date = ban_info.get("report_date", "Unknown")
