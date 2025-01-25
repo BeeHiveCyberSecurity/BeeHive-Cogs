@@ -1,4 +1,4 @@
-from redbot.core import commands, Config
+from redbot.core import commands, Config # type: ignore
 import discord
 import aiohttp
 import asyncio
