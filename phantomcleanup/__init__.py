@@ -1,4 +1,5 @@
-from redbot.core.bot import Red
+from .phantomcleanup import PhantomCleanup
 
 async def setup(bot: Red):
-    bot.add_cog(PhantomCleanup(bot))
+    cog = PhantomCleanup(bot)
+    await bot.add_cog(cog)
