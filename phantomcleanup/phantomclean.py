@@ -47,7 +47,7 @@ class PhantomClean(commands.Cog):
     async def unban_users(self, ctx: commands.Context):
         """Unbans all users in the server's banlist."""
         guild = ctx.guild
-        bans = await guild.bans()
+        bans = [entry async for entry in guild.bans()]
         
         if not bans:
             await ctx.send("No users to unban.")
