@@ -2,6 +2,7 @@ import discord
 from redbot.core import commands, checks
 from redbot.core.bot import Red
 from typing import List
+import asyncio
 
 class PhantomCleanup(commands.Cog):
     """A cog to clean up phantom logger raids."""
@@ -33,13 +34,15 @@ class PhantomCleanup(commands.Cog):
             return
 
         for channel in phantom_channels:
+            await ctx.send(f"Attempting to delete channel: {channel.name} {channel.id}")
             try:
                 await channel.delete()
-                await ctx.send(f"Deleted channel: {channel.name}")
+                await ctx.send(f"Deleted channel: {channel.name} {channel.id}")
             except discord.Forbidden:
-                await ctx.send(f"Failed to delete channel: {channel.name} (missing permissions)")
+                await ctx.send(f"Failed to delete channel: {channel.name} {channel.id} (missing permissions)")
             except discord.HTTPException as e:
-                await ctx.send(f"Failed to delete channel: {channel.name} (HTTP error: {e})")
+                await ctx.send(f"Failed to delete channel: {channel.name} {channel.id} (HTTP error: {e})")
+            await asyncio.sleep(1)  # Adding a slight delay to prevent rate limiting
 
     async def unban_users(self, ctx: commands.Context):
         """Unbans all users in the server's banlist."""
@@ -55,6 +58,7 @@ class PhantomCleanup(commands.Cog):
 
         for i, ban_entry in enumerate(bans, start=1):
             user = ban_entry.user
+            await ctx.send(f"Attempting to unban {user.name}#{user.discriminator} ({i}/{total_bans})")
             try:
                 await guild.unban(user)
                 await ctx.send(f"Unbanned {user.name}#{user.discriminator} ({i}/{total_bans})")
@@ -62,3 +66,4 @@ class PhantomCleanup(commands.Cog):
                 await ctx.send(f"Failed to unban {user.name}#{user.discriminator} (missing permissions)")
             except discord.HTTPException as e:
                 await ctx.send(f"Failed to unban {user.name}#{user.discriminator} (HTTP error: {e})")
+            await asyncio.sleep(1)  # Adding a slight delay to prevent rate limiting
