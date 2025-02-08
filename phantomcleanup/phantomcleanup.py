@@ -11,7 +11,7 @@ class PhantomCleanup(commands.Cog):
 
     @commands.command()
     @checks.mod_or_permissions(manage_guild=True)
-    async def cleanup(self, ctx: commands.Context):
+    async def phantomcleanup(self, ctx: commands.Context):
         """Cleans up phantom logger channels and unbans users."""
         await ctx.send("Starting cleanup process...")
 
