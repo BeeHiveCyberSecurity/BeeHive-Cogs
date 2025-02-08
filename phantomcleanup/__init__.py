@@ -1,5 +1,5 @@
-from .phantoncleanup import PhantomCleanup
+from .phantomclean import PhantomClean
 
 async def setup(bot):
-    cog = PhantomCleanup(bot)
+    cog = PhantomClean(bot)
     await bot.add_cog(cog)

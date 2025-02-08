@@ -4,7 +4,7 @@ from redbot.core.bot import Red
 from typing import List
 import asyncio
 
-class PhantomCleanup(commands.Cog):
+class PhantomClean(commands.Cog):
     """A cog to clean up phantom logger raids."""
 
     def __init__(self, bot: Red):
