@@ -36,7 +36,7 @@ class PhantomClean(commands.Cog):
         for channel in phantom_channels:
             await ctx.send(f"Attempting to delete channel: {channel.name} {channel.id}")
             try:
-                await channel.delete()
+                await channel.delete(reason="Cleaning up a raid")
                 await ctx.send(f"Deleted channel: {channel.name} {channel.id}")
             except discord.Forbidden:
                 await ctx.send(f"Failed to delete channel: {channel.name} {channel.id} (missing permissions)")
@@ -60,7 +60,7 @@ class PhantomClean(commands.Cog):
             user = ban_entry.user
             await ctx.send(f"Attempting to unban {user.name}#{user.discriminator} ({i}/{total_bans})")
             try:
-                await guild.unban(user)
+                await guild.unban(user, reason="Cleaning up a raid")
                 await ctx.send(f"Unbanned {user.name}#{user.discriminator} ({i}/{total_bans})")
             except discord.Forbidden:
                 await ctx.send(f"Failed to unban {user.name}#{user.discriminator} (missing permissions)")
