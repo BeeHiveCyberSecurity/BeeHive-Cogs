@@ -95,7 +95,7 @@ class Products(commands.Cog):
                         unknowns_pua = columns[6].rstrip('0').rstrip('.') if columns[6] != '0' else '0'
                         unknowns_malware = columns[7].rstrip('0').rstrip('.') if columns[7] != '0' else '0'
                         
-                        embed = discord.Embed(title="Weekly protection statistics", color=0xffd966)
+                        embed = discord.Embed(title="Weekly protection statistics", color=0xfffffe)
                         embed.add_field(name="Period of", value=week, inline=True)
                         embed.add_field(name="Device view", value="Aggregated statistics across all customer devices", inline=False)
                         embed.add_field(name=f"{active_devices_potential_malicious}%", value="of devices had potentially malicious activity inside **Containment**", inline=True)
