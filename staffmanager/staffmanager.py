@@ -47,8 +47,13 @@ class StaffManager(commands.Cog):
             new_count = member_data["punishments_issued"] + 1
             await self.config.member(user).punishments_issued.set(new_count)
 
-    @commands.command()
-    async def staffinfo(self, ctx, member: discord.Member):
+    @commands.group()
+    async def staff(self, ctx):
+        """Group for staff management commands"""
+        pass
+
+    @staff.command()
+    async def info(self, ctx, member: discord.Member):
         """Get information about a staff member"""
         member_data = await self.config.member(member).all()
         if not member_data["is_staff"]:
@@ -71,7 +76,7 @@ class StaffManager(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    @commands.command()
+    @staff.command()
     @commands.is_owner()
     async def suspend(self, ctx, member: discord.Member, days: int, *, reason: str):
         """Temporarily suspend a staff member's role for a specified reason"""
