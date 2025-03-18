@@ -19,6 +19,14 @@ class StaffManager(commands.Cog):
         }
         self.config.register_member(**default_member)
 
+    async def get_staff_roles(self, guild):
+        """Fetch mod and admin roles from the guild settings"""
+        mod_role_id = await self.config.guild(guild).mod_role()
+        admin_role_id = await self.config.guild(guild).admin_role()
+        mod_role = guild.get_role(mod_role_id)
+        admin_role = guild.get_role(admin_role_id)
+        return mod_role, admin_role
+
     @commands.Cog.listener()
     async def on_member_update(self, before, after):
         """Check for role changes to update staff status"""
@@ -26,8 +34,7 @@ class StaffManager(commands.Cog):
             return
 
         guild = after.guild
-        mod_role = guild.get_role(guild.settings.mod_role)
-        admin_role = guild.get_role(guild.settings.admin_role)
+        mod_role, admin_role = await self.get_staff_roles(guild)
 
         is_staff = any(role in after.roles for role in [mod_role, admin_role])
         member_data = await self.config.member(after).all()
@@ -117,8 +124,7 @@ class StaffManager(commands.Cog):
             return
 
         guild = ctx.guild
-        mod_role = guild.get_role(guild.settings.mod_role)
-        admin_role = guild.get_role(guild.settings.admin_role)
+        mod_role, admin_role = await self.get_staff_roles(guild)
         staff_roles = [role for role in [mod_role, admin_role] if role in member.roles]
 
         await self.config.member(member).suspended.set(True)
