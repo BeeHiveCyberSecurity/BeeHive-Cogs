@@ -113,7 +113,8 @@ class Weather(commands.Cog):
                                     color=0xff4545
                                 )
                                 if 'instruction' in alert['properties']:
-                                    embed.add_field(name="Instruction", value=alert['properties']['instruction'], inline=False)
+                                    instruction = alert['properties']['instruction'].replace('\n', ' ').strip()
+                                    embed.add_field(name="Instruction", value=instruction, inline=False)
                                 if 'severity' in alert['properties']:
                                     embed.add_field(name="Severity", value=alert['properties']['severity'], inline=True)
                                 if 'urgency' in alert['properties']:
