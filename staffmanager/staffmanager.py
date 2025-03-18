@@ -77,6 +77,33 @@ class StaffManager(commands.Cog):
         await ctx.send(embed=embed)
 
     @staff.command()
+    async def list(self, ctx):
+        """List all staff members and their tenure"""
+        guild = ctx.guild
+        members = guild.members
+        staff_list = []
+
+        for member in members:
+            member_data = await self.config.member(member).all()
+            if member_data["is_staff"]:
+                staff_since = member_data["staff_since"]
+                tenure = "N/A"
+                if staff_since:
+                    staff_since_date = datetime.fromisoformat(staff_since)
+                    tenure = (datetime.utcnow() - staff_since_date).days
+                staff_list.append((member.display_name, tenure))
+
+        if not staff_list:
+            await ctx.send("There are no staff members currently.")
+            return
+
+        embed = discord.Embed(title="Staff Members List", color=discord.Color.green())
+        for name, tenure in staff_list:
+            embed.add_field(name=name, value=f"Tenure: {tenure} days", inline=False)
+
+        await ctx.send(embed=embed)
+
+    @staff.command()
     @commands.is_owner()
     async def suspend(self, ctx, member: discord.Member, days: int, *, reason: str):
         """Temporarily suspend a staff member's role for a specified reason"""
