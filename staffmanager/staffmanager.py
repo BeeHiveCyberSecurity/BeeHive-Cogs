@@ -17,47 +17,24 @@ class StaffManager(commands.Cog):
             "suspension_end": None,
             "original_roles": [],
         }
+        default_guild = {
+            "staff_roles": {}
+        }
         self.config.register_member(**default_member)
-
-    async def get_staff_roles(self, guild):
-        """Fetch mod and admin roles from the guild settings"""
-        mod_role_id = await self.config.guild(guild).mod_role()
-        admin_role_id = await self.config.guild(guild).admin_role()
-        mod_role = guild.get_role(mod_role_id)
-        admin_role = guild.get_role(admin_role_id)
-        return mod_role, admin_role
-
-    @commands.Cog.listener()
-    async def on_member_update(self, before, after):
-        """Check for role changes to update staff status"""
-        if before.roles == after.roles:
-            return
-
-        guild = after.guild
-        mod_role, admin_role = await self.get_staff_roles(guild)
-
-        is_staff = any(role in after.roles for role in [mod_role, admin_role])
-        member_data = await self.config.member(after).all()
-
-        if is_staff and not member_data["is_staff"]:
-            await self.config.member(after).is_staff.set(True)
-            await self.config.member(after).staff_since.set(datetime.utcnow().isoformat())
-        elif not is_staff and member_data["is_staff"]:
-            await self.config.member(after).is_staff.set(False)
-            await self.config.member(after).staff_since.set(None)
-
-    @commands.Cog.listener()
-    async def on_member_ban(self, guild, user):
-        """Automatically count punishments when a member is banned"""
-        member_data = await self.config.member(user).all()
-        if member_data["is_staff"]:
-            new_count = member_data["punishments_issued"] + 1
-            await self.config.member(user).punishments_issued.set(new_count)
+        self.config.register_guild(**default_guild)
 
     @commands.group()
     async def staffmanager(self, ctx):
         """Group for staff management commands"""
         pass
+
+    @staffmanager.command()
+    @commands.has_permissions(manage_roles=True)
+    async def addrole(self, ctx, role: discord.Role, role_type: str):
+        """Add a role as a staff role with a specific type (e.g., mod, admin, helper)"""
+        async with self.config.guild(ctx.guild).staff_roles() as staff_roles:
+            staff_roles[role.id] = role_type
+        await ctx.send(f"Role {role.name} has been added as a {role_type} staff role.")
 
     @staffmanager.command()
     async def info(self, ctx, member: discord.Member):
@@ -124,8 +101,7 @@ class StaffManager(commands.Cog):
             return
 
         guild = ctx.guild
-        mod_role, admin_role = await self.get_staff_roles(guild)
-        staff_roles = [role for role in [mod_role, admin_role] if role in member.roles]
+        staff_roles = [role for role in member.roles if role.id in (await self.config.guild(guild).staff_roles()).keys()]
 
         await self.config.member(member).suspended.set(True)
         await self.config.member(member).suspension_reason.set(reason)
