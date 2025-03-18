@@ -48,11 +48,11 @@ class StaffManager(commands.Cog):
             await self.config.member(user).punishments_issued.set(new_count)
 
     @commands.group()
-    async def staff(self, ctx):
+    async def staffmanager(self, ctx):
         """Group for staff management commands"""
         pass
 
-    @staff.command()
+    @staffmanager.command()
     async def info(self, ctx, member: discord.Member):
         """Get information about a staff member"""
         member_data = await self.config.member(member).all()
@@ -76,7 +76,7 @@ class StaffManager(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    @staff.command()
+    @staffmanager.command()
     async def list(self, ctx):
         """List all staff members and their tenure"""
         guild = ctx.guild
@@ -103,7 +103,7 @@ class StaffManager(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    @staff.command()
+    @staffmanager.command()
     @commands.is_owner()
     async def suspend(self, ctx, member: discord.Member, days: int, *, reason: str):
         """Temporarily suspend a staff member's role for a specified reason"""
