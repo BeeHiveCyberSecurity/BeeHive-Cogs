@@ -376,7 +376,15 @@ class Omni(commands.Cog):
             more_harmful_than_percentage = ((total_guilds - rank) / total_guilds) * 100
             less_harmful_than_percentage = (rank / total_guilds) * 100
 
-            embed.add_field(name="Trust and safety analysis", value=f"This server is ranked {rank} out of {total_guilds} servers.\nThis server is statistically more harmful than {more_harmful_than_percentage:.2f}% of servers, and less harmful than {less_harmful_than_percentage:.2f}% of servers", inline=False)
+            def get_ordinal_suffix(n):
+                if 10 <= n % 100 <= 20:
+                    suffix = 'th'
+                else:
+                    suffix = {1: 'st', 2: 'nd', 3: 'rd'}.get(n % 10, 'th')
+                return suffix
+
+            rank_suffix = get_ordinal_suffix(rank)
+            embed.add_field(name="Trust and safety analysis", value=f"This server is ranked {rank}{rank_suffix} out of {total_guilds} servers.\nThis server is statistically more harmful than {more_harmful_than_percentage:.2f}% of servers, and less harmful than {less_harmful_than_percentage:.2f}% of servers", inline=False)
             embed.add_field(name="Estimated moderator time saved", value=time_saved_str, inline=False)
             embed.add_field(name="Most frequent flags", value=top_categories_bullets, inline=False)
 
