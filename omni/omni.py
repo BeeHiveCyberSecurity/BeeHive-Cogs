@@ -386,11 +386,11 @@ class Omni(commands.Cog):
                 global_moderated_user_percentage = (len(global_moderated_users) / total_members * 100) if total_members > 0 else 0
                 moderation_rate_difference = moderated_user_percentage - global_moderated_user_percentage
                 if moderation_rate_difference > 0:
-                    moderation_rate_comparison = f"Members in this server require **{moderation_rate_difference:.2f}%** more moderation on average compared to the global average."
+                    moderation_rate_comparison = f":rotating_light: Members in this server require `{moderation_rate_difference:.2f}%` more moderation on average compared to the global average."
                 elif moderation_rate_difference < 0:
-                    moderation_rate_comparison = f"Members in this server require **{-moderation_rate_difference:.2f}%** less moderation on average compared to the global average."
+                    moderation_rate_comparison = f":white_check_mark: Members in this server require `{-moderation_rate_difference:.2f}%` less moderation on average compared to the global average."
                 else:
-                    moderation_rate_comparison = "Members in this server require the same level of moderation on average compared to the global average."
+                    moderation_rate_comparison = ":warning: Members in this server require the same level of moderation on average compared to the global average."
 
                 def get_ordinal_suffix(n):
                     if 10 <= n % 100 <= 20:
@@ -400,14 +400,14 @@ class Omni(commands.Cog):
                     return suffix
 
                 rank_suffix = get_ordinal_suffix(rank)
-                embed.add_field(name="Trust and safety analysis", value=f"- This server takes **{rank}{rank_suffix}** place out of **{total_guilds} servers**.\n> In this scale, 1st place is the most abusive server, and your goal is to place as low as possible in position (losing is winning).\n\n- This server is *statistically* more harmful than **{more_harmful_than_percentage:.2f}%** of servers, and less harmful than **{less_harmful_than_percentage:.2f}%** of servers.\n> The goal is to be less harmful than as many server as possible, as less harmful communities are most likely to foster more engagement and growth than their more abusive counterparts.\n\n- {moderation_rate_comparison}", inline=False)
+                embed.add_field(name="Trust and safety analysis", value=f"- **This server takes {rank}{rank_suffix} place out of {total_guilds} servers.**\n> In this scale, 1st place is the most abusive server, and your goal is to place as low as possible in position (losing is winning).\n\n- **This server is *statistically* more harmful than {more_harmful_than_percentage:.2f}% of servers, and less harmful than {less_harmful_than_percentage:.2f}% of servers.**\n> The goal is to be less harmful than as many server as possible, as less harmful communities are most likely to foster more engagement and growth than their more abusive counterparts.\n\n- **{moderation_rate_comparison}**\n> The goal is to require as little moderation as possible and to be moderated under the global average.", inline=False)
 
                 if rank in [1, 2, 3]:
-                    embed.add_field(name="Discord compliance", value=":rotating_light: **Extreme risk**\nThis server needs immediate improvement in moderation and user behavior to avoid potential suspensions, terminations, or other assorted compliance measures.", inline=False)
+                    embed.add_field(name="Discord compliance", value=":rotating_light: **Extreme risk**\n> This server needs immediate improvement in moderation and user behavior to avoid potential suspensions, terminations, or other assorted compliance measures.", inline=False)
                 elif rank in range(4, 11):
-                    embed.add_field(name="Discord compliance", value=":warning: **Approaching risk**\nThis server's not at immediate risk, but improvement is needed to keep it from getting to that point.", inline=False)
+                    embed.add_field(name="Discord compliance", value=":warning: **Approaching risk**\n> This server's not at immediate risk, but improvement is needed to keep it from getting to that point.", inline=False)
                 else:
-                    embed.add_field(name="Discord compliance", value=":white_check_mark: **Aim for continuing improvement**\nThis server's doing comparatively OK, but it's always best to be a safe, welcoming place to keep your server's safety ranking optimal.", inline=False)
+                    embed.add_field(name="Discord compliance", value=":white_check_mark: **Aim for continuing improvement**\n> This server's doing comparatively OK, but it's always best to be a safe, welcoming place to keep your server's safety ranking optimal.", inline=False)
 
                 # Global statistics
                 global_message_count = await self.config.global_message_count()
