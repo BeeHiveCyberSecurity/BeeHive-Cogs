@@ -182,14 +182,14 @@ class Omni(commands.Cog):
     @omni.command()
     async def stats(self, ctx):
         """Show statistics of the moderation activity."""
-        top_categories = self.category_counter.most_common(3)
+        top_categories = self.category_counter.most_common(5)
         top_categories_bullets = "\n".join([f"- {cat}: {count}" for cat, count in top_categories])
         
-        embed = discord.Embed(title="AI is hard at work for you'", color=discord.Color.blue())
-        embed.add_field(name="Total messages processed", value=str(self.message_count), inline=False)
-        embed.add_field(name="Total messages auto-moderated", value=str(self.moderated_count), inline=False)
-        embed.add_field(name="Total users auto-moderated", value=str(len(self.moderated_users)), inline=False)
-        embed.add_field(name="Top categories of abusive content", value=top_categories_bullets, inline=False)
+        embed = discord.Embed(title="✨ AI is hard at work for you", color=0xfffffe)
+        embed.add_field(name="Messages processed", value=str(self.message_count), inline=False)
+        embed.add_field(name="Messages moderated", value=str(self.moderated_count), inline=False)
+        embed.add_field(name="Users punished", value=str(len(self.moderated_users)), inline=False)
+        embed.add_field(name="Top violation categories", value=top_categories_bullets, inline=False)
         
         await ctx.send(embed=embed)
 
