@@ -27,7 +27,7 @@ class Omni(commands.Cog):
             return
 
         api_tokens = await self.bot.get_shared_api_tokens("openai")
-        api_key = await api_tokens.get("api_key")
+        api_key = api_tokens.get("api_key")
         if not api_key:
             return
 
@@ -102,6 +102,14 @@ class Omni(commands.Cog):
                 for category, score in category_scores.items():
                     embed.add_field(name=category.capitalize(), value=f"{score:.2f}", inline=True)
                 await log_channel.send(embed=embed)
+        else:
+            # If no log channel is set, send a warning to the server owner
+            owner = guild.owner
+            if owner:
+                await owner.send(
+                    f"Warning: No log channel is set for the guild '{guild.name}'. "
+                    "Please set a log channel using the `[p]omni logs` command to enable message logging."
+                )
 
     @commands.guild_only()
     @commands.admin_or_permissions(manage_guild=True)
