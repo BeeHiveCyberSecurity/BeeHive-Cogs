@@ -168,11 +168,11 @@ class Omni(commands.Cog):
                 if log_channel:
                     embed = discord.Embed(
                         title="✨ Message moderated using AI",
-                        description=f"Message by {message.author.mention} was flagged and deleted.",
+                        description=f"A message was deleted from chat because it potentially violated the rules.",
                         color=0xff4545,
                         timestamp=datetime.utcnow()
                     )
-                    embed.add_field(name="Content", value=message.content or "No content", inline=False)
+                    embed.add_field(name="Message content", value=f"||{message.content}||" or "No content", inline=False)
                     embed.add_field(name="Sender", value=f"{message.author} (ID: {message.author.id})", inline=True)
                     embed.add_field(name="Channel", value=f"{message.channel} (ID: {message.channel.id})", inline=True)
                     moderation_threshold = await self.config.guild(guild).moderation_threshold()
