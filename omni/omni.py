@@ -386,11 +386,11 @@ class Omni(commands.Cog):
                 global_moderated_user_percentage = (len(global_moderated_users) / total_members * 100) if total_members > 0 else 0
                 moderation_rate_difference = moderated_user_percentage - global_moderated_user_percentage
                 if moderation_rate_difference > 0:
-                    moderation_rate_comparison = f":rotating_light: Members in this server require `{moderation_rate_difference:.2f}%` more moderation on average compared to the global average."
+                    moderation_rate_comparison = f"Members in this server require `{moderation_rate_difference:.2f}%` more moderation on average compared to the global average. This server may have more abrasive users than most other servers in statistical comparison."
                 elif moderation_rate_difference < 0:
-                    moderation_rate_comparison = f":white_check_mark: Members in this server require `{-moderation_rate_difference:.2f}%` less moderation on average compared to the global average."
+                    moderation_rate_comparison = f"Members in this server require `{-moderation_rate_difference:.2f}%` less moderation on average compared to the global average. This server has members that are statistically friendlier and require less moderation & guidance."
                 else:
-                    moderation_rate_comparison = ":warning: Members in this server require the same level of moderation on average compared to the global average."
+                    moderation_rate_comparison = "Members in this server require the same level of moderation on average compared to the global average. Standard internet users, to statistical expectation."
 
                 def get_ordinal_suffix(n):
                     if 10 <= n % 100 <= 20:
