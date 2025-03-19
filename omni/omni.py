@@ -176,14 +176,16 @@ class Omni(commands.Cog):
             try:
                 await message.delete()
             except discord.NotFound:
-                pass  # Handle cases where the message is already deleted
+                pass  
 
-            # Timeout the user if duration is set
             if timeout_duration > 0:
                 try:
-                    await message.author.timeout(timedelta(minutes=timeout_duration), reason="Automated moderation action")
+                    reason = "AI moderatior action. Violation scores: " + ", ".join(
+                        f"{category}: {score:.2f}" for category, score in category_scores.items() if score > 0
+                    )
+                    await message.author.timeout(timedelta(minutes=timeout_duration), reason=reason)
                 except discord.Forbidden:
-                    pass  # Handle cases where the bot doesn't have permission to timeout
+                    pass
 
             if log_channel_id:
                 log_channel = guild.get_channel(log_channel_id)
@@ -348,9 +350,9 @@ class Omni(commands.Cog):
             
             embed = discord.Embed(title="✨ AI is hard at work for you", color=0xfffffe)
             embed.add_field(name="In this server", value="", inline=False)
-            embed.add_field(name="Messages processed", value=str(message_count), inline=True)
-            embed.add_field(name="Messages moderated", value=str(moderated_count), inline=True)
-            embed.add_field(name="Users punished", value=str(len(moderated_users)), inline=True)
+            embed.add_field(name="Messages processed", value=f"{message_count} messages", inline=True)
+            embed.add_field(name="Messages moderated", value=f"{moderated_count} messages", inline=True)
+            embed.add_field(name="Users punished", value=f"{len(moderated_users)} users", inline=True)
             embed.add_field(name="Most frequent reasons", value=top_categories_bullets, inline=False)
 
             # Global statistics
@@ -363,9 +365,9 @@ class Omni(commands.Cog):
                 global_top_categories = global_category_counter.most_common(5)
                 global_top_categories_bullets = "\n".join([f"- {cat.capitalize()}: {count}" for cat, count in global_top_categories])
                 embed.add_field(name="Across all servers", value="", inline=False)
-                embed.add_field(name="Messages processed", value=str(global_message_count), inline=True)
-                embed.add_field(name="Messages moderated", value=str(global_moderated_count), inline=True)
-                embed.add_field(name="Users punished", value=str(len(global_moderated_users)), inline=True)
+                embed.add_field(name="Messages processed", value=f"{global_message_count} messages", inline=True)
+                embed.add_field(name="Messages moderated", value=f"{global_moderated_count} messages", inline=True)
+                embed.add_field(name="Users punished", value=f"{len(global_moderated_users)} users", inline=True)
                 embed.add_field(name="Most frequent reasons", value=global_top_categories_bullets, inline=False)
 
             await ctx.send(embed=embed)
