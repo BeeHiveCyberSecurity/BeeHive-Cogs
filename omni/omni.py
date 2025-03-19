@@ -102,7 +102,7 @@ class Omni(commands.Cog):
     @commands.guild_only()
     @commands.admin_or_permissions(manage_guild=True)
     @commands.group()
-    async def openaimod(self, ctx):
+    async def omni(self, ctx):
         """Commands for configuring OpenAI moderation."""
         pass
 
