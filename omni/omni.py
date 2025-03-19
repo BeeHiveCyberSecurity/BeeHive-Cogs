@@ -26,22 +26,19 @@ class Omni(commands.Cog):
             whitelisted_channels=[],
             cog_version=self.VERSION
         )
+        self.config.register_global(
+            global_message_count=0,
+            global_moderated_count=0,
+            global_moderated_users=[],
+            global_category_counter={}
+        )
         self.session = None
-        self.message_count = 0
-        self.moderated_count = 0
-        self.moderated_users = set()
-        self.category_counter = Counter()
 
     async def initialize(self):
         try:
             self.session = aiohttp.ClientSession()
             all_guilds = await self.config.all_guilds()
             for guild_id, data in all_guilds.items():
-                self.message_count = data.get("message_count", 0)
-                self.moderated_count = data.get("moderated_count", 0)
-                self.moderated_users = set(data.get("moderated_users", []))
-                self.category_counter = Counter(data.get("category_counter", {}))
-                
                 # Check for version update
                 stored_version = data.get("cog_version", "0.0.0")
                 if stored_version != self.VERSION:
@@ -80,8 +77,13 @@ class Omni(commands.Cog):
             if message.channel.id in whitelisted_channels:
                 return
 
-            self.message_count += 1
-            await self.config.guild(guild).message_count.set(self.message_count)
+            # Update per-server statistics
+            message_count = await self.config.guild(guild).message_count() + 1
+            await self.config.guild(guild).message_count.set(message_count)
+
+            # Update global statistics
+            global_message_count = await self.config.global_message_count() + 1
+            await self.config.global_message_count.set(global_message_count)
 
             api_tokens = await self.bot.get_shared_api_tokens("openai")
             api_key = api_tokens.get("api_key")
@@ -99,14 +101,34 @@ class Omni(commands.Cog):
             text_flagged, text_category_scores = await self.analyze_text(normalized_content, api_key, message)
 
             if text_flagged:
-                self.moderated_count += 1
-                await self.config.guild(guild).moderated_count.set(self.moderated_count)
-                self.moderated_users.add(message.author.id)
-                await self.config.guild(guild).moderated_users.set(list(self.moderated_users))
+                # Update per-server statistics
+                moderated_count = await self.config.guild(guild).moderated_count() + 1
+                await self.config.guild(guild).moderated_count.set(moderated_count)
+
+                moderated_users = set(await self.config.guild(guild).moderated_users())
+                moderated_users.add(message.author.id)
+                await self.config.guild(guild).moderated_users.set(list(moderated_users))
+
+                category_counter = Counter(await self.config.guild(guild).category_counter())
                 for category, score in text_category_scores.items():
                     if score > 0:
-                        self.category_counter[category] += 1
-                await self.config.guild(guild).category_counter.set(dict(self.category_counter))
+                        category_counter[category] += 1
+                await self.config.guild(guild).category_counter.set(dict(category_counter))
+
+                # Update global statistics
+                global_moderated_count = await self.config.global_moderated_count() + 1
+                await self.config.global_moderated_count.set(global_moderated_count)
+
+                global_moderated_users = set(await self.config.global_moderated_users())
+                global_moderated_users.add(message.author.id)
+                await self.config.global_moderated_users.set(list(global_moderated_users))
+
+                global_category_counter = Counter(await self.config.global_category_counter())
+                for category, score in text_category_scores.items():
+                    if score > 0:
+                        global_category_counter[category] += 1
+                await self.config.global_category_counter.set(dict(global_category_counter))
+
                 await self.handle_moderation(message, text_category_scores)
 
             # Check if debug mode is enabled
@@ -316,29 +338,27 @@ class Omni(commands.Cog):
         """Show statistics of the moderation activity."""
         try:
             # Local statistics
-            top_categories = self.category_counter.most_common(5)
+            message_count = await self.config.guild(ctx.guild).message_count()
+            moderated_count = await self.config.guild(ctx.guild).moderated_count()
+            moderated_users = await self.config.guild(ctx.guild).moderated_users()
+            category_counter = Counter(await self.config.guild(ctx.guild).category_counter())
+
+            top_categories = category_counter.most_common(5)
             top_categories_bullets = "\n".join([f"- {cat.capitalize()}: {count}" for cat, count in top_categories])
             
             embed = discord.Embed(title="✨ AI is hard at work for you", color=0xfffffe)
             embed.add_field(name="In this server", value="", inline=False)
-            embed.add_field(name="Messages processed", value=str(self.message_count), inline=True)
-            embed.add_field(name="Messages moderated", value=str(self.moderated_count), inline=True)
-            embed.add_field(name="Users punished", value=str(len(self.moderated_users)), inline=True)
+            embed.add_field(name="Messages processed", value=str(message_count), inline=True)
+            embed.add_field(name="Messages moderated", value=str(moderated_count), inline=True)
+            embed.add_field(name="Users punished", value=str(len(moderated_users)), inline=True)
             embed.add_field(name="Most frequent reasons", value=top_categories_bullets, inline=False)
 
             # Global statistics
             if len(self.bot.guilds) > 1:
-                global_message_count = 0
-                global_moderated_count = 0
-                global_moderated_users = set()
-                global_category_counter = Counter()
-
-                all_guilds = await self.config.all_guilds()
-                for data in all_guilds.values():
-                    global_message_count += data.get("message_count", 0)
-                    global_moderated_count += data.get("moderated_count", 0)
-                    global_moderated_users.update(data.get("moderated_users", []))
-                    global_category_counter.update(data.get("category_counter", {}))
+                global_message_count = await self.config.global_message_count()
+                global_moderated_count = await self.config.global_moderated_count()
+                global_moderated_users = await self.config.global_moderated_users()
+                global_category_counter = Counter(await self.config.global_category_counter())
 
                 global_top_categories = global_category_counter.most_common(5)
                 global_top_categories_bullets = "\n".join([f"- {cat.capitalize()}: {count}" for cat, count in global_top_categories])
