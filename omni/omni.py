@@ -21,6 +21,10 @@ class Omni(commands.Cog):
             category_counter={}
         )
         self.session = aiohttp.ClientSession()
+        self.message_count = 0
+        self.moderated_count = 0
+        self.moderated_users = set()
+        self.category_counter = Counter()
 
     async def initialize(self):
         all_guilds = await self.config.all_guilds()
