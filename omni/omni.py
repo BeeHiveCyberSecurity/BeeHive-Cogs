@@ -101,7 +101,7 @@ class Omni(commands.Cog):
             log_channel = guild.get_channel(log_channel_id)
             if log_channel:
                 embed = discord.Embed(
-                    title="Message Logged",
+                    title="AI moderated a message",
                     description=f"Message by {message.author.mention} was logged.",
                     color=discord.Color.blue()
                 )
