@@ -28,7 +28,7 @@ class Omni(commands.Cog):
             image_count=0,
             image_moderated_count=0
         )
-        self.session = aiohttp.ClientSession()
+        self.session = None
         self.message_count = 0
         self.moderated_count = 0
         self.moderated_users = set()
@@ -37,6 +37,7 @@ class Omni(commands.Cog):
         self.image_moderated_count = 0
 
     async def initialize(self):
+        self.session = aiohttp.ClientSession()
         all_guilds = await self.config.all_guilds()
         for guild_id, data in all_guilds.items():
             self.message_count = data.get("message_count", 0)
@@ -102,6 +103,10 @@ class Omni(commands.Cog):
         api_key = api_tokens.get("api_key")
         if not api_key:
             return
+
+        # Ensure the session is open
+        if self.session is None or self.session.closed:
+            self.session = aiohttp.ClientSession()
 
         # Normalize the message content
         normalized_content = self.normalize_text(message.content)
@@ -392,5 +397,6 @@ class Omni(commands.Cog):
         await ctx.send(embed=embed)
 
     def cog_unload(self):
-        self.bot.loop.create_task(self.session.close())
+        if self.session and not self.session.closed:
+            self.bot.loop.create_task(self.session.close())
 
