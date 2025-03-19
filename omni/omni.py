@@ -2,6 +2,7 @@ import discord
 from redbot.core import commands, Config
 import aiohttp
 from datetime import timedelta
+from collections import Counter
 
 class Omni(commands.Cog):
     """AI-powered automatic text and image moderation provided by frontier moderation models"""
@@ -16,6 +17,10 @@ class Omni(commands.Cog):
             debug_mode=False  # Debug mode toggle
         )
         self.session = aiohttp.ClientSession()
+        self.message_count = 0
+        self.moderated_count = 0
+        self.moderated_users = set()
+        self.category_counter = Counter()
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -25,6 +30,8 @@ class Omni(commands.Cog):
         guild = message.guild
         if not guild:
             return
+
+        self.message_count += 1
 
         api_tokens = await self.bot.get_shared_api_tokens("openai")
         api_key = api_tokens.get("api_key")
@@ -50,6 +57,11 @@ class Omni(commands.Cog):
             category_scores = result.get("category_scores", {})
 
             if flagged:
+                self.moderated_count += 1
+                self.moderated_users.add(message.author.id)
+                for category, score in category_scores.items():
+                    if score > 0:
+                        self.category_counter[category] += 1
                 await self.handle_moderation(message, category_scores)
 
             # Check if debug mode is enabled
@@ -166,6 +178,19 @@ class Omni(commands.Cog):
         await self.config.guild(guild).debug_mode.set(new_debug_mode)
         status = "enabled" if new_debug_mode else "disabled"
         await ctx.send(f"Debug mode {status}.")
+
+    @omni.command()
+    async def stats(self, ctx):
+        """Show statistics of the moderation activity."""
+        top_categories = self.category_counter.most_common(3)
+        top_categories_str = ", ".join([f"{cat}: {count}" for cat, count in top_categories])
+        await ctx.send(
+            f"**Omni Moderation Stats:**\n"
+            f"Total messages processed: {self.message_count}\n"
+            f"Total messages auto-moderated: {self.moderated_count}\n"
+            f"Total users auto-moderated: {len(self.moderated_users)}\n"
+            f"Top categories of abusive content: {top_categories_str}"
+        )
 
     def cog_unload(self):
         self.bot.loop.create_task(self.session.close())
