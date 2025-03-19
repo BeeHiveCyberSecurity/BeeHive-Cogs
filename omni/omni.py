@@ -27,7 +27,7 @@ class Omni(commands.Cog):
             return
 
         api_tokens = await self.bot.get_shared_api_tokens("openai")
-        api_key = api_tokens.get("api_key")
+        api_key = await api_tokens.get("api_key")
         if not api_key:
             return
 
