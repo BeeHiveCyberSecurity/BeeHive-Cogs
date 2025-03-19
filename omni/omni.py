@@ -219,7 +219,7 @@ class Omni(commands.Cog):
                 if log_channel:
                     embed = discord.Embed(
                         title="✨ Message moderated using AI",
-                        description=f"The following message was deleted from chat because it may have violated the rules of the server, Discord's Terms of Service, or Discord's Community Guidelines..\n```{message.content}```",
+                        description=f"The following message was deleted from chat because it may have violated the rules of the server, Discord's **[Terms of Service](<https://discord.com/terms>)**, or Discord's **[Community Guidelines](<https://discord.com/guidelines>)**...\n```{message.content}```",
                         color=0xff4545,
                         timestamp=datetime.utcnow()
                     )
