@@ -174,7 +174,7 @@ class Omni(commands.Cog):
                     )
                     embed.add_field(name="Sender", value=f"<@{message.author.id}> - {message.author.id}", inline=True)
                     embed.add_field(name="Channel", value=f"<#{message.channel.id}> - {message.channel.id}", inline=True)
-                    embed.add_field(name="Violation scores", value=f"\u200b", inline=False)
+                    embed.add_field(name="Violation scores", value=f"", inline=False)
                     moderation_threshold = await self.config.guild(guild).moderation_threshold()
                     sorted_scores = sorted(category_scores.items(), key=lambda item: item[1], reverse=True)[:3]
                     for category, score in sorted_scores:
