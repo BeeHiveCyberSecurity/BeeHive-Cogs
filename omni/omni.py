@@ -106,7 +106,7 @@ class Omni(commands.Cog):
         """Commands for configuring OpenAI moderation."""
         pass
 
-    @openaimod.command()
+    @omni.command()
     async def setthreshold(self, ctx, threshold: float):
         """Set the moderation threshold (0 to 1)."""
         if 0 <= threshold <= 1:
@@ -115,7 +115,7 @@ class Omni(commands.Cog):
         else:
             await ctx.send("Threshold must be between 0 and 1.")
 
-    @openaimod.command()
+    @omni.command()
     async def settimeout(self, ctx, duration: int):
         """Set the timeout duration in minutes (0 for no timeout)."""
         if duration >= 0:
@@ -124,13 +124,13 @@ class Omni(commands.Cog):
         else:
             await ctx.send("Timeout duration must be 0 or greater.")
 
-    @openaimod.command()
+    @omni.command()
     async def setlogchannel(self, ctx, channel: discord.TextChannel):
         """Set the channel to log moderated messages."""
         await self.config.guild(ctx.guild).log_channel.set(channel.id)
         await ctx.send(f"Log channel set to {channel.mention}.")
 
-    @openaimod.command()
+    @omni.command()
     @commands.is_owner()
     async def toggledebug(self, ctx):
         """Toggle debug mode to log all messages and their scores."""
