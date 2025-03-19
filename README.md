@@ -1,5 +1,5 @@
 # Welcome to BeeHive-Cogs
-![GitHub Issues or Pull Requests](https://img.shields.io/github/issues/BeeHiveCyberSecurity/BeeHive-Cogs)
+![GitHub Issues or Pull Requests](https://img.shields.io/github/issues/BeeHiveSafety/BeeHive-Cogs)
 
 > Enjoy these cogs? Please consider [supporting them financially](https://donate.stripe.com/eVag0y2kI9BI36McNa) with a donation of any amount to help keep them maintained.
 
@@ -12,7 +12,7 @@ This repository contains cogs that can help equip your Red instance with advance
 Before you can install our cogs, you need to add our repo to your instance so it can find, our cogs by name. To do so, run the following command.
 
 ```
-[p]repo add BeeHive-Cogs https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs
+[p]repo add BeeHiveSafety https://github.com/BeeHiveSafety/BeeHive-Cogs
 ```
 
 When you run this command, Red may give you a warning about installing third party cogs. If you're presented with this, you'll need to respond in chat with "I agree". 
@@ -28,7 +28,7 @@ We'll provide a, relatively same-in-spirit disclaimer below.
 ## Public cogs
 Our public cogs are the cogs we make that do, assorted things. Maybe you'll find them useful - or maybe not. 
 
-### [weatherpro](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/weatherpro)
+### [weatherpro](https://github.com/BeeHiveSafety/BeeHive-Cogs/tree/main/weatherpro)
 
 Access detailed weather information, forecasts, and historical data for any location in the United States using ZIP codes. Perfect for planning events, travel, or just staying informed about the weather in your area. `[p]weather`, `[p]weatherset`.
 
@@ -41,7 +41,7 @@ Access detailed weather information, forecasts, and historical data for any loca
 ```
 
 
-### [ping](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/ping)
+### [ping](https://github.com/BeeHiveSafety/BeeHive-Cogs/tree/main/ping)
 
 A nice, functional ping-and-speedtest cog that shows your host latency, transit latency, download speed, and upload speed in a neat, orderly, no-frills embed. If your bot is hosted on a poor quality connection, includes a special offer when detected. `[p]ping`.
 
@@ -52,7 +52,7 @@ A nice, functional ping-and-speedtest cog that shows your host latency, transit 
 [p]load ping
 ```
 
-### [names](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/names)
+### [names](https://github.com/BeeHiveSafety/BeeHive-Cogs/tree/main/names)
 
 Help manage unruly, unsightly, and otherwise annoying nicknames/screennames in your server. Purify and normalize visually obnoxious names manually, or enable automatic cleanups to keep your server tidy. `[p]nickname`.
 
@@ -63,7 +63,7 @@ Help manage unruly, unsightly, and otherwise annoying nicknames/screennames in y
 [p]load names
 ```
 
-### [antiphishing](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/antiphishing)
+### [antiphishing](https://github.com/BeeHiveSafety/BeeHive-Cogs/tree/main/antiphishing)
 
 Passively detect and remove known malicious websites sent in your server's chats. `[p]antiphishing`.
 
@@ -74,7 +74,7 @@ Passively detect and remove known malicious websites sent in your server's chats
 [p]load antiphishing
 ```
 
-### [skysearch](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/skysearch)
+### [skysearch](https://github.com/BeeHiveSafety/BeeHive-Cogs/tree/main/skysearch)
 
 Interactive features to let you explore and search for aircraft by their registrations, squawks, ICAO 24-bit addresses, and more, as well as fetch information about airports like locations, photos, forecasts, and more. `[p]aircraft`, `[p]airport`.
 
@@ -85,7 +85,7 @@ Interactive features to let you explore and search for aircraft by their registr
 [p]load skysearch
 ```
 
-### [disclaimers](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/disclaimers)
+### [disclaimers](https://github.com/BeeHiveSafety/BeeHive-Cogs/tree/main/disclaimers)
 
 Set up and manage pre-defined disclaimers that attach to users of particular significance, like lawyers, financial advisors, or other professions where a disclaimer may be warranted as a responsible disclosure. `[p]disclaimers`.
 
@@ -96,7 +96,7 @@ Set up and manage pre-defined disclaimers that attach to users of particular sig
 [p]load disclaimers
 ```
 
-### [serverinfo](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/serverinfo)
+### [serverinfo](https://github.com/BeeHiveSafety/BeeHive-Cogs/tree/main/serverinfo)
 
 Provides detailed information about your Discord server, including member statistics, channel counts, role information, and more. Useful to keep track of various server metrics and check if the server is configured, relatively, correctly. `[p]serverinfo`.
 
@@ -107,7 +107,7 @@ Provides detailed information about your Discord server, including member statis
 [p]load serverinfo
 ```
 
-### [invites](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/invites)
+### [invites](https://github.com/BeeHiveSafety/BeeHive-Cogs/tree/main/invites)
 
 Manage and track invite links for your Discord server. This cog allows you to see who invited whom, track the number of uses for each invite link, and generate new invite links with specific settings. Useful for community growth and moderation. `[p]invites`.
 
@@ -118,7 +118,7 @@ Manage and track invite links for your Discord server. This cog allows you to se
 [p]load invites
 ```
 
-### [holidays](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/holidays)
+### [holidays](https://github.com/BeeHiveSafety/BeeHive-Cogs/tree/main/holidays)
 
 Keep track of various holidays and special events from around the world. This cog allows you to fetch information about upcoming holidays as well as set reminders for holidays in your region. Perfect for community engagement and planning events. `[p]holiday`, `[p]holidayset`.
 
@@ -130,7 +130,7 @@ Keep track of various holidays and special events from around the world. This co
 ```
 
 
-### [meetings](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/meetings)
+### [meetings](https://github.com/BeeHiveSafety/BeeHive-Cogs/tree/main/meetings)
 
 Organize and manage meetings directly within your Discord server. This cog allows you to schedule meetings, send reminders, and keep track of attendees. Perfect for community managers, project teams, and any group that needs to coordinate regular meetings. `[p]meeting`, `[p]meetingset`.
 
@@ -144,7 +144,7 @@ Organize and manage meetings directly within your Discord server. This cog allow
 
 
 
-### [products](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/products)
+### [products](https://github.com/BeeHiveSafety/BeeHive-Cogs/tree/main/products)
 
 Cog made for primarily our server to help us deliver information on our products to inquisitive users. `(incomplete)`
 
@@ -156,7 +156,7 @@ Brand cogs are cogs we make that are intended to integrate other third party ser
 >These are made open-effort and open-source to extend the functionality of Red-DiscordBot, not to imbibe an endorsement of any one specific brand.
 >If you choose to use these in potentially sensitive environments, this is the disclaimer that indicates you do so at your own risk and liability.
 
-### [abuseipdb](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/abuseipdb)
+### [abuseipdb](https://github.com/BeeHiveSafety/BeeHive-Cogs/tree/main/abuseipdb)
 
 Integrate the AbuseIPDB API with your Red-DiscordBot to check and report IP addresses for abusive activity. This cog allows you to query the reputation of an IP address and report malicious IPs directly from your Discord server. `[p]abuseipdb`.
 
@@ -167,7 +167,7 @@ Integrate the AbuseIPDB API with your Red-DiscordBot to check and report IP addr
 [p]load abuseipdb
 ```
 
-### [cloudflare](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/cloudflare)
+### [cloudflare](https://github.com/BeeHiveSafety/BeeHive-Cogs/tree/main/cloudflare)
 
 Utilize a multitude of advanced Cloudflare tools thru Discord, including the Cloudflare URL Scanner. For the bot owner, unlock the ability to interact with multiple Cloudflare products you utilize thru your Red-DiscordBot instance.
 
@@ -178,7 +178,7 @@ Utilize a multitude of advanced Cloudflare tools thru Discord, including the Clo
 [p]load cloudflare
 ```
 
-### [virustotal](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/virustotal)
+### [virustotal](https://github.com/BeeHiveSafety/BeeHive-Cogs/tree/main/virustotal)
 
 Utilize the VirusTotal API with a free API key to scan and analyze files for potential threats and malicious content. `[p]virustotal`.
 
@@ -189,7 +189,7 @@ Utilize the VirusTotal API with a free API key to scan and analyze files for pot
 [p]load virustotal
 ```
 
-### [urlscan](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/urlscan)
+### [urlscan](https://github.com/BeeHiveSafety/BeeHive-Cogs/tree/main/urlscan)
 
 Leverage the power of the URLScan.io API with a `free` URLScan API Key to evaluate URLs for safety and security. Enable `[p]urlscan autoscan` to automatically monitor and protect your chat from potentially harmful links. `[p]urlscan`.
 
@@ -203,7 +203,7 @@ Leverage the power of the URLScan.io API with a `free` URLScan API Key to evalua
 [p]set api urlscan api_key YOURAPIKEYHERE
 ```
 
-### [ransomwaredotlive](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/ransomwaredotlive)
+### [ransomwaredotlive](https://github.com/BeeHiveSafety/BeeHive-Cogs/tree/main/ransomwaredotlive)
 
 Integrate the Ransomware.live API with your Red-DiscordBot to monitor and receive updates on the latest ransomware activities as well as query information about recent and historical ransomware attacks.`[p]ransomware`.
 
@@ -214,18 +214,7 @@ Integrate the Ransomware.live API with your Red-DiscordBot to monitor and receiv
 [p]load ransomwaredotlive
 ```
 
-### [stripeidentity](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/stripeidentity)
-
-Utilize Stripe Identity through your Red-DiscordBot instance to intake and verify various forms of identification, including driver's licenses, passports, and state IDs. This feature is ideal for enforcing age restrictions in adult-only servers. Note that a Stripe account in good standing with access to Stripe Identity is required. Verification costs are $0.50 or $1.50 per verification. `[p]agecheck`, `[p]identitycheck`.
-
-```
-[p]cog install BeeHive-Cogs stripeidentity
-```
-```
-[p]load stripeidentity
-```
-
-### [ncmec](https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/tree/main/ncmec)
+### [ncmec](https://github.com/BeeHiveSafety/BeeHive-Cogs/tree/main/ncmec)
 
 Integrate the National Center for Missing & Exploited Children (NCMEC) API with your Red-DiscordBot to query information about missing persons. Planned, integrate with Microsoft Moderator to automatically detect and report suspected CSAM to NCMEC.
 
