@@ -384,7 +384,7 @@ class Omni(commands.Cog):
                 return suffix
 
             rank_suffix = get_ordinal_suffix(rank)
-            embed.add_field(name="Trust and safety analysis", value=f"This server is ranked {rank}{rank_suffix} out of {total_guilds} servers.\nThis server is statistically more harmful than {more_harmful_than_percentage:.2f}% of servers, and less harmful than {less_harmful_than_percentage:.2f}% of servers", inline=False)
+            embed.add_field(name="Trust and safety analysis", value=f"This server takes **{rank}{rank_suffix}** place out of **{total_guilds} servers**. In this scale, 1st place is the most abusive server, and your goal is to place as low as possible in position.\nThis server is statistically more harmful than {more_harmful_than_percentage:.2f}% of servers, and less harmful than {less_harmful_than_percentage:.2f}% of servers", inline=False)
             embed.add_field(name="Estimated moderator time saved", value=time_saved_str, inline=False)
             embed.add_field(name="Most frequent flags", value=top_categories_bullets, inline=False)
 
