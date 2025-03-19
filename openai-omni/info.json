@@ -1,0 +1,15 @@
+{
+    "author": ["adminescalation", "escalateprivs"],
+    "description": "A cog for moderating messages using OpenAI's omni-moderation endpoint.",
+    "install_msg": "## :white_check_mark: Successfully installed OpenAI Omni.\nConfigure the cog using `[p]openaimod` commands.",
+    "end_user_data_statement": "This cog stores server-specific configuration data such as API keys and moderation settings.",
+    "name": "openai-omni",
+    "short": "Moderate messages using OpenAI's omni-moderation.",
+    "permissions": [
+        "manage_messages",
+        "embed_links",
+        "manage_roles"
+    ],
+    "min_bot_version": "3.5.0",
+    "requirements": ["aiohttp"]
+}
