@@ -26,7 +26,8 @@ class Omni(commands.Cog):
         if not guild:
             return
 
-        api_key = await self.bot.get_shared_api_tokens("openai").get("api_key")
+        api_tokens = await self.bot.get_shared_api_tokens("openai")
+        api_key = api_tokens.get("api_key")
         if not api_key:
             return
 
@@ -60,7 +61,10 @@ class Omni(commands.Cog):
         log_channel_id = await self.config.guild(guild).log_channel()
 
         # Delete the message
-        await message.delete()
+        try:
+            await message.delete()
+        except discord.NotFound:
+            pass  # Handle cases where the message is already deleted
 
         # Timeout the user if duration is set
         if timeout_duration > 0:
