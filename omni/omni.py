@@ -3,7 +3,7 @@ from redbot.core import commands, Config
 import aiohttp
 from datetime import timedelta
 
-class OpenAIModerationCog(commands.Cog):
+class Omni(commands.Cog):
     """Cog for moderating messages using OpenAI's omni-moderation endpoint."""
 
     def __init__(self, bot):
