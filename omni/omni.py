@@ -14,13 +14,21 @@ class Omni(commands.Cog):
             moderation_threshold=0.5,
             timeout_duration=0,  # Duration in minutes
             log_channel=None,
-            debug_mode=False  # Debug mode toggle
+            debug_mode=False,  # Debug mode toggle
+            message_count=0,
+            moderated_count=0,
+            moderated_users=[],
+            category_counter={}
         )
         self.session = aiohttp.ClientSession()
-        self.message_count = 0
-        self.moderated_count = 0
-        self.moderated_users = set()
-        self.category_counter = Counter()
+
+    async def initialize(self):
+        all_guilds = await self.config.all_guilds()
+        for guild_id, data in all_guilds.items():
+            self.message_count = data.get("message_count", 0)
+            self.moderated_count = data.get("moderated_count", 0)
+            self.moderated_users = set(data.get("moderated_users", []))
+            self.category_counter = Counter(data.get("category_counter", {}))
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -32,6 +40,7 @@ class Omni(commands.Cog):
             return
 
         self.message_count += 1
+        await self.config.guild(guild).message_count.set(self.message_count)
 
         api_tokens = await self.bot.get_shared_api_tokens("openai")
         api_key = api_tokens.get("api_key")
@@ -58,10 +67,13 @@ class Omni(commands.Cog):
 
             if flagged:
                 self.moderated_count += 1
+                await self.config.guild(guild).moderated_count.set(self.moderated_count)
                 self.moderated_users.add(message.author.id)
+                await self.config.guild(guild).moderated_users.set(list(self.moderated_users))
                 for category, score in category_scores.items():
                     if score > 0:
                         self.category_counter[category] += 1
+                await self.config.guild(guild).category_counter.set(dict(self.category_counter))
                 await self.handle_moderation(message, category_scores)
 
             # Check if debug mode is enabled
