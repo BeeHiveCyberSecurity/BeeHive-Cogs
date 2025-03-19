@@ -68,6 +68,8 @@ class Omni(commands.Cog):
             c if unicodedata.category(c).startswith(('L', 'N')) else ' '
             for c in unicodedata.normalize('NFKD', text)
         )
+        # Handle special words/characters
+        text = text.replace('nègre', 'negro')
         # Replace multiple spaces with a single space
         text = re.sub(r'\s+', ' ', text).strip()
         return text
