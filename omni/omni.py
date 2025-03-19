@@ -204,7 +204,7 @@ class Omni(commands.Cog):
                 if log_channel:
                     embed = discord.Embed(
                         title="✨ Message moderated using AI",
-                        description=f"The following message was deleted from chat because it may have violated the rules of the server.\n```{message.content}```",
+                        description=f"The following message was deleted from chat because it may have violated the rules of the server, Discord's Terms of Service, or Discord's Community Guidelines..\n```{message.content}```",
                         color=0xff4545,
                         timestamp=datetime.utcnow()
                     )
@@ -230,8 +230,8 @@ class Omni(commands.Cog):
                 if log_channel:
                     embed = discord.Embed(
                         title="✨ Message processed using AI",
-                        description=f"The following message was processed and no danger was found\n```{message.content}```",
-                        color=0x2bbd8e,
+                        description=f"The following message was processed\n```{message.content}```",
+                        color=0xfffffe,
                         timestamp=datetime.utcnow()
                     )
                     embed.add_field(name="Sent by", value=f"<@{message.author.id}> - `{message.author.id}`", inline=True)
