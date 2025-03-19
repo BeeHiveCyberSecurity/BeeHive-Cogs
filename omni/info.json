@@ -1,15 +1,14 @@
 {
     "author": ["adminescalation", "escalateprivs"],
-    "description": "A cog for moderating messages using OpenAI's omni-moderation endpoint.",
-    "install_msg": "## :white_check_mark: Successfully installed OpenAI Omni.\nConfigure the cog using `[p]omni`",
-    "end_user_data_statement": "This cog stores server-specific configuration data such as API keys and moderation settings.",
+    "description": "AI-powered automatic text moderation using frontier moderation models from OpenAI. Get AI-powered moderation in your server for absolutely free",
+    "install_msg": "## :white_check_mark: Successfully installed Omni.\nConfigure the cog using `[p]omni` commands.\n\n**A note about OpenAI, models, and pricing...**\n\nWe'd like to highlight to you that OpenAI provides it's moderation endpoints for free - but chat and other OpenAI tools may cost you money. We're not responsible for any accidental AI usage, and the subsequent charges they incur. Moderation should not cost you money, so we'd recommend if you only intend to use OpenAI for moderation, you set a non-existantly low spend limit so you can't accidentally cost yourself money.",
+    "end_user_data_statement": "This cog stores server-specific configuration data such as API keys, moderation settings, and message statistics.",
     "name": "Omni",
-    "short": "Moderate messages using OpenAI's omni-moderation.",
+    "short": "AI-powered text moderation using frontier models.",
     "permissions": [
         "manage_messages",
-        "embed_links",
-        "manage_roles"
+        "embed_links"
     ],
     "min_bot_version": "3.5.0",
-    "requirements": ["aiohttp", "openai"]
+    "requirements": ["aiohttp"]
 }
