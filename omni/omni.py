@@ -79,14 +79,14 @@ class Omni(commands.Cog):
             log_channel = guild.get_channel(log_channel_id)
             if log_channel:
                 embed = discord.Embed(
-                    title="AI moderated a message",
+                    title="✨ AI moderated a message",
                     description=f"Message by {message.author.mention} was flagged and deleted.",
                     color=0xff4545
                 )
                 embed.add_field(name="Content", value=message.content, inline=False)
                 moderation_threshold = await self.config.guild(guild).moderation_threshold()
                 for category, score in category_scores.items():
-                    if score <= 0.00:
+                    if score == 0.00:
                         score_display = ":white_check_mark: Clean"
                     else:
                         score_display = f"**{score:.2f}**" if score > moderation_threshold else f"{score:.2f}"
@@ -108,7 +108,7 @@ class Omni(commands.Cog):
                 embed.add_field(name="Content", value=message.content, inline=False)
                 moderation_threshold = await self.config.guild(guild).moderation_threshold()
                 for category, score in category_scores.items():
-                    if score <= 0.00:
+                    if score == 0.00:
                         score_display = ":white_check_mark: Clean"
                     else:
                         score_display = f"**{score:.2f}**" if score > moderation_threshold else f"{score:.2f}"
