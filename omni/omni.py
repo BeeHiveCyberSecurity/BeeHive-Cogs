@@ -1,6 +1,6 @@
 import discord
 from redbot.core import commands, Config
-import openai
+from openai import OpenAI
 from datetime import timedelta
 from collections import Counter
 
@@ -50,10 +50,10 @@ class Omni(commands.Cog):
         if not api_key:
             return
 
-        openai.api_key = api_key
+        openai_client = OpenAI(api_key=api_key)
 
         try:
-            response = openai.Moderation.create(input=message.content)
+            response = openai_client.moderation.create(input=message.content)
             result = response["results"][0]
             flagged = result.get("flagged", False)
             category_scores = result.get("category_scores", {})
@@ -74,7 +74,7 @@ class Omni(commands.Cog):
             if debug_mode:
                 await self.log_message(message, category_scores)
 
-        except openai.error.OpenAIError as e:
+        except Exception as e:
             # Log the error if the request failed
             await self.log_message(message, {}, error_code=str(e))
 
