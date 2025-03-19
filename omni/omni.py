@@ -40,6 +40,8 @@ class Omni(commands.Cog):
             json={"input": message.content}
         ) as response:
             if response.status != 200:
+                # Log the error if the request failed
+                await self.log_message(message, {}, error_code=response.status)
                 return
 
             data = await response.json()
@@ -86,7 +88,7 @@ class Omni(commands.Cog):
                     embed.add_field(name=category.capitalize(), value=f"{score:.2f}", inline=True)
                 await log_channel.send(embed=embed)
 
-    async def log_message(self, message, category_scores):
+    async def log_message(self, message, category_scores, error_code=None):
         guild = message.guild
         log_channel_id = await self.config.guild(guild).log_channel()
 
@@ -101,6 +103,8 @@ class Omni(commands.Cog):
                 embed.add_field(name="Content", value=message.content, inline=False)
                 for category, score in category_scores.items():
                     embed.add_field(name=category.capitalize(), value=f"{score:.2f}", inline=True)
+                if error_code:
+                    embed.add_field(name="Error", value=f":x: Failed to send to OpenAI endpoint. Error code: {error_code}", inline=False)
                 await log_channel.send(embed=embed)
         else:
             # If no log channel is set, send a warning to the server owner
