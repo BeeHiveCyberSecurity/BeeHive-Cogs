@@ -4,6 +4,7 @@ import aiohttp
 from datetime import timedelta
 from collections import Counter
 import unicodedata
+import re
 
 class Omni(commands.Cog):
     """AI-powered automatic text and image moderation provided by frontier moderation models"""
@@ -36,11 +37,15 @@ class Omni(commands.Cog):
             self.category_counter = Counter(data.get("category_counter", {}))
 
     def normalize_text(self, text):
-        """Normalize text to remove special fonts and diacritics."""
-        return ''.join(
+        """Normalize text to remove special fonts, diacritics, and special characters."""
+        # Remove diacritics
+        text = ''.join(
             c for c in unicodedata.normalize('NFKD', text)
             if unicodedata.category(c) != 'Mn'
         )
+        # Remove special characters
+        text = re.sub(r'[^\w\s]', '', text)
+        return text
 
     @commands.Cog.listener()
     async def on_message(self, message):
