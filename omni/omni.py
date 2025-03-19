@@ -369,7 +369,7 @@ class Omni(commands.Cog):
             embed.add_field(name="Messages processed", value=f"**{message_count:,}** message{'s' if message_count != 1 else ''}", inline=True)
             embed.add_field(name="Messages moderated", value=f"**{moderated_count:,}** message{'s' if moderated_count != 1 else ''} ({moderated_message_percentage:.2f}%)", inline=True)
             embed.add_field(name="Users punished", value=f"**{len(moderated_users):,}** user{'s' if len(moderated_users) != 1 else ''} ({moderated_user_percentage:.2f}%)", inline=True)
-            embed.add_field(name="Estimated moderator time saved", value=f"**{time_saved_minutes}** minute{'s' if time_saved_minutes != 1 else ''} and **{time_saved_seconds}** second{'s' if time_saved_seconds != 1 else ''}", inline=True)
+            embed.add_field(name="Estimated moderator time saved", value=f"**{time_saved_minutes}** minute{'s' if time_saved_minutes != 1 else ''} and **{time_saved_seconds}** second{'s' if time_saved_seconds != 1 else ''}", inline=False)
             embed.add_field(name="Most frequent reasons", value=top_categories_bullets, inline=False)
 
             # Global statistics
@@ -394,7 +394,7 @@ class Omni(commands.Cog):
                 embed.add_field(name="Messages processed", value=f"**{global_message_count:,}** message{'s' if global_message_count != 1 else ''}", inline=True)
                 embed.add_field(name="Messages moderated", value=f"**{global_moderated_count:,}** message{'s' if global_moderated_count != 1 else ''} ({global_moderated_message_percentage:.2f}%)", inline=True)
                 embed.add_field(name="Users punished", value=f"**{len(global_moderated_users):,}** user{'s' if len(global_moderated_users) != 1 else ''} ({global_moderated_user_percentage:.2f}%)", inline=True)
-                embed.add_field(name="Estimated moderator time saved", value=f"**{global_time_saved_minutes}** minute{'s' if global_time_saved_minutes != 1 else ''} and **{global_time_saved_seconds}** second{'s' if global_time_saved_seconds != 1 else ''}", inline=True)
+                embed.add_field(name="Estimated moderator time saved", value=f"**{global_time_saved_minutes}** minute{'s' if global_time_saved_minutes != 1 else ''} and **{global_time_saved_seconds}** second{'s' if global_time_saved_seconds != 1 else ''}", inline=False)
                 embed.add_field(name="Most frequent reasons", value=global_top_categories_bullets, inline=False)
 
             await ctx.send(embed=embed)
