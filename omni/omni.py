@@ -107,7 +107,7 @@ class Omni(commands.Cog):
         pass
 
     @omni.command()
-    async def setthreshold(self, ctx, threshold: float):
+    async def threshold(self, ctx, threshold: float):
         """Set the moderation threshold (0 to 1)."""
         if 0 <= threshold <= 1:
             await self.config.guild(ctx.guild).moderation_threshold.set(threshold)
@@ -116,7 +116,7 @@ class Omni(commands.Cog):
             await ctx.send("Threshold must be between 0 and 1.")
 
     @omni.command()
-    async def settimeout(self, ctx, duration: int):
+    async def timeout(self, ctx, duration: int):
         """Set the timeout duration in minutes (0 for no timeout)."""
         if duration >= 0:
             await self.config.guild(ctx.guild).timeout_duration.set(duration)
@@ -125,14 +125,14 @@ class Omni(commands.Cog):
             await ctx.send("Timeout duration must be 0 or greater.")
 
     @omni.command()
-    async def setlogchannel(self, ctx, channel: discord.TextChannel):
+    async def logs(self, ctx, channel: discord.TextChannel):
         """Set the channel to log moderated messages."""
         await self.config.guild(ctx.guild).log_channel.set(channel.id)
         await ctx.send(f"Log channel set to {channel.mention}.")
 
     @omni.command()
     @commands.is_owner()
-    async def toggledebug(self, ctx):
+    async def debug(self, ctx):
         """Toggle debug mode to log all messages and their scores."""
         guild = ctx.guild
         current_debug_mode = await self.config.guild(guild).debug_mode()
