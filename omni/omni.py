@@ -246,17 +246,6 @@ class Omni(commands.Cog):
                     if error_code:
                         embed.add_field(name="Error", value=f":x: `{error_code}` Failed to send to OpenAI endpoint.", inline=False)
                     await log_channel.send(embed=embed)
-            else:
-                # If no log channel is set, send a warning to the server owner
-                owner = guild.owner
-                if owner:
-                    try:
-                        await owner.send(
-                            f"Warning: No log channel is set for the guild '{guild.name}'. "
-                            "Please set a log channel using the `[p]omni logs` command to enable message logging."
-                        )
-                    except discord.Forbidden:
-                        pass  # Handle cases where the bot doesn't have permission to DM the owner
         except Exception as e:
             raise RuntimeError(f"Failed to log message: {e}")
 
