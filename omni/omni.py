@@ -406,6 +406,15 @@ class Omni(commands.Cog):
                 embed.add_field(name="Estimated moderator time saved", value=global_time_saved_str, inline=False)
                 embed.add_field(name="Most frequent reasons", value=global_top_categories_bullets, inline=False)
 
+                # Offensiveness ranking
+                guilds_sorted_by_harmfulness = sorted(self.bot.guilds, key=lambda g: (await self.config.guild(g).moderated_count()) / (await self.config.guild(g).message_count() or 1), reverse=True)
+                rank = guilds_sorted_by_harmfulness.index(ctx.guild) + 1
+                total_guilds = len(guilds_sorted_by_harmfulness)
+                more_harmful_than_percentage = ((total_guilds - rank) / total_guilds) * 100
+                less_harmful_than_percentage = (rank / total_guilds) * 100
+
+                embed.add_field(name="Trust and safety analysis", value=f"This server is ranked {rank} out of {total_guilds} servers.\nThis server is statistically more harmful than {more_harmful_than_percentage:.2f}% of servers, and less harmful than {less_harmful_than_percentage:.2f}% of servers", inline=False)
+
             await ctx.send(embed=embed)
         except Exception as e:
             raise RuntimeError(f"Failed to display stats: {e}")
