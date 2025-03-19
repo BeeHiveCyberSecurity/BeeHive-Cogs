@@ -183,7 +183,7 @@ class Omni(commands.Cog):
     async def stats(self, ctx):
         """Show statistics of the moderation activity."""
         top_categories = self.category_counter.most_common(5)
-        top_categories_bullets = "\n".join([f"- {cat}: {count}" for cat, count in top_categories])
+        top_categories_bullets = "\n".join([f"- {cat.capitalize()}: {count}" for cat, count in top_categories])
         
         embed = discord.Embed(title="✨ AI is hard at work for you", color=0xfffffe)
         embed.add_field(name="Messages processed", value=str(self.message_count), inline=False)
