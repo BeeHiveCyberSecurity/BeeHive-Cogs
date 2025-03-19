@@ -1,5 +1,5 @@
 {
-    "author": ["adminescalation", "escalateprivs"],
+    "author": ["adminescalation"],
     "description": "AI-powered automatic text moderation using frontier moderation models from OpenAI. Get AI-powered moderation in your server for absolutely free",
     "install_msg": "## :white_check_mark: Successfully installed Omni.\nConfigure the cog using `[p]omni` commands.\n\n**A note about OpenAI, models, and pricing...**\n\nWe'd like to highlight to you that OpenAI provides it's moderation endpoints for free - but chat and other OpenAI tools may cost you money. We're not responsible for any accidental AI usage, and the subsequent charges they incur. Moderation should not cost you money, so we'd recommend if you only intend to use OpenAI for moderation, you set a non-existantly low spend limit so you can't accidentally cost yourself money.",
     "end_user_data_statement": "This cog stores server-specific configuration data such as API keys, moderation settings, and message statistics.",
