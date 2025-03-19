@@ -437,6 +437,34 @@ class Omni(commands.Cog):
         except Exception as e:
             raise RuntimeError(f"Failed to display settings: {e}")
 
+    @omni.command()
+    async def reasons(self, ctx):
+        """Show the categories and explanations of labels."""
+        try:
+            categories = {
+                "harassment": "Content that expresses, incites, or promotes harassing language towards any target.",
+                "harassment/threatening": "Harassment content that also includes violence or serious harm towards any target.",
+                "hate": "Content that expresses, incites, or promotes hate based on race, gender, ethnicity, religion, nationality, sexual orientation, disability status, or caste.",
+                "hate/threatening": "Hateful content that also includes violence or serious harm towards the targeted group based on race, gender, ethnicity, religion, nationality, sexual orientation, disability status, or caste.",
+                "illicit": "Content that gives advice or instruction on how to commit illicit acts.",
+                "illicit/violent": "The same types of content flagged by the illicit category, but also includes references to violence or procuring a weapon.",
+                "self-harm": "Content that promotes, encourages, or depicts acts of self-harm, such as suicide, cutting, and eating disorders.",
+                "self-harm/intent": "Content where the speaker expresses that they are engaging or intend to engage in acts of self-harm.",
+                "self-harm/instructions": "Content that encourages performing acts of self-harm or that gives instructions or advice on how to commit such acts.",
+                "sexual": "Content meant to arouse sexual excitement or that promotes sexual services.",
+                "sexual/minors": "Sexual content that includes an individual who is under 18 years old.",
+                "violence": "Content that depicts death, violence, or physical injury.",
+                "violence/graphic": "Content that depicts death, violence, or physical injury in graphic detail."
+            }
+
+            embed = discord.Embed(title="Label Categories and Explanations", color=discord.Color.blue())
+            for category, description in categories.items():
+                embed.add_field(name=category.capitalize(), value=description, inline=False)
+
+            await ctx.send(embed=embed)
+        except Exception as e:
+            raise RuntimeError(f"Failed to display reasons: {e}")
+
     def cog_unload(self):
         try:
             if self.session and not self.session.closed:
