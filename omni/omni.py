@@ -24,13 +24,17 @@ class Omni(commands.Cog):
             moderated_users=[],
             category_counter={},
             whitelisted_channels=[],
-            cog_version=self.VERSION
+            cog_version=self.VERSION,
+            image_count=0,
+            image_moderated_count=0
         )
         self.session = aiohttp.ClientSession()
         self.message_count = 0
         self.moderated_count = 0
         self.moderated_users = set()
         self.category_counter = Counter()
+        self.image_count = 0
+        self.image_moderated_count = 0
 
     async def initialize(self):
         all_guilds = await self.config.all_guilds()
@@ -39,6 +43,8 @@ class Omni(commands.Cog):
             self.moderated_count = data.get("moderated_count", 0)
             self.moderated_users = set(data.get("moderated_users", []))
             self.category_counter = Counter(data.get("category_counter", {}))
+            self.image_count = data.get("image_count", 0)
+            self.image_moderated_count = data.get("image_moderated_count", 0)
             
             # Check for version update
             stored_version = data.get("cog_version", "0.0.0")
@@ -154,38 +160,47 @@ class Omni(commands.Cog):
     async def analyze_images(self, attachments, api_key, message):
         flagged = False
         category_scores = {}
-        for attachment in attachments:
-            if attachment.content_type and attachment.content_type.startswith('image/'):
-                async with self.session.post(
-                    "https://api.openai.com/v1/moderations",
-                    headers={
-                        "Content-Type": "application/json",
-                        "Authorization": f"Bearer {api_key}"
-                    },
-                    json={
-                        "model": "omni-moderation-latest",
-                        "input": [
-                            {
-                                "type": "image_url",
-                                "image_url": {
-                                    "url": attachment.url
-                                }
-                            }
-                        ]
-                    }
-                ) as response:
-                    if response.status != 200:
-                        # Log the error if the request failed
-                        await self.log_message(message, {}, error_code=response.status)
-                        continue
+        image_urls = [attachment.url for attachment in attachments if attachment.content_type and attachment.content_type.startswith('image/')]
+        
+        # Extract URLs from message content
+        url_pattern = re.compile(r'(https?://\S+)')
+        image_urls.extend(url_pattern.findall(message.content))
 
-                    data = await response.json()
-                    result = data.get("results", [{}])[0]
-                    if result.get("flagged", False):
-                        flagged = True
-                    for category, score in result.get("category_scores", {}).items():
-                        if score > 0:
-                            category_scores[category] = max(category_scores.get(category, 0), score)
+        for image_url in image_urls:
+            self.image_count += 1
+            await self.config.guild(message.guild).image_count.set(self.image_count)
+            async with self.session.post(
+                "https://api.openai.com/v1/moderations",
+                headers={
+                    "Content-Type": "application/json",
+                    "Authorization": f"Bearer {api_key}"
+                },
+                json={
+                    "model": "omni-moderation-latest",
+                    "input": [
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": image_url
+                            }
+                        }
+                    ]
+                }
+            ) as response:
+                if response.status != 200:
+                    # Log the error if the request failed
+                    await self.log_message(message, {}, error_code=response.status)
+                    continue
+
+                data = await response.json()
+                result = data.get("results", [{}])[0]
+                if result.get("flagged", False):
+                    flagged = True
+                    self.image_moderated_count += 1
+                    await self.config.guild(message.guild).image_moderated_count.set(self.image_moderated_count)
+                for category, score in result.get("category_scores", {}).items():
+                    if score > 0:
+                        category_scores[category] = max(category_scores.get(category, 0), score)
         return flagged, category_scores
 
     async def handle_moderation(self, message, category_scores, image_flagged):
@@ -345,6 +360,8 @@ class Omni(commands.Cog):
         embed = discord.Embed(title="✨ AI is hard at work for you", color=0xfffffe)
         embed.add_field(name="Messages processed", value=str(self.message_count), inline=True)
         embed.add_field(name="Messages moderated", value=str(self.moderated_count), inline=True)
+        embed.add_field(name="Images processed", value=str(self.image_count), inline=True)
+        embed.add_field(name="Images moderated", value=str(self.image_moderated_count), inline=True)
         embed.add_field(name="Users punished", value=str(len(self.moderated_users)), inline=True)
         embed.add_field(name="Top violation categories", value=top_categories_bullets, inline=False)
         
