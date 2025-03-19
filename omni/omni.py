@@ -457,7 +457,7 @@ class Omni(commands.Cog):
                 "violence/graphic": "Content that depicts death, violence, or physical injury in graphic detail."
             }
 
-            embed = discord.Embed(title="What the AI moderator is looking for"), color=0xfffffe
+            embed = discord.Embed(title="What the AI moderator is looking for", color=0xfffffe)
             for category, description in categories.items():
                 embed.add_field(name=category.capitalize(), value=description, inline=False)
 
