@@ -141,7 +141,7 @@ class Omni(commands.Cog):
     async def update_category_counter(self, guild, counter_name, text_category_scores):
         category_counter = Counter(await self.config.guild(guild).get_attr(counter_name)())
         for category, score in text_category_scores.items():
-            if score > 0:
+            if score > 0.2:
                 category_counter[category] += 1
         await self.config.guild(guild).get_attr(counter_name).set(dict(category_counter))
 
@@ -193,7 +193,7 @@ class Omni(commands.Cog):
             if timeout_duration > 0:
                 try:
                     reason = "AI moderator action. Violation scores: " + ", ".join(
-                        f"{category}: {score:.2f}" for category, score in category_scores.items() if score > 0
+                        f"{category}: {score:.2f}" for category, score in category_scores.items() if score > 0.2
                     )
                     await message.author.timeout(timedelta(minutes=timeout_duration), reason=reason)
                 except discord.Forbidden:
