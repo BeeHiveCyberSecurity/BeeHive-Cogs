@@ -369,7 +369,8 @@ class Omni(commands.Cog):
             embed.add_field(name="Messages moderated", value=f"**{moderated_count:,}** message{'s' if moderated_count != 1 else ''} ({moderated_message_percentage:.2f}%)", inline=True)
             embed.add_field(name="Users punished", value=f"**{len(moderated_users):,}** user{'s' if len(moderated_users) != 1 else ''} ({moderated_user_percentage:.2f}%)", inline=True)
 
-            guilds_sorted_by_harmfulness = sorted(self.bot.guilds, key=lambda g: (await self.config.guild(g).moderated_count()) / (await self.config.guild(g).message_count() or 1), reverse=True)
+            # Calculate guilds sorted by harmfulness
+            guilds_sorted_by_harmfulness = await self._get_guilds_sorted_by_harmfulness()
             rank = guilds_sorted_by_harmfulness.index(ctx.guild) + 1
             total_guilds = len(guilds_sorted_by_harmfulness)
             more_harmful_than_percentage = ((total_guilds - rank) / total_guilds) * 100
@@ -417,6 +418,17 @@ class Omni(commands.Cog):
             await ctx.send(embed=embed)
         except Exception as e:
             raise RuntimeError(f"Failed to display stats: {e}")
+
+    async def _get_guilds_sorted_by_harmfulness(self):
+        """Helper function to sort guilds by harmfulness."""
+        guilds_with_harmfulness = []
+        for guild in self.bot.guilds:
+            message_count = await self.config.guild(guild).message_count() or 1
+            moderated_count = await self.config.guild(guild).moderated_count()
+            harmfulness = moderated_count / message_count
+            guilds_with_harmfulness.append((guild, harmfulness))
+        guilds_sorted_by_harmfulness = sorted(guilds_with_harmfulness, key=lambda x: x[1], reverse=True)
+        return [guild for guild, _ in guilds_sorted_by_harmfulness]
 
     @omni.command()
     @commands.admin_or_permissions(manage_guild=True)
