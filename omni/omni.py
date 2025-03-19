@@ -234,7 +234,8 @@ class Omni(commands.Cog):
                 )
                 embed.add_field(name="Content", value=message.content or "No content", inline=False)
                 moderation_threshold = await self.config.guild(guild).moderation_threshold()
-                for category, score in category_scores.items():
+                sorted_scores = sorted(category_scores.items(), key=lambda item: item[1], reverse=True)
+                for category, score in sorted_scores:
                     if score == 0.00:
                         score_display = ":white_check_mark: Clean"
                     else:
@@ -261,7 +262,8 @@ class Omni(commands.Cog):
                 )
                 embed.add_field(name="Content", value=message.content or "No content", inline=False)
                 moderation_threshold = await self.config.guild(guild).moderation_threshold()
-                for category, score in category_scores.items():
+                sorted_scores = sorted(category_scores.items(), key=lambda item: item[1], reverse=True)
+                for category, score in sorted_scores:
                     if score == 0.00:
                         score_display = ":white_check_mark: Clean"
                     else:
