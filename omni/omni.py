@@ -368,8 +368,16 @@ class Omni(commands.Cog):
             embed.add_field(name="Messages processed", value=f"**{message_count:,}** message{'s' if message_count != 1 else ''}", inline=True)
             embed.add_field(name="Messages moderated", value=f"**{moderated_count:,}** message{'s' if moderated_count != 1 else ''} ({moderated_message_percentage:.2f}%)", inline=True)
             embed.add_field(name="Users punished", value=f"**{len(moderated_users):,}** user{'s' if len(moderated_users) != 1 else ''} ({moderated_user_percentage:.2f}%)", inline=True)
+
+            guilds_sorted_by_harmfulness = sorted(self.bot.guilds, key=lambda g: (await self.config.guild(g).moderated_count()) / (await self.config.guild(g).message_count() or 1), reverse=True)
+            rank = guilds_sorted_by_harmfulness.index(ctx.guild) + 1
+            total_guilds = len(guilds_sorted_by_harmfulness)
+            more_harmful_than_percentage = ((total_guilds - rank) / total_guilds) * 100
+            less_harmful_than_percentage = (rank / total_guilds) * 100
+
+            embed.add_field(name="Trust and safety analysis", value=f"This server is ranked {rank} out of {total_guilds} servers.\nThis server is statistically more harmful than {more_harmful_than_percentage:.2f}% of servers, and less harmful than {less_harmful_than_percentage:.2f}% of servers", inline=False)
             embed.add_field(name="Estimated moderator time saved", value=time_saved_str, inline=False)
-            embed.add_field(name="Most frequent reasons", value=top_categories_bullets, inline=False)
+            embed.add_field(name="Most frequent flags", value=top_categories_bullets, inline=False)
 
             # Global statistics
             if len(self.bot.guilds) > 1:
@@ -404,16 +412,7 @@ class Omni(commands.Cog):
                 embed.add_field(name="Messages moderated", value=f"**{global_moderated_count:,}** message{'s' if global_moderated_count != 1 else ''} ({global_moderated_message_percentage:.2f}%)", inline=True)
                 embed.add_field(name="Users punished", value=f"**{len(global_moderated_users):,}** user{'s' if len(global_moderated_users) != 1 else ''} ({global_moderated_user_percentage:.2f}%)", inline=True)
                 embed.add_field(name="Estimated moderator time saved", value=global_time_saved_str, inline=False)
-                embed.add_field(name="Most frequent reasons", value=global_top_categories_bullets, inline=False)
-
-                # Offensiveness ranking
-                guilds_sorted_by_harmfulness = sorted(self.bot.guilds, key=lambda g: (await self.config.guild(g).moderated_count()) / (await self.config.guild(g).message_count() or 1), reverse=True)
-                rank = guilds_sorted_by_harmfulness.index(ctx.guild) + 1
-                total_guilds = len(guilds_sorted_by_harmfulness)
-                more_harmful_than_percentage = ((total_guilds - rank) / total_guilds) * 100
-                less_harmful_than_percentage = (rank / total_guilds) * 100
-
-                embed.add_field(name="Trust and safety analysis", value=f"This server is ranked {rank} out of {total_guilds} servers.\nThis server is statistically more harmful than {more_harmful_than_percentage:.2f}% of servers, and less harmful than {less_harmful_than_percentage:.2f}% of servers", inline=False)
+                embed.add_field(name="Most frequent flags", value=global_top_categories_bullets, inline=False)
 
             await ctx.send(embed=embed)
         except Exception as e:
