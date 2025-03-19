@@ -315,6 +315,7 @@ class Omni(commands.Cog):
     async def stats(self, ctx):
         """Show statistics of the moderation activity."""
         try:
+            # Local statistics
             top_categories = self.category_counter.most_common(5)
             top_categories_bullets = "\n".join([f"- {cat.capitalize()}: {count}" for cat, count in top_categories])
             
@@ -323,7 +324,29 @@ class Omni(commands.Cog):
             embed.add_field(name="Messages moderated", value=str(self.moderated_count), inline=True)
             embed.add_field(name="Users punished", value=str(len(self.moderated_users)), inline=True)
             embed.add_field(name="Top violation categories", value=top_categories_bullets, inline=False)
-            
+
+            # Global statistics
+            if len(self.bot.guilds) > 1:
+                global_message_count = 0
+                global_moderated_count = 0
+                global_moderated_users = set()
+                global_category_counter = Counter()
+
+                all_guilds = await self.config.all_guilds()
+                for data in all_guilds.values():
+                    global_message_count += data.get("message_count", 0)
+                    global_moderated_count += data.get("moderated_count", 0)
+                    global_moderated_users.update(data.get("moderated_users", []))
+                    global_category_counter.update(data.get("category_counter", {}))
+
+                global_top_categories = global_category_counter.most_common(5)
+                global_top_categories_bullets = "\n".join([f"- {cat.capitalize()}: {count}" for cat, count in global_top_categories])
+
+                embed.add_field(name="Global Messages processed", value=str(global_message_count), inline=True)
+                embed.add_field(name="Global Messages moderated", value=str(global_moderated_count), inline=True)
+                embed.add_field(name="Global Users punished", value=str(len(global_moderated_users)), inline=True)
+                embed.add_field(name="Global Top violation categories", value=global_top_categories_bullets, inline=False)
+
             await ctx.send(embed=embed)
         except Exception as e:
             raise RuntimeError(f"Failed to display stats: {e}")
