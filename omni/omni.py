@@ -108,7 +108,7 @@ class Omni(commands.Cog):
                 embed.add_field(name="Content", value=message.content, inline=False)
                 moderation_threshold = await self.config.guild(guild).moderation_threshold()
                 for category, score in category_scores.items():
-                    if score <= 0:
+                    if score <= 0.01:
                         score_display = ":white_check_mark: Clean"
                     else:
                         score_display = f"**{score:.2f}**" if score > moderation_threshold else f"{score:.2f}"
