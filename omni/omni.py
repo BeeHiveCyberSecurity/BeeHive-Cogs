@@ -20,7 +20,6 @@ class Omni(commands.Cog):
             moderated_users=[],
             category_counter={}
         )
-        self.client = OpenAI()
         self.message_count = 0
         self.moderated_count = 0
         self.moderated_users = set()
@@ -50,6 +49,8 @@ class Omni(commands.Cog):
         api_key = api_tokens.get("api_key")
         if not api_key:
             return
+
+        self.client = OpenAI(api_key=api_key)
 
         try:
             response = self.client.moderations.create(
