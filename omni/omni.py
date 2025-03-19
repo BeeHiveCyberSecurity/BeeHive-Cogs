@@ -153,7 +153,7 @@ class Omni(commands.Cog):
         ) as response:
             if response.status != 200:
                 # Log the error if the request failed
-                await self.log_message(message, {}, error_code=response.status)
+                await self.log_message(message, {}, False, error_code=response.status)
                 return False, {}
 
             data = await response.json()
@@ -194,7 +194,7 @@ class Omni(commands.Cog):
             ) as response:
                 if response.status != 200:
                     # Log the error if the request failed
-                    await self.log_message(message, {}, error_code=response.status)
+                    await self.log_message(message, {}, False, error_code=response.status)
                     continue
 
                 data = await response.json()
