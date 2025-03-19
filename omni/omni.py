@@ -9,7 +9,7 @@ import re
 class Omni(commands.Cog):
     """AI-powered automatic text and image moderation provided by frontier moderation models"""
 
-    VERSION = "0.0.2"
+    VERSION = "0.0.3"
 
     def __init__(self, bot):
         self.bot = bot
@@ -23,6 +23,7 @@ class Omni(commands.Cog):
             moderated_count=0,
             moderated_users=[],
             category_counter={},
+            whitelisted_channels=[],
             cog_version=self.VERSION
         )
         self.session = aiohttp.ClientSession()
@@ -81,6 +82,11 @@ class Omni(commands.Cog):
 
         guild = message.guild
         if not guild:
+            return
+
+        # Check if the channel is whitelisted
+        whitelisted_channels = await self.config.guild(guild).whitelisted_channels()
+        if message.channel.id in whitelisted_channels:
             return
 
         self.message_count += 1
@@ -204,6 +210,7 @@ class Omni(commands.Cog):
         pass
 
     @omni.command()
+    @commands.admin_or_permissions(manage_guild=True)
     async def threshold(self, ctx, threshold: float):
         """Set the moderation threshold (0 to 1)."""
         if 0 <= threshold <= 1:
@@ -213,6 +220,7 @@ class Omni(commands.Cog):
             await ctx.send("Threshold must be between 0 and 1.")
 
     @omni.command()
+    @commands.admin_or_permissions(manage_guild=True)
     async def timeout(self, ctx, duration: int):
         """Set the timeout duration in minutes (0 for no timeout)."""
         if duration >= 0:
@@ -222,10 +230,33 @@ class Omni(commands.Cog):
             await ctx.send("Timeout duration must be 0 or greater.")
 
     @omni.command()
+    @commands.admin_or_permissions(manage_guild=True)
     async def logs(self, ctx, channel: discord.TextChannel):
         """Set the channel to log moderated messages."""
         await self.config.guild(ctx.guild).log_channel.set(channel.id)
         await ctx.send(f"Log channel set to {channel.mention}.")
+
+    @omni.command()
+    @commands.admin_or_permissions(manage_guild=True)
+    async def whitelist(self, ctx, channel: discord.TextChannel):
+        """Add or remove a channel from the whitelist."""
+        guild = ctx.guild
+        whitelisted_channels = await self.config.guild(guild).whitelisted_channels()
+        changelog = []
+
+        if channel.id in whitelisted_channels:
+            whitelisted_channels.remove(channel.id)
+            changelog.append(f"Removed: {channel.mention}")
+        else:
+            whitelisted_channels.append(channel.id)
+            changelog.append(f"Added: {channel.mention}")
+
+        await self.config.guild(guild).whitelisted_channels.set(whitelisted_channels)
+
+        if changelog:
+            changelog_message = "\n".join(changelog)
+            embed = discord.Embed(title="Whitelist Changelog", description=changelog_message, color=discord.Color.blue())
+            await ctx.send(embed=embed)
 
     @omni.command()
     @commands.is_owner()
@@ -253,6 +284,7 @@ class Omni(commands.Cog):
         await ctx.send(embed=embed)
 
     @omni.command()
+    @commands.admin_or_permissions(manage_guild=True)
     async def settings(self, ctx):
         """Show the current settings of the cog."""
         guild = ctx.guild
@@ -260,15 +292,18 @@ class Omni(commands.Cog):
         timeout_duration = await self.config.guild(guild).timeout_duration()
         log_channel_id = await self.config.guild(guild).log_channel()
         debug_mode = await self.config.guild(guild).debug_mode()
+        whitelisted_channels = await self.config.guild(guild).whitelisted_channels()
 
         log_channel = guild.get_channel(log_channel_id) if log_channel_id else "Not set"
         log_channel_name = log_channel.mention if log_channel else "Not set"
+        whitelisted_channels_names = ", ".join([guild.get_channel(ch_id).mention for ch_id in whitelisted_channels if guild.get_channel(ch_id)]) or "None"
 
         embed = discord.Embed(title="Current Omni Settings", color=discord.Color.green())
         embed.add_field(name="Moderation Threshold", value=str(moderation_threshold), inline=True)
         embed.add_field(name="Timeout Duration", value=f"{timeout_duration} minutes", inline=True)
         embed.add_field(name="Log Channel", value=log_channel_name, inline=True)
         embed.add_field(name="Debug Mode", value="Enabled" if debug_mode else "Disabled", inline=True)
+        embed.add_field(name="Whitelisted Channels", value=whitelisted_channels_names, inline=False)
 
         await ctx.send(embed=embed)
 
