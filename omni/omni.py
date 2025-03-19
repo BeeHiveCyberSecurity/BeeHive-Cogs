@@ -172,8 +172,8 @@ class Omni(commands.Cog):
                         color=0xff4545,
                         timestamp=datetime.utcnow()
                     )
-                    embed.add_field(name="Sender", value=f"<@{message.author.id}> - {message.author.id}", inline=True)
-                    embed.add_field(name="Channel", value=f"<#{message.channel.id}> - {message.channel.id}", inline=True)
+                    embed.add_field(name="Sent by", value=f"<@{message.author.id}> - `{message.author.id}`", inline=True)
+                    embed.add_field(name="Sent in", value=f"<#{message.channel.id}> - `{message.channel.id}`", inline=True)
                     embed.add_field(name="Violation scores", value=f"", inline=False)
                     moderation_threshold = await self.config.guild(guild).moderation_threshold()
                     sorted_scores = sorted(category_scores.items(), key=lambda item: item[1], reverse=True)[:3]
@@ -196,14 +196,14 @@ class Omni(commands.Cog):
                 log_channel = guild.get_channel(log_channel_id)
                 if log_channel:
                     embed = discord.Embed(
-                        title="AI screened a message and found no threat",
-                        description=f"Message by {message.author.mention} was logged.",
-                        color=discord.Color.blue(),
+                        title="✨ Message processed using AI",
+                        description=f"The following message was processed and no danger was found\n```{message.content}```",
+                        color=0x2bbd8e,
                         timestamp=datetime.utcnow()
                     )
-                    embed.add_field(name="Content", value=message.content or "No content", inline=False)
-                    embed.add_field(name="Sender", value=f"{message.author} (ID: {message.author.id})", inline=True)
-                    embed.add_field(name="Channel", value=f"{message.channel} (ID: {message.channel.id})", inline=True)
+                    embed.add_field(name="Sent by", value=f"<@{message.author.id}> - `{message.author.id}`", inline=True)
+                    embed.add_field(name="Sent in", value=f"<#{message.channel.id}> - `{message.channel.id}`", inline=True)
+                    embed.add_field(name="Violation scores", value=f"", inline=False)
                     moderation_threshold = await self.config.guild(guild).moderation_threshold()
                     sorted_scores = sorted(category_scores.items(), key=lambda item: item[1], reverse=True)[:3]
                     for category, score in sorted_scores:
@@ -213,7 +213,7 @@ class Omni(commands.Cog):
                             score_display = f"**{score:.2f}**" if score > moderation_threshold else f"{score:.2f}"
                         embed.add_field(name=category.capitalize(), value=score_display, inline=True)
                     if error_code:
-                        embed.add_field(name="Error", value=f":x: Failed to send to OpenAI endpoint. Error code: {error_code}", inline=False)
+                        embed.add_field(name="Error", value=f":x: `{error_code}` Failed to send to OpenAI endpoint.", inline=False)
                     await log_channel.send(embed=embed)
             else:
                 # If no log channel is set, send a warning to the server owner
