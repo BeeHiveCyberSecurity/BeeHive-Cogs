@@ -56,8 +56,9 @@ class Omni(commands.Cog):
                 for c in unicodedata.normalize('NFKD', text)
             )
             # Handle special words/characters
-            text = text.replace('nègre', 'negro')
-            text = text.replace('reggin', 'nigger')
+            replacements = {'nègre': 'negro', 'reggin': 'nigger'}
+            for word, replacement in replacements.items():
+                text = text.replace(word, replacement)
             # Replace multiple spaces with a single space
             text = re.sub(r'\s+', ' ', text).strip()
             return text
@@ -74,25 +75,19 @@ class Omni(commands.Cog):
 
     async def process_message(self, message):
         try:
-            if message.author.bot:
+            if message.author.bot or not message.guild:
                 return
 
             guild = message.guild
-            if not guild:
-                return
 
             # Check if the channel is whitelisted
             whitelisted_channels = await self.config.guild(guild).whitelisted_channels()
             if message.channel.id in whitelisted_channels:
                 return
 
-            # Update per-server statistics
-            message_count = await self.config.guild(guild).message_count() + 1
-            await self.config.guild(guild).message_count.set(message_count)
-
-            # Update global statistics
-            global_message_count = await self.config.global_message_count() + 1
-            await self.config.global_message_count.set(global_message_count)
+            # Update per-server and global statistics
+            await self.increment_statistic(guild, 'message_count')
+            await self.increment_statistic(None, 'global_message_count')
 
             api_tokens = await self.bot.get_shared_api_tokens("openai")
             api_key = api_tokens.get("api_key")
@@ -110,34 +105,7 @@ class Omni(commands.Cog):
             text_flagged, text_category_scores = await self.analyze_text(normalized_content, api_key, message)
 
             if text_flagged:
-                # Update per-server statistics
-                moderated_count = await self.config.guild(guild).moderated_count() + 1
-                await self.config.guild(guild).moderated_count.set(moderated_count)
-
-                moderated_users = set(await self.config.guild(guild).moderated_users())
-                moderated_users.add(message.author.id)
-                await self.config.guild(guild).moderated_users.set(list(moderated_users))
-
-                category_counter = Counter(await self.config.guild(guild).category_counter())
-                for category, score in text_category_scores.items():
-                    if score > 0:
-                        category_counter[category] += 1
-                await self.config.guild(guild).category_counter.set(dict(category_counter))
-
-                # Update global statistics
-                global_moderated_count = await self.config.global_moderated_count() + 1
-                await self.config.global_moderated_count.set(global_moderated_count)
-
-                global_moderated_users = set(await self.config.global_moderated_users())
-                global_moderated_users.add(message.author.id)
-                await self.config.global_moderated_users.set(list(global_moderated_users))
-
-                global_category_counter = Counter(await self.config.global_category_counter())
-                for category, score in text_category_scores.items():
-                    if score > 0:
-                        global_category_counter[category] += 1
-                await self.config.global_category_counter.set(dict(global_category_counter))
-
+                await self.update_moderation_stats(guild, message, text_category_scores)
                 await self.handle_moderation(message, text_category_scores)
 
             # Check if debug mode is enabled
@@ -146,6 +114,36 @@ class Omni(commands.Cog):
                 await self.log_message(message, text_category_scores)
         except Exception as e:
             raise RuntimeError(f"Error processing message: {e}")
+
+    async def increment_statistic(self, guild, stat_name):
+        if guild:
+            current_value = await self.config.guild(guild).get_attr(stat_name)() + 1
+            await self.config.guild(guild).get_attr(stat_name).set(current_value)
+        else:
+            current_value = await self.config.get_attr(stat_name)() + 1
+            await self.config.get_attr(stat_name).set(current_value)
+
+    async def update_moderation_stats(self, guild, message, text_category_scores):
+        await self.increment_statistic(guild, 'moderated_count')
+        await self.increment_statistic(None, 'global_moderated_count')
+
+        await self.update_user_list(guild, 'moderated_users', message.author.id)
+        await self.update_user_list(None, 'global_moderated_users', message.author.id)
+
+        await self.update_category_counter(guild, 'category_counter', text_category_scores)
+        await self.update_category_counter(None, 'global_category_counter', text_category_scores)
+
+    async def update_user_list(self, guild, list_name, user_id):
+        user_list = set(await self.config.guild(guild).get_attr(list_name)())
+        user_list.add(user_id)
+        await self.config.guild(guild).get_attr(list_name).set(list(user_list))
+
+    async def update_category_counter(self, guild, counter_name, text_category_scores):
+        category_counter = Counter(await self.config.guild(guild).get_attr(counter_name)())
+        for category, score in text_category_scores.items():
+            if score > 0:
+                category_counter[category] += 1
+        await self.config.guild(guild).get_attr(counter_name).set(dict(category_counter))
 
     async def analyze_text(self, text, api_key, message):
         try:
@@ -188,9 +186,7 @@ class Omni(commands.Cog):
             try:
                 await message.delete()
                 # Add user to moderated users list if message is deleted
-                moderated_users = set(await self.config.guild(guild).moderated_users())
-                moderated_users.add(message.author.id)
-                await self.config.guild(guild).moderated_users.set(list(moderated_users))
+                await self.update_user_list(guild, 'moderated_users', message.author.id)
             except discord.NotFound:
                 pass  
 
@@ -218,10 +214,7 @@ class Omni(commands.Cog):
                     moderation_threshold = await self.config.guild(guild).moderation_threshold()
                     sorted_scores = sorted(category_scores.items(), key=lambda item: item[1], reverse=True)[:3]
                     for category, score in sorted_scores:
-                        if score == 0.00:
-                            score_display = ":white_check_mark: Clean"
-                        else:
-                            score_display = f"**{score:.2f}**" if score > moderation_threshold else f"{score:.2f}"
+                        score_display = f"**{score:.2f}**" if score > moderation_threshold else f"{score:.2f}"
                         embed.add_field(name=category.capitalize(), value=score_display, inline=True)
                     await log_channel.send(embed=embed)
         except Exception as e:
@@ -247,10 +240,7 @@ class Omni(commands.Cog):
                     moderation_threshold = await self.config.guild(guild).moderation_threshold()
                     sorted_scores = sorted(category_scores.items(), key=lambda item: item[1], reverse=True)[:3]
                     for category, score in sorted_scores:
-                        if score == 0.00:
-                            score_display = ":white_check_mark: Clean"
-                        else:
-                            score_display = f"**{score:.2f}**" if score > moderation_threshold else f"{score:.2f}"
+                        score_display = f"**{score:.2f}**" if score > moderation_threshold else f"{score:.2f}"
                         embed.add_field(name=category.capitalize(), value=score_display, inline=True)
                     if error_code:
                         embed.add_field(name="Error", value=f":x: `{error_code}` Failed to send to OpenAI endpoint.", inline=False)
