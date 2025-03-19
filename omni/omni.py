@@ -182,6 +182,10 @@ class Omni(commands.Cog):
             # Delete the message
             try:
                 await message.delete()
+                # Add user to moderated users list if message is deleted
+                moderated_users = set(await self.config.guild(guild).moderated_users())
+                moderated_users.add(message.author.id)
+                await self.config.guild(guild).moderated_users.set(list(moderated_users))
             except discord.NotFound:
                 pass  
 
