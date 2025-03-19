@@ -368,35 +368,36 @@ class Omni(commands.Cog):
             embed.add_field(name="Messages processed", value=f"**{message_count:,}** message{'s' if message_count != 1 else ''}", inline=True)
             embed.add_field(name="Messages moderated", value=f"**{moderated_count:,}** message{'s' if moderated_count != 1 else ''} ({moderated_message_percentage:.2f}%)", inline=True)
             embed.add_field(name="Users punished", value=f"**{len(moderated_users):,}** user{'s' if len(moderated_users) != 1 else ''} ({moderated_user_percentage:.2f}%)", inline=True)
-
-            # Calculate guilds sorted by harmfulness
-            guilds_sorted_by_harmfulness = await self._get_guilds_sorted_by_harmfulness()
-            rank = guilds_sorted_by_harmfulness.index(ctx.guild) + 1
-            total_guilds = len(guilds_sorted_by_harmfulness)
-            more_harmful_than_percentage = ((total_guilds - rank) / total_guilds) * 100
-            less_harmful_than_percentage = (rank / total_guilds) * 100
-
-            def get_ordinal_suffix(n):
-                if 10 <= n % 100 <= 20:
-                    suffix = 'th'
-                else:
-                    suffix = {1: 'st', 2: 'nd', 3: 'rd'}.get(n % 10, 'th')
-                return suffix
-
-            rank_suffix = get_ordinal_suffix(rank)
-            embed.add_field(name="Trust and safety analysis", value=f"This server takes **{rank}{rank_suffix}** place out of **{total_guilds} servers**. In this scale, 1st place is the most abusive server, and your goal is to place as low as possible in position.\n\nThis server is statistically more harmful than {more_harmful_than_percentage:.2f}% of servers, and less harmful than {less_harmful_than_percentage:.2f}% of servers. The goal is to be less harmful than as many server as possible, as less harmful communities are most likely to foster more engagement and growth than their more abusive counterparts.", inline=False)
-
-            if rank in [1, 2, 3]:
-                embed.add_field(name="Discord compliance", value=":rotating_light: **Extreme risk**", inline=False)
-            elif rank in range(4, 11):
-                embed.add_field(name="Discord compliance", value=":warning: **Approaching risk**", inline=False)
-            else:
-                embed.add_field(name="Discord compliance", value=":white_check_mark: **Aim for continuing improvement**", inline=False)
             embed.add_field(name="Estimated moderator time saved", value=time_saved_str, inline=False)
             embed.add_field(name="Most frequent flags", value=top_categories_bullets, inline=False)
 
-            # Global statistics
-            if len(self.bot.guilds) > 1:
+            # Show global stats, trust and safety analysis, and discord compliance if in more than 45 servers
+            if len(self.bot.guilds) > 45:
+                # Calculate guilds sorted by harmfulness
+                guilds_sorted_by_harmfulness = await self._get_guilds_sorted_by_harmfulness()
+                rank = guilds_sorted_by_harmfulness.index(ctx.guild) + 1
+                total_guilds = len(guilds_sorted_by_harmfulness)
+                more_harmful_than_percentage = ((total_guilds - rank) / total_guilds) * 100
+                less_harmful_than_percentage = (rank / total_guilds) * 100
+
+                def get_ordinal_suffix(n):
+                    if 10 <= n % 100 <= 20:
+                        suffix = 'th'
+                    else:
+                        suffix = {1: 'st', 2: 'nd', 3: 'rd'}.get(n % 10, 'th')
+                    return suffix
+
+                rank_suffix = get_ordinal_suffix(rank)
+                embed.add_field(name="Trust and safety analysis", value=f"This server takes **{rank}{rank_suffix}** place out of **{total_guilds} servers**. In this scale, 1st place is the most abusive server, and your goal is to place as low as possible in position.\n\nThis server is statistically more harmful than {more_harmful_than_percentage:.2f}% of servers, and less harmful than {less_harmful_than_percentage:.2f}% of servers. The goal is to be less harmful than as many server as possible, as less harmful communities are most likely to foster more engagement and growth than their more abusive counterparts.", inline=False)
+
+                if rank in [1, 2, 3]:
+                    embed.add_field(name="Discord compliance", value=":rotating_light: **Extreme risk**", inline=False)
+                elif rank in range(4, 11):
+                    embed.add_field(name="Discord compliance", value=":warning: **Approaching risk**", inline=False)
+                else:
+                    embed.add_field(name="Discord compliance", value=":white_check_mark: **Aim for continuing improvement**", inline=False)
+
+                # Global statistics
                 global_message_count = await self.config.global_message_count()
                 global_moderated_count = await self.config.global_moderated_count()
                 global_moderated_users = await self.config.global_moderated_users()
