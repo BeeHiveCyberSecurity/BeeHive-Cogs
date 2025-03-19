@@ -34,7 +34,7 @@ Access detailed weather information, forecasts, and historical data for any loca
 
 
 ```
-[p]cog install BeeHive-Cogs weatherpro
+[p]cog install BeeHiveSafety weatherpro
 ```
 ```
 [p]load weatherpro
@@ -46,7 +46,7 @@ Access detailed weather information, forecasts, and historical data for any loca
 A nice, functional ping-and-speedtest cog that shows your host latency, transit latency, download speed, and upload speed in a neat, orderly, no-frills embed. If your bot is hosted on a poor quality connection, includes a special offer when detected. `[p]ping`.
 
 ```
-[p]cog install BeeHive-Cogs ping
+[p]cog install BeeHiveSafety ping
 ```
 ```
 [p]load ping
@@ -57,7 +57,7 @@ A nice, functional ping-and-speedtest cog that shows your host latency, transit 
 Help manage unruly, unsightly, and otherwise annoying nicknames/screennames in your server. Purify and normalize visually obnoxious names manually, or enable automatic cleanups to keep your server tidy. `[p]nickname`.
 
 ```
-[p]cog install BeeHive-Cogs names
+[p]cog install BeeHiveSafety names
 ```
 ```
 [p]load names
@@ -68,7 +68,7 @@ Help manage unruly, unsightly, and otherwise annoying nicknames/screennames in y
 Passively detect and remove known malicious websites sent in your server's chats. `[p]antiphishing`.
 
 ```
-[p]cog install BeeHive-Cogs antiphishing
+[p]cog install BeeHiveSafety antiphishing
 ```
 ```
 [p]load antiphishing
@@ -79,7 +79,7 @@ Passively detect and remove known malicious websites sent in your server's chats
 Interactive features to let you explore and search for aircraft by their registrations, squawks, ICAO 24-bit addresses, and more, as well as fetch information about airports like locations, photos, forecasts, and more. `[p]aircraft`, `[p]airport`.
 
 ```
-[p]cog install BeeHive-Cogs skysearch
+[p]cog install BeeHiveSafety skysearch
 ```
 ```
 [p]load skysearch
@@ -90,7 +90,7 @@ Interactive features to let you explore and search for aircraft by their registr
 Set up and manage pre-defined disclaimers that attach to users of particular significance, like lawyers, financial advisors, or other professions where a disclaimer may be warranted as a responsible disclosure. `[p]disclaimers`.
 
 ```
-[p]cog install BeeHive-Cogs disclaimers
+[p]cog install BeeHiveSafety disclaimers
 ```
 ```
 [p]load disclaimers
@@ -101,7 +101,7 @@ Set up and manage pre-defined disclaimers that attach to users of particular sig
 Provides detailed information about your Discord server, including member statistics, channel counts, role information, and more. Useful to keep track of various server metrics and check if the server is configured, relatively, correctly. `[p]serverinfo`.
 
 ```
-[p]cog install BeeHive-Cogs serverinfo
+[p]cog install BeeHiveSafety serverinfo
 ```
 ```
 [p]load serverinfo
@@ -112,7 +112,7 @@ Provides detailed information about your Discord server, including member statis
 Manage and track invite links for your Discord server. This cog allows you to see who invited whom, track the number of uses for each invite link, and generate new invite links with specific settings. Useful for community growth and moderation. `[p]invites`.
 
 ```
-[p]cog install BeeHive-Cogs invites
+[p]cog install BeeHiveSafety invites
 ```
 ```
 [p]load invites
@@ -123,26 +123,11 @@ Manage and track invite links for your Discord server. This cog allows you to se
 Keep track of various holidays and special events from around the world. This cog allows you to fetch information about upcoming holidays as well as set reminders for holidays in your region. Perfect for community engagement and planning events. `[p]holiday`, `[p]holidayset`.
 
 ```
-[p]cog install BeeHive-Cogs holidays
+[p]cog install BeeHiveSafety holidays
 ```
 ```
 [p]load holidays
 ```
-
-
-### [meetings](https://github.com/BeeHiveSafety/BeeHive-Cogs/tree/main/meetings)
-
-Organize and manage meetings directly within your Discord server. This cog allows you to schedule meetings, send reminders, and keep track of attendees. Perfect for community managers, project teams, and any group that needs to coordinate regular meetings. `[p]meeting`, `[p]meetingset`.
-
-```
-[p]cog install BeeHive-Cogs meetings
-```
-```
-[p]load meetings
-```
-
-
-
 
 ### [products](https://github.com/BeeHiveSafety/BeeHive-Cogs/tree/main/products)
 
@@ -161,7 +146,7 @@ Brand cogs are cogs we make that are intended to integrate other third party ser
 Integrate the AbuseIPDB API with your Red-DiscordBot to check and report IP addresses for abusive activity. This cog allows you to query the reputation of an IP address and report malicious IPs directly from your Discord server. `[p]abuseipdb`.
 
 ```
-[p]cog install BeeHive-Cogs abuseipdb
+[p]cog install BeeHiveSafety abuseipdb
 ```
 ```
 [p]load abuseipdb
@@ -172,7 +157,7 @@ Integrate the AbuseIPDB API with your Red-DiscordBot to check and report IP addr
 Utilize a multitude of advanced Cloudflare tools thru Discord, including the Cloudflare URL Scanner. For the bot owner, unlock the ability to interact with multiple Cloudflare products you utilize thru your Red-DiscordBot instance.
 
 ```
-[p]cog install BeeHive-Cogs cloudflare
+[p]cog install BeeHiveSafety cloudflare
 ```
 ```
 [p]load cloudflare
@@ -183,7 +168,7 @@ Utilize a multitude of advanced Cloudflare tools thru Discord, including the Clo
 Utilize the VirusTotal API with a free API key to scan and analyze files for potential threats and malicious content. `[p]virustotal`.
 
 ```
-[p]cog install BeeHive-Cogs virustotal
+[p]cog install BeeHiveSafety virustotal
 ```
 ```
 [p]load virustotal
@@ -194,7 +179,7 @@ Utilize the VirusTotal API with a free API key to scan and analyze files for pot
 Leverage the power of the URLScan.io API with a `free` URLScan API Key to evaluate URLs for safety and security. Enable `[p]urlscan autoscan` to automatically monitor and protect your chat from potentially harmful links. `[p]urlscan`.
 
 ```
-[p]cog install BeeHive-Cogs urlscan
+[p]cog install BeeHiveSafety urlscan
 ```
 ```
 [p]load urlscan
@@ -208,22 +193,25 @@ Leverage the power of the URLScan.io API with a `free` URLScan API Key to evalua
 Integrate the Ransomware.live API with your Red-DiscordBot to monitor and receive updates on the latest ransomware activities as well as query information about recent and historical ransomware attacks.`[p]ransomware`.
 
 ```
-[p]cog install BeeHive-Cogs ransomwaredotlive
+[p]cog install BeeHiveSafety ransomwaredotlive
 ```
 ```
 [p]load ransomwaredotlive
 ```
 
-### [ncmec](https://github.com/BeeHiveSafety/BeeHive-Cogs/tree/main/ncmec)
+### [omni](https://github.com/BeeHiveSafety/BeeHive-Cogs/tree/main/omni)
 
-Integrate the National Center for Missing & Exploited Children (NCMEC) API with your Red-DiscordBot to query information about missing persons. Planned, integrate with Microsoft Moderator to automatically detect and report suspected CSAM to NCMEC.
+Utilize OpenAI's frontier moderation models to keep chat clean in your server for free. `[p]omni`
+```
+[p]cog install BeeHiveSafety omni
+```
+```
+[p]load omni
+```
 
-```
-[p]cog install BeeHive-Cogs ncmec
-```
-```
-[p]load ncmec
-```
+
+
+
 
 
 
