@@ -129,7 +129,7 @@ class Omni(commands.Cog):
     @commands.admin_or_permissions(manage_guild=True)
     @commands.group()
     async def omni(self, ctx):
-        """Commands for configuring OpenAI moderation."""
+        """AI-powered automatic text and image moderation provided by frontier moderation models"""
         pass
 
     @omni.command()
