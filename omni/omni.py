@@ -9,18 +9,21 @@ import re
 class Omni(commands.Cog):
     """AI-powered automatic text and image moderation provided by frontier moderation models"""
 
+    VERSION = "0.0.1"
+
     def __init__(self, bot):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=1234567890)
         self.config.register_guild(
             moderation_threshold=0.5,
-            timeout_duration=0,  # Duration in minutes
+            timeout_duration=0,
             log_channel=None,
-            debug_mode=False,  # Debug mode toggle
+            debug_mode=False,
             message_count=0,
             moderated_count=0,
             moderated_users=[],
-            category_counter={}
+            category_counter={},
+            cog_version=self.VERSION
         )
         self.session = aiohttp.ClientSession()
         self.message_count = 0
@@ -35,6 +38,29 @@ class Omni(commands.Cog):
             self.moderated_count = data.get("moderated_count", 0)
             self.moderated_users = set(data.get("moderated_users", []))
             self.category_counter = Counter(data.get("category_counter", {}))
+            
+            # Check for version update
+            stored_version = data.get("cog_version", "0.0.0")
+            if stored_version != self.VERSION:
+                await self.notify_version_update(guild_id)
+                await self.config.guild_from_id(guild_id).cog_version.set(self.VERSION)
+
+    async def notify_version_update(self, guild_id):
+        guild = self.bot.get_guild(guild_id)
+        if not guild:
+            return
+
+        log_channel_id = await self.config.guild(guild).log_channel()
+        if log_channel_id:
+            log_channel = guild.get_channel(log_channel_id)
+            if log_channel:
+                embed = discord.Embed(
+                    title="AI Moderation Update",
+                    description="AI moderation has been updated to a new version.",
+                    color=discord.Color.green()
+                )
+                embed.add_field(name="New Version", value=self.VERSION, inline=False)
+                await log_channel.send(embed=embed)
 
     def normalize_text(self, text):
         """Normalize text to replace with standard alphabetical/numeric characters."""
