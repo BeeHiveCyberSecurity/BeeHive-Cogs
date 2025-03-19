@@ -198,9 +198,9 @@ class Omni(commands.Cog):
         top_categories_bullets = "\n".join([f"- {cat.capitalize()}: {count}" for cat, count in top_categories])
         
         embed = discord.Embed(title="✨ AI is hard at work for you", color=0xfffffe)
-        embed.add_field(name="Messages processed", value=str(self.message_count), inline=False)
-        embed.add_field(name="Messages moderated", value=str(self.moderated_count), inline=False)
-        embed.add_field(name="Users punished", value=str(len(self.moderated_users)), inline=False)
+        embed.add_field(name="Messages processed", value=str(self.message_count), inline=True)
+        embed.add_field(name="Messages moderated", value=str(self.moderated_count), inline=True)
+        embed.add_field(name="Users punished", value=str(len(self.moderated_users)), inline=True)
         embed.add_field(name="Top violation categories", value=top_categories_bullets, inline=False)
         
         await ctx.send(embed=embed)
