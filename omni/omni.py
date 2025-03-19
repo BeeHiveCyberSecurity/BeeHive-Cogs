@@ -187,7 +187,7 @@ class Omni(commands.Cog):
 
             if timeout_duration > 0:
                 try:
-                    reason = "AI moderatior action. Violation scores: " + ", ".join(
+                    reason = "AI moderator action. Violation scores: " + ", ".join(
                         f"{category}: {score:.2f}" for category, score in category_scores.items() if score > 0
                     )
                     await message.author.timeout(timedelta(minutes=timeout_duration), reason=reason)
