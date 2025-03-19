@@ -345,14 +345,18 @@ class Omni(commands.Cog):
             moderated_users = await self.config.guild(ctx.guild).moderated_users()
             category_counter = Counter(await self.config.guild(ctx.guild).category_counter())
 
+            member_count = ctx.guild.member_count
+            moderated_message_percentage = (moderated_count / message_count * 100) if message_count > 0 else 0
+            moderated_user_percentage = (len(moderated_users) / member_count * 100) if member_count > 0 else 0
+
             top_categories = category_counter.most_common(5)
             top_categories_bullets = "\n".join([f"- {cat.capitalize()}: {count}" for cat, count in top_categories])
             
             embed = discord.Embed(title="✨ AI is hard at work for you", color=0xfffffe)
             embed.add_field(name="In this server", value="", inline=False)
             embed.add_field(name="Messages processed", value=f"{message_count} messages", inline=True)
-            embed.add_field(name="Messages moderated", value=f"{moderated_count} messages", inline=True)
-            embed.add_field(name="Users punished", value=f"{len(moderated_users)} users", inline=True)
+            embed.add_field(name="Messages moderated", value=f"{moderated_count} messages ({moderated_message_percentage:.2f}%)", inline=True)
+            embed.add_field(name="Users punished", value=f"{len(moderated_users)} users ({moderated_user_percentage:.2f}%)", inline=True)
             embed.add_field(name="Most frequent reasons", value=top_categories_bullets, inline=False)
 
             # Global statistics
@@ -362,12 +366,16 @@ class Omni(commands.Cog):
                 global_moderated_users = await self.config.global_moderated_users()
                 global_category_counter = Counter(await self.config.global_category_counter())
 
+                total_members = sum(guild.member_count for guild in self.bot.guilds)
+                global_moderated_message_percentage = (global_moderated_count / global_message_count * 100) if global_message_count > 0 else 0
+                global_moderated_user_percentage = (len(global_moderated_users) / total_members * 100) if total_members > 0 else 0
+
                 global_top_categories = global_category_counter.most_common(5)
                 global_top_categories_bullets = "\n".join([f"- {cat.capitalize()}: {count}" for cat, count in global_top_categories])
                 embed.add_field(name="Across all servers", value="", inline=False)
                 embed.add_field(name="Messages processed", value=f"{global_message_count} messages", inline=True)
-                embed.add_field(name="Messages moderated", value=f"{global_moderated_count} messages", inline=True)
-                embed.add_field(name="Users punished", value=f"{len(global_moderated_users)} users", inline=True)
+                embed.add_field(name="Messages moderated", value=f"{global_moderated_count} messages ({global_moderated_message_percentage:.2f}%)", inline=True)
+                embed.add_field(name="Users punished", value=f"{len(global_moderated_users)} users ({global_moderated_user_percentage:.2f}%)", inline=True)
                 embed.add_field(name="Most frequent reasons", value=global_top_categories_bullets, inline=False)
 
             await ctx.send(embed=embed)
