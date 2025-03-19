@@ -64,6 +64,13 @@ class Omni(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
+        await self.process_message(message)
+
+    @commands.Cog.listener()
+    async def on_message_edit(self, before, after):
+        await self.process_message(after)
+
+    async def process_message(self, message):
         try:
             if message.author.bot:
                 return
