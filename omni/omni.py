@@ -5,6 +5,7 @@ from datetime import timedelta, datetime
 from collections import Counter
 import unicodedata
 import re
+import asyncio
 
 class Omni(commands.Cog):
     """AI-powered automatic text moderation provided by frontier moderation models"""
@@ -148,29 +149,32 @@ class Omni(commands.Cog):
 
     async def analyze_text(self, text, api_key, message):
         try:
-            async with self.session.post(
-                "https://api.openai.com/v1/moderations",
-                headers={
-                    "Content-Type": "application/json",
-                    "Authorization": f"Bearer {api_key}"
-                },
-                json={
-                    "model": "omni-moderation-latest",
-                    "input": [
-                        {"type": "text", "text": text}
-                    ]
-                }
-            ) as response:
-                if response.status != 200:
-                    # Log the error if the request failed
-                    await self.log_message(message, {}, error_code=response.status)
-                    return False, {}
-
-                data = await response.json()
-                result = data.get("results", [{}])[0]
-                flagged = result.get("flagged", False)
-                category_scores = result.get("category_scores", {})
-                return flagged, category_scores
+            while True:
+                async with self.session.post(
+                    "https://api.openai.com/v1/moderations",
+                    headers={
+                        "Content-Type": "application/json",
+                        "Authorization": f"Bearer {api_key}"
+                    },
+                    json={
+                        "model": "omni-moderation-latest",
+                        "input": [
+                            {"type": "text", "text": text}
+                        ]
+                    }
+                ) as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        result = data.get("results", [{}])[0]
+                        flagged = result.get("flagged", False)
+                        category_scores = result.get("category_scores", {})
+                        return flagged, category_scores
+                    elif response.status == 500:
+                        await asyncio.sleep(5)  # Wait a few seconds before retrying
+                    else:
+                        # Log the error if the request failed
+                        await self.log_message(message, {}, error_code=response.status)
+                        return False, {}
         except Exception as e:
             raise RuntimeError(f"Failed to analyze text: {e}")
 
