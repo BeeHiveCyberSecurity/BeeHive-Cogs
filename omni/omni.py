@@ -100,41 +100,95 @@ class Omni(commands.Cog):
         # Normalize the message content
         normalized_content = self.normalize_text(message.content)
 
+        # Analyze text content
+        text_flagged, text_category_scores = await self.analyze_text(normalized_content, api_key, message)
+
+        # Analyze image content
+        image_flagged, image_category_scores = await self.analyze_images(message.attachments, api_key, message)
+
+        # Combine results
+        flagged = text_flagged or image_flagged
+        category_scores = {**text_category_scores, **image_category_scores}
+
+        if flagged:
+            self.moderated_count += 1
+            await self.config.guild(guild).moderated_count.set(self.moderated_count)
+            self.moderated_users.add(message.author.id)
+            await self.config.guild(guild).moderated_users.set(list(self.moderated_users))
+            for category, score in category_scores.items():
+                if score > 0:
+                    self.category_counter[category] += 1
+            await self.config.guild(guild).category_counter.set(dict(self.category_counter))
+            await self.handle_moderation(message, category_scores, image_flagged)
+
+        # Check if debug mode is enabled
+        debug_mode = await self.config.guild(guild).debug_mode()
+        if debug_mode:
+            await self.log_message(message, category_scores, image_flagged)
+
+    async def analyze_text(self, text, api_key, message):
         async with self.session.post(
             "https://api.openai.com/v1/moderations",
             headers={
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {api_key}"
             },
-            json={"input": normalized_content}
+            json={
+                "model": "omni-moderation-latest",
+                "input": [
+                    {"type": "text", "text": text}
+                ]
+            }
         ) as response:
             if response.status != 200:
                 # Log the error if the request failed
                 await self.log_message(message, {}, error_code=response.status)
-                return
+                return False, {}
 
             data = await response.json()
             result = data.get("results", [{}])[0]
             flagged = result.get("flagged", False)
             category_scores = result.get("category_scores", {})
+            return flagged, category_scores
 
-            if flagged:
-                self.moderated_count += 1
-                await self.config.guild(guild).moderated_count.set(self.moderated_count)
-                self.moderated_users.add(message.author.id)
-                await self.config.guild(guild).moderated_users.set(list(self.moderated_users))
-                for category, score in category_scores.items():
-                    if score > 0:
-                        self.category_counter[category] += 1
-                await self.config.guild(guild).category_counter.set(dict(self.category_counter))
-                await self.handle_moderation(message, category_scores)
+    async def analyze_images(self, attachments, api_key, message):
+        flagged = False
+        category_scores = {}
+        for attachment in attachments:
+            if attachment.content_type and attachment.content_type.startswith('image/'):
+                async with self.session.post(
+                    "https://api.openai.com/v1/moderations",
+                    headers={
+                        "Content-Type": "application/json",
+                        "Authorization": f"Bearer {api_key}"
+                    },
+                    json={
+                        "model": "omni-moderation-latest",
+                        "input": [
+                            {
+                                "type": "image_url",
+                                "image_url": {
+                                    "url": attachment.url
+                                }
+                            }
+                        ]
+                    }
+                ) as response:
+                    if response.status != 200:
+                        # Log the error if the request failed
+                        await self.log_message(message, {}, error_code=response.status)
+                        continue
 
-            # Check if debug mode is enabled
-            debug_mode = await self.config.guild(guild).debug_mode()
-            if debug_mode:
-                await self.log_message(message, category_scores)
+                    data = await response.json()
+                    result = data.get("results", [{}])[0]
+                    if result.get("flagged", False):
+                        flagged = True
+                    for category, score in result.get("category_scores", {}).items():
+                        if score > 0:
+                            category_scores[category] = max(category_scores.get(category, 0), score)
+        return flagged, category_scores
 
-    async def handle_moderation(self, message, category_scores):
+    async def handle_moderation(self, message, category_scores, image_flagged):
         guild = message.guild
         timeout_duration = await self.config.guild(guild).timeout_duration()
         log_channel_id = await self.config.guild(guild).log_channel()
@@ -160,7 +214,7 @@ class Omni(commands.Cog):
                     description=f"Message by {message.author.mention} was flagged and deleted.",
                     color=0xff4545
                 )
-                embed.add_field(name="Content", value=message.content, inline=False)
+                embed.add_field(name="Content", value=message.content or "No content", inline=False)
                 moderation_threshold = await self.config.guild(guild).moderation_threshold()
                 for category, score in category_scores.items():
                     if score == 0.00:
@@ -168,9 +222,14 @@ class Omni(commands.Cog):
                     else:
                         score_display = f"**{score:.2f}**" if score > moderation_threshold else f"{score:.2f}"
                     embed.add_field(name=category.capitalize(), value=score_display, inline=True)
+                if image_flagged:
+                    for attachment in message.attachments:
+                        if attachment.content_type and attachment.content_type.startswith('image/'):
+                            embed.set_image(url=attachment.url)
+                            break
                 await log_channel.send(embed=embed)
 
-    async def log_message(self, message, category_scores, error_code=None):
+    async def log_message(self, message, category_scores, image_flagged, error_code=None):
         guild = message.guild
         log_channel_id = await self.config.guild(guild).log_channel()
 
@@ -182,7 +241,7 @@ class Omni(commands.Cog):
                     description=f"Message by {message.author.mention} was logged.",
                     color=discord.Color.blue()
                 )
-                embed.add_field(name="Content", value=message.content, inline=False)
+                embed.add_field(name="Content", value=message.content or "No content", inline=False)
                 moderation_threshold = await self.config.guild(guild).moderation_threshold()
                 for category, score in category_scores.items():
                     if score == 0.00:
@@ -190,6 +249,11 @@ class Omni(commands.Cog):
                     else:
                         score_display = f"**{score:.2f}**" if score > moderation_threshold else f"{score:.2f}"
                     embed.add_field(name=category.capitalize(), value=score_display, inline=True)
+                if image_flagged:
+                    for attachment in message.attachments:
+                        if attachment.content_type and attachment.content_type.startswith('image/'):
+                            embed.set_image(url=attachment.url)
+                            break
                 if error_code:
                     embed.add_field(name="Error", value=f":x: Failed to send to OpenAI endpoint. Error code: {error_code}", inline=False)
                 await log_channel.send(embed=embed)
@@ -197,10 +261,13 @@ class Omni(commands.Cog):
             # If no log channel is set, send a warning to the server owner
             owner = guild.owner
             if owner:
-                await owner.send(
-                    f"Warning: No log channel is set for the guild '{guild.name}'. "
-                    "Please set a log channel using the `[p]omni logs` command to enable message logging."
-                )
+                try:
+                    await owner.send(
+                        f"Warning: No log channel is set for the guild '{guild.name}'. "
+                        "Please set a log channel using the `[p]omni logs` command to enable message logging."
+                    )
+                except discord.Forbidden:
+                    pass  # Handle cases where the bot doesn't have permission to DM the owner
 
     @commands.guild_only()
     @commands.admin_or_permissions(manage_guild=True)
@@ -294,7 +361,7 @@ class Omni(commands.Cog):
         debug_mode = await self.config.guild(guild).debug_mode()
         whitelisted_channels = await self.config.guild(guild).whitelisted_channels()
 
-        log_channel = guild.get_channel(log_channel_id) if log_channel_id else "Not set"
+        log_channel = guild.get_channel(log_channel_id) if log_channel_id else None
         log_channel_name = log_channel.mention if log_channel else "Not set"
         whitelisted_channels_names = ", ".join([guild.get_channel(ch_id).mention for ch_id in whitelisted_channels if guild.get_channel(ch_id)]) or "None"
 
