@@ -86,7 +86,10 @@ class Omni(commands.Cog):
                 embed.add_field(name="Content", value=message.content, inline=False)
                 moderation_threshold = await self.config.guild(guild).moderation_threshold()
                 for category, score in category_scores.items():
-                    score_display = f"**{score:.2f}**" if score > moderation_threshold else f"{score:.2f}"
+                    if score == 0.0:
+                        score_display = ":white_check_mark: Clean"
+                    else:
+                        score_display = f"**{score:.2f}**" if score > moderation_threshold else f"{score:.2f}"
                     embed.add_field(name=category.capitalize(), value=score_display, inline=True)
                 await log_channel.send(embed=embed)
 
@@ -105,7 +108,10 @@ class Omni(commands.Cog):
                 embed.add_field(name="Content", value=message.content, inline=False)
                 moderation_threshold = await self.config.guild(guild).moderation_threshold()
                 for category, score in category_scores.items():
-                    score_display = f"**{score:.2f}**" if score > moderation_threshold else f"{score:.2f}"
+                    if score == 0.0:
+                        score_display = ":white_check_mark: Clean"
+                    else:
+                        score_display = f"**{score:.2f}**" if score > moderation_threshold else f"{score:.2f}"
                     embed.add_field(name=category.capitalize(), value=score_display, inline=True)
                 if error_code:
                     embed.add_field(name="Error", value=f":x: Failed to send to OpenAI endpoint. Error code: {error_code}", inline=False)
