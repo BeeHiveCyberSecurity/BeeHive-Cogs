@@ -184,10 +184,8 @@ class Omni(commands.Cog):
                     "model": "omni-moderation-latest",
                     "input": [
                         {
-                            "type": "image_url",
-                            "image_url": {
-                                "url": image_url
-                            }
+                            "type": "image",
+                            "image_url": image_url
                         }
                     ]
                 }
