@@ -176,7 +176,7 @@ Utilize the VirusTotal API with a free API key to scan and analyze files for pot
 
 ### [urlscan](https://github.com/BeeHiveSafety/BeeHive-Cogs/tree/main/urlscan)
 
-Leverage the power of the URLScan.io API with a `free` URLScan API Key to evaluate URLs for safety and security. Enable `[p]urlscan autoscan` to automatically monitor and protect your chat from potentially harmful links. `[p]urlscan`.
+Use the URLScan.io API with a `free` URLScan API Key to evaluate URLs for safety and security. Enable `[p]urlscan autoscan` to automatically monitor and protect your chat from potentially harmful links. `[p]urlscan`.
 
 ```
 [p]cog install BeeHiveSafety urlscan
@@ -202,11 +202,15 @@ Integrate the Ransomware.live API with your Red-DiscordBot to monitor and receiv
 ### [omni](https://github.com/BeeHiveSafety/BeeHive-Cogs/tree/main/omni)
 
 Utilize OpenAI's frontier moderation models to keep chat clean in your server for free. `[p]omni`
+
 ```
 [p]cog install BeeHiveSafety omni
 ```
 ```
 [p]load omni
+```
+```
+[p]set api openai api_key YOURAPIKEYHERE
 ```
 
 
