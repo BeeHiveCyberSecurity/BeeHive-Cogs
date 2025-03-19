@@ -4,7 +4,7 @@ import aiohttp
 from datetime import timedelta
 
 class Omni(commands.Cog):
-    """Cog for moderating messages using OpenAI's omni-moderation endpoint."""
+    """AI-powered automatic text and image moderation provided by frontier moderation models"""
 
     def __init__(self, bot):
         self.bot = bot
