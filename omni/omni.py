@@ -168,12 +168,13 @@ class Omni(commands.Cog):
                 if log_channel:
                     embed = discord.Embed(
                         title="✨ Message moderated using AI",
-                        description=f"The following message was deleted from chat because it may have violated the rules of the server.\n\n```{message.content}```",
+                        description=f"The following message was deleted from chat because it may have violated the rules of the server.\n```{message.content}```",
                         color=0xff4545,
                         timestamp=datetime.utcnow()
                     )
-                    embed.add_field(name="Sender", value=f"<@{message.author.id}>\n`{message.author.id}`", inline=False)
-                    embed.add_field(name="Channel", value=f"<#{message.channel.id}>\n`{message.channel.id}`", inline=False)
+                    embed.add_field(name="Sender", value=f"<@{message.author.id}> - {message.author.id}", inline=True)
+                    embed.add_field(name="Channel", value=f"<#{message.channel.id}> - {message.channel.id}", inline=True)
+                    embed.add_field(name="\u200b", value=f"\u200b", inline=False)
                     moderation_threshold = await self.config.guild(guild).moderation_threshold()
                     sorted_scores = sorted(category_scores.items(), key=lambda item: item[1], reverse=True)[:3]
                     for category, score in sorted_scores:
