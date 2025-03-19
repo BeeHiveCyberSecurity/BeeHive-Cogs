@@ -5,11 +5,9 @@ from datetime import timedelta
 from collections import Counter
 import unicodedata
 import re
-from PIL import Image
-import io
 
 class Omni(commands.Cog):
-    """AI-powered automatic text and image moderation provided by frontier moderation models"""
+    """AI-powered automatic text moderation provided by frontier moderation models"""
 
     VERSION = "0.0.3"
 
@@ -26,17 +24,13 @@ class Omni(commands.Cog):
             moderated_users=[],
             category_counter={},
             whitelisted_channels=[],
-            cog_version=self.VERSION,
-            image_count=0,
-            image_moderated_count=0
+            cog_version=self.VERSION
         )
         self.session = None
         self.message_count = 0
         self.moderated_count = 0
         self.moderated_users = set()
         self.category_counter = Counter()
-        self.image_count = 0
-        self.image_moderated_count = 0
 
     async def initialize(self):
         try:
@@ -47,8 +41,6 @@ class Omni(commands.Cog):
                 self.moderated_count = data.get("moderated_count", 0)
                 self.moderated_users = set(data.get("moderated_users", []))
                 self.category_counter = Counter(data.get("category_counter", {}))
-                self.image_count = data.get("image_count", 0)
-                self.image_moderated_count = data.get("image_moderated_count", 0)
                 
                 # Check for version update
                 stored_version = data.get("cog_version", "0.0.0")
@@ -126,28 +118,21 @@ class Omni(commands.Cog):
             # Analyze text content
             text_flagged, text_category_scores = await self.analyze_text(normalized_content, api_key, message)
 
-            # Analyze image content
-            image_flagged, image_category_scores = await self.analyze_images(message.attachments, api_key, message)
-
-            # Combine results
-            flagged = text_flagged or image_flagged
-            category_scores = {**text_category_scores, **image_category_scores}
-
-            if flagged:
+            if text_flagged:
                 self.moderated_count += 1
                 await self.config.guild(guild).moderated_count.set(self.moderated_count)
                 self.moderated_users.add(message.author.id)
                 await self.config.guild(guild).moderated_users.set(list(self.moderated_users))
-                for category, score in category_scores.items():
+                for category, score in text_category_scores.items():
                     if score > 0:
                         self.category_counter[category] += 1
                 await self.config.guild(guild).category_counter.set(dict(self.category_counter))
-                await self.handle_moderation(message, category_scores, image_flagged)
+                await self.handle_moderation(message, text_category_scores)
 
             # Check if debug mode is enabled
             debug_mode = await self.config.guild(guild).debug_mode()
             if debug_mode:
-                await self.log_message(message, category_scores, image_flagged)
+                await self.log_message(message, text_category_scores)
         except Exception as e:
             raise RuntimeError(f"Error processing message: {e}")
 
@@ -168,7 +153,7 @@ class Omni(commands.Cog):
             ) as response:
                 if response.status != 200:
                     # Log the error if the request failed
-                    await self.log_message(message, {}, False, error_code=response.status)
+                    await self.log_message(message, {}, error_code=response.status)
                     return False, {}
 
                 data = await response.json()
@@ -179,98 +164,7 @@ class Omni(commands.Cog):
         except Exception as e:
             raise RuntimeError(f"Failed to analyze text: {e}")
 
-    async def analyze_images(self, attachments, api_key, message):
-        try:
-            flagged = False
-            category_scores = {}
-            image_urls = []
-
-            for attachment in attachments:
-                if attachment.content_type and attachment.content_type.startswith('image/'):
-                    if attachment.content_type == 'image/gif':
-                        # Handle GIFs by extracting a frame
-                        image_urls.extend(await self.extract_gif_frames(attachment, message.guild))
-                    else:
-                        image_urls.append(attachment.url)
-
-            # Extract URLs from message content
-            url_pattern = re.compile(r'(https?://\S+)')
-            image_urls.extend(url_pattern.findall(message.content))
-
-            for image_url in image_urls:
-                self.image_count += 1
-                await self.config.guild(message.guild).image_count.set(self.image_count)
-                async with self.session.post(
-                    "https://api.openai.com/v1/moderations",
-                    headers={
-                        "Content-Type": "application/json",
-                        "Authorization": f"Bearer {api_key}"
-                    },
-                    json={
-                        "model": "omni-moderation-latest",
-                        "input": [
-                            {
-                                "type": "image_url",
-                                "image_url": image_url
-                            }
-                        ]
-                    }
-                ) as response:
-                    if response.status != 200:
-                        # Log the error if the request failed
-                        await self.log_message(message, {}, False, error_code=response.status)
-                        continue
-
-                    data = await response.json()
-                    result = data.get("results", [{}])[0]
-                    if result.get("flagged", False):
-                        flagged = True
-                        self.image_moderated_count += 1
-                        await self.config.guild(message.guild).image_moderated_count.set(self.image_moderated_count)
-                    for category, score in result.get("category_scores", {}).items():
-                        if score > 0:
-                            category_scores[category] = max(category_scores.get(category, 0), score)
-            return flagged, category_scores
-        except Exception as e:
-            raise RuntimeError(f"Failed to analyze images: {e}")
-
-    async def extract_gif_frames(self, attachment, guild):
-        """Extract one or two frames from a GIF for moderation."""
-        try:
-            frames = []
-            async with self.session.get(attachment.url) as response:
-                if response.status == 200:
-                    data = await response.read()
-                    with Image.open(io.BytesIO(data)) as img:
-                        for i in range(min(2, img.n_frames)):
-                            img.seek(i)
-                            frame = io.BytesIO()
-                            img.save(frame, format='PNG')
-                            frame_url = await self.upload_frame(frame, guild)
-                            frames.append(frame_url)
-            return frames
-        except Exception as e:
-            raise RuntimeError(f"Failed to extract GIF frames: {e}")
-
-    async def upload_frame(self, frame, guild):
-        """Upload a frame to a Discord channel and return the URL."""
-        try:
-            log_channel_id = await self.config.guild(guild).log_channel()
-            if not log_channel_id:
-                return None
-
-            log_channel = guild.get_channel(log_channel_id)
-            if not log_channel:
-                return None
-
-            frame.seek(0)
-            discord_file = discord.File(frame, filename="frame.png")
-            message = await log_channel.send(file=discord_file)
-            return message.attachments[0].url if message.attachments else None
-        except Exception as e:
-            raise RuntimeError(f"Failed to upload frame: {e}")
-
-    async def handle_moderation(self, message, category_scores, image_flagged):
+    async def handle_moderation(self, message, category_scores):
         try:
             guild = message.guild
             timeout_duration = await self.config.guild(guild).timeout_duration()
@@ -306,16 +200,11 @@ class Omni(commands.Cog):
                         else:
                             score_display = f"**{score:.2f}**" if score > moderation_threshold else f"{score:.2f}"
                         embed.add_field(name=category.capitalize(), value=score_display, inline=True)
-                    if image_flagged:
-                        for attachment in message.attachments:
-                            if attachment.content_type and attachment.content_type.startswith('image/'):
-                                embed.set_image(url=attachment.url)
-                                break
                     await log_channel.send(embed=embed)
         except Exception as e:
             raise RuntimeError(f"Failed to handle moderation: {e}")
 
-    async def log_message(self, message, category_scores, image_flagged, error_code=None):
+    async def log_message(self, message, category_scores, error_code=None):
         try:
             guild = message.guild
             log_channel_id = await self.config.guild(guild).log_channel()
@@ -337,11 +226,6 @@ class Omni(commands.Cog):
                         else:
                             score_display = f"**{score:.2f}**" if score > moderation_threshold else f"{score:.2f}"
                         embed.add_field(name=category.capitalize(), value=score_display, inline=True)
-                    if image_flagged:
-                        for attachment in message.attachments:
-                            if attachment.content_type and attachment.content_type.startswith('image/'):
-                                embed.set_image(url=attachment.url)
-                                break
                     if error_code:
                         embed.add_field(name="Error", value=f":x: Failed to send to OpenAI endpoint. Error code: {error_code}", inline=False)
                     await log_channel.send(embed=embed)
@@ -363,7 +247,7 @@ class Omni(commands.Cog):
     @commands.admin_or_permissions(manage_guild=True)
     @commands.group()
     async def omni(self, ctx):
-        """AI-powered automatic text and image moderation provided by frontier moderation models"""
+        """AI-powered automatic text moderation provided by frontier moderation models"""
         pass
 
     @omni.command()
@@ -451,8 +335,6 @@ class Omni(commands.Cog):
             embed = discord.Embed(title="✨ AI is hard at work for you", color=0xfffffe)
             embed.add_field(name="Messages processed", value=str(self.message_count), inline=True)
             embed.add_field(name="Messages moderated", value=str(self.moderated_count), inline=True)
-            embed.add_field(name="Images processed", value=str(self.image_count), inline=True)
-            embed.add_field(name="Images moderated", value=str(self.image_moderated_count), inline=True)
             embed.add_field(name="Users punished", value=str(len(self.moderated_users)), inline=True)
             embed.add_field(name="Top violation categories", value=top_categories_bullets, inline=False)
             
