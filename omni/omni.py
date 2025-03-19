@@ -439,7 +439,7 @@ class Omni(commands.Cog):
 
     @omni.command()
     async def reasons(self, ctx):
-        """Show the categories and explanations of labels."""
+        """Explains how the AI moderator labels and categorizes content"""
         try:
             categories = {
                 "harassment": "Content that expresses, incites, or promotes harassing language towards any target.",
@@ -457,7 +457,7 @@ class Omni(commands.Cog):
                 "violence/graphic": "Content that depicts death, violence, or physical injury in graphic detail."
             }
 
-            embed = discord.Embed(title="Label Categories and Explanations", color=discord.Color.blue())
+            embed = discord.Embed(title="Label Categories and Explanations", color=0xfffffe
             for category, description in categories.items():
                 embed.add_field(name=category.capitalize(), value=description, inline=False)
 
