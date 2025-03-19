@@ -37,14 +37,14 @@ class Omni(commands.Cog):
             self.category_counter = Counter(data.get("category_counter", {}))
 
     def normalize_text(self, text):
-        """Normalize text to remove special fonts, diacritics, and special characters."""
-        # Remove diacritics
+        """Normalize text to replace with standard alphabetical/numeric characters."""
+        # Normalize to NFKD form and replace non-standard characters
         text = ''.join(
-            c for c in unicodedata.normalize('NFKD', text)
-            if unicodedata.category(c) != 'Mn'
+            c if unicodedata.category(c).startswith(('L', 'N')) else ' '
+            for c in unicodedata.normalize('NFKD', text)
         )
-        # Remove special characters
-        text = re.sub(r'[^\w\s]', '', text)
+        # Replace multiple spaces with a single space
+        text = re.sub(r'\s+', ' ', text).strip()
         return text
 
     @commands.Cog.listener()
