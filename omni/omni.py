@@ -15,7 +15,7 @@ class Omni(commands.Cog):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=1234567890)
         self.config.register_guild(
-            moderation_threshold=0.5,
+            moderation_threshold=0.70,
             timeout_duration=0,
             log_channel=None,
             debug_mode=False,
