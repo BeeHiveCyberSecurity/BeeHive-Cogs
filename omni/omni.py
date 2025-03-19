@@ -87,7 +87,7 @@ class Omni(commands.Cog):
 
             # Update per-server and global statistics
             await self.increment_statistic(guild, 'message_count')
-            await self.increment_statistic(None, 'global_message_count')
+            await self.increment_statistic('global', 'global_message_count')
 
             api_tokens = await self.bot.get_shared_api_tokens("openai")
             api_key = api_tokens.get("api_key")
@@ -116,34 +116,46 @@ class Omni(commands.Cog):
             raise RuntimeError(f"Error processing message: {e}")
 
     async def increment_statistic(self, guild, stat_name):
-        if guild:
-            current_value = await self.config.guild(guild).get_attr(stat_name)() + 1
-            await self.config.guild(guild).get_attr(stat_name).set(current_value)
-        else:
+        if guild == 'global':
             current_value = await self.config.get_attr(stat_name)() + 1
             await self.config.get_attr(stat_name).set(current_value)
+        else:
+            current_value = await self.config.guild(guild).get_attr(stat_name)() + 1
+            await self.config.guild(guild).get_attr(stat_name).set(current_value)
 
     async def update_moderation_stats(self, guild, message, text_category_scores):
         await self.increment_statistic(guild, 'moderated_count')
-        await self.increment_statistic(None, 'global_moderated_count')
+        await self.increment_statistic('global', 'global_moderated_count')
 
         await self.update_user_list(guild, 'moderated_users', message.author.id)
-        await self.update_user_list(None, 'global_moderated_users', message.author.id)
+        await self.update_user_list('global', 'global_moderated_users', message.author.id)
 
         await self.update_category_counter(guild, 'category_counter', text_category_scores)
-        await self.update_category_counter(None, 'global_category_counter', text_category_scores)
+        await self.update_category_counter('global', 'global_category_counter', text_category_scores)
 
     async def update_user_list(self, guild, list_name, user_id):
-        user_list = set(await self.config.guild(guild).get_attr(list_name)())
-        user_list.add(user_id)
-        await self.config.guild(guild).get_attr(list_name).set(list(user_list))
+        if guild == 'global':
+            user_list = set(await self.config.get_attr(list_name)())
+            user_list.add(user_id)
+            await self.config.get_attr(list_name).set(list(user_list))
+        else:
+            user_list = set(await self.config.guild(guild).get_attr(list_name)())
+            user_list.add(user_id)
+            await self.config.guild(guild).get_attr(list_name).set(list(user_list))
 
     async def update_category_counter(self, guild, counter_name, text_category_scores):
-        category_counter = Counter(await self.config.guild(guild).get_attr(counter_name)())
-        for category, score in text_category_scores.items():
-            if score > 0.2:
-                category_counter[category] += 1
-        await self.config.guild(guild).get_attr(counter_name).set(dict(category_counter))
+        if guild == 'global':
+            category_counter = Counter(await self.config.get_attr(counter_name)())
+            for category, score in text_category_scores.items():
+                if score > 0.2:
+                    category_counter[category] += 1
+            await self.config.get_attr(counter_name).set(dict(category_counter))
+        else:
+            category_counter = Counter(await self.config.guild(guild).get_attr(counter_name)())
+            for category, score in text_category_scores.items():
+                if score > 0.2:
+                    category_counter[category] += 1
+            await self.config.guild(guild).get_attr(counter_name).set(dict(category_counter))
 
     async def analyze_text(self, text, api_key, message):
         try:
