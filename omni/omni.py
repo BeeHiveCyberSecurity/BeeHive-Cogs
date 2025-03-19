@@ -5,6 +5,8 @@ from datetime import timedelta
 from collections import Counter
 import unicodedata
 import re
+from PIL import Image
+import io
 
 class Omni(commands.Cog):
     """AI-powered automatic text and image moderation provided by frontier moderation models"""
@@ -165,8 +167,16 @@ class Omni(commands.Cog):
     async def analyze_images(self, attachments, api_key, message):
         flagged = False
         category_scores = {}
-        image_urls = [attachment.url for attachment in attachments if attachment.content_type and attachment.content_type.startswith('image/')]
-        
+        image_urls = []
+
+        for attachment in attachments:
+            if attachment.content_type and attachment.content_type.startswith('image/'):
+                if attachment.content_type == 'image/gif':
+                    # Handle GIFs by extracting a frame
+                    image_urls.extend(await self.extract_gif_frames(attachment, message.guild))
+                else:
+                    image_urls.append(attachment.url)
+
         # Extract URLs from message content
         url_pattern = re.compile(r'(https?://\S+)')
         image_urls.extend(url_pattern.findall(message.content))
@@ -205,6 +215,36 @@ class Omni(commands.Cog):
                     if score > 0:
                         category_scores[category] = max(category_scores.get(category, 0), score)
         return flagged, category_scores
+
+    async def extract_gif_frames(self, attachment, guild):
+        """Extract one or two frames from a GIF for moderation."""
+        frames = []
+        async with self.session.get(attachment.url) as response:
+            if response.status == 200:
+                data = await response.read()
+                with Image.open(io.BytesIO(data)) as img:
+                    for i in range(min(2, img.n_frames)):
+                        img.seek(i)
+                        frame = io.BytesIO()
+                        img.save(frame, format='PNG')
+                        frame_url = await self.upload_frame(frame, guild)
+                        frames.append(frame_url)
+        return frames
+
+    async def upload_frame(self, frame, guild):
+        """Upload a frame to a Discord channel and return the URL."""
+        log_channel_id = await self.config.guild(guild).log_channel()
+        if not log_channel_id:
+            return None
+
+        log_channel = guild.get_channel(log_channel_id)
+        if not log_channel:
+            return None
+
+        frame.seek(0)
+        discord_file = discord.File(frame, filename="frame.png")
+        message = await log_channel.send(file=discord_file)
+        return message.attachments[0].url if message.attachments else None
 
     async def handle_moderation(self, message, category_scores, image_flagged):
         guild = message.guild
