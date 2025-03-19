@@ -56,6 +56,7 @@ class Omni(commands.Cog):
             )
             # Handle special words/characters
             text = text.replace('nègre', 'negro')
+            text = text.replace('reggin', 'nigger')
             # Replace multiple spaces with a single space
             text = re.sub(r'\s+', ' ', text).strip()
             return text
