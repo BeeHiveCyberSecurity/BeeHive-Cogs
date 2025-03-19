@@ -102,7 +102,11 @@ class Omni(commands.Cog):
             normalized_content = self.normalize_text(message.content)
 
             # Analyze text content
-            text_flagged, text_category_scores = await self.analyze_text(normalized_content, api_key, message)
+            text_category_scores = await self.analyze_text(normalized_content, api_key, message)
+
+            # Determine if the message should be flagged based on the threshold
+            moderation_threshold = await self.config.guild(guild).moderation_threshold()
+            text_flagged = any(score > moderation_threshold for score in text_category_scores.values())
 
             if text_flagged:
                 await self.update_moderation_stats(guild, message, text_category_scores)
@@ -176,15 +180,14 @@ class Omni(commands.Cog):
                     if response.status == 200:
                         data = await response.json()
                         result = data.get("results", [{}])[0]
-                        flagged = result.get("flagged", False)
                         category_scores = result.get("category_scores", {})
-                        return flagged, category_scores
+                        return category_scores
                     elif response.status == 500:
                         await asyncio.sleep(5)  # Wait a few seconds before retrying
                     else:
                         # Log the error if the request failed
                         await self.log_message(message, {}, error_code=response.status)
-                        return False, {}
+                        return {}
         except Exception as e:
             raise RuntimeError(f"Failed to analyze text: {e}")
 
