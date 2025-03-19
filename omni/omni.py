@@ -45,29 +45,9 @@ class Omni(commands.Cog):
                 # Check for version update
                 stored_version = data.get("cog_version", "0.0.0")
                 if stored_version != self.VERSION:
-                    await self.notify_version_update(guild_id)
                     await self.config.guild_from_id(guild_id).cog_version.set(self.VERSION)
         except Exception as e:
             raise RuntimeError(f"Failed to initialize Omni cog: {e}")
-
-    async def notify_version_update(self, guild_id):
-        try:
-            guild = self.bot.get_guild(guild_id)
-            if not guild:
-                return
-
-            log_channel_id = await self.config.guild(guild).log_channel()
-            if log_channel_id:
-                log_channel = guild.get_channel(log_channel_id)
-                if log_channel:
-                    embed = discord.Embed(
-                        title="AI moderation has been updated",
-                        description=f"Your bot is now running version `{self.VERSION}`",
-                        color=discord.Color.from_rgb(43, 189, 142)
-                    )
-                    await log_channel.send(embed=embed)
-        except Exception as e:
-            raise RuntimeError(f"Failed to notify version update for guild {guild_id}: {e}")
 
     def normalize_text(self, text):
         """Normalize text to replace with standard alphabetical/numeric characters."""
