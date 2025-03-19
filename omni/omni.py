@@ -173,8 +173,8 @@ class Omni(commands.Cog):
                         timestamp=datetime.utcnow()
                     )
                     embed.add_field(name="Message content", value=f"||{message.content}||" or "No content", inline=False)
-                    embed.add_field(name="Sender", value=f"{message.author} (ID: {message.author.id})", inline=True)
-                    embed.add_field(name="Channel", value=f"{message.channel} (ID: {message.channel.id})", inline=True)
+                    embed.add_field(name="Sender", value=f"{message.author}\n```{message.author.id}```", inline=False)
+                    embed.add_field(name="Channel", value=f"{message.channel}\n```{message.channel.id}```", inline=False)
                     moderation_threshold = await self.config.guild(guild).moderation_threshold()
                     sorted_scores = sorted(category_scores.items(), key=lambda item: item[1], reverse=True)[:3]
                     for category, score in sorted_scores:
