@@ -354,9 +354,9 @@ class Omni(commands.Cog):
             
             embed = discord.Embed(title="✨ AI is hard at work for you", color=0xfffffe)
             embed.add_field(name="In this server", value="", inline=False)
-            embed.add_field(name="Messages processed", value=f"{message_count} messages", inline=True)
-            embed.add_field(name="Messages moderated", value=f"{moderated_count} messages ({moderated_message_percentage:.2f}%)", inline=True)
-            embed.add_field(name="Users punished", value=f"{len(moderated_users)} users ({moderated_user_percentage:.2f}%)", inline=True)
+            embed.add_field(name="Messages processed", value=f"{message_count} message{'s' if message_count != 1 else ''}", inline=True)
+            embed.add_field(name="Messages moderated", value=f"{moderated_count} message{'s' if moderated_count != 1 else ''} ({moderated_message_percentage:.2f}%)", inline=True)
+            embed.add_field(name="Users punished", value=f"{len(moderated_users)} user{'s' if len(moderated_users) != 1 else ''} ({moderated_user_percentage:.2f}%)", inline=True)
             embed.add_field(name="Most frequent reasons", value=top_categories_bullets, inline=False)
 
             # Global statistics
@@ -373,9 +373,9 @@ class Omni(commands.Cog):
                 global_top_categories = global_category_counter.most_common(5)
                 global_top_categories_bullets = "\n".join([f"- {cat.capitalize()}: {count}" for cat, count in global_top_categories])
                 embed.add_field(name="Across all servers", value="", inline=False)
-                embed.add_field(name="Messages processed", value=f"{global_message_count} messages", inline=True)
-                embed.add_field(name="Messages moderated", value=f"{global_moderated_count} messages ({global_moderated_message_percentage:.2f}%)", inline=True)
-                embed.add_field(name="Users punished", value=f"{len(global_moderated_users)} users ({global_moderated_user_percentage:.2f}%)", inline=True)
+                embed.add_field(name="Messages processed", value=f"{global_message_count} message{'s' if global_message_count != 1 else ''}", inline=True)
+                embed.add_field(name="Messages moderated", value=f"{global_moderated_count} message{'s' if global_moderated_count != 1 else ''} ({global_moderated_message_percentage:.2f}%)", inline=True)
+                embed.add_field(name="Users punished", value=f"{len(global_moderated_users)} user{'s' if len(global_moderated_users) != 1 else ''} ({global_moderated_user_percentage:.2f}%)", inline=True)
                 embed.add_field(name="Most frequent reasons", value=global_top_categories_bullets, inline=False)
 
             await ctx.send(embed=embed)
