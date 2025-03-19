@@ -1,6 +1,6 @@
 import discord
 from redbot.core import commands, Config
-import aiohttp
+from openai import OpenAI
 from datetime import timedelta
 from collections import Counter
 
@@ -20,7 +20,7 @@ class Omni(commands.Cog):
             moderated_users=[],
             category_counter={}
         )
-        self.session = aiohttp.ClientSession()
+        self.client = OpenAI()
         self.message_count = 0
         self.moderated_count = 0
         self.moderated_users = set()
@@ -51,21 +51,12 @@ class Omni(commands.Cog):
         if not api_key:
             return
 
-        async with self.session.post(
-            "https://api.openai.com/v1/moderations",
-            headers={
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {api_key}"
-            },
-            json={"input": message.content}
-        ) as response:
-            if response.status != 200:
-                # Log the error if the request failed
-                await self.log_message(message, {}, error_code=response.status)
-                return
-
-            data = await response.json()
-            result = data.get("results", [{}])[0]
+        try:
+            response = self.client.moderations.create(
+                model="omni-moderation-latest",
+                input=message.content
+            )
+            result = response.get("results", [{}])[0]
             flagged = result.get("flagged", False)
             category_scores = result.get("category_scores", {})
 
@@ -84,6 +75,10 @@ class Omni(commands.Cog):
             debug_mode = await self.config.guild(guild).debug_mode()
             if debug_mode:
                 await self.log_message(message, category_scores)
+
+        except Exception as e:
+            # Log the error if the request failed
+            await self.log_message(message, {}, error_code=str(e))
 
     async def handle_moderation(self, message, category_scores):
         guild = message.guild
@@ -210,5 +205,5 @@ class Omni(commands.Cog):
         await ctx.send(embed=embed)
 
     def cog_unload(self):
-        self.bot.loop.create_task(self.session.close())
+        pass
 
