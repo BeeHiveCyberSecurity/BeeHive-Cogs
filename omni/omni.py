@@ -3,6 +3,7 @@ from redbot.core import commands, Config
 import aiohttp
 from datetime import timedelta
 from collections import Counter
+import unicodedata
 
 class Omni(commands.Cog):
     """AI-powered automatic text and image moderation provided by frontier moderation models"""
@@ -34,6 +35,13 @@ class Omni(commands.Cog):
             self.moderated_users = set(data.get("moderated_users", []))
             self.category_counter = Counter(data.get("category_counter", {}))
 
+    def normalize_text(self, text):
+        """Normalize text to remove special fonts and diacritics."""
+        return ''.join(
+            c for c in unicodedata.normalize('NFKD', text)
+            if unicodedata.category(c) != 'Mn'
+        )
+
     @commands.Cog.listener()
     async def on_message(self, message):
         if message.author.bot:
@@ -51,13 +59,16 @@ class Omni(commands.Cog):
         if not api_key:
             return
 
+        # Normalize the message content
+        normalized_content = self.normalize_text(message.content)
+
         async with self.session.post(
             "https://api.openai.com/v1/moderations",
             headers={
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {api_key}"
             },
-            json={"input": message.content}
+            json={"input": normalized_content}
         ) as response:
             if response.status != 200:
                 # Log the error if the request failed
