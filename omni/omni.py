@@ -320,10 +320,11 @@ class Omni(commands.Cog):
             top_categories_bullets = "\n".join([f"- {cat.capitalize()}: {count}" for cat, count in top_categories])
             
             embed = discord.Embed(title="✨ AI is hard at work for you", color=0xfffffe)
+            embed.add_field(name="In this server", value="", inline=False)
             embed.add_field(name="Messages processed", value=str(self.message_count), inline=True)
             embed.add_field(name="Messages moderated", value=str(self.moderated_count), inline=True)
             embed.add_field(name="Users punished", value=str(len(self.moderated_users)), inline=True)
-            embed.add_field(name="Top violation categories", value=top_categories_bullets, inline=False)
+            embed.add_field(name="Most frequent reasons", value=top_categories_bullets, inline=False)
 
             # Global statistics
             if len(self.bot.guilds) > 1:
@@ -341,11 +342,11 @@ class Omni(commands.Cog):
 
                 global_top_categories = global_category_counter.most_common(5)
                 global_top_categories_bullets = "\n".join([f"- {cat.capitalize()}: {count}" for cat, count in global_top_categories])
-
-                embed.add_field(name="Global Messages processed", value=str(global_message_count), inline=True)
-                embed.add_field(name="Global Messages moderated", value=str(global_moderated_count), inline=True)
-                embed.add_field(name="Global Users punished", value=str(len(global_moderated_users)), inline=True)
-                embed.add_field(name="Global Top violation categories", value=global_top_categories_bullets, inline=False)
+                embed.add_field(name="Across all servers", value="", inline=False)
+                embed.add_field(name="Messages processed", value=str(global_message_count), inline=True)
+                embed.add_field(name="Messages moderated", value=str(global_moderated_count), inline=True)
+                embed.add_field(name="Users punished", value=str(len(global_moderated_users)), inline=True)
+                embed.add_field(name="Most frequent reasons", value=global_top_categories_bullets, inline=False)
 
             await ctx.send(embed=embed)
         except Exception as e:
