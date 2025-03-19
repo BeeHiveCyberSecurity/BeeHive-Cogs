@@ -10,7 +10,6 @@ class OpenAIModerationCog(commands.Cog):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=1234567890)
         self.config.register_guild(
-            api_key=None,
             moderation_threshold=0.5,
             timeout_duration=0,  # Duration in minutes
             log_channel=None,
@@ -27,7 +26,7 @@ class OpenAIModerationCog(commands.Cog):
         if not guild:
             return
 
-        api_key = await self.config.guild(guild).api_key()
+        api_key = await self.bot.get_shared_api_tokens("openai").get("api_key")
         if not api_key:
             return
 
@@ -106,12 +105,6 @@ class OpenAIModerationCog(commands.Cog):
     async def openaimod(self, ctx):
         """Commands for configuring OpenAI moderation."""
         pass
-
-    @openaimod.command()
-    async def setapikey(self, ctx, api_key: str):
-        """Set the OpenAI API key for this server."""
-        await self.config.guild(ctx.guild).api_key.set(api_key)
-        await ctx.send("API key set successfully.")
 
     @openaimod.command()
     async def setthreshold(self, ctx, threshold: float):
