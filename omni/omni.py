@@ -252,6 +252,26 @@ class Omni(commands.Cog):
         
         await ctx.send(embed=embed)
 
+    @omni.command()
+    async def settings(self, ctx):
+        """Show the current settings of the cog."""
+        guild = ctx.guild
+        moderation_threshold = await self.config.guild(guild).moderation_threshold()
+        timeout_duration = await self.config.guild(guild).timeout_duration()
+        log_channel_id = await self.config.guild(guild).log_channel()
+        debug_mode = await self.config.guild(guild).debug_mode()
+
+        log_channel = guild.get_channel(log_channel_id) if log_channel_id else "Not set"
+        log_channel_name = log_channel.mention if log_channel else "Not set"
+
+        embed = discord.Embed(title="Current Omni Settings", color=discord.Color.green())
+        embed.add_field(name="Moderation Threshold", value=str(moderation_threshold), inline=True)
+        embed.add_field(name="Timeout Duration", value=f"{timeout_duration} minutes", inline=True)
+        embed.add_field(name="Log Channel", value=log_channel_name, inline=True)
+        embed.add_field(name="Debug Mode", value="Enabled" if debug_mode else "Disabled", inline=True)
+
+        await ctx.send(embed=embed)
+
     def cog_unload(self):
         self.bot.loop.create_task(self.session.close())
 
