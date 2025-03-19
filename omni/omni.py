@@ -386,11 +386,11 @@ class Omni(commands.Cog):
                 global_moderated_user_percentage = (len(global_moderated_users) / total_members * 100) if total_members > 0 else 0
                 moderation_rate_difference = moderated_user_percentage - global_moderated_user_percentage
                 if moderation_rate_difference > 0:
-                    moderation_rate_comparison = f"Members in this server require `{moderation_rate_difference:.2f}%` more moderation on average compared to the global average. This server may have more abrasive users than most other servers in statistical comparison."
+                    moderation_rate_comparison = f"**Members in this server require `{moderation_rate_difference:.2f}%` more moderation on average compared to the global average.**\n> :warning: This server may have more abrasive users than most other servers in statistical comparison."
                 elif moderation_rate_difference < 0:
-                    moderation_rate_comparison = f"Members in this server require `{-moderation_rate_difference:.2f}%` less moderation on average compared to the global average. This server has members that are statistically friendlier and require less moderation & guidance."
+                    moderation_rate_comparison = f"**Members in this server require `{-moderation_rate_difference:.2f}%` less moderation on average compared to the global average.**\n> :peace: This server has members that are statistically friendlier and require less moderation & guidance."
                 else:
-                    moderation_rate_comparison = "Members in this server require the same level of moderation on average compared to the global average. Standard internet users, to statistical expectation."
+                    moderation_rate_comparison = "**Members in this server require the same level of moderation on average compared to the global average.**\n> :thumbs_up: Standard internet users, to statistical expectation."
 
                 def get_ordinal_suffix(n):
                     if 10 <= n % 100 <= 20:
@@ -400,7 +400,7 @@ class Omni(commands.Cog):
                     return suffix
 
                 rank_suffix = get_ordinal_suffix(rank)
-                embed.add_field(name="Trust and safety analysis", value=f"- **This server takes `{rank}{rank_suffix} place` out of `{total_guilds} servers`.**\n> In this scale, 1st place is the most abusive server, and your goal is to place as low as possible in position (losing is winning).\n\n- **This server is *statistically* more harmful than `{more_harmful_than_percentage:.2f}%` of servers, and less harmful than `{less_harmful_than_percentage:.2f}%` of servers.**\n> The goal is to be less harmful than as many server as possible, as less harmful communities are most likely to foster more engagement and growth than their more abusive counterparts.\n\n- **{moderation_rate_comparison}**\n> The goal is to require as little moderation as possible and to be moderated under the global average.", inline=False)
+                embed.add_field(name="Trust and safety analysis", value=f"- **This server takes `{rank}{rank_suffix} place` out of `{total_guilds} servers`.**\n> In this scale, 1st place is the most abusive server, and your goal is to place as low as possible in position (losing is winning).\n\n- **This server is *statistically* more harmful than `{more_harmful_than_percentage:.2f}%` of servers, and less harmful than `{less_harmful_than_percentage:.2f}%` of servers.**\n> The goal is to be less harmful than as many server as possible, as less harmful communities are most likely to foster more engagement and growth than their more abusive counterparts.\n\n- {moderation_rate_comparison}\n> The goal is to require as little moderation as possible and to be moderated under the global average.", inline=False)
 
                 if rank in [1, 2, 3]:
                     embed.add_field(name="Discord compliance", value=":rotating_light: **Extreme risk**\n> This server needs immediate improvement in moderation and user behavior to avoid potential suspensions, terminations, or other assorted compliance measures.", inline=False)
