@@ -367,7 +367,7 @@ class Omni(commands.Cog):
             embed.add_field(name="Messages processed", value=f"**{message_count:,}** message{'s' if message_count != 1 else ''}", inline=True)
             embed.add_field(name="Messages moderated", value=f"**{moderated_count:,}** message{'s' if moderated_count != 1 else ''} ({moderated_message_percentage:.2f}%)", inline=True)
             embed.add_field(name="Users punished", value=f"**{len(moderated_users):,}** user{'s' if len(moderated_users) != 1 else ''} ({moderated_user_percentage:.2f}%)", inline=True)
-            embed.add_field(name="Estimated moderator time saved", value=time_saved_str, inline=False)
+            embed.add_field(name="Estimated staff time saved", value=f"{time_saved_str} hands-on-keyboard time", inline=False)
             embed.add_field(name="Most frequent flags", value=top_categories_bullets, inline=False)
 
             # Show global stats, trust and safety analysis, and discord compliance if in more than 45 servers
@@ -436,7 +436,7 @@ class Omni(commands.Cog):
                 embed.add_field(name="Messages processed", value=f"**{global_message_count:,}** message{'s' if global_message_count != 1 else ''}", inline=True)
                 embed.add_field(name="Messages moderated", value=f"**{global_moderated_count:,}** message{'s' if global_moderated_count != 1 else ''} ({global_moderated_message_percentage:.2f}%)", inline=True)
                 embed.add_field(name="Users punished", value=f"**{len(global_moderated_users):,}** user{'s' if len(global_moderated_users) != 1 else ''} ({global_moderated_user_percentage:.2f}%)", inline=True)
-                embed.add_field(name="Estimated moderator time saved", value=global_time_saved_str, inline=False)
+                embed.add_field(name="Estimated staff time saved", value=f"{global_time_saved_str} hands-on-keyboard time", inline=False)
                 embed.add_field(name="Most frequent flags", value=global_top_categories_bullets, inline=False)
 
             await ctx.send(embed=embed)
