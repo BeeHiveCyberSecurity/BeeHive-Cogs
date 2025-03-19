@@ -9,7 +9,7 @@ import re
 class Omni(commands.Cog):
     """AI-powered automatic text and image moderation provided by frontier moderation models"""
 
-    VERSION = "0.0.1"
+    VERSION = "0.0.2"
 
     def __init__(self, bot):
         self.bot = bot
