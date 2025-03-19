@@ -183,14 +183,15 @@ class Omni(commands.Cog):
     async def stats(self, ctx):
         """Show statistics of the moderation activity."""
         top_categories = self.category_counter.most_common(3)
-        top_categories_str = ", ".join([f"{cat}: {count}" for cat, count in top_categories])
-        await ctx.send(
-            f"**Omni Moderation Stats:**\n"
-            f"Total messages processed: {self.message_count}\n"
-            f"Total messages auto-moderated: {self.moderated_count}\n"
-            f"Total users auto-moderated: {len(self.moderated_users)}\n"
-            f"Top categories of abusive content: {top_categories_str}"
-        )
+        top_categories_bullets = "\n".join([f"- {cat}: {count}" for cat, count in top_categories])
+        
+        embed = discord.Embed(title="AI is hard at work for you'", color=discord.Color.blue())
+        embed.add_field(name="Total messages processed", value=str(self.message_count), inline=False)
+        embed.add_field(name="Total messages auto-moderated", value=str(self.moderated_count), inline=False)
+        embed.add_field(name="Total users auto-moderated", value=str(len(self.moderated_users)), inline=False)
+        embed.add_field(name="Top categories of abusive content", value=top_categories_bullets, inline=False)
+        
+        await ctx.send(embed=embed)
 
     def cog_unload(self):
         self.bot.loop.create_task(self.session.close())
