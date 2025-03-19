@@ -356,6 +356,11 @@ class Omni(commands.Cog):
             moderated_message_percentage = (moderated_count / message_count * 100) if message_count > 0 else 0
             moderated_user_percentage = (len(moderated_users) / member_count * 100) if member_count > 0 else 0
 
+            # Calculate estimated moderator time saved
+            time_saved_seconds = moderated_count * 5  # Assuming 5 seconds per message
+            time_saved_minutes = time_saved_seconds // 60
+            time_saved_seconds %= 60
+
             top_categories = category_counter.most_common(5)
             top_categories_bullets = "\n".join([f"- **{cat.capitalize()}** x{count:,}" for cat, count in top_categories])
             
@@ -364,6 +369,7 @@ class Omni(commands.Cog):
             embed.add_field(name="Messages processed", value=f"**{message_count:,}** message{'s' if message_count != 1 else ''}", inline=True)
             embed.add_field(name="Messages moderated", value=f"**{moderated_count:,}** message{'s' if moderated_count != 1 else ''} ({moderated_message_percentage:.2f}%)", inline=True)
             embed.add_field(name="Users punished", value=f"**{len(moderated_users):,}** user{'s' if len(moderated_users) != 1 else ''} ({moderated_user_percentage:.2f}%)", inline=True)
+            embed.add_field(name="Estimated moderator time saved", value=f"**{time_saved_minutes}** minute{'s' if time_saved_minutes != 1 else ''} and **{time_saved_seconds}** second{'s' if time_saved_seconds != 1 else ''}", inline=True)
             embed.add_field(name="Most frequent reasons", value=top_categories_bullets, inline=False)
 
             # Global statistics
@@ -377,12 +383,18 @@ class Omni(commands.Cog):
                 global_moderated_message_percentage = (global_moderated_count / global_message_count * 100) if global_message_count > 0 else 0
                 global_moderated_user_percentage = (len(global_moderated_users) / total_members * 100) if total_members > 0 else 0
 
+                # Calculate global estimated moderator time saved
+                global_time_saved_seconds = global_moderated_count * 5  # Assuming 5 seconds per message
+                global_time_saved_minutes = global_time_saved_seconds // 60
+                global_time_saved_seconds %= 60
+
                 global_top_categories = global_category_counter.most_common(5)
                 global_top_categories_bullets = "\n".join([f"- **{cat.capitalize()}** x{count:,}" for cat, count in global_top_categories])
                 embed.add_field(name="Across all servers", value="", inline=False)
                 embed.add_field(name="Messages processed", value=f"**{global_message_count:,}** message{'s' if global_message_count != 1 else ''}", inline=True)
                 embed.add_field(name="Messages moderated", value=f"**{global_moderated_count:,}** message{'s' if global_moderated_count != 1 else ''} ({global_moderated_message_percentage:.2f}%)", inline=True)
                 embed.add_field(name="Users punished", value=f"**{len(global_moderated_users):,}** user{'s' if len(global_moderated_users) != 1 else ''} ({global_moderated_user_percentage:.2f}%)", inline=True)
+                embed.add_field(name="Estimated moderator time saved", value=f"**{global_time_saved_minutes}** minute{'s' if global_time_saved_minutes != 1 else ''} and **{global_time_saved_seconds}** second{'s' if global_time_saved_seconds != 1 else ''}", inline=True)
                 embed.add_field(name="Most frequent reasons", value=global_top_categories_bullets, inline=False)
 
             await ctx.send(embed=embed)
