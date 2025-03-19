@@ -1,7 +1,7 @@
 import discord
 from redbot.core import commands, Config
 import aiohttp
-from datetime import timedelta
+from datetime import timedelta, datetime
 from collections import Counter
 import unicodedata
 import re
@@ -189,11 +189,14 @@ class Omni(commands.Cog):
                     embed = discord.Embed(
                         title="✨ Message moderated using AI",
                         description=f"Message by {message.author.mention} was flagged and deleted.",
-                        color=0xff4545
+                        color=0xff4545,
+                        timestamp=datetime.utcnow()
                     )
                     embed.add_field(name="Content", value=message.content or "No content", inline=False)
+                    embed.add_field(name="Sender", value=f"{message.author} (ID: {message.author.id})", inline=True)
+                    embed.add_field(name="Channel", value=f"{message.channel} (ID: {message.channel.id})", inline=True)
                     moderation_threshold = await self.config.guild(guild).moderation_threshold()
-                    sorted_scores = sorted(category_scores.items(), key=lambda item: item[1], reverse=True)
+                    sorted_scores = sorted(category_scores.items(), key=lambda item: item[1], reverse=True)[:3]
                     for category, score in sorted_scores:
                         if score == 0.00:
                             score_display = ":white_check_mark: Clean"
@@ -215,11 +218,14 @@ class Omni(commands.Cog):
                     embed = discord.Embed(
                         title="AI screened a message and found no threat",
                         description=f"Message by {message.author.mention} was logged.",
-                        color=discord.Color.blue()
+                        color=discord.Color.blue(),
+                        timestamp=datetime.utcnow()
                     )
                     embed.add_field(name="Content", value=message.content or "No content", inline=False)
+                    embed.add_field(name="Sender", value=f"{message.author} (ID: {message.author.id})", inline=True)
+                    embed.add_field(name="Channel", value=f"{message.channel} (ID: {message.channel.id})", inline=True)
                     moderation_threshold = await self.config.guild(guild).moderation_threshold()
-                    sorted_scores = sorted(category_scores.items(), key=lambda item: item[1], reverse=True)
+                    sorted_scores = sorted(category_scores.items(), key=lambda item: item[1], reverse=True)[:3]
                     for category, score in sorted_scores:
                         if score == 0.00:
                             score_display = ":white_check_mark: Clean"
