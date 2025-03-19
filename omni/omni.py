@@ -55,11 +55,10 @@ class Omni(commands.Cog):
             log_channel = guild.get_channel(log_channel_id)
             if log_channel:
                 embed = discord.Embed(
-                    title="AI Moderation Update",
-                    description="AI moderation has been updated to a new version.",
-                    color=discord.Color.green()
+                    title="AI moderation has been updated",
+                    description=f"Your bot is now running version `{self.VERSION}`",
+                    color=discord.Color.from_rgb(43, 189, 142)
                 )
-                embed.add_field(name="New Version", value=self.VERSION, inline=False)
                 await log_channel.send(embed=embed)
 
     def normalize_text(self, text):
