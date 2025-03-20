@@ -796,7 +796,9 @@ class Omni(commands.Cog):
                     await interaction.response.send_message(f"Global moderation has been {status} across all servers.", ephemeral=True)
 
             # Send the interaction to the bot owner
-            await ctx.send("Choose the global moderation state:", view=GlobalStateView())
+            view = GlobalStateView()
+            await ctx.send("Choose the global moderation state:", view=view)
+            await view.wait()  # Wait for the interaction to complete
         except Exception as e:
             raise RuntimeError(f"Failed to toggle global moderation state: {e}")
 
