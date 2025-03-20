@@ -574,25 +574,25 @@ class Omni(commands.Cog):
             most_moderated = sorted(user_moderation_percentages.items(), key=lambda x: x[1][1] / x[1][0] if x[1][0] > 0 else 0, reverse=True)[:5]
             least_moderated = sorted(user_moderation_percentages.items(), key=lambda x: x[1][1] / x[1][0] if x[1][0] > 0 else 0)[:5]
 
-            embed = discord.Embed(title="User Moderation Statistics", color=0xfffffe)
+            embed = discord.Embed(title=f"{ctx.guild.name}'s most and least moderated", color=0xfffffe)
 
             if most_moderated:
                 most_moderated_str = "\n".join(
                     f"<@{user_id}>: {moderated}/{total} messages moderated ({(moderated / total * 100):.2f}%)"
                     for user_id, (total, moderated) in most_moderated if total > 0
                 )
-                embed.add_field(name="Most Moderated Users", value=most_moderated_str, inline=False)
+                embed.add_field(name="Most moderated", value=most_moderated_str, inline=False)
             else:
-                embed.add_field(name="Most Moderated Users", value="No data available.", inline=False)
+                embed.add_field(name="Most moderated", value="Omni is still collecting data, check back soon for more information about your server", inline=False)
 
             if least_moderated:
                 least_moderated_str = "\n".join(
                     f"<@{user_id}>: {moderated}/{total} messages moderated ({(moderated / total * 100):.2f}%)"
                     for user_id, (total, moderated) in least_moderated if total > 0
                 )
-                embed.add_field(name="Least Moderated Users", value=least_moderated_str, inline=False)
+                embed.add_field(name="Least moderated", value=least_moderated_str, inline=False)
             else:
-                embed.add_field(name="Least Moderated Users", value="No data available.", inline=False)
+                embed.add_field(name="Least moderated", value="Omni is still collecting data, check back soon for more information about your server", inline=False)
 
             await ctx.send(embed=embed)
         except Exception as e:
