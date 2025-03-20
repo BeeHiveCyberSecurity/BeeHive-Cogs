@@ -345,7 +345,7 @@ class Omni(commands.Cog):
 
         **Recommendations**
         - For general communities, a threshold of `0.50` is often effective.
-        - For stricter moderation, consider a threshold below `0.30`.
+        - For professional communities (or if stricter moderation is preferred), consider a threshold below `0.40`.
         - For more lenient settings, a threshold above `0.70` might be suitable.
         """
         try:
