@@ -776,31 +776,29 @@ class Omni(commands.Cog):
     @omni.command()
     @commands.is_owner()
     async def globalstate(self, ctx):
-        """Toggle global moderation state across all servers."""
+        """Toggle default moderation state for new servers."""
         try:
             # Create a view with buttons for the owner to choose
-            class GlobalStateView(discord.ui.View):
-                @discord.ui.button(label="Activate", style=discord.ButtonStyle.green)
-                async def activate(self, button: discord.ui.Button, interaction: discord.Interaction):
-                    await self.toggle_global_moderation(True, interaction)
+            class DefaultModerationStateView(discord.ui.View):
+                @discord.ui.button(label="Enable by Default", style=discord.ButtonStyle.green)
+                async def enable_by_default(self, button: discord.ui.Button, interaction: discord.Interaction):
+                    await self.toggle_default_moderation(True, interaction)
 
-                @discord.ui.button(label="Deactivate", style=discord.ButtonStyle.red)
-                async def deactivate(self, button: discord.ui.Button, interaction: discord.Interaction):
-                    await self.toggle_global_moderation(False, interaction)
+                @discord.ui.button(label="Disable by Default", style=discord.ButtonStyle.red)
+                async def disable_by_default(self, button: discord.ui.Button, interaction: discord.Interaction):
+                    await self.toggle_default_moderation(False, interaction)
 
-                async def toggle_global_moderation(self, state, interaction):
-                    all_guilds = await self.config.all_guilds()
-                    for guild_id in all_guilds:
-                        await self.config.guild_from_id(guild_id).moderation_enabled.set(state)
-                    status = "activated" if state else "de-activated"
-                    await interaction.response.send_message(f"Global moderation has been {status} across all servers.", ephemeral=True)
+                async def toggle_default_moderation(self, state, interaction):
+                    await self.config.default_moderation_enabled.set(state)
+                    status = "enabled" if state else "disabled"
+                    await interaction.response.send_message(f"Moderation is now {status} by default for new servers.", ephemeral=True)
 
             # Send the interaction to the bot owner
-            view = GlobalStateView()
-            await ctx.send("Choose the global moderation state:", view=view)
+            view = DefaultModerationStateView()
+            await ctx.send("Choose the default moderation state for new servers:", view=view)
             await view.wait()  # Wait for the interaction to complete
         except Exception as e:
-            raise RuntimeError(f"Failed to toggle global moderation state: {e}")
+            raise RuntimeError(f"Failed to toggle default moderation state: {e}")
 
     def cog_unload(self):
         try:
