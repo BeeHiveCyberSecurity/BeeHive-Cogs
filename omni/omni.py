@@ -721,9 +721,9 @@ class Omni(commands.Cog):
 
             # Confirmation message
             confirmation_embed = discord.Embed(
-                title="Cleanup Complete",
+                title="Data cleanup completed",
                 description=f"All statistics and counters have been reset.\nTotal data deleted: {size_str}.",
-                color=discord.Color.green()
+                color=0x2bbd8e
             )
             await ctx.send(embed=confirmation_embed)
 
