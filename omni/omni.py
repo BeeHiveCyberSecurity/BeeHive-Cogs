@@ -409,7 +409,7 @@ class Omni(commands.Cog):
         except Exception as e:
             raise RuntimeError(f"Failed to update whitelist: {e}")
 
-    @omni.command()
+    @omni.command(hidden=True)
     @commands.is_owner()
     async def debug(self, ctx):
         """Toggle debug mode to log all messages and their scores."""
