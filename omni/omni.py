@@ -2,7 +2,7 @@ import discord
 from redbot.core import commands, Config
 import aiohttp
 from datetime import timedelta, datetime
-from collections import Counter
+from collections import Counter, defaultdict
 import unicodedata
 import re
 import asyncio
@@ -26,7 +26,8 @@ class Omni(commands.Cog):
             category_counter={},
             whitelisted_channels=[],
             cog_version=self.VERSION,
-            moderation_enabled=False
+            moderation_enabled=False,
+            user_message_counts={}
         )
         self.config.register_global(
             global_message_count=0,
@@ -95,6 +96,9 @@ class Omni(commands.Cog):
             await self.increment_statistic(guild, 'message_count')
             await self.increment_statistic('global', 'global_message_count')
 
+            # Update user message count
+            await self.increment_user_message_count(guild, message.author.id)
+
             api_tokens = await self.bot.get_shared_api_tokens("openai")
             api_key = api_tokens.get("api_key")
             if not api_key:
@@ -132,6 +136,11 @@ class Omni(commands.Cog):
         else:
             current_value = await self.config.guild(guild).get_attr(stat_name)() + 1
             await self.config.guild(guild).get_attr(stat_name).set(current_value)
+
+    async def increment_user_message_count(self, guild, user_id):
+        user_message_counts = await self.config.guild(guild).user_message_counts()
+        user_message_counts[user_id] = user_message_counts.get(user_id, 0) + 1
+        await self.config.guild(guild).user_message_counts.set(user_message_counts)
 
     async def update_moderation_stats(self, guild, message, text_category_scores):
         await self.increment_statistic(guild, 'moderated_count')
@@ -545,6 +554,49 @@ class Omni(commands.Cog):
             await ctx.send(embed=embed)
         except Exception as e:
             raise RuntimeError(f"Failed to display reasons: {e}")
+
+    @omni.command()
+    @commands.admin_or_permissions(manage_guild=True)
+    async def users(self, ctx):
+        """Show the 5 most and least frequently moderated users."""
+        try:
+            guild = ctx.guild
+            user_message_counts = await self.config.guild(guild).user_message_counts()
+            moderated_users = await self.config.guild(guild).moderated_users()
+
+            # Calculate moderation percentages
+            user_moderation_percentages = {
+                user_id: (user_message_counts.get(user_id, 0), moderated_users.count(user_id))
+                for user_id in user_message_counts
+            }
+
+            # Sort users by moderation percentage
+            most_moderated = sorted(user_moderation_percentages.items(), key=lambda x: x[1][1] / x[1][0] if x[1][0] > 0 else 0, reverse=True)[:5]
+            least_moderated = sorted(user_moderation_percentages.items(), key=lambda x: x[1][1] / x[1][0] if x[1][0] > 0 else 0)[:5]
+
+            embed = discord.Embed(title="User Moderation Statistics", color=0xfffffe)
+
+            if most_moderated:
+                most_moderated_str = "\n".join(
+                    f"<@{user_id}>: {moderated}/{total} messages moderated ({(moderated / total * 100):.2f}%)"
+                    for user_id, (total, moderated) in most_moderated if total > 0
+                )
+                embed.add_field(name="Most Moderated Users", value=most_moderated_str, inline=False)
+            else:
+                embed.add_field(name="Most Moderated Users", value="No data available.", inline=False)
+
+            if least_moderated:
+                least_moderated_str = "\n".join(
+                    f"<@{user_id}>: {moderated}/{total} messages moderated ({(moderated / total * 100):.2f}%)"
+                    for user_id, (total, moderated) in least_moderated if total > 0
+                )
+                embed.add_field(name="Least Moderated Users", value=least_moderated_str, inline=False)
+            else:
+                embed.add_field(name="Least Moderated Users", value="No data available.", inline=False)
+
+            await ctx.send(embed=embed)
+        except Exception as e:
+            raise RuntimeError(f"Failed to display user moderation statistics: {e}")
 
     def cog_unload(self):
         try:
