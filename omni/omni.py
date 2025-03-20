@@ -343,7 +343,7 @@ class Omni(commands.Cog):
 
         Adjust this setting based on your community's needs for moderation sensitivity.
 
-        Recommendations:
+        ### Recommendations
         - For general communities, a threshold of `0.50` is often effective.
         - For stricter moderation, consider a threshold below `0.30`.
         - For more lenient settings, a threshold above `0.70` might be suitable.
