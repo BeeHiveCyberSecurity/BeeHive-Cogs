@@ -29,7 +29,9 @@ class Omni(commands.Cog):
             moderation_enabled=True,
             user_message_counts={},
             image_count=0,
-            moderated_image_count=0
+            moderated_image_count=0,
+            timeout_count=0,  # Track the number of timeouts issued
+            total_timeout_duration=0  # Track the total duration of timeouts in minutes
         )
         self.config.register_global(
             global_message_count=0,
@@ -37,7 +39,9 @@ class Omni(commands.Cog):
             global_moderated_users=[],
             global_category_counter={},
             global_image_count=0,
-            global_moderated_image_count=0
+            global_moderated_image_count=0,
+            global_timeout_count=0,  # Track the number of global timeouts issued
+            global_total_timeout_duration=0  # Track the total global duration of timeouts in minutes
         )
         self.session = None
 
@@ -147,12 +151,12 @@ class Omni(commands.Cog):
         except Exception as e:
             raise RuntimeError(f"Error processing message: {e}")
 
-    async def increment_statistic(self, guild, stat_name):
+    async def increment_statistic(self, guild, stat_name, increment_value=1):
         if guild == 'global':
-            current_value = await self.config.get_attr(stat_name)() + 1
+            current_value = await self.config.get_attr(stat_name)() + increment_value
             await self.config.get_attr(stat_name).set(current_value)
         else:
-            current_value = await self.config.guild(guild).get_attr(stat_name)() + 1
+            current_value = await self.config.guild(guild).get_attr(stat_name)() + increment_value
             await self.config.guild(guild).get_attr(stat_name).set(current_value)
 
     async def increment_user_message_count(self, guild, user_id):
@@ -247,6 +251,11 @@ class Omni(commands.Cog):
                         f"{category}: {score:.2f}" for category, score in category_scores.items() if score > 0.2
                     )
                     await message.author.timeout(timedelta(minutes=timeout_duration), reason=reason)
+                    # Increment timeout count and total timeout duration
+                    await self.increment_statistic(guild, 'timeout_count')
+                    await self.increment_statistic('global', 'global_timeout_count')
+                    await self.increment_statistic(guild, 'total_timeout_duration', timeout_duration)
+                    await self.increment_statistic('global', 'global_total_timeout_duration', timeout_duration)
                 except discord.Forbidden:
                     pass
 
@@ -408,6 +417,8 @@ class Omni(commands.Cog):
             category_counter = Counter(await self.config.guild(ctx.guild).category_counter())
             image_count = await self.config.guild(ctx.guild).image_count()
             moderated_image_count = await self.config.guild(ctx.guild).moderated_image_count()
+            timeout_count = await self.config.guild(ctx.guild).timeout_count()
+            total_timeout_duration = await self.config.guild(ctx.guild).total_timeout_duration()
 
             member_count = ctx.guild.member_count
             moderated_message_percentage = (moderated_count / message_count * 100) if message_count > 0 else 0
@@ -429,6 +440,17 @@ class Omni(commands.Cog):
             else:
                 time_saved_str = f"**{time_saved_seconds}** second{'s' if time_saved_seconds != 1 else ''}"
 
+            # Calculate total timeout duration in a readable format
+            timeout_days, timeout_hours = divmod(total_timeout_duration, 1440)  # 1440 minutes in a day
+            timeout_hours, timeout_minutes = divmod(timeout_hours, 60)
+
+            if timeout_days > 0:
+                timeout_duration_str = f"**{timeout_days}** day{'s' if timeout_days != 1 else ''}, **{timeout_hours}** hour{'s' if timeout_hours != 1 else ''}"
+            elif timeout_hours > 0:
+                timeout_duration_str = f"**{timeout_hours}** hour{'s' if timeout_hours != 1 else ''}, **{timeout_minutes}** minute{'s' if timeout_minutes != 1 else ''}"
+            else:
+                timeout_duration_str = f"**{timeout_minutes}** minute{'s' if timeout_minutes != 1 else ''}"
+
             top_categories = category_counter.most_common(5)
             top_categories_bullets = "\n".join([f"- **{cat.capitalize()}** x{count:,}" for cat, count in top_categories])
             
@@ -439,6 +461,8 @@ class Omni(commands.Cog):
             embed.add_field(name="Users punished", value=f"**{len(moderated_users):,}** user{'s' if len(moderated_users) != 1 else ''} ({moderated_user_percentage:.2f}%)", inline=True)
             embed.add_field(name="Images processed", value=f"**{image_count:,}** image{'s' if image_count != 1 else ''}", inline=True)
             embed.add_field(name="Images moderated", value=f"**{moderated_image_count:,}** image{'s' if moderated_image_count != 1 else ''} ({moderated_image_percentage:.2f}%)", inline=True)
+            embed.add_field(name="Timeouts issued", value=f"**{timeout_count:,}** timeout{'s' if timeout_count != 1 else ''}", inline=True)
+            embed.add_field(name="Total timeout duration", value=f"{timeout_duration_str}", inline=True)
             embed.add_field(name="Estimated staff time saved", value=f"{time_saved_str} of **hands-on-keyboard** time", inline=False)
             embed.add_field(name="Most frequent flags", value=top_categories_bullets, inline=False)
 
@@ -486,6 +510,8 @@ class Omni(commands.Cog):
                 global_category_counter = Counter(await self.config.global_category_counter())
                 global_image_count = await self.config.global_image_count()
                 global_moderated_image_count = await self.config.global_moderated_image_count()
+                global_timeout_count = await self.config.global_timeout_count()
+                global_total_timeout_duration = await self.config.global_total_timeout_duration()
 
                 global_moderated_message_percentage = (global_moderated_count / global_message_count * 100) if global_message_count > 0 else 0
                 global_moderated_image_percentage = (global_moderated_image_count / global_image_count * 100) if global_image_count > 0 else 0
@@ -505,6 +531,17 @@ class Omni(commands.Cog):
                 else:
                     global_time_saved_str = f"**{global_time_saved_seconds}** second{'s' if global_time_saved_seconds != 1 else ''}"
 
+                # Calculate global total timeout duration in a readable format
+                global_timeout_days, global_timeout_hours = divmod(global_total_timeout_duration, 1440)  # 1440 minutes in a day
+                global_timeout_hours, global_timeout_minutes = divmod(global_timeout_hours, 60)
+
+                if global_timeout_days > 0:
+                    global_timeout_duration_str = f"**{global_timeout_days}** day{'s' if global_timeout_days != 1 else ''}, **{global_timeout_hours}** hour{'s' if global_timeout_hours != 1 else ''}"
+                elif global_timeout_hours > 0:
+                    global_timeout_duration_str = f"**{global_timeout_hours}** hour{'s' if global_timeout_hours != 1 else ''}, **{global_timeout_minutes}** minute{'s' if global_timeout_minutes != 1 else ''}"
+                else:
+                    global_timeout_duration_str = f"**{global_timeout_minutes}** minute{'s' if global_timeout_minutes != 1 else ''}"
+
                 global_top_categories = global_category_counter.most_common(5)
                 global_top_categories_bullets = "\n".join([f"- **{cat.capitalize()}** x{count:,}" for cat, count in global_top_categories])
                 embed.add_field(name="Across all monitored servers", value="", inline=False)
@@ -513,6 +550,8 @@ class Omni(commands.Cog):
                 embed.add_field(name="Users punished", value=f"**{len(global_moderated_users):,}** user{'s' if len(global_moderated_users) != 1 else ''} ({global_moderated_user_percentage:.2f}%)", inline=True)
                 embed.add_field(name="Images processed", value=f"**{global_image_count:,}** image{'s' if global_image_count != 1 else ''}", inline=True)
                 embed.add_field(name="Images moderated", value=f"**{global_moderated_image_count:,}** image{'s' if global_moderated_image_count != 1 else ''} ({global_moderated_image_percentage:.2f}%)", inline=True)
+                embed.add_field(name="Timeouts issued", value=f"**{global_timeout_count:,}** timeout{'s' if global_timeout_count != 1 else ''}", inline=True)
+                embed.add_field(name="Total timeout duration", value=f"{global_timeout_duration_str}", inline=True)
                 embed.add_field(name="Estimated staff time saved", value=f"{global_time_saved_str} of **hands-on-keyboard** time", inline=False)
                 embed.add_field(name="Most frequent flags", value=global_top_categories_bullets, inline=False)
 
@@ -690,6 +729,8 @@ class Omni(commands.Cog):
                 await guild_conf.user_message_counts.set({})
                 await guild_conf.image_count.set(0)
                 await guild_conf.moderated_image_count.set(0)
+                await guild_conf.timeout_count.set(0)
+                await guild_conf.total_timeout_duration.set(0)
 
             # Reset global statistics
             await self.config.global_message_count.set(0)
@@ -698,6 +739,8 @@ class Omni(commands.Cog):
             await self.config.global_category_counter.set({})
             await self.config.global_image_count.set(0)
             await self.config.global_moderated_image_count.set(0)
+            await self.config.global_timeout_count.set(0)
+            await self.config.global_total_timeout_duration.set(0)
 
             # Calculate data size after cleanup
             data_size_after_cleanup = 0
@@ -729,6 +772,33 @@ class Omni(commands.Cog):
 
         except Exception as e:
             raise RuntimeError(f"Failed to reset statistics: {e}")
+
+    @omni.command()
+    @commands.is_owner()
+    async def globalstate(self, ctx):
+        """Toggle global moderation state across all servers."""
+        try:
+            # Create a view with buttons for the owner to choose
+            class GlobalStateView(discord.ui.View):
+                @discord.ui.button(label="Activate", style=discord.ButtonStyle.green)
+                async def activate(self, button: discord.ui.Button, interaction: discord.Interaction):
+                    await self.toggle_global_moderation(True, interaction)
+
+                @discord.ui.button(label="Deactivate", style=discord.ButtonStyle.red)
+                async def deactivate(self, button: discord.ui.Button, interaction: discord.Interaction):
+                    await self.toggle_global_moderation(False, interaction)
+
+                async def toggle_global_moderation(self, state, interaction):
+                    all_guilds = await self.config.all_guilds()
+                    for guild_id in all_guilds:
+                        await self.config.guild_from_id(guild_id).moderation_enabled.set(state)
+                    status = "activated" if state else "de-activated"
+                    await interaction.response.send_message(f"Global moderation has been {status} across all servers.", ephemeral=True)
+
+            # Send the interaction to the bot owner
+            await ctx.send("Choose the global moderation state:", view=GlobalStateView())
+        except Exception as e:
+            raise RuntimeError(f"Failed to toggle global moderation state: {e}")
 
     def cog_unload(self):
         try:
