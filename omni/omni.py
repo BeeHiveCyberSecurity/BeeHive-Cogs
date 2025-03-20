@@ -789,7 +789,7 @@ class Omni(commands.Cog):
                     await self.toggle_default_moderation(False, interaction)
 
                 async def toggle_default_moderation(self, state, interaction):
-                    await self.config.default_moderation_enabled.set(state)
+                    await self.config.moderation_enabled.set(state)
                     status = "enabled" if state else "disabled"
                     await interaction.response.send_message(f"Moderation is now {status} by default for new servers.", ephemeral=True)
 
