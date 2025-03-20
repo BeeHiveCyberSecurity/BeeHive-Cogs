@@ -27,13 +27,17 @@ class Omni(commands.Cog):
             whitelisted_channels=[],
             cog_version=self.VERSION,
             moderation_enabled=False,
-            user_message_counts={}
+            user_message_counts={},
+            image_count=0,
+            moderated_image_count=0
         )
         self.config.register_global(
             global_message_count=0,
             global_moderated_count=0,
             global_moderated_users=[],
-            global_category_counter={}
+            global_category_counter={},
+            global_image_count=0,
+            global_moderated_image_count=0
         )
         self.session = None
 
@@ -122,6 +126,8 @@ class Omni(commands.Cog):
                             "type": "image_url",
                             "image_url": {"url": attachment.url}
                         })
+                        await self.increment_statistic(guild, 'image_count')
+                        await self.increment_statistic('global', 'global_image_count')
 
             # Analyze text and image content
             text_category_scores = await self.analyze_content(input_data, api_key, message)
@@ -163,6 +169,11 @@ class Omni(commands.Cog):
 
         await self.update_category_counter(guild, 'category_counter', text_category_scores)
         await self.update_category_counter('global', 'global_category_counter', text_category_scores)
+
+        # Check if the message contains images and update moderated image count
+        if any(attachment.content_type.startswith("image/") and not attachment.content_type.endswith("gif") for attachment in message.attachments):
+            await self.increment_statistic(guild, 'moderated_image_count')
+            await self.increment_statistic('global', 'global_moderated_image_count')
 
     async def update_user_list(self, guild, list_name, user_id):
         if guild == 'global':
@@ -256,6 +267,14 @@ class Omni(commands.Cog):
                     for category, score in sorted_scores:
                         score_display = f"**{score:.2f}**" if score > moderation_threshold else f"{score:.2f}"
                         embed.add_field(name=category.capitalize(), value=score_display, inline=True)
+                    
+                    # Add image to embed if present
+                    if message.attachments:
+                        for attachment in message.attachments:
+                            if attachment.content_type.startswith("image/") and not attachment.content_type.endswith("gif"):
+                                embed.set_image(url=attachment.url)
+                                break
+
                     await log_channel.send(embed=embed)
         except Exception as e:
             raise RuntimeError(f"Failed to handle moderation: {e}")
@@ -284,6 +303,14 @@ class Omni(commands.Cog):
                         embed.add_field(name=category.capitalize(), value=score_display, inline=True)
                     if error_code:
                         embed.add_field(name="Error", value=f":x: `{error_code}` Failed to send to OpenAI endpoint.", inline=False)
+                    
+                    # Add image to embed if present
+                    if message.attachments:
+                        for attachment in message.attachments:
+                            if attachment.content_type.startswith("image/") and not attachment.content_type.endswith("gif"):
+                                embed.set_image(url=attachment.url)
+                                break
+
                     await log_channel.send(embed=embed)
         except Exception as e:
             raise RuntimeError(f"Failed to log message: {e}")
@@ -379,10 +406,13 @@ class Omni(commands.Cog):
             moderated_count = await self.config.guild(ctx.guild).moderated_count()
             moderated_users = await self.config.guild(ctx.guild).moderated_users()
             category_counter = Counter(await self.config.guild(ctx.guild).category_counter())
+            image_count = await self.config.guild(ctx.guild).image_count()
+            moderated_image_count = await self.config.guild(ctx.guild).moderated_image_count()
 
             member_count = ctx.guild.member_count
             moderated_message_percentage = (moderated_count / message_count * 100) if message_count > 0 else 0
             moderated_user_percentage = (len(moderated_users) / member_count * 100) if member_count > 0 else 0
+            moderated_image_percentage = (moderated_image_count / image_count * 100) if image_count > 0 else 0
 
             # Calculate estimated moderator time saved
             time_saved_seconds = (moderated_count * 5) + message_count  # 5 seconds per moderated message + 1 second per message read
@@ -407,6 +437,8 @@ class Omni(commands.Cog):
             embed.add_field(name="Messages processed", value=f"**{message_count:,}** message{'s' if message_count != 1 else ''}", inline=True)
             embed.add_field(name="Messages moderated", value=f"**{moderated_count:,}** message{'s' if moderated_count != 1 else ''} ({moderated_message_percentage:.2f}%)", inline=True)
             embed.add_field(name="Users punished", value=f"**{len(moderated_users):,}** user{'s' if len(moderated_users) != 1 else ''} ({moderated_user_percentage:.2f}%)", inline=True)
+            embed.add_field(name="Images processed", value=f"**{image_count:,}** image{'s' if image_count != 1 else ''}", inline=True)
+            embed.add_field(name="Images moderated", value=f"**{moderated_image_count:,}** image{'s' if moderated_image_count != 1 else ''} ({moderated_image_percentage:.2f}%)", inline=True)
             embed.add_field(name="Estimated staff time saved", value=f"{time_saved_str} of **hands-on-keyboard** time", inline=False)
             embed.add_field(name="Most frequent flags", value=top_categories_bullets, inline=False)
 
@@ -452,8 +484,11 @@ class Omni(commands.Cog):
                 global_message_count = await self.config.global_message_count()
                 global_moderated_count = await self.config.global_moderated_count()
                 global_category_counter = Counter(await self.config.global_category_counter())
+                global_image_count = await self.config.global_image_count()
+                global_moderated_image_count = await self.config.global_moderated_image_count()
 
                 global_moderated_message_percentage = (global_moderated_count / global_message_count * 100) if global_message_count > 0 else 0
+                global_moderated_image_percentage = (global_moderated_image_count / global_image_count * 100) if global_image_count > 0 else 0
 
                 # Calculate global estimated moderator time saved
                 global_time_saved_seconds = (global_moderated_count * 5) + global_message_count  # 5 seconds per moderated message + 1 second per message read
@@ -476,6 +511,8 @@ class Omni(commands.Cog):
                 embed.add_field(name="Messages processed", value=f"**{global_message_count:,}** message{'s' if global_message_count != 1 else ''}", inline=True)
                 embed.add_field(name="Messages moderated", value=f"**{global_moderated_count:,}** message{'s' if global_moderated_count != 1 else ''} ({global_moderated_message_percentage:.2f}%)", inline=True)
                 embed.add_field(name="Users punished", value=f"**{len(global_moderated_users):,}** user{'s' if len(global_moderated_users) != 1 else ''} ({global_moderated_user_percentage:.2f}%)", inline=True)
+                embed.add_field(name="Images processed", value=f"**{global_image_count:,}** image{'s' if global_image_count != 1 else ''}", inline=True)
+                embed.add_field(name="Images moderated", value=f"**{global_moderated_image_count:,}** image{'s' if global_moderated_image_count != 1 else ''} ({global_moderated_image_percentage:.2f}%)", inline=True)
                 embed.add_field(name="Estimated staff time saved", value=f"{global_time_saved_str} of **hands-on-keyboard** time", inline=False)
                 embed.add_field(name="Most frequent flags", value=global_top_categories_bullets, inline=False)
 
@@ -573,6 +610,8 @@ class Omni(commands.Cog):
             guild = ctx.guild
             user_message_counts = await self.config.guild(guild).user_message_counts()
             moderated_users = await self.config.guild(guild).moderated_users()
+            user_image_counts = await self.config.guild(guild).image_count()
+            moderated_image_counts = await self.config.guild(guild).moderated_image_count()
 
             # Calculate moderation percentages
             user_moderation_percentages = {
@@ -592,7 +631,7 @@ class Omni(commands.Cog):
                     user = await self.bot.fetch_user(user_id)
                     embed.add_field(
                         name=f"{user.name} (ID: {user_id})",
-                        value=f"📝 **{total}**\n🚨 **{moderated}** ({(moderated / total * 100):.2f}%)",
+                        value=f"📝 **{total}**\n🚨 **{moderated}** ({(moderated / total * 100):.2f}%)\n🖼️ **{user_image_counts}**\n🚨🖼️ **{moderated_image_counts}**",
                         inline=False
                     )
 
@@ -602,7 +641,7 @@ class Omni(commands.Cog):
                     user = await self.bot.fetch_user(user_id)
                     embed.add_field(
                         name=f"{user.name} (ID: {user_id})",
-                        value=f"📝 **{total}**\n🚨 **{moderated}** ({(moderated / total * 100):.2f}%)",
+                        value=f"📝 **{total}**\n🚨 **{moderated}** ({(moderated / total * 100):.2f}%)\n🖼️ **{user_image_counts}**\n🚨🖼️ **{moderated_image_counts}**",
                         inline=False
                     )
 
