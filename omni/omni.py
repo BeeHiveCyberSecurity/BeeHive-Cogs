@@ -662,8 +662,6 @@ class Omni(commands.Cog):
             guild = ctx.guild
             user_message_counts = await self.config.guild(guild).user_message_counts()
             moderated_users = await self.config.guild(guild).moderated_users()
-            user_image_counts = await self.config.guild(guild).image_count()
-            moderated_image_counts = await self.config.guild(guild).moderated_image_count()
 
             # Calculate moderation percentages
             user_moderation_percentages = {
@@ -684,7 +682,7 @@ class Omni(commands.Cog):
                     user = await self.bot.fetch_user(user_id)
                     embed.add_field(
                         name=f"{user.name} (ID: {user_id})",
-                        value=f"📝 **{total}** | 🚨 **{moderated}** ({(moderated / total * 100):.2f}%)\n🖼️ **{user_image_counts}** | 🚨 **{moderated_image_counts}**",
+                        value=f"📝 **{total}** messages sent | 🚨 **{moderated}** messages moderated ({(moderated / total * 100):.2f}%)",
                         inline=False
                     )
 
@@ -695,7 +693,7 @@ class Omni(commands.Cog):
                     user = await self.bot.fetch_user(user_id)
                     embed.add_field(
                         name=f"{user.name} (ID: {user_id})",
-                        value=f"📝 **{total}** sent, **{moderated}** ({(moderated / total * 100):.2f}%) moderated\n🖼️ **{user_image_counts}** sent, **{moderated_image_counts}** moderated",
+                        value=f"📝 **{total}** messages sent | 🚨 **{moderated}** messages moderated ({(moderated / total * 100):.2f}%)",
                         inline=False
                     )
 
