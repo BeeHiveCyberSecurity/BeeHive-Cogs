@@ -649,6 +649,87 @@ class Omni(commands.Cog):
         except Exception as e:
             raise RuntimeError(f"Failed to display user moderation statistics: {e}")
 
+    @omni.command()
+    @commands.is_owner()
+    async def cleanup(self, ctx):
+        """Reset all server and global statistics and counters."""
+        try:
+            # Warning message
+            warning_embed = discord.Embed(
+                title="Warning",
+                description="This operation is computationally intensive and will reset all server and global statistics and counters. Please confirm by typing 'CONFIRM'.",
+                color=discord.Color.red()
+            )
+            await ctx.send(embed=warning_embed)
+
+            def check(m):
+                return m.author == ctx.author and m.content == "CONFIRM" and m.channel == ctx.channel
+
+            try:
+                await self.bot.wait_for('message', check=check, timeout=30)
+            except asyncio.TimeoutError:
+                await ctx.send("Cleanup operation cancelled due to timeout.")
+                return
+
+            # Calculate data size before cleanup
+            total_data_size = 0
+            all_guilds = await self.config.all_guilds()
+            for guild_id, data in all_guilds.items():
+                total_data_size += sum(len(str(value)) for value in data.values())
+
+            global_data = await self.config.all_global()
+            total_data_size += sum(len(str(value)) for value in global_data.values())
+
+            # Reset all guild statistics
+            for guild_id in all_guilds:
+                guild_conf = self.config.guild_from_id(guild_id)
+                await guild_conf.message_count.set(0)
+                await guild_conf.moderated_count.set(0)
+                await guild_conf.moderated_users.set([])
+                await guild_conf.category_counter.set({})
+                await guild_conf.user_message_counts.set({})
+                await guild_conf.image_count.set(0)
+                await guild_conf.moderated_image_count.set(0)
+
+            # Reset global statistics
+            await self.config.global_message_count.set(0)
+            await self.config.global_moderated_count.set(0)
+            await self.config.global_moderated_users.set([])
+            await self.config.global_category_counter.set({})
+            await self.config.global_image_count.set(0)
+            await self.config.global_moderated_image_count.set(0)
+
+            # Calculate data size after cleanup
+            data_size_after_cleanup = 0
+            all_guilds = await self.config.all_guilds()
+            for guild_id, data in all_guilds.items():
+                data_size_after_cleanup += sum(len(str(value)) for value in data.values())
+
+            global_data = await self.config.all_global()
+            data_size_after_cleanup += sum(len(str(value)) for value in global_data.values())
+
+            # Calculate deleted data size
+            deleted_data_size = total_data_size - data_size_after_cleanup
+
+            # Convert to appropriate size unit
+            if deleted_data_size < 1024:
+                size_str = f"{deleted_data_size} bytes"
+            elif deleted_data_size < 1024**2:
+                size_str = f"{deleted_data_size / 1024:.2f} KB"
+            else:
+                size_str = f"{deleted_data_size / 1024**2:.2f} MB"
+
+            # Confirmation message
+            confirmation_embed = discord.Embed(
+                title="Cleanup Complete",
+                description=f"All statistics and counters have been reset.\nTotal data deleted: {size_str}.",
+                color=discord.Color.green()
+            )
+            await ctx.send(embed=confirmation_embed)
+
+        except Exception as e:
+            raise RuntimeError(f"Failed to reset statistics: {e}")
+
     def cog_unload(self):
         try:
             if self.session and not self.session.closed:
