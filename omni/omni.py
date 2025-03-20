@@ -696,7 +696,7 @@ class Omni(commands.Cog):
             # Warning message
             warning_embed = discord.Embed(
                 title="You're about to perform a destructive operation",
-                description="This operation is computationally intensive and will reset all server and global statistics and counters for Omni. Please confirm by typing `CONFIRM`.",
+                description="This operation is computationally intensive and will reset all server and global statistics and counters for Omni. **This deletion is irreversible.**\n\nPlease confirm by typing `CONFIRM`.",
                 color=0xff4545
             )
             await ctx.send(embed=warning_embed)
