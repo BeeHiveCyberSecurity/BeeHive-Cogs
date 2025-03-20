@@ -45,6 +45,16 @@ class Omni(commands.Cog):
         )
         self.session = None
 
+        # In-memory statistics
+        self.memory_stats = defaultdict(lambda: defaultdict(int))
+        self.memory_user_message_counts = defaultdict(lambda: defaultdict(int))
+        self.memory_moderated_users = defaultdict(set)
+        self.memory_category_counter = defaultdict(Counter)
+
+        # Save interval in seconds
+        self.save_interval = 300  # Save every 5 minutes
+        self.bot.loop.create_task(self.periodic_save())
+
     async def initialize(self):
         try:
             self.session = aiohttp.ClientSession()
@@ -100,12 +110,12 @@ class Omni(commands.Cog):
             if message.channel.id in whitelisted_channels:
                 return
 
-            # Update per-server and global statistics
-            await self.increment_statistic(guild, 'message_count')
-            await self.increment_statistic('global', 'global_message_count')
+            # Update per-server and global statistics in memory
+            self.increment_statistic(guild.id, 'message_count')
+            self.increment_statistic('global', 'global_message_count')
 
-            # Update user message count
-            await self.increment_user_message_count(guild, message.author.id)
+            # Update user message count in memory
+            self.increment_user_message_count(guild.id, message.author.id)
 
             api_tokens = await self.bot.get_shared_api_tokens("openai")
             api_key = api_tokens.get("api_key")
@@ -130,8 +140,8 @@ class Omni(commands.Cog):
                             "type": "image_url",
                             "image_url": {"url": attachment.url}
                         })
-                        await self.increment_statistic(guild, 'image_count')
-                        await self.increment_statistic('global', 'global_image_count')
+                        self.increment_statistic(guild.id, 'image_count')
+                        self.increment_statistic('global', 'global_image_count')
 
             # Analyze text and image content
             text_category_scores = await self.analyze_content(input_data, api_key, message)
@@ -141,7 +151,7 @@ class Omni(commands.Cog):
             text_flagged = any(score > moderation_threshold for score in text_category_scores.values())
 
             if text_flagged:
-                await self.update_moderation_stats(guild, message, text_category_scores)
+                self.update_moderation_stats(guild.id, message, text_category_scores)
                 await self.handle_moderation(message, text_category_scores)
 
             # Check if debug mode is enabled
@@ -151,57 +161,31 @@ class Omni(commands.Cog):
         except Exception as e:
             raise RuntimeError(f"Error processing message: {e}")
 
-    async def increment_statistic(self, guild, stat_name, increment_value=1):
-        if guild == 'global':
-            current_value = await self.config.get_attr(stat_name)() + increment_value
-            await self.config.get_attr(stat_name).set(current_value)
-        else:
-            current_value = await self.config.guild(guild).get_attr(stat_name)() + increment_value
-            await self.config.guild(guild).get_attr(stat_name).set(current_value)
+    def increment_statistic(self, guild_id, stat_name, increment_value=1):
+        self.memory_stats[guild_id][stat_name] += increment_value
 
-    async def increment_user_message_count(self, guild, user_id):
-        user_message_counts = await self.config.guild(guild).user_message_counts()
-        user_message_counts[user_id] = user_message_counts.get(user_id, 0) + 1
-        await self.config.guild(guild).user_message_counts.set(user_message_counts)
+    def increment_user_message_count(self, guild_id, user_id):
+        self.memory_user_message_counts[guild_id][user_id] += 1
 
-    async def update_moderation_stats(self, guild, message, text_category_scores):
-        await self.increment_statistic(guild, 'moderated_count')
-        await self.increment_statistic('global', 'global_moderated_count')
+    def update_moderation_stats(self, guild_id, message, text_category_scores):
+        self.increment_statistic(guild_id, 'moderated_count')
+        self.increment_statistic('global', 'global_moderated_count')
 
-        await self.update_user_list(guild, 'moderated_users', message.author.id)
-        await self.update_user_list('global', 'global_moderated_users', message.author.id)
+        self.memory_moderated_users[guild_id].add(message.author.id)
+        self.memory_moderated_users['global'].add(message.author.id)
 
-        await self.update_category_counter(guild, 'category_counter', text_category_scores)
-        await self.update_category_counter('global', 'global_category_counter', text_category_scores)
+        self.update_category_counter(guild_id, text_category_scores)
+        self.update_category_counter('global', text_category_scores)
 
         # Check if the message contains images and update moderated image count
         if any(attachment.content_type.startswith("image/") and not attachment.content_type.endswith("gif") for attachment in message.attachments):
-            await self.increment_statistic(guild, 'moderated_image_count')
-            await self.increment_statistic('global', 'global_moderated_image_count')
+            self.increment_statistic(guild_id, 'moderated_image_count')
+            self.increment_statistic('global', 'global_moderated_image_count')
 
-    async def update_user_list(self, guild, list_name, user_id):
-        if guild == 'global':
-            user_list = set(await self.config.get_attr(list_name)())
-            user_list.add(user_id)
-            await self.config.get_attr(list_name).set(list(user_list))
-        else:
-            user_list = set(await self.config.guild(guild).get_attr(list_name)())
-            user_list.add(user_id)
-            await self.config.guild(guild).get_attr(list_name).set(list(user_list))
-
-    async def update_category_counter(self, guild, counter_name, text_category_scores):
-        if guild == 'global':
-            category_counter = Counter(await self.config.get_attr(counter_name)())
-            for category, score in text_category_scores.items():
-                if score > 0.2:
-                    category_counter[category] += 1
-            await self.config.get_attr(counter_name).set(dict(category_counter))
-        else:
-            category_counter = Counter(await self.config.guild(guild).get_attr(counter_name)())
-            for category, score in text_category_scores.items():
-                if score > 0.2:
-                    category_counter[category] += 1
-            await self.config.guild(guild).get_attr(counter_name).set(dict(category_counter))
+    def update_category_counter(self, guild_id, text_category_scores):
+        for category, score in text_category_scores.items():
+            if score > 0.2:
+                self.memory_category_counter[guild_id][category] += 1
 
     async def analyze_content(self, input_data, api_key, message):
         try:
@@ -241,7 +225,7 @@ class Omni(commands.Cog):
             try:
                 await message.delete()
                 # Add user to moderated users list if message is deleted
-                await self.update_user_list(guild, 'moderated_users', message.author.id)
+                self.memory_moderated_users[guild.id].add(message.author.id)
             except discord.NotFound:
                 pass  
 
@@ -252,10 +236,10 @@ class Omni(commands.Cog):
                     )
                     await message.author.timeout(timedelta(minutes=timeout_duration), reason=reason)
                     # Increment timeout count and total timeout duration
-                    await self.increment_statistic(guild, 'timeout_count')
-                    await self.increment_statistic('global', 'global_timeout_count')
-                    await self.increment_statistic(guild, 'total_timeout_duration', timeout_duration)
-                    await self.increment_statistic('global', 'global_total_timeout_duration', timeout_duration)
+                    self.increment_statistic(guild.id, 'timeout_count')
+                    self.increment_statistic('global', 'global_timeout_count')
+                    self.increment_statistic(guild.id, 'total_timeout_duration', timeout_duration)
+                    self.increment_statistic('global', 'global_total_timeout_duration', timeout_duration)
                 except discord.Forbidden:
                     pass
 
@@ -323,6 +307,61 @@ class Omni(commands.Cog):
                     await log_channel.send(embed=embed)
         except Exception as e:
             raise RuntimeError(f"Failed to log message: {e}")
+
+    async def periodic_save(self):
+        """Periodically save in-memory statistics to persistent storage."""
+        while True:
+            await asyncio.sleep(self.save_interval)
+            try:
+                for guild_id, stats in self.memory_stats.items():
+                    if guild_id == 'global':
+                        for stat_name, value in stats.items():
+                            current_value = await self.config.get_attr(stat_name)()
+                            await self.config.get_attr(stat_name).set(current_value + value)
+                    else:
+                        guild_conf = self.config.guild_from_id(guild_id)
+                        for stat_name, value in stats.items():
+                            current_value = await guild_conf.get_attr(stat_name)()
+                            await guild_conf.get_attr(stat_name).set(current_value + value)
+
+                for guild_id, user_counts in self.memory_user_message_counts.items():
+                    if guild_id != 'global':
+                        guild_conf = self.config.guild_from_id(guild_id)
+                        current_user_counts = await guild_conf.user_message_counts()
+                        for user_id, count in user_counts.items():
+                            current_user_counts[user_id] = current_user_counts.get(user_id, 0) + count
+                        await guild_conf.user_message_counts.set(current_user_counts)
+
+                for guild_id, users in self.memory_moderated_users.items():
+                    if guild_id == 'global':
+                        current_users = set(await self.config.global_moderated_users())
+                        current_users.update(users)
+                        await self.config.global_moderated_users.set(list(current_users))
+                    else:
+                        guild_conf = self.config.guild_from_id(guild_id)
+                        current_users = set(await guild_conf.moderated_users())
+                        current_users.update(users)
+                        await guild_conf.moderated_users.set(list(current_users))
+
+                for guild_id, counter in self.memory_category_counter.items():
+                    if guild_id == 'global':
+                        current_counter = Counter(await self.config.global_category_counter())
+                        current_counter.update(counter)
+                        await self.config.global_category_counter.set(dict(current_counter))
+                    else:
+                        guild_conf = self.config.guild_from_id(guild_id)
+                        current_counter = Counter(await guild_conf.category_counter())
+                        current_counter.update(counter)
+                        await guild_conf.category_counter.set(dict(current_counter))
+
+                # Clear in-memory statistics after saving
+                self.memory_stats.clear()
+                self.memory_user_message_counts.clear()
+                self.memory_moderated_users.clear()
+                self.memory_category_counter.clear()
+
+            except Exception as e:
+                raise RuntimeError(f"Failed to save statistics: {e}")
 
     @commands.guild_only()
     @commands.admin_or_permissions(manage_guild=True)
@@ -750,6 +789,12 @@ class Omni(commands.Cog):
             await self.config.global_moderated_image_count.set(0)
             await self.config.global_timeout_count.set(0)
             await self.config.global_total_timeout_duration.set(0)
+
+            # Clear in-memory statistics
+            self.memory_stats.clear()
+            self.memory_user_message_counts.clear()
+            self.memory_moderated_users.clear()
+            self.memory_category_counter.clear()
 
             # Confirmation message
             confirmation_embed = discord.Embed(
