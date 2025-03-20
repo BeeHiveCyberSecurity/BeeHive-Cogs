@@ -696,7 +696,7 @@ class Omni(commands.Cog):
             # Warning message
             warning_embed = discord.Embed(
                 title="You're about to perform a destructive operation",
-                description="This operation is computationally intensive and will reset all server and global statistics and counters for Omni. Please confirm by typing 'CONFIRM'.",
+                description="This operation is computationally intensive and will reset all server and global statistics and counters for Omni. Please confirm by typing `CONFIRM`.",
                 color=0xff4545
             )
             await ctx.send(embed=warning_embed)
@@ -710,16 +710,8 @@ class Omni(commands.Cog):
                 await ctx.send("Cleanup operation cancelled due to timeout.")
                 return
 
-            # Calculate data size before cleanup
-            total_data_size = 0
-            all_guilds = await self.config.all_guilds()
-            for guild_id, data in all_guilds.items():
-                total_data_size += sum(len(str(value)) for value in data.values())
-
-            global_data = await self.config.all_global()
-            total_data_size += sum(len(str(value)) for value in global_data.values())
-
             # Reset all guild statistics
+            all_guilds = await self.config.all_guilds()
             for guild_id in all_guilds:
                 guild_conf = self.config.guild_from_id(guild_id)
                 await guild_conf.message_count.set(0)
@@ -742,30 +734,10 @@ class Omni(commands.Cog):
             await self.config.global_timeout_count.set(0)
             await self.config.global_total_timeout_duration.set(0)
 
-            # Calculate data size after cleanup
-            data_size_after_cleanup = 0
-            all_guilds = await self.config.all_guilds()
-            for guild_id, data in all_guilds.items():
-                data_size_after_cleanup += sum(len(str(value)) for value in data.values())
-
-            global_data = await self.config.all_global()
-            data_size_after_cleanup += sum(len(str(value)) for value in global_data.values())
-
-            # Calculate deleted data size
-            deleted_data_size = total_data_size - data_size_after_cleanup
-
-            # Convert to appropriate size unit
-            if deleted_data_size < 1024:
-                size_str = f"{deleted_data_size} bytes"
-            elif deleted_data_size < 1024**2:
-                size_str = f"{deleted_data_size / 1024:.2f} KB"
-            else:
-                size_str = f"{deleted_data_size / 1024**2:.2f} MB"
-
             # Confirmation message
             confirmation_embed = discord.Embed(
                 title="Data cleanup completed",
-                description=f"All statistics and counters have been reset.\nTotal data deleted: {size_str}.",
+                description="All statistics and counters have been reset.",
                 color=0x2bbd8e
             )
             await ctx.send(embed=confirmation_embed)
