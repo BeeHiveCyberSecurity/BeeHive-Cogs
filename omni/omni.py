@@ -334,7 +334,22 @@ class Omni(commands.Cog):
     @omni.command()
     @commands.admin_or_permissions(manage_guild=True)
     async def threshold(self, ctx, threshold: float):
-        """Set the moderation threshold (0 to 1)."""
+        """
+        Set the moderation threshold for message sensitivity.
+
+        The threshold value should be between 0 and 1, where:
+        - 0.00 represents a very sensitive setting, capturing more messages for moderation.
+        - 1.00 represents a barely sensitive setting, allowing most messages to pass through without moderation.
+
+        You may choose any value out to two digits in between 0 and 1. We recommend `0.45` for 13+ servers.
+
+        Adjust this setting based on your community's needs for moderation sensitivity.
+
+        Recommendations:
+        - For general communities, a threshold of `0.50` is often effective.
+        - For stricter moderation, consider a threshold below `0.30`.
+        - For more lenient settings, a threshold above `0.70` might be suitable.
+        """
         try:
             if 0 <= threshold <= 1:
                 await self.config.guild(ctx.guild).moderation_threshold.set(threshold)
