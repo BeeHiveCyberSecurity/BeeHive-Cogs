@@ -664,7 +664,8 @@ class Omni(commands.Cog):
 
             embed = discord.Embed(title=f"{ctx.guild.name}'s most/least moderated members", color=0xfffffe)
 
-            # Add fields for most moderated users
+            # Add a divider for most moderated users
+            embed.add_field(name="Most moderated", value="\u200b", inline=False)
             for user_id, (total, moderated) in most_moderated:
                 if total > 0:
                     user = await self.bot.fetch_user(user_id)
@@ -674,13 +675,14 @@ class Omni(commands.Cog):
                         inline=False
                     )
 
-            # Add fields for least moderated users
+            # Add a divider for least moderated users
+            embed.add_field(name="Least moderated", value="\u200b", inline=False)
             for user_id, (total, moderated) in least_moderated:
                 if total > 0:
                     user = await self.bot.fetch_user(user_id)
                     embed.add_field(
                         name=f"{user.name} (ID: {user_id})",
-                        value=f"📝 **{total}** | 🚨 **{moderated}** ({(moderated / total * 100):.2f}%)\n🖼️ **{user_image_counts}** | 🚨 **{moderated_image_counts}**",
+                        value=f"📝 **{total}** sent, **{moderated}** ({(moderated / total * 100):.2f}%) moderated\n🖼️ **{user_image_counts}** sent, **{moderated_image_counts}** moderated",
                         inline=False
                     )
 
