@@ -111,8 +111,20 @@ class Omni(commands.Cog):
             # Normalize the message content
             normalized_content = self.normalize_text(message.content)
 
-            # Analyze text content
-            text_category_scores = await self.analyze_text(normalized_content, api_key, message)
+            # Prepare input for moderation API
+            input_data = [{"type": "text", "text": normalized_content}]
+
+            # Check for image attachments
+            if message.attachments:
+                for attachment in message.attachments:
+                    if attachment.content_type.startswith("image/") and not attachment.content_type.endswith("gif"):
+                        input_data.append({
+                            "type": "image_url",
+                            "image_url": {"url": attachment.url}
+                        })
+
+            # Analyze text and image content
+            text_category_scores = await self.analyze_content(input_data, api_key, message)
 
             # Determine if the message should be flagged based on the threshold
             moderation_threshold = await self.config.guild(guild).moderation_threshold()
@@ -176,7 +188,7 @@ class Omni(commands.Cog):
                     category_counter[category] += 1
             await self.config.guild(guild).get_attr(counter_name).set(dict(category_counter))
 
-    async def analyze_text(self, text, api_key, message):
+    async def analyze_content(self, input_data, api_key, message):
         try:
             while True:
                 async with self.session.post(
@@ -187,9 +199,7 @@ class Omni(commands.Cog):
                     },
                     json={
                         "model": "omni-moderation-latest",
-                        "input": [
-                            {"type": "text", "text": text}
-                        ]
+                        "input": input_data
                     }
                 ) as response:
                     if response.status == 200:
@@ -204,7 +214,7 @@ class Omni(commands.Cog):
                         await self.log_message(message, {}, error_code=response.status)
                         return {}
         except Exception as e:
-            raise RuntimeError(f"Failed to analyze text: {e}")
+            raise RuntimeError(f"Failed to analyze content: {e}")
 
     async def handle_moderation(self, message, category_scores):
         try:
