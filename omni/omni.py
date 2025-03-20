@@ -25,7 +25,8 @@ class Omni(commands.Cog):
             moderated_users=[],
             category_counter={},
             whitelisted_channels=[],
-            cog_version=self.VERSION
+            cog_version=self.VERSION,
+            moderation_enabled=True  # New setting for enabling/disabling moderation
         )
         self.config.register_global(
             global_message_count=0,
@@ -79,6 +80,11 @@ class Omni(commands.Cog):
                 return
 
             guild = message.guild
+
+            # Check if moderation is enabled
+            moderation_enabled = await self.config.guild(guild).moderation_enabled()
+            if not moderation_enabled:
+                return
 
             # Check if the channel is whitelisted
             whitelisted_channels = await self.config.guild(guild).whitelisted_channels()
@@ -480,6 +486,7 @@ class Omni(commands.Cog):
             log_channel_id = await self.config.guild(guild).log_channel()
             debug_mode = await self.config.guild(guild).debug_mode()
             whitelisted_channels = await self.config.guild(guild).whitelisted_channels()
+            moderation_enabled = await self.config.guild(guild).moderation_enabled()
 
             log_channel = guild.get_channel(log_channel_id) if log_channel_id else None
             log_channel_name = log_channel.mention if log_channel else "Not set"
@@ -491,10 +498,25 @@ class Omni(commands.Cog):
             embed.add_field(name="Log Channel", value=log_channel_name, inline=True)
             embed.add_field(name="Debug Mode", value="Enabled" if debug_mode else "Disabled", inline=True)
             embed.add_field(name="Whitelisted Channels", value=whitelisted_channels_names, inline=False)
+            embed.add_field(name="Moderation Enabled", value="Yes" if moderation_enabled else "No", inline=True)
 
             await ctx.send(embed=embed)
         except Exception as e:
             raise RuntimeError(f"Failed to display settings: {e}")
+
+    @omni.command()
+    @commands.admin_or_permissions(manage_guild=True)
+    async def toggle(self, ctx):
+        """Toggle automatic moderation on or off."""
+        try:
+            guild = ctx.guild
+            current_status = await self.config.guild(guild).moderation_enabled()
+            new_status = not current_status
+            await self.config.guild(guild).moderation_enabled.set(new_status)
+            status = "enabled" if new_status else "disabled"
+            await ctx.send(f"Automatic moderation {status}.")
+        except Exception as e:
+            raise RuntimeError(f"Failed to toggle automatic moderation: {e}")
 
     @omni.command()
     async def reasons(self, ctx):
