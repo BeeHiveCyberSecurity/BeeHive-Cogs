@@ -656,9 +656,9 @@ class Omni(commands.Cog):
         try:
             # Warning message
             warning_embed = discord.Embed(
-                title="Warning",
-                description="This operation is computationally intensive and will reset all server and global statistics and counters. Please confirm by typing 'CONFIRM'.",
-                color=discord.Color.red()
+                title="You're about to perform a destructive operation",
+                description="This operation is computationally intensive and will reset all server and global statistics and counters for Omni. Please confirm by typing 'CONFIRM'.",
+                color=0xff4545
             )
             await ctx.send(embed=warning_embed)
 
