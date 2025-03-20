@@ -26,7 +26,7 @@ class Omni(commands.Cog):
             category_counter={},
             whitelisted_channels=[],
             cog_version=self.VERSION,
-            moderation_enabled=True  # New setting for enabling/disabling moderation
+            moderation_enabled=False
         )
         self.config.register_global(
             global_message_count=0,
