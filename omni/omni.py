@@ -328,7 +328,11 @@ class Omni(commands.Cog):
     @commands.admin_or_permissions(manage_guild=True)
     @commands.group()
     async def omni(self, ctx):
-        """Automated AI moderation for chats, images, and emotes powered by the latest OpenAI moderation models"""
+        """
+        Automated AI moderation for chats, images, and emotes powered by the latest OpenAI moderation models.
+        
+        Read more about **[omni-moderation-latest](<https://platform.openai.com/docs/models/omni-moderation-latest>)** or [visit OpenAI's website](<https://openai.com>) to learn more.
+        """
         pass
 
     @omni.command()
