@@ -762,7 +762,7 @@ class Omni(commands.Cog):
         except Exception as e:
             raise RuntimeError(f"Failed to reset statistics: {e}")
 
-    @omni.command()
+    @omni.command(hidden=True)
     @commands.is_owner()
     async def globalstate(self, ctx):
         """Toggle default moderation state for new servers."""
