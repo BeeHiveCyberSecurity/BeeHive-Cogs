@@ -26,7 +26,7 @@ class Omni(commands.Cog):
             category_counter={},
             whitelisted_channels=[],
             cog_version=self.VERSION,
-            moderation_enabled=False,
+            moderation_enabled=True,
             user_message_counts={},
             image_count=0,
             moderated_image_count=0
