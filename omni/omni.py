@@ -341,8 +341,6 @@ class Omni(commands.Cog):
         - 0.00 represents a very sensitive setting, capturing more messages for moderation.
         - 1.00 represents a barely sensitive setting, allowing most messages to pass through without moderation.
 
-        You may choose any value out to two digits in between 0 and 1. We recommend `0.45` for 13+ servers.
-
         Adjust this setting based on your community's needs for moderation sensitivity.
 
         Recommendations:
