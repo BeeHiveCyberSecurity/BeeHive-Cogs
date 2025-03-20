@@ -504,6 +504,9 @@ class Omni(commands.Cog):
         global_top_categories = global_category_counter.most_common(5)
         global_top_categories_bullets = "\n".join([f"- **{cat.capitalize()}** x{count:,}" for cat, count in global_top_categories])
 
+        global_moderated_users = await self.config.global_moderated_users()
+        global_moderated_user_percentage = (len(global_moderated_users) / sum(guild.member_count for guild in self.bot.guilds) * 100) if self.bot.guilds else 0
+
         return {
             "global_message_count": global_message_count,
             "global_moderated_count": global_moderated_count,
@@ -514,7 +517,8 @@ class Omni(commands.Cog):
             "global_timeout_count": global_timeout_count,
             "global_timeout_duration_str": global_timeout_duration_str,
             "global_time_saved_str": global_time_saved_str,
-            "global_top_categories_bullets": global_top_categories_bullets
+            "global_top_categories_bullets": global_top_categories_bullets,
+            "global_moderated_user_percentage": global_moderated_user_percentage
         }
 
     def _add_global_stats_to_embed_fields(self, embed, global_stats):
