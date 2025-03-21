@@ -118,21 +118,6 @@ Manage and track invite links for your Discord server. This cog allows you to se
 [p]load invites
 ```
 
-### [holidays](https://github.com/BeeHiveSafety/BeeHive-Cogs/tree/main/holidays)
-
-Keep track of various holidays and special events from around the world. This cog allows you to fetch information about upcoming holidays as well as set reminders for holidays in your region. Perfect for community engagement and planning events. `[p]holiday`, `[p]holidayset`.
-
-```
-[p]cog install BeeHiveSafety holidays
-```
-```
-[p]load holidays
-```
-
-### [products](https://github.com/BeeHiveSafety/BeeHive-Cogs/tree/main/products)
-
-Cog made for primarily our server to help us deliver information on our products to inquisitive users. `(incomplete)`
-
 ## Brand cogs
 Brand cogs are cogs we make that are intended to integrate other third party services primarily with your, Red instance. Red is a powerful tool when correctly equipped, and we hope these cogs help extend your Red-bot's capabilities.
 
