@@ -22,7 +22,7 @@ class Omni(commands.Cog):
             debug_mode=False,
             message_count=0,
             moderated_count=0,
-            moderated_users=[],
+            moderated_users={},
             category_counter={},
             whitelisted_channels=[],
             cog_version=self.VERSION,
@@ -36,7 +36,7 @@ class Omni(commands.Cog):
         self.config.register_global(
             global_message_count=0,
             global_moderated_count=0,
-            global_moderated_users=[],
+            global_moderated_users={},
             global_category_counter={},
             global_image_count=0,
             global_moderated_image_count=0,
@@ -135,7 +135,7 @@ class Omni(commands.Cog):
             # Check for image attachments
             if message.attachments:
                 for attachment in message.attachments:
-                    if attachment.content_type.startswith("image/") and not attachment.content_type.endswith("gif"):
+                    if attachment.content_type and attachment.content_type.startswith("image/") and not attachment.content_type.endswith("gif"):
                         input_data.append({
                             "type": "image_url",
                             "image_url": {"url": attachment.url}
@@ -178,7 +178,7 @@ class Omni(commands.Cog):
         self.update_category_counter('global', text_category_scores)
 
         # Check if the message contains images and update moderated image count
-        if any(attachment.content_type.startswith("image/") and not attachment.content_type.endswith("gif") for attachment in message.attachments):
+        if any(attachment.content_type and attachment.content_type.startswith("image/") and not attachment.content_type.endswith("gif") for attachment in message.attachments):
             self.increment_statistic(guild_id, 'moderated_image_count')
             self.increment_statistic('global', 'global_moderated_image_count')
 
@@ -264,7 +264,7 @@ class Omni(commands.Cog):
                     # Add image to embed if present
                     if message.attachments:
                         for attachment in message.attachments:
-                            if attachment.content_type.startswith("image/") and not attachment.content_type.endswith("gif"):
+                            if attachment.content_type and attachment.content_type.startswith("image/") and not attachment.content_type.endswith("gif"):
                                 embed.set_image(url=attachment.url)
                                 break
 
@@ -304,7 +304,7 @@ class Omni(commands.Cog):
                     # Add image to embed if present
                     if message.attachments:
                         for attachment in message.attachments:
-                            if attachment.content_type.startswith("image/") and not attachment.content_type.endswith("gif"):
+                            if attachment.content_type and attachment.content_type.startswith("image/") and not attachment.content_type.endswith("gif"):
                                 embed.set_image(url=attachment.url)
                                 break
 
