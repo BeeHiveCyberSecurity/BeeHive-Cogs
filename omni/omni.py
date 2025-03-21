@@ -268,7 +268,11 @@ class Omni(commands.Cog):
                                 embed.set_image(url=attachment.url)
                                 break
 
-                    await log_channel.send(embed=embed)
+                    # Add a button to jump to the message in the conversation
+                    view = discord.ui.View()
+                    view.add_item(discord.ui.Button(label="Jump to place in conversation", url=message.jump_url))
+
+                    await log_channel.send(embed=embed, view=view)
         except Exception as e:
             raise RuntimeError(f"Failed to handle moderation: {e}")
 
@@ -304,7 +308,11 @@ class Omni(commands.Cog):
                                 embed.set_image(url=attachment.url)
                                 break
 
-                    await log_channel.send(embed=embed)
+                    # Add a button to jump to the message in the conversation
+                    view = discord.ui.View()
+                    view.add_item(discord.ui.Button(label="Jump to place in conversation", url=message.jump_url))
+
+                    await log_channel.send(embed=embed, view=view)
         except Exception as e:
             raise RuntimeError(f"Failed to log message: {e}")
 
