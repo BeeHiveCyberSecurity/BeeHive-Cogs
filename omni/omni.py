@@ -750,6 +750,9 @@ class Omni(commands.Cog):
                         inline=False
                     )
 
+            # Set footer text
+            embed.set_footer(text="The list is subject to change as data is collected")
+
             await ctx.send(embed=embed)
         except Exception as e:
             raise RuntimeError(f"Failed to display user moderation statistics: {e}")
