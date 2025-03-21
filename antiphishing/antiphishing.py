@@ -41,7 +41,6 @@ class AntiPhishing(commands.Cog):
             kicks=0,
             bans=0,
             timeouts=0,
-            autoban=3,
             last_updated=None,
             webhook=None,
             log_channel=None,
@@ -168,7 +167,6 @@ class AntiPhishing(commands.Cog):
             title='Current settings',
             colour=0xfffffe,
         )
-        embed.add_field(name="Autoban threshold", value=f"{guild_data.get('autoban', 'Not set')}", inline=False)
         embed.add_field(name="Action", value=f"{guild_data.get('action', 'Not set').title()}", inline=False)
         embed.add_field(name="Alert hook", value=enrollment_status, inline=False)
         embed.add_field(name="Log channel", value=log_channel_status, inline=False)
@@ -290,23 +288,6 @@ class AntiPhishing(commands.Cog):
         embed.add_field(name="Recent changes", value=f"*{self.__quick_notes__}*", inline=False)
         return embed
 
-    @antiphishing.command()
-    @commands.admin_or_permissions()
-    async def autoban(self, ctx: Context, autoban: int):
-        """
-        Configure an independent autoban
-        """
-        if autoban < 0:
-            await self._send_embed(ctx, 'Error: Invalid number', 
-                                   "The number of malicious links must be at least 0.", 
-                                   16729413, "https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle.png")
-            return
-
-        await self.config.guild(ctx.guild).autoban.set(autoban)
-        await self._send_embed(ctx, 'Settings changed', 
-                               f"The number of malicious links a user can share before being banned is now set to **{autoban}**.", 
-                               0xffd966, "https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/notifications.png")
-
     @commands.admin_or_permissions()
     @antiphishing.command()
     async def logchannel(self, ctx: Context, channel: discord.TextChannel):
@@ -415,9 +396,6 @@ class AntiPhishing(commands.Cog):
             count = await self.config.guild(message.guild).caught()
             await self.config.guild(message.guild).caught.set(count + 1)
         member_count = await self.config.member(message.author).caught()
-        autoban = await self.config.guild(message.guild).autoban()
-        if autoban > 0 and member_count + 1 >= autoban:
-            action = "ban"
         await self.config.member(message.author).caught.set(member_count + 1)
         
         webhook_url = await self.config.guild(message.guild).webhook()
