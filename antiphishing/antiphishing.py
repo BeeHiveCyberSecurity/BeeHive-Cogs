@@ -5,9 +5,8 @@ from typing import List, Optional
 from urllib.parse import urlparse
 import aiohttp  # type: ignore
 import discord  # type: ignore
-import asyncio
 from discord.ext import tasks  # type: ignore
-from redbot.core import Config, commands, modlog  # type: ignore
+from redbot.core import Config, commands  # type: ignore
 from redbot.core.bot import Red  # type: ignore
 from redbot.core.commands import Context  # type: ignore
 import tldextract
@@ -28,6 +27,12 @@ class AntiPhishing(commands.Cog):
     def __init__(self, bot: Red):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=73836)
+        self._initialize_config()
+        self.session = aiohttp.ClientSession()
+        self.domains = []
+        self.bot.loop.create_task(self.get_phishing_domains())
+
+    def _initialize_config(self):
         self.config.register_guild(
             action="notify",
             caught=0,
@@ -44,9 +49,6 @@ class AntiPhishing(commands.Cog):
             staff_role=None  # Configurable staff role mention
         )
         self.config.register_member(caught=0)
-        self.session = aiohttp.ClientSession()
-        self.domains = []
-        self.bot.loop.create_task(self.get_phishing_domains())
 
     def cog_unload(self):
         self.bot.loop.create_task(self.session.close())
@@ -62,9 +64,7 @@ class AntiPhishing(commands.Cog):
         """
         Extract URLs from a message.
         """
-        matches = URL_REGEX_PATTERN.findall(message)
-        urls = [match[0] for match in matches]
-        return urls
+        return [match[0] for match in URL_REGEX_PATTERN.findall(message)]
 
     def get_links(self, message: str) -> Optional[List[str]]:
         """
@@ -75,8 +75,7 @@ class AntiPhishing(commands.Cog):
             message = message.replace(char, "")
         if message:
             links = self.extract_urls(message)
-            if links:
-                return list(set(links))
+            return list(set(links)) if links else None
         return None
 
     @commands.group()
@@ -88,142 +87,49 @@ class AntiPhishing(commands.Cog):
 
     @commands.admin_or_permissions()
     @antiphishing.command()
-    async def scan(self, ctx: Context):
-        """
-        Scan the last 500 links in each channel against the blocklist.
-        """
-        blocklist = set(self.domains)  # Assuming self.domains contains the blocklist
-        channels = ctx.guild.text_channels
-        bad_links = []
-        total_links_checked = 0
-        start_time = discord.utils.utcnow()
-
-        embed = discord.Embed(
-            title='Scan started',
-            description='Starting a scan for malicious links, this may take a short while to complete.',
-            colour=0xfffffe
-        )
-        embed.set_thumbnail(url='https://i.imgur.com/ZP7UnDZ.gif')
-        progress_message = await ctx.send(embed=embed)
-
-        for channel in channels:
-            if not channel.permissions_for(ctx.guild.me).read_messages:
-                continue  # Skip channels where the bot doesn't have permission to read messages
-            try:
-                async for message in channel.history(limit=500):
-                    links = self.get_links(message.content)
-                    if links:
-                        total_links_checked += len(links)
-                        for link in links:
-                            extracted = tldextract.extract(link)
-                            domain = f"{extracted.domain}.{extracted.suffix}".lower()
-                            if any(domain == blocked_domain for blocked_domain in self.domains):
-                                bad_links.append((channel.name, message.jump_url, link))
-                    await asyncio.sleep(1)  # Add a small delay to avoid hitting rate limits
-            except discord.Forbidden:
-                continue  # Skip channels where the bot doesn't have permission to read history
-
-            # Update progress every 10 seconds
-            elapsed_time = (discord.utils.utcnow() - start_time).total_seconds()
-            if int(elapsed_time) % 10 == 0:
-                time_str = self.format_elapsed_time(elapsed_time)
-                embed.description = (
-                    f'Starting a scan for malicious links, this may take a short while to complete.\n'
-                    f'Scanned **{total_links_checked}** links so far.\n'
-                    f'Time elapsed: **{time_str}**.'
-                )
-                try:
-                    await progress_message.edit(embed=embed)
-                except discord.Forbidden:
-                    pass  # Handle the case where the bot cannot edit the message
-
-            await asyncio.sleep(1)  # Add a delay between channel scans to be gentle on rate limits
-
-        # Final results
-        elapsed_time = (discord.utils.utcnow() - start_time).total_seconds()
-        time_str = self.format_elapsed_time(elapsed_time)
-        if bad_links:
-            description = f"Found {len(bad_links)} dangerous links:\n"
-            for channel_name, jump_url, link in bad_links:
-                description += f"- Channel: {channel_name}, [Message]({jump_url}), Link: {link}\n"
-            embed = discord.Embed(
-                title='Scan completed',
-                description=description,
-                colour=0xff4545
-            )
-        else:
-            embed = discord.Embed(
-                title='Scan completed',
-                description='No dangerous links were found - hooray! :tada:',
-                colour=0x2bbd8e
-            )
-
-        # Add scan statistics
-        embed.add_field(name="Links checked", value=total_links_checked)
-        embed.add_field(name="Dangerous links found", value=len(bad_links))
-        embed.add_field(name="Time elapsed", value=time_str)
-
-        try:
-            await progress_message.edit(embed=embed)
-        except discord.Forbidden:
-            await ctx.send(embed=embed)  # Send a new message if editing is not possible
-
-    def format_elapsed_time(self, elapsed_seconds: float) -> str:
-        """
-        Format elapsed time into a human-readable string.
-        """
-        minutes, seconds = divmod(int(elapsed_seconds), 60)
-        hours, minutes = divmod(minutes, 60)
-        time_components = []
-        if hours:
-            time_components.append(f"{hours} hour{'s' if hours != 1 else ''}")
-        if minutes:
-            time_components.append(f"{minutes} minute{'s' if minutes != 1 else ''}")
-        time_components.append(f"{seconds} second{'s' if seconds != 1 else ''}")
-        return " ".join(time_components)
-
-
-    @commands.admin_or_permissions()
-    @antiphishing.command()
     async def alerthook(self, ctx: Context, webhook: str):
         """
         Set an alert webhook. Useful if you manage multiple servers and want to consolidate link safety alerts.
         """
-        if not webhook.startswith("http://") and not webhook.startswith("https://"):
-            embed = discord.Embed(
-                title='Invalid target webhook',
-                description="The provided webhook URL is invalid. Please provide a valid URL starting with `http://` or `https://`.",
-                colour=0xff4545,
-            )
-            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle.png")
-            await ctx.send(embed=embed)
+        if not webhook.startswith(("http://", "https://")):
+            await self._send_invalid_webhook_embed(ctx)
             return
 
+        if not await self._validate_webhook(webhook):
+            await self._send_invalid_webhook_embed(ctx)
+            return
+
+        await self._set_webhook(ctx, webhook)
+
+    async def _send_invalid_webhook_embed(self, ctx: Context):
+        await self._send_embed(
+            ctx, 
+            'Invalid target webhook', 
+            "The provided webhook URL is invalid. Please provide a valid URL starting with `http://` or `https://`.", 
+            0xff4545, 
+            "https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle.png"
+        )
+
+    async def _validate_webhook(self, webhook: str) -> bool:
         try:
             async with self.session.get(webhook) as response:
-                if response.status != 200:
-                    raise ValueError("Invalid webhook URL")
-        except Exception as e:
-            embed = discord.Embed(
-                title='Invalid target webhook',
-                description=f"The provided webhook URL is invalid or unreachable. Error: {e}",
-                colour=0xff4545,
-            )
-            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle.png")
-            await ctx.send(embed=embed)
-            return
+                return response.status == 200
+        except Exception:
+            return False
 
+    async def _set_webhook(self, ctx: Context, webhook: str):
         await self.config.guild(ctx.guild).webhook.set(webhook)
         await ctx.message.delete()
-        embed = discord.Embed(
-            title='Enrollment successful',
-            description="Successfully set a remote link monitoring channel",
-            colour=0x2bbd8e,
+        await self._send_embed(
+            ctx, 
+            'Enrollment successful', 
+            "Successfully set a remote link monitoring channel", 
+            0x2bbd8e, 
+            "https://www.beehive.systems/hubfs/Icon%20Packs/Green/check-circle.png"
         )
-        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/check-circle.png")
-        await ctx.send(embed=embed)
+        await self._send_webhook_confirmation(ctx, webhook)
 
-        # Send confirmation to the webhook
+    async def _send_webhook_confirmation(self, ctx: Context, webhook: str):
         confirmation_embed = discord.Embed(
             title="Enrollment confirmation",
             description=f"The server **{ctx.guild.name}** has been enrolled for remote URL monitoring.",
@@ -235,6 +141,11 @@ class AntiPhishing(commands.Cog):
             if response.status not in [200, 204]:
                 print(f"Failed to send enrollment confirmation to webhook: {response.status}")
 
+    async def _send_embed(self, ctx: Context, title: str, description: str, colour: int, thumbnail_url: str):
+        embed = discord.Embed(title=title, description=description, colour=colour)
+        embed.set_thumbnail(url=thumbnail_url)
+        await ctx.send(embed=embed)
+
     @commands.admin_or_permissions()    
     @antiphishing.command()
     async def settings(self, ctx: Context):
@@ -242,6 +153,10 @@ class AntiPhishing(commands.Cog):
         Show current settings
         """
         guild_data = await self.config.guild(ctx.guild).all()
+        embed = self._create_settings_embed(guild_data)
+        await ctx.send(embed=embed)
+
+    def _create_settings_embed(self, guild_data: dict) -> discord.Embed:
         webhook = guild_data.get('webhook', None)
         log_channel_id = guild_data.get('log_channel', None)
         staff_role_id = guild_data.get('staff_role', None)
@@ -259,7 +174,7 @@ class AntiPhishing(commands.Cog):
         embed.add_field(name="Log channel", value=log_channel_status, inline=False)
         embed.add_field(name="Staff Role", value=staff_role_status, inline=False)
         embed.add_field(name="Timeout Duration", value=f"{guild_data.get('timeout_duration', 30)} minutes", inline=False)
-        await ctx.send(embed=embed)
+        return embed
         
     @commands.admin_or_permissions()
     @antiphishing.command()
@@ -277,25 +192,29 @@ class AntiPhishing(commands.Cog):
         """
         valid_actions = ["ignore", "notify", "delete", "kick", "ban", "timeout"]
         if action not in valid_actions:
-            embed = discord.Embed(
-                title='Error: Invalid action',
-                description=(
-                    "You provided an invalid action. You are able to choose any of the following actions to occur when a malicious link is detected...\n\n"
-                    "**`ignore`** - Disables phishing protection **(Not recommended)**\n"
-                    "**`notify`** - Alerts in channel when malicious links detected **(Default)**\n"
-                    "**`delete`** - Deletes the message\n"
-                    "**`kick`** - Delete message and kick sender\n"
-                    "**`ban`** - Delete message and ban sender\n"
-                    "**`timeout`** - Delete message and temporarily time the user out **(Recommended)**\n\n"
-                    "Retry that command with one of the above options."
-                ),
-                colour=16729413,
-            )
-            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle.png")
-            await ctx.send(embed=embed)
+            await self._send_invalid_action_embed(ctx)
             return
 
         await self.config.guild(ctx.guild).action.set(action)
+        await self._send_action_confirmation(ctx, action)
+
+    async def _send_invalid_action_embed(self, ctx: Context):
+        await self._send_embed(
+            ctx, 
+            'Error: Invalid action', 
+            "You provided an invalid action. You are able to choose any of the following actions to occur when a malicious link is detected...\n\n"
+            "**`ignore`** - Disables phishing protection **(Not recommended)**\n"
+            "**`notify`** - Alerts in channel when malicious links detected **(Default)**\n"
+            "**`delete`** - Deletes the message\n"
+            "**`kick`** - Delete message and kick sender\n"
+            "**`ban`** - Delete message and ban sender\n"
+            "**`timeout`** - Delete message and temporarily time the user out **(Recommended)**\n\n"
+            "Retry that command with one of the above options.", 
+            16729413, 
+            "https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle.png"
+        )
+
+    async def _send_action_confirmation(self, ctx: Context, action: str):
         descriptions = {
             "ignore": "Phishing protection is now **disabled**. Malicious links will not trigger any actions.",
             "notify": "Malicious links will now trigger a **notification** in the channel when detected.",
@@ -335,77 +254,41 @@ class AntiPhishing(commands.Cog):
         """
         Check statistics
         """
-        caught = await self.config.guild(ctx.guild).caught()
-        notifications = await self.config.guild(ctx.guild).notifications()
-        deletions = await self.config.guild(ctx.guild).deletions()
-        kicks = await self.config.guild(ctx.guild).kicks()
-        bans = await self.config.guild(ctx.guild).bans()
-        timeouts = await self.config.guild(ctx.guild).timeouts()
-        last_updated = self.__last_updated__
-        patch_notes = self.__quick_notes__
+        guild_data = await self.config.guild(ctx.guild).all()
+        embed = self._create_stats_embed(guild_data)
+        view = discord.ui.View()
+        button = discord.ui.Button(label="Learn more about BeeHive", url="https://www.beehive.systems")
+        view.add_item(button)
+        await ctx.send(embed=embed, view=view)
+
+    def _create_stats_embed(self, guild_data: dict) -> discord.Embed:
+        caught, notifications, deletions, kicks, bans, timeouts = (
+            guild_data.get('caught', 0),
+            guild_data.get('notifications', 0),
+            guild_data.get('deletions', 0),
+            guild_data.get('kicks', 0),
+            guild_data.get('bans', 0),
+            guild_data.get('timeouts', 0)
+        )
         total_domains = len(self.domains)
-        
-        s_caught = "s" if caught != 1 else ""
-        s_notifications = "s" if notifications != 1 else ""
-        s_deletions = "s" if deletions != 1 else ""
-        s_kicks = "s" if kicks != 1 else ""
-        s_bans = "s" if bans != 1 else ""
-        s_timeouts = "s" if timeouts != 1 else ""
-        
-        last_updated_str = f"{last_updated}"
         
         embed = discord.Embed(
             title='Link safety statistics', 
             colour=0xfffffe,
         )
         embed.add_field(name="Protection", value="", inline=False)
-        embed.add_field(
-            name="Detected",
-            value=f"**{caught}** malicious link{s_caught}",
-            inline=True
-        )
-        embed.add_field(
-            name="Notifications",
-            value=f"Warned you of danger **{notifications}** time{s_notifications}",
-            inline=True
-        )
-        embed.add_field(
-            name="Deletions",
-            value=f"Removed **{deletions}** message{s_deletions}",
-            inline=True
-        )
-        embed.add_field(
-            name="Kicks",
-            value=f"Kicked **{kicks}** user{s_kicks}",
-            inline=True
-        )
-        embed.add_field(
-            name="Bans",
-            value=f"Banned **{bans}** user{s_bans}",
-            inline=True
-        )
-        embed.add_field(
-            name="Timeouts",
-            value=f"Timed out **{timeouts}** user{s_timeouts}",
-            inline=True
-        )
-        embed.add_field(
-            name="Blocklist count",
-            value=f"There are **{total_domains:,}** domains on the [BeeHive](https://www.beehive.systems) blocklist",
-            inline=False
-        )
+        embed.add_field(name="Detected", value=f"**{caught}** malicious link{'s' if caught != 1 else ''}", inline=True)
+        embed.add_field(name="Notifications", value=f"Warned you of danger **{notifications}** time{'s' if notifications != 1 else ''}", inline=True)
+        embed.add_field(name="Deletions", value=f"Removed **{deletions}** message{'s' if deletions != 1 else ''}", inline=True)
+        embed.add_field(name="Kicks", value=f"Kicked **{kicks}** user{'s' if kicks != 1 else ''}", inline=True)
+        embed.add_field(name="Bans", value=f"Banned **{bans}** user{'s' if bans != 1 else ''}", inline=True)
+        embed.add_field(name="Timeouts", value=f"Timed out **{timeouts}** user{'s' if timeouts != 1 else ''}", inline=True)
+        embed.add_field(name="Blocklist count", value=f"There are **{total_domains:,}** domains on the [BeeHive](https://www.beehive.systems) blocklist", inline=False)
         embed.add_field(name="About this cog", value="", inline=False)
-        embed.add_field(
-            name="Version",
-            value=f"You're running **v{self.__version__}**",
-            inline=True
-        )
-        embed.add_field(name="Last updated", value=f"**{last_updated_str}**", inline=True)
-        embed.add_field(name="Recent changes", value=f"*{patch_notes}*", inline=False)
-        view = discord.ui.View()
-        button = discord.ui.Button(label="Learn more about BeeHive", url="https://www.beehive.systems")
-        view.add_item(button)
-        await ctx.send(embed=embed, view=view)
+        embed.add_field(name="Version", value=f"You're running **v{self.__version__}**", inline=True)
+        embed.add_field(name="Last updated", value=f"**{self.__last_updated__}**", inline=True)
+        embed.add_field(name="Recent changes", value=f"*{self.__quick_notes__}*", inline=False)
+        return embed
 
     @antiphishing.command()
     @commands.admin_or_permissions()
@@ -414,23 +297,15 @@ class AntiPhishing(commands.Cog):
         Configure an independent autoban
         """
         if autoban < 0:
-            embed = discord.Embed(
-                title='Error: Invalid number',
-                description="The number of malicious links must be at least 0.",
-                colour=16729413,
-            )
-            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle.png")
-            await ctx.send(embed=embed)
+            await self._send_embed(ctx, 'Error: Invalid number', 
+                                   "The number of malicious links must be at least 0.", 
+                                   16729413, "https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle.png")
             return
 
         await self.config.guild(ctx.guild).autoban.set(autoban)
-        embed = discord.Embed(
-            title='Settings changed',
-            description=f"The number of malicious links a user can share before being banned is now set to **{autoban}**.",
-            colour=0xffd966,
-        )
-        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/notifications.png")
-        await ctx.send(embed=embed)
+        await self._send_embed(ctx, 'Settings changed', 
+                               f"The number of malicious links a user can share before being banned is now set to **{autoban}**.", 
+                               0xffd966, "https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/notifications.png")
 
     @commands.admin_or_permissions()
     @antiphishing.command()
@@ -439,13 +314,9 @@ class AntiPhishing(commands.Cog):
         Set logging channel
         """
         await self.config.guild(ctx.guild).log_channel.set(channel.id)
-        embed = discord.Embed(
-            title='Settings changed',
-            description=f"The logging channel has been set to {channel.mention}.",
-            colour=0x2bbd8e,
-        )
-        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/check-circle.png")
-        await ctx.send(embed=embed)
+        await self._send_embed(ctx, 'Settings changed', 
+                               f"The logging channel has been set to {channel.mention}.", 
+                               0x2bbd8e, "https://www.beehive.systems/hubfs/Icon%20Packs/Green/check-circle.png")
 
     @commands.admin_or_permissions()
     @antiphishing.command()
@@ -454,13 +325,9 @@ class AntiPhishing(commands.Cog):
         Set responder role
         """
         await self.config.guild(ctx.guild).staff_role.set(role.id)
-        embed = discord.Embed(
-            title='Settings changed',
-            description=f"The staff role has been set to {role.mention}.",
-            colour=0x2bbd8e,
-        )
-        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/check-circle.png")
-        await ctx.send(embed=embed)
+        await self._send_embed(ctx, 'Settings changed', 
+                               f"The staff role has been set to {role.mention}.", 
+                               0x2bbd8e, "https://www.beehive.systems/hubfs/Icon%20Packs/Green/check-circle.png")
 
     @commands.admin_or_permissions()
     @antiphishing.command()
@@ -469,23 +336,15 @@ class AntiPhishing(commands.Cog):
         Set timeout duration
         """
         if minutes < 1:
-            embed = discord.Embed(
-                title='Error: Invalid duration',
-                description="The timeout duration must be at least 1 minute.",
-                colour=16729413,
-            )
-            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle.png")
-            await ctx.send(embed=embed)
+            await self._send_embed(ctx, 'Error: Invalid duration', 
+                                   "The timeout duration must be at least 1 minute.", 
+                                   16729413, "https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle.png")
             return
 
         await self.config.guild(ctx.guild).timeout_duration.set(minutes)
-        embed = discord.Embed(
-            title='Settings changed',
-            description=f"The timeout duration is now set to **{minutes}** minutes.",
-            colour=0xffd966,
-        )
-        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/clock.png")
-        await ctx.send(embed=embed)
+        await self._send_embed(ctx, 'Settings changed', 
+                               f"The timeout duration is now set to **{minutes}** minutes.", 
+                               0xffd966, "https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/clock.png")
 
     @tasks.loop(minutes=15)
     async def get_phishing_domains(self) -> None:
@@ -496,38 +355,8 @@ class AntiPhishing(commands.Cog):
             "User-Agent": f"BeeHive AntiPhishing v{self.__version__} (https://www.beehive.systems/)"
         }
 
-        try:
-            async with self.session.get(
-                "https://phish.sinking.yachts/v2/all", headers=headers
-            ) as request:
-                if request.status == 200:
-                    try:
-                        data = await request.json()
-                        domains.update(data)
-                    except Exception as e:
-                        print(f"Error parsing JSON from Sinking Yachts: {e}")
-                else:
-                    print(f"Failed to fetch Sinking Yachts blacklist, status code: {request.status}")
-        except aiohttp.ClientError as e:
-            print(f"Network error while fetching Sinking Yachts blacklist: {e}")
-
-        try:
-            async with self.session.get(
-                "https://www.beehive.systems/hubfs/blocklist/blocklist.json", headers=headers
-            ) as request:
-                if request.status == 200:
-                    try:
-                        data = await request.json()
-                        if isinstance(data, list):
-                            domains.update(data)
-                        else:
-                            print("Unexpected data format received from blocklist.")
-                    except Exception as e:
-                        print(f"Error parsing JSON from blocklist: {e}")
-                else:
-                    print(f"Failed to fetch blocklist, status code: {request.status}")
-        except aiohttp.ClientError as e:
-            print(f"Network error while fetching blocklist: {e}")
+        await self._fetch_domains("https://phish.sinking.yachts/v2/all", headers, domains)
+        await self._fetch_domains("https://www.beehive.systems/hubfs/blocklist/blocklist.json", headers, domains)
 
         self.domains = list(domains)
 
@@ -544,6 +373,23 @@ class AntiPhishing(commands.Cog):
                     )
                     await log_channel.send(embed=embed)
 
+    async def _fetch_domains(self, url: str, headers: dict, domains: set):
+        try:
+            async with self.session.get(url, headers=headers) as request:
+                if request.status == 200:
+                    try:
+                        data = await request.json()
+                        if isinstance(data, list):
+                            domains.update(data)
+                        else:
+                            print("Unexpected data format received from blocklist.")
+                    except Exception as e:
+                        print(f"Error parsing JSON from {url}: {e}")
+                else:
+                    print(f"Failed to fetch blocklist from {url}, status code: {request.status}")
+        except aiohttp.ClientError as e:
+            print(f"Network error while fetching blocklist from {url}: {e}")
+
     async def follow_redirects(self, url: str) -> List[str]:
         """
         Follow redirects and return the final URL and any intermediate URLs.
@@ -555,8 +401,7 @@ class AntiPhishing(commands.Cog):
         try:
             async with self.session.head(url, allow_redirects=True, headers=headers) as response:
                 urls.append(str(response.url))
-                for history in response.history:
-                    urls.append(str(history.url))
+                urls.extend(str(history.url) for history in response.history)
         except aiohttp.ClientError as e:
             print(f"Network error while following redirects: {e}")
         except Exception as e:
@@ -577,132 +422,157 @@ class AntiPhishing(commands.Cog):
         
         webhook_url = await self.config.guild(message.guild).webhook()
         if webhook_url:
-            redirect_chain_str = "\n".join(redirect_chain)
-            webhook_embed = discord.Embed(
-                title="Malicious link detected",
-                description=f"A URL was detected in the server **{message.guild.name}**.",
-                color=0xffd966,
-            )
-            webhook_embed.add_field(name="User", value=message.author.mention)
-            webhook_embed.add_field(name="URL", value=domain)
-            webhook_embed.add_field(name="Redirect Chain", value=redirect_chain_str)
-            try:
-                async with self.session.post(webhook_url, json={"embeds": [webhook_embed.to_dict()]}) as response:
-                    if response.status not in [200, 204]:
-                        print(f"Failed to send webhook: {response.status}")
-            except aiohttp.ClientError as e:
-                print(f"Network error while sending webhook: {e}")
+            await self._send_webhook(webhook_url, message, domain, redirect_chain)
         
         log_channel_id = await self.config.guild(message.guild).log_channel()
         staff_role_id = await self.config.guild(message.guild).staff_role()
         if log_channel_id:
             log_channel = message.guild.get_channel(log_channel_id)
             if log_channel:
-                redirect_chain_str = "\n".join(redirect_chain)
-                log_embed = discord.Embed(
-                    title="Malicious link detected",
-                    description=f"{message.author.mention} sent a dangerous link in {message.channel.mention}",
+                await self._log_malicious_link(log_channel, message, domain, redirect_chain, staff_role_id)
+        
+        await self._take_action(action, message, domain, redirect_chain)
+
+    async def _send_webhook(self, webhook_url: str, message: discord.Message, domain: str, redirect_chain: List[str]):
+        redirect_chain_str = "\n".join(redirect_chain)
+        webhook_embed = discord.Embed(
+            title="Malicious link detected",
+            description=f"A URL was detected in the server **{message.guild.name}**.",
+            color=0xffd966,
+        )
+        webhook_embed.add_field(name="User", value=message.author.mention)
+        webhook_embed.add_field(name="URL", value=domain)
+        webhook_embed.add_field(name="Redirect Chain", value=redirect_chain_str)
+        try:
+            async with self.session.post(webhook_url, json={"embeds": [webhook_embed.to_dict()]}) as response:
+                if response.status not in [200, 204]:
+                    print(f"Failed to send webhook: {response.status}")
+        except aiohttp.ClientError as e:
+            print(f"Network error while sending webhook: {e}")
+
+    async def _log_malicious_link(self, log_channel: discord.TextChannel, message: discord.Message, domain: str, redirect_chain: List[str], staff_role_id: Optional[int]):
+        redirect_chain_str = "\n".join(redirect_chain)
+        log_embed = discord.Embed(
+            title="Malicious link detected",
+            description=f"{message.author.mention} sent a dangerous link in {message.channel.mention}",
+            color=0xff4545,
+        )
+        log_embed.add_field(name="User ID", value=f"```{message.author.id}```", inline=False)
+        log_embed.add_field(name="Domain", value=f"```{domain}```", inline=False)
+        log_embed.add_field(name="Redirects", value=f"```{redirect_chain_str}```", inline=False)
+        staff_mention = f"<@&{staff_role_id}>" if staff_role_id else ""
+        await log_channel.send(content=staff_mention, embed=log_embed, allowed_mentions=discord.AllowedMentions(roles=True))
+
+    async def _take_action(self, action: str, message: discord.Message, domain: str, redirect_chain: List[str]):
+        action_methods = {
+            "notify": self._notify_action,
+            "delete": self._delete_action,
+            "kick": self._kick_action,
+            "ban": self._ban_action,
+            "timeout": self._timeout_action
+        }
+        if action in action_methods:
+            await action_methods[action](message, redirect_chain)
+
+    async def _notify_action(self, message: discord.Message, redirect_chain: List[str]):
+        if message.channel.permissions_for(message.guild.me).send_messages:
+            with contextlib.suppress(discord.NotFound):
+                mod_roles = await self.bot.get_mod_roles(message.guild)
+                mod_mentions = " ".join(role.mention for role in mod_roles) if mod_roles else ""
+                
+                redirect_chain_status = self._get_redirect_chain_status(redirect_chain)
+                
+                embed = discord.Embed(
+                    title="Dangerous link detected!",
+                    description=(
+                        f"This is a known malicious website. This website may contain malware or spyware, be a phishing lure, or otherwise attempt to convince you to hand over personal data or payment information. You should avoid visiting this website to safeguard your device and private information, and alert a staff member that this message appeared!"
+                    ),
                     color=0xff4545,
                 )
-                log_embed.add_field(name="User ID", value=f"```{message.author.id}```", inline=False)
-                log_embed.add_field(name="Domain", value=f"```{domain}```", inline=False)
-                log_embed.add_field(name="Redirects", value=f"```{redirect_chain_str}```", inline=False)
-                staff_mention = f"<@&{staff_role_id}>" if staff_role_id else ""
-                await log_channel.send(content=staff_mention, embed=log_embed, allowed_mentions=discord.AllowedMentions(roles=True))
-        
-        if action == "notify":
-            if message.channel.permissions_for(message.guild.me).send_messages:
-                with contextlib.suppress(discord.NotFound):
-                    mod_roles = await self.bot.get_mod_roles(message.guild)
-                    mod_mentions = " ".join(role.mention for role in mod_roles) if mod_roles else ""
+                embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/warning.png")
+                embed.timestamp = datetime.datetime.utcnow()
+                if mod_mentions:
+                    await message.channel.send(content=mod_mentions, embed=embed, allowed_mentions=discord.AllowedMentions(roles=True))
+                else:
+                    await message.reply(embed=embed, allowed_mentions=discord.AllowedMentions.none())
                 
-                    redirect_chain_status = []
-                    for url in redirect_chain:
-                        try:
-                            extracted = tldextract.extract(url)
-                            domain = f"{extracted.domain}.{extracted.suffix}"
-                            status = "Malicious" if domain in self.domains else "Unknown"
-                            redirect_chain_status.append(f"{url} ({status})")
-                        except IndexError:
-                            print(f"Error extracting domain from URL: {url}")
-                            redirect_chain_status.append(f"{url} (Unknown)")
-                    
-                    redirect_chain_str = "\n".join(redirect_chain_status)
-                    
-                    embed = discord.Embed(
-                        title="Dangerous link detected!",
-                        description=(
-                            f"This is a known malicious website. This website may contain malware or spyware, be a phishing lure, or otherwise attempt to convince you to hand over personal data or payment information. You should avoid visiting this website to safeguard your device and private information, and alert a staff member that this message appeared!"
-                        ),
-                        color=0xff4545,
-                    )
-                    embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/warning.png")
-                    embed.timestamp = datetime.datetime.utcnow()
-                    if mod_mentions:
-                        await message.channel.send(content=mod_mentions, embed=embed, allowed_mentions=discord.AllowedMentions(roles=True))
-                    else:
-                        await message.reply(embed=embed, allowed_mentions=discord.AllowedMentions.none())
-                    
-                notifications = await self.config.guild(message.guild).notifications()
-                await self.config.guild(message.guild).notifications.set(notifications + 1)
-        elif action == "delete":
-            if message.channel.permissions_for(message.guild.me).manage_messages:
-                with contextlib.suppress(discord.NotFound):
-                    await message.delete()
+            notifications = await self.config.guild(message.guild).notifications()
+            await self.config.guild(message.guild).notifications.set(notifications + 1)
 
-                deletions = await self.config.guild(message.guild).deletions()
-                await self.config.guild(message.guild).deletions.set(deletions + 1)
-        elif action == "kick":
-            if (
-                message.channel.permissions_for(message.guild.me).kick_members
-                and message.channel.permissions_for(message.guild.me).manage_messages
-            ):
-                with contextlib.suppress(discord.NotFound):
-                    await message.delete()
-                    if (
-                        message.author.top_role >= message.guild.me.top_role
-                        or message.author == message.guild.owner
-                    ):
-                        return
+    def _get_redirect_chain_status(self, redirect_chain: List[str]) -> List[str]:
+        redirect_chain_status = []
+        for url in redirect_chain:
+            try:
+                extracted = tldextract.extract(url)
+                domain = f"{extracted.domain}.{extracted.suffix}"
+                status = "Malicious" if domain in self.domains else "Unknown"
+                redirect_chain_status.append(f"{url} ({status})")
+            except IndexError:
+                print(f"Error extracting domain from URL: {url}")
+                redirect_chain_status.append(f"{url} (Unknown)")
+        return redirect_chain_status
 
-                    await message.author.kick()
+    async def _delete_action(self, message: discord.Message):
+        if message.channel.permissions_for(message.guild.me).manage_messages:
+            with contextlib.suppress(discord.NotFound):
+                await message.delete()
 
-                kicks = await self.config.guild(message.guild).kicks()
-                await self.config.guild(message.guild).kicks.set(kicks + 1)
-        elif action == "ban":
-            if (
-                message.channel.permissions_for(message.guild.me).ban_members
-                and message.channel.permissions_for(message.guild.me).manage_messages
-            ):
-                with contextlib.suppress(discord.NotFound):
-                    await message.delete()
-                    if (
-                        message.author.top_role >= message.guild.me.top_role
-                        or message.author == message.guild.owner
-                    ):
-                        return
+            deletions = await self.config.guild(message.guild).deletions()
+            await self.config.guild(message.guild).deletions.set(deletions + 1)
 
-                    await message.author.ban()
+    async def _kick_action(self, message: discord.Message):
+        if (
+            message.channel.permissions_for(message.guild.me).kick_members
+            and message.channel.permissions_for(message.guild.me).manage_messages
+        ):
+            with contextlib.suppress(discord.NotFound):
+                await message.delete()
+                if (
+                    message.author.top_role >= message.guild.me.top_role
+                    or message.author == message.guild.owner
+                ):
+                    return
 
-                bans = await self.config.guild(message.guild).bans()
-                await self.config.guild(message.guild).bans.set(bans + 1)
-        elif action == "timeout":
-            if message.channel.permissions_for(message.guild.me).moderate_members:
-                with contextlib.suppress(discord.NotFound):
-                    await message.delete()
-                    if (
-                        message.author.top_role >= message.guild.me.top_role
-                        or message.author == message.guild.owner
-                    ):
-                        return
+                await message.author.kick()
 
-                    # Timeout the user for a customizable duration
-                    timeout_duration_minutes = await self.config.guild(message.guild).timeout_duration()
-                    timeout_duration = datetime.timedelta(minutes=timeout_duration_minutes)
-                    await message.author.timeout_for(timeout_duration, reason="Shared a known dangerous link")
+            kicks = await self.config.guild(message.guild).kicks()
+            await self.config.guild(message.guild).kicks.set(kicks + 1)
 
-                timeouts = await self.config.guild(message.guild).timeouts()  # Retrieve current timeout count
-                await self.config.guild(message.guild).timeouts.set(timeouts + 1)  # Increment timeout count
+    async def _ban_action(self, message: discord.Message):
+        if (
+            message.channel.permissions_for(message.guild.me).ban_members
+            and message.channel.permissions_for(message.guild.me).manage_messages
+        ):
+            with contextlib.suppress(discord.NotFound):
+                await message.delete()
+                if (
+                    message.author.top_role >= message.guild.me.top_role
+                    or message.author == message.guild.owner
+                ):
+                    return
+
+                await message.author.ban()
+
+            bans = await self.config.guild(message.guild).bans()
+            await self.config.guild(message.guild).bans.set(bans + 1)
+
+    async def _timeout_action(self, message: discord.Message):
+        if message.channel.permissions_for(message.guild.me).moderate_members:
+            with contextlib.suppress(discord.NotFound):
+                await message.delete()
+                if (
+                    message.author.top_role >= message.guild.me.top_role
+                    or message.author == message.guild.owner
+                ):
+                    return
+
+                # Timeout the user for a customizable duration
+                timeout_duration_minutes = await self.config.guild(message.guild).timeout_duration()
+                timeout_duration = datetime.timedelta(minutes=timeout_duration_minutes)
+                await message.author.timeout_for(timeout_duration, reason="Shared a known dangerous link")
+
+            timeouts = await self.config.guild(message.guild).timeouts()  # Retrieve current timeout count
+            await self.config.guild(message.guild).timeouts.set(timeouts + 1)  # Increment timeout count
 
     @commands.Cog.listener()
     async def on_message_edit(self, before: discord.Message, after: discord.Message):
@@ -719,28 +589,19 @@ class AntiPhishing(commands.Cog):
             return
 
         # Check if the guild is enrolled and send all detected links to the webhook
-        if await self.config.guild(after.guild).enrolled():
-            webhook_url = await self.config.guild(after.guild).webhook_url()
-            if webhook_url:
-                async with aiohttp.ClientSession() as session:
-                    webhook = discord.Webhook.from_url(webhook_url, adapter=discord.AsyncWebhookAdapter(session))
-                    await webhook.send(f"Detected links: {', '.join(links)}")
+        webhook_url = await self.config.guild(after.guild).webhook()
+        if webhook_url:
+            async with self.session.post(webhook_url, json={"content": f"Detected links: {', '.join(links)}"}) as response:
+                if response.status not in [200, 204]:
+                    print(f"Failed to send detected links to webhook: {response.status}")
 
-        for url in links:
-            domains_to_check = await self.follow_redirects(url)
-            for domain_url in domains_to_check:
-                extracted = tldextract.extract(domain_url)
-                domain = f"{extracted.domain}.{extracted.suffix}"
-                if any(domain == blocked_domain for blocked_domain in self.domains):
-                    await self.handle_phishing(after, domain, domains_to_check)
-                    return
+        await self._process_links(after, links)
 
     @commands.Cog.listener()
     async def on_message_without_command(self, message: discord.Message):
         """
         Handles the logic for checking URLs.
         """
-
         if not message.guild or message.author.bot:
             return
         if await self.bot.cog_disabled_in_guild(self, message.guild):
@@ -750,6 +611,9 @@ class AntiPhishing(commands.Cog):
         if not links:
             return
 
+        await self._process_links(message, links)
+
+    async def _process_links(self, message: discord.Message, links: List[str]):
         for url in links:
             domains_to_check = await self.follow_redirects(url)
             for domain_url in domains_to_check:
