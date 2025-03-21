@@ -21,10 +21,15 @@ class Holidays(commands.Cog):
         
         # Load valid country codes from the JSON file
         data_dir = bundled_data_path(self)
-        with (data_dir / "country_codes.json").open(mode="r") as f:
-            country_data = json.load(f)
-            self.valid_country_codes = {entry["countryCode"] for entry in country_data}
-            self.country_data = country_data
+        try:
+            with (data_dir / "country_codes.json").open(mode="r") as f:
+                country_data = json.load(f)
+                self.valid_country_codes = {entry["countryCode"] for entry in country_data}
+                self.country_data = country_data
+        except (FileNotFoundError, json.JSONDecodeError) as e:
+            self.valid_country_codes = set()
+            self.country_data = []
+            print(f"Error loading country codes: {e}")
 
         self.bot.loop.create_task(self.send_holiday_alerts())
 
@@ -49,23 +54,26 @@ class Holidays(commands.Cog):
             return
 
         current_year = dt.now().year
-        async with self.session.get(f"https://date.nager.at/Api/v2/PublicHolidays/{current_year}/{country_code}") as response:
-            if response.status != 200:
-                return
+        try:
+            async with self.session.get(f"https://date.nager.at/Api/v2/PublicHolidays/{current_year}/{country_code}") as response:
+                if response.status != 200:
+                    return
 
-            data = await response.json()
-            if data:
-                upcoming_holidays = [holiday for holiday in data if dt.strptime(holiday['date'], '%Y-%m-%d') >= dt.now()]
-                if upcoming_holidays:
-                    next_holiday = upcoming_holidays[0]
-                    holiday_date = dt.strptime(next_holiday['date'], '%Y-%m-%d')
-                    if holiday_date.date() == (dt.now() + timedelta(days=1)).date():
-                        embed = discord.Embed(
-                            title=f"Upcoming {country_code} public holiday",
-                            description=f"**{next_holiday['localName']}** occurring tomorrow on **<t:{int((holiday_date + timedelta(hours=7)).timestamp())}:D>**.",
-                            color=0xfffffe
-                        )
-                        await user.send(embed=embed)
+                data = await response.json()
+                if data:
+                    upcoming_holidays = [holiday for holiday in data if dt.strptime(holiday['date'], '%Y-%m-%d') >= dt.now()]
+                    if upcoming_holidays:
+                        next_holiday = upcoming_holidays[0]
+                        holiday_date = dt.strptime(next_holiday['date'], '%Y-%m-%d')
+                        if holiday_date.date() == (dt.now() + timedelta(days=1)).date():
+                            embed = discord.Embed(
+                                title=f"Upcoming {country_code} public holiday",
+                                description=f"**{next_holiday['localName']}** occurring tomorrow on **<t:{int((holiday_date + timedelta(hours=7)).timestamp())}:D>**.",
+                                color=0xfffffe
+                            )
+                            await user.send(embed=embed)
+        except aiohttp.ClientError as e:
+            print(f"Error fetching holiday data: {e}")
 
     @commands.group(name="holiday")
     async def holiday(self, ctx):
@@ -96,29 +104,37 @@ class Holidays(commands.Cog):
             return
 
         current_year = dt.now().year
-        async with self.session.get(f"https://date.nager.at/Api/v2/PublicHolidays/{current_year}/{country_code}") as response:
-            if response.status != 200:
-                embed = discord.Embed(
-                    title="Failed to fetch holidays",
-                    description="Failed to fetch holidays. Please try again later.",
-                    color=0xff4545
-                )
-                await ctx.send(embed=embed)
-                return
-
-            data = await response.json()
-            if data:
-                # Filter out past holidays
-                upcoming_holidays = [holiday for holiday in data if dt.strptime(holiday['date'], '%Y-%m-%d') >= dt.now()]
-                if upcoming_holidays:
-                    next_holiday = upcoming_holidays[0]
-                    holiday_date = dt.strptime(next_holiday['date'], '%Y-%m-%d')
+        try:
+            async with self.session.get(f"https://date.nager.at/Api/v2/PublicHolidays/{current_year}/{country_code}") as response:
+                if response.status != 200:
                     embed = discord.Embed(
-                        title=f"Next {country_code} public holiday",
-                        description=f"**{next_holiday['localName']}** occurring on **<t:{int((holiday_date + timedelta(hours=7)).timestamp())}:D>** (**<t:{int((holiday_date + timedelta(hours=7)).timestamp())}:R>**).",
-                        color=0xfffffe
+                        title="Failed to fetch holidays",
+                        description="Failed to fetch holidays. Please try again later.",
+                        color=0xff4545
                     )
                     await ctx.send(embed=embed)
+                    return
+
+                data = await response.json()
+                if data:
+                    # Filter out past holidays
+                    upcoming_holidays = [holiday for holiday in data if dt.strptime(holiday['date'], '%Y-%m-%d') >= dt.now()]
+                    if upcoming_holidays:
+                        next_holiday = upcoming_holidays[0]
+                        holiday_date = dt.strptime(next_holiday['date'], '%Y-%m-%d')
+                        embed = discord.Embed(
+                            title=f"Next {country_code} public holiday",
+                            description=f"**{next_holiday['localName']}** occurring on **<t:{int((holiday_date + timedelta(hours=7)).timestamp())}:D>** (**<t:{int((holiday_date + timedelta(hours=7)).timestamp())}:R>**).",
+                            color=0xfffffe
+                        )
+                        await ctx.send(embed=embed)
+                    else:
+                        embed = discord.Embed(
+                            title="No upcoming holidays",
+                            description=f"No upcoming public holidays found for {country_code}.",
+                            color=0xff4545
+                        )
+                        await ctx.send(embed=embed)
                 else:
                     embed = discord.Embed(
                         title="No upcoming holidays",
@@ -126,13 +142,8 @@ class Holidays(commands.Cog):
                         color=0xff4545
                     )
                     await ctx.send(embed=embed)
-            else:
-                embed = discord.Embed(
-                    title="No upcoming holidays",
-                    description=f"No upcoming public holidays found for {country_code}.",
-                    color=0xff4545
-                )
-                await ctx.send(embed=embed)
+        except aiohttp.ClientError as e:
+            print(f"Error fetching holiday data: {e}")
 
     @holiday.command(name="list")
     async def list(self, ctx):
@@ -146,56 +157,62 @@ class Holidays(commands.Cog):
             await ctx.send(f"{country_code} is not a valid country code. Please set a valid country code using the `holidayset country` command.")
             return
 
-        async with self.session.get(f"https://date.nager.at/Api/v2/PublicHolidays/{ctx.message.created_at.year}/{country_code}") as response:
-            if response.status != 200:
-                await ctx.send("Failed to fetch holidays. Please try again later.")
-                return
+        try:
+            async with self.session.get(f"https://date.nager.at/Api/v2/PublicHolidays/{ctx.message.created_at.year}/{country_code}") as response:
+                if response.status != 200:
+                    await ctx.send("Failed to fetch holidays. Please try again later.")
+                    return
 
-            data = await response.json()
-            if data:
-                seen_holidays = set()
-                embed = discord.Embed(
-                    title=f"Public holidays in {country_code} for {ctx.message.created_at.year}",
-                    color=0xfffffe
-                )
-                for holiday in data:
-                    holiday_date = dt.strptime(holiday['date'], '%Y-%m-%d')
-                    holiday_key = (holiday['localName'], holiday_date)
-                    if holiday_key not in seen_holidays:
-                        seen_holidays.add(holiday_key)
-                        embed.add_field(
-                            name=holiday['localName'],
-                            value=f"**<t:{int((holiday_date + timedelta(hours=7)).timestamp())}:D>** (**<t:{int((holiday_date + timedelta(hours=7)).timestamp())}:R>**)",
-                            inline=True
-                        )
-                await ctx.send(embed=embed)
-            else:
-                await ctx.send(f"No public holidays found for {country_code} in {ctx.message.created_at.year}.")
+                data = await response.json()
+                if data:
+                    seen_holidays = set()
+                    embed = discord.Embed(
+                        title=f"Public holidays in {country_code} for {ctx.message.created_at.year}",
+                        color=0xfffffe
+                    )
+                    for holiday in data:
+                        holiday_date = dt.strptime(holiday['date'], '%Y-%m-%d')
+                        holiday_key = (holiday['localName'], holiday_date)
+                        if holiday_key not in seen_holidays:
+                            seen_holidays.add(holiday_key)
+                            embed.add_field(
+                                name=holiday['localName'],
+                                value=f"**<t:{int((holiday_date + timedelta(hours=7)).timestamp())}:D>** (**<t:{int((holiday_date + timedelta(hours=7)).timestamp())}:R>**)",
+                                inline=True
+                            )
+                    await ctx.send(embed=embed)
+                else:
+                    await ctx.send(f"No public holidays found for {country_code} in {ctx.message.created_at.year}.")
+        except aiohttp.ClientError as e:
+            print(f"Error fetching holiday data: {e}")
 
     @holiday.command(name="upcoming")
     async def upcoming(self, ctx):
         """Fetch upcoming public holidays worldwide."""
-        async with self.session.get("https://date.nager.at/api/v3/NextPublicHolidaysWorldwide") as response:
-            if response.status != 200:
-                await ctx.send("Failed to fetch upcoming holidays. Please try again later.")
-                return
+        try:
+            async with self.session.get("https://date.nager.at/api/v3/NextPublicHolidaysWorldwide") as response:
+                if response.status != 200:
+                    await ctx.send("Failed to fetch upcoming holidays. Please try again later.")
+                    return
 
-            data = await response.json()
-            if data:
-                embed = discord.Embed(
-                    title="Upcoming Public Holidays Worldwide",
-                    color=0xfffffe
-                )
-                for holiday in data[:10]:  # Limit to the first 10 holidays to avoid too long messages
-                    holiday_date = dt.strptime(holiday['date'], '%Y-%m-%d')
-                    embed.add_field(
-                        name=f"{holiday['localName']} ({holiday['countryCode']})",
-                        value=f"**<t:{int((holiday_date + timedelta(hours=7)).timestamp())}:D>** (**<t:{int((holiday_date + timedelta(hours=7)).timestamp())}:R>**)",
-                        inline=True
+                data = await response.json()
+                if data:
+                    embed = discord.Embed(
+                        title="Upcoming Public Holidays Worldwide",
+                        color=0xfffffe
                     )
-                await ctx.send(embed=embed)
-            else:
-                await ctx.send("No upcoming public holidays found.")
+                    for holiday in data[:10]:  # Limit to the first 10 holidays to avoid too long messages
+                        holiday_date = dt.strptime(holiday['date'], '%Y-%m-%d')
+                        embed.add_field(
+                            name=f"{holiday['localName']} ({holiday['countryCode']})",
+                            value=f"**<t:{int((holiday_date + timedelta(hours=7)).timestamp())}:D>** (**<t:{int((holiday_date + timedelta(hours=7)).timestamp())}:R>**)",
+                            inline=True
+                        )
+                    await ctx.send(embed=embed)
+                else:
+                    await ctx.send("No upcoming public holidays found.")
+        except aiohttp.ClientError as e:
+            print(f"Error fetching holiday data: {e}")
 
     @holiday.command(name="weekends")
     async def weekends(self, ctx, year: int = None, country_code: str = None):
@@ -215,32 +232,39 @@ class Holidays(commands.Cog):
             await ctx.send(f"{country_code} is not a valid country code. Please provide a valid country code.")
             return
 
-        async with self.session.get(f"https://date.nager.at/api/v3/LongWeekend/{year}/{country_code}") as response:
-            if response.status != 200:
-                await ctx.send("Failed to fetch long weekends. Please try again later.")
-                return
+        try:
+            async with self.session.get(f"https://date.nager.at/api/v3/LongWeekend/{year}/{country_code}") as response:
+                if response.status != 200:
+                    await ctx.send("Failed to fetch long weekends. Please try again later.")
+                    return
 
-            data = await response.json()
-            if data:
-                embed = discord.Embed(
-                    title=f"Long weekends in {country_code} for {year}",
-                    color=0xfffffe
-                )
-                for weekend in data:
-                    start_date = dt.strptime(weekend['startDate'], '%Y-%m-%d')
-                    end_date = dt.strptime(weekend['endDate'], '%Y-%m-%d')
-                    embed.add_field(
-                        name=f"Long weekend ({weekend['dayCount']} days)",
-                        value=f"**Start:** <t:{int((start_date + timedelta(hours=7)).timestamp())}:D>\n**End:** <t:{int((end_date + timedelta(hours=7)).timestamp())}:D>",
-                        inline=True
+                data = await response.json()
+                if data:
+                    embed = discord.Embed(
+                        title=f"Long weekends in {country_code} for {year}",
+                        color=0xfffffe
                     )
-                await ctx.send(embed=embed)
-            else:
-                await ctx.send(f"No long weekends found for {country_code} in {year}.")
+                    for weekend in data:
+                        start_date = dt.strptime(weekend['startDate'], '%Y-%m-%d')
+                        end_date = dt.strptime(weekend['endDate'], '%Y-%m-%d')
+                        embed.add_field(
+                            name=f"Long weekend ({weekend['dayCount']} days)",
+                            value=f"**Start:** <t:{int((start_date + timedelta(hours=7)).timestamp())}:D>\n**End:** <t:{int((end_date + timedelta(hours=7)).timestamp())}:D>",
+                            inline=True
+                        )
+                    await ctx.send(embed=embed)
+                else:
+                    await ctx.send(f"No long weekends found for {country_code} in {year}.")
+        except aiohttp.ClientError as e:
+            print(f"Error fetching long weekend data: {e}")
 
     @holiday.command(name="regions")
     async def regions(self, ctx):
         """Show a directory of all settable country codes and country names."""
+        if not self.country_data:
+            await ctx.send("Country data is not available.")
+            return
+
         country_list = sorted(self.country_data, key=lambda x: x['name'])
         pages = [country_list[i:i + 15] for i in range(0, len(country_list), 15)]
         
@@ -268,7 +292,6 @@ class Holidays(commands.Cog):
         await message.add_reaction("❌")
         await message.add_reaction("▶️")
         
-
         def check(reaction, user):
             return user == ctx.author and str(reaction.emoji) in ["◀️", "▶️", "❌"] and reaction.message.id == message.id
 
