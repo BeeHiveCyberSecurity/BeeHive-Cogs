@@ -15,6 +15,22 @@ class Omni(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=1234567890)
+        self.register_guild_defaults()
+        self.register_global_defaults()
+        self.session = None
+
+        # In-memory statistics
+        self.memory_stats = defaultdict(lambda: defaultdict(int))
+        self.memory_user_message_counts = defaultdict(lambda: defaultdict(int))
+        self.memory_moderated_users = defaultdict(lambda: defaultdict(int))
+        self.memory_category_counter = defaultdict(Counter)
+
+        # Save interval in seconds
+        self.save_interval = 300  # Save every 5 minutes
+        self.bot.loop.create_task(self.periodic_save())
+
+    def register_guild_defaults(self):
+        """Register default settings for guilds."""
         self.config.register_guild(
             moderation_threshold=0.75,
             timeout_duration=0,
@@ -33,6 +49,9 @@ class Omni(commands.Cog):
             timeout_count=0,  # Track the number of timeouts issued
             total_timeout_duration=0  # Track the total duration of timeouts in minutes
         )
+
+    def register_global_defaults(self):
+        """Register default settings for global statistics."""
         self.config.register_global(
             global_message_count=0,
             global_moderated_count=0,
@@ -43,17 +62,6 @@ class Omni(commands.Cog):
             global_timeout_count=0,  # Track the number of global timeouts issued
             global_total_timeout_duration=0  # Track the total global duration of timeouts in minutes
         )
-        self.session = None
-
-        # In-memory statistics
-        self.memory_stats = defaultdict(lambda: defaultdict(int))
-        self.memory_user_message_counts = defaultdict(lambda: defaultdict(int))
-        self.memory_moderated_users = defaultdict(lambda: defaultdict(int))
-        self.memory_category_counter = defaultdict(Counter)
-
-        # Save interval in seconds
-        self.save_interval = 300  # Save every 5 minutes
-        self.bot.loop.create_task(self.periodic_save())
 
     async def initialize(self):
         try:
