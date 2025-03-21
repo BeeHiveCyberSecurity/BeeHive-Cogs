@@ -735,7 +735,7 @@ class Omni(commands.Cog):
                     user = await self.bot.fetch_user(user_id)
                     embed.add_field(
                         name=f"{user.name} (ID: {user_id})",
-                        value=f"📝 **{total}** messages sent | 🚨 **{moderated}** messages moderated ({(moderated / total * 100):.2f}%)",
+                        value=f" **{total}** messages sent | **{moderated}** messages moderated ({(moderated / total * 100):.2f}%)",
                         inline=False
                     )
 
@@ -746,7 +746,7 @@ class Omni(commands.Cog):
                     user = await self.bot.fetch_user(user_id)
                     embed.add_field(
                         name=f"{user.name} (ID: {user_id})",
-                        value=f"📝 **{total}** messages sent | 🚨 **{moderated}** messages moderated ({(moderated / total * 100):.2f}%)",
+                        value=f" **{total}** messages sent | **{moderated}** messages moderated ({(moderated / total * 100):.2f}%)",
                         inline=False
                     )
 
