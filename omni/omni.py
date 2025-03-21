@@ -15,8 +15,34 @@ class Omni(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=1234567890)
-        self.register_guild_defaults()
-        self.register_global_defaults()
+        self.config.register_guild(
+            moderation_threshold=0.75,
+            timeout_duration=0,
+            log_channel=None,
+            debug_mode=False,
+            message_count=0,
+            moderated_count=0,
+            moderated_users=[],
+            category_counter={},
+            whitelisted_channels=[],
+            cog_version=self.VERSION,
+            moderation_enabled=True,
+            user_message_counts={},
+            image_count=0,
+            moderated_image_count=0,
+            timeout_count=0,  # Track the number of timeouts issued
+            total_timeout_duration=0  # Track the total duration of timeouts in minutes
+        )
+        self.config.register_global(
+            global_message_count=0,
+            global_moderated_count=0,
+            global_moderated_users=[],
+            global_category_counter={},
+            global_image_count=0,
+            global_moderated_image_count=0,
+            global_timeout_count=0,  # Track the number of global timeouts issued
+            global_total_timeout_duration=0  # Track the total global duration of timeouts in minutes
+        )
         self.session = None
 
         # In-memory statistics
@@ -28,40 +54,6 @@ class Omni(commands.Cog):
         # Save interval in seconds
         self.save_interval = 300  # Save every 5 minutes
         self.bot.loop.create_task(self.periodic_save())
-
-    def register_guild_defaults(self):
-        """Register default settings for guilds."""
-        self.config.register_guild(
-            moderation_threshold=0.75,
-            timeout_duration=0,
-            log_channel=None,
-            debug_mode=False,
-            message_count=0,
-            moderated_count=0,
-            moderated_users={},
-            category_counter={},
-            whitelisted_channels=[],
-            cog_version=self.VERSION,
-            moderation_enabled=True,
-            user_message_counts={},
-            image_count=0,
-            moderated_image_count=0,
-            timeout_count=0,  # Track the number of timeouts issued
-            total_timeout_duration=0  # Track the total duration of timeouts in minutes
-        )
-
-    def register_global_defaults(self):
-        """Register default settings for global statistics."""
-        self.config.register_global(
-            global_message_count=0,
-            global_moderated_count=0,
-            global_moderated_users={},
-            global_category_counter={},
-            global_image_count=0,
-            global_moderated_image_count=0,
-            global_timeout_count=0,  # Track the number of global timeouts issued
-            global_total_timeout_duration=0  # Track the total global duration of timeouts in minutes
-        )
 
     async def initialize(self):
         try:
@@ -143,7 +135,7 @@ class Omni(commands.Cog):
             # Check for image attachments
             if message.attachments:
                 for attachment in message.attachments:
-                    if attachment.content_type and attachment.content_type.startswith("image/") and not attachment.content_type.endswith("gif"):
+                    if attachment.content_type.startswith("image/") and not attachment.content_type.endswith("gif"):
                         input_data.append({
                             "type": "image_url",
                             "image_url": {"url": attachment.url}
@@ -186,7 +178,7 @@ class Omni(commands.Cog):
         self.update_category_counter('global', text_category_scores)
 
         # Check if the message contains images and update moderated image count
-        if any(attachment.content_type and attachment.content_type.startswith("image/") and not attachment.content_type.endswith("gif") for attachment in message.attachments):
+        if any(attachment.content_type.startswith("image/") and not attachment.content_type.endswith("gif") for attachment in message.attachments):
             self.increment_statistic(guild_id, 'moderated_image_count')
             self.increment_statistic('global', 'global_moderated_image_count')
 
@@ -272,7 +264,7 @@ class Omni(commands.Cog):
                     # Add image to embed if present
                     if message.attachments:
                         for attachment in message.attachments:
-                            if attachment.content_type and attachment.content_type.startswith("image/") and not attachment.content_type.endswith("gif"):
+                            if attachment.content_type.startswith("image/") and not attachment.content_type.endswith("gif"):
                                 embed.set_image(url=attachment.url)
                                 break
 
@@ -312,7 +304,7 @@ class Omni(commands.Cog):
                     # Add image to embed if present
                     if message.attachments:
                         for attachment in message.attachments:
-                            if attachment.content_type and attachment.content_type.startswith("image/") and not attachment.content_type.endswith("gif"):
+                            if attachment.content_type.startswith("image/") and not attachment.content_type.endswith("gif"):
                                 embed.set_image(url=attachment.url)
                                 break
 
