@@ -621,6 +621,7 @@ class Omni(commands.Cog):
                 embed.add_field(name="Estimated staff time saved", value=f"{global_time_saved_str} of **hands-on-keyboard** time", inline=False)
                 embed.add_field(name="Most frequent flags", value=global_top_categories_bullets, inline=False)
 
+            embed.set_footer(text="Statistics are subject to vary and change as data is collected")
             await ctx.send(embed=embed)
         except Exception as e:
             raise RuntimeError(f"Failed to display stats: {e}")
