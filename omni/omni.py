@@ -10,8 +10,6 @@ import asyncio
 class Omni(commands.Cog):
     """AI-powered automatic text moderation provided by frontier moderation models"""
 
-    VERSION = "0.0.3"
-
     def __init__(self, bot):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=1234567890)
@@ -25,7 +23,6 @@ class Omni(commands.Cog):
             moderated_users=[],
             category_counter={},
             whitelisted_channels=[],
-            cog_version=self.VERSION,
             moderation_enabled=True,
             user_message_counts={},
             image_count=0,
@@ -58,12 +55,6 @@ class Omni(commands.Cog):
     async def initialize(self):
         try:
             self.session = aiohttp.ClientSession()
-            all_guilds = await self.config.all_guilds()
-            for guild_id, data in all_guilds.items():
-                # Check for version update
-                stored_version = data.get("cog_version", "0.0.0")
-                if stored_version != self.VERSION:
-                    await self.config.guild_from_id(guild_id).cog_version.set(self.VERSION)
         except Exception as e:
             raise RuntimeError(f"Failed to initialize Omni cog: {e}")
 
