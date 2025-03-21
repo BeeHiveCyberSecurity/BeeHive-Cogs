@@ -75,11 +75,10 @@ class Holidays(commands.Cog):
         except aiohttp.ClientError as e:
             print(f"Error fetching holiday data: {e}")
 
-    @commands.group(name="holiday")
+    @commands.group(name="holiday", invoke_without_command=True)
     async def holiday(self, ctx):
         """Group command for interacting with holidays."""
-        if ctx.invoked_subcommand is None:
-            await ctx.send_help(ctx.command)
+        await ctx.send_help(ctx.command)
 
     @holiday.command(name="next")
     async def next(self, ctx):
