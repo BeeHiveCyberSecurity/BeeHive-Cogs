@@ -48,7 +48,7 @@ class Omni(commands.Cog):
         # In-memory statistics
         self.memory_stats = defaultdict(lambda: defaultdict(int))
         self.memory_user_message_counts = defaultdict(lambda: defaultdict(int))
-        self.memory_moderated_users = defaultdict(set)
+        self.memory_moderated_users = defaultdict(lambda: defaultdict(int))
         self.memory_category_counter = defaultdict(Counter)
 
         # Save interval in seconds
@@ -171,8 +171,8 @@ class Omni(commands.Cog):
         self.increment_statistic(guild_id, 'moderated_count')
         self.increment_statistic('global', 'global_moderated_count')
 
-        self.memory_moderated_users[guild_id].add(message.author.id)
-        self.memory_moderated_users['global'].add(message.author.id)
+        self.memory_moderated_users[guild_id][message.author.id] += 1
+        self.memory_moderated_users['global'][message.author.id] += 1
 
         self.update_category_counter(guild_id, text_category_scores)
         self.update_category_counter('global', text_category_scores)
@@ -225,7 +225,7 @@ class Omni(commands.Cog):
             try:
                 await message.delete()
                 # Add user to moderated users list if message is deleted
-                self.memory_moderated_users[guild.id].add(message.author.id)
+                self.memory_moderated_users[guild.id][message.author.id] += 1
             except discord.NotFound:
                 pass  
 
@@ -342,14 +342,16 @@ class Omni(commands.Cog):
 
                 for guild_id, users in self.memory_moderated_users.items():
                     if guild_id == 'global':
-                        current_users = set(await self.config.global_moderated_users())
-                        current_users.update(users)
-                        await self.config.global_moderated_users.set(list(current_users))
+                        current_users = await self.config.global_moderated_users()
+                        for user_id, count in users.items():
+                            current_users[user_id] = current_users.get(user_id, 0) + count
+                        await self.config.global_moderated_users.set(current_users)
                     else:
                         guild_conf = self.config.guild_from_id(guild_id)
-                        current_users = set(await guild_conf.moderated_users())
-                        current_users.update(users)
-                        await guild_conf.moderated_users.set(list(current_users))
+                        current_users = await guild_conf.moderated_users()
+                        for user_id, count in users.items():
+                            current_users[user_id] = current_users.get(user_id, 0) + count
+                        await guild_conf.moderated_users.set(current_users)
 
                 for guild_id, counter in self.memory_category_counter.items():
                     if guild_id == 'global':
@@ -716,7 +718,7 @@ class Omni(commands.Cog):
 
             # Calculate moderation percentages
             user_moderation_percentages = {
-                user_id: (user_message_counts.get(user_id, 0), moderated_users.count(user_id))
+                user_id: (user_message_counts.get(user_id, 0), moderated_users.get(user_id, 0))
                 for user_id in user_message_counts
             }
 
@@ -780,7 +782,7 @@ class Omni(commands.Cog):
                 guild_conf = self.config.guild_from_id(guild_id)
                 await guild_conf.message_count.set(0)
                 await guild_conf.moderated_count.set(0)
-                await guild_conf.moderated_users.set([])
+                await guild_conf.moderated_users.set({})
                 await guild_conf.category_counter.set({})
                 await guild_conf.user_message_counts.set({})
                 await guild_conf.image_count.set(0)
@@ -791,7 +793,7 @@ class Omni(commands.Cog):
             # Reset global statistics
             await self.config.global_message_count.set(0)
             await self.config.global_moderated_count.set(0)
-            await self.config.global_moderated_users.set([])
+            await self.config.global_moderated_users.set({})
             await self.config.global_category_counter.set({})
             await self.config.global_image_count.set(0)
             await self.config.global_moderated_image_count.set(0)
