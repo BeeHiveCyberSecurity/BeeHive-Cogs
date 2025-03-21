@@ -720,7 +720,7 @@ class Omni(commands.Cog):
             # Calculate moderation percentages
             user_moderation_percentages = {
                 user_id: (user_message_counts.get(user_id, 0), moderated_users.get(user_id, 0))
-                for user_id in user_message_counts
+                for user_id in set(user_message_counts) | set(moderated_users)
             }
 
             # Sort users by moderation percentage
