@@ -55,8 +55,11 @@ class Offers(commands.Cog):
             message = await interaction.response.edit_message(embed=embed, view=view)
 
             if len(offers) > 1:
-                await message.add_reaction("⬅️")
-                await message.add_reaction("➡️")
+                try:
+                    await message.add_reaction("⬅️")
+                    await message.add_reaction("➡️")
+                except discord.HTTPException:
+                    pass  # Handle the case where adding reactions fails
 
                 def check(reaction, user):
                     return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️"] and reaction.message.id == message.id
