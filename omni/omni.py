@@ -847,7 +847,7 @@ class Omni(commands.Cog):
             log_channel = guild.get_channel(log_channel_id) if log_channel_id else None
 
             if not log_channel:
-                await ctx.send("Log channel is not set. Please set it using the `omni logs` command.")
+                await ctx.send("Ask a staff member to set a logs channel for Omni before you can submit feedback on the moderation")
                 return
 
             embed = discord.Embed(
