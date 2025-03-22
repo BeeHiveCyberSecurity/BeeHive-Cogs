@@ -8,7 +8,8 @@ class RulesCog(commands.Cog):
         self.config = Config.get_conf(self, identifier=1234567890)
         default_guild = {
             "acceptance_role_id": None,
-            "rules_channel_id": None
+            "rules_channel_id": None,
+            "acceptance_prompt_enabled": False
         }
         self.config.register_guild(**default_guild)
 
@@ -25,23 +26,159 @@ class RulesCog(commands.Cog):
         channel = ctx.guild.get_channel(rules_channel_id) if rules_channel_id else ctx.channel
 
         rules = [
-            "### Rule 1: Be respectful to everyone.\n> **1.1** Treat all members with kindness and consideration. Personal attacks, harassment, and bullying will not be tolerated.",
-            "### Rule 2: No spamming or flooding the chat.\n> **2.1** Avoid sending repetitive messages, excessive emojis, or large blocks of text that disrupt the flow of conversation.",
-            "### Rule 3: No hate speech or offensive language.\n> **3.1** This includes any form of discrimination, racism, sexism, homophobia, or any other form of hate speech.",
-            "### Rule 4: Keep conversations in the appropriate channels.\n> **4.1** Use the designated channels for specific topics to keep discussions organized and relevant.",
-            "### Rule 5: Follow the Discord Community Guidelines.\n> **5.1** Ensure that your behavior and content comply with Discord's official guidelines, which can be found at https://discord.com/guidelines.",
-            "### Rule 6: Listen to the moderators and admins.\n> **6.1** They are here to help maintain a safe and enjoyable environment. Follow their instructions and respect their decisions.",
-            "### Rule 7: Do not share dangerous or malicious content.\n> **7.1** This includes links to phishing sites, malware, or any other harmful material.",
-            "### Rule 8: Do not share personal information.\n> **8.1** Protect your privacy and the privacy of others by not sharing personal details such as addresses, phone numbers, or any other sensitive information.",
-            "### Rule 9: Use appropriate usernames and avatars.\n> **9.1** Usernames and avatars should not be offensive, inappropriate, or disruptive to the community.",
-            "### Rule 10: No self-promotion or advertising.\n> **10.1** Do not promote your own content, services, or servers without permission from the moderators.",
-            "### Rule 11: No excessive shitposting.\n> **11.1** Keep the content meaningful and avoid posting low-effort or irrelevant content excessively.",
-            "### Rule 12: Staff have the final decision for all moderative actions.\n> **12.1** Even if an action is not in clear violation of a rule, staff decisions are to be respected and followed."
+            {
+                "title": "Rule 1: Be respectful to everyone.",
+                "description": (
+                    "**1.1** Treat all members with kindness and consideration.\n"
+                    "Personal attacks, harassment, and bullying will not be tolerated.\n"
+                    "Examples:\n"
+                    "- Name-calling or using derogatory terms.\n"
+                    "- Sending threatening messages.\n"
+                    "- Mocking someone's personal attributes."
+                )
+            },
+            {
+                "title": "Rule 2: No spamming or flooding the chat.",
+                "description": (
+                    "**2.1** Avoid sending repetitive messages, excessive emojis, or large blocks of text.\n"
+                    "Examples:\n"
+                    "- Posting the same message repeatedly in a short period.\n"
+                    "- Using an excessive number of emojis in a single message.\n"
+                    "- Sending large blocks of text that disrupt the conversation."
+                )
+            },
+            {
+                "title": "Rule 3: No hate speech or offensive language.",
+                "description": (
+                    "**3.1** This includes any form of discrimination, racism, sexism, homophobia, or any other form of hate speech.\n"
+                    "Examples:\n"
+                    "- Using racial slurs or derogatory language.\n"
+                    "- Making sexist jokes or comments.\n"
+                    "- Sharing homophobic or transphobic content."
+                )
+            },
+            {
+                "title": "Rule 4: Keep conversations in the appropriate channels.",
+                "description": (
+                    "**4.1** Use the designated channels for specific topics to keep discussions organized and relevant.\n"
+                    "Examples:\n"
+                    "- Posting memes in a serious discussion channel.\n"
+                    "- Asking for tech support in a general chat.\n"
+                    "- Discussing off-topic subjects in a focused channel."
+                )
+            },
+            {
+                "title": "Rule 5: Follow the Discord Community Guidelines.",
+                "description": (
+                    "**5.1** Ensure that your behavior and content comply with Discord's official guidelines.\n"
+                    "Link: [Discord Guidelines](https://discord.com/guidelines)\n"
+                    "Examples:\n"
+                    "- Sharing content that violates Discord's terms.\n"
+                    "- Engaging in activities that Discord prohibits.\n"
+                    "- Ignoring warnings about guideline violations."
+                )
+            },
+            {
+                "title": "Rule 6: Listen to the moderators and admins.",
+                "description": (
+                    "**6.1** They are here to help maintain a safe and enjoyable environment.\n"
+                    "Examples:\n"
+                    "- Ignoring direct instructions from moderators.\n"
+                    "- Arguing with staff decisions publicly.\n"
+                    "- Disrespecting staff members in any form."
+                )
+            },
+            {
+                "title": "Rule 7: Do not share dangerous or malicious content.",
+                "description": (
+                    "**7.1** This includes links to phishing sites, malware, or any other harmful material.\n"
+                    "Examples:\n"
+                    "- Posting links to suspicious websites.\n"
+                    "- Sharing files that contain malware.\n"
+                    "- Encouraging others to visit harmful sites."
+                )
+            },
+            {
+                "title": "Rule 8: Do not share personal information.",
+                "description": (
+                    "**8.1** Protect your privacy and the privacy of others by not sharing personal details.\n"
+                    "Examples:\n"
+                    "- Posting your or others' addresses or phone numbers.\n"
+                    "- Sharing private conversations without consent.\n"
+                    "- Revealing sensitive personal information."
+                )
+            },
+            {
+                "title": "Rule 9: Use appropriate usernames and avatars.",
+                "description": (
+                    "**9.1** Usernames and avatars should not be offensive, inappropriate, or disruptive.\n"
+                    "Examples:\n"
+                    "- Using explicit images as avatars.\n"
+                    "- Choosing usernames with offensive language.\n"
+                    "- Changing usernames to impersonate others."
+                )
+            },
+            {
+                "title": "Rule 10: No self-promotion or advertising.",
+                "description": (
+                    "**10.1** Do not promote your own content, services, or servers without permission.\n"
+                    "Examples:\n"
+                    "- Posting links to your YouTube channel without approval.\n"
+                    "- Advertising your business in chat.\n"
+                    "- Inviting members to other servers without consent."
+                )
+            },
+            {
+                "title": "Rule 11: No excessive shitposting.",
+                "description": (
+                    "**11.1** Keep the content meaningful and avoid posting low-effort or irrelevant content excessively.\n"
+                    "Examples:\n"
+                    "- Posting random memes repeatedly.\n"
+                    "- Sharing irrelevant jokes in serious discussions.\n"
+                    "- Flooding channels with low-effort content."
+                )
+            },
+            {
+                "title": "Rule 12: Staff have the final decision for all moderative actions.",
+                "description": (
+                    "**12.1** Even if an action is not in clear violation of a rule, staff decisions are to be respected and followed.\n"
+                    "Examples:\n"
+                    "- Publicly disputing a moderator's decision.\n"
+                    "- Attempting to bypass a staff ruling.\n"
+                    "- Encouraging others to challenge staff authority."
+                )
+            },
+            {
+                "title": "Rule 13: No illegal activities.",
+                "description": (
+                    "**13.1** Engaging in or promoting illegal activities is strictly prohibited.\n"
+                    "Examples:\n"
+                    "- Sharing pirated software or media.\n"
+                    "- Discussing illegal drug use.\n"
+                    "- Planning or promoting illegal activities."
+                )
+            },
+            {
+                "title": "Rule 14: Respect privacy and confidentiality.",
+                "description": (
+                    "**14.1** Do not share private or confidential information without consent.\n"
+                    "Examples:\n"
+                    "- Leaking private messages or server information.\n"
+                    "- Sharing screenshots of private conversations.\n"
+                    "- Discussing confidential matters in public channels."
+                )
+            }
         ]
+
         for rule in rules:
-            embed = discord.Embed(description=rule, color=0xfffffe)
+            embed = discord.Embed(title=rule["title"], description=rule["description"], color=0xfffffe)
             await channel.send(embed=embed)
             await asyncio.sleep(2)
+
+        # Check if acceptance prompt is enabled
+        acceptance_prompt_enabled = await self.config.guild(ctx.guild).acceptance_prompt_enabled()
+        if acceptance_prompt_enabled:
+            await self.send_accept_message(ctx)
 
     @rules_group.command(name='setacceptancerole')
     @commands.has_permissions(manage_roles=True)
@@ -57,7 +194,16 @@ class RulesCog(commands.Cog):
         await self.config.guild(ctx.guild).rules_channel_id.set(channel.id)
         await ctx.send(f"Rules channel set to: {channel.mention}")
 
-    @rules_group.command(name='sendacceptmsg')
+    @rules_group.command(name='toggleacceptprompt')
+    @commands.has_permissions(administrator=True)
+    async def toggle_acceptance_prompt(self, ctx):
+        """Toggle the acceptance prompt on or off."""
+        current_state = await self.config.guild(ctx.guild).acceptance_prompt_enabled()
+        new_state = not current_state
+        await self.config.guild(ctx.guild).acceptance_prompt_enabled.set(new_state)
+        state_str = "enabled" if new_state else "disabled"
+        await ctx.send(f"Acceptance prompt has been {state_str}.")
+
     async def send_accept_message(self, ctx):
         """Send a message for users to accept the rules."""
         acceptance_role_id = await self.config.guild(ctx.guild).acceptance_role_id()
