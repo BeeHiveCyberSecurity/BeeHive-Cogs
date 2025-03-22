@@ -874,7 +874,15 @@ class Omni(commands.Cog):
                     color=discord.Color.green()
                 )
                 await log_channel.send(embed=feedback_embed)
-                await interaction.response.send_message(f"Your vote that the AI moderation is **{vote_type}** has been recorded.", ephemeral=True)
+
+                # Update the original embed and remove buttons
+                updated_embed = discord.Embed(
+                    title="Vote Submitted",
+                    description=f"Your vote that the AI moderation is **{vote_type}** has been recorded. Thank you!",
+                    color=discord.Color.green()
+                )
+                await interaction.message.edit(embed=updated_embed, view=None)
+                await interaction.response.send_message("Your vote has been submitted, thank you!", ephemeral=True)
 
             too_lenient_button = discord.ui.Button(label="Too Lenient", style=discord.ButtonStyle.green)
             too_lenient_button.callback = lambda interaction: vote_callback(interaction, "too lenient")
