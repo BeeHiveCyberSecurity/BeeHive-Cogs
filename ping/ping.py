@@ -53,9 +53,14 @@ class Ping(commands.Cog):
         )
 
         for i, result in enumerate(self.speedtest_results[-5:], start=1):
+            test_date = result.get('date', 'Unknown Date')
             embed.add_field(
-                name=f"Test {i}",
-                value=f"Download: {result['download']} Mbps, Upload: {result['upload']} Mbps, Ping: {result['ping']} ms",
+                name=f"{test_date}",
+                value=(
+                    f"**Download:** {result['download']} Mbps\n"
+                    f"**Upload:** {result['upload']} Mbps\n"
+                    f"**Ping:** {result['ping']} ms"
+                ),
                 inline=False
             )
 
@@ -148,7 +153,8 @@ class Ping(commands.Cog):
         self.speedtest_results.append({
             "download": download_speed,
             "upload": upload_speed,
-            "ping": ping
+            "ping": ping,
+            "date": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         })
         if len(self.speedtest_results) > 5:
             self.speedtest_results.pop(0)
