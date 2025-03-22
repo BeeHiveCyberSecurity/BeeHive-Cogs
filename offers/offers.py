@@ -9,16 +9,16 @@ class Offers(commands.Cog):
         self.bot = bot
         self.offers_data = {
             "Electronics": [
-                {"title": "Discount on Laptops", "description": "Save 20% on select laptops.", "link": "http://example.com/laptops", "logo": "http://example.com/laptop_logo.png"},
-                {"title": "Smartphone Sale", "description": "Get the latest smartphones at a discount.", "link": "http://example.com/smartphones", "logo": "http://example.com/smartphone_logo.png"}
+                {"title": "Discount on Laptops", "description": "Save 20% on select laptops.", "link": "http://example.com/laptops", "logo": "http://example.com/laptop_logo.png", "color": 0x1f8b4c},
+                {"title": "Smartphone Sale", "description": "Get the latest smartphones at a discount.", "link": "http://example.com/smartphones", "logo": "http://example.com/smartphone_logo.png", "color": 0x3498db}
             ],
             "Fashion": [
-                {"title": "Summer Collection Sale", "description": "Up to 50% off on summer collection.", "link": "http://example.com/summer", "logo": "http://example.com/summer_logo.png"},
-                {"title": "Winter Wear Deals", "description": "Exclusive discounts on winter wear.", "link": "http://example.com/winter", "logo": "http://example.com/winter_logo.png"}
+                {"title": "Summer Collection Sale", "description": "Up to 50% off on summer collection.", "link": "http://example.com/summer", "logo": "http://example.com/summer_logo.png", "color": 0xe74c3c},
+                {"title": "Winter Wear Deals", "description": "Exclusive discounts on winter wear.", "link": "http://example.com/winter", "logo": "http://example.com/winter_logo.png", "color": 0x9b59b6}
             ],
             "Groceries": [
-                {"title": "Weekly Grocery Discounts", "description": "Save on your weekly grocery shopping.", "link": "http://example.com/groceries", "logo": "http://example.com/groceries_logo.png"},
-                {"title": "Organic Food Offers", "description": "Discounts on organic food items.", "link": "http://example.com/organic", "logo": "http://example.com/organic_logo.png"}
+                {"title": "Weekly Grocery Discounts", "description": "Save on your weekly grocery shopping.", "link": "http://example.com/groceries", "logo": "http://example.com/groceries_logo.png", "color": 0x2ecc71},
+                {"title": "Organic Food Offers", "description": "Discounts on organic food items.", "link": "http://example.com/organic", "logo": "http://example.com/organic_logo.png", "color": 0xf1c40f}
             ]
         }
 
@@ -37,7 +37,7 @@ class Offers(commands.Cog):
 
             async def update_embed(index):
                 offer = offers[index]
-                embed = discord.Embed(title=offer["title"], description=f"{offer['description']}\n[Link]({offer['link']})", color=0x00ff00)
+                embed = discord.Embed(title=offer["title"], description=f"{offer['description']}\n[Link]({offer['link']})", color=offer["color"])
                 embed.set_thumbnail(url=offer["logo"])
                 embed.set_footer(text=f"Offer {index + 1} of {len(offers)}")
                 return embed
