@@ -31,6 +31,7 @@ class Omni(commands.Cog):
             total_timeout_duration=0,  # Track the total duration of timeouts in minutes
             too_weak_votes=0,  # Track the number of "too weak" votes
             too_tough_votes=0,  # Track the number of "too tough" votes
+            just_right_votes=0,  # Track the number of "just right" votes
             last_vote_time=None  # Track the last time a vote affected the threshold
         )
         self.config.register_global(
@@ -485,6 +486,7 @@ class Omni(commands.Cog):
             total_timeout_duration = await self.config.guild(ctx.guild).total_timeout_duration()
             too_weak_votes = await self.config.guild(ctx.guild).too_weak_votes()
             too_tough_votes = await self.config.guild(ctx.guild).too_tough_votes()
+            just_right_votes = await self.config.guild(ctx.guild).just_right_votes()
 
             member_count = ctx.guild.member_count
             moderated_message_percentage = (moderated_count / message_count * 100) if message_count > 0 else 0
@@ -531,7 +533,7 @@ class Omni(commands.Cog):
             embed.add_field(name="Total timeout duration", value=f"{timeout_duration_str}", inline=True)
             embed.add_field(name="Estimated staff time saved", value=f"{time_saved_str} of **hands-on-keyboard** time", inline=False)
             embed.add_field(name="Most frequent flags", value=top_categories_bullets, inline=False)
-            embed.add_field(name="Feedback", value=f"**{too_weak_votes}** votes for too weak, **{too_tough_votes}** votes for too tough", inline=False)
+            embed.add_field(name="Feedback", value=f"**{too_weak_votes}** votes for too weak, **{too_tough_votes}** votes for too tough, **{just_right_votes}** votes for just right", inline=False)
 
             # Show global stats, trust and safety analysis, and discord compliance if in more than 45 servers
             if len(self.bot.guilds) > 45:
@@ -796,6 +798,7 @@ class Omni(commands.Cog):
                 await guild_conf.total_timeout_duration.set(0)
                 await guild_conf.too_weak_votes.set(0)
                 await guild_conf.too_tough_votes.set(0)
+                await guild_conf.just_right_votes.set(0)
 
             # Reset global statistics
             await self.config.global_message_count.set(0)
@@ -886,6 +889,9 @@ class Omni(commands.Cog):
                 elif vote_type == "too strict":
                     await self.config.guild(guild).too_tough_votes.set(await self.config.guild(guild).too_tough_votes() + 1)
                     tips = f"- Review your channels to see what your members have been discussing\n- Evaluate appropriateness according to server rules and Discord policies\n- Consider raising the set threshold to allow more freedom. - `{ctx.clean_prefix}omni threshold`"
+                elif vote_type == "just right":
+                    await self.config.guild(guild).just_right_votes.set(await self.config.guild(guild).just_right_votes() + 1)
+                    tips = f"- The current moderation settings seem to be well-balanced.\n- Continue monitoring to ensure it remains effective."
 
                 feedback_embed = discord.Embed(
                     title="🤖 Feedback received",
@@ -909,13 +915,18 @@ class Omni(commands.Cog):
                 await interaction.message.edit(embed=updated_embed, view=None)
                 await interaction.response.send_message("You can submit additional feedback tomorrow. Thank you for taking the time to help make this server a better place. If you have additional feedback about this server's AI-assisted moderation, please contact a member of the staff or administration team.", ephemeral=True)
 
-            too_weak_button = discord.ui.Button(label="Moderation is too forgiving", style=discord.ButtonStyle.grey)
+            too_weak_button = discord.ui.Button(label="Moderation is too forgiving", style=discord.ButtonStyle.red)
             too_weak_button.callback = lambda interaction: vote_callback(interaction, "too weak")
 
-            too_tough_button = discord.ui.Button(label="Moderation is too strict", style=discord.ButtonStyle.grey)
+            just_right_button = discord.ui.Button(label="Moderation is just right", style=discord.ButtonStyle.green)
+            just_right_button.callback = lambda interaction: vote_callback(interaction, "just right")
+
+            too_tough_button = discord.ui.Button(label="Moderation is too strict", style=discord.ButtonStyle.red)
             too_tough_button.callback = lambda interaction: vote_callback(interaction, "too strict")
 
+
             view.add_item(too_weak_button)
+            view.add_item(just_right_button)
             view.add_item(too_tough_button)
 
             await ctx.send(embed=embed, view=view)
