@@ -860,7 +860,7 @@ class Omni(commands.Cog):
 
             async def vote_callback(interaction, vote_type):
                 if interaction.user != ctx.author:
-                    await interaction.response.send_message("You are not allowed to vote on this.", ephemeral=True)
+                    await interaction.response.send_message(f"This feedback session doesn't belong to you.\n\nIf you'd like to provide feedback on the agentic moderation in this server, please use `{ctx.clean_prefix}omni vote` to start your own feedback session.", ephemeral=True)
                     return
 
                 if vote_type == "too weak":
