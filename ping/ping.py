@@ -11,6 +11,7 @@ class Ping(commands.Cog):
         self.bot = bot
         self.executor = ThreadPoolExecutor(max_workers=1)
         self.latency_history = []
+        self.speedtest_results = []  # Store speedtest results
 
     @commands.hybrid_command(name="ping", description="Displays the bot's latency, download speed, and upload speed")
     async def ping(self, ctx: commands.Context):
@@ -26,6 +27,7 @@ class Ping(commands.Cog):
 
         try:
             download_speed, upload_speed, ping = await self._perform_speedtest()
+            self._log_speedtest_result(download_speed, upload_speed, ping)  # Log the result
         except Exception as e:
             await initial_message.edit(content=f"An error occurred while performing the speed test: {e}", embed=None)
             return
@@ -36,6 +38,28 @@ class Ping(commands.Cog):
 
         embed = await self._create_final_embed(avg_latency, download_speed, upload_speed, ping)
         await initial_message.edit(embed=embed)
+
+    @commands.hybrid_command(name="history", description="Displays the history of speedtest results")
+    async def history(self, ctx: commands.Context):
+        """Displays the history of speedtest results"""
+        if not self.speedtest_results:
+            await ctx.send("No speedtest results available.")
+            return
+
+        embed = discord.Embed(
+            title="Speedtest History",
+            description="Here are the last 5 speedtest results:",
+            color=discord.Color(0xfffffe)
+        )
+
+        for i, result in enumerate(self.speedtest_results[-5:], start=1):
+            embed.add_field(
+                name=f"Test {i}",
+                value=f"Download: {result['download']} Mbps, Upload: {result['upload']} Mbps, Ping: {result['ping']} ms",
+                inline=False
+            )
+
+        await ctx.send(embed=embed)
 
     def _update_latency_history(self, ws_latency):
         self.latency_history.append(ws_latency)
@@ -118,3 +142,13 @@ class Ping(commands.Cog):
             retries += 1
 
         return download_speed, upload_speed, ping
+
+    def _log_speedtest_result(self, download_speed, upload_speed, ping):
+        """Log the speedtest result."""
+        self.speedtest_results.append({
+            "download": download_speed,
+            "upload": upload_speed,
+            "ping": ping
+        })
+        if len(self.speedtest_results) > 5:
+            self.speedtest_results.pop(0)
