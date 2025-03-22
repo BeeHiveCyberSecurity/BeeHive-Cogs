@@ -30,7 +30,8 @@ class Omni(commands.Cog):
             timeout_count=0,  # Track the number of timeouts issued
             total_timeout_duration=0,  # Track the total duration of timeouts in minutes
             too_weak_votes=0,  # Track the number of "too weak" votes
-            too_tough_votes=0  # Track the number of "too tough" votes
+            too_tough_votes=0,  # Track the number of "too tough" votes
+            last_vote_time=None  # Track the last time a vote affected the threshold
         )
         self.config.register_global(
             global_message_count=0,
@@ -863,6 +864,21 @@ class Omni(commands.Cog):
                     await interaction.response.send_message(f"This feedback session doesn't belong to you.\n\nIf you'd like to provide feedback on the agentic moderation in this server, please use `{ctx.clean_prefix}omni vote` to start your own feedback session.", ephemeral=True)
                     return
 
+                # Check if the vote can affect the threshold
+                last_vote_time = await self.config.guild(guild).last_vote_time()
+                current_time = datetime.utcnow()
+                threshold_adjusted = False
+
+                if not last_vote_time or (current_time - last_vote_time).total_seconds() >= 86400:
+                    moderation_threshold = await self.config.guild(guild).moderation_threshold()
+                    if vote_type == "too weak":
+                        moderation_threshold = max(0, moderation_threshold - 0.01)
+                    elif vote_type == "too strict":
+                        moderation_threshold = min(1, moderation_threshold + 0.01)
+                    await self.config.guild(guild).moderation_threshold.set(moderation_threshold)
+                    await self.config.guild(guild).last_vote_time.set(current_time)
+                    threshold_adjusted = True
+
                 if vote_type == "too weak":
                     await self.config.guild(guild).too_weak_votes.set(await self.config.guild(guild).too_weak_votes() + 1)
                     tips = "- Consider increasing the sensitivity of the automod to catch more potential issues."
@@ -875,6 +891,10 @@ class Omni(commands.Cog):
                     description=f"User <@{ctx.author.id}> submitted feedback that the AI moderation is **{vote_type}**.\n\n{tips}",
                     color=0xfffffe
                 )
+
+                if threshold_adjusted:
+                    feedback_embed.description += "\n\nOmni made automatic, intelligent adjustments based on user feedback."
+
                 await log_channel.send(embed=feedback_embed)
 
                 # Update the original embed and remove buttons
@@ -890,7 +910,7 @@ class Omni(commands.Cog):
             too_weak_button.callback = lambda interaction: vote_callback(interaction, "too weak")
 
             too_tough_button = discord.ui.Button(label="Moderation is too strict", style=discord.ButtonStyle.grey)
-            too_tough_button.callback = lambda interaction: vote_callback(interaction, "too tough")
+            too_tough_button.callback = lambda interaction: vote_callback(interaction, "too strict")
 
             view.add_item(too_weak_button)
             view.add_item(too_tough_button)
