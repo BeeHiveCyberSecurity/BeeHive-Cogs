@@ -29,7 +29,7 @@ class Omni(commands.Cog):
             moderated_image_count=0,
             timeout_count=0,  # Track the number of timeouts issued
             total_timeout_duration=0,  # Track the total duration of timeouts in minutes
-            too_lenient_votes=0,  # Track the number of "too lenient" votes
+            too_weak_votes=0,  # Track the number of "too weak" votes
             too_tough_votes=0  # Track the number of "too tough" votes
         )
         self.config.register_global(
@@ -482,7 +482,7 @@ class Omni(commands.Cog):
             moderated_image_count = await self.config.guild(ctx.guild).moderated_image_count()
             timeout_count = await self.config.guild(ctx.guild).timeout_count()
             total_timeout_duration = await self.config.guild(ctx.guild).total_timeout_duration()
-            too_lenient_votes = await self.config.guild(ctx.guild).too_lenient_votes()
+            too_weak_votes = await self.config.guild(ctx.guild).too_weak_votes()
             too_tough_votes = await self.config.guild(ctx.guild).too_tough_votes()
 
             member_count = ctx.guild.member_count
@@ -530,7 +530,7 @@ class Omni(commands.Cog):
             embed.add_field(name="Total timeout duration", value=f"{timeout_duration_str}", inline=True)
             embed.add_field(name="Estimated staff time saved", value=f"{time_saved_str} of **hands-on-keyboard** time", inline=False)
             embed.add_field(name="Most frequent flags", value=top_categories_bullets, inline=False)
-            embed.add_field(name="Feedback", value=f"**{too_lenient_votes}** votes for too lenient, **{too_tough_votes}** votes for too tough", inline=False)
+            embed.add_field(name="Feedback", value=f"**{too_weak_votes}** votes for too weak, **{too_tough_votes}** votes for too tough", inline=False)
 
             # Show global stats, trust and safety analysis, and discord compliance if in more than 45 servers
             if len(self.bot.guilds) > 45:
@@ -793,7 +793,7 @@ class Omni(commands.Cog):
                 await guild_conf.moderated_image_count.set(0)
                 await guild_conf.timeout_count.set(0)
                 await guild_conf.total_timeout_duration.set(0)
-                await guild_conf.too_lenient_votes.set(0)
+                await guild_conf.too_weak_votes.set(0)
                 await guild_conf.too_tough_votes.set(0)
 
             # Reset global statistics
@@ -863,34 +863,36 @@ class Omni(commands.Cog):
                     await interaction.response.send_message("You are not allowed to vote on this.", ephemeral=True)
                     return
 
-                if vote_type == "too lenient":
-                    await self.config.guild(guild).too_lenient_votes.set(await self.config.guild(guild).too_lenient_votes() + 1)
-                elif vote_type == "too tough":
+                if vote_type == "too weak":
+                    await self.config.guild(guild).too_weak_votes.set(await self.config.guild(guild).too_weak_votes() + 1)
+                    tips = "Consider increasing the sensitivity of the automod to catch more potential issues."
+                elif vote_type == "too strict":
                     await self.config.guild(guild).too_tough_votes.set(await self.config.guild(guild).too_tough_votes() + 1)
+                    tips = "Consider decreasing the sensitivity of the automod to allow more freedom."
 
                 feedback_embed = discord.Embed(
-                    title="AI Moderation Feedback",
-                    description=f"User <@{ctx.author.id}> voted that the AI moderation is **{vote_type}**.",
-                    color=discord.Color.green()
+                    title="🤖 Feedback received",
+                    description=f"User <@{ctx.author.id}> submitted feedback that the AI moderation is **{vote_type}**.\n\n{tips}",
+                    color=0xfffffe
                 )
                 await log_channel.send(embed=feedback_embed)
 
                 # Update the original embed and remove buttons
                 updated_embed = discord.Embed(
-                    title="Vote Submitted",
-                    description=f"Your vote that the AI moderation is **{vote_type}** has been recorded. Thank you!",
-                    color=discord.Color.green()
+                    title="Feedback recorded",
+                    description=f"Your vote that the AI moderation is **{vote_type}** has been recorded. Thank you for helping improve the assistive AI used in this server.",
+                    color=0x2bbd8e
                 )
                 await interaction.message.edit(embed=updated_embed, view=None)
                 await interaction.response.send_message("Your vote has been submitted, thank you!", ephemeral=True)
 
-            too_lenient_button = discord.ui.Button(label="Too Lenient", style=discord.ButtonStyle.green)
-            too_lenient_button.callback = lambda interaction: vote_callback(interaction, "too lenient")
+            too_weak_button = discord.ui.Button(label="Omni is missing clearly violatory content", style=discord.ButtonStyle.grey)
+            too_weak_button.callback = lambda interaction: vote_callback(interaction, "too weak")
 
-            too_tough_button = discord.ui.Button(label="Too Tough", style=discord.ButtonStyle.red)
+            too_tough_button = discord.ui.Button(label="Omni is moderating too strictly", style=discord.ButtonStyle.grey)
             too_tough_button.callback = lambda interaction: vote_callback(interaction, "too tough")
 
-            view.add_item(too_lenient_button)
+            view.add_item(too_weak_button)
             view.add_item(too_tough_button)
 
             await ctx.send(embed=embed, view=view)
