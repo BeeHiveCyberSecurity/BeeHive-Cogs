@@ -882,10 +882,10 @@ class Omni(commands.Cog):
 
                 if vote_type == "too weak":
                     await self.config.guild(guild).too_weak_votes.set(await self.config.guild(guild).too_weak_votes() + 1)
-                    tips = "- Consider increasing the sensitivity of the automod to catch more potential issues."
+                    tips = f"- Consider lowering the threshold to catch more potential issues. - `{ctx.clean_prefix}omni threshold`"
                 elif vote_type == "too strict":
                     await self.config.guild(guild).too_tough_votes.set(await self.config.guild(guild).too_tough_votes() + 1)
-                    tips = "- Consider decreasing the sensitivity of the automod to allow more freedom."
+                    tips = f"- Consider raising the set threshold to allow more freedom. - `{ctx.clean_prefix}omni threshold`"
 
                 feedback_embed = discord.Embed(
                     title="🤖 Feedback received",
