@@ -12,44 +12,38 @@ class Omni(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.config = Config.get_conf(self, identifier=1234567890)
+        self.config = Config.get_conf(self, identifier=11111111111)
         self.config.register_guild(
-            moderation_settings={
-                "threshold": 0.75,
-                "timeout_duration": 0,
-                "log_channel": None,
-                "debug_mode": False,
-                "delete_violatory_messages": True,
-                "enabled": True
-            },
-            statistics={
-                "message_count": 0,
-                "moderated_count": 0,
-                "moderated_users": {},
-                "category_counter": {},
-                "user_message_counts": {},
-                "image_count": 0,
-                "moderated_image_count": 0,
-                "timeout_count": 0,
-                "total_timeout_duration": 0,
-                "too_weak_votes": 0,
-                "too_tough_votes": 0,
-                "just_right_votes": 0,
-                "last_vote_time": None
-            },
-            whitelisted_channels=[]
+            moderation_threshold=0.75,
+            timeout_duration=0,
+            log_channel=None,
+            debug_mode=False,
+            message_count=0,
+            moderated_count=0,
+            moderated_users={},
+            category_counter={},
+            whitelisted_channels=[],
+            moderation_enabled=True,
+            user_message_counts={},
+            image_count=0,
+            moderated_image_count=0,
+            timeout_count=0,  # Track the number of timeouts issued
+            total_timeout_duration=0,  # Track the total duration of timeouts in minutes
+            too_weak_votes=0,  # Track the number of "too weak" votes
+            too_tough_votes=0,  # Track the number of "too tough" votes
+            just_right_votes=0,  # Track the number of "just right" votes
+            last_vote_time=None,  # Track the last time a vote affected the threshold
+            delete_violatory_messages=True  # Track whether violatory messages should be deleted
         )
         self.config.register_global(
-            global_statistics={
-                "message_count": 0,
-                "moderated_count": 0,
-                "moderated_users": {},
-                "category_counter": {},
-                "image_count": 0,
-                "moderated_image_count": 0,
-                "timeout_count": 0,
-                "total_timeout_duration": 0
-            }
+            global_message_count=0,
+            global_moderated_count=0,
+            global_moderated_users={},
+            global_category_counter={},
+            global_image_count=0,
+            global_moderated_image_count=0,
+            global_timeout_count=0,  # Track the number of global timeouts issued
+            global_total_timeout_duration=0  # Track the total global duration of timeouts in minutes
         )
         self.session = None
 
@@ -103,7 +97,7 @@ class Omni(commands.Cog):
             guild = message.guild
 
             # Check if moderation is enabled
-            moderation_enabled = await self.config.guild(guild).moderation_settings.enabled()
+            moderation_enabled = await self.config.guild(guild).moderation_enabled()
             if not moderation_enabled:
                 return
 
@@ -114,7 +108,7 @@ class Omni(commands.Cog):
 
             # Update per-server and global statistics in memory
             self.increment_statistic(guild.id, 'message_count')
-            self.increment_statistic('global', 'message_count')
+            self.increment_statistic('global', 'global_message_count')
 
             # Update user message count in memory
             self.increment_user_message_count(guild.id, message.author.id)
@@ -137,19 +131,19 @@ class Omni(commands.Cog):
             # Check for image attachments
             if message.attachments:
                 for attachment in message.attachments:
-                    if attachment.content_type and attachment.content_type.startswith("image/") and not attachment.content_type.endswith("gif"):
+                    if attachment.content_type.startswith("image/") and not attachment.content_type.endswith("gif"):
                         input_data.append({
                             "type": "image_url",
                             "image_url": {"url": attachment.url}
                         })
                         self.increment_statistic(guild.id, 'image_count')
-                        self.increment_statistic('global', 'image_count')
+                        self.increment_statistic('global', 'global_image_count')
 
             # Analyze text and image content
             text_category_scores = await self.analyze_content(input_data, api_key, message)
 
             # Determine if the message should be flagged based on the threshold
-            moderation_threshold = await self.config.guild(guild).moderation_settings.threshold()
+            moderation_threshold = await self.config.guild(guild).moderation_threshold()
             text_flagged = any(score > moderation_threshold for score in text_category_scores.values())
 
             if text_flagged:
@@ -157,7 +151,7 @@ class Omni(commands.Cog):
                 await self.handle_moderation(message, text_category_scores)
 
             # Check if debug mode is enabled
-            debug_mode = await self.config.guild(guild).moderation_settings.debug_mode()
+            debug_mode = await self.config.guild(guild).debug_mode()
             if debug_mode:
                 await self.log_message(message, text_category_scores)
         except Exception as e:
@@ -171,7 +165,7 @@ class Omni(commands.Cog):
 
     def update_moderation_stats(self, guild_id, message, text_category_scores):
         self.increment_statistic(guild_id, 'moderated_count')
-        self.increment_statistic('global', 'moderated_count')
+        self.increment_statistic('global', 'global_moderated_count')
 
         self.memory_moderated_users[guild_id][message.author.id] += 1
         self.memory_moderated_users['global'][message.author.id] += 1
@@ -180,9 +174,9 @@ class Omni(commands.Cog):
         self.update_category_counter('global', text_category_scores)
 
         # Check if the message contains images and update moderated image count
-        if any(attachment.content_type and attachment.content_type.startswith("image/") and not attachment.content_type.endswith("gif") for attachment in message.attachments):
+        if any(attachment.content_type.startswith("image/") and not attachment.content_type.endswith("gif") for attachment in message.attachments):
             self.increment_statistic(guild_id, 'moderated_image_count')
-            self.increment_statistic('global', 'moderated_image_count')
+            self.increment_statistic('global', 'global_moderated_image_count')
 
     def update_category_counter(self, guild_id, text_category_scores):
         for category, score in text_category_scores.items():
@@ -220,9 +214,9 @@ class Omni(commands.Cog):
     async def handle_moderation(self, message, category_scores):
         try:
             guild = message.guild
-            timeout_duration = await self.config.guild(guild).moderation_settings.timeout_duration()
-            log_channel_id = await self.config.guild(guild).moderation_settings.log_channel()
-            delete_violatory_messages = await self.config.guild(guild).moderation_settings.delete_violatory_messages()
+            timeout_duration = await self.config.guild(guild).timeout_duration()
+            log_channel_id = await self.config.guild(guild).log_channel()
+            delete_violatory_messages = await self.config.guild(guild).delete_violatory_messages()
 
             # Delete the message if the setting is enabled
             if delete_violatory_messages:
@@ -241,9 +235,9 @@ class Omni(commands.Cog):
                     await message.author.timeout(timedelta(minutes=timeout_duration), reason=reason)
                     # Increment timeout count and total timeout duration
                     self.increment_statistic(guild.id, 'timeout_count')
-                    self.increment_statistic('global', 'timeout_count')
+                    self.increment_statistic('global', 'global_timeout_count')
                     self.increment_statistic(guild.id, 'total_timeout_duration', timeout_duration)
-                    self.increment_statistic('global', 'total_timeout_duration', timeout_duration)
+                    self.increment_statistic('global', 'global_total_timeout_duration', timeout_duration)
                 except discord.Forbidden:
                     pass
 
@@ -259,7 +253,7 @@ class Omni(commands.Cog):
                     embed.add_field(name="Sent by", value=f"<@{message.author.id}> - `{message.author.id}`", inline=True)
                     embed.add_field(name="Sent in", value=f"<#{message.channel.id}> - `{message.channel.id}`", inline=True)
                     embed.add_field(name="Scoring", value=f"", inline=False)
-                    moderation_threshold = await self.config.guild(guild).moderation_settings.threshold()
+                    moderation_threshold = await self.config.guild(guild).moderation_threshold()
                     sorted_scores = sorted(category_scores.items(), key=lambda item: item[1], reverse=True)[:3]
                     for category, score in sorted_scores:
                         score_display = f"**{score:.2f}**" if score > moderation_threshold else f"{score:.2f}"
@@ -268,7 +262,7 @@ class Omni(commands.Cog):
                     # Add image to embed if present
                     if message.attachments:
                         for attachment in message.attachments:
-                            if attachment.content_type and attachment.content_type.startswith("image/") and not attachment.content_type.endswith("gif"):
+                            if attachment.content_type.startswith("image/") and not attachment.content_type.endswith("gif"):
                                 embed.set_image(url=attachment.url)
                                 break
 
@@ -285,7 +279,7 @@ class Omni(commands.Cog):
     async def log_message(self, message, category_scores, error_code=None):
         try:
             guild = message.guild
-            log_channel_id = await self.config.guild(guild).moderation_settings.log_channel()
+            log_channel_id = await self.config.guild(guild).log_channel()
 
             if log_channel_id:
                 log_channel = guild.get_channel(log_channel_id)
@@ -299,7 +293,7 @@ class Omni(commands.Cog):
                     embed.add_field(name="Sent by", value=f"<@{message.author.id}> - `{message.author.id}`", inline=True)
                     embed.add_field(name="Sent in", value=f"<#{message.channel.id}> - `{message.channel.id}`", inline=True)
                     embed.add_field(name="Scoring", value=f"", inline=False)
-                    moderation_threshold = await self.config.guild(guild).moderation_settings.threshold()
+                    moderation_threshold = await self.config.guild(guild).moderation_threshold()
                     sorted_scores = sorted(category_scores.items(), key=lambda item: item[1], reverse=True)[:3]
                     for category, score in sorted_scores:
                         score_display = f"**{score:.2f}**" if score > moderation_threshold else f"{score:.2f}"
@@ -310,7 +304,7 @@ class Omni(commands.Cog):
                     # Add image to embed if present
                     if message.attachments:
                         for attachment in message.attachments:
-                            if attachment.content_type and attachment.content_type.startswith("image/") and not attachment.content_type.endswith("gif"):
+                            if attachment.content_type.startswith("image/") and not attachment.content_type.endswith("gif"):
                                 embed.set_image(url=attachment.url)
                                 break
 
@@ -392,6 +386,31 @@ class Omni(commands.Cog):
         """
         pass
 
+    @omni.command()
+    @commands.admin_or_permissions(manage_guild=True)
+    async def threshold(self, ctx, threshold: float):
+        """
+        Set the moderation threshold for message sensitivity.
+
+        The threshold value should be between 0 and 1, where:
+        - 0.00 represents a very sensitive setting, capturing more messages for moderation.
+        - 1.00 represents a barely sensitive setting, allowing most messages to pass through without moderation.
+
+        Adjust this setting based on your community's needs for moderation sensitivity.
+
+        **Recommendations**
+        - For general communities, a threshold of `0.50` is often effective.
+        - For professional communities (or if stricter moderation is preferred), consider a threshold below `0.40`.
+        - For more lenient settings, a threshold above `0.70` might be suitable.
+        """
+        try:
+            if 0 <= threshold <= 1:
+                await self.config.guild(ctx.guild).moderation_threshold.set(threshold)
+                await ctx.send(f"Moderation threshold set to {threshold}.")
+            else:
+                await ctx.send("Threshold must be between 0 and 1.")
+        except Exception as e:
+            raise RuntimeError(f"Failed to set threshold: {e}")
 
     @omni.command()
     @commands.admin_or_permissions(manage_guild=True)
@@ -399,7 +418,7 @@ class Omni(commands.Cog):
         """Set the timeout duration in minutes (0 for no timeout)."""
         try:
             if duration >= 0:
-                await self.config.guild(ctx.guild).moderation_settings.timeout_duration.set(duration)
+                await self.config.guild(ctx.guild).timeout_duration.set(duration)
                 await ctx.send(f"Timeout duration set to {duration} minutes.")
             else:
                 await ctx.send("Timeout duration must be 0 or greater.")
@@ -411,7 +430,7 @@ class Omni(commands.Cog):
     async def logs(self, ctx, channel: discord.TextChannel):
         """Set the channel to log moderated messages."""
         try:
-            await self.config.guild(ctx.guild).moderation_settings.log_channel.set(channel.id)
+            await self.config.guild(ctx.guild).log_channel.set(channel.id)
             await ctx.send(f"Log channel set to {channel.mention}.")
         except Exception as e:
             raise RuntimeError(f"Failed to set log channel: {e}")
@@ -447,56 +466,30 @@ class Omni(commands.Cog):
         """Toggle debug mode to log all messages and their scores."""
         try:
             guild = ctx.guild
-            current_debug_mode = await self.config.guild(guild).moderation_settings.debug_mode()
+            current_debug_mode = await self.config.guild(guild).debug_mode()
             new_debug_mode = not current_debug_mode
-            await self.config.guild(guild).moderation_settings.debug_mode.set(new_debug_mode)
+            await self.config.guild(guild).debug_mode.set(new_debug_mode)
             status = "enabled" if new_debug_mode else "disabled"
             await ctx.send(f"Debug mode {status}.")
         except Exception as e:
             raise RuntimeError(f"Failed to toggle debug mode: {e}")
 
     @omni.command()
-    @commands.admin_or_permissions(manage_guild=True)
-    async def threshold(self, ctx, threshold: float):
-        """
-        Set the moderation threshold for message sensitivity.
-
-        The threshold value should be between 0 and 1, where:
-        - 0.00 represents a very sensitive setting, capturing more messages for moderation.
-        - 1.00 represents a barely sensitive setting, allowing most messages to pass through without moderation.
-
-        Adjust this setting based on your community's needs for moderation sensitivity.
-
-        **Recommendations**
-        - For general communities, a threshold of `0.50` is often effective.
-        - For professional communities (or if stricter moderation is preferred), consider a threshold below `0.40`.
-        - For more lenient settings, a threshold above `0.70` might be suitable.
-        """
-        try:
-            if 0 <= threshold <= 1:
-                await self.config.guild(ctx.guild).moderation_settings.threshold.set(threshold)
-                await ctx.send(f"Moderation threshold set to {threshold}.")
-            else:
-                await ctx.send("Threshold must be between 0 and 1.")
-        except Exception as e:
-            raise RuntimeError(f"Failed to set threshold: {e}")
-
-    @omni.command()
     async def stats(self, ctx):
         """Show statistics of the moderation activity."""
         try:
             # Local statistics
-            message_count = await self.config.guild(ctx.guild).statistics.message_count()
-            moderated_count = await self.config.guild(ctx.guild).statistics.moderated_count()
-            moderated_users = await self.config.guild(ctx.guild).statistics.moderated_users()
-            category_counter = Counter(await self.config.guild(ctx.guild).statistics.category_counter())
-            image_count = await self.config.guild(ctx.guild).statistics.image_count()
-            moderated_image_count = await self.config.guild(ctx.guild).statistics.moderated_image_count()
-            timeout_count = await self.config.guild(ctx.guild).statistics.timeout_count()
-            total_timeout_duration = await self.config.guild(ctx.guild).statistics.total_timeout_duration()
-            too_weak_votes = await self.config.guild(ctx.guild).statistics.too_weak_votes()
-            too_tough_votes = await self.config.guild(ctx.guild).statistics.too_tough_votes()
-            just_right_votes = await self.config.guild(ctx.guild).statistics.just_right_votes()
+            message_count = await self.config.guild(ctx.guild).message_count()
+            moderated_count = await self.config.guild(ctx.guild).moderated_count()
+            moderated_users = await self.config.guild(ctx.guild).moderated_users()
+            category_counter = Counter(await self.config.guild(ctx.guild).category_counter())
+            image_count = await self.config.guild(ctx.guild).image_count()
+            moderated_image_count = await self.config.guild(ctx.guild).moderated_image_count()
+            timeout_count = await self.config.guild(ctx.guild).timeout_count()
+            total_timeout_duration = await self.config.guild(ctx.guild).total_timeout_duration()
+            too_weak_votes = await self.config.guild(ctx.guild).too_weak_votes()
+            too_tough_votes = await self.config.guild(ctx.guild).too_tough_votes()
+            just_right_votes = await self.config.guild(ctx.guild).just_right_votes()
 
             member_count = ctx.guild.member_count
             moderated_message_percentage = (moderated_count / message_count * 100) if message_count > 0 else 0
@@ -555,7 +548,7 @@ class Omni(commands.Cog):
                 less_harmful_than_percentage = (rank / total_guilds) * 100
 
                 # Calculate member moderation rate comparison
-                global_moderated_users = await self.config.global_statistics.moderated_users()
+                global_moderated_users = await self.config.global_moderated_users()
                 total_members = sum(guild.member_count for guild in self.bot.guilds)
                 global_moderated_user_percentage = (len(global_moderated_users) / total_members * 100) if total_members > 0 else 0
                 moderation_rate_difference = moderated_user_percentage - global_moderated_user_percentage
@@ -584,13 +577,13 @@ class Omni(commands.Cog):
                     embed.add_field(name="Discord compliance advisor", value="- :white_check_mark: **Aim for continuing improvement**\n\n> This server's doing *comparatively* **OK**, but it's always best to be a safe, welcoming place to keep your server's safety ranking optimal.", inline=False)
 
                 # Global statistics
-                global_message_count = await self.config.global_statistics.message_count()
-                global_moderated_count = await self.config.global_statistics.moderated_count()
-                global_category_counter = Counter(await self.config.global_statistics.category_counter())
-                global_image_count = await self.config.global_statistics.image_count()
-                global_moderated_image_count = await self.config.global_statistics.moderated_image_count()
-                global_timeout_count = await self.config.global_statistics.timeout_count()
-                global_total_timeout_duration = await self.config.global_statistics.total_timeout_duration()
+                global_message_count = await self.config.global_message_count()
+                global_moderated_count = await self.config.global_moderated_count()
+                global_category_counter = Counter(await self.config.global_category_counter())
+                global_image_count = await self.config.global_image_count()
+                global_moderated_image_count = await self.config.global_moderated_image_count()
+                global_timeout_count = await self.config.global_timeout_count()
+                global_total_timeout_duration = await self.config.global_total_timeout_duration()
 
                 global_moderated_message_percentage = (global_moderated_count / global_message_count * 100) if global_message_count > 0 else 0
                 global_moderated_image_percentage = (global_moderated_image_count / global_image_count * 100) if global_image_count > 0 else 0
@@ -643,8 +636,8 @@ class Omni(commands.Cog):
         """Helper function to sort guilds by harmfulness."""
         guilds_with_harmfulness = []
         for guild in self.bot.guilds:
-            message_count = await self.config.guild(guild).statistics.message_count() or 1
-            moderated_count = await self.config.guild(guild).statistics.moderated_count()
+            message_count = await self.config.guild(guild).message_count() or 1
+            moderated_count = await self.config.guild(guild).moderated_count()
             harmfulness = moderated_count / message_count
             guilds_with_harmfulness.append((guild, harmfulness))
         guilds_sorted_by_harmfulness = sorted(guilds_with_harmfulness, key=lambda x: x[1], reverse=True)
@@ -656,13 +649,13 @@ class Omni(commands.Cog):
         """Show the current settings of the cog."""
         try:
             guild = ctx.guild
-            moderation_threshold = await self.config.guild(guild).moderation_settings.threshold()
-            timeout_duration = await self.config.guild(guild).moderation_settings.timeout_duration()
-            log_channel_id = await self.config.guild(guild).moderation_settings.log_channel()
-            debug_mode = await self.config.guild(guild).moderation_settings.debug_mode()
+            moderation_threshold = await self.config.guild(guild).moderation_threshold()
+            timeout_duration = await self.config.guild(guild).timeout_duration()
+            log_channel_id = await self.config.guild(guild).log_channel()
+            debug_mode = await self.config.guild(guild).debug_mode()
             whitelisted_channels = await self.config.guild(guild).whitelisted_channels()
-            moderation_enabled = await self.config.guild(guild).moderation_settings.enabled()
-            delete_violatory_messages = await self.config.guild(guild).moderation_settings.delete_violatory_messages()
+            moderation_enabled = await self.config.guild(guild).moderation_enabled()
+            delete_violatory_messages = await self.config.guild(guild).delete_violatory_messages()
 
             log_channel = guild.get_channel(log_channel_id) if log_channel_id else None
             log_channel_name = log_channel.mention if log_channel else "Not set"
@@ -687,9 +680,9 @@ class Omni(commands.Cog):
         """Toggle automatic moderation on or off."""
         try:
             guild = ctx.guild
-            current_status = await self.config.guild(guild).moderation_settings.enabled()
+            current_status = await self.config.guild(guild).moderation_enabled()
             new_status = not current_status
-            await self.config.guild(guild).moderation_settings.enabled.set(new_status)
+            await self.config.guild(guild).moderation_enabled.set(new_status)
             status = "enabled" if new_status else "disabled"
             await ctx.send(f"Automatic moderation {status}.")
         except Exception as e:
@@ -701,9 +694,9 @@ class Omni(commands.Cog):
         """Toggle whether violatory messages are deleted or not."""
         try:
             guild = ctx.guild
-            current_status = await self.config.guild(guild).moderation_settings.delete_violatory_messages()
+            current_status = await self.config.guild(guild).delete_violatory_messages()
             new_status = not current_status
-            await self.config.guild(guild).moderation_settings.delete_violatory_messages.set(new_status)
+            await self.config.guild(guild).delete_violatory_messages.set(new_status)
             status = "enabled" if new_status else "disabled"
             await ctx.send(f"Deletion of violatory messages {status}.")
         except Exception as e:
@@ -743,8 +736,8 @@ class Omni(commands.Cog):
         """Show the 5 most and least frequently moderated users."""
         try:
             guild = ctx.guild
-            user_message_counts = await self.config.guild(guild).statistics.user_message_counts()
-            moderated_users = await self.config.guild(guild).statistics.moderated_users()
+            user_message_counts = await self.config.guild(guild).user_message_counts()
+            moderated_users = await self.config.guild(guild).moderated_users()
 
             # Calculate moderation percentages
             user_moderation_percentages = {
@@ -813,28 +806,28 @@ class Omni(commands.Cog):
             all_guilds = await self.config.all_guilds()
             for guild_id in all_guilds:
                 guild_conf = self.config.guild_from_id(guild_id)
-                await guild_conf.statistics.message_count.set(0)
-                await guild_conf.statistics.moderated_count.set(0)
-                await guild_conf.statistics.moderated_users.set({})
-                await guild_conf.statistics.category_counter.set({})
-                await guild_conf.statistics.user_message_counts.set({})
-                await guild_conf.statistics.image_count.set(0)
-                await guild_conf.statistics.moderated_image_count.set(0)
-                await guild_conf.statistics.timeout_count.set(0)
-                await guild_conf.statistics.total_timeout_duration.set(0)
-                await guild_conf.statistics.too_weak_votes.set(0)
-                await guild_conf.statistics.too_tough_votes.set(0)
-                await guild_conf.statistics.just_right_votes.set(0)
+                await guild_conf.message_count.set(0)
+                await guild_conf.moderated_count.set(0)
+                await guild_conf.moderated_users.set({})
+                await guild_conf.category_counter.set({})
+                await guild_conf.user_message_counts.set({})
+                await guild_conf.image_count.set(0)
+                await guild_conf.moderated_image_count.set(0)
+                await guild_conf.timeout_count.set(0)
+                await guild_conf.total_timeout_duration.set(0)
+                await guild_conf.too_weak_votes.set(0)
+                await guild_conf.too_tough_votes.set(0)
+                await guild_conf.just_right_votes.set(0)
 
             # Reset global statistics
-            await self.config.global_statistics.message_count.set(0)
-            await self.config.global_statistics.moderated_count.set(0)
-            await self.config.global_statistics.moderated_users.set({})
-            await self.config.global_statistics.category_counter.set({})
-            await self.config.global_statistics.image_count.set(0)
-            await self.config.global_statistics.moderated_image_count.set(0)
-            await self.config.global_statistics.timeout_count.set(0)
-            await self.config.global_statistics.total_timeout_duration.set(0)
+            await self.config.global_message_count.set(0)
+            await self.config.global_moderated_count.set(0)
+            await self.config.global_moderated_users.set({})
+            await self.config.global_category_counter.set({})
+            await self.config.global_image_count.set(0)
+            await self.config.global_moderated_image_count.set(0)
+            await self.config.global_timeout_count.set(0)
+            await self.config.global_total_timeout_duration.set(0)
 
             # Clear in-memory statistics
             self.memory_stats.clear()
@@ -859,10 +852,10 @@ class Omni(commands.Cog):
         """Toggle default moderation state for new servers."""
         try:
             # Get the current state
-            current_state = await self.config.moderation_settings.enabled()
+            current_state = await self.config.moderation_enabled()
             # Toggle the state
             new_state = not current_state
-            await self.config.moderation_settings.enabled.set(new_state)
+            await self.config.moderation_enabled.set(new_state)
             status = "enabled" if new_state else "disabled"
             await ctx.send(f"Moderation is now {status} by default for new servers.")
         except Exception as e:
@@ -873,7 +866,7 @@ class Omni(commands.Cog):
         """Give feedback on the server's agentic moderation"""
         try:
             guild = ctx.guild
-            log_channel_id = await self.config.guild(guild).moderation_settings.log_channel()
+            log_channel_id = await self.config.guild(guild).log_channel()
             log_channel = guild.get_channel(log_channel_id) if log_channel_id else None
 
             if not log_channel:
@@ -894,29 +887,29 @@ class Omni(commands.Cog):
                     return
 
                 # Check if the vote can affect the threshold
-                last_vote_time = await self.config.guild(guild).statistics.last_vote_time()
+                last_vote_time = await self.config.guild(guild).last_vote_time()
                 current_time = datetime.utcnow()
                 threshold_adjusted = False
 
                 if not last_vote_time or (current_time - datetime.fromisoformat(last_vote_time)).total_seconds() >= 86400:
-                    moderation_threshold = await self.config.guild(guild).moderation_settings.threshold()
+                    moderation_threshold = await self.config.guild(guild).moderation_threshold()
                     old_threshold = moderation_threshold
                     if vote_type == "too weak":
                         moderation_threshold = max(0, moderation_threshold - 0.01)
                     elif vote_type == "too strict":
                         moderation_threshold = min(1, moderation_threshold + 0.01)
-                    await self.config.guild(guild).moderation_settings.threshold.set(moderation_threshold)
-                    await self.config.guild(guild).statistics.last_vote_time.set(current_time.isoformat())
+                    await self.config.guild(guild).moderation_threshold.set(moderation_threshold)
+                    await self.config.guild(guild).last_vote_time.set(current_time.isoformat())
                     threshold_adjusted = True
 
                 if vote_type == "too weak":
-                    await self.config.guild(guild).statistics.too_weak_votes.set(await self.config.guild(guild).statistics.too_weak_votes() + 1)
+                    await self.config.guild(guild).too_weak_votes.set(await self.config.guild(guild).too_weak_votes() + 1)
                     tips = f"- Review your channels to see what your members have been discussing\n- Evaluate appropriateness according to server rules and Discord policies\n- Consider lowering the threshold to catch more potential issues. - `{ctx.clean_prefix}omni threshold`"
                 elif vote_type == "too strict":
-                    await self.config.guild(guild).statistics.too_tough_votes.set(await self.config.guild(guild).statistics.too_tough_votes() + 1)
+                    await self.config.guild(guild).too_tough_votes.set(await self.config.guild(guild).too_tough_votes() + 1)
                     tips = f"- Review your channels to see what your members have been discussing\n- Evaluate appropriateness according to server rules and Discord policies\n- Consider raising the set threshold to allow more freedom. - `{ctx.clean_prefix}omni threshold`"
                 elif vote_type == "just right":
-                    await self.config.guild(guild).statistics.just_right_votes.set(await self.config.guild(guild).statistics.just_right_votes() + 1)
+                    await self.config.guild(guild).just_right_votes.set(await self.config.guild(guild).just_right_votes() + 1)
                     tips = f"- The current moderation settings seem to be well-balanced.\n- Continue monitoring to ensure it remains effective."
 
                 feedback_embed = discord.Embed(
