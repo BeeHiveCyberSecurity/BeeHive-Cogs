@@ -840,7 +840,7 @@ class Omni(commands.Cog):
 
     @omni.command()
     async def vote(self, ctx):
-        """Vote on the toughness of the AI moderation."""
+        """Give feedback on the server's agentic moderation"""
         try:
             guild = ctx.guild
             log_channel_id = await self.config.guild(guild).log_channel()
