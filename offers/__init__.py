@@ -1,6 +1,6 @@
 from .offers import Offers
 
-def setup(bot):
+async def setup(bot):
     cog = Offers(bot)
-    bot.add_cog(cog)
+    await bot.add_cog(cog)
 
