@@ -44,6 +44,8 @@ class WarActivity(commands.Cog):
                         print(f"Failed to fetch war activity: HTTP {response.status}")
             except aiohttp.ClientError as e:
                 print(f"Error fetching war activity: {e}")
+            except Exception as e:
+                print(f"Unexpected error: {e}")
 
     async def send_alerts(self, guild_id, new_posts):
         alert_channel_id = await self.config.guild_from_id(guild_id).alert_channel_id()
@@ -56,6 +58,8 @@ class WarActivity(commands.Cog):
                         await channel.send(embed=embed)
                     except discord.HTTPException as e:
                         print(f"Failed to send alert: {e}")
+                    except Exception as e:
+                        print(f"Unexpected error while sending alert: {e}")
 
     async def check_and_send_alerts_loop(self):
         await self.bot.wait_until_ready()
@@ -65,7 +69,7 @@ class WarActivity(commands.Cog):
             await asyncio.sleep(120)  # Check every 2 minutes
 
     def create_embed_from_post(self, post):
-        description_without_emoji = ''.join(char for char in post["me"] if char.isalnum() or char.isspace() or char in '.,!?')
+        description_without_emoji = ''.join(char for char in post.get("me", "") if char.isalnum() or char.isspace() or char in '.,!?')
         embed = discord.Embed(
             title="From the battlefield",
             description=description_without_emoji,
@@ -115,10 +119,15 @@ class WarActivity(commands.Cog):
                                         await message.remove_reaction(reaction, user)
                                     except asyncio.TimeoutError:
                                         break
+                                    except Exception as e:
+                                        print(f"Unexpected error during reaction handling: {e}")
+                                        break
                         else:
                             await ctx.send("No recent intelligence reports found.")
                     else:
                         await ctx.send(f"Failed to fetch intelligence: HTTP {response.status}")
             except aiohttp.ClientError as e:
                 await ctx.send(f"Error occurred while fetching intelligence: {e}")
+            except Exception as e:
+                await ctx.send(f"Unexpected error occurred: {e}")
 
