@@ -1,4 +1,5 @@
 import discord
+import asyncio
 from redbot.core import commands
 
 class Offers(commands.Cog):
@@ -24,7 +25,6 @@ class Offers(commands.Cog):
     @commands.command()
     async def offers(self, ctx):
         """Browse different categories of money-saving offers."""
-        view = discord.ui.View(timeout=None)  # Ensure the view doesn't timeout
         select = discord.ui.Select(placeholder="Choose a category", min_values=1, max_values=1)
 
         for category in self.offers_data.keys():
@@ -45,30 +45,33 @@ class Offers(commands.Cog):
             async def interaction_check(interaction):
                 return interaction.user == ctx.author
 
-            async def next_offer(interaction):
-                nonlocal current_index
-                current_index = (current_index + 1) % len(offers)
-                embed = await update_embed(current_index)
-                await interaction.response.edit_message(embed=embed, view=view)
-
-            async def previous_offer(interaction):
-                nonlocal current_index
-                current_index = (current_index - 1) % len(offers)
-                embed = await update_embed(current_index)
-                await interaction.response.edit_message(embed=embed, view=view)
-
             embed = await update_embed(current_index)
-            await interaction.response.edit_message(embed=embed, view=view)
+            message = await interaction.response.edit_message(embed=embed)
 
-            # Clear and re-add buttons to ensure they appear
-            view.clear_items()
-            view.add_item(discord.ui.Button(label="Previous", style=discord.ButtonStyle.secondary, emoji="⬅️", custom_id="previous"))
-            view.add_item(discord.ui.Button(label="Next", style=discord.ButtonStyle.secondary, emoji="➡️", custom_id="next"))
+            await message.add_reaction("⬅️")
+            await message.add_reaction("➡️")
 
-            view.children[0].callback = previous_offer
-            view.children[1].callback = next_offer
+            def check(reaction, user):
+                return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️"] and reaction.message.id == message.id
+
+            while True:
+                try:
+                    reaction, user = await self.bot.wait_for("reaction_add", timeout=60.0, check=check)
+
+                    if str(reaction.emoji) == "➡️":
+                        current_index = (current_index + 1) % len(offers)
+                    elif str(reaction.emoji) == "⬅️":
+                        current_index = (current_index - 1) % len(offers)
+
+                    embed = await update_embed(current_index)
+                    await message.edit(embed=embed)
+                    await message.remove_reaction(reaction, user)
+
+                except asyncio.TimeoutError:
+                    break
 
         select.callback = select_callback
+        view = discord.ui.View(timeout=None)
         view.add_item(select)
 
         initial_embed = discord.Embed(title="Browse Offers", description="Select a category to view offers.", color=0x00ff00)
