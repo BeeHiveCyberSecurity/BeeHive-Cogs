@@ -49,10 +49,14 @@ class Offers(commands.Cog):
             async def interaction_check(interaction):
                 return interaction.user == ctx.author
 
+            # Delete the original message with the select menu
+            await interaction.message.delete()
+
+            # Send a new message with the first offer
             embed = await update_embed(current_index)
             view = discord.ui.View(timeout=None)
             view.add_item(discord.ui.Button(label=f"View {offers[current_index]['title']}", url=offers[current_index]["link"]))
-            message = await interaction.response.edit_message(embed=embed, view=view)
+            message = await ctx.send(embed=embed, view=view)
 
             if len(offers) > 1:
                 left_button = discord.ui.Button(emoji="⬅️", style=discord.ButtonStyle.secondary)
