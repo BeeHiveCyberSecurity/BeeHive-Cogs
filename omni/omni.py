@@ -851,9 +851,9 @@ class Omni(commands.Cog):
                 return
 
             embed = discord.Embed(
-                title="Vote on AI Moderation",
-                description="Do you think the AI moderation is too lenient or too tough? Click a button to vote.",
-                color=discord.Color.blue()
+                title="How's our agentic moderation?",
+                description="How's the automated moderation doing in this server? Your feedback matters, and the staff will be notified of your feedback to help us tune Omni.",
+                color=0xfffffe
             )
 
             view = discord.ui.View()
@@ -865,10 +865,10 @@ class Omni(commands.Cog):
 
                 if vote_type == "too weak":
                     await self.config.guild(guild).too_weak_votes.set(await self.config.guild(guild).too_weak_votes() + 1)
-                    tips = "Consider increasing the sensitivity of the automod to catch more potential issues."
+                    tips = "- Consider increasing the sensitivity of the automod to catch more potential issues."
                 elif vote_type == "too strict":
                     await self.config.guild(guild).too_tough_votes.set(await self.config.guild(guild).too_tough_votes() + 1)
-                    tips = "Consider decreasing the sensitivity of the automod to allow more freedom."
+                    tips = "- Consider decreasing the sensitivity of the automod to allow more freedom."
 
                 feedback_embed = discord.Embed(
                     title="🤖 Feedback received",
