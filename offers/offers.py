@@ -41,7 +41,7 @@ class Offers(commands.Cog):
 
             async def update_embed(index):
                 offer = offers[index]
-                embed = discord.Embed(title=offer["title"], description=f"**{offer['description']}**\n\n{offer['offer']}", color=offer["color"])
+                embed = discord.Embed(title=offer["title"], description=f"{offer['description']}\n\n**{offer['offer']}**", color=offer["color"])
                 embed.set_thumbnail(url=offer["logo"])
                 embed.set_footer(text=f"Offer {index + 1} of {len(offers)}")
                 return embed
