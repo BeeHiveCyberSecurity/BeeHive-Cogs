@@ -20,7 +20,7 @@ class Omni(commands.Cog):
             debug_mode=False,
             message_count=0,
             moderated_count=0,
-            moderated_users=[],
+            moderated_users={},
             category_counter={},
             whitelisted_channels=[],
             moderation_enabled=True,
@@ -32,12 +32,13 @@ class Omni(commands.Cog):
             too_weak_votes=0,  # Track the number of "too weak" votes
             too_tough_votes=0,  # Track the number of "too tough" votes
             just_right_votes=0,  # Track the number of "just right" votes
-            last_vote_time=None  # Track the last time a vote affected the threshold
+            last_vote_time=None,  # Track the last time a vote affected the threshold
+            delete_violatory_messages=True  # Track whether violatory messages should be deleted
         )
         self.config.register_global(
             global_message_count=0,
             global_moderated_count=0,
-            global_moderated_users=[],
+            global_moderated_users={},
             global_category_counter={},
             global_image_count=0,
             global_moderated_image_count=0,
@@ -215,14 +216,16 @@ class Omni(commands.Cog):
             guild = message.guild
             timeout_duration = await self.config.guild(guild).timeout_duration()
             log_channel_id = await self.config.guild(guild).log_channel()
+            delete_violatory_messages = await self.config.guild(guild).delete_violatory_messages()
 
-            # Delete the message
-            try:
-                await message.delete()
-                # Add user to moderated users list if message is deleted
-                self.memory_moderated_users[guild.id][message.author.id] += 1
-            except discord.NotFound:
-                pass  
+            # Delete the message if the setting is enabled
+            if delete_violatory_messages:
+                try:
+                    await message.delete()
+                    # Add user to moderated users list if message is deleted
+                    self.memory_moderated_users[guild.id][message.author.id] += 1
+                except discord.NotFound:
+                    pass  
 
             if timeout_duration > 0:
                 try:
@@ -652,6 +655,7 @@ class Omni(commands.Cog):
             debug_mode = await self.config.guild(guild).debug_mode()
             whitelisted_channels = await self.config.guild(guild).whitelisted_channels()
             moderation_enabled = await self.config.guild(guild).moderation_enabled()
+            delete_violatory_messages = await self.config.guild(guild).delete_violatory_messages()
 
             log_channel = guild.get_channel(log_channel_id) if log_channel_id else None
             log_channel_name = log_channel.mention if log_channel else "Not set"
@@ -664,6 +668,7 @@ class Omni(commands.Cog):
             embed.add_field(name="Debug Mode", value="Enabled" if debug_mode else "Disabled", inline=True)
             embed.add_field(name="Whitelisted Channels", value=whitelisted_channels_names, inline=False)
             embed.add_field(name="Moderation Enabled", value="Yes" if moderation_enabled else "No", inline=True)
+            embed.add_field(name="Delete Violatory Messages", value="Yes" if delete_violatory_messages else "No", inline=True)
 
             await ctx.send(embed=embed)
         except Exception as e:
@@ -682,6 +687,20 @@ class Omni(commands.Cog):
             await ctx.send(f"Automatic moderation {status}.")
         except Exception as e:
             raise RuntimeError(f"Failed to toggle automatic moderation: {e}")
+
+    @omni.command()
+    @commands.admin_or_permissions(manage_guild=True)
+    async def delete(self, ctx):
+        """Toggle whether violatory messages are deleted or not."""
+        try:
+            guild = ctx.guild
+            current_status = await self.config.guild(guild).delete_violatory_messages()
+            new_status = not current_status
+            await self.config.guild(guild).delete_violatory_messages.set(new_status)
+            status = "enabled" if new_status else "disabled"
+            await ctx.send(f"Deletion of violatory messages {status}.")
+        except Exception as e:
+            raise RuntimeError(f"Failed to toggle message deletion: {e}")
 
     @omni.command()
     async def reasons(self, ctx):
