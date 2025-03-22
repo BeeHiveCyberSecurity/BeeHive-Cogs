@@ -1,7 +1,7 @@
 import discord  # type: ignore
 import datetime  # type: ignore
 import speedtest  # type: ignore
-from redbot.core import commands  # type: ignore
+from redbot.core import commands, Config  # type: ignore
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 import aiohttp
@@ -11,7 +11,11 @@ class Ping(commands.Cog):
         self.bot = bot
         self.executor = ThreadPoolExecutor(max_workers=1)
         self.latency_history = []
-        self.speedtest_results = []  # Store speedtest results
+        self.config = Config.get_conf(self, identifier=1234567890)
+        default_global = {
+            "speedtest_results": []
+        }
+        self.config.register_global(**default_global)
 
     @commands.group(name="ping", description="Ping command group", invoke_without_command=True)
     async def ping(self, ctx: commands.Context):
@@ -31,7 +35,7 @@ class Ping(commands.Cog):
 
         try:
             download_speed, upload_speed, ping = await self._perform_speedtest()
-            self._log_speedtest_result(download_speed, upload_speed, ping)  # Log the result
+            await self._log_speedtest_result(download_speed, upload_speed, ping)  # Log the result
         except Exception as e:
             await initial_message.edit(content=f"An error occurred while performing the speed test: {e}", embed=None)
             return
@@ -46,7 +50,8 @@ class Ping(commands.Cog):
     @ping.command(name="history", description="Displays the history of speedtest results")
     async def history(self, ctx: commands.Context):
         """Displays the history of speedtest results"""
-        if not self.speedtest_results:
+        speedtest_results = await self.config.speedtest_results()
+        if not speedtest_results:
             await ctx.send("No speedtest results available.")
             return
 
@@ -56,7 +61,7 @@ class Ping(commands.Cog):
             color=discord.Color(0xfffffe)
         )
 
-        for i, result in enumerate(self.speedtest_results[-5:], start=1):
+        for i, result in enumerate(speedtest_results[-5:], start=1):
             test_date = result.get('date', 'Unknown Date')
             embed.add_field(
                 name=f"{test_date}",
@@ -152,13 +157,15 @@ class Ping(commands.Cog):
 
         return download_speed, upload_speed, ping
 
-    def _log_speedtest_result(self, download_speed, upload_speed, ping):
+    async def _log_speedtest_result(self, download_speed, upload_speed, ping):
         """Log the speedtest result."""
-        self.speedtest_results.append({
+        speedtest_results = await self.config.speedtest_results()
+        speedtest_results.append({
             "download": download_speed,
             "upload": upload_speed,
             "ping": ping,
             "date": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         })
-        if len(self.speedtest_results) > 5:
-            self.speedtest_results.pop(0)
+        if len(speedtest_results) > 5:
+            speedtest_results.pop(0)
+        await self.config.speedtest_results.set(speedtest_results)
