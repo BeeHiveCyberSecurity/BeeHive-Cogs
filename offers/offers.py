@@ -8,14 +8,6 @@ class Offers(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.offers_data = {
-            "Electronics": [
-                {"title": "Discount on Laptops", "description": "High-performance laptops for work and play.", "offer": "Save 20% on select laptops.", "link": "http://example.com/laptops", "logo": "http://example.com/laptop_logo.png", "color": 0x1f8b4c},
-                {"title": "Smartphone Sale", "description": "Latest smartphones with cutting-edge features.", "offer": "Get the latest smartphones at a discount.", "link": "http://example.com/smartphones", "logo": "http://example.com/smartphone_logo.png", "color": 0x3498db}
-            ],
-            "Fashion": [
-                {"title": "Summer Collection Sale", "description": "Trendy summer outfits for all occasions.", "offer": "Up to 50% off on summer collection.", "link": "http://example.com/summer", "logo": "http://example.com/summer_logo.png", "color": 0xe74c3c},
-                {"title": "Winter Wear Deals", "description": "Stay warm with our stylish winter wear.", "offer": "Exclusive discounts on winter wear.", "link": "http://example.com/winter", "logo": "http://example.com/winter_logo.png", "color": 0x9b59b6}
-            ],
             "Adult": [
                 {"title": "Puffco", "description": "Puffco products are a platform for the plant to shine and make the magic of concentrates accessible to everyone. We strive for elegance, simplicity and delivering the full spectrum experience. Whether it’s the flavor nuances you haven’t noticed before in your favorite strains, the new feelings in your body, and/ or a clearer mental state - the Puffco difference is profound.", "offer": "$30 off valid for first-time Puffco customers only, $150 cart minimum. Cart must include a Pivot, Peak, Proxy, Peak Pro or Plus. This offer does not apply to new products within the first 30 days of their release. Discount codes cannot stack.", "link": "http://rwrd.io/wu0i3ir?c", "logo": "https://cdn.brandfetch.io/idD9NYRknz/w/2000/h/3478/theme/dark/logo.png?c=1dxbfHSJFAPEGdCLU4o5B", "color": 0x000000}
             ],
