@@ -871,6 +871,7 @@ class Omni(commands.Cog):
 
                 if not last_vote_time or (current_time - last_vote_time).total_seconds() >= 86400:
                     moderation_threshold = await self.config.guild(guild).moderation_threshold()
+                    old_threshold = moderation_threshold
                     if vote_type == "too weak":
                         moderation_threshold = max(0, moderation_threshold - 0.01)
                     elif vote_type == "too strict":
@@ -893,7 +894,7 @@ class Omni(commands.Cog):
                 )
 
                 if threshold_adjusted:
-                    feedback_embed.description += "\n\n**Omni made automatic, intelligent adjustments based on user feedback.**"
+                    feedback_embed.description += f"\n\n**Omni made automatic, intelligent adjustments based on user feedback.**\nPrevious threshold: `{old_threshold}`\nUpdated threshold: `{moderation_threshold}`"
 
                 await log_channel.send(embed=feedback_embed)
 
@@ -903,6 +904,8 @@ class Omni(commands.Cog):
                     description=f"Thank you for helping improve the assistive AI used in this server.",
                     color=0x2bbd8e
                 )
+                if threshold_adjusted:
+                    updated_embed.description += " Based on your feedback, the moderation agent has been adjusted. Please continue to provide feedback as needed."
                 await interaction.message.edit(embed=updated_embed, view=None)
                 await interaction.response.send_message("You can submit additional feedback tomorrow. Thank you for taking the time to help make this server a better place. If you have additional feedback about this server's AI-assisted moderation, please contact a member of the staff or administration team.", ephemeral=True)
 
