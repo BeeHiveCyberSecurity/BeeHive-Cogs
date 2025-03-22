@@ -84,6 +84,8 @@ class Offers(commands.Cog):
                 view.add_item(left_button)
                 view.add_item(right_button)
 
+                await message.edit(view=view)  # Ensure the view is updated with buttons
+
         select.callback = select_callback
         view = discord.ui.View(timeout=None)
         view.add_item(select)
