@@ -42,7 +42,6 @@ class AntiPhishing(commands.Cog):
             bans=0,
             timeouts=0,
             last_updated=None,
-            webhook=None,
             log_channel=None,
             timeout_duration=30,  # Default timeout duration in minutes
             staff_role=None  # Configurable staff role mention
@@ -84,67 +83,6 @@ class AntiPhishing(commands.Cog):
         Configurable options to help keep known malicious links out of your community's conversations.
         """
 
-    @commands.admin_or_permissions()
-    @antiphishing.command()
-    async def alerthook(self, ctx: Context, webhook: str):
-        """
-        Set an alert webhook. Useful if you manage multiple servers and want to consolidate link safety alerts.
-        """
-        if not webhook.startswith(("http://", "https://")):
-            await self._send_invalid_webhook_embed(ctx)
-            return
-
-        if not await self._validate_webhook(webhook):
-            await self._send_invalid_webhook_embed(ctx)
-            return
-
-        await self._set_webhook(ctx, webhook)
-
-    async def _send_invalid_webhook_embed(self, ctx: Context):
-        await self._send_embed(
-            ctx, 
-            'Invalid target webhook', 
-            "The provided webhook URL is invalid. Please provide a valid URL starting with `http://` or `https://`.", 
-            0xff4545, 
-            "https://www.beehive.systems/hubfs/Icon%20Packs/Red/close-circle.png"
-        )
-
-    async def _validate_webhook(self, webhook: str) -> bool:
-        try:
-            async with self.session.get(webhook) as response:
-                return response.status == 200
-        except Exception:
-            return False
-
-    async def _set_webhook(self, ctx: Context, webhook: str):
-        await self.config.guild(ctx.guild).webhook.set(webhook)
-        await ctx.message.delete()
-        await self._send_embed(
-            ctx, 
-            'Enrollment successful', 
-            "Successfully set a remote link monitoring channel", 
-            0x2bbd8e, 
-            "https://www.beehive.systems/hubfs/Icon%20Packs/Green/check-circle.png"
-        )
-        await self._send_webhook_confirmation(ctx, webhook)
-
-    async def _send_webhook_confirmation(self, ctx: Context, webhook: str):
-        confirmation_embed = discord.Embed(
-            title="Enrollment confirmation",
-            description=f"The server **{ctx.guild.name}** has been enrolled for remote URL monitoring.",
-            color=0x2bbd8e,
-        )
-        confirmation_embed.add_field(name="Server ID", value=ctx.guild.id)
-        confirmation_embed.add_field(name="Server Name", value=ctx.guild.name)
-        async with self.session.post(webhook, json={"embeds": [confirmation_embed.to_dict()]}) as response:
-            if response.status not in [200, 204]:
-                print(f"Failed to send enrollment confirmation to webhook: {response.status}")
-
-    async def _send_embed(self, ctx: Context, title: str, description: str, colour: int, thumbnail_url: str):
-        embed = discord.Embed(title=title, description=description, colour=colour)
-        embed.set_thumbnail(url=thumbnail_url)
-        await ctx.send(embed=embed)
-
     @commands.admin_or_permissions()    
     @antiphishing.command()
     async def settings(self, ctx: Context):
@@ -156,10 +94,8 @@ class AntiPhishing(commands.Cog):
         await ctx.send(embed=embed)
 
     def _create_settings_embed(self, guild_data: dict) -> discord.Embed:
-        webhook = guild_data.get('webhook', None)
         log_channel_id = guild_data.get('log_channel', None)
         staff_role_id = guild_data.get('staff_role', None)
-        enrollment_status = "**Connected**" if webhook else "Not connected"
         log_channel_status = f"<#{log_channel_id}>" if log_channel_id else "Not Set"
         staff_role_status = f"<@&{staff_role_id}>" if staff_role_id else "Not Set"
         
@@ -168,7 +104,6 @@ class AntiPhishing(commands.Cog):
             colour=0xfffffe,
         )
         embed.add_field(name="Action", value=f"{guild_data.get('action', 'Not set').title()}", inline=False)
-        embed.add_field(name="Alert hook", value=enrollment_status, inline=False)
         embed.add_field(name="Log channel", value=log_channel_status, inline=False)
         embed.add_field(name="Staff Role", value=staff_role_status, inline=False)
         embed.add_field(name="Timeout Duration", value=f"{guild_data.get('timeout_duration', 30)} minutes", inline=False)
@@ -398,10 +333,6 @@ class AntiPhishing(commands.Cog):
         member_count = await self.config.member(message.author).caught()
         await self.config.member(message.author).caught.set(member_count + 1)
         
-        webhook_url = await self.config.guild(message.guild).webhook()
-        if webhook_url:
-            await self._send_webhook(webhook_url, message, domain, redirect_chain)
-        
         log_channel_id = await self.config.guild(message.guild).log_channel()
         staff_role_id = await self.config.guild(message.guild).staff_role()
         if log_channel_id:
@@ -410,23 +341,6 @@ class AntiPhishing(commands.Cog):
                 await self._log_malicious_link(log_channel, message, domain, redirect_chain, staff_role_id)
         
         await self._take_action(action, message, domain, redirect_chain)
-
-    async def _send_webhook(self, webhook_url: str, message: discord.Message, domain: str, redirect_chain: List[str]):
-        redirect_chain_str = "\n".join(redirect_chain)
-        webhook_embed = discord.Embed(
-            title="Malicious link detected",
-            description=f"A URL was detected in the server **{message.guild.name}**.",
-            color=0xffd966,
-        )
-        webhook_embed.add_field(name="User", value=message.author.mention)
-        webhook_embed.add_field(name="URL", value=domain)
-        webhook_embed.add_field(name="Redirect Chain", value=redirect_chain_str)
-        try:
-            async with self.session.post(webhook_url, json={"embeds": [webhook_embed.to_dict()]}) as response:
-                if response.status not in [200, 204]:
-                    print(f"Failed to send webhook: {response.status}")
-        except aiohttp.ClientError as e:
-            print(f"Network error while sending webhook: {e}")
 
     async def _log_malicious_link(self, log_channel: discord.TextChannel, message: discord.Message, domain: str, redirect_chain: List[str], staff_role_id: Optional[int]):
         redirect_chain_str = "\n".join(redirect_chain)
@@ -565,13 +479,6 @@ class AntiPhishing(commands.Cog):
         links = self.get_links(after.content)
         if not links:
             return
-
-        # Check if the guild is enrolled and send all detected links to the webhook
-        webhook_url = await self.config.guild(after.guild).webhook()
-        if webhook_url:
-            async with self.session.post(webhook_url, json={"content": f"Detected links: {', '.join(links)}"}) as response:
-                if response.status not in [200, 204]:
-                    print(f"Failed to send detected links to webhook: {response.status}")
 
         await self._process_links(after, links)
 
