@@ -55,32 +55,34 @@ class Offers(commands.Cog):
             message = await interaction.response.edit_message(embed=embed, view=view)
 
             if len(offers) > 1:
-                try:
-                    await message.add_reaction("⬅️")
-                    await message.add_reaction("➡️")
-                except discord.HTTPException:
-                    pass  # Handle the case where adding reactions fails
+                left_button = discord.ui.Button(emoji="⬅️", style=discord.ButtonStyle.secondary)
+                right_button = discord.ui.Button(emoji="➡️", style=discord.ButtonStyle.secondary)
 
-                def check(reaction, user):
-                    return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️"] and reaction.message.id == message.id
+                async def left_button_callback(interaction):
+                    nonlocal current_index
+                    current_index = (current_index - 1) % len(offers)
+                    embed = await update_embed(current_index)
+                    view = discord.ui.View(timeout=None)
+                    view.add_item(discord.ui.Button(label=f"View {offers[current_index]['title']}", url=offers[current_index]["link"]))
+                    view.add_item(left_button)
+                    view.add_item(right_button)
+                    await message.edit(embed=embed, view=view)
 
-                while True:
-                    try:
-                        reaction, user = await self.bot.wait_for("reaction_add", timeout=60.0, check=check)
+                async def right_button_callback(interaction):
+                    nonlocal current_index
+                    current_index = (current_index + 1) % len(offers)
+                    embed = await update_embed(current_index)
+                    view = discord.ui.View(timeout=None)
+                    view.add_item(discord.ui.Button(label=f"View {offers[current_index]['title']}", url=offers[current_index]["link"]))
+                    view.add_item(left_button)
+                    view.add_item(right_button)
+                    await message.edit(embed=embed, view=view)
 
-                        if str(reaction.emoji) == "➡️":
-                            current_index = (current_index + 1) % len(offers)
-                        elif str(reaction.emoji) == "⬅️":
-                            current_index = (current_index - 1) % len(offers)
+                left_button.callback = left_button_callback
+                right_button.callback = right_button_callback
 
-                        embed = await update_embed(current_index)
-                        view = discord.ui.View(timeout=None)
-                        view.add_item(discord.ui.Button(label=f"View {offers[current_index]['title']}", url=offers[current_index]["link"]))
-                        await message.edit(embed=embed, view=view)
-                        await message.remove_reaction(reaction, user)
-
-                    except asyncio.TimeoutError:
-                        break
+                view.add_item(left_button)
+                view.add_item(right_button)
 
         select.callback = select_callback
         view = discord.ui.View(timeout=None)
