@@ -869,7 +869,7 @@ class Omni(commands.Cog):
                 current_time = datetime.utcnow()
                 threshold_adjusted = False
 
-                if not last_vote_time or (current_time - last_vote_time).total_seconds() >= 86400:
+                if not last_vote_time or (current_time - datetime.fromisoformat(last_vote_time)).total_seconds() >= 86400:
                     moderation_threshold = await self.config.guild(guild).moderation_threshold()
                     old_threshold = moderation_threshold
                     if vote_type == "too weak":
@@ -877,7 +877,7 @@ class Omni(commands.Cog):
                     elif vote_type == "too strict":
                         moderation_threshold = min(1, moderation_threshold + 0.01)
                     await self.config.guild(guild).moderation_threshold.set(moderation_threshold)
-                    await self.config.guild(guild).last_vote_time.set(current_time)
+                    await self.config.guild(guild).last_vote_time.set(current_time.isoformat())
                     threshold_adjusted = True
 
                 if vote_type == "too weak":
