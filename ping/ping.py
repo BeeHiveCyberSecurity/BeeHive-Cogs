@@ -56,12 +56,12 @@ class Ping(commands.Cog):
             return
 
         embed = discord.Embed(
-            title="Speedtest History",
-            description="Here are the last 5 speedtest results:",
+            title="Ping and speedtest history",
+            description="Here are the last 25 speedtest results:",
             color=discord.Color(0xfffffe)
         )
 
-        for i, result in enumerate(speedtest_results[-5:], start=1):
+        for i, result in enumerate(speedtest_results[-25:], start=1):
             test_date = result.get('date', 'Unknown Date')
             try:
                 # Convert the stored date string to a datetime object
@@ -174,6 +174,6 @@ class Ping(commands.Cog):
             "ping": ping,
             "date": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         })
-        if len(speedtest_results) > 5:
+        if len(speedtest_results) > 25:
             speedtest_results.pop(0)
         await self.config.speedtest_results.set(speedtest_results)
