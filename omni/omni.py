@@ -893,7 +893,7 @@ class Omni(commands.Cog):
                 )
 
                 if threshold_adjusted:
-                    feedback_embed.description += "\n\nOmni made automatic, intelligent adjustments based on user feedback."
+                    feedback_embed.description += "\n\n**Omni made automatic, intelligent adjustments based on user feedback.**"
 
                 await log_channel.send(embed=feedback_embed)
 
