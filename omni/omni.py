@@ -852,7 +852,7 @@ class Omni(commands.Cog):
 
             embed = discord.Embed(
                 title="How's our agentic moderation?",
-                description="How's the automated moderation doing in this server? Your feedback matters, and the staff will be notified of your feedback to help us tune Omni.",
+                description="Your feedback matters, and the staff will be notified of your feedback to help us tune Omni.",
                 color=0xfffffe
             )
 
