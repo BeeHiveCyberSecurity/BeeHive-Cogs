@@ -82,5 +82,5 @@ class Offers(commands.Cog):
         view = discord.ui.View(timeout=None)
         view.add_item(select)
 
-        initial_embed = discord.Embed(title="Browse Offers", description="Select a category to view offers.", color=0x00ff00)
+        initial_embed = discord.Embed(title="Browse available offers", description="Select a category to view offers.", color=0xfffffe)
         await ctx.send(embed=initial_embed, view=view)
