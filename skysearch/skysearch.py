@@ -67,20 +67,23 @@ class Skysearch(commands.Cog):
 #                embed = discord.Embed(title='Aircraft information', color=discord.Colour(0xff9145))
 #                emergency_status = ":warning: **UAV has lost radio contact**"
 #                embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Orange/alert-circle-outline.png")
+            description = f"# {aircraft_data.get('desc', 'N/A')}"
+            if aircraft_data.get('year', None) is not None:
+                description += f" **({aircraft_data.get('year')})**"
             if squawk_code == '7500':
-                embed = discord.Embed(title='Aircraft alert', description=f"# {aircraft_data.get('desc', 'N/A')}", color=discord.Colour(0xff4545))
+                embed = discord.Embed(title='Aircraft alert', description=description, color=discord.Colour(0xff4545))
                 emergency_status = ":rotating_light: Aircraft has been **hijacked**"
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/alert-circle.png")
             elif squawk_code == '7600':
-                embed = discord.Embed(title='Aircraft alert', description=f"# {aircraft_data.get('desc', 'N/A')}", color=discord.Colour(0xff4545))
+                embed = discord.Embed(title='Aircraft alert', description=description, color=discord.Colour(0xff4545))
                 emergency_status = ":signal_strength: Aircraft has **lost radio contact**"
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/alert-circle.png")
             elif squawk_code == '7700':
-                embed = discord.Embed(title='Aircraft alert', description=f"# {aircraft_data.get('desc', 'N/A')}", color=discord.Colour(0xff4545))
+                embed = discord.Embed(title='Aircraft alert', description=description, color=discord.Colour(0xff4545))
                 emergency_status = ":warning: Aircraft has **declared a general emergency**"
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/alert-circle.png")
             else:
-                embed = discord.Embed(title='Aircraft information', description=f"# {aircraft_data.get('desc', 'N/A')}", color=discord.Colour(0xfffffe))
+                embed = discord.Embed(title='Aircraft information', description=description, color=discord.Colour(0xfffffe))
                 emergency_status = ":white_check_mark: Aircraft reports **normal** conditions"
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/airplane.png")
             callsign = aircraft_data.get('flight', 'N/A').strip()
@@ -133,8 +136,6 @@ class Skysearch(commands.Cog):
             if lat != 'N/A' and lon != 'N/A':
                 embed.add_field(name="Position", value=f"`{lat}, {lon}`", inline=True)
             embed.add_field(name="Squawk", value=f"**{aircraft_data.get('squawk', 'BLOCKED')}**", inline=True)
-            if aircraft_data.get('year', None) is not None:
-                embed.add_field(name="Built in", value=f"{aircraft_data.get('year')}", inline=True)
             
             aircraft_model = aircraft_data.get('t', None)
             if aircraft_model is not None:
