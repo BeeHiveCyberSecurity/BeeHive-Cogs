@@ -880,11 +880,11 @@ class Omni(commands.Cog):
                 # Update the original embed and remove buttons
                 updated_embed = discord.Embed(
                     title="Feedback recorded",
-                    description=f"Your vote that the AI moderation is **{vote_type}** has been recorded. Thank you for helping improve the assistive AI used in this server.",
+                    description=f"Thank you for helping improve the assistive AI used in this server.",
                     color=0x2bbd8e
                 )
                 await interaction.message.edit(embed=updated_embed, view=None)
-                await interaction.response.send_message("Your vote has been submitted, thank you!", ephemeral=True)
+                await interaction.response.send_message("You can submit additional feedback tomorrow. Thank you for taking the time to help make this server a better place", ephemeral=True)
 
             too_weak_button = discord.ui.Button(label="Omni is missing clearly violatory content", style=discord.ButtonStyle.grey)
             too_weak_button.callback = lambda interaction: vote_callback(interaction, "too weak")
