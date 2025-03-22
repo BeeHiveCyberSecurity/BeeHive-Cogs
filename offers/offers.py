@@ -37,7 +37,7 @@ class Offers(commands.Cog):
 
             async def update_embed(index):
                 offer = offers[index]
-                embed = discord.Embed(title=offer["title"], description=f"{offer['description']}\n[Link]({offer['link']})", color=offer["color"])
+                embed = discord.Embed(title=offer["title"], description=offer["description"], color=offer["color"])
                 embed.set_thumbnail(url=offer["logo"])
                 embed.set_footer(text=f"Offer {index + 1} of {len(offers)}")
                 return embed
@@ -46,7 +46,9 @@ class Offers(commands.Cog):
                 return interaction.user == ctx.author
 
             embed = await update_embed(current_index)
-            message = await interaction.response.edit_message(embed=embed)
+            view = discord.ui.View(timeout=None)
+            view.add_item(discord.ui.Button(label="View Offer", url=offers[current_index]["link"]))
+            message = await interaction.response.edit_message(embed=embed, view=view)
 
             if len(offers) > 1:
                 await message.add_reaction("⬅️")
@@ -65,7 +67,9 @@ class Offers(commands.Cog):
                             current_index = (current_index - 1) % len(offers)
 
                         embed = await update_embed(current_index)
-                        await message.edit(embed=embed)
+                        view = discord.ui.View(timeout=None)
+                        view.add_item(discord.ui.Button(label="View Offer", url=offers[current_index]["link"]))
+                        await message.edit(embed=embed, view=view)
                         await message.remove_reaction(reaction, user)
 
                     except asyncio.TimeoutError:
