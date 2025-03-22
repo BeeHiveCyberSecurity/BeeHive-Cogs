@@ -265,7 +265,7 @@ class Omni(commands.Cog):
 
                     # Add a button to jump to the message before the deleted one in the conversation
                     view = discord.ui.View()
-                    previous_message = await message.channel.history(limit=2, before=message).flatten()
+                    previous_message = [msg async for msg in message.channel.history(limit=2, before=message)]
                     if previous_message:
                         view.add_item(discord.ui.Button(label="Jump to place in conversation", url=previous_message[0].jump_url))
 
@@ -307,7 +307,7 @@ class Omni(commands.Cog):
 
                     # Add a button to jump to the message before the processed one in the conversation
                     view = discord.ui.View()
-                    previous_message = await message.channel.history(limit=2, before=message).flatten()
+                    previous_message = [msg async for msg in message.channel.history(limit=2, before=message)]
                     if previous_message:
                         view.add_item(discord.ui.Button(label="Jump to place in conversation", url=previous_message[0].jump_url))
 
