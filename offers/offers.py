@@ -50,7 +50,7 @@ class Offers(commands.Cog):
 
             embed = await update_embed(current_index)
             view = discord.ui.View(timeout=None)
-            view.add_item(discord.ui.Button(label="View Offer", url=offers[current_index]["link"]))
+            view.add_item(discord.ui.Button(label=f"View {offers[current_index]['title']}", url=offers[current_index]["link"]))
             message = await interaction.response.edit_message(embed=embed, view=view)
 
             if len(offers) > 1:
@@ -71,7 +71,7 @@ class Offers(commands.Cog):
 
                         embed = await update_embed(current_index)
                         view = discord.ui.View(timeout=None)
-                        view.add_item(discord.ui.Button(label="View Offer", url=offers[current_index]["link"]))
+                        view.add_item(discord.ui.Button(label=f"View {offers[current_index]['title']}", url=offers[current_index]["link"]))
                         await message.edit(embed=embed, view=view)
                         await message.remove_reaction(reaction, user)
 
