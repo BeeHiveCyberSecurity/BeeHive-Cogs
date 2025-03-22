@@ -71,6 +71,7 @@ class Offers(commands.Cog):
                     view.add_item(left_button)
                     view.add_item(right_button)
                     await message.edit(embed=embed, view=view)
+                    await interaction.response.defer()  # Acknowledge the interaction to prevent "interaction failed"
 
                 async def right_button_callback(interaction):
                     nonlocal current_index
@@ -81,6 +82,7 @@ class Offers(commands.Cog):
                     view.add_item(left_button)
                     view.add_item(right_button)
                     await message.edit(embed=embed, view=view)
+                    await interaction.response.defer()  # Acknowledge the interaction to prevent "interaction failed"
 
                 left_button.callback = left_button_callback
                 right_button.callback = right_button_callback
