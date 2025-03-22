@@ -63,8 +63,16 @@ class Ping(commands.Cog):
 
         for i, result in enumerate(speedtest_results[-5:], start=1):
             test_date = result.get('date', 'Unknown Date')
+            try:
+                # Convert the stored date string to a datetime object
+                date_obj = datetime.datetime.strptime(test_date, "%Y-%m-%d %H:%M:%S")
+                # Format the date in a more natural way
+                natural_date = date_obj.strftime("%B %d, %Y at %I:%M %p")
+            except ValueError:
+                natural_date = "Unknown Date"
+
             embed.add_field(
-                name=f"{test_date}",
+                name=f"{natural_date}",
                 value=(
                     f"**Download:** {result['download']} Mbps\n"
                     f"**Upload:** {result['upload']} Mbps\n"
