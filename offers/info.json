@@ -1,0 +1,13 @@
+{
+    "author": ["adminelevation"],
+    "description": "A cog to browse money-saving offers across various categories.",
+    "install_msg": "Thank you for installing the Offers cog! Use `[p]offers` to browse available offers.",
+    "end_user_data_statement": "This cog does not store any end user data.",
+    "name": "Offers",
+    "short": "Browse money-saving offers.",
+    "permissions": [],
+    "min_bot_version": "3.5.0",
+    "requirements": [],
+    "tags": ["offers", "shopping", "savings", "discounts"]
+}
+
