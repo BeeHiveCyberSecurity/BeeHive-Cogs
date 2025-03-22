@@ -13,11 +13,10 @@ class Ping(commands.Cog):
         self.latency_history = []
         self.speedtest_results = []  # Store speedtest results
 
-    @commands.group(name="ping", description="Ping command group")
+    @commands.group(name="ping", description="Ping command group", invoke_without_command=True)
     async def ping(self, ctx: commands.Context):
         """Ping command group"""
-        if ctx.invoked_subcommand is None:
-            await self._run_ping(ctx)
+        await self._run_ping(ctx)
 
     async def _run_ping(self, ctx: commands.Context):
         """Displays the bot's latency, download speed, and upload speed"""
