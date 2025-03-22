@@ -48,27 +48,28 @@ class Offers(commands.Cog):
             embed = await update_embed(current_index)
             message = await interaction.response.edit_message(embed=embed)
 
-            await message.add_reaction("⬅️")
-            await message.add_reaction("➡️")
+            if len(offers) > 1:
+                await message.add_reaction("⬅️")
+                await message.add_reaction("➡️")
 
-            def check(reaction, user):
-                return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️"] and reaction.message.id == message.id
+                def check(reaction, user):
+                    return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️"] and reaction.message.id == message.id
 
-            while True:
-                try:
-                    reaction, user = await self.bot.wait_for("reaction_add", timeout=60.0, check=check)
+                while True:
+                    try:
+                        reaction, user = await self.bot.wait_for("reaction_add", timeout=60.0, check=check)
 
-                    if str(reaction.emoji) == "➡️":
-                        current_index = (current_index + 1) % len(offers)
-                    elif str(reaction.emoji) == "⬅️":
-                        current_index = (current_index - 1) % len(offers)
+                        if str(reaction.emoji) == "➡️":
+                            current_index = (current_index + 1) % len(offers)
+                        elif str(reaction.emoji) == "⬅️":
+                            current_index = (current_index - 1) % len(offers)
 
-                    embed = await update_embed(current_index)
-                    await message.edit(embed=embed)
-                    await message.remove_reaction(reaction, user)
+                        embed = await update_embed(current_index)
+                        await message.edit(embed=embed)
+                        await message.remove_reaction(reaction, user)
 
-                except asyncio.TimeoutError:
-                    break
+                    except asyncio.TimeoutError:
+                        break
 
         select.callback = select_callback
         view = discord.ui.View(timeout=None)
