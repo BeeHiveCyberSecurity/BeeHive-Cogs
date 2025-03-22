@@ -13,8 +13,13 @@ class Ping(commands.Cog):
         self.latency_history = []
         self.speedtest_results = []  # Store speedtest results
 
-    @commands.hybrid_command(name="ping", description="Displays the bot's latency, download speed, and upload speed")
+    @commands.group(name="ping", description="Ping command group")
     async def ping(self, ctx: commands.Context):
+        """Ping command group"""
+        if ctx.invoked_subcommand is None:
+            await self._run_ping(ctx)
+
+    async def _run_ping(self, ctx: commands.Context):
         """Displays the bot's latency, download speed, and upload speed"""
         await ctx.defer()
         ws_latency = round(self.bot.latency * 1000, 2)
@@ -39,7 +44,7 @@ class Ping(commands.Cog):
         embed = await self._create_final_embed(avg_latency, download_speed, upload_speed, ping)
         await initial_message.edit(embed=embed)
 
-    @commands.hybrid_command(name="history", description="Displays the history of speedtest results")
+    @ping.command(name="history", description="Displays the history of speedtest results")
     async def history(self, ctx: commands.Context):
         """Displays the history of speedtest results"""
         if not self.speedtest_results:
