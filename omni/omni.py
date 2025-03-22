@@ -261,9 +261,11 @@ class Omni(commands.Cog):
                                 embed.set_image(url=attachment.url)
                                 break
 
-                    # Add a button to jump to the message in the conversation
+                    # Add a button to jump to the message before the deleted one in the conversation
                     view = discord.ui.View()
-                    view.add_item(discord.ui.Button(label="Jump to place in conversation", url=message.jump_url))
+                    previous_message = await message.channel.history(limit=2, before=message).flatten()
+                    if previous_message:
+                        view.add_item(discord.ui.Button(label="Jump to place in conversation", url=previous_message[0].jump_url))
 
                     await log_channel.send(embed=embed, view=view)
         except Exception as e:
@@ -301,9 +303,11 @@ class Omni(commands.Cog):
                                 embed.set_image(url=attachment.url)
                                 break
 
-                    # Add a button to jump to the message in the conversation
+                    # Add a button to jump to the message before the processed one in the conversation
                     view = discord.ui.View()
-                    view.add_item(discord.ui.Button(label="Jump to place in conversation", url=message.jump_url))
+                    previous_message = await message.channel.history(limit=2, before=message).flatten()
+                    if previous_message:
+                        view.add_item(discord.ui.Button(label="Jump to place in conversation", url=previous_message[0].jump_url))
 
                     await log_channel.send(embed=embed, view=view)
         except Exception as e:
