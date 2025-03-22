@@ -28,7 +28,9 @@ class Omni(commands.Cog):
             image_count=0,
             moderated_image_count=0,
             timeout_count=0,  # Track the number of timeouts issued
-            total_timeout_duration=0  # Track the total duration of timeouts in minutes
+            total_timeout_duration=0,  # Track the total duration of timeouts in minutes
+            too_lenient_votes=0,  # Track the number of "too lenient" votes
+            too_tough_votes=0  # Track the number of "too tough" votes
         )
         self.config.register_global(
             global_message_count=0,
@@ -476,6 +478,8 @@ class Omni(commands.Cog):
             moderated_image_count = await self.config.guild(ctx.guild).moderated_image_count()
             timeout_count = await self.config.guild(ctx.guild).timeout_count()
             total_timeout_duration = await self.config.guild(ctx.guild).total_timeout_duration()
+            too_lenient_votes = await self.config.guild(ctx.guild).too_lenient_votes()
+            too_tough_votes = await self.config.guild(ctx.guild).too_tough_votes()
 
             member_count = ctx.guild.member_count
             moderated_message_percentage = (moderated_count / message_count * 100) if message_count > 0 else 0
@@ -522,6 +526,7 @@ class Omni(commands.Cog):
             embed.add_field(name="Total timeout duration", value=f"{timeout_duration_str}", inline=True)
             embed.add_field(name="Estimated staff time saved", value=f"{time_saved_str} of **hands-on-keyboard** time", inline=False)
             embed.add_field(name="Most frequent flags", value=top_categories_bullets, inline=False)
+            embed.add_field(name="Feedback", value=f"**{too_lenient_votes}** votes for too lenient, **{too_tough_votes}** votes for too tough", inline=False)
 
             # Show global stats, trust and safety analysis, and discord compliance if in more than 45 servers
             if len(self.bot.guilds) > 45:
@@ -784,6 +789,8 @@ class Omni(commands.Cog):
                 await guild_conf.moderated_image_count.set(0)
                 await guild_conf.timeout_count.set(0)
                 await guild_conf.total_timeout_duration.set(0)
+                await guild_conf.too_lenient_votes.set(0)
+                await guild_conf.too_tough_votes.set(0)
 
             # Reset global statistics
             await self.config.global_message_count.set(0)
@@ -826,6 +833,58 @@ class Omni(commands.Cog):
             await ctx.send(f"Moderation is now {status} by default for new servers.")
         except Exception as e:
             raise RuntimeError(f"Failed to toggle default moderation state: {e}")
+
+    @omni.command()
+    async def vote(self, ctx):
+        """Vote on the toughness of the AI moderation."""
+        try:
+            guild = ctx.guild
+            log_channel_id = await self.config.guild(guild).log_channel()
+            log_channel = guild.get_channel(log_channel_id) if log_channel_id else None
+
+            if not log_channel:
+                await ctx.send("Log channel is not set. Please set it using the `omni logs` command.")
+                return
+
+            embed = discord.Embed(
+                title="Vote on AI Moderation",
+                description="Do you think the AI moderation is too lenient or too tough? Click a button to vote.",
+                color=discord.Color.blue()
+            )
+
+            view = discord.ui.View()
+
+            async def vote_callback(interaction, vote_type):
+                if interaction.user != ctx.author:
+                    await interaction.response.send_message("You are not allowed to vote on this.", ephemeral=True)
+                    return
+
+                if vote_type == "too lenient":
+                    await self.config.guild(guild).too_lenient_votes.set(await self.config.guild(guild).too_lenient_votes() + 1)
+                elif vote_type == "too tough":
+                    await self.config.guild(guild).too_tough_votes.set(await self.config.guild(guild).too_tough_votes() + 1)
+
+                feedback_embed = discord.Embed(
+                    title="AI Moderation Feedback",
+                    description=f"User <@{ctx.author.id}> voted that the AI moderation is **{vote_type}**.",
+                    color=discord.Color.green()
+                )
+                await log_channel.send(embed=feedback_embed)
+                await interaction.response.send_message(f"Your vote that the AI moderation is **{vote_type}** has been recorded.", ephemeral=True)
+
+            too_lenient_button = discord.ui.Button(label="Too Lenient", style=discord.ButtonStyle.green)
+            too_lenient_button.callback = lambda interaction: vote_callback(interaction, "too lenient")
+
+            too_tough_button = discord.ui.Button(label="Too Tough", style=discord.ButtonStyle.red)
+            too_tough_button.callback = lambda interaction: vote_callback(interaction, "too tough")
+
+            view.add_item(too_lenient_button)
+            view.add_item(too_tough_button)
+
+            await ctx.send(embed=embed, view=view)
+
+        except Exception as e:
+            raise RuntimeError(f"Failed to initiate vote: {e}")
 
     def cog_unload(self):
         try:
