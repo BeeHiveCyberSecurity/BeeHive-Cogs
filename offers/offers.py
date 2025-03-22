@@ -21,7 +21,7 @@ class Offers(commands.Cog):
                 {"title": "Organic Food Offers", "description": "Healthy organic food for a better lifestyle.", "offer": "Discounts on organic food items.", "link": "http://example.com/organic", "logo": "http://example.com/organic_logo.png", "color": 0xf1c40f}
             ],
             "Business": [
-                {"title": "OpenPhone", "description": "Professional business phone solutions.", "offer": "Get a business phone number for your team.", "link": "http://example.com/openphone", "logo": "http://example.com/openphone_logo.png", "color": 0x8e44ad}
+                {"title": "OpenPhone", "description": "Professional business phone solutions.", "offer": "Sign up for OpenPhone using the link below and remain a paying customer for three (3) months. You'll get a **$20 Visa gift card** as a reward.", "link": "https://openph.one/referral/14OYE-r", "logo": "https://cdn.brandfetch.io/id8eCYh_qw/w/800/h/582/theme/dark/symbol.png?c=1dxbfHSJFAPEGdCLU4o5B", "color": 0x6439F5}
             ]
         }
 
@@ -40,7 +40,7 @@ class Offers(commands.Cog):
 
             async def update_embed(index):
                 offer = offers[index]
-                embed = discord.Embed(title=offer["title"], description=f"{offer['description']}\n\n**Offer:** {offer['offer']}", color=offer["color"])
+                embed = discord.Embed(title=offer["title"], description=f"**{offer['description']}**\n\n`{offer['offer']}`", color=offer["color"])
                 embed.set_thumbnail(url=offer["logo"])
                 embed.set_footer(text=f"Offer {index + 1} of {len(offers)}")
                 return embed
