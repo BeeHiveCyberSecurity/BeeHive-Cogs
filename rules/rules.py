@@ -6,12 +6,24 @@ class RulesCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=1234567890)
-        default_guild = {"acceptance_role_id": None}
+        default_guild = {
+            "acceptance_role_id": None,
+            "rules_channel_id": None
+        }
         self.config.register_guild(**default_guild)
 
+    @commands.group(name='rules', invoke_without_command=True)
     @commands.admin_or_permissions()
-    @commands.command(name='sendrules')
+    async def rules_group(self, ctx):
+        """Group command for managing server rules."""
+        await ctx.send_help(ctx.command)
+
+    @rules_group.command(name='send')
     async def send_rules(self, ctx):
+        """Send the server rules to the configured rules channel or current channel."""
+        rules_channel_id = await self.config.guild(ctx.guild).rules_channel_id()
+        channel = ctx.guild.get_channel(rules_channel_id) if rules_channel_id else ctx.channel
+
         rules = [
             "### Rule 1: Be respectful to everyone.\n> **1.1** Treat all members with kindness and consideration. Personal attacks, harassment, and bullying will not be tolerated.",
             "### Rule 2: No spamming or flooding the chat.\n> **2.1** Avoid sending repetitive messages, excessive emojis, or large blocks of text that disrupt the flow of conversation.",
@@ -28,17 +40,24 @@ class RulesCog(commands.Cog):
         ]
         for rule in rules:
             embed = discord.Embed(description=rule, color=0xfffffe)
-            await ctx.send(embed=embed)
+            await channel.send(embed=embed)
             await asyncio.sleep(2)
 
-    @commands.command(name='setacceptancerole')
+    @rules_group.command(name='setacceptancerole')
     @commands.has_permissions(manage_roles=True)
     async def set_acceptance_role(self, ctx, role: discord.Role):
         """Set the role to be given when a user accepts the rules."""
         await self.config.guild(ctx.guild).acceptance_role_id.set(role.id)
         await ctx.send(f"Acceptance role set to: {role.name}")
 
-    @commands.command(name='sendacceptmsg')
+    @rules_group.command(name='setruleschannel')
+    @commands.has_permissions(manage_channels=True)
+    async def set_rules_channel(self, ctx, channel: discord.TextChannel):
+        """Set the channel where rules will be sent."""
+        await self.config.guild(ctx.guild).rules_channel_id.set(channel.id)
+        await ctx.send(f"Rules channel set to: {channel.mention}")
+
+    @rules_group.command(name='sendacceptmsg')
     async def send_accept_message(self, ctx):
         """Send a message for users to accept the rules."""
         acceptance_role_id = await self.config.guild(ctx.guild).acceptance_role_id()
@@ -62,10 +81,17 @@ class RulesCog(commands.Cog):
 
         while True:
             try:
-                reaction, user = await self.bot.wait_for('reaction_add', check=check)
+                reaction, user = await self.bot.wait_for('reaction_add', check=check, timeout=60.0)
                 role = ctx.guild.get_role(acceptance_role_id)
                 if role:
-                    await user.add_roles(role)
+                    try:
+                        await user.add_roles(role)
+                        try:
+                            await user.send("Thank you for accepting the rules. Please remember that failing to follow them will result in moderation.")
+                        except discord.Forbidden:
+                            pass  # If we can't DM the user, just pass silently
+                    except discord.Forbidden:
+                        await ctx.send(f"Failed to assign role to {user.mention}. Check bot permissions.")
             except asyncio.TimeoutError:
                 break
 
