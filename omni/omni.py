@@ -476,10 +476,10 @@ class Omni(commands.Cog):
                 embed.add_field(
                     name="Trust and safety analysis",
                     value=(
-                        f"- **Server Rank:** `{rank}{rank_suffix}` out of `{total_guilds}` servers.\n"
+                        f"- **Server rank** `{rank}{rank_suffix}` out of `{total_guilds}` servers.\n"
                         f"  > *1st is most abusive; aim for a lower rank.*\n\n"
-                        f"- **Harmfulness:** More harmful than `{more_harmful_than_percentage:.2f}%`, "
-                        f"less harmful than `{less_harmful_than_percentage:.2f}%` of servers.\n"
+                        f"- **Harmfulness** More harmful than `{more_harmful_than_percentage:.2f}%`"
+                        f" of servers.\n"
                         f"  > *Strive to be less harmful for better community engagement.*\n\n"
                         f"- {moderation_rate_comparison}\n"
                         f"  > *Aim for minimal moderation, below global average.*"
