@@ -34,7 +34,7 @@ class NicknameManagement(commands.Cog):
             return
 
         guild_settings = await self.config.guild(ctx.guild).all()
-        allowed_characters = guild_settings["allowed_characters"]
+        allowed_characters = set(guild_settings["allowed_characters"])
         purified_nickname = ''.join(c for c in member.display_name if c in allowed_characters)
         purified_nickname = purified_nickname[:guild_settings["max_length"]]
 
@@ -42,13 +42,14 @@ class NicknameManagement(commands.Cog):
             purified_nickname = ''.join(c for c in member.name if c in allowed_characters)
             purified_nickname = purified_nickname[:guild_settings["max_length"]]
 
-        try:
-            await member.edit(nick=purified_nickname, reason="Nickname purified to allowed characters")
-            await ctx.send(f"{member.mention}'s nickname has been purified to: {purified_nickname}")
-        except discord.Forbidden:
-            await ctx.send("I do not have permission to change that member's nickname.")
-        except discord.HTTPException as e:
-            await ctx.send(f"An error occurred: {e}")
+        if member.display_name != purified_nickname:
+            try:
+                await member.edit(nick=purified_nickname, reason="Nickname purified to allowed characters")
+                await ctx.send(f"{member.mention}'s nickname has been purified to: {purified_nickname}")
+            except discord.Forbidden:
+                await ctx.send("I do not have permission to change that member's nickname.")
+            except discord.HTTPException as e:
+                await ctx.send(f"An error occurred: {e}")
 
     @nickname.command()
     @commands.has_permissions(manage_nicknames=True)
@@ -59,7 +60,7 @@ class NicknameManagement(commands.Cog):
             return
 
         guild_settings = await self.config.guild(ctx.guild).all()
-        allowed_characters = guild_settings["allowed_characters"]
+        allowed_characters = set(guild_settings["allowed_characters"])
         normalized_nickname = ''.join(c for c in member.display_name if c in allowed_characters).title()
         normalized_nickname = normalized_nickname[:guild_settings["max_length"]]
 
@@ -67,13 +68,14 @@ class NicknameManagement(commands.Cog):
             normalized_nickname = ''.join(c for c in member.name if c in allowed_characters).title()
             normalized_nickname = normalized_nickname[:guild_settings["max_length"]]
 
-        try:
-            await member.edit(nick=normalized_nickname, reason="Nickname normalized to standard format")
-            await ctx.send(f"{member.mention}'s nickname has been normalized to: {normalized_nickname}")
-        except discord.Forbidden:
-            await ctx.send("I do not have permission to change that member's nickname.")
-        except discord.HTTPException as e:
-            await ctx.send(f"An error occurred: {e}")
+        if member.display_name != normalized_nickname:
+            try:
+                await member.edit(nick=normalized_nickname, reason="Nickname normalized to standard format")
+                await ctx.send(f"{member.mention}'s nickname has been normalized to: {normalized_nickname}")
+            except discord.Forbidden:
+                await ctx.send("I do not have permission to change that member's nickname.")
+            except discord.HTTPException as e:
+                await ctx.send(f"An error occurred: {e}")
 
     @nickname.command()
     @commands.has_permissions(administrator=True)
@@ -86,6 +88,9 @@ class NicknameManagement(commands.Cog):
     @commands.has_permissions(administrator=True)
     async def maxlength(self, ctx, length: int):
         """Set the maximum length for nicknames."""
+        if length < 1:
+            await ctx.send("Maximum length must be at least 1.")
+            return
         await self.config.guild(ctx.guild).max_length.set(length)
         await ctx.send(f"Maximum nickname length set to: {length}")
 
@@ -107,7 +112,7 @@ class NicknameManagement(commands.Cog):
 
         await ctx.send("Starting nickname cleanup. This may take a while...")
         guild_settings = await self.config.guild(ctx.guild).all()
-        allowed_characters = guild_settings["allowed_characters"]
+        allowed_characters = set(guild_settings["allowed_characters"])
         max_length = guild_settings["max_length"]
 
         total_members = len(ctx.guild.members)
@@ -143,10 +148,7 @@ class NicknameManagement(commands.Cog):
 
                 removed_characters = set(original_nickname) - set(purified_nickname)
                 for char in removed_characters:
-                    if char in character_removal_count:
-                        character_removal_count[char] += 1
-                    else:
-                        character_removal_count[char] = 1
+                    character_removal_count[char] = character_removal_count.get(char, 0) + 1
 
                 if original_nickname != purified_nickname:
                     try:
@@ -173,14 +175,14 @@ class NicknameManagement(commands.Cog):
         embed.add_field(name="Processed members", value=processed_members, inline=True)
         embed.add_field(name="Changed nicknames", value=changed_nicknames, inline=True)
         embed.add_field(name="Failed changes", value=failed_changes, inline=True)
-        embed.add_field(name="Most removed characters", value=most_removed_characters_str, inline=False)
+        embed.add_field(name="Most removed characters", value=most_removed_characters_str or "None", inline=False)
         await progress_message.edit(embed=embed)
 
     async def on_member_update(self, before, after):
         if before.display_name != after.display_name:
             guild_settings = await self.config.guild(after.guild).all()
             if guild_settings["auto_purify"]:
-                allowed_characters = guild_settings["allowed_characters"]
+                allowed_characters = set(guild_settings["allowed_characters"])
                 purified_nickname = ''.join(c for c in after.display_name if c in allowed_characters)
                 purified_nickname = purified_nickname[:guild_settings["max_length"]]
                 if not purified_nickname:
@@ -198,7 +200,7 @@ class NicknameManagement(commands.Cog):
         await asyncio.sleep(300)  # Wait for 5 minutes before attempting to change the nickname
         guild_settings = await self.config.guild(member.guild).all()
         if guild_settings["auto_purify"]:
-            allowed_characters = guild_settings["allowed_characters"]
+            allowed_characters = set(guild_settings["allowed_characters"])
             purified_nickname = ''.join(c for c in member.display_name if c in allowed_characters)
             purified_nickname = purified_nickname[:guild_settings["max_length"]]
             if not purified_nickname:
@@ -218,7 +220,7 @@ class NicknameManagement(commands.Cog):
             for guild in self.bot.guilds:
                 guild_settings = await self.config.guild(guild).all()
                 if guild_settings["auto_purify"]:
-                    allowed_characters = guild_settings["allowed_characters"]
+                    allowed_characters = set(guild_settings["allowed_characters"])
                     max_length = guild_settings["max_length"]
                     for member in guild.members:
                         purified_nickname = ''.join(c for c in member.display_name if c in allowed_characters)
