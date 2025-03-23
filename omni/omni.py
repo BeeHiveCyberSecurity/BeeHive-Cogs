@@ -193,13 +193,16 @@ class Omni(commands.Cog):
             log_channel_id = await self.config.guild(guild).log_channel()
             delete_violatory_messages = await self.config.guild(guild).delete_violatory_messages()
 
+            message_deleted = False
             if delete_violatory_messages:
                 try:
                     await message.delete()
                     self.memory_moderated_users[guild.id][message.author.id] += 1
+                    message_deleted = True
                 except discord.NotFound:
                     pass
 
+            timeout_issued = False
             if timeout_duration > 0:
                 try:
                     reason = "AI moderator action. Violation scores: " + ", ".join(
@@ -210,6 +213,7 @@ class Omni(commands.Cog):
                     self.increment_statistic('global', 'global_timeout_count')
                     self.increment_statistic(guild.id, 'total_timeout_duration', timeout_duration)
                     self.increment_statistic('global', 'global_total_timeout_duration', timeout_duration)
+                    timeout_issued = True
                 except discord.Forbidden:
                     pass
 
@@ -217,6 +221,14 @@ class Omni(commands.Cog):
                 log_channel = guild.get_channel(log_channel_id)
                 if log_channel:
                     embed = await self._create_moderation_embed(message, category_scores, "✨ Message moderated using AI")
+                    if message_deleted and timeout_issued:
+                        embed.description += "\n\nThe message was deleted and the user was issued a timeout."
+                    elif message_deleted:
+                        embed.description += "\n\nThe message was deleted."
+                    elif timeout_issued:
+                        embed.description += "\n\nThe user was issued a timeout."
+                    else:
+                        embed.description += "\n\nNo further action was taken."
                     await log_channel.send(embed=embed, view=await self._create_jump_view(message))
         except Exception as e:
             raise RuntimeError(f"Failed to handle moderation: {e}")
@@ -224,7 +236,7 @@ class Omni(commands.Cog):
     async def _create_moderation_embed(self, message, category_scores, title):
         embed = discord.Embed(
             title=title,
-            description=f"The following message was deleted from chat because it may have violated the rules of the server, Discord's **[Terms of Service](<https://discord.com/terms>)**, or Discord's **[Community Guidelines](<https://discord.com/guidelines>)**...\n```{message.content}```",
+            description=f"The following message was flagged for potentially breaking server rules, Discord's **[Terms](<https://discord.com/terms>)**, or Discord's **[Community Guidelines](<https://discord.com/guidelines>)**. \n```{message.content}```",
             color=0xff4545,
             timestamp=datetime.utcnow()
         )
