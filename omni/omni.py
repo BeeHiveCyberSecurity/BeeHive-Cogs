@@ -792,6 +792,8 @@ class Omni(commands.Cog):
         except Exception as e:
             raise RuntimeError(f"Failed to initiate vote: {e}")
 
+# Put commands that's already validated not broken down here
+
     @omni.command()
     @commands.admin_or_permissions(manage_guild=True)
     async def timeout(self, ctx, duration: int):
