@@ -12,7 +12,24 @@ class Omni(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        self.session = None
+        self.save_interval = 300  # Save every 5 minutes
+
+        # Configuration setup
         self.config = Config.get_conf(self, identifier=11111111111)
+        self._register_config()
+
+        # In-memory statistics
+        self.memory_stats = defaultdict(lambda: defaultdict(int))
+        self.memory_user_message_counts = defaultdict(lambda: defaultdict(int))
+        self.memory_moderated_users = defaultdict(lambda: defaultdict(int))
+        self.memory_category_counter = defaultdict(Counter)
+
+        # Start periodic save task
+        self.bot.loop.create_task(self.periodic_save())
+
+    def _register_config(self):
+        """Register configuration defaults."""
         self.config.register_guild(
             moderation_threshold=0.75,
             timeout_duration=0,
@@ -27,13 +44,13 @@ class Omni(commands.Cog):
             user_message_counts={},
             image_count=0,
             moderated_image_count=0,
-            timeout_count=0,  # Track the number of timeouts issued
-            total_timeout_duration=0,  # Track the total duration of timeouts in minutes
-            too_weak_votes=0,  # Track the number of "too weak" votes
-            too_tough_votes=0,  # Track the number of "too tough" votes
-            just_right_votes=0,  # Track the number of "just right" votes
-            last_vote_time=None,  # Track the last time a vote affected the threshold
-            delete_violatory_messages=True  # Track whether violatory messages should be deleted
+            timeout_count=0,
+            total_timeout_duration=0,
+            too_weak_votes=0,
+            too_tough_votes=0,
+            just_right_votes=0,
+            last_vote_time=None,
+            delete_violatory_messages=True
         )
         self.config.register_global(
             global_message_count=0,
@@ -42,22 +59,12 @@ class Omni(commands.Cog):
             global_category_counter={},
             global_image_count=0,
             global_moderated_image_count=0,
-            global_timeout_count=0,  # Track the number of global timeouts issued
-            global_total_timeout_duration=0  # Track the total global duration of timeouts in minutes
+            global_timeout_count=0,
+            global_total_timeout_duration=0
         )
-        self.session = None
-
-        # In-memory statistics
-        self.memory_stats = defaultdict(lambda: defaultdict(int))
-        self.memory_user_message_counts = defaultdict(lambda: defaultdict(int))
-        self.memory_moderated_users = defaultdict(lambda: defaultdict(int))
-        self.memory_category_counter = defaultdict(Counter)
-
-        # Save interval in seconds
-        self.save_interval = 300  # Save every 5 minutes
-        self.bot.loop.create_task(self.periodic_save())
 
     async def initialize(self):
+        """Initialize the aiohttp session."""
         try:
             self.session = aiohttp.ClientSession()
         except Exception as e:
@@ -66,18 +73,14 @@ class Omni(commands.Cog):
     def normalize_text(self, text):
         """Normalize text to replace with standard alphabetical/numeric characters."""
         try:
-            # Normalize to NFKD form and replace non-standard characters
             text = ''.join(
                 c if unicodedata.category(c).startswith(('L', 'N')) else ' '
                 for c in unicodedata.normalize('NFKD', text)
             )
-            # Handle special words/characters
             replacements = {'nègre': 'negro', 'reggin': 'nigger'}
             for word, replacement in replacements.items():
                 text = text.replace(word, replacement)
-            # Replace multiple spaces with a single space
-            text = re.sub(r'\s+', ' ', text).strip()
-            return text
+            return re.sub(r'\s+', ' ', text).strip()
         except Exception as e:
             raise ValueError(f"Failed to normalize text: {e}")
 
@@ -95,54 +98,34 @@ class Omni(commands.Cog):
                 return
 
             guild = message.guild
-
-            # Check if moderation is enabled
-            moderation_enabled = await self.config.guild(guild).moderation_enabled()
-            if not moderation_enabled:
+            if not await self.config.guild(guild).moderation_enabled():
                 return
 
-            # Check if the channel is whitelisted
-            whitelisted_channels = await self.config.guild(guild).whitelisted_channels()
-            if message.channel.id in whitelisted_channels:
+            if message.channel.id in await self.config.guild(guild).whitelisted_channels():
                 return
 
-            # Update per-server and global statistics in memory
             self.increment_statistic(guild.id, 'message_count')
             self.increment_statistic('global', 'global_message_count')
-
-            # Update user message count in memory
             self.increment_user_message_count(guild.id, message.author.id)
 
-            api_tokens = await self.bot.get_shared_api_tokens("openai")
-            api_key = api_tokens.get("api_key")
+            api_key = (await self.bot.get_shared_api_tokens("openai")).get("api_key")
             if not api_key:
                 return
 
-            # Ensure the session is open
             if self.session is None or self.session.closed:
                 self.session = aiohttp.ClientSession()
 
-            # Normalize the message content
             normalized_content = self.normalize_text(message.content)
-
-            # Prepare input for moderation API
             input_data = [{"type": "text", "text": normalized_content}]
 
-            # Check for image attachments
             if message.attachments:
                 for attachment in message.attachments:
                     if attachment.content_type.startswith("image/") and not attachment.content_type.endswith("gif"):
-                        input_data.append({
-                            "type": "image_url",
-                            "image_url": {"url": attachment.url}
-                        })
+                        input_data.append({"type": "image_url", "image_url": {"url": attachment.url}})
                         self.increment_statistic(guild.id, 'image_count')
                         self.increment_statistic('global', 'global_image_count')
 
-            # Analyze text and image content
             text_category_scores = await self.analyze_content(input_data, api_key, message)
-
-            # Determine if the message should be flagged based on the threshold
             moderation_threshold = await self.config.guild(guild).moderation_threshold()
             text_flagged = any(score > moderation_threshold for score in text_category_scores.values())
 
@@ -150,9 +133,7 @@ class Omni(commands.Cog):
                 self.update_moderation_stats(guild.id, message, text_category_scores)
                 await self.handle_moderation(message, text_category_scores)
 
-            # Check if debug mode is enabled
-            debug_mode = await self.config.guild(guild).debug_mode()
-            if debug_mode:
+            if await self.config.guild(guild).debug_mode():
                 await self.log_message(message, text_category_scores)
         except Exception as e:
             raise RuntimeError(f"Error processing message: {e}")
@@ -166,14 +147,11 @@ class Omni(commands.Cog):
     def update_moderation_stats(self, guild_id, message, text_category_scores):
         self.increment_statistic(guild_id, 'moderated_count')
         self.increment_statistic('global', 'global_moderated_count')
-
         self.memory_moderated_users[guild_id][message.author.id] += 1
         self.memory_moderated_users['global'][message.author.id] += 1
-
         self.update_category_counter(guild_id, text_category_scores)
         self.update_category_counter('global', text_category_scores)
 
-        # Check if the message contains images and update moderated image count
         if any(attachment.content_type.startswith("image/") and not attachment.content_type.endswith("gif") for attachment in message.attachments):
             self.increment_statistic(guild_id, 'moderated_image_count')
             self.increment_statistic('global', 'global_moderated_image_count')
@@ -199,13 +177,10 @@ class Omni(commands.Cog):
                 ) as response:
                     if response.status == 200:
                         data = await response.json()
-                        result = data.get("results", [{}])[0]
-                        category_scores = result.get("category_scores", {})
-                        return category_scores
+                        return data.get("results", [{}])[0].get("category_scores", {})
                     elif response.status == 500:
-                        await asyncio.sleep(5)  # Wait a few seconds before retrying
+                        await asyncio.sleep(5)
                     else:
-                        # Log the error if the request failed
                         await self.log_message(message, {}, error_code=response.status)
                         return {}
         except Exception as e:
@@ -218,14 +193,12 @@ class Omni(commands.Cog):
             log_channel_id = await self.config.guild(guild).log_channel()
             delete_violatory_messages = await self.config.guild(guild).delete_violatory_messages()
 
-            # Delete the message if the setting is enabled
             if delete_violatory_messages:
                 try:
                     await message.delete()
-                    # Add user to moderated users list if message is deleted
                     self.memory_moderated_users[guild.id][message.author.id] += 1
                 except discord.NotFound:
-                    pass  
+                    pass
 
             if timeout_duration > 0:
                 try:
@@ -233,7 +206,6 @@ class Omni(commands.Cog):
                         f"{category}: {score:.2f}" for category, score in category_scores.items() if score > 0.2
                     )
                     await message.author.timeout(timedelta(minutes=timeout_duration), reason=reason)
-                    # Increment timeout count and total timeout duration
                     self.increment_statistic(guild.id, 'timeout_count')
                     self.increment_statistic('global', 'global_timeout_count')
                     self.increment_statistic(guild.id, 'total_timeout_duration', timeout_duration)
@@ -244,37 +216,40 @@ class Omni(commands.Cog):
             if log_channel_id:
                 log_channel = guild.get_channel(log_channel_id)
                 if log_channel:
-                    embed = discord.Embed(
-                        title="✨ Message moderated using AI",
-                        description=f"The following message was deleted from chat because it may have violated the rules of the server, Discord's **[Terms of Service](<https://discord.com/terms>)**, or Discord's **[Community Guidelines](<https://discord.com/guidelines>)**...\n```{message.content}```",
-                        color=0xff4545,
-                        timestamp=datetime.utcnow()
-                    )
-                    embed.add_field(name="Sent by", value=f"<@{message.author.id}> - `{message.author.id}`", inline=True)
-                    embed.add_field(name="Sent in", value=f"<#{message.channel.id}> - `{message.channel.id}`", inline=True)
-                    embed.add_field(name="Scoring", value=f"", inline=False)
-                    moderation_threshold = await self.config.guild(guild).moderation_threshold()
-                    sorted_scores = sorted(category_scores.items(), key=lambda item: item[1], reverse=True)[:3]
-                    for category, score in sorted_scores:
-                        score_display = f"**{score:.2f}**" if score > moderation_threshold else f"{score:.2f}"
-                        embed.add_field(name=category.capitalize(), value=score_display, inline=True)
-                    
-                    # Add image to embed if present
-                    if message.attachments:
-                        for attachment in message.attachments:
-                            if attachment.content_type.startswith("image/") and not attachment.content_type.endswith("gif"):
-                                embed.set_image(url=attachment.url)
-                                break
-
-                    # Add a button to jump to the message before the deleted one in the conversation
-                    view = discord.ui.View()
-                    previous_message = [msg async for msg in message.channel.history(limit=2, before=message)]
-                    if previous_message:
-                        view.add_item(discord.ui.Button(label="Jump to place in conversation", url=previous_message[0].jump_url))
-
-                    await log_channel.send(embed=embed, view=view)
+                    embed = self._create_moderation_embed(message, category_scores, "✨ Message moderated using AI")
+                    await log_channel.send(embed=embed, view=self._create_jump_view(message))
         except Exception as e:
             raise RuntimeError(f"Failed to handle moderation: {e}")
+
+    def _create_moderation_embed(self, message, category_scores, title):
+        embed = discord.Embed(
+            title=title,
+            description=f"The following message was deleted from chat because it may have violated the rules of the server, Discord's **[Terms of Service](<https://discord.com/terms>)**, or Discord's **[Community Guidelines](<https://discord.com/guidelines>)**...\n```{message.content}```",
+            color=0xff4545,
+            timestamp=datetime.utcnow()
+        )
+        embed.add_field(name="Sent by", value=f"<@{message.author.id}> - `{message.author.id}`", inline=True)
+        embed.add_field(name="Sent in", value=f"<#{message.channel.id}> - `{message.channel.id}`", inline=True)
+        embed.add_field(name="Scoring", value="", inline=False)
+        moderation_threshold = await self.config.guild(message.guild).moderation_threshold()
+        sorted_scores = sorted(category_scores.items(), key=lambda item: item[1], reverse=True)[:3]
+        for category, score in sorted_scores:
+            score_display = f"**{score:.2f}**" if score > moderation_threshold else f"{score:.2f}"
+            embed.add_field(name=category.capitalize(), value=score_display, inline=True)
+
+        if message.attachments:
+            for attachment in message.attachments:
+                if attachment.content_type.startswith("image/") and not attachment.content_type.endswith("gif"):
+                    embed.set_image(url=attachment.url)
+                    break
+        return embed
+
+    def _create_jump_view(self, message):
+        view = discord.ui.View()
+        previous_message = [msg async for msg in message.channel.history(limit=2, before=message)]
+        if previous_message:
+            view.add_item(discord.ui.Button(label="Jump to place in conversation", url=previous_message[0].jump_url))
+        return view
 
     async def log_message(self, message, category_scores, error_code=None):
         try:
@@ -284,37 +259,10 @@ class Omni(commands.Cog):
             if log_channel_id:
                 log_channel = guild.get_channel(log_channel_id)
                 if log_channel:
-                    embed = discord.Embed(
-                        title="✨ Message processed using AI",
-                        description=f"The following message was processed\n```{message.content}```",
-                        color=0xfffffe,
-                        timestamp=datetime.utcnow()
-                    )
-                    embed.add_field(name="Sent by", value=f"<@{message.author.id}> - `{message.author.id}`", inline=True)
-                    embed.add_field(name="Sent in", value=f"<#{message.channel.id}> - `{message.channel.id}`", inline=True)
-                    embed.add_field(name="Scoring", value=f"", inline=False)
-                    moderation_threshold = await self.config.guild(guild).moderation_threshold()
-                    sorted_scores = sorted(category_scores.items(), key=lambda item: item[1], reverse=True)[:3]
-                    for category, score in sorted_scores:
-                        score_display = f"**{score:.2f}**" if score > moderation_threshold else f"{score:.2f}"
-                        embed.add_field(name=category.capitalize(), value=score_display, inline=True)
+                    embed = self._create_moderation_embed(message, category_scores, "✨ Message processed using AI")
                     if error_code:
                         embed.add_field(name="Error", value=f":x: `{error_code}` Failed to send to OpenAI endpoint.", inline=False)
-                    
-                    # Add image to embed if present
-                    if message.attachments:
-                        for attachment in message.attachments:
-                            if attachment.content_type.startswith("image/") and not attachment.content_type.endswith("gif"):
-                                embed.set_image(url=attachment.url)
-                                break
-
-                    # Add a button to jump to the message before the processed one in the conversation
-                    view = discord.ui.View()
-                    previous_message = [msg async for msg in message.channel.history(limit=2, before=message)]
-                    if previous_message:
-                        view.add_item(discord.ui.Button(label="Jump to place in conversation", url=previous_message[0].jump_url))
-
-                    await log_channel.send(embed=embed, view=view)
+                    await log_channel.send(embed=embed, view=self._create_jump_view(message))
         except Exception as e:
             raise RuntimeError(f"Failed to log message: {e}")
 
@@ -323,57 +271,60 @@ class Omni(commands.Cog):
         while True:
             await asyncio.sleep(self.save_interval)
             try:
-                for guild_id, stats in self.memory_stats.items():
-                    if guild_id == 'global':
-                        for stat_name, value in stats.items():
-                            current_value = await self.config.get_attr(stat_name)()
-                            await self.config.get_attr(stat_name).set(current_value + value)
-                    else:
-                        guild_conf = self.config.guild_from_id(guild_id)
-                        for stat_name, value in stats.items():
-                            current_value = await guild_conf.get_attr(stat_name)()
-                            await guild_conf.get_attr(stat_name).set(current_value + value)
-
-                for guild_id, user_counts in self.memory_user_message_counts.items():
-                    if guild_id != 'global':
-                        guild_conf = self.config.guild_from_id(guild_id)
-                        current_user_counts = await guild_conf.user_message_counts()
-                        for user_id, count in user_counts.items():
-                            current_user_counts[user_id] = current_user_counts.get(user_id, 0) + count
-                        await guild_conf.user_message_counts.set(current_user_counts)
-
-                for guild_id, users in self.memory_moderated_users.items():
-                    if guild_id == 'global':
-                        current_users = await self.config.global_moderated_users()
-                        for user_id, count in users.items():
-                            current_users[user_id] = current_users.get(user_id, 0) + count
-                        await self.config.global_moderated_users.set(current_users)
-                    else:
-                        guild_conf = self.config.guild_from_id(guild_id)
-                        current_users = await guild_conf.moderated_users()
-                        for user_id, count in users.items():
-                            current_users[user_id] = current_users.get(user_id, 0) + count
-                        await guild_conf.moderated_users.set(current_users)
-
-                for guild_id, counter in self.memory_category_counter.items():
-                    if guild_id == 'global':
-                        current_counter = Counter(await self.config.global_category_counter())
-                        current_counter.update(counter)
-                        await self.config.global_category_counter.set(dict(current_counter))
-                    else:
-                        guild_conf = self.config.guild_from_id(guild_id)
-                        current_counter = Counter(await guild_conf.category_counter())
-                        current_counter.update(counter)
-                        await guild_conf.category_counter.set(dict(current_counter))
-
-                # Clear in-memory statistics after saving
-                self.memory_stats.clear()
-                self.memory_user_message_counts.clear()
-                self.memory_moderated_users.clear()
-                self.memory_category_counter.clear()
-
+                await self._save_statistics()
             except Exception as e:
                 raise RuntimeError(f"Failed to save statistics: {e}")
+
+    async def _save_statistics(self):
+        """Save statistics to persistent storage."""
+        for guild_id, stats in self.memory_stats.items():
+            if guild_id == 'global':
+                for stat_name, value in stats.items():
+                    current_value = await self.config.get_attr(stat_name)()
+                    await self.config.get_attr(stat_name).set(current_value + value)
+            else:
+                guild_conf = self.config.guild_from_id(guild_id)
+                for stat_name, value in stats.items():
+                    current_value = await guild_conf.get_attr(stat_name)()
+                    await guild_conf.get_attr(stat_name).set(current_value + value)
+
+        for guild_id, user_counts in self.memory_user_message_counts.items():
+            if guild_id != 'global':
+                guild_conf = self.config.guild_from_id(guild_id)
+                current_user_counts = await guild_conf.user_message_counts()
+                for user_id, count in user_counts.items():
+                    current_user_counts[user_id] = current_user_counts.get(user_id, 0) + count
+                await guild_conf.user_message_counts.set(current_user_counts)
+
+        for guild_id, users in self.memory_moderated_users.items():
+            if guild_id == 'global':
+                current_users = await self.config.global_moderated_users()
+                for user_id, count in users.items():
+                    current_users[user_id] = current_users.get(user_id, 0) + count
+                await self.config.global_moderated_users.set(current_users)
+            else:
+                guild_conf = self.config.guild_from_id(guild_id)
+                current_users = await guild_conf.moderated_users()
+                for user_id, count in users.items():
+                    current_users[user_id] = current_users.get(user_id, 0) + count
+                await guild_conf.moderated_users.set(current_users)
+
+        for guild_id, counter in self.memory_category_counter.items():
+            if guild_id == 'global':
+                current_counter = Counter(await self.config.global_category_counter())
+                current_counter.update(counter)
+                await self.config.global_category_counter.set(dict(current_counter))
+            else:
+                guild_conf = self.config.guild_from_id(guild_id)
+                current_counter = Counter(await guild_conf.category_counter())
+                current_counter.update(counter)
+                await guild_conf.category_counter.set(dict(current_counter))
+
+        # Clear in-memory statistics after saving
+        self.memory_stats.clear()
+        self.memory_user_message_counts.clear()
+        self.memory_moderated_users.clear()
+        self.memory_category_counter.clear()
 
     @commands.guild_only()
     @commands.admin_or_permissions(manage_guild=True)
@@ -729,56 +680,6 @@ class Omni(commands.Cog):
             await ctx.send(embed=embed)
         except Exception as e:
             raise RuntimeError(f"Failed to display reasons: {e}")
-
-    @omni.command()
-    @commands.admin_or_permissions(manage_guild=True)
-    async def users(self, ctx):
-        """Show the 5 most and least frequently moderated users."""
-        try:
-            guild = ctx.guild
-            user_message_counts = await self.config.guild(guild).user_message_counts()
-            moderated_users = await self.config.guild(guild).moderated_users()
-
-            # Calculate moderation percentages
-            user_moderation_percentages = {
-                user_id: (user_message_counts.get(user_id, 0), moderated_users.get(user_id, 0))
-                for user_id in set(user_message_counts) | set(moderated_users)
-            }
-
-            # Sort users by moderation percentage
-            most_moderated = sorted(user_moderation_percentages.items(), key=lambda x: x[1][1] / x[1][0] if x[1][0] > 0 else 0, reverse=True)[:5]
-            least_moderated = sorted(user_moderation_percentages.items(), key=lambda x: x[1][1] / x[1][0] if x[1][0] > 0 else 0)[:5]
-
-            embed = discord.Embed(title=f"{ctx.guild.name}'s most/least moderated members", color=0xfffffe)
-
-            # Add a divider for most moderated users
-            embed.add_field(name="Most moderated", value="\u200b", inline=False)
-            for user_id, (total, moderated) in most_moderated:
-                if total > 0:
-                    user = await self.bot.fetch_user(user_id)
-                    embed.add_field(
-                        name=f"{user.name} (ID: {user_id})",
-                        value=f" **{total}** messages sent | **{moderated}** messages moderated ({(moderated / total * 100):.2f}%)",
-                        inline=False
-                    )
-
-            # Add a divider for least moderated users
-            embed.add_field(name="Least moderated", value="\u200b", inline=False)
-            for user_id, (total, moderated) in least_moderated:
-                if total > 0:
-                    user = await self.bot.fetch_user(user_id)
-                    embed.add_field(
-                        name=f"{user.name} (ID: {user_id})",
-                        value=f" **{total}** messages sent | **{moderated}** messages moderated ({(moderated / total * 100):.2f}%)",
-                        inline=False
-                    )
-
-            # Set footer text
-            embed.set_footer(text="The list is subject to change as data is collected")
-
-            await ctx.send(embed=embed)
-        except Exception as e:
-            raise RuntimeError(f"Failed to display user moderation statistics: {e}")
 
     @omni.command()
     @commands.is_owner()
