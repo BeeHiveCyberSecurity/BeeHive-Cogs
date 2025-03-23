@@ -217,7 +217,7 @@ class Omni(commands.Cog):
                 log_channel = guild.get_channel(log_channel_id)
                 if log_channel:
                     embed = await self._create_moderation_embed(message, category_scores, "✨ Message moderated using AI")
-                    await log_channel.send(embed=embed, view=self._create_jump_view(message))
+                    await log_channel.send(embed=embed, view=await self._create_jump_view(message))
         except Exception as e:
             raise RuntimeError(f"Failed to handle moderation: {e}")
 
@@ -244,12 +244,17 @@ class Omni(commands.Cog):
                     break
         return embed
 
-    def _create_jump_view(self, message):
+    async def _create_jump_view(self, message):
         view = discord.ui.View()
-        previous_message = [msg async for msg in message.channel.history(limit=2, before=message)]
+        previous_message = await self._get_previous_message(message)
         if previous_message:
-            view.add_item(discord.ui.Button(label="Jump to place in conversation", url=previous_message[0].jump_url))
+            view.add_item(discord.ui.Button(label="Jump to place in conversation", url=previous_message.jump_url))
         return view
+
+    async def _get_previous_message(self, message):
+        async for msg in message.channel.history(limit=2, before=message):
+            return msg
+        return None
 
     async def log_message(self, message, category_scores, error_code=None):
         try:
@@ -262,7 +267,7 @@ class Omni(commands.Cog):
                     embed = await self._create_moderation_embed(message, category_scores, "✨ Message processed using AI")
                     if error_code:
                         embed.add_field(name="Error", value=f":x: `{error_code}` Failed to send to OpenAI endpoint.", inline=False)
-                    await log_channel.send(embed=embed, view=self._create_jump_view(message))
+                    await log_channel.send(embed=embed, view=await self._create_jump_view(message))
         except Exception as e:
             raise RuntimeError(f"Failed to log message: {e}")
 
