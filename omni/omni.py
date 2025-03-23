@@ -685,20 +685,6 @@ class Omni(commands.Cog):
         except Exception as e:
             raise RuntimeError(f"Failed to reset statistics: {e}")
 
-    @omni.command(hidden=True)
-    @commands.is_owner()
-    async def globalstate(self, ctx):
-        """Toggle default moderation state for new servers."""
-        try:
-            # Get the current state
-            current_state = await self.config.moderation_enabled()
-            # Toggle the state
-            new_state = not current_state
-            await self.config.moderation_enabled.set(new_state)
-            status = "enabled" if new_state else "disabled"
-            await ctx.send(f"Moderation is now {status} by default for new servers.")
-        except Exception as e:
-            raise RuntimeError(f"Failed to toggle default moderation state: {e}")
 
     @omni.command()
     async def vote(self, ctx):
@@ -793,6 +779,21 @@ class Omni(commands.Cog):
             raise RuntimeError(f"Failed to initiate vote: {e}")
 
 # Put commands that's already validated not broken down here
+
+    @omni.command(hidden=True)
+    @commands.is_owner()
+    async def globalstate(self, ctx):
+        """Toggle default moderation state for new servers."""
+        try:
+            # Get the current state
+            current_state = await self.config.moderation_enabled()
+            # Toggle the state
+            new_state = not current_state
+            await self.config.moderation_enabled.set(new_state)
+            status = "enabled" if new_state else "disabled"
+            await ctx.send(f"Moderation is now {status} by default for new servers.")
+        except Exception as e:
+            raise RuntimeError(f"Failed to toggle default moderation state: {e}")
 
     @omni.command()
     @commands.admin_or_permissions(manage_guild=True)
