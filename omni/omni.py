@@ -222,13 +222,13 @@ class Omni(commands.Cog):
                 if log_channel:
                     embed = await self._create_moderation_embed(message, category_scores, "✨ Message moderated using AI")
                     if message_deleted and timeout_issued:
-                        embed.description += "\n\nThe message was deleted and the user was issued a timeout."
+                        embed.description += "\nThe **message was deleted** and the **user was issued a timeout**."
                     elif message_deleted:
-                        embed.description += "\n\nThe message was deleted."
+                        embed.description += "\nThe **message was deleted**."
                     elif timeout_issued:
-                        embed.description += "\n\nThe user was issued a timeout."
+                        embed.description += "\nThe **user was issued a timeout**."
                     else:
-                        embed.description += "\n\nNo further action was taken."
+                        embed.description += "\nNo further action was taken."
                     await log_channel.send(embed=embed, view=await self._create_jump_view(message))
         except Exception as e:
             raise RuntimeError(f"Failed to handle moderation: {e}")
