@@ -473,7 +473,19 @@ class Omni(commands.Cog):
                     return suffix
 
                 rank_suffix = get_ordinal_suffix(rank)
-                embed.add_field(name="Trust and safety analysis", value=f"- **This server takes `{rank}{rank_suffix} place` out of `{total_guilds} servers`.**\n> This ranking is based on the ratio of flagged messages compared to total messages, and is relative to all other servers and channels the bot can see. In this scale, 1st place is the most abusive server, and your goal is to place as low as possible in position (losing is winning).\n\n- **Based on collected data, this server is more harmful than `{more_harmful_than_percentage:.2f}%` of servers, and less harmful than `{less_harmful_than_percentage:.2f}%` of servers.**\n> The goal is to be less harmful than as many servers as possible, as less harmful communities are most likely to foster more engagement and growth than their more abusive counterparts.\n\n- {moderation_rate_comparison}\n\n> The goal is to require as little moderation as possible and to be moderated under the global average.", inline=False)
+                embed.add_field(
+                    name="Trust and safety analysis",
+                    value=(
+                        f"- **Server Rank:** `{rank}{rank_suffix}` out of `{total_guilds}` servers.\n"
+                        f"  > *1st is most abusive; aim for a lower rank.*\n\n"
+                        f"- **Harmfulness:** More harmful than `{more_harmful_than_percentage:.2f}%`, "
+                        f"less harmful than `{less_harmful_than_percentage:.2f}%` of servers.\n"
+                        f"  > *Strive to be less harmful for better community engagement.*\n\n"
+                        f"- {moderation_rate_comparison}\n"
+                        f"  > *Aim for minimal moderation, below global average.*"
+                    ),
+                    inline=False
+                )
 
                 if rank in [1, 2, 3]:
                     embed.add_field(name="Discord compliance", value="- :rotating_light: **Extreme risk**\n\n> This server needs **immediate** improvement in moderation and user behavior to avoid potential suspensions, terminations, or other assorted compliance measures.", inline=False)
