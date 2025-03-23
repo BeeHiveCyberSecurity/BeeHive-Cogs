@@ -481,8 +481,8 @@ class Omni(commands.Cog):
                         f"- **Harmfulness** More harmful than `{more_harmful_than_percentage:.2f}%`"
                         f" of servers.\n"
                         f"  > *Strive to be less harmful for better community engagement.*\n\n"
-                        f"- {moderation_rate_comparison}\n"
-                        f"  > *Aim for minimal moderation, below global average.*"
+                        f"- {moderation_rate_comparison}. "
+                        f"*Aim for minimal moderation, below global average.*"
                     ),
                     inline=False
                 )
