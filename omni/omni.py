@@ -444,56 +444,8 @@ class Omni(commands.Cog):
             embed.add_field(name="Most frequent flags", value=top_categories_bullets, inline=False)
             embed.add_field(name="Feedback", value=f"**{too_weak_votes}** votes for too weak, **{too_tough_votes}** votes for too tough, **{just_right_votes}** votes for just right", inline=False)
 
-            # Show global stats, trust and safety analysis, and discord compliance if in more than 45 servers
+            # Show global stats if in more than 45 servers
             if len(self.bot.guilds) > 45:
-                # Calculate guilds sorted by harmfulness
-                guilds_sorted_by_harmfulness = await self._get_guilds_sorted_by_harmfulness()
-                rank = guilds_sorted_by_harmfulness.index(ctx.guild) + 1
-                total_guilds = len(guilds_sorted_by_harmfulness)
-                more_harmful_than_percentage = ((total_guilds - rank) / total_guilds) * 100
-                less_harmful_than_percentage = (rank / total_guilds) * 100
-
-                # Calculate member moderation rate comparison
-                global_moderated_users = await self.config.global_moderated_users()
-                total_members = sum(guild.member_count for guild in self.bot.guilds)
-                global_moderated_user_percentage = (len(global_moderated_users) / total_members * 100) if total_members > 0 else 0
-                moderation_rate_difference = moderated_user_percentage - global_moderated_user_percentage
-                if moderation_rate_difference > 0:
-                    moderation_rate_comparison = f"**Members in this server require `{moderation_rate_difference:.2f}%` more moderation on average compared to the global average.**\n> *This server may have more abrasive users than most other servers in statistical comparison.*"
-                elif moderation_rate_difference < 0:
-                    moderation_rate_comparison = f"**Members in this server require `{-moderation_rate_difference:.2f}%` less moderation on average compared to the global average.**\n> *This server has members that are statistically friendlier and require less moderation & guidance.*"
-                else:
-                    moderation_rate_comparison = "**Members in this server require the same level of moderation on average compared to the global average.**\n> *Standard internet users, to statistical expectation.*"
-
-                def get_ordinal_suffix(n):
-                    if 10 <= n % 100 <= 20:
-                        suffix = 'th'
-                    else:
-                        suffix = {1: 'st', 2: 'nd', 3: 'rd'}.get(n % 10, 'th')
-                    return suffix
-
-                rank_suffix = get_ordinal_suffix(rank)
-                embed.add_field(
-                    name="Trust and safety analysis",
-                    value=(
-                        f"- **Server rank** `{rank}{rank_suffix}` out of `{total_guilds}` servers.\n"
-                        f"  > *1st is most abusive; aim for a lower rank.*\n"
-                        f"- **Harmfulness** More harmful than `{more_harmful_than_percentage:.2f}%`"
-                        f" of servers.\n"
-                        f"  > *Strive to be less harmful for better community engagement.*\n"
-                        f"- {moderation_rate_comparison}. "
-                        f"*Aim for minimal moderation, below global average.*"
-                    ),
-                    inline=False
-                )
-
-                if rank in [1, 2, 3]:
-                    embed.add_field(name="Discord compliance", value="- :rotating_light: **Extreme risk**\n\n> This server needs **immediate** improvement in moderation and user behavior to avoid potential suspensions, terminations, or other assorted compliance measures.", inline=False)
-                elif rank in range(4, 11):
-                    embed.add_field(name="Discord compliance", value="- :warning: **Approaching risk**\n\n> This server's not at immediate risk, but **improvement is needed** to keep it from getting to that point.", inline=False)
-                else:
-                    embed.add_field(name="Discord compliance", value="- :white_check_mark: **Aim for continuing improvement**\n\n> This server's doing *comparatively* **OK**, but it's always best to be a safe, welcoming place to keep your server's safety ranking optimal.", inline=False)
-
                 # Global statistics
                 global_message_count = await self.config.global_message_count()
                 global_moderated_count = await self.config.global_moderated_count()
@@ -537,7 +489,7 @@ class Omni(commands.Cog):
                 embed.add_field(name="Across all monitored servers", value="", inline=False)
                 embed.add_field(name="Messages processed", value=f"**{global_message_count:,}** message{'s' if global_message_count != 1 else ''}", inline=True)
                 embed.add_field(name="Messages moderated", value=f"**{global_moderated_count:,}** message{'s' if global_moderated_count != 1 else ''} ({global_moderated_message_percentage:.2f}%)", inline=True)
-                embed.add_field(name="Users punished", value=f"**{len(global_moderated_users):,}** user{'s' if len(global_moderated_users) != 1 else ''} ({global_moderated_user_percentage:.2f}%)", inline=True)
+                embed.add_field(name="Users punished", value=f"**{len(global_moderated_users):,}** user{'s' if len(global_moderated_users) != 1 else ''}", inline=True)
                 embed.add_field(name="Images processed", value=f"**{global_image_count:,}** image{'s' if global_image_count != 1 else ''}", inline=True)
                 embed.add_field(name="Images moderated", value=f"**{global_moderated_image_count:,}** image{'s' if global_moderated_image_count != 1 else ''} ({global_moderated_image_percentage:.2f}%)", inline=True)
                 embed.add_field(name="Timeouts issued", value=f"**{global_timeout_count:,}** timeout{'s' if global_timeout_count != 1 else ''}", inline=True)
@@ -549,17 +501,6 @@ class Omni(commands.Cog):
             await ctx.send(embed=embed)
         except Exception as e:
             raise RuntimeError(f"Failed to display stats: {e}")
-
-    async def _get_guilds_sorted_by_harmfulness(self):
-        """Helper function to sort guilds by harmfulness."""
-        guilds_with_harmfulness = []
-        for guild in self.bot.guilds:
-            message_count = await self.config.guild(guild).message_count() or 1
-            moderated_count = await self.config.guild(guild).moderated_count()
-            harmfulness = moderated_count / message_count
-            guilds_with_harmfulness.append((guild, harmfulness))
-        guilds_sorted_by_harmfulness = sorted(guilds_with_harmfulness, key=lambda x: x[1], reverse=True)
-        return [guild for guild, _ in guilds_sorted_by_harmfulness]
 
     @omni.command()
     @commands.admin_or_permissions(manage_guild=True)
