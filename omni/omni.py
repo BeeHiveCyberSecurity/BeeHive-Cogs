@@ -569,48 +569,6 @@ class Omni(commands.Cog):
             raise RuntimeError(f"Failed to display settings: {e}")
 
     @omni.command()
-    @commands.admin_or_permissions(manage_guild=True)
-    async def toggle(self, ctx):
-        """Toggle automatic moderation on or off."""
-        try:
-            guild = ctx.guild
-            current_status = await self.config.guild(guild).moderation_enabled()
-            new_status = not current_status
-            await self.config.guild(guild).moderation_enabled.set(new_status)
-            status = "enabled" if new_status else "disabled"
-            await ctx.send(f"Automatic moderation {status}.")
-        except Exception as e:
-            raise RuntimeError(f"Failed to toggle automatic moderation: {e}")
-
-    @omni.command()
-    async def reasons(self, ctx):
-        """Explains how the AI moderator labels and categorizes content"""
-        try:
-            categories = {
-                "harassment": "Content that expresses, incites, or promotes harassing language towards any target.",
-                "harassment/threatening": "Harassment content that also includes violence or serious harm towards any target.",
-                "hate": "Content that expresses, incites, or promotes hate based on race, gender, ethnicity, religion, nationality, sexual orientation, disability status, or caste.",
-                "hate/threatening": "Hateful content that also includes violence or serious harm towards the targeted group based on race, gender, ethnicity, religion, nationality, sexual orientation, disability status, or caste.",
-                "illicit": "Content that gives advice or instruction on how to commit illicit acts.",
-                "illicit/violent": "The same types of content flagged by the illicit category, but also includes references to violence or procuring a weapon.",
-                "self-harm": "Content that promotes, encourages, or depicts acts of self-harm, such as suicide, cutting, and eating disorders.",
-                "self-harm/intent": "Content where the speaker expresses that they are engaging or intend to engage in acts of self-harm.",
-                "self-harm/instructions": "Content that encourages performing acts of self-harm or that gives instructions or advice on how to commit such acts.",
-                "sexual": "Content meant to arouse sexual excitement or that promotes sexual services.",
-                "sexual/minors": "Sexual content that includes an individual who is under 18 years old.",
-                "violence": "Content that depicts death, violence, or physical injury.",
-                "violence/graphic": "Content that depicts death, violence, or physical injury in graphic detail."
-            }
-
-            embed = discord.Embed(title="What the AI moderator is looking for", color=0xfffffe)
-            for category, description in categories.items():
-                embed.add_field(name=category.capitalize(), value=description, inline=False)
-
-            await ctx.send(embed=embed)
-        except Exception as e:
-            raise RuntimeError(f"Failed to display reasons: {e}")
-
-    @omni.command()
     @commands.is_owner()
     async def cleanup(self, ctx):
         """Reset all server and global statistics and counters."""
@@ -770,6 +728,48 @@ class Omni(commands.Cog):
             raise RuntimeError(f"Failed to initiate vote: {e}")
 
 # Put commands that's already validated not broken down here
+
+    @omni.command()
+    @commands.admin_or_permissions(manage_guild=True)
+    async def toggle(self, ctx):
+        """Toggle automatic moderation on or off."""
+        try:
+            guild = ctx.guild
+            current_status = await self.config.guild(guild).moderation_enabled()
+            new_status = not current_status
+            await self.config.guild(guild).moderation_enabled.set(new_status)
+            status = "enabled" if new_status else "disabled"
+            await ctx.send(f"Automatic moderation {status}.")
+        except Exception as e:
+            raise RuntimeError(f"Failed to toggle automatic moderation: {e}")
+
+    @omni.command()
+    async def reasons(self, ctx):
+        """Explains how the AI moderator labels and categorizes content"""
+        try:
+            categories = {
+                "harassment": "Content that expresses, incites, or promotes harassing language towards any target.",
+                "harassment/threatening": "Harassment content that also includes violence or serious harm towards any target.",
+                "hate": "Content that expresses, incites, or promotes hate based on race, gender, ethnicity, religion, nationality, sexual orientation, disability status, or caste.",
+                "hate/threatening": "Hateful content that also includes violence or serious harm towards the targeted group based on race, gender, ethnicity, religion, nationality, sexual orientation, disability status, or caste.",
+                "illicit": "Content that gives advice or instruction on how to commit illicit acts.",
+                "illicit/violent": "The same types of content flagged by the illicit category, but also includes references to violence or procuring a weapon.",
+                "self-harm": "Content that promotes, encourages, or depicts acts of self-harm, such as suicide, cutting, and eating disorders.",
+                "self-harm/intent": "Content where the speaker expresses that they are engaging or intend to engage in acts of self-harm.",
+                "self-harm/instructions": "Content that encourages performing acts of self-harm or that gives instructions or advice on how to commit such acts.",
+                "sexual": "Content meant to arouse sexual excitement or that promotes sexual services.",
+                "sexual/minors": "Sexual content that includes an individual who is under 18 years old.",
+                "violence": "Content that depicts death, violence, or physical injury.",
+                "violence/graphic": "Content that depicts death, violence, or physical injury in graphic detail."
+            }
+
+            embed = discord.Embed(title="What the AI moderator is looking for", color=0xfffffe)
+            for category, description in categories.items():
+                embed.add_field(name=category.capitalize(), value=description, inline=False)
+
+            await ctx.send(embed=embed)
+        except Exception as e:
+            raise RuntimeError(f"Failed to display reasons: {e}")
 
     @omni.command()
     @commands.admin_or_permissions(manage_guild=True)
