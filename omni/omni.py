@@ -583,20 +583,6 @@ class Omni(commands.Cog):
             raise RuntimeError(f"Failed to toggle automatic moderation: {e}")
 
     @omni.command()
-    @commands.admin_or_permissions(manage_guild=True)
-    async def delete(self, ctx):
-        """Toggle whether violatory messages are deleted or not."""
-        try:
-            guild = ctx.guild
-            current_status = await self.config.guild(guild).delete_violatory_messages()
-            new_status = not current_status
-            await self.config.guild(guild).delete_violatory_messages.set(new_status)
-            status = "enabled" if new_status else "disabled"
-            await ctx.send(f"Deletion of violatory messages {status}.")
-        except Exception as e:
-            raise RuntimeError(f"Failed to toggle message deletion: {e}")
-
-    @omni.command()
     async def reasons(self, ctx):
         """Explains how the AI moderator labels and categorizes content"""
         try:
@@ -784,6 +770,20 @@ class Omni(commands.Cog):
             raise RuntimeError(f"Failed to initiate vote: {e}")
 
 # Put commands that's already validated not broken down here
+
+    @omni.command()
+    @commands.admin_or_permissions(manage_guild=True)
+    async def delete(self, ctx):
+        """Toggle whether violatory messages are deleted or not."""
+        try:
+            guild = ctx.guild
+            current_status = await self.config.guild(guild).delete_violatory_messages()
+            new_status = not current_status
+            await self.config.guild(guild).delete_violatory_messages.set(new_status)
+            status = "enabled" if new_status else "disabled"
+            await ctx.send(f"Deletion of violatory messages {status}.")
+        except Exception as e:
+            raise RuntimeError(f"Failed to toggle message deletion: {e}")
 
     @omni.command(hidden=True)
     @commands.is_owner()
