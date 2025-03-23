@@ -364,68 +364,6 @@ class Omni(commands.Cog):
             raise RuntimeError(f"Failed to set threshold: {e}")
 
     @omni.command()
-    @commands.admin_or_permissions(manage_guild=True)
-    async def timeout(self, ctx, duration: int):
-        """Set the timeout duration in minutes (0 for no timeout)."""
-        try:
-            if duration >= 0:
-                await self.config.guild(ctx.guild).timeout_duration.set(duration)
-                await ctx.send(f"Timeout duration set to {duration} minutes.")
-            else:
-                await ctx.send("Timeout duration must be 0 or greater.")
-        except Exception as e:
-            raise RuntimeError(f"Failed to set timeout duration: {e}")
-
-    @omni.command()
-    @commands.admin_or_permissions(manage_guild=True)
-    async def logs(self, ctx, channel: discord.TextChannel):
-        """Set the channel to log moderated messages."""
-        try:
-            await self.config.guild(ctx.guild).log_channel.set(channel.id)
-            await ctx.send(f"Log channel set to {channel.mention}.")
-        except Exception as e:
-            raise RuntimeError(f"Failed to set log channel: {e}")
-
-    @omni.command()
-    @commands.admin_or_permissions(manage_guild=True)
-    async def whitelist(self, ctx, channel: discord.TextChannel):
-        """Add or remove a channel from the whitelist."""
-        try:
-            guild = ctx.guild
-            whitelisted_channels = await self.config.guild(guild).whitelisted_channels()
-            changelog = []
-
-            if channel.id in whitelisted_channels:
-                whitelisted_channels.remove(channel.id)
-                changelog.append(f"Removed: {channel.mention}")
-            else:
-                whitelisted_channels.append(channel.id)
-                changelog.append(f"Added: {channel.mention}")
-
-            await self.config.guild(guild).whitelisted_channels.set(whitelisted_channels)
-
-            if changelog:
-                changelog_message = "\n".join(changelog)
-                embed = discord.Embed(title="Whitelist Changelog", description=changelog_message, color=discord.Color.blue())
-                await ctx.send(embed=embed)
-        except Exception as e:
-            raise RuntimeError(f"Failed to update whitelist: {e}")
-
-    @omni.command(hidden=True)
-    @commands.is_owner()
-    async def debug(self, ctx):
-        """Toggle debug mode to log all messages and their scores."""
-        try:
-            guild = ctx.guild
-            current_debug_mode = await self.config.guild(guild).debug_mode()
-            new_debug_mode = not current_debug_mode
-            await self.config.guild(guild).debug_mode.set(new_debug_mode)
-            status = "enabled" if new_debug_mode else "disabled"
-            await ctx.send(f"Debug mode {status}.")
-        except Exception as e:
-            raise RuntimeError(f"Failed to toggle debug mode: {e}")
-
-    @omni.command()
     async def stats(self, ctx):
         """Show statistics of the moderation activity."""
         try:
@@ -853,6 +791,68 @@ class Omni(commands.Cog):
 
         except Exception as e:
             raise RuntimeError(f"Failed to initiate vote: {e}")
+
+    @omni.command()
+    @commands.admin_or_permissions(manage_guild=True)
+    async def timeout(self, ctx, duration: int):
+        """Set the timeout duration in minutes (0 for no timeout)."""
+        try:
+            if duration >= 0:
+                await self.config.guild(ctx.guild).timeout_duration.set(duration)
+                await ctx.send(f"Timeout duration set to {duration} minutes.")
+            else:
+                await ctx.send("Timeout duration must be 0 or greater.")
+        except Exception as e:
+            raise RuntimeError(f"Failed to set timeout duration: {e}")
+
+    @omni.command()
+    @commands.admin_or_permissions(manage_guild=True)
+    async def logs(self, ctx, channel: discord.TextChannel):
+        """Set the channel to log moderated messages."""
+        try:
+            await self.config.guild(ctx.guild).log_channel.set(channel.id)
+            await ctx.send(f"Log channel set to {channel.mention}.")
+        except Exception as e:
+            raise RuntimeError(f"Failed to set log channel: {e}")
+
+    @omni.command()
+    @commands.admin_or_permissions(manage_guild=True)
+    async def whitelist(self, ctx, channel: discord.TextChannel):
+        """Add or remove a channel from the whitelist."""
+        try:
+            guild = ctx.guild
+            whitelisted_channels = await self.config.guild(guild).whitelisted_channels()
+            changelog = []
+
+            if channel.id in whitelisted_channels:
+                whitelisted_channels.remove(channel.id)
+                changelog.append(f"Removed: {channel.mention}")
+            else:
+                whitelisted_channels.append(channel.id)
+                changelog.append(f"Added: {channel.mention}")
+
+            await self.config.guild(guild).whitelisted_channels.set(whitelisted_channels)
+
+            if changelog:
+                changelog_message = "\n".join(changelog)
+                embed = discord.Embed(title="Whitelist Changelog", description=changelog_message, color=discord.Color.blue())
+                await ctx.send(embed=embed)
+        except Exception as e:
+            raise RuntimeError(f"Failed to update whitelist: {e}")
+
+    @omni.command(hidden=True)
+    @commands.is_owner()
+    async def debug(self, ctx):
+        """Toggle debug mode to log all messages and their scores."""
+        try:
+            guild = ctx.guild
+            current_debug_mode = await self.config.guild(guild).debug_mode()
+            new_debug_mode = not current_debug_mode
+            await self.config.guild(guild).debug_mode.set(new_debug_mode)
+            status = "enabled" if new_debug_mode else "disabled"
+            await ctx.send(f"Debug mode {status}.")
+        except Exception as e:
+            raise RuntimeError(f"Failed to toggle debug mode: {e}")
 
     def cog_unload(self):
         try:
