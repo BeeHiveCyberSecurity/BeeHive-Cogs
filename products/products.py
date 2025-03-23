@@ -248,12 +248,13 @@ class Products(commands.Cog):
             colour=0xfffffe
         )
         embed.add_field(
-            name="Instructions",
-            value="**1.** Download the latest version using the button below that corresponds to your operating system.\n\n**2.** Run the downloaded file as administrator.\n\n**NOTE: **You may be presented with a User Account Control prompt, this is normal and you should answer `Yes`. The agent will install silently and automatically.",
+            name="To get started",
+            value="- Download the latest version using the button below that corresponds to your operating system.\n- Run the downloaded file. Your system may prompt you for admin privileges, allow it.\n\nThe agent will install silently and automatically, with no configuration needed.",
             inline=False
         )
         view = discord.ui.View()
-        view.add_item(discord.ui.Button(label="Download for Windows", url="https://cdn.beehive.systems/em_etkuCw1C_installer_Win7-Win11_x86_x64.msi", style=discord.ButtonStyle.link, emoji="<:windows:1194913113863114762>"))
+        view.add_item(discord.ui.Button(label="Download for Windows", url="https://cdn.beehive.systems/em_b2LVrQQy_installer_Win7-Win11_x86_x64.msi", style=discord.ButtonStyle.link, emoji="<:windows:1194913113863114762>"))
+        view.add_item(discord.ui.Button(label="Download for MacOS", url="https://cdn.beehive.systems/itsmagent-installer-iaW5KL9T.pkg", style=discord.ButtonStyle.link, emoji="<:apple:1194913115826040843>"))
         await ctx.send(embed=embed, view=view)
 
     @commands.bot_has_permissions(embed_links=True)
