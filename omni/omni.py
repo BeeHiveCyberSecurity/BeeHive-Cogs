@@ -449,6 +449,7 @@ class Omni(commands.Cog):
                 # Global statistics
                 global_message_count = await self.config.global_message_count()
                 global_moderated_count = await self.config.global_moderated_count()
+                global_moderated_users = await self.config.global_moderated_users()
                 global_category_counter = Counter(await self.config.global_category_counter())
                 global_image_count = await self.config.global_image_count()
                 global_moderated_image_count = await self.config.global_moderated_image_count()
