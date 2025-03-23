@@ -120,7 +120,7 @@ class Omni(commands.Cog):
 
             if message.attachments:
                 for attachment in message.attachments:
-                    if attachment.content_type.startswith("image/") and not attachment.content_type.endswith("gif"):
+                    if attachment.content_type and attachment.content_type.startswith("image/") and not attachment.content_type.endswith("gif"):
                         input_data.append({"type": "image_url", "image_url": {"url": attachment.url}})
                         self.increment_statistic(guild.id, 'image_count')
                         self.increment_statistic('global', 'global_image_count')
@@ -152,7 +152,7 @@ class Omni(commands.Cog):
         self.update_category_counter(guild_id, text_category_scores)
         self.update_category_counter('global', text_category_scores)
 
-        if any(attachment.content_type.startswith("image/") and not attachment.content_type.endswith("gif") for attachment in message.attachments):
+        if any(attachment.content_type and attachment.content_type.startswith("image/") and not attachment.content_type.endswith("gif") for attachment in message.attachments):
             self.increment_statistic(guild_id, 'moderated_image_count')
             self.increment_statistic('global', 'global_moderated_image_count')
 
@@ -216,12 +216,12 @@ class Omni(commands.Cog):
             if log_channel_id:
                 log_channel = guild.get_channel(log_channel_id)
                 if log_channel:
-                    embed = self._create_moderation_embed(message, category_scores, "✨ Message moderated using AI")
+                    embed = await self._create_moderation_embed(message, category_scores, "✨ Message moderated using AI")
                     await log_channel.send(embed=embed, view=self._create_jump_view(message))
         except Exception as e:
             raise RuntimeError(f"Failed to handle moderation: {e}")
 
-    def _create_moderation_embed(self, message, category_scores, title):
+    async def _create_moderation_embed(self, message, category_scores, title):
         embed = discord.Embed(
             title=title,
             description=f"The following message was deleted from chat because it may have violated the rules of the server, Discord's **[Terms of Service](<https://discord.com/terms>)**, or Discord's **[Community Guidelines](<https://discord.com/guidelines>)**...\n```{message.content}```",
@@ -239,7 +239,7 @@ class Omni(commands.Cog):
 
         if message.attachments:
             for attachment in message.attachments:
-                if attachment.content_type.startswith("image/") and not attachment.content_type.endswith("gif"):
+                if attachment.content_type and attachment.content_type.startswith("image/") and not attachment.content_type.endswith("gif"):
                     embed.set_image(url=attachment.url)
                     break
         return embed
@@ -259,7 +259,7 @@ class Omni(commands.Cog):
             if log_channel_id:
                 log_channel = guild.get_channel(log_channel_id)
                 if log_channel:
-                    embed = self._create_moderation_embed(message, category_scores, "✨ Message processed using AI")
+                    embed = await self._create_moderation_embed(message, category_scores, "✨ Message processed using AI")
                     if error_code:
                         embed.add_field(name="Error", value=f":x: `{error_code}` Failed to send to OpenAI endpoint.", inline=False)
                     await log_channel.send(embed=embed, view=self._create_jump_view(message))
