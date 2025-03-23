@@ -477,10 +477,10 @@ class Omni(commands.Cog):
                     name="Trust and safety analysis",
                     value=(
                         f"- **Server rank** `{rank}{rank_suffix}` out of `{total_guilds}` servers.\n"
-                        f"  > *1st is most abusive; aim for a lower rank.*\n\n"
+                        f"  > *1st is most abusive; aim for a lower rank.*\n"
                         f"- **Harmfulness** More harmful than `{more_harmful_than_percentage:.2f}%`"
                         f" of servers.\n"
-                        f"  > *Strive to be less harmful for better community engagement.*\n\n"
+                        f"  > *Strive to be less harmful for better community engagement.*\n"
                         f"- {moderation_rate_comparison}. "
                         f"*Aim for minimal moderation, below global average.*"
                     ),
