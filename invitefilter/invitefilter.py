@@ -17,8 +17,11 @@ class InviteFilter(commands.Cog):
             whitelisted_channels=[],
             whitelisted_roles=[],
             logging_channel=None,
-            timeout_duration=10,
+            timeout_duration=1,  # Default to 1 minute
             invites_deleted=0
+        )
+        self.config.register_global(
+            total_invites_deleted=0
         )
 
     @commands.Cog.listener()
@@ -40,13 +43,19 @@ class InviteFilter(commands.Cog):
         invite_pattern = r"(?:https?://)?(?:www\.)?(?:discord(?:app)?\.(?:gg|com/invite)|dsc\.gg|discord\.gg|\.gg)/[a-zA-Z0-9]+"
         match = re.search(invite_pattern, message.content)
         if match:
+            actions_taken = []
             try:
                 invite_url = match.group(0)
                 invite = await self.bot.fetch_invite(invite_url)
                 if await self.config.guild(guild).delete_invites():
                     await message.delete()
+                    actions_taken.append("Message deleted")
                     invites_deleted = await self.config.guild(guild).invites_deleted()
                     await self.config.guild(guild).invites_deleted.set(invites_deleted + 1)
+                    total_invites_deleted = await self.config.total_invites_deleted()
+                    await self.config.total_invites_deleted.set(total_invites_deleted + 1)
+                timeout_duration = await self.config.guild(guild).timeout_duration()
+                actions_taken.append(f"Timeout issued for {timeout_duration} minutes")
                 logging_channel_id = await self.config.guild(guild).logging_channel()
                 if logging_channel_id:
                     logging_channel = guild.get_channel(logging_channel_id)
@@ -63,6 +72,8 @@ class InviteFilter(commands.Cog):
                         embed.add_field(name="Server ID", value=invite.guild.id, inline=True)
                         embed.add_field(name="Member count", value=invite.approximate_member_count, inline=True)
                         embed.add_field(name="Online now", value=invite.approximate_presence_count, inline=True)
+                        if actions_taken:
+                            embed.add_field(name="Actions Taken", value=", ".join(actions_taken), inline=False)
                         await logging_channel.send(embed=embed)
             except discord.Forbidden:
                 pass
@@ -145,14 +156,24 @@ class InviteFilter(commands.Cog):
         """Set the timeout duration for message deletions."""
         guild = ctx.guild
         await self.config.guild(guild).timeout_duration.set(duration)
-        await ctx.send(f"Timeout duration set to {duration} seconds.")
+        await ctx.send(f"Timeout duration set to {duration} minutes.")
 
     @invitefilter.command()
     async def stats(self, ctx):
-        """Display the number of invites deleted."""
+        """Display the number of invites deleted and the timeout duration."""
         guild = ctx.guild
         invites_deleted = await self.config.guild(guild).invites_deleted()
-        await ctx.send(f"Total invites deleted: {invites_deleted}")
+        timeout_duration = await self.config.guild(guild).timeout_duration()
+        total_invites_deleted = await self.config.total_invites_deleted()
+        
+        embed = discord.Embed(title="Invite filter stats", color=0xfffffe)
+        embed.add_field(name="In this server", value="", inline=False)
+        embed.add_field(name="Invites deleted", value=str(invites_deleted), inline=True)
+        embed.add_field(name="Time user's spent timed out", value=f"{timeout_duration} minutes", inline=False)
+        embed.add_field(name="In all servers", value="", inline=False)
+        embed.add_field(name="Invites deleted", value=str(total_invites_deleted), inline=False)
+        
+        await ctx.send(embed=embed)
 
     @invitefilter.command()
     async def settings(self, ctx):
@@ -168,12 +189,12 @@ class InviteFilter(commands.Cog):
         whitelisted_roles_names = [guild.get_role(role_id).name for role_id in whitelisted_roles if guild.get_role(role_id)]
         logging_channel_mention = guild.get_channel(logging_channel_id).mention if logging_channel_id and guild.get_channel(logging_channel_id) else "None"
 
-        embed = discord.Embed(title="Invite Filter Settings", color=discord.Color.green())
-        embed.add_field(name="Delete Invites", value="Enabled" if delete_invites else "Disabled", inline=False)
-        embed.add_field(name="Whitelisted Channels", value=", ".join(whitelisted_channels_mentions) or "None", inline=False)
-        embed.add_field(name="Whitelisted Roles", value=", ".join(whitelisted_roles_names) or "None", inline=False)
-        embed.add_field(name="Logging Channel", value=logging_channel_mention, inline=False)
-        embed.add_field(name="Timeout Duration", value=f"{timeout_duration} seconds", inline=False)
+        embed = discord.Embed(title="Invite filter settings", color=discord.Color.green())
+        embed.add_field(name="Delete messages that contain invites", value=":white_check_mark: Enabled" if delete_invites else ":x: Disabled", inline=False)
+        embed.add_field(name="Currently whitelisted channels", value=", ".join(whitelisted_channels_mentions) or "None", inline=False)
+        embed.add_field(name="Currently whitelisted roles", value=", ".join(whitelisted_roles_names) or "None", inline=False)
+        embed.add_field(name="Logging channel", value=logging_channel_mention, inline=False)
+        embed.add_field(name="Length of timeouts", value=f"{timeout_duration} minutes", inline=False)
 
         await ctx.send(embed=embed)
 
