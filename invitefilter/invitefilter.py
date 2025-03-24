@@ -90,7 +90,17 @@ class InviteFilter(commands.Cog):
 
     @invitefilter.command()
     async def whitelist(self, ctx, target: discord.TextChannel = None, role: discord.Role = None):
-        """Add or remove a channel or role from the invite filter whitelist."""
+        """
+        Add or remove a channel or role from the invite filter whitelist.
+
+        Usage:
+        - To add a channel to the whitelist: `[p]invitefilter whitelist #channel`
+        - To remove a channel from the whitelist: `[p]invitefilter whitelist #channel`
+        - To add a role to the whitelist: `[p]invitefilter whitelist @role`
+        - To remove a role from the whitelist: `[p]invitefilter whitelist @role`
+
+        If the specified channel or role is already whitelisted, it will be removed. Otherwise, it will be added.
+        """
         guild = ctx.guild
         changelog = []
 
