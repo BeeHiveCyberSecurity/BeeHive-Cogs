@@ -1,0 +1,15 @@
+{
+    "author": ["movelaterally"],
+    "description": "Discord invite/advertising detection & control. Automatically delete, issue timeouts, and more to those who advertise in your server.",
+    "install_msg": "Thank you for installing InviteFilter. Use `[p]help invitefilter` to get started.",
+    "end_user_data_statement": "This cog stores server-specific configuration data such as invite settings and statistics.",
+    "name": "InviteFilter",
+    "short": "Detect and remove Discord invites.",
+    "permissions": [
+        "manage_messages",
+        "embed_links"
+    ],
+    "min_bot_version": "3.4.0",
+    "requirements": []
+}
+
