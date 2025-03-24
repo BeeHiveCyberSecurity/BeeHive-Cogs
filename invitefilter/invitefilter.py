@@ -53,7 +53,7 @@ class InviteFilter(commands.Cog):
                     if logging_channel:
                         embed = discord.Embed(
                             title="💬 Invite Filtration",
-                            description="A potentially unwanted invite was detected"
+                            description="A potentially unwanted invite was detected",
                             color=0xff4545
                         )
                         embed.add_field(name="Channel", value=message.channel.mention, inline=True)
