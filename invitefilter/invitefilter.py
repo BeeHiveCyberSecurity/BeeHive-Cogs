@@ -52,7 +52,7 @@ class InviteFilter(commands.Cog):
                     logging_channel = guild.get_channel(logging_channel_id)
                     if logging_channel:
                         embed = discord.Embed(
-                            title="💬 Invite Filtration",
+                            title="💬 Invite filtration",
                             description="A potentially unwanted invite was detected",
                             color=0xff4545
                         )
