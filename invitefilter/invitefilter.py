@@ -43,12 +43,6 @@ class InviteFilter(commands.Cog):
             try:
                 invite_url = match.group(0)
                 invite = await self.bot.fetch_invite(invite_url)
-                server_info = (
-                    f"Server Name: {invite.guild.name}\n"
-                    f"Server ID: {invite.guild.id}\n"
-                    f"Member Count: {invite.approximate_member_count}\n"
-                    f"Online Members: {invite.approximate_presence_count}\n"
-                )
                 if await self.config.guild(guild).delete_invites():
                     await message.delete()
                     invites_deleted = await self.config.guild(guild).invites_deleted()
@@ -58,11 +52,17 @@ class InviteFilter(commands.Cog):
                     logging_channel = guild.get_channel(logging_channel_id)
                     if logging_channel:
                         embed = discord.Embed(
-                            title="Invite Detected and Removed",
-                            description=f"Invite detected and removed from {message.channel.mention} by {message.author.mention}.",
-                            color=discord.Color.red()
+                            title="💬 Invite Filtration",
+                            description="A potentially unwanted invite was detected"
+                            color=0xff4545
                         )
-                        embed.add_field(name="Server Information", value=server_info, inline=False)
+                        embed.add_field(name="Channel", value=message.channel.mention, inline=True)
+                        embed.add_field(name="User", value=message.author.mention, inline=True)
+                        embed.add_field(name="Invite", value=invite_url, inline=False)
+                        embed.add_field(name="Server name", value=invite.guild.name, inline=True)
+                        embed.add_field(name="Server ID", value=invite.guild.id, inline=True)
+                        embed.add_field(name="Member count", value=invite.approximate_member_count, inline=True)
+                        embed.add_field(name="Online now", value=invite.approximate_presence_count, inline=True)
                         await logging_channel.send(embed=embed)
             except discord.Forbidden:
                 pass
