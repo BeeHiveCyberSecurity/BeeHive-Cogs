@@ -2,4 +2,4 @@ from .invitefilter import InviteFilter
 
 async def setup(bot):
     cog = InviteFilter(bot)
-    bot.add_cog(cog)
+    await bot.add_cog(cog)
