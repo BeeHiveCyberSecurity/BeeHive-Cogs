@@ -69,10 +69,10 @@ class InviteFilter(commands.Cog):
 
     @commands.guild_only()
     @commands.admin_or_permissions(manage_guild=True)
-    @commands.group()
+    @commands.group(invoke_without_command=True)
     async def invitefilter(self, ctx):
         """Manage the invite filter settings."""
-        pass
+        await ctx.send_help(ctx.command)
 
     @invitefilter.command()
     async def toggle(self, ctx):
