@@ -15,6 +15,7 @@ class InviteFilter(commands.Cog):
         self.config.register_guild(
             delete_invites=True,
             whitelisted_channels=[],
+            whitelisted_roles=[],
             logging_channel=None,
             timeout_duration=10,
             invites_deleted=0
@@ -30,6 +31,9 @@ class InviteFilter(commands.Cog):
             return
 
         if message.channel.id in await self.config.guild(guild).whitelisted_channels():
+            return
+
+        if any(role.id in await self.config.guild(guild).whitelisted_roles() for role in message.author.roles):
             return
 
         # Enhanced invite pattern to catch variations like ".gg/server"
@@ -85,20 +89,30 @@ class InviteFilter(commands.Cog):
         await ctx.send(f"Invite filter {status}.")
 
     @invitefilter.command()
-    async def whitelist(self, ctx, channel: discord.TextChannel):
-        """Add or remove a channel from the invite filter whitelist."""
+    async def whitelist(self, ctx, target: discord.TextChannel = None, role: discord.Role = None):
+        """Add or remove a channel or role from the invite filter whitelist."""
         guild = ctx.guild
-        whitelisted_channels = await self.config.guild(guild).whitelisted_channels()
         changelog = []
 
-        if channel.id in whitelisted_channels:
-            whitelisted_channels.remove(channel.id)
-            changelog.append(f"Removed: {channel.mention}")
-        else:
-            whitelisted_channels.append(channel.id)
-            changelog.append(f"Added: {channel.mention}")
+        if target:
+            whitelisted_channels = await self.config.guild(guild).whitelisted_channels()
+            if target.id in whitelisted_channels:
+                whitelisted_channels.remove(target.id)
+                changelog.append(f"Removed channel: {target.mention}")
+            else:
+                whitelisted_channels.append(target.id)
+                changelog.append(f"Added channel: {target.mention}")
+            await self.config.guild(guild).whitelisted_channels.set(whitelisted_channels)
 
-        await self.config.guild(guild).whitelisted_channels.set(whitelisted_channels)
+        if role:
+            whitelisted_roles = await self.config.guild(guild).whitelisted_roles()
+            if role.id in whitelisted_roles:
+                whitelisted_roles.remove(role.id)
+                changelog.append(f"Removed role: {role.name}")
+            else:
+                whitelisted_roles.append(role.id)
+                changelog.append(f"Added role: {role.name}")
+            await self.config.guild(guild).whitelisted_roles.set(whitelisted_roles)
 
         if changelog:
             changelog_message = "\n".join(changelog)
@@ -132,15 +146,18 @@ class InviteFilter(commands.Cog):
         guild = ctx.guild
         delete_invites = await self.config.guild(guild).delete_invites()
         whitelisted_channels = await self.config.guild(guild).whitelisted_channels()
+        whitelisted_roles = await self.config.guild(guild).whitelisted_roles()
         logging_channel_id = await self.config.guild(guild).logging_channel()
         timeout_duration = await self.config.guild(guild).timeout_duration()
 
         whitelisted_channels_mentions = [guild.get_channel(ch_id).mention for ch_id in whitelisted_channels if guild.get_channel(ch_id)]
+        whitelisted_roles_names = [guild.get_role(role_id).name for role_id in whitelisted_roles if guild.get_role(role_id)]
         logging_channel_mention = guild.get_channel(logging_channel_id).mention if logging_channel_id and guild.get_channel(logging_channel_id) else "None"
 
         embed = discord.Embed(title="Invite Filter Settings", color=discord.Color.green())
         embed.add_field(name="Delete Invites", value="Enabled" if delete_invites else "Disabled", inline=False)
         embed.add_field(name="Whitelisted Channels", value=", ".join(whitelisted_channels_mentions) or "None", inline=False)
+        embed.add_field(name="Whitelisted Roles", value=", ".join(whitelisted_roles_names) or "None", inline=False)
         embed.add_field(name="Logging Channel", value=logging_channel_mention, inline=False)
         embed.add_field(name="Timeout Duration", value=f"{timeout_duration} seconds", inline=False)
 
