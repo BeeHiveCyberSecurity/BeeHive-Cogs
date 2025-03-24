@@ -88,45 +88,45 @@ class InviteFilter(commands.Cog):
         status = "enabled" if new_status else "disabled"
         await ctx.send(f"Invite filter {status}.")
 
-    @invitefilter.command()
-    async def whitelist(self, ctx, target: discord.TextChannel = None, role: discord.Role = None):
-        """
-        Add or remove a channel or role from the invite filter whitelist.
+    @invitefilter.group(invoke_without_command=True)
+    async def whitelist(self, ctx):
+        """Manage the invite filter whitelist."""
+        await ctx.send_help(ctx.command)
 
-        Usage:
-        - To add a channel to the whitelist: `[p]invitefilter whitelist #channel`
-        - To remove a channel from the whitelist: `[p]invitefilter whitelist #channel`
-        - To add a role to the whitelist: `[p]invitefilter whitelist @role`
-        - To remove a role from the whitelist: `[p]invitefilter whitelist @role`
-
-        If the specified channel or role is already whitelisted, it will be removed. Otherwise, it will be added.
-        """
-        if not target and not role:
-            await ctx.send_help(ctx.command)
-            return
-
+    @whitelist.command(name="channel")
+    async def whitelist_channel(self, ctx, target: discord.TextChannel):
+        """Add or remove a channel from the invite filter whitelist."""
         guild = ctx.guild
+        whitelisted_channels = await self.config.guild(guild).whitelisted_channels()
         changelog = []
 
-        if target:
-            whitelisted_channels = await self.config.guild(guild).whitelisted_channels()
-            if target.id in whitelisted_channels:
-                whitelisted_channels.remove(target.id)
-                changelog.append(f"Removed channel: {target.mention}")
-            else:
-                whitelisted_channels.append(target.id)
-                changelog.append(f"Added channel: {target.mention}")
-            await self.config.guild(guild).whitelisted_channels.set(whitelisted_channels)
+        if target.id in whitelisted_channels:
+            whitelisted_channels.remove(target.id)
+            changelog.append(f"Removed channel: {target.mention}")
+        else:
+            whitelisted_channels.append(target.id)
+            changelog.append(f"Added channel: {target.mention}")
+        await self.config.guild(guild).whitelisted_channels.set(whitelisted_channels)
 
-        if role:
-            whitelisted_roles = await self.config.guild(guild).whitelisted_roles()
-            if role.id in whitelisted_roles:
-                whitelisted_roles.remove(role.id)
-                changelog.append(f"Removed role: {role.name}")
-            else:
-                whitelisted_roles.append(role.id)
-                changelog.append(f"Added role: {role.name}")
-            await self.config.guild(guild).whitelisted_roles.set(whitelisted_roles)
+        if changelog:
+            changelog_message = "\n".join(changelog)
+            embed = discord.Embed(title="Whitelist Changelog", description=changelog_message, color=discord.Color.blue())
+            await ctx.send(embed=embed)
+
+    @whitelist.command(name="role")
+    async def whitelist_role(self, ctx, role: discord.Role):
+        """Add or remove a role from the invite filter whitelist."""
+        guild = ctx.guild
+        whitelisted_roles = await self.config.guild(guild).whitelisted_roles()
+        changelog = []
+
+        if role.id in whitelisted_roles:
+            whitelisted_roles.remove(role.id)
+            changelog.append(f"Removed role: {role.name}")
+        else:
+            whitelisted_roles.append(role.id)
+            changelog.append(f"Added role: {role.name}")
+        await self.config.guild(guild).whitelisted_roles.set(whitelisted_roles)
 
         if changelog:
             changelog_message = "\n".join(changelog)
