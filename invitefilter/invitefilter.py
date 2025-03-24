@@ -101,6 +101,10 @@ class InviteFilter(commands.Cog):
 
         If the specified channel or role is already whitelisted, it will be removed. Otherwise, it will be added.
         """
+        if not target and not role:
+            await ctx.send_help(ctx.command)
+            return
+
         guild = ctx.guild
         changelog = []
 
