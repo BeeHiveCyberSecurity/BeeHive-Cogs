@@ -69,7 +69,7 @@ class InviteFilter(commands.Cog):
 
     @commands.guild_only()
     @commands.admin_or_permissions(manage_guild=True)
-    @commands.group(invoke_without_command=True)
+    @commands.group(invoke_without_command=True, aliases=["if"])
     async def invitefilter(self, ctx):
         """Manage the invite filter settings."""
         await ctx.send_help(ctx.command)
@@ -106,14 +106,14 @@ class InviteFilter(commands.Cog):
             await ctx.send(embed=embed)
 
     @invitefilter.command()
-    async def setlogchannel(self, ctx, channel: discord.TextChannel):
+    async def logs(self, ctx, channel: discord.TextChannel):
         """Set the logging channel for invite detections."""
         guild = ctx.guild
         await self.config.guild(guild).logging_channel.set(channel.id)
         await ctx.send(f"Logging channel set to {channel.mention}.")
 
     @invitefilter.command()
-    async def settimeout(self, ctx, duration: int):
+    async def timeout(self, ctx, duration: int):
         """Set the timeout duration for message deletions."""
         guild = ctx.guild
         await self.config.guild(guild).timeout_duration.set(duration)
