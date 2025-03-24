@@ -344,7 +344,6 @@ class Omni(commands.Cog):
         self.memory_category_counter.clear()
 
     @commands.guild_only()
-    @commands.admin_or_permissions(manage_guild=True)
     @commands.group()
     async def omni(self, ctx):
         """
