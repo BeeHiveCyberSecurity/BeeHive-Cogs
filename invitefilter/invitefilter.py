@@ -36,7 +36,8 @@ class InviteFilter(commands.Cog):
         if message.channel.id in await self.config.guild(guild).whitelisted_channels():
             return
 
-        if any(role.id in await self.config.guild(guild).whitelisted_roles() for role in message.author.roles):
+        whitelisted_roles = await self.config.guild(guild).whitelisted_roles()
+        if any(role.id in whitelisted_roles for role in message.author.roles):
             return
 
         # Enhanced invite pattern to catch variations like ".gg/server"
