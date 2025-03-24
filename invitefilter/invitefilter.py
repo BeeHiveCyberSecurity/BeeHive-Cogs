@@ -169,7 +169,7 @@ class InviteFilter(commands.Cog):
         embed = discord.Embed(title="Invite filter stats", color=0xfffffe)
         embed.add_field(name="In this server", value="", inline=False)
         embed.add_field(name="Invites deleted", value=str(invites_deleted), inline=True)
-        embed.add_field(name="Time user's spent timed out", value=f"{timeout_duration} minutes", inline=False)
+        embed.add_field(name="Time users spent timed out", value=f"{timeout_duration} minutes", inline=False)
         embed.add_field(name="In all servers", value="", inline=False)
         embed.add_field(name="Invites deleted", value=str(total_invites_deleted), inline=False)
         
