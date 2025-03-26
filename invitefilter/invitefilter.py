@@ -51,10 +51,13 @@ class InviteFilter(commands.Cog):
                 if await self.config.guild(guild).delete_invites():
                     await message.delete()
                     actions_taken.append("Message deleted")
-                    invites_deleted = await self.config.guild(guild).invites_deleted()
-                    await self.config.guild(guild).invites_deleted.set(invites_deleted + 1)
-                    total_invites_deleted = await self.config.total_invites_deleted()
-                    await self.config.total_invites_deleted.set(total_invites_deleted + 1)
+                    # Increment the guild-specific and global invite deletion counters
+                    await self.config.guild(guild).invites_deleted.set(
+                        await self.config.guild(guild).invites_deleted() + 1
+                    )
+                    await self.config.total_invites_deleted.set(
+                        await self.config.total_invites_deleted() + 1
+                    )
                 timeout_duration = await self.config.guild(guild).timeout_duration()
                 actions_taken.append(f"Timeout issued for {timeout_duration} minutes")
                 logging_channel_id = await self.config.guild(guild).logging_channel()
