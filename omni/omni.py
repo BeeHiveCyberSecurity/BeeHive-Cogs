@@ -40,6 +40,8 @@ class Omni(commands.Cog):
             moderated_users={},
             category_counter={},
             whitelisted_channels=[],
+            whitelisted_roles=[],
+            whitelisted_users=[],
             moderation_enabled=True,
             user_message_counts={},
             image_count=0,
@@ -102,6 +104,12 @@ class Omni(commands.Cog):
                 return
 
             if message.channel.id in await self.config.guild(guild).whitelisted_channels():
+                return
+
+            if any(role.id in await self.config.guild(guild).whitelisted_roles() for role in message.author.roles):
+                return
+
+            if message.author.id in await self.config.guild(guild).whitelisted_users():
                 return
 
             self.increment_statistic(guild.id, 'message_count')
@@ -513,12 +521,16 @@ class Omni(commands.Cog):
             log_channel_id = await self.config.guild(guild).log_channel()
             debug_mode = await self.config.guild(guild).debug_mode()
             whitelisted_channels = await self.config.guild(guild).whitelisted_channels()
+            whitelisted_roles = await self.config.guild(guild).whitelisted_roles()
+            whitelisted_users = await self.config.guild(guild).whitelisted_users()
             moderation_enabled = await self.config.guild(guild).moderation_enabled()
             delete_violatory_messages = await self.config.guild(guild).delete_violatory_messages()
 
             log_channel = guild.get_channel(log_channel_id) if log_channel_id else None
             log_channel_name = log_channel.mention if log_channel else "Not set"
             whitelisted_channels_names = ", ".join([guild.get_channel(ch_id).mention for ch_id in whitelisted_channels if guild.get_channel(ch_id)]) or "None"
+            whitelisted_roles_names = ", ".join([guild.get_role(role_id).mention for role_id in whitelisted_roles if guild.get_role(role_id)]) or "None"
+            whitelisted_users_names = ", ".join([f"<@{user_id}>" for user_id in whitelisted_users]) or "None"
 
             embed = discord.Embed(title="Current Omni Settings", color=discord.Color.green())
             embed.add_field(name="Moderation Threshold", value=str(moderation_threshold), inline=True)
@@ -526,6 +538,8 @@ class Omni(commands.Cog):
             embed.add_field(name="Log Channel", value=log_channel_name, inline=True)
             embed.add_field(name="Debug Mode", value="Enabled" if debug_mode else "Disabled", inline=True)
             embed.add_field(name="Whitelisted Channels", value=whitelisted_channels_names, inline=False)
+            embed.add_field(name="Whitelisted Roles", value=whitelisted_roles_names, inline=False)
+            embed.add_field(name="Whitelisted Users", value=whitelisted_users_names, inline=False)
             embed.add_field(name="Moderation Enabled", value="Yes" if moderation_enabled else "No", inline=True)
             embed.add_field(name="Delete Violatory Messages", value="Yes" if delete_violatory_messages else "No", inline=True)
 
@@ -788,9 +802,14 @@ class Omni(commands.Cog):
         except Exception as e:
             raise RuntimeError(f"Failed to set log channel: {e}")
 
-    @omni.command()
+    @omni.group()
     @commands.admin_or_permissions(manage_guild=True)
-    async def whitelist(self, ctx, channel: discord.TextChannel):
+    async def whitelist(self, ctx):
+        """Manage whitelists for channels, roles, and users."""
+        pass
+
+    @whitelist.command(name="channel")
+    async def whitelist_channel(self, ctx, channel: discord.TextChannel):
         """Add or remove a channel from the whitelist."""
         try:
             guild = ctx.guild
@@ -811,7 +830,55 @@ class Omni(commands.Cog):
                 embed = discord.Embed(title="Whitelist Changelog", description=changelog_message, color=discord.Color.blue())
                 await ctx.send(embed=embed)
         except Exception as e:
-            raise RuntimeError(f"Failed to update whitelist: {e}")
+            raise RuntimeError(f"Failed to update channel whitelist: {e}")
+
+    @whitelist.command(name="role")
+    async def whitelist_role(self, ctx, role: discord.Role):
+        """Add or remove a role from the whitelist."""
+        try:
+            guild = ctx.guild
+            whitelisted_roles = await self.config.guild(guild).whitelisted_roles()
+            changelog = []
+
+            if role.id in whitelisted_roles:
+                whitelisted_roles.remove(role.id)
+                changelog.append(f"Removed: {role.mention}")
+            else:
+                whitelisted_roles.append(role.id)
+                changelog.append(f"Added: {role.mention}")
+
+            await self.config.guild(guild).whitelisted_roles.set(whitelisted_roles)
+
+            if changelog:
+                changelog_message = "\n".join(changelog)
+                embed = discord.Embed(title="Whitelist Changelog", description=changelog_message, color=discord.Color.blue())
+                await ctx.send(embed=embed)
+        except Exception as e:
+            raise RuntimeError(f"Failed to update role whitelist: {e}")
+
+    @whitelist.command(name="user")
+    async def whitelist_user(self, ctx, user: discord.User):
+        """Add or remove a user from the whitelist."""
+        try:
+            guild = ctx.guild
+            whitelisted_users = await self.config.guild(guild).whitelisted_users()
+            changelog = []
+
+            if user.id in whitelisted_users:
+                whitelisted_users.remove(user.id)
+                changelog.append(f"Removed: {user.mention}")
+            else:
+                whitelisted_users.append(user.id)
+                changelog.append(f"Added: {user.mention}")
+
+            await self.config.guild(guild).whitelisted_users.set(whitelisted_users)
+
+            if changelog:
+                changelog_message = "\n".join(changelog)
+                embed = discord.Embed(title="Whitelist Changelog", description=changelog_message, color=discord.Color.blue())
+                await ctx.send(embed=embed)
+        except Exception as e:
+            raise RuntimeError(f"Failed to update user whitelist: {e}")
 
     @omni.command(hidden=True)
     @commands.is_owner()
