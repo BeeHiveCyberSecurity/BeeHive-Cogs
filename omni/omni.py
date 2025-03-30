@@ -106,7 +106,8 @@ class Omni(commands.Cog):
             if message.channel.id in await self.config.guild(guild).whitelisted_channels():
                 return
 
-            if any(role.id in await self.config.guild(guild).whitelisted_roles() for role in message.author.roles):
+            whitelisted_roles = await self.config.guild(guild).whitelisted_roles()
+            if any(role.id in whitelisted_roles for role in message.author.roles):
                 return
 
             if message.author.id in await self.config.guild(guild).whitelisted_users():
