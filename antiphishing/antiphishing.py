@@ -2,7 +2,7 @@ import contextlib
 import datetime
 import re
 from typing import List, Optional, Dict, Any
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlsplit, urlunsplit
 import aiohttp  # type: ignore
 import discord  # type: ignore
 from discord.ext import tasks  # type: ignore
@@ -10,10 +10,6 @@ from redbot.core import Config, commands  # type: ignore
 from redbot.core.bot import Red  # type: ignore
 from redbot.core.commands import Context  # type: ignore
 import tldextract
-
-URL_REGEX_PATTERN = re.compile(
-    r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,6}\b)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
-)
 
 class AntiPhishing(commands.Cog):
     """
@@ -61,9 +57,18 @@ class AntiPhishing(commands.Cog):
     
     def extract_urls(self, message: str) -> List[str]:
         """
-        Extract URLs from a message.
+        Extract URLs from a message using urlsplit for more robust parsing.
         """
-        return [match[0] for match in URL_REGEX_PATTERN.findall(message)]
+        urls = []
+        words = message.split()
+        for word in words:
+            try:
+                result = urlsplit(word)
+                if result.scheme in {"http", "https"} and result.netloc:
+                    urls.append(urlunsplit(result))
+            except ValueError:
+                continue
+        return urls
 
     def get_links(self, message: str) -> Optional[List[str]]:
         """
