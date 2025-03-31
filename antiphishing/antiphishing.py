@@ -9,7 +9,7 @@ from discord.ext import tasks  # type: ignore
 from redbot.core import Config, commands  # type: ignore
 from redbot.core.bot import Red  # type: ignore
 from redbot.core.commands import Context  # type: ignore
-import tldextract
+import tldextract  # type: ignore
 
 class AntiPhishing(commands.Cog):
     """
@@ -396,9 +396,9 @@ class AntiPhishing(commands.Cog):
             "timeout": self._timeout_action
         }
         if action in action_methods:
-            await action_methods[action](message, redirect_chain)
+            await action_methods[action](message, domain, redirect_chain)
 
-    async def _notify_action(self, message: discord.Message, redirect_chain: List[str]):
+    async def _notify_action(self, message: discord.Message, domain: str, redirect_chain: List[str]):
         if message.channel.permissions_for(message.guild.me).send_messages:
             with contextlib.suppress(discord.NotFound):
                 mod_roles = await self.bot.get_mod_roles(message.guild)
@@ -443,7 +443,7 @@ class AntiPhishing(commands.Cog):
                 redirect_chain_status.append(f"{url} (Unknown)")
         return redirect_chain_status
 
-    async def _delete_action(self, message: discord.Message):
+    async def _delete_action(self, message: discord.Message, domain: str, redirect_chain: List[str]):
         if message.channel.permissions_for(message.guild.me).manage_messages:
             with contextlib.suppress(discord.NotFound):
                 await message.delete()
@@ -451,7 +451,7 @@ class AntiPhishing(commands.Cog):
             deletions = await self.config.guild(message.guild).deletions()
             await self.config.guild(message.guild).deletions.set(deletions + 1)
 
-    async def _kick_action(self, message: discord.Message):
+    async def _kick_action(self, message: discord.Message, domain: str, redirect_chain: List[str]):
         if (
             message.channel.permissions_for(message.guild.me).kick_members
             and message.channel.permissions_for(message.guild.me).manage_messages
@@ -469,7 +469,7 @@ class AntiPhishing(commands.Cog):
             kicks = await self.config.guild(message.guild).kicks()
             await self.config.guild(message.guild).kicks.set(kicks + 1)
 
-    async def _ban_action(self, message: discord.Message):
+    async def _ban_action(self, message: discord.Message, domain: str, redirect_chain: List[str]):
         if (
             message.channel.permissions_for(message.guild.me).ban_members
             and message.channel.permissions_for(message.guild.me).manage_messages
@@ -487,7 +487,7 @@ class AntiPhishing(commands.Cog):
             bans = await self.config.guild(message.guild).bans()
             await self.config.guild(message.guild).bans.set(bans + 1)
 
-    async def _timeout_action(self, message: discord.Message):
+    async def _timeout_action(self, message: discord.Message, domain: str, redirect_chain: List[str]):
         if message.channel.permissions_for(message.guild.me).moderate_members:
             with contextlib.suppress(discord.NotFound):
                 await message.delete()

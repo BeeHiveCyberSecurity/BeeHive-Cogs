@@ -1,5 +1,5 @@
 import discord
-from redbot.core import commands, Config
+from redbot.core import commands, Config # type: ignore
 import re
 import datetime  # Added for timedelta
 
