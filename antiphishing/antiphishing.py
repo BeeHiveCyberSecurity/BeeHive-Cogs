@@ -1,7 +1,7 @@
 import contextlib
 import datetime
 import re
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 from urllib.parse import urlparse
 import aiohttp  # type: ignore
 import discord  # type: ignore
@@ -30,6 +30,7 @@ class AntiPhishing(commands.Cog):
         self._initialize_config()
         self.session = aiohttp.ClientSession()
         self.domains = []
+        self.domains_v2 = {}
         self.bot.loop.create_task(self.get_phishing_domains())
 
     def _initialize_config(self):
@@ -203,7 +204,7 @@ class AntiPhishing(commands.Cog):
             guild_data.get('bans', 0),
             guild_data.get('timeouts', 0)
         )
-        total_domains = len(self.domains)
+        total_domains = len(self.domains) + len(self.domains_v2)
         
         embed = discord.Embed(
             title='Link safety statistics', 
@@ -265,16 +266,18 @@ class AntiPhishing(commands.Cog):
     @tasks.loop(minutes=15)
     async def get_phishing_domains(self) -> None:
         domains = set()
+        domains_v2 = {}
 
         headers = {
             "X-Identity": f"BeeHive AntiPhishing v{self.__version__} (https://www.beehive.systems/)",
             "User-Agent": f"BeeHive AntiPhishing v{self.__version__} (https://www.beehive.systems/)"
         }
 
-        await self._fetch_domains("https://phish.sinking.yachts/v2/all", headers, domains)
         await self._fetch_domains("https://www.beehive.systems/hubfs/blocklist/blocklist.json", headers, domains)
+        await self._fetch_domains_v2("https://www.beehive.systems/hubfs/blocklist/blocklistv2.json", headers, domains_v2)
 
         self.domains = list(domains)
+        self.domains_v2 = domains_v2
 
         # Send "Definitions updated" message to each individual log channel if set
         for guild in self.bot.guilds:
@@ -305,6 +308,23 @@ class AntiPhishing(commands.Cog):
                     print(f"Failed to fetch blocklist from {url}, status code: {request.status}")
         except aiohttp.ClientError as e:
             print(f"Network error while fetching blocklist from {url}: {e}")
+
+    async def _fetch_domains_v2(self, url: str, headers: dict, domains_v2: Dict[str, Any]):
+        try:
+            async with self.session.get(url, headers=headers) as request:
+                if request.status == 200:
+                    try:
+                        data = await request.json()
+                        if isinstance(data, dict):
+                            domains_v2.update(data)
+                        else:
+                            print("Unexpected data format received from blocklist v2.")
+                    except Exception as e:
+                        print(f"Error parsing JSON from {url}: {e}")
+                else:
+                    print(f"Failed to fetch blocklist v2 from {url}, status code: {request.status}")
+        except aiohttp.ClientError as e:
+            print(f"Network error while fetching blocklist v2 from {url}: {e}")
 
     async def follow_redirects(self, url: str) -> List[str]:
         """
@@ -352,6 +372,13 @@ class AntiPhishing(commands.Cog):
         log_embed.add_field(name="User ID", value=f"```{message.author.id}```", inline=False)
         log_embed.add_field(name="Domain", value=f"```{domain}```", inline=False)
         log_embed.add_field(name="Redirects", value=f"```{redirect_chain_str}```", inline=False)
+        
+        # Add additional information if the domain is in the v2 list
+        if domain in self.domains_v2:
+            additional_info = self.domains_v2[domain]
+            formatted_info = "\n".join(f"{key}: {value}" for key, value in additional_info.items())
+            log_embed.add_field(name="Additional Info", value=f"```{formatted_info}```", inline=False)
+        
         staff_mention = f"<@&{staff_role_id}>" if staff_role_id else ""
         await log_channel.send(content=staff_mention, embed=log_embed, allowed_mentions=discord.AllowedMentions(roles=True))
 
@@ -397,7 +424,7 @@ class AntiPhishing(commands.Cog):
             try:
                 extracted = tldextract.extract(url)
                 domain = f"{extracted.domain}.{extracted.suffix}"
-                status = "Malicious" if domain in self.domains else "Unknown"
+                status = "Malicious" if domain in self.domains or domain in self.domains_v2 else "Unknown"
                 redirect_chain_status.append(f"{url} ({status})")
             except IndexError:
                 print(f"Error extracting domain from URL: {url}")
@@ -504,7 +531,7 @@ class AntiPhishing(commands.Cog):
             for domain_url in domains_to_check:
                 extracted = tldextract.extract(domain_url)
                 domain = f"{extracted.domain}.{extracted.suffix}".lower()  # Ensure domain comparison is case-insensitive
-                if any(domain == blocked_domain.lower() for blocked_domain in self.domains):  # Compare against lowercased domains
+                if any(domain == blocked_domain.lower() for blocked_domain in self.domains + list(self.domains_v2.keys())):  # Compare against lowercased domains
                     await self.handle_phishing(message, domain, domains_to_check)
                     return
 
