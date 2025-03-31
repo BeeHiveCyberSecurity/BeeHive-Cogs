@@ -410,6 +410,13 @@ class AntiPhishing(commands.Cog):
                 )
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/warning.png")
                 embed.timestamp = datetime.datetime.utcnow()
+                
+                # Add additional information if the domain is in the v2 list
+                if domain in self.domains_v2:
+                    additional_info = self.domains_v2[domain]
+                    formatted_info = "\n".join(f"{key}: {value}" for key, value in additional_info.items())
+                    embed.add_field(name="Additional Info", value=f"```{formatted_info}```", inline=False)
+                
                 if mod_mentions:
                     await message.channel.send(content=mod_mentions, embed=embed, allowed_mentions=discord.AllowedMentions(roles=True))
                 else:
