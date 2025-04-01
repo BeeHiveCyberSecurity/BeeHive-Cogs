@@ -2,7 +2,7 @@ import contextlib
 import datetime
 import re
 from typing import List, Optional, Dict, Any
-from urllib.parse import urlparse, urlsplit, urlunsplit
+from urllib.parse import urlsplit, urlunsplit
 import aiohttp  # type: ignore
 import discord  # type: ignore
 from discord.ext import tasks  # type: ignore
@@ -25,7 +25,7 @@ class AntiPhishing(commands.Cog):
         self.config = Config.get_conf(self, identifier=73836)
         self._initialize_config()
         self.session = aiohttp.ClientSession()
-        self.domains = []
+        self.domains = set()
         self.domains_v2 = {}
         self.bot.loop.create_task(self.get_phishing_domains())
 
@@ -49,7 +49,7 @@ class AntiPhishing(commands.Cog):
         self.bot.loop.create_task(self.session.close())
 
     async def red_delete_data_for_user(self, **kwargs):
-        return
+        pass
 
     def format_help_for_context(self, ctx: Context) -> str:
         pre_processed = super().format_help_for_context(ctx)
@@ -60,8 +60,7 @@ class AntiPhishing(commands.Cog):
         Extract URLs from a message using urlsplit for more robust parsing.
         """
         urls = []
-        words = message.split()
-        for word in words:
+        for word in message.split():
             try:
                 result = urlsplit(word)
                 if result.scheme in {"http", "https"} and result.netloc:
@@ -77,10 +76,8 @@ class AntiPhishing(commands.Cog):
         zero_width_chars = ["\u200b", "\u200c", "\u200d", "\u2060", "\uFEFF"]
         for char in zero_width_chars:
             message = message.replace(char, "")
-        if message:
-            links = self.extract_urls(message)
-            return list(set(links)) if links else None
-        return None
+        links = self.extract_urls(message)
+        return list(set(links)) if links else None
 
     @commands.group()
     @commands.guild_only()
@@ -100,8 +97,8 @@ class AntiPhishing(commands.Cog):
         await ctx.send(embed=embed)
 
     def _create_settings_embed(self, guild_data: dict) -> discord.Embed:
-        log_channel_id = guild_data.get('log_channel', None)
-        staff_role_id = guild_data.get('staff_role', None)
+        log_channel_id = guild_data.get('log_channel')
+        staff_role_id = guild_data.get('staff_role')
         log_channel_status = f"<#{log_channel_id}>" if log_channel_id else "Not Set"
         staff_role_status = f"<@&{staff_role_id}>" if staff_role_id else "Not Set"
         
@@ -129,7 +126,7 @@ class AntiPhishing(commands.Cog):
         **`ban`** - Deletes message and bans sender
         **`timeout`** - Delete message and temporarily time the user out **(Recommended)**
         """
-        valid_actions = ["ignore", "notify", "delete", "kick", "ban", "timeout"]
+        valid_actions = {"ignore", "notify", "delete", "kick", "ban", "timeout"}
         if action not in valid_actions:
             await self._send_invalid_action_embed(ctx)
             return
@@ -281,7 +278,7 @@ class AntiPhishing(commands.Cog):
         await self._fetch_domains("https://www.beehive.systems/hubfs/blocklist/blocklist.json", headers, domains)
         await self._fetch_domains_v2("https://www.beehive.systems/hubfs/blocklist/blocklistv2.json", headers, domains_v2)
 
-        self.domains = list(domains)
+        self.domains = domains
         self.domains_v2 = domains_v2
 
         # Send "Definitions updated" message to each individual log channel if set
@@ -543,7 +540,7 @@ class AntiPhishing(commands.Cog):
             for domain_url in domains_to_check:
                 extracted = tldextract.extract(domain_url)
                 domain = f"{extracted.domain}.{extracted.suffix}".lower()  # Ensure domain comparison is case-insensitive
-                if any(domain == blocked_domain.lower() for blocked_domain in self.domains + list(self.domains_v2.keys())):  # Compare against lowercased domains
+                if domain in self.domains or domain in self.domains_v2:  # Compare against lowercased domains
                     await self.handle_phishing(message, domain, domains_to_check)
                     return
 
