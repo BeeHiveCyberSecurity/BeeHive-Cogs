@@ -1250,12 +1250,6 @@ class Cloudflare(commands.Cog):
                 id_value = f"`{whois_info['id']}`"
                 page = add_field_to_page(page, "ID", id_value)
 
-            if "registrar_city" in whois_info:
-                registrar_city = f"**`{whois_info['registrar_city']}`**"
-                page = add_field_to_page(page, "Registrar City", registrar_city)
-            if "registrar_country" in whois_info:
-                registrar_country = f"**`{whois_info['registrar_country']}`**"
-                page = add_field_to_page(page, "Registrar Country", registrar_country)
             if "registrar_email" in whois_info:
                 registrar_email = f"**`{whois_info['registrar_email']}`**"
                 page = add_field_to_page(page, "Registrar Email", registrar_email)
