@@ -1432,43 +1432,46 @@ class Cloudflare(commands.Cog):
         }
 
         async with self.session.get(url, headers=headers, params=params) as response:
-            if response.status == 200:
-                data = await response.json()
-                if data["success"]:
-                    result = data["result"]
-                    embed = discord.Embed(title=f"Domain intelligence for {result.get('domain', 'N/A')}", color=0xFF6633)
-                    
-                    embed.add_field(name="Domain", value=f"`{result.get('domain', 'N/A')}`", inline=False)
-                    embed.add_field(name="Risk Score", value=f"`{result.get('risk_score', 'N/A')}`", inline=False)
-                    embed.add_field(name="Popularity Rank", value=f"`{result.get('popularity_rank', 'N/A')}`", inline=False)
-                    
-                    application = result.get("application", {})
-                    embed.add_field(name="Application", value=f"`{application.get('name', 'N/A')}`", inline=False)
-                    
-                    additional_info = result.get("additional_information", {})
-                    embed.add_field(name="Suspected Malware Family", value=f"`{additional_info.get('suspected_malware_family', 'N/A')}`", inline=False)
-                    
-                    content_categories = result.get("content_categories", [])
-                    embed.add_field(name="Content Categories", value=", ".join([f"`{cat.get('name', 'N/A')}`" for cat in content_categories]), inline=False)
-                    
-                    resolves_to_refs = result.get("resolves_to_refs", [])
-                    embed.add_field(name="Resolves To", value=", ".join([f"`{ref.get('value', 'N/A')}`" for ref in resolves_to_refs]), inline=False)
-                    
-                    inherited_content_categories = result.get("inherited_content_categories", [])
-                    embed.add_field(name="Inherited Content Categories", value=", ".join([f"`{cat.get('name', 'N/A')}`" for cat in inherited_content_categories]), inline=False)
-                    
-                    embed.add_field(name="Inherited From", value=f"`{result.get('inherited_from', 'N/A')}`", inline=False)
-                    
-                    inherited_risk_types = result.get("inherited_risk_types", [])
-                    embed.add_field(name="Inherited Risk Types", value=", ".join([f"`{risk.get('name', 'N/A')}`" for risk in inherited_risk_types]), inline=False)
-                    
-                    risk_types = result.get("risk_types", [])
-                    embed.add_field(name="Risk Types", value=", ".join([f"`{risk.get('name', 'N/A')}`" for risk in risk_types]), inline=False)
+            data = await response.json()
+            if response.status == 200 and data.get("success", False):
+                result = data.get("result", {})
+                embed = discord.Embed(title=f"Domain intelligence for {result.get('domain', 'N/A')}", color=0xFF6633)
+                
+                embed.add_field(name="Domain", value=f"`{result.get('domain', 'N/A')}`", inline=False)
+                embed.add_field(name="Risk Score", value=f"`{result.get('risk_score', 'N/A')}`", inline=False)
+                embed.add_field(name="Popularity Rank", value=f"`{result.get('popularity_rank', 'N/A')}`", inline=False)
+                
+                application = result.get("application", {})
+                embed.add_field(name="Application", value=f"`{application.get('name', 'N/A')}`", inline=False)
+                
+                additional_info = result.get("additional_information", {})
+                embed.add_field(name="Suspected Malware Family", value=f"`{additional_info.get('suspected_malware_family', 'N/A')}`", inline=False)
+                
+                content_categories = result.get("content_categories", [])
+                embed.add_field(name="Content Categories", value=", ".join([f"`{cat.get('name', 'N/A')}`" for cat in content_categories]), inline=False)
+                
+                resolves_to_refs = result.get("resolves_to_refs", [])
+                embed.add_field(name="Resolves To", value=", ".join([f"`{ref.get('value', 'N/A')}`" for ref in resolves_to_refs]), inline=False)
+                
+                inherited_content_categories = result.get("inherited_content_categories", [])
+                embed.add_field(name="Inherited Content Categories", value=", ".join([f"`{cat.get('name', 'N/A')}`" for cat in inherited_content_categories]), inline=False)
+                
+                embed.add_field(name="Inherited From", value=f"`{result.get('inherited_from', 'N/A')}`", inline=False)
+                
+                inherited_risk_types = result.get("inherited_risk_types", [])
+                embed.add_field(name="Inherited Risk Types", value=", ".join([f"`{risk.get('name', 'N/A')}`" for risk in inherited_risk_types]), inline=False)
+                
+                risk_types = result.get("risk_types", [])
+                embed.add_field(name="Risk Types", value=", ".join([f"`{risk.get('name', 'N/A')}`" for risk in risk_types]), inline=False)
 
-                    # Add blocklist status
-                    blocklist_status = ":white_check_mark: Yes" if is_blocked else ":x: No"
-                    embed.add_field(name="On BeeHive Blocklist", value=f"**{blocklist_status}**", inline=False)
-                    await ctx.send(embed=embed)
+                # Add blocklist status
+                blocklist_status = ":white_check_mark: Yes" if is_blocked else ":x: No"
+                embed.add_field(name="On BeeHive Blocklist", value=f"**{blocklist_status}**", inline=False)
+                await ctx.send(embed=embed)
+            else:
+                error_message = data.get("errors", [{"message": "Unknown error"}])[0].get("message", "Unknown error")
+                error_embed = discord.Embed(title="Error", description=f"Error: {error_message}", color=0xff4545)
+                await ctx.send(embed=error_embed)
                 else:
                     error_embed = discord.Embed(title="Error", description=f"Error: {data['errors']}", color=0xff4545)
                     await ctx.send(embed=error_embed)
@@ -1542,9 +1545,6 @@ class Cloudflare(commands.Cog):
                 else:
                     embed = discord.Embed(title="Error", description=f"Error: {data['errors']}", color=0xff4545)
                     await ctx.send(embed=embed)
-            elif response.status == 400:
-                embed = discord.Embed(title="Bad Request", description="The server could not understand the request due to invalid syntax.", color=0xff4545)
-                await ctx.send(embed=embed)
             else:
                 embed = discord.Embed(title="Failed to query Cloudflare API", description=f"Status code: {response.status}", color=0xff4545)
                 await ctx.send(embed=embed)
