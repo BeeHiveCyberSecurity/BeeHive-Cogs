@@ -1695,17 +1695,17 @@ class Cloudflare(commands.Cog):
                 
                 type_value = belongs_to.get('type')
                 if type_value:
-                    embed.add_field(name="Type", value=f"**`{type_value.upper()}`**", inline=True)
+                    embed.add_field(name="Type", value=f"{type_value.upper()}", inline=True)
                 
                 risk_types = result.get("risk_types", [])
                 if risk_types:
                     risk_types_str = ", ".join([f"**`{risk.get('name', 'N/A')}`**" for risk in risk_types if risk.get('name')])
                     if risk_types_str:
-                        embed.add_field(name="Risk types", value=risk_types_str, inline=False)
+                        embed.add_field(name="Risk types", value=risk_types_str, inline=True)
                 
                 if "ptr_lookup" in result and result["ptr_lookup"] and "ptr_domains" in result["ptr_lookup"] and result["ptr_lookup"]["ptr_domains"]:
-                    ptr_domains = ", ".join([f"{domain}" for domain in result["ptr_lookup"]["ptr_domains"]])
-                    embed.add_field(name="PTR domains", value=ptr_domains, inline=False)
+                    ptr_domains = "\n".join([f"- {domain}" for domain in result["ptr_lookup"]["ptr_domains"]])
+                    embed.add_field(name="PTR domains", value=ptr_domains, inline=True)
                 
                 result_info = data.get("result_info", {})
                 total_count = result_info.get('total_count')
