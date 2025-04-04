@@ -1206,6 +1206,7 @@ class Cloudflare(commands.Cog):
             if "registrar" in whois_info:
                 registrar_value = f"{whois_info['registrar']}"
                 page.add_field(name="Registered with", value=registrar_value, inline=True)
+
             if "created_date" in whois_info:
                 created_date = whois_info["created_date"]
                 if isinstance(created_date, str):
@@ -1217,6 +1218,18 @@ class Cloudflare(commands.Cog):
                 unix_timestamp = int(created_date.replace(hour=0, minute=0, second=0, microsecond=0).timestamp())
                 discord_timestamp = f"<t:{unix_timestamp}:d>"
                 page.add_field(name="Created on", value=discord_timestamp, inline=True)
+
+            if "expiration_date" in whois_info:
+                expiration_date = whois_info["expiration_date"]
+                if isinstance(expiration_date, str):
+                    try:
+                        expiration_date = datetime.strptime(expiration_date, "%Y-%m-%dT%H:%M:%S.%fZ")
+                    except ValueError:
+                        expiration_date = datetime.strptime(expiration_date, "%Y-%m-%dT%H:%M:%S")
+                unix_timestamp = int(expiration_date.timestamp())
+                discord_timestamp = f"<t:{unix_timestamp}:d>"
+                page = add_field_to_page(page, "Expires on", discord_timestamp)
+
             if "dnssec" in whois_info:
                 dnssec_value = whois_info["dnssec"]
                 if dnssec_value is True:
@@ -1227,20 +1240,6 @@ class Cloudflare(commands.Cog):
                     dnssec_value = f":question: Unknown"
                 page.add_field(name="DNSSEC", value=dnssec_value, inline=True)
                 
-                if "domain" in whois_info:
-                    domain_value = whois_info["domain"]
-                    domain_value = f"{domain_value}"
-                    page = add_field_to_page(page, "Domain", domain_value)
-            if "expiration_date" in whois_info:
-                expiration_date = whois_info["expiration_date"]
-                if isinstance(expiration_date, str):
-                    try:
-                        expiration_date = datetime.strptime(expiration_date, "%Y-%m-%dT%H:%M:%S.%fZ")
-                    except ValueError:
-                        expiration_date = datetime.strptime(expiration_date, "%Y-%m-%dT%H:%M:%S")
-                unix_timestamp = int(expiration_date.timestamp())
-                discord_timestamp = f"**<t:{unix_timestamp}:F>**"
-                page = add_field_to_page(page, "Expiration Date", discord_timestamp)
             if "extension" in whois_info:
                 extension_value = whois_info["extension"]
                 extension_value = f"**`{extension_value}`**"
