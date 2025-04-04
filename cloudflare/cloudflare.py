@@ -1188,7 +1188,7 @@ class Cloudflare(commands.Cog):
                 embed = discord.Embed(
                     title="Domain Not Registered",
                     description="The domain doesn't seem to be registered. Please check the query and try again.",
-                    color=discord.Color.from_str("#ff4545")
+                    color=0xff4545
                 )
                 await ctx.send(embed=embed)
                 return
