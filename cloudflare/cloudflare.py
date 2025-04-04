@@ -1550,37 +1550,37 @@ class Cloudflare(commands.Cog):
                 
                 domain = result.get('domain')
                 if domain:
-                    embed.add_field(name="Domain", value=f"`{domain}`", inline=False)
+                    embed.add_field(name="Domain", value=f"{domain}", inline=False)
                 
                 risk_score = result.get('risk_score')
                 if risk_score is not None:
-                    embed.add_field(name="Risk score", value=f"`{risk_score}`", inline=False)
+                    embed.add_field(name="Risk score", value=f"{risk_score}", inline=False)
                 
                 popularity_rank = result.get('popularity_rank')
                 if popularity_rank is not None:
-                    embed.add_field(name="Popularity rank", value=f"`{popularity_rank}`", inline=False)
+                    embed.add_field(name="Popularity rank", value=f"{popularity_rank}", inline=False)
                 
                 application = result.get("application", {})
                 application_name = application.get('name')
                 if application_name:
-                    embed.add_field(name="Application", value=f"`{application_name}`", inline=False)
+                    embed.add_field(name="Application", value=f"{application_name}", inline=False)
                 
                 additional_info = result.get("additional_information", {})
                 suspected_malware_family = additional_info.get('suspected_malware_family')
                 if suspected_malware_family:
-                    embed.add_field(name="Suspected malware family", value=f"`{suspected_malware_family}`", inline=False)
+                    embed.add_field(name="Suspected malware family", value=f"{suspected_malware_family}", inline=False)
                 
                 content_categories = result.get("content_categories", [])
                 if content_categories:
-                    embed.add_field(name="Content categories", value=", ".join([f"`{cat.get('name', 'N/A')}`" for cat in content_categories]), inline=False)
+                    embed.add_field(name="Content categories", value=", ".join([f"{cat.get('name', 'N/A')}" for cat in content_categories]), inline=False)
                 
                 resolves_to_refs = result.get("resolves_to_refs", [])
                 if resolves_to_refs:
-                    embed.add_field(name="Resolves to", value=", ".join([f"`{ref.get('value', 'N/A')}`" for ref in resolves_to_refs]), inline=False)
+                    embed.add_field(name="Resolves to", value=", ".join([f"{ref.get('value', 'N/A')}" for ref in resolves_to_refs]), inline=False)
                 
                 inherited_content_categories = result.get("inherited_content_categories", [])
                 if inherited_content_categories:
-                    embed.add_field(name="Inherited content categories", value=", ".join([f"`{cat.get('name', 'N/A')}`" for cat in inherited_content_categories]), inline=False)
+                    embed.add_field(name="Inherited content categories", value=", ".join([f"{cat.get('name', 'N/A')}" for cat in inherited_content_categories]), inline=False)
                 
                 inherited_from = result.get('inherited_from')
                 if inherited_from:
@@ -1588,11 +1588,11 @@ class Cloudflare(commands.Cog):
                 
                 inherited_risk_types = result.get("inherited_risk_types", [])
                 if inherited_risk_types:
-                    embed.add_field(name="Inherited risk types", value=", ".join([f"`{risk.get('name', 'N/A')}`" for risk in inherited_risk_types]), inline=False)
+                    embed.add_field(name="Inherited risk types", value=", ".join([f"{risk.get('name', 'N/A')}" for risk in inherited_risk_types]), inline=False)
                 
                 risk_types = result.get("risk_types", [])
                 if risk_types:
-                    embed.add_field(name="Risk types", value=", ".join([f"`{risk.get('name', 'N/A')}`" for risk in risk_types]), inline=False)
+                    embed.add_field(name="Risk types", value=", ".join([f"{risk.get('name', 'N/A')}" for risk in risk_types]), inline=False)
 
                 # Add blocklist status
                 blocklist_status = ":white_check_mark: Yes" if is_blocked else ":x: No"
