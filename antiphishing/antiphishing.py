@@ -434,7 +434,9 @@ class AntiPhishing(commands.Cog):
                                 domains_v2[domain] = {
                                     "category": entry.get("category", ""),
                                     "severity": entry.get("severity", ""),
-                                    "description": entry.get("description", "")
+                                    "description": entry.get("description", ""),
+                                    "targeted_orgs": entry.get("targeted_orgs", ""),
+                                    "detected_date": entry.get("detected_date", "")
                                 }
                         log.debug(f"Successfully fetched and parsed V2 blocklist from {url}. {len(data['blocklist'])} entries raw.")
                         return True
@@ -593,23 +595,32 @@ class AntiPhishing(commands.Cog):
 
             embed = discord.Embed(
                 title="🚨 Dangerous link detected",
-                description=(
-                    f"{message.author.mention} sent a link (`{domain}`) identified as potentially malicious. "
-                    "This website might contain malware, spyware, phishing attempts, or other harmful content. "
-                    "**Avoid clicking this link.**"
-                ),
                 color=0xff4545, # Red
             )
             embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/warning.png")
             embed.timestamp = datetime.datetime.now(datetime.timezone.utc)
             embed.set_footer(text="Please alert staff if you believe this is an error.")
 
-            # Add V2 info if available
+            # Check if the domain is in blocklistv2 and add specific details
             additional_info = self.domains_v2.get(domain)
             if additional_info and isinstance(additional_info, dict):
-                formatted_info = "\n".join(f"**{key.replace('_', ' ').title()}**: {value}" for key, value in additional_info.items())
-                if len(formatted_info) > 1000: formatted_info = formatted_info[:1000] + "\n... (truncated)"
-                embed.add_field(name="Threat Details", value=formatted_info, inline=False)
+                description = (
+                    f"{message.author.mention} sent a link (`{domain}`) identified as potentially malicious. "
+                    "This website might contain malware, spyware, phishing attempts, or other harmful content. "
+                    "**Avoid clicking this link.**\n\n"
+                    f"**Category**: {additional_info.get('category', 'N/A')}\n"
+                    f"**Description**: {additional_info.get('description', 'N/A')}\n"
+                    f"**Targeted Organizations**: {additional_info.get('targeted_orgs', 'N/A')}\n"
+                    f"**Detected Date**: {additional_info.get('detected_date', 'N/A')}"
+                )
+                embed.add_field(name="Threat Details", value=description, inline=False)
+            else:
+                # Default message for blocklist
+                embed.description = (
+                    f"{message.author.mention} sent a link (`{domain}`) identified as potentially malicious. "
+                    "This website might contain malware, spyware, phishing attempts, or other harmful content. "
+                    "**Avoid clicking this link.**"
+                )
 
             # Reply to the original message if possible, otherwise send to channel
             reply_target = message.to_reference(fail_if_not_exists=False)
