@@ -2468,7 +2468,13 @@ class Cloudflare(commands.Cog):
                             embed.add_field(name="Categories", value=f"{categories}", inline=False)
                         if phishing:
                             embed.add_field(name="Phishing", value=f"{phishing}", inline=False)
-                        await ctx.send(embed=embed)
+
+                        # Add a URL button to view the report
+                        view = discord.ui.View()
+                        report_url = f"https://radar.cloudflare.com/scan/{scan_id}"
+                        report_button = discord.ui.Button(label="View on Cloudflare Radar", url=report_url, style=discord.ButtonStyle.link)
+                        view.add_item(report_button)
+                        await ctx.send(embed=embed, view=view)
                         return
 
             except Exception as e:
