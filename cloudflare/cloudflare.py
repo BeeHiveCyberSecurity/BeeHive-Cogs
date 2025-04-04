@@ -1204,7 +1204,7 @@ class Cloudflare(commands.Cog):
                 return page
 
             if "registrar" in whois_info:
-                registrar_value = f"**{whois_info['registrar']}**"
+                registrar_value = f"{whois_info['registrar']}"
                 page.add_field(name="Registered with", value=registrar_value, inline=True)
             if "created_date" in whois_info:
                 created_date = whois_info["created_date"]
