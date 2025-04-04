@@ -592,7 +592,7 @@ class AntiPhishing(commands.Cog):
             allowed_mentions = discord.AllowedMentions(roles=True if staff_role_id else False)
 
             embed = discord.Embed(
-                title="🚨 Dangerous Link Detected! 🚨",
+                title="🚨 Dangerous link detected",
                 description=(
                     f"{message.author.mention} sent a link (`{domain}`) identified as potentially malicious. "
                     "This website might contain malware, spyware, phishing attempts, or other harmful content. "
