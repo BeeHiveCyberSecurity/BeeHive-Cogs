@@ -1705,7 +1705,7 @@ class Cloudflare(commands.Cog):
                 
                 if "ptr_lookup" in result and result["ptr_lookup"] and "ptr_domains" in result["ptr_lookup"] and result["ptr_lookup"]["ptr_domains"]:
                 ptr_domains = ", ".join([f"{domain}" for domain in result["ptr_lookup"]["ptr_domains"]])
-                embed.add_field(name="PTR Domains", value=ptr_domains, inline=False)
+                embed.add_field(name="PTR domains", value=ptr_domains, inline=False)
                 
                 result_info = data.get("result_info", {})
                 total_count = result_info.get('total_count')
