@@ -1183,6 +1183,16 @@ class Cloudflare(commands.Cog):
 
             whois_info = data.get("result", {})
 
+            # Check if the domain is found
+            if whois_info.get("found", True) is False:
+                embed = discord.Embed(
+                    title="Domain Not Registered",
+                    description="The domain doesn't seem to be registered. Please check the query and try again.",
+                    color=discord.Color.from_str("#ff4545")
+                )
+                await ctx.send(embed=embed)
+                return
+
             pages = []
             page = discord.Embed(title=f"WHOIS Information for {domain}", color=0xFF6633)
             field_count = 0
