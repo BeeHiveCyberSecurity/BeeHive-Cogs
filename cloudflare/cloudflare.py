@@ -1717,6 +1717,7 @@ class Cloudflare(commands.Cog):
                     if per_page:
                         embed.add_field(name="Per Page", value=f"**`{per_page}`**", inline=False)
                     
+                    embed.set_footer(text="IP intelligence provided by Cloudflare")
                     await ctx.send(embed=embed)
                 else:
                     error_message = data.get("errors", [{"message": "Unknown error"}])[0].get("message", "Unknown error")
