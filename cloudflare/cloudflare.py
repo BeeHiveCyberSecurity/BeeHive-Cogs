@@ -1700,7 +1700,7 @@ class Cloudflare(commands.Cog):
                 
                 risk_types = result.get("risk_types", [])
                 if risk_types:
-                    risk_types_str = ", ".join([f"**`{risk.get('name', 'N/A')}`**" for risk in risk_types if risk.get('name')])
+                    risk_types_str = ", ".join([f"{risk.get('name', 'N/A')}" for risk in risk_types if risk.get('name')])
                     if risk_types_str:
                         embed.add_field(name="Risk types", value=risk_types_str, inline=True)
                 
