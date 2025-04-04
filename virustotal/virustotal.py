@@ -13,24 +13,18 @@ class VirusTotal(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=1234567890)
-        self.config.register_guild(auto_scan_enabled=False, info_emoji_enabled=False, submission_history={})
-        self.info_emoji = "ℹ️"
+        self.config.register_guild(auto_scan_enabled=False, submission_history={})
         self.submission_history = {}
 
     async def initialize(self):
         for guild in self.bot.guilds:
             guild_data = await self.config.guild(guild).all()
             await self.config.guild(guild).auto_scan_enabled.set(guild_data["auto_scan_enabled"])
-            await self.config.guild(guild).info_emoji_enabled.set(guild_data["info_emoji_enabled"])
             await self.config.guild(guild).submission_history.set(guild_data["submission_history"])
 
     @commands.group(name="virustotal", invoke_without_command=True)
     async def virustotal(self, ctx):
-        """
-        VirusTotal is a free online service that analyzes files and URLs to detect viruses, malware, and other security threats.
-        
-        Learn more at [virustotal.com](<https://www.virustotal.com>)
-        """
+        """VirusTotal is a free online service that analyzes files and URLs to detect viruses, malware, and other security threats."""
         await ctx.send_help(ctx.command)
 
     @checks.admin_or_permissions(manage_guild=True)
@@ -44,25 +38,12 @@ class VirusTotal(commands.Cog):
         status = "enabled" if new_status else "disabled"
         await ctx.send(f"Automatic file scanning has been {status}.")
 
-    @checks.admin_or_permissions(manage_guild=True)
-    @virustotal.command(name="infoemoji")
-    async def toggle_info_emoji(self, ctx):
-        """Toggle automatic info emoji reaction on or off"""
-        guild = ctx.guild
-        info_emoji_enabled = await self.config.guild(guild).info_emoji_enabled()
-        new_status = not info_emoji_enabled
-        await self.config.guild(guild).info_emoji_enabled.set(new_status)
-        status = "enabled" if new_status else "disabled"
-        await ctx.send(f"Info emoji reaction has been {status}.")
-
     @virustotal.command(name="settings")
     async def settings(self, ctx):
         """Show current settings for VirusTotal"""
         guild = ctx.guild
         auto_scan_enabled = await self.config.guild(guild).auto_scan_enabled()
-        info_emoji_enabled = await self.config.guild(guild).info_emoji_enabled()
         auto_scan_status = "Enabled" if auto_scan_enabled else "Disabled"
-        info_emoji_status = "Enabled" if info_emoji_enabled else "Disabled"
         
         vt_key = await self.bot.get_shared_api_tokens("virustotal")
         api_key_status = ":white_check_mark: Set" if vt_key.get("api_key") else ":x: Missing"
@@ -73,7 +54,6 @@ class VirusTotal(commands.Cog):
         embed = discord.Embed(title="VirusTotal settings", colour=discord.Colour(0x394eff))
         embed.add_field(name="Overview", value="", inline=False)
         embed.add_field(name="Automatic uploads", value=auto_scan_status, inline=True)
-        embed.add_field(name="Quick reactions", value=info_emoji_status, inline=True)
         embed.add_field(name="API key", value=api_key_status, inline=True)
         embed.add_field(name="About this cog", value="", inline=False)
         embed.add_field(name="Version", value=version, inline=True)
@@ -82,30 +62,16 @@ class VirusTotal(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        """Automatically scan files if auto_scan is enabled and react to hashes if info_emoji is enabled"""
+        """Automatically scan files if auto_scan is enabled"""
         guild = message.guild
         if guild is None:
             return  # Ignore messages not in a guild
 
         auto_scan_enabled = await self.config.guild(guild).auto_scan_enabled()
-        info_emoji_enabled = await self.config.guild(guild).info_emoji_enabled()
         if auto_scan_enabled and message.attachments:
             ctx = await self.bot.get_context(message)
             if ctx.valid:
                 await self.silent_scan(ctx, message.attachments)
-        
-        if info_emoji_enabled:
-            hashes = self.extract_hashes(message.content)
-            if hashes:
-                await message.add_reaction(self.info_emoji)
-                def check(reaction, user):
-                    return user != self.bot.user and str(reaction.emoji) == self.info_emoji and reaction.message.id == message.id
-                try:
-                    reaction, user = await self.bot.wait_for('reaction_add', timeout=60.0, check=check)
-                    if reaction:
-                        await self.handle_hash_reaction(message, hashes)
-                except asyncio.TimeoutError:
-                    pass
 
     def extract_hashes(self, text):
         """Extract potential file hashes from the text"""
@@ -120,48 +86,6 @@ class VirusTotal(commands.Cog):
         for pattern in patterns.values():
             hashes.extend(re.findall(pattern, text))
         return hashes
-
-    async def handle_hash_reaction(self, message, hashes):
-        """Handle the reaction to a hash by fetching VirusTotal results"""
-        vt_key = await self.bot.get_shared_api_tokens("virustotal")
-        if not vt_key.get("api_key"):
-            return  # No API key set, silently return
-
-        async with aiohttp.ClientSession() as session:
-            for file_hash in hashes:
-                async with session.get(
-                    f"https://www.virustotal.com/api/v3/files/{file_hash}",
-                    headers={"x-apikey": vt_key["api_key"]},
-                ) as response:
-                    if response.status != 200:
-                        continue  # Skip hashes that can't be checked
-
-                    data = await response.json()
-                    attributes = data.get("data", {}).get("attributes", {})
-                    stats = attributes.get("last_analysis_stats", {})
-                    malicious_count = stats.get("malicious", 0)
-                    suspicious_count = stats.get("suspicious", 0)
-                    undetected_count = stats.get("undetected", 0)
-                    harmless_count = stats.get("harmless", 0)
-                    total_count = malicious_count + suspicious_count + undetected_count + harmless_count
-                    percent = round((malicious_count / total_count) * 100, 2) if total_count > 0 else 0
-
-                    embed = discord.Embed(title="File intelligence")
-                    if malicious_count >= 11:
-                        embed.description = f"**{int(percent)}%** of vendors rated this file dangerous! You should avoid this file completely, and delete it from your systems to ensure security."
-                        embed.color = discord.Colour(0xff4545)
-                    elif 1 < malicious_count < 11:
-                        embed.description = f"**{int(percent)}%** of vendors rated this file dangerous. While there are malicious ratings available for this file, there aren't many, so this could be a false positive. **You should investigate further before coming to a decision.**"
-                        embed.color = discord.Colour(0xff9144)
-                    else:
-                        embed.color = discord.Colour(0x2BBD8E)
-                        embed.description = f"**{harmless_count + undetected_count}** vendors say this file is malware-free"
-
-                    embed.set_footer(text=f"SHA1 | {file_hash}")
-                    button = discord.ui.Button(label="View results on VirusTotal", url=f"https://www.virustotal.com/gui/file/{file_hash}", style=discord.ButtonStyle.url)
-                    view = discord.ui.View()
-                    view.add_item(button)
-                    await message.channel.send(embed=embed, view=view)
 
     async def silent_scan(self, ctx, attachments):
         """Scan files silently and alert only if they're malicious or suspicious"""
@@ -214,9 +138,30 @@ class VirusTotal(commands.Cog):
                                 else:
                                     await asyncio.sleep(15)  # Wait a bit before checking again
 
-    @commands.bot_has_permissions(embed_links=True)
-    @virustotal.command(name="scan", aliases=["vt"])
-    async def scan(self, ctx, file_url: str = None):
+    @virustotal.group(name="scan", invoke_without_command=True)
+    async def scan(self, ctx):
+        """Submit a file or URL to VirusTotal for analysis"""
+        await ctx.send_help(ctx.command)
+
+    @scan.command(name="url")
+    async def scan_url(self, ctx, file_url: str):
+        """Submit a URL to VirusTotal for analysis"""
+        async with ctx.typing():
+            vt_key = await self.bot.get_shared_api_tokens("virustotal")
+            if not vt_key.get("api_key"):
+                await self.send_error(ctx, "No VirusTotal API Key set", "Your Red instance doesn't have an API key set for VirusTotal.\n\nUntil you add an API key using `[p]set api`, the VirusTotal API will refuse your requests and this cog won't work.")
+                return
+
+            async with aiohttp.ClientSession() as session:
+                try:
+                    await self.submit_url_for_analysis(ctx, session, vt_key, file_url)
+                except (aiohttp.ClientResponseError, ValueError) as e:
+                    await self.send_error(ctx, "Failed to submit URL", str(e))
+                except asyncio.TimeoutError:
+                    await self.send_error(ctx, "Request timed out", "The bot was unable to complete the request due to a timeout.")
+
+    @scan.command(name="file")
+    async def scan_file(self, ctx):
         """Submit a file to VirusTotal for analysis"""
         async with ctx.typing():
             vt_key = await self.bot.get_shared_api_tokens("virustotal")
@@ -226,18 +171,15 @@ class VirusTotal(commands.Cog):
 
             async with aiohttp.ClientSession() as session:
                 try:
-                    # Check if a file URL is provided or if there are attachments in the message or the referenced message
                     attachments = ctx.message.attachments
                     if ctx.message.reference and not attachments:
                         ref_message = await ctx.channel.fetch_message(ctx.message.reference.message_id)
                         attachments = ref_message.attachments
 
-                    if file_url:
-                        await self.submit_url_for_analysis(ctx, session, vt_key, file_url)
-                    elif attachments:
+                    if attachments:
                         await self.submit_attachment_for_analysis(ctx, session, vt_key, attachments[0])
                     else:
-                        await self.send_error(ctx, "No file provided", "The bot was unable to find content to submit for analysis!\nPlease provide one of the following when using this command:\n- URL file can be downloaded from\n- Drag-and-drop a file less than 30mb in size\n- Reply to a message containing a file")
+                        await self.send_error(ctx, "No file provided", "The bot was unable to find content to submit for analysis!\nPlease provide one of the following when using this command:\n- Drag-and-drop a file less than 30mb in size\n- Reply to a message containing a file")
                 except (aiohttp.ClientResponseError, ValueError) as e:
                     await self.send_error(ctx, "Failed to submit file", str(e))
                 except asyncio.TimeoutError:
