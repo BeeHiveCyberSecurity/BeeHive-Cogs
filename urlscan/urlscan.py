@@ -21,7 +21,12 @@ class URLScan(commands.Cog):
         self.config.register_guild(**default_guild)
 
     @commands.group(name='urlscan', help="Scan URL's for dangerous content", invoke_without_command=True)
-    async def urlscan(self, ctx, *, urls: str = None):
+    async def urlscan(self, ctx):
+        """Base command for URLScan. Use subcommands for specific actions."""
+        await ctx.send_help(ctx.command)
+
+    @urlscan.command(name='scan', help="Scan a URL using urlscan.io")
+    async def scan(self, ctx, *, urls: str = None):
         """Scan a URL using urlscan.io"""
         await self.scan_urls(ctx, urls)
 
