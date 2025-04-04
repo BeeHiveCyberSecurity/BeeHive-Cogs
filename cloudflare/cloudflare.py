@@ -1186,7 +1186,7 @@ class Cloudflare(commands.Cog):
             # Check if the domain is found
             if whois_info.get("found", True) is False:
                 embed = discord.Embed(
-                    title="Domain Not Registered",
+                    title="Domain not registered",
                     description="The domain doesn't seem to be registered. Please check the query and try again.",
                     color=0xff4545
                 )
