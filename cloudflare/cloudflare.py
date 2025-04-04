@@ -1455,7 +1455,8 @@ class Cloudflare(commands.Cog):
                     # Send the HTML file
                     await interaction.response.send_message(
                         content="Please open the attached file in a web browser to view the report.",
-                        file=discord.File(temp_file_path)
+                        file=discord.File(temp_file_path),
+                        ephemeral=True
                     )
                 except Exception as e:
                     await interaction.response.send_message(
