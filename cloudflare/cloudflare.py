@@ -1220,6 +1220,15 @@ class Cloudflare(commands.Cog):
                 discord_timestamp = f"<t:{unix_timestamp}:d>"
                 page.add_field(name="Created on", value=discord_timestamp, inline=True)
 
+            if "updated_date" in whois_info:
+                try:
+                    updated_date = int(datetime.strptime(whois_info["updated_date"], "%Y-%m-%dT%H:%M:%S.%fZ").timestamp())
+                    page = add_field_to_page(page, "Updated on", f"<t:{updated_date}:d>")
+                except ValueError:
+                    pass
+                except AttributeError:
+                    pass
+
             if "expiration_date" in whois_info:
                 expiration_date = whois_info["expiration_date"]
                 if isinstance(expiration_date, str):
@@ -1245,6 +1254,9 @@ class Cloudflare(commands.Cog):
                 nameservers_list = "\n".join(f"- {ns}" for ns in whois_info["nameservers"])
                 page = add_field_to_page(page, "Nameservers", nameservers_list)
                 
+            if "status" in whois_info:
+                status_list = "\n".join(f"- {status}" for status in whois_info["status"])
+                page = add_field_to_page(page, "Status", status_list)
 
             if "id" in whois_info:
                 id_value = f"`{whois_info['id']}`"
@@ -1283,17 +1295,7 @@ class Cloudflare(commands.Cog):
             if "registrar_street" in whois_info:
                 registrar_street = f"**`{whois_info['registrar_street']}`**"
                 page = add_field_to_page(page, "Registrar Street", registrar_street)
-            if "status" in whois_info:
-                status_list = "\n".join(f"- {status}" for status in whois_info["status"])
-                page = add_field_to_page(page, "Status", status_list)
-            if "updated_date" in whois_info:
-                try:
-                    updated_date = int(datetime.strptime(whois_info["updated_date"], "%Y-%m-%dT%H:%M:%S").timestamp())
-                    page = add_field_to_page(page, "Updated Date", f"**<t:{updated_date}:F>**")
-                except ValueError:
-                    pass  # Handle the case where the date format is incorrect
-                except AttributeError:
-                    pass  # Handle the case where the date is not a string
+        
             if "whois_server" in whois_info:
                 whois_server = f"**`{whois_info['whois_server']}`**"
                 page = add_field_to_page(page, "WHOIS Server", whois_server)
