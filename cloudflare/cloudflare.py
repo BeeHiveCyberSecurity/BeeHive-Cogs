@@ -1293,6 +1293,9 @@ class Cloudflare(commands.Cog):
                 contact_methods.append(f":incoming_envelope: **Email:** {whois_info['registrar_email']}")
             if "registrar_phone" in whois_info:
                 phone_number = whois_info['registrar_phone']
+                # Ensure the phone number is not concatenated with any other string
+                if isinstance(phone_number, str):
+                    phone_number = phone_number.split('Name Server:')[0].strip()
                 contact_methods.append(f":telephone_receiver: **Phone:** {phone_number}")
             if "registrar_phone_ext" in whois_info:
                 contact_methods.append(f":1234: **Phone Ext:** {whois_info['registrar_phone_ext']}")
