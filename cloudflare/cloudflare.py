@@ -1776,7 +1776,7 @@ class Cloudflare(commands.Cog):
                         if "domain" in result:
                             embed.add_field(name="Domain", value=f"{result['domain']}", inline=True)
                         for categorization in page:
-                            categories = ", ".join([f"- {category['name']}" for category in categorization["categories"]])
+                            categories = ", ".join([f"- {category['name']}\n" for category in categorization["categories"]])
                             embed.add_field(name="Categories", value=categories, inline=True)
                             if "start" in categorization:
                                 start_timestamp = discord.utils.format_dt(discord.utils.parse_time(categorization['start']), style='d')
