@@ -1239,23 +1239,16 @@ class Cloudflare(commands.Cog):
                 else:
                     dnssec_value = f":question: Unknown"
                 page.add_field(name="DNSSEC", value=dnssec_value, inline=True)
+
+            if "nameservers" in whois_info:
+                nameservers_list = "\n".join(f"- **{ns}**" for ns in whois_info["nameservers"])
+                page = add_field_to_page(page, "Nameservers", nameservers_list)
                 
-            if "extension" in whois_info:
-                extension_value = whois_info["extension"]
-                extension_value = f"**`{extension_value}`**"
-                page = add_field_to_page(page, "Extension", extension_value)
 
             if "id" in whois_info:
                 id_value = f"**`{whois_info['id']}`**"
                 page = add_field_to_page(page, "ID", id_value)
 
-            if "nameservers" in whois_info:
-                nameservers_list = "\n".join(f"- **`{ns}`**" for ns in whois_info["nameservers"])
-                page = add_field_to_page(page, "Nameservers", nameservers_list)
-
-            if "punycode" in whois_info:
-                punycode_value = f"**`{whois_info['punycode']}`**"
-                page = add_field_to_page(page, "Punycode", punycode_value)
             if "registrar_city" in whois_info:
                 registrar_city = f"**`{whois_info['registrar_city']}`**"
                 page = add_field_to_page(page, "Registrar City", registrar_city)
