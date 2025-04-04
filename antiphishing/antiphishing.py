@@ -453,86 +453,9 @@ class AntiPhishing(commands.Cog):
             log.exception(f"An unexpected error occurred fetching V2 blocklist from {url}: {e}")
             return False
 
-
-    async def follow_redirects(self, url: str) -> List[str]:
-        """
-        Follow redirects using HEAD requests and return all unique URLs in the chain (lowercase hostnames).
-        """
-        visited_urls = set()
-        redirect_chain = []
-        current_url = url
-        max_redirects = 10
-        headers = {
-            "User-Agent": f"BeeHive AntiPhishing v{self.__version__} (Discord Bot; +https://github.com/BeeHive-Systems/BeeHive-Cogs)"
-        }
-
-        for _ in range(max_redirects):
-            if current_url in visited_urls:
-                log.debug(f"Redirect loop detected for {url}, stopping at {current_url}")
-                break # Avoid infinite loops
-            visited_urls.add(current_url)
-
-            try:
-                # Use HEAD request to avoid downloading large content
-                async with self.session.head(current_url, allow_redirects=False, headers=headers, timeout=5) as response:
-                    # Add the current URL's hostname to the chain
-                    try:
-                        parsed = urlsplit(current_url)
-                        if parsed.netloc:
-                            redirect_chain.append(parsed.netloc.lower())
-                    except ValueError:
-                        log.warning(f"Could not parse URL for hostname: {current_url}")
-
-
-                    # Check for redirect status codes (3xx)
-                    if 300 <= response.status < 400:
-                        next_url = response.headers.get('Location')
-                        if not next_url:
-                            log.warning(f"Redirect status {response.status} received from {current_url} but no Location header found.")
-                            break # No location header to follow
-
-                        # Handle relative redirects
-                        next_url = urlunsplit(urlsplit(next_url)._replace(scheme=urlsplit(current_url).scheme) if not urlsplit(next_url).scheme else urlsplit(next_url))
-                        current_url = next_url
-                        log.debug(f"Following redirect from {response.url} to {current_url}")
-                    else:
-                        # Not a redirect, this is the final destination (or an error)
-                        log.debug(f"Redirect chain for {url} ended at {current_url} with status {response.status}")
-                        break
-            except aiohttp.ClientResponseError as e:
-                log.warning(f"HTTP error following redirects for {url} at step {current_url}: {e.status} {e.message}")
-                # Add the hostname even if it errored, it might still be malicious
-                try:
-                    parsed = urlsplit(current_url)
-                    if parsed.netloc:
-                        redirect_chain.append(parsed.netloc.lower())
-                except ValueError: pass
-                break # Stop following on client/server errors
-            except aiohttp.ClientError as e:
-                log.warning(f"Network error following redirects for {url} at step {current_url}: {e}")
-                break # Stop following on network errors
-            except asyncio.TimeoutError:
-                log.warning(f"Timeout following redirects for {url} at step {current_url}")
-                break
-            except Exception as e:
-                log.exception(f"Unexpected error following redirects for {url} at step {current_url}: {e}")
-                break
-        else:
-            log.warning(f"Reached maximum redirect limit ({max_redirects}) for {url}")
-            # Add the last known hostname if max redirects reached
-            try:
-                parsed = urlsplit(current_url)
-                if parsed.netloc:
-                    redirect_chain.append(parsed.netloc.lower())
-            except ValueError: pass
-
-        # Return unique hostnames encountered
-        return list(dict.fromkeys(redirect_chain)) # Preserves order while making unique
-
-
-    async def handle_phishing(self, message: discord.Message, matched_domain: str, redirect_chain_hostnames: List[str]) -> None:
+    async def handle_phishing(self, message: discord.Message, matched_domain: str) -> None:
         """Handles the actions when a phishing link is detected."""
-        log.info(f"Phishing link detected: '{matched_domain}' in message {message.id} by {message.author} ({message.author.id}) in guild {message.guild.id}. Redirect chain: {redirect_chain_hostnames}")
+        log.info(f"Phishing link detected: '{matched_domain}' in message {message.id} by {message.author} ({message.author.id}) in guild {message.guild.id}.")
         action = await self.config.guild(message.guild).action()
 
         # Increment counters
@@ -548,7 +471,7 @@ class AntiPhishing(commands.Cog):
         if log_channel_id:
             log_channel = message.guild.get_channel(log_channel_id)
             if log_channel and log_channel.permissions_for(message.guild.me).send_messages:
-                await self._log_malicious_link(log_channel, message, matched_domain, redirect_chain_hostnames, staff_role_id)
+                await self._log_malicious_link(log_channel, message, matched_domain, staff_role_id)
             elif log_channel:
                  log.warning(f"Missing permissions to log phishing detection in {log_channel.name} ({message.guild.name}).")
             else:
@@ -556,15 +479,10 @@ class AntiPhishing(commands.Cog):
 
 
         # Take action
-        await self._take_action(action, message, matched_domain, redirect_chain_hostnames)
+        await self._take_action(action, message, matched_domain)
 
-    async def _log_malicious_link(self, log_channel: discord.TextChannel, message: discord.Message, matched_domain: str, redirect_chain_hostnames: List[str], staff_role_id: Optional[int]):
+    async def _log_malicious_link(self, log_channel: discord.TextChannel, message: discord.Message, matched_domain: str, staff_role_id: Optional[int]):
         """Sends a detailed log message to the designated channel."""
-        redirect_chain_str = "\n".join(f"`{hostname}`" for hostname in redirect_chain_hostnames) if redirect_chain_hostnames else "`None`"
-        # Truncate if too long for embed field
-        if len(redirect_chain_str) > 1000:
-            redirect_chain_str = redirect_chain_str[:1000] + "\n... (truncated)"
-
         log_embed = discord.Embed(
             title="🚨 Malicious Link Detected 🚨",
             description=f"{message.author.mention} (`{message.author.id}`) sent a dangerous link in {message.channel.mention}.",
@@ -574,7 +492,6 @@ class AntiPhishing(commands.Cog):
         log_embed.set_author(name=f"{message.author.display_name} ({message.author.id})", icon_url=message.author.display_avatar.url)
         log_embed.add_field(name="Matched Domain", value=f"`{matched_domain}`", inline=False)
         log_embed.add_field(name="Full Message Content", value=f"```\n{message.content[:1000]}\n```" if message.content else "*(No text content)*", inline=False)
-        log_embed.add_field(name="Redirect Chain (Hostnames)", value=redirect_chain_str, inline=False)
         log_embed.add_field(name="Action Taken", value=f"`{await self.config.guild(message.guild).action()}`", inline=True)
         log_embed.add_field(name="Message Link", value=f"[Jump to Message]({message.jump_url})", inline=True)
 
@@ -605,7 +522,7 @@ class AntiPhishing(commands.Cog):
              log.exception(f"Unexpected error sending log embed: {e}")
 
 
-    async def _take_action(self, action: str, message: discord.Message, domain: str, redirect_chain: List[str]):
+    async def _take_action(self, action: str, message: discord.Message, domain: str):
         """Executes the configured action."""
         action_methods = {
             "notify": self._notify_action,
@@ -624,19 +541,19 @@ class AntiPhishing(commands.Cog):
                         log.warning(f"Cannot perform '{action}' on {message.author} ({message.author.id}) due to hierarchy/ownership.")
                         # Fallback to delete if possible, otherwise notify
                         if await self._can_delete(message):
-                            await self._delete_action(message, domain, redirect_chain, is_fallback=True)
+                            await self._delete_action(message, domain, is_fallback=True)
                         elif await self._can_notify(message):
-                             await self._notify_action(message, domain, redirect_chain, is_fallback=True)
+                             await self._notify_action(message, domain, is_fallback=True)
                         return # Stop further action processing
                  else:
                      log.warning(f"Cannot perform '{action}' on {message.author} ({message.author.id}) as they are not a Member object (likely left?).")
                      # Fallback to delete if possible
                      if await self._can_delete(message):
-                         await self._delete_action(message, domain, redirect_chain, is_fallback=True)
+                         await self._delete_action(message, domain, is_fallback=True)
                      return # Stop further action processing
 
 
-            await action_methods[action](message, domain, redirect_chain)
+            await action_methods[action](message, domain)
         elif action != "ignore":
             log.warning(f"Unknown action '{action}' configured for guild {message.guild.id}.")
 
@@ -658,7 +575,7 @@ class AntiPhishing(commands.Cog):
 
     # --- Action Implementations ---
 
-    async def _notify_action(self, message: discord.Message, domain: str, redirect_chain: List[str], is_fallback: bool = False):
+    async def _notify_action(self, message: discord.Message, domain: str, is_fallback: bool = False):
         """Sends a warning message in the channel."""
         if not await self._can_notify(message):
             log.warning(f"Missing SEND_MESSAGES permission for notify action in {message.channel.name} ({message.guild.name}).")
@@ -710,14 +627,14 @@ class AntiPhishing(commands.Cog):
             log.exception(f"Unexpected error during notify action: {e}")
 
 
-    async def _delete_action(self, message: discord.Message, domain: str, redirect_chain: List[str], is_fallback: bool = False):
+    async def _delete_action(self, message: discord.Message, domain: str, is_fallback: bool = False):
         """Deletes the offending message."""
         if not await self._can_delete(message):
             log.warning(f"Missing MANAGE_MESSAGES permission for delete action in {message.channel.name} ({message.guild.name}).")
             # If delete fails as primary action, try to notify as fallback
             if not is_fallback and await self._can_notify(message):
                 log.info("Falling back to notify action because delete failed due to permissions.")
-                await self._notify_action(message, domain, redirect_chain, is_fallback=True)
+                await self._notify_action(message, domain, is_fallback=True)
             return
 
         try:
@@ -731,7 +648,7 @@ class AntiPhishing(commands.Cog):
             # If delete fails as primary action, try to notify as fallback
             if not is_fallback and await self._can_notify(message):
                 log.info("Falling back to notify action because delete failed due to permissions.")
-                await self._notify_action(message, domain, redirect_chain, is_fallback=True)
+                await self._notify_action(message, domain, is_fallback=True)
         except discord.NotFound:
             log.warning(f"Message {message.id} not found for deletion (already deleted?).")
         except discord.HTTPException as e:
@@ -740,12 +657,12 @@ class AntiPhishing(commands.Cog):
             log.exception(f"Unexpected error during delete action: {e}")
 
 
-    async def _kick_action(self, message: discord.Message, domain: str, redirect_chain: List[str]):
+    async def _kick_action(self, message: discord.Message, domain: str):
         """Deletes the message and kicks the user."""
         reason = f"Sent a known malicious link: {domain}"
 
         # Attempt delete first
-        await self._delete_action(message, domain, redirect_chain, is_fallback=True) # Delete is part of kick
+        await self._delete_action(message, domain, is_fallback=True) # Delete is part of kick
 
         if not await self._can_kick(message):
             log.warning(f"Missing KICK_MEMBERS permission for kick action in guild {message.guild.name}.")
@@ -768,12 +685,12 @@ class AntiPhishing(commands.Cog):
             log.exception(f"Unexpected error during kick action: {e}")
 
 
-    async def _ban_action(self, message: discord.Message, domain: str, redirect_chain: List[str]):
+    async def _ban_action(self, message: discord.Message, domain: str):
         """Deletes the message and bans the user."""
         reason = f"Sent a known malicious link: {domain}"
 
         # Attempt delete first
-        await self._delete_action(message, domain, redirect_chain, is_fallback=True) # Delete is part of ban
+        await self._delete_action(message, domain, is_fallback=True) # Delete is part of ban
 
         if not await self._can_ban(message):
             log.warning(f"Missing BAN_MEMBERS permission for ban action in guild {message.guild.name}.")
@@ -798,12 +715,12 @@ class AntiPhishing(commands.Cog):
             log.exception(f"Unexpected error during ban action: {e}")
 
 
-    async def _timeout_action(self, message: discord.Message, domain: str, redirect_chain: List[str]):
+    async def _timeout_action(self, message: discord.Message, domain: str):
         """Deletes the message and times out the user."""
         reason = f"Sent a known malicious link: {domain}"
 
         # Attempt delete first
-        await self._delete_action(message, domain, redirect_chain, is_fallback=True) # Delete is part of timeout
+        await self._delete_action(message, domain, is_fallback=True) # Delete is part of timeout
 
         if not await self._can_timeout(message):
             log.warning(f"Missing MODERATE_MEMBERS permission for timeout action in guild {message.guild.name}.")
@@ -875,49 +792,40 @@ class AntiPhishing(commands.Cog):
         await self._process_links(message, links)
 
     async def _process_links(self, message: discord.Message, links: List[str]):
-        """Processes extracted links, follows redirects, and checks against blocklists."""
+        """Processes extracted links and checks against blocklists."""
         for url in links:
             log.debug(f"Processing link: {url} from message {message.id}")
-            redirect_hostnames = await self.follow_redirects(url)
-            log.debug(f"Redirect hostnames for {url}: {redirect_hostnames}")
 
-            # Add the original URL's hostname if not already present from redirects
             try:
-                original_hostname = urlsplit(url).netloc.lower()
-                if original_hostname and original_hostname not in redirect_hostnames:
-                    # Insert at the beginning for clarity
-                    redirect_hostnames.insert(0, original_hostname)
+                hostname = urlsplit(url).netloc.lower()
             except ValueError:
-                 log.warning(f"Could not parse original URL for hostname: {url}")
+                log.warning(f"Could not parse URL for hostname: {url}")
+                continue
 
+            # 1. Check exact hostname match (e.g., malicious.example.com)
+            if hostname in self.domains or hostname in self.domains_v2:
+                log.debug(f"Exact match found: {hostname}")
+                await self.handle_phishing(message, hostname)
+                return # Action taken, stop processing this message
 
-            for hostname in redirect_hostnames:
-                # 1. Check exact hostname match (e.g., malicious.example.com)
-                if hostname in self.domains or hostname in self.domains_v2:
-                    log.debug(f"Exact match found: {hostname}")
-                    await self.handle_phishing(message, hostname, redirect_hostnames)
-                    return # Action taken, stop processing this message
+            # 2. Check registered domain match (e.g., example.com from www.example.com)
+            try:
+                # Use no_fetch=True as we don't need updated TLD list for every check
+                extracted = tldextract.extract(hostname, include_psl_private_domains=True)
+                # Construct registered domain only if both parts exist
+                if extracted.domain and extracted.suffix:
+                    registered_domain = f"{extracted.domain}.{extracted.suffix}".lower()
+                    # Avoid re-checking if hostname was already the registered domain
+                    if registered_domain != hostname and (registered_domain in self.domains or registered_domain in self.domains_v2):
+                        log.debug(f"Registered domain match found: {registered_domain} (from {hostname})")
+                        await self.handle_phishing(message, registered_domain)
+                        return # Action taken, stop processing this message
+            except Exception as e:
+                # Log error during extraction but continue checking other hostnames/links
+                log.error(f"Error extracting domain from hostname '{hostname}': {e}")
+                continue
 
-                # 2. Check registered domain match (e.g., example.com from www.example.com)
-                try:
-                    # Use no_fetch=True as we don't need updated TLD list for every check
-                    extracted = tldextract.extract(hostname, include_psl_private_domains=True)
-                    # Construct registered domain only if both parts exist
-                    if extracted.domain and extracted.suffix:
-                        registered_domain = f"{extracted.domain}.{extracted.suffix}".lower()
-                        # Avoid re-checking if hostname was already the registered domain
-                        if registered_domain != hostname and (registered_domain in self.domains or registered_domain in self.domains_v2):
-                            log.debug(f"Registered domain match found: {registered_domain} (from {hostname})")
-                            await self.handle_phishing(message, registered_domain, redirect_hostnames)
-                            return # Action taken, stop processing this message
-                    # else:
-                    #     log.debug(f"Could not extract registered domain from hostname: {hostname}")
-                except Exception as e:
-                    # Log error during extraction but continue checking other hostnames/links
-                    log.error(f"Error extracting domain from hostname '{hostname}': {e}")
-                    continue
-
-            log.debug(f"No malicious domains found in chain for URL: {url}")
+            log.debug(f"No malicious domains found for URL: {url}")
 
 
 
