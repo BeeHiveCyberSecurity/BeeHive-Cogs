@@ -426,13 +426,16 @@ class AntiPhishing(commands.Cog):
                 request.raise_for_status()
                 try:
                     data = await request.json()
-                    if isinstance(data, dict):
+                    if isinstance(data, dict) and "blocklist" in data:
                         # Store domain keys as lowercase
-                        domains_v2.update({k.lower(): v for k, v in data.items() if isinstance(k, str)})
-                        log.debug(f"Successfully fetched and parsed V2 blocklist from {url}. {len(data)} entries raw.")
+                        for entry in data["blocklist"]:
+                            domain = entry.get("domain", "").lower()
+                            if domain:
+                                domains_v2[domain] = entry
+                        log.debug(f"Successfully fetched and parsed V2 blocklist from {url}. {len(data['blocklist'])} entries raw.")
                         return True
                     else:
-                        log.warning(f"Unexpected data format received from V2 blocklist {url}. Expected dict, got {type(data)}.")
+                        log.warning(f"Unexpected data format received from V2 blocklist {url}. Expected dict with 'blocklist', got {type(data)}.")
                         return False
                 except aiohttp.ContentTypeError:
                     log.exception(f"Failed to decode JSON from V2 blocklist {url}. Content type: {request.content_type}")
