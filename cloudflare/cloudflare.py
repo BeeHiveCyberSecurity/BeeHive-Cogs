@@ -1274,7 +1274,7 @@ class Cloudflare(commands.Cog):
                     "ok": ":white_check_mark: Active"
                 }
                 status_list = "\n".join(
-                    f"- {status} {status_explainers.get(status.lower(), ':grey_question: Unknown status')}" 
+                    f"- `{status}` \n> {status_explainers.get(status.lower(), ':grey_question: Unknown status')}" 
                     for status in whois_info["status"]
                 )
                 page = add_field_to_page(page, "Status", status_list)
