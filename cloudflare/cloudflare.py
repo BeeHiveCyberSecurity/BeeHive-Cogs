@@ -1310,10 +1310,6 @@ class Cloudflare(commands.Cog):
                 contact_info = "\n".join(contact_methods)
                 page = add_field_to_page(page, "To report abuse", contact_info)
 
-            if "id" in whois_info:
-                id_value = f"```{whois_info['id']}```"
-                page = add_field_to_page(page, "ID", id_value)
-
             if page.fields:
                 pages.append(page)
 
