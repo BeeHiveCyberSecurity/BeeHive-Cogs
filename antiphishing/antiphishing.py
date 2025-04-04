@@ -744,10 +744,13 @@ class AntiPhishing(commands.Cog):
                 continue
 
             try:
-                domain_match = re.search(r'([a-z0-9-]+\.[a-z]{2,})$', hostname)
+                # Fix: Ensure the domain extraction considers subdomains
+                domain_match = re.search(r'([a-z0-9-]+\.[a-z0-9-]+\.[a-z]{2,})$', hostname)
+                if not domain_match:
+                    domain_match = re.search(r'([a-z0-9-]+\.[a-z]{2,})$', hostname)
                 if domain_match:
                     registered_domain = domain_match.group(1).lower()
-                    if registered_domain != hostname and (registered_domain in self.domains or registered_domain in self.domains_v2):
+                    if registered_domain in self.domains or registered_domain in self.domains_v2:
                         log.debug(f"Registered domain match found: {registered_domain} (from {hostname})")
                         await self.handle_phishing(message, registered_domain)
                         continue
