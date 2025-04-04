@@ -1869,7 +1869,7 @@ class Cloudflare(commands.Cog):
                     if "description" in result:
                         embed.add_field(name="Owner", value=f"{result['description']}", inline=True)
                     if "country" in result:
-                        embed.add_field(name="Country", value=f":flag_{result['country']}: {result['country']}", inline=True)
+                        embed.add_field(name="Country", value=f":flag_{result['country'].lower()}: {result['country']}", inline=True)
                     if "type" in result:
                         embed.add_field(name="Type", value=f"{result['type'].capitalize()}", inline=True)
                     if "risk_score" in result:
