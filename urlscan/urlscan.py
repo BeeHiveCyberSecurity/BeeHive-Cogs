@@ -15,7 +15,8 @@ class URLScan(commands.Cog):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=1234567890)
         default_guild = {
-            "autoscan_enabled": False
+            "autoscan_enabled": False,
+            "log_channel": None
         }
         self.config.register_guild(**default_guild)
 
@@ -45,6 +46,14 @@ class URLScan(commands.Cog):
                 color=0x2BBD8E if state else 0xff4545
             )
             await ctx.send(embed=embed)
+
+    @commands.guild_only()
+    @commands.has_permissions(manage_guild=True)
+    @urlscan.command(name="setlogchannel", description="Set the logging channel for URL scan results")
+    async def set_log_channel(self, ctx, channel: discord.TextChannel):
+        """Set the logging channel for URL scan results"""
+        await self.config.guild(ctx.guild).log_channel.set(channel.id)
+        await ctx.send(f"Log channel set to {channel.mention}")
 
     async def scan_urls(self, ctx, urls: str = None):
         urlscan_key = await self.bot.get_shared_api_tokens("urlscan")
@@ -136,6 +145,9 @@ class URLScan(commands.Cog):
             return
 
         ctx = await self.bot.get_context(message)
+        log_channel_id = await self.config.guild(message.guild).log_channel()
+        log_channel = self.bot.get_channel(log_channel_id) if log_channel_id else None
+
         for url in urls_to_scan:
             urlscan_key = await self.bot.get_shared_api_tokens("urlscan")
             api_key = urlscan_key.get("api_key")
@@ -168,6 +180,8 @@ class URLScan(commands.Cog):
                                         color=0xe25946
                                     )
                                     await message.channel.send(embed=embed)
+                                    if log_channel:
+                                        await log_channel.send(embed=embed)
                                 except discord.NotFound:
                                     # Message was already deleted, possibly by another link filtering module
                                     pass
@@ -179,5 +193,7 @@ class URLScan(commands.Cog):
                                         color=0xe25946
                                     )
                                     await message.channel.send(embed=embed)
+                                    if log_channel:
+                                        await log_channel.send(embed=embed)
                                 break
             
