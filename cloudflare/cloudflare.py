@@ -1871,7 +1871,7 @@ class Cloudflare(commands.Cog):
                     if "country" in result:
                         embed.add_field(name="Country", value=f"{result['country']}", inline=True)
                     if "type" in result:
-                        embed.add_field(name="Type", value=f"{result['type']}", inline=True)
+                        embed.add_field(name="Type", value=f"{result['type'].capitalize()}", inline=True)
                     if "risk_score" in result:
                         embed.add_field(name="Risk Score", value=f"**`{result['risk_score']}`**", inline=False)
                     embed.set_footer(text="ASN intelligence provided by Cloudflare")
