@@ -1467,7 +1467,45 @@ class Cloudflare(commands.Cog):
                 # Add blocklist status
                 blocklist_status = ":white_check_mark: Yes" if is_blocked else ":x: No"
                 embed.add_field(name="On BeeHive Blocklist", value=f"**{blocklist_status}**", inline=False)
-                await ctx.send(embed=embed)
+
+                # Create a view with a download button
+                view = discord.ui.View()
+
+                async def download_report(interaction: discord.Interaction):
+                    try:
+                        # Generate the report content
+                        report_content = f"Domain Intelligence Report for {domain}\n\n"
+                        report_content += f"Domain: {result.get('domain', 'N/A')}\n"
+                        report_content += f"Risk Score: {result.get('risk_score', 'N/A')}\n"
+                        report_content += f"Popularity Rank: {result.get('popularity_rank', 'N/A')}\n"
+                        report_content += f"Application: {application.get('name', 'N/A')}\n"
+                        report_content += f"Suspected Malware Family: {additional_info.get('suspected_malware_family', 'N/A')}\n"
+                        report_content += f"Content Categories: {', '.join([cat.get('name', 'N/A') for cat in content_categories])}\n"
+                        report_content += f"Resolves To: {', '.join([ref.get('value', 'N/A') for ref in resolves_to_refs])}\n"
+                        report_content += f"Inherited Content Categories: {', '.join([cat.get('name', 'N/A') for cat in inherited_content_categories])}\n"
+                        report_content += f"Inherited From: {result.get('inherited_from', 'N/A')}\n"
+                        report_content += f"Inherited Risk Types: {', '.join([risk.get('name', 'N/A') for risk in inherited_risk_types])}\n"
+                        report_content += f"Risk Types: {', '.join([risk.get('name', 'N/A') for risk in risk_types])}\n"
+                        report_content += f"On BeeHive Blocklist: {'Yes' if is_blocked else 'No'}\n"
+
+                        # Use a temporary file
+                        with tempfile.NamedTemporaryFile(delete=False, suffix=".txt") as temp_file:
+                            temp_file.write(report_content.encode('utf-8'))
+                            temp_file_path = temp_file.name
+
+                        # Send the TXT file
+                        await interaction.response.send_message(file=discord.File(temp_file_path))
+                    except Exception as e:
+                        await interaction.response.send_message(
+                            content="Failed to generate or send the TXT report.",
+                            ephemeral=True
+                        )
+
+                download_button = discord.ui.Button(label="Download full report", style=discord.ButtonStyle.primary)
+                download_button.callback = download_report
+                view.add_item(download_button)
+
+                await ctx.send(embed=embed, view=view)
             else:
                 error_message = data.get("errors", [{"message": "Unknown error"}])[0].get("message", "Unknown error")
                 error_embed = discord.Embed(title="Error", description=f"Error: {error_message}", color=0xff4545)
