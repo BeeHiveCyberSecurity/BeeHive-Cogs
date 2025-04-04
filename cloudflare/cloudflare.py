@@ -1873,7 +1873,7 @@ class Cloudflare(commands.Cog):
                     if "type" in result:
                         embed.add_field(name="Type", value=f"{result['type'].capitalize()}", inline=True)
                     if "risk_score" in result:
-                        embed.add_field(name="Risk Score", value=f"**`{result['risk_score']}`**", inline=False)
+                        embed.add_field(name="Risk score", value=f"{result['risk_score']}", inline=True)
                     embed.set_footer(text="ASN intelligence provided by Cloudflare")
                     await ctx.send(embed=embed)
                 else:
