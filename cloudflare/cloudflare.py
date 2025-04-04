@@ -1776,14 +1776,14 @@ class Cloudflare(commands.Cog):
                         if "domain" in result:
                             embed.add_field(name="Domain", value=f"{result['domain']}", inline=True)
                         for categorization in page:
-                            categories = ", ".join([f"**`{category['name']}`**" for category in categorization["categories"]])
+                            categories = ", ".join([f"- {category['name']}" for category in categorization["categories"]])
                             embed.add_field(name="Categories", value=categories, inline=True)
                             if "start" in categorization:
-                                start_timestamp = discord.utils.format_dt(discord.utils.parse_time(categorization['start']), style='R')
-                                embed.add_field(name="Beginning", value=f"**{start_timestamp}**", inline=True)
+                                start_timestamp = discord.utils.format_dt(discord.utils.parse_time(categorization['start']), style='r')
+                                embed.add_field(name="Beginning", value=f"{start_timestamp}", inline=True)
                             if "end" in categorization:
-                                end_timestamp = discord.utils.format_dt(discord.utils.parse_time(categorization['end']), style='R')
-                                embed.add_field(name="Ending", value=f"**{end_timestamp}**", inline=True)
+                                end_timestamp = discord.utils.format_dt(discord.utils.parse_time(categorization['end']), style='r')
+                                embed.add_field(name="Ending", value=f"{end_timestamp}", inline=True)
                         return embed
 
                     message = await ctx.send(embed=create_embed(pages[current_page]))
