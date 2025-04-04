@@ -1923,10 +1923,8 @@ class Cloudflare(commands.Cog):
                     if subnets:
                         pages = [subnets[i:i + 10] for i in range(0, len(subnets), 10)]
                         current_page = 0
-                        embed = discord.Embed(title=f"ASN subnets for {asn}", color=0x2BBD8E)
-                        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/globe.png")
-                        for subnet in pages[current_page]:
-                            embed.add_field(name="Subnet", value=f"**`{subnet}`**", inline=False)
+                        embed = discord.Embed(title=f"Subnets for ASN#{asn}", color=0xFF6633)
+                        embed.add_field(name="Subnets", value="\n".join([f"- {subnet}" for subnet in pages[current_page]]), inline=False)
                         message = await ctx.send(embed=embed)
 
                         if len(pages) > 1:
@@ -1965,8 +1963,7 @@ class Cloudflare(commands.Cog):
                                     await message.clear_reactions()
                                     break
                     else:
-                        embed = discord.Embed(title=f"ASN subnets for {asn}", color=0x2BBD8E)
-                        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/globe.png")
+                        embed = discord.Embed(title=f"Subnets for ASN#{asn}", color=0xFF6633)
                         embed.add_field(name="Subnets", value="No subnets found for this ASN.", inline=False)
                         await ctx.send(embed=embed)
                 else:
