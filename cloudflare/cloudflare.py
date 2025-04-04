@@ -1295,7 +1295,7 @@ class Cloudflare(commands.Cog):
                 contact_methods.append(f"Org: {whois_info['registrar_org']}")
             if "registrar_phone" in whois_info:
                 phone_number = whois_info['registrar_phone']
-                formatted_phone_number = f"+{phone_number[0]} ({phone_number[1:4]}) {phone_number[4:7]}-{phone_number[7:]}"
+                formatted_phone_number = f"+{phone_number[:phone_number.index('.')]} ({phone_number[phone_number.index('.')+1:phone_number.index('.')+4]}) {phone_number[phone_number.index('.')+4:phone_number.index('.')+7]}-{phone_number[phone_number.index('.')+7:]}"
                 contact_methods.append(f":calling: {formatted_phone_number}")
             if "registrar_phone_ext" in whois_info:
                 contact_methods.append(f":calling: :1234: {whois_info['registrar_phone_ext']}")
