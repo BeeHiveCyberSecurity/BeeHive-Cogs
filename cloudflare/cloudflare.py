@@ -1184,7 +1184,7 @@ class Cloudflare(commands.Cog):
             whois_info = data.get("result", {})
 
             pages = []
-            page = discord.Embed(title=f"WHOIS Information for {domain}", color=discord.Color.from_str("#2BBD8E"))
+            page = discord.Embed(title=f"WHOIS Information for {domain}", color=0xFF6633)
             field_count = 0
 
             def add_field_to_page(page, name, value):
@@ -1193,7 +1193,7 @@ class Cloudflare(commands.Cog):
                 field_count += 1
                 if field_count == 10:
                     pages.append(page)
-                    page = discord.Embed(title=f"WHOIS Information for {domain}", color=discord.Color.from_str("#2BBD8E"))
+                    page = discord.Embed(title=f"WHOIS Information for {domain}", color=0xFF6633)
                     field_count = 0
                 return page
 
@@ -1499,8 +1499,6 @@ class Cloudflare(commands.Cog):
                 button = discord.ui.Button(label="Technical", url=whois_info["technical_referral_url"])
                 view.add_item(button)
 
-            for page in pages:
-                page.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/globe.png")
             message = await ctx.send(embed=pages[0], view=view)
 
             current_page = 0
