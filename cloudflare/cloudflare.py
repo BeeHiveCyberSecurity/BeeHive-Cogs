@@ -1335,7 +1335,6 @@ class Cloudflare(commands.Cog):
 
             async def download_report(interaction: discord.Interaction):
                 try:
-                    # Generate HTML content with improved design and styling
                     html_content = f"""
                     <html>
                         <head>
