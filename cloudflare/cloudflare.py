@@ -1250,6 +1250,10 @@ class Cloudflare(commands.Cog):
                     dnssec_value = f":question: Unknown"
                 page.add_field(name="DNSSEC", value=dnssec_value, inline=True)
 
+            if "whois_server" in whois_info:
+                whois_server = f"**`{whois_info['whois_server']}`**"
+                page.add_field(name="Lookup via", value=whois_server, inline=True)
+
             if "nameservers" in whois_info:
                 nameservers_list = "\n".join(f"- {ns}" for ns in whois_info["nameservers"])
                 page = add_field_to_page(page, "Nameservers", nameservers_list)
@@ -1295,10 +1299,6 @@ class Cloudflare(commands.Cog):
             if "registrar_street" in whois_info:
                 registrar_street = f"**`{whois_info['registrar_street']}`**"
                 page = add_field_to_page(page, "Registrar Street", registrar_street)
-        
-            if "whois_server" in whois_info:
-                whois_server = f"**`{whois_info['whois_server']}`**"
-                page = add_field_to_page(page, "WHOIS Server", whois_server)
 
             if page.fields:
                 pages.append(page)
