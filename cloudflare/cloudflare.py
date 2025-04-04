@@ -1383,7 +1383,7 @@ class Cloudflare(commands.Cog):
                                     margin-bottom: 20px;
                                 }}
                                 .card {{
-                                    background-color: #f9f9fb;
+                                    background-color: #f0f4f9;
                                     border-radius: 10px;
                                     padding: 15px;
                                     margin-bottom: 10px;
@@ -1391,11 +1391,11 @@ class Cloudflare(commands.Cog):
                                 }}
                                 .key {{
                                     font-weight: bold;
-                                    color: #34495e;
+                                    color: #000000;
                                     font-size: 1em;
                                 }}
                                 .value {{
-                                    color: #7f8c8d;
+                                    color: #000000;
                                     font-size: 1em;
                                 }}
                                 hr {{
