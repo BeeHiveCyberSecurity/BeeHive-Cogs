@@ -2451,14 +2451,14 @@ class Cloudflare(commands.Cog):
 
                         if malicious:
                             embed = discord.Embed(
-                                title="Scan completed",
+                                title="Cloudflare detected a threat",
                                 description=f"A URL safety scan finished for Scan ID\n```{scan_id}```",
                                 color=0xff4545
                             )
                             embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/bug.png")
                         else:
                             embed = discord.Embed(
-                                title="Scan completed",
+                                title="Cloudflare detected no threats",
                                 description=f"A URL safety scan finished for Scan ID\n```{scan_id}```",
                                 color=0x2BBD8E
                             )
