@@ -1385,6 +1385,7 @@ class Cloudflare(commands.Cog):
                                     display: flex;
                                     flex-wrap: wrap;
                                     justify-content: space-between;
+                                    gap: 10px; /* Add gap to ensure space between cards */
                                 }}
                                 .card {{
                                     background-color: #f0f4f9;
@@ -1392,7 +1393,8 @@ class Cloudflare(commands.Cog):
                                     padding: 15px;
                                     margin-bottom: 10px;
                                     box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-                                    width: calc(50% - 10px);
+                                    flex: 1 1 calc(50% - 10px); /* Ensure cards take up half the container width minus the gap */
+                                    box-sizing: border-box; /* Include padding and border in the element's total width and height */
                                 }}
                                 .key {{
                                     font-weight: bold;
