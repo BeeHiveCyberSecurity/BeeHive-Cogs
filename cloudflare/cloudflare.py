@@ -1417,7 +1417,8 @@ class Cloudflare(commands.Cog):
                                 <div class="section">
                                     <h2>Report information</h2>
                                     <div class="card">
-                                        <p><span class="key">Domain queried</span> <span class="value">{domain}</span></p>
+                                        <p><span class="key">Domain queried</span></p>
+                                        <p><span class="value">{domain}</span></p>
                                     </div>
                                 </div>
                                 <div class="section">
@@ -1426,7 +1427,8 @@ class Cloudflare(commands.Cog):
                     for key, value in whois_info.items():
                         html_content += f"""
                                     <div class='card'>
-                                        <p><span class='key'>{key.replace('_', ' ').title()}:</span> <span class='value'>{value}</span></p>
+                                        <p><span class='key'>{key.replace('_', ' ').title()}:</span></p>
+                                        <p><span class='value'>{value}</span></p>
                                     </div>
                         """
 
