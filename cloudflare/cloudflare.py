@@ -1218,10 +1218,14 @@ class Cloudflare(commands.Cog):
                 discord_timestamp = f"<t:{unix_timestamp}:f>"
                 page = add_field_to_page(page, "Created Date", discord_timestamp)
             if "dnssec" in whois_info:
-                if "dnssec" in whois_info:
-                    dnssec_value = whois_info["dnssec"]
+                dnssec_value = whois_info["dnssec"]
+                if dnssec_value is True:
+                    dnssec_value = ":white_check_mark: Enabled"
+                elif dnssec_value is False:
+                    dnssec_value = ":x: Disabled"
+                else:
                     dnssec_value = f"{dnssec_value}"
-                    page = add_field_to_page(page, "DNSSEC", dnssec_value)
+                page = add_field_to_page(page, "DNSSEC", dnssec_value)
                 if "domain" in whois_info:
                     domain_value = whois_info["domain"]
                     domain_value = f"{domain_value}"
