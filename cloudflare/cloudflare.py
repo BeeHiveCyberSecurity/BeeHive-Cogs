@@ -1472,9 +1472,6 @@ class Cloudflare(commands.Cog):
                 error_message = data.get("errors", [{"message": "Unknown error"}])[0].get("message", "Unknown error")
                 error_embed = discord.Embed(title="Error", description=f"Error: {error_message}", color=0xff4545)
                 await ctx.send(embed=error_embed)
-            else:
-                error_embed = discord.Embed(title="Error", description=f"Error: {data['errors']}", color=0xff4545)
-                await ctx.send(embed=error_embed)
 
     @intel.command(name="ip")
     async def queryip(self, ctx, ip: str):
