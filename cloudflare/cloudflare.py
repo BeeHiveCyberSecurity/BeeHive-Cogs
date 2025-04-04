@@ -1214,8 +1214,8 @@ class Cloudflare(commands.Cog):
                         created_date = datetime.strptime(created_date, "%Y-%m-%dT%H:%M:%S.%fZ")
                     except ValueError:
                         created_date = datetime.strptime(created_date, "%Y-%m-%dT%H:%M:%S")
-                unix_timestamp = int(created_date.timestamp())
-                discord_timestamp = f"<t:{unix_timestamp}:f>"
+                unix_timestamp = int(created_date.replace(hour=0, minute=0, second=0, microsecond=0).timestamp())
+                discord_timestamp = f"<t:{unix_timestamp}:d>"
                 page = add_field_to_page(page, "Created Date", discord_timestamp)
             if "dnssec" in whois_info:
                 dnssec_value = whois_info["dnssec"]
