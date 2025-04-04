@@ -2498,7 +2498,6 @@ class Cloudflare(commands.Cog):
             description=f"Automatic URL scans utilizing Cloudflare threat intelligence have been **{status}**.",
             colour=0xffd966,
         )
-        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/notifications.png")
         await ctx.send(embed=embed)
         
     @commands.Cog.listener()
@@ -2545,7 +2544,7 @@ class Cloudflare(commands.Cog):
                     if not scan_id:
                         continue
 
-                    await asyncio.sleep(60)
+                    await asyncio.sleep(120)
 
                     scan_result_url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/urlscanner/scan/{scan_id}"
                     async with self.session.get(scan_result_url, headers=headers) as scan_response:
@@ -2560,9 +2559,9 @@ class Cloudflare(commands.Cog):
                         if malicious:
                             await message.delete()
                             embed = discord.Embed(
-                                title="Malicious URL Detected",
-                                description=f"A message containing a malicious URL was removed.",
-                                color=0xff4545
+                                title="Cloudflare detected a threat!",
+                                description=f"Cloudflare detected a threat in a message sent in this channel and removed it to safeguard the community.",
+                                color=0xFF6633
                             )
                             await message.channel.send(embed=embed)
                             return
