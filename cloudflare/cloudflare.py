@@ -1862,16 +1862,16 @@ class Cloudflare(commands.Cog):
                 data = await response.json()
                 if data["success"]:
                     result = data["result"]
-                    embed = discord.Embed(title=f"ASN intelligence for {asn}", color=0x2BBD8E)
+                    embed = discord.Embed(title=f"ASN intelligence for {asn}", color=0xFF6633)
                     
                     if "asn" in result:
-                        embed.add_field(name="ASN", value=f"**`{result['asn']}`**", inline=False)
+                        embed.add_field(name="ASN Number", value=f"{result['asn']}", inline=True)
                     if "description" in result:
-                        embed.add_field(name="Description", value=f"**`{result['description']}`**", inline=False)
+                        embed.add_field(name="Owner", value=f"{result['description']}", inline=True)
                     if "country" in result:
-                        embed.add_field(name="Country", value=f"**`{result['country']}`**", inline=False)
+                        embed.add_field(name="Country", value=f"{result['country']}", inline=True)
                     if "type" in result:
-                        embed.add_field(name="Type", value=f"**`{result['type']}`**", inline=False)
+                        embed.add_field(name="Type", value=f"{result['type']}", inline=True)
                     if "risk_score" in result:
                         embed.add_field(name="Risk Score", value=f"**`{result['risk_score']}`**", inline=False)
                     
