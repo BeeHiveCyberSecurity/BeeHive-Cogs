@@ -821,7 +821,7 @@ class AntiPhishing(commands.Cog):
             if hostname in self.domains or hostname in self.domains_v2:
                 log.debug(f"Exact match found: {hostname}")
                 await self.handle_phishing(message, hostname)
-                return # Action taken, stop processing this message
+                continue # Continue processing other links in the message
 
             # 2. Check registered domain match (e.g., example.com from www.example.com)
             try:
@@ -834,7 +834,7 @@ class AntiPhishing(commands.Cog):
                     if registered_domain != hostname and (registered_domain in self.domains or registered_domain in self.domains_v2):
                         log.debug(f"Registered domain match found: {registered_domain} (from {hostname})")
                         await self.handle_phishing(message, registered_domain)
-                        return # Action taken, stop processing this message
+                        continue # Continue processing other links in the message
             except Exception as e:
                 # Log error during extraction but continue checking other hostnames/links
                 log.error(f"Error extracting domain from hostname '{hostname}': {e}")
