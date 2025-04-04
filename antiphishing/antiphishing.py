@@ -1,4 +1,3 @@
-import contextlib
 import asyncio
 import datetime
 import re
@@ -10,7 +9,6 @@ from discord.ext import tasks  # type: ignore
 from redbot.core import Config, commands  # type: ignore
 from redbot.core.bot import Red  # type: ignore
 from redbot.core.commands import Context  # type: ignore
-import tldextract  # type: ignore
 import logging
 
 log = logging.getLogger("red.beehive-cogs.antiphishing")
@@ -62,35 +60,27 @@ class AntiPhishing(commands.Cog):
 
     def extract_urls(self, message: str) -> List[str]:
         """
-        Extract URLs from a message using urlsplit for more robust parsing.
+        Extract URLs from a message using regex.
         Handles potential surrounding characters like < >
         """
-        # Relaxed regex to find potential URLs, including those wrapped in <>
-        # This regex aims to capture http/https URLs, potentially with surrounding characters.
         url_pattern = re.compile(r'(?:<)?(https?://[^\s<>]+)(?:>)?')
-        urls = []
-        # Remove zero-width characters first
         zero_width_chars = ["\u200b", "\u200c", "\u200d", "\u2060", "\uFEFF"]
         for char in zero_width_chars:
             message = message.replace(char, "")
 
-        matches = url_pattern.finditer(message)
-        for match in matches:
-            url = match.group(1) # Get the captured URL part
+        matches = url_pattern.findall(message)
+        urls = []
+        for url in matches:
             try:
-                # Validate and reconstruct the URL to ensure it's well-formed
                 result = urlsplit(url)
                 if result.scheme in {"http", "https"} and result.netloc:
-                    # Reconstruct to normalize (e.g., handle IDN domains, punycode)
                     reconstructed_url = urlunsplit(result)
                     urls.append(reconstructed_url)
                 else:
                     log.debug(f"Skipping invalid URL structure: {url}")
             except ValueError as e:
                 log.debug(f"Error parsing potential URL '{url}': {e}")
-                continue
         return urls
-
 
     def get_links(self, message: str) -> Optional[List[str]]:
         """
@@ -147,7 +137,7 @@ class AntiPhishing(commands.Cog):
         **`timeout`** - Delete message and temporarily time the user out **(Recommended)**
         """
         valid_actions = {"ignore", "notify", "delete", "kick", "ban", "timeout"}
-        action = action.lower() # Ensure action is lowercase
+        action = action.lower()
         if action not in valid_actions:
             await self._send_invalid_action_embed(ctx)
             return
@@ -205,11 +195,10 @@ class AntiPhishing(commands.Cog):
         }
 
         description = descriptions.get(action, "Unknown action configured.")
-        colour = colours.get(action, 0xfffffe) # Default to white if action somehow invalid
+        colour = colours.get(action, 0xfffffe)
         thumbnail_url = thumbnail_urls.get(action, "")
 
         await self._send_embed(ctx, 'Settings changed', description, colour, thumbnail_url)
-
 
     @antiphishing.command()
     async def stats(self, ctx: Context):
@@ -232,7 +221,6 @@ class AntiPhishing(commands.Cog):
             guild_data.get('bans', 0),
             guild_data.get('timeouts', 0)
         )
-        # Count unique domains from both lists
         total_domains = len(self.domains | set(self.domains_v2.keys()))
 
         embed = discord.Embed(
@@ -270,7 +258,6 @@ class AntiPhishing(commands.Cog):
                                    "The logging channel has been cleared.",
                                    0xffd966, "https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/close.png")
 
-
     @commands.admin_or_permissions()
     @antiphishing.command()
     async def staffrole(self, ctx: Context, role: Optional[discord.Role]):
@@ -287,7 +274,6 @@ class AntiPhishing(commands.Cog):
             await self._send_embed(ctx, 'Settings changed',
                                    "The staff role mention has been cleared.",
                                     0xffd966, "https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/close.png")
-
 
     @commands.admin_or_permissions()
     @antiphishing.command()
@@ -349,8 +335,7 @@ class AntiPhishing(commands.Cog):
         # Fetch V2 list
         fetched_v2 = await self._fetch_domains_v2("https://www.beehive.systems/hubfs/blocklist/blocklistv2.json", headers, new_domains_v2)
 
-        if fetched_v1 or fetched_v2: # Only update if at least one fetch was successful
-            # Check if the new data is different from the current data
+        if fetched_v1 or fetched_v2:
             if new_domains != self.domains or new_domains_v2 != self.domains_v2:
                 self.domains = new_domains
                 self.domains_v2 = new_domains_v2
@@ -360,9 +345,8 @@ class AntiPhishing(commands.Cog):
                 log.info("Phishing domain lists checked, no changes detected.")
         else:
             log.warning("Failed to fetch updates for both V1 and V2 blocklists.")
-            return # Don't send update messages if fetching failed
+            return
 
-        # Send "Definitions updated" message if lists were actually changed
         if updated:
             for guild in self.bot.guilds:
                 log_channel_id = await self.config.guild(guild).log_channel()
@@ -387,33 +371,21 @@ class AntiPhishing(commands.Cog):
         await self.bot.wait_until_ready()
         log.info("Starting phishing domain update loop.")
 
-
     async def _fetch_domains(self, url: str, headers: dict, domains: set) -> bool:
         """Fetches V1 domain list, stores lowercase, returns True on success."""
         try:
             async with self.session.get(url, headers=headers, timeout=10) as request:
-                request.raise_for_status() # Raise exception for bad status codes (4xx or 5xx)
-                try:
-                    data = await request.json()
-                    if isinstance(data, list):
-                        # Store domains as lowercase
-                        domains.update(d.lower() for d in data if isinstance(d, str))
-                        log.debug(f"Successfully fetched and parsed V1 blocklist from {url}. {len(data)} entries raw.")
-                        return True
-                    else:
-                        log.warning(f"Unexpected data format received from V1 blocklist {url}. Expected list, got {type(data)}.")
-                        return False
-                except aiohttp.ContentTypeError:
-                    log.exception(f"Failed to decode JSON from V1 blocklist {url}. Content type: {request.content_type}")
+                request.raise_for_status()
+                data = await request.json()
+                if isinstance(data, list):
+                    domains.update(d.lower() for d in data if isinstance(d, str))
+                    log.debug(f"Successfully fetched and parsed V1 blocklist from {url}. {len(data)} entries raw.")
+                    return True
+                else:
+                    log.warning(f"Unexpected data format received from V1 blocklist {url}. Expected list, got {type(data)}.")
                     return False
-                except Exception as e:
-                    log.exception(f"Error parsing JSON from V1 blocklist {url}: {e}")
-                    return False
-        except aiohttp.ClientResponseError as e:
-            log.warning(f"HTTP error fetching V1 blocklist from {url}: {e.status} {e.message}")
-            return False
-        except aiohttp.ClientError as e:
-            log.warning(f"Network error while fetching V1 blocklist from {url}: {e}")
+        except (aiohttp.ClientResponseError, aiohttp.ClientError) as e:
+            log.warning(f"Error fetching V1 blocklist from {url}: {e}")
             return False
         except Exception as e:
             log.exception(f"An unexpected error occurred fetching V1 blocklist from {url}: {e}")
@@ -424,36 +396,25 @@ class AntiPhishing(commands.Cog):
         try:
             async with self.session.get(url, headers=headers, timeout=10) as request:
                 request.raise_for_status()
-                try:
-                    data = await request.json()
-                    if isinstance(data, dict) and "blocklist" in data:
-                        # Store domain keys as lowercase
-                        for entry in data["blocklist"]:
-                            domain = entry.get("domain", "").lower()
-                            if domain:
-                                domains_v2[domain] = {
-                                    "category": entry.get("category", ""),
-                                    "severity": entry.get("severity", ""),
-                                    "description": entry.get("description", ""),
-                                    "targeted_orgs": entry.get("targeted_orgs", ""),
-                                    "detected_date": entry.get("detected_date", "")
-                                }
-                        log.debug(f"Successfully fetched and parsed V2 blocklist from {url}. {len(data['blocklist'])} entries raw.")
-                        return True
-                    else:
-                        log.warning(f"Unexpected data format received from V2 blocklist {url}. Expected dict with 'blocklist', got {type(data)}.")
-                        return False
-                except aiohttp.ContentTypeError:
-                    log.exception(f"Failed to decode JSON from V2 blocklist {url}. Content type: {request.content_type}")
+                data = await request.json()
+                if isinstance(data, dict) and "blocklist" in data:
+                    for entry in data["blocklist"]:
+                        domain = entry.get("domain", "").lower()
+                        if domain:
+                            domains_v2[domain] = {
+                                "category": entry.get("category", ""),
+                                "severity": entry.get("severity", ""),
+                                "description": entry.get("description", ""),
+                                "targeted_orgs": entry.get("targeted_orgs", ""),
+                                "detected_date": entry.get("detected_date", "")
+                            }
+                    log.debug(f"Successfully fetched and parsed V2 blocklist from {url}. {len(data['blocklist'])} entries raw.")
+                    return True
+                else:
+                    log.warning(f"Unexpected data format received from V2 blocklist {url}. Expected dict with 'blocklist', got {type(data)}.")
                     return False
-                except Exception as e:
-                    log.exception(f"Error parsing JSON from V2 blocklist {url}: {e}")
-                    return False
-        except aiohttp.ClientResponseError as e:
-            log.warning(f"HTTP error fetching V2 blocklist from {url}: {e.status} {e.message}")
-            return False
-        except aiohttp.ClientError as e:
-            log.warning(f"Network error while fetching V2 blocklist from {url}: {e}")
+        except (aiohttp.ClientResponseError, aiohttp.ClientError) as e:
+            log.warning(f"Error fetching V2 blocklist from {url}: {e}")
             return False
         except Exception as e:
             log.exception(f"An unexpected error occurred fetching V2 blocklist from {url}: {e}")
@@ -464,14 +425,12 @@ class AntiPhishing(commands.Cog):
         log.info(f"Phishing link detected: '{matched_domain}' in message {message.id} by {message.author} ({message.author.id}) in guild {message.guild.id}.")
         action = await self.config.guild(message.guild).action()
 
-        # Increment counters
         if action != "ignore":
             async with self.config.guild(message.guild).caught() as count:
                 count += 1
         async with self.config.member(message.author).caught() as member_count:
             member_count += 1
 
-        # Log the event
         log_channel_id = await self.config.guild(message.guild).log_channel()
         staff_role_id = await self.config.guild(message.guild).staff_role()
         if log_channel_id:
@@ -479,12 +438,10 @@ class AntiPhishing(commands.Cog):
             if log_channel and log_channel.permissions_for(message.guild.me).send_messages:
                 await self._log_malicious_link(log_channel, message, matched_domain, staff_role_id)
             elif log_channel:
-                 log.warning(f"Missing permissions to log phishing detection in {log_channel.name} ({message.guild.name}).")
+                log.warning(f"Missing permissions to log phishing detection in {log_channel.name} ({message.guild.name}).")
             else:
-                 log.warning(f"Configured log channel {log_channel_id} not found in guild {message.guild.name} ({message.guild.id}).")
+                log.warning(f"Configured log channel {log_channel_id} not found in guild {message.guild.name} ({message.guild.id}).")
 
-
-        # Take action
         await self._take_action(action, message, matched_domain)
 
     async def _log_malicious_link(self, log_channel: discord.TextChannel, message: discord.Message, matched_domain: str, staff_role_id: Optional[int]):
@@ -501,17 +458,15 @@ class AntiPhishing(commands.Cog):
         log_embed.add_field(name="Action Taken", value=f"`{await self.config.guild(message.guild).action()}`", inline=True)
         log_embed.add_field(name="Message Link", value=f"[Jump to Message]({message.jump_url})", inline=True)
 
-        # Add additional information if the domain is in the v2 list
-        additional_info = self.domains_v2.get(matched_domain) # Use .get for safety
+        additional_info = self.domains_v2.get(matched_domain)
         if additional_info and isinstance(additional_info, dict):
             try:
                 formatted_info = "\n".join(f"**{key.replace('_', ' ').title()}**: {value}" for key, value in additional_info.items())
                 if len(formatted_info) > 1000:
-                     formatted_info = formatted_info[:1000] + "\n... (truncated)"
+                    formatted_info = formatted_info[:1000] + "\n... (truncated)"
                 log_embed.add_field(name="Additional Info (V2)", value=formatted_info, inline=False)
             except Exception as e:
                 log.error(f"Error formatting V2 additional info for log: {e}")
-
 
         log_embed.set_footer(text=f"User total detections: {await self.config.member(message.author).caught()}")
 
@@ -525,8 +480,7 @@ class AntiPhishing(commands.Cog):
         except discord.HTTPException as e:
             log.error(f"HTTP error sending log embed in {log_channel.name} ({log_channel.guild.name}): {e}")
         except Exception as e:
-             log.exception(f"Unexpected error sending log embed: {e}")
-
+            log.exception(f"Unexpected error sending log embed: {e}")
 
     async def _take_action(self, action: str, message: discord.Message, domain: str):
         """Executes the configured action."""
@@ -536,34 +490,28 @@ class AntiPhishing(commands.Cog):
             "kick": self._kick_action,
             "ban": self._ban_action,
             "timeout": self._timeout_action,
-            "ignore": None # Explicitly do nothing for ignore
+            "ignore": None
         }
         if action in action_methods and action_methods[action]:
-            # Check hierarchy before taking mod actions
             if action in ["kick", "ban", "timeout"]:
-                 if isinstance(message.author, discord.Member): # Ensure it's a member object
-                    # Cannot action owner or users with higher/equal roles than the bot
+                if isinstance(message.author, discord.Member):
                     if message.author == message.guild.owner or message.author.top_role >= message.guild.me.top_role:
                         log.warning(f"Cannot perform '{action}' on {message.author} ({message.author.id}) due to hierarchy/ownership.")
-                        # Fallback to delete if possible, otherwise notify
                         if await self._can_delete(message):
                             await self._delete_action(message, domain, is_fallback=True)
                         elif await self._can_notify(message):
-                             await self._notify_action(message, domain, is_fallback=True)
-                        return # Stop further action processing
-                 else:
-                     log.warning(f"Cannot perform '{action}' on {message.author} ({message.author.id}) as they are not a Member object (likely left?).")
-                     # Fallback to delete if possible
-                     if await self._can_delete(message):
-                         await self._delete_action(message, domain, is_fallback=True)
-                     return # Stop further action processing
-
+                            await self._notify_action(message, domain, is_fallback=True)
+                        return
+                else:
+                    log.warning(f"Cannot perform '{action}' on {message.author} ({message.author.id}) as they are not a Member object (likely left?).")
+                    if await self._can_delete(message):
+                        await self._delete_action(message, domain, is_fallback=True)
+                    return
 
             await action_methods[action](message, domain)
         elif action != "ignore":
             log.warning(f"Unknown action '{action}' configured for guild {message.guild.id}.")
 
-    # --- Helper permission checks ---
     async def _can_notify(self, message: discord.Message) -> bool:
         return message.channel.permissions_for(message.guild.me).send_messages
 
@@ -579,8 +527,6 @@ class AntiPhishing(commands.Cog):
     async def _can_timeout(self, message: discord.Message) -> bool:
         return message.guild.me.guild_permissions.moderate_members
 
-    # --- Action Implementations ---
-
     async def _notify_action(self, message: discord.Message, domain: str, is_fallback: bool = False):
         """Sends a warning message in the channel."""
         if not await self._can_notify(message):
@@ -588,7 +534,6 @@ class AntiPhishing(commands.Cog):
             return
 
         try:
-            # Fetch staff role for potential mention (use configured one if available)
             staff_role_id = await self.config.guild(message.guild).staff_role()
             staff_mention = f"<@&{staff_role_id}>" if staff_role_id else ""
             allowed_mentions = discord.AllowedMentions(roles=True if staff_role_id else False)
@@ -601,7 +546,6 @@ class AntiPhishing(commands.Cog):
             embed.timestamp = datetime.datetime.now(datetime.timezone.utc)
             embed.set_footer(text="Please alert staff if you believe this is an error.")
 
-            # Check if the domain is in blocklistv2 and add specific details
             additional_info = self.domains_v2.get(domain)
             if additional_info and isinstance(additional_info, dict):
                 description = (
@@ -615,21 +559,19 @@ class AntiPhishing(commands.Cog):
                 )
                 embed.add_field(name="Threat Details", value=description, inline=False)
             else:
-                # Default message for blocklist
                 embed.description = (
                     f"{message.author.mention} sent a link (`{domain}`) identified as potentially malicious. "
                     "This website might contain malware, spyware, phishing attempts, or other harmful content. "
                     "**Avoid clicking this link.**"
                 )
 
-            # Reply to the original message if possible, otherwise send to channel
             reply_target = message.to_reference(fail_if_not_exists=False)
             if reply_target:
-                 await message.channel.send(content=staff_mention if staff_mention else None, embed=embed, allowed_mentions=allowed_mentions, reference=reply_target)
+                await message.channel.send(content=staff_mention if staff_mention else None, embed=embed, allowed_mentions=allowed_mentions, reference=reply_target)
             else:
-                 await message.channel.send(content=staff_mention if staff_mention else None, embed=embed, allowed_mentions=allowed_mentions)
+                await message.channel.send(content=staff_mention if staff_mention else None, embed=embed, allowed_mentions=allowed_mentions)
 
-            if not is_fallback: # Only count if it's the primary action
+            if not is_fallback:
                 async with self.config.guild(message.guild).notifications() as count:
                     count += 1
         except discord.Forbidden:
@@ -641,12 +583,10 @@ class AntiPhishing(commands.Cog):
         except Exception as e:
             log.exception(f"Unexpected error during notify action: {e}")
 
-
     async def _delete_action(self, message: discord.Message, domain: str, is_fallback: bool = False):
         """Deletes the offending message."""
         if not await self._can_delete(message):
             log.warning(f"Missing MANAGE_MESSAGES permission for delete action in {message.channel.name} ({message.guild.name}).")
-            # If delete fails as primary action, try to notify as fallback
             if not is_fallback and await self._can_notify(message):
                 log.info("Falling back to notify action because delete failed due to permissions.")
                 await self._notify_action(message, domain, is_fallback=True)
@@ -655,12 +595,11 @@ class AntiPhishing(commands.Cog):
         try:
             await message.delete()
             log.info(f"Deleted message {message.id} due to phishing link '{domain}'.")
-            if not is_fallback: # Only count if it's the primary action
+            if not is_fallback:
                 async with self.config.guild(message.guild).deletions() as count:
                     count += 1
         except discord.Forbidden:
             log.warning(f"Missing permissions to delete message {message.id}.")
-            # If delete fails as primary action, try to notify as fallback
             if not is_fallback and await self._can_notify(message):
                 log.info("Falling back to notify action because delete failed due to permissions.")
                 await self._notify_action(message, domain, is_fallback=True)
@@ -671,21 +610,19 @@ class AntiPhishing(commands.Cog):
         except Exception as e:
             log.exception(f"Unexpected error during delete action: {e}")
 
-
     async def _kick_action(self, message: discord.Message, domain: str):
         """Deletes the message and kicks the user."""
         reason = f"Sent a known malicious link: {domain}"
 
-        # Attempt delete first
-        await self._delete_action(message, domain, is_fallback=True) # Delete is part of kick
+        await self._delete_action(message, domain, is_fallback=True)
 
         if not await self._can_kick(message):
             log.warning(f"Missing KICK_MEMBERS permission for kick action in guild {message.guild.name}.")
             return
 
         if not isinstance(message.author, discord.Member):
-             log.warning(f"Cannot kick {message.author} ({message.author.id}), not a member object.")
-             return
+            log.warning(f"Cannot kick {message.author} ({message.author.id}), not a member object.")
+            return
 
         try:
             await message.author.kick(reason=reason)
@@ -699,25 +636,21 @@ class AntiPhishing(commands.Cog):
         except Exception as e:
             log.exception(f"Unexpected error during kick action: {e}")
 
-
     async def _ban_action(self, message: discord.Message, domain: str):
         """Deletes the message and bans the user."""
         reason = f"Sent a known malicious link: {domain}"
 
-        # Attempt delete first
-        await self._delete_action(message, domain, is_fallback=True) # Delete is part of ban
+        await self._delete_action(message, domain, is_fallback=True)
 
         if not await self._can_ban(message):
             log.warning(f"Missing BAN_MEMBERS permission for ban action in guild {message.guild.name}.")
             return
 
-        if not isinstance(message.author, discord.Member): # Need member object to ban typically
-             log.warning(f"Cannot ban {message.author} ({message.author.id}), not a member object.")
-             # Could potentially ban by ID if needed, but requires different approach
-             return
+        if not isinstance(message.author, discord.Member):
+            log.warning(f"Cannot ban {message.author} ({message.author.id}), not a member object.")
+            return
 
         try:
-            # Ban with 0 days deletion, just ban the user
             await message.author.ban(reason=reason, delete_message_days=0)
             log.info(f"Banned {message.author} ({message.author.id}) for reason: {reason}")
             async with self.config.guild(message.guild).bans() as count:
@@ -729,27 +662,24 @@ class AntiPhishing(commands.Cog):
         except Exception as e:
             log.exception(f"Unexpected error during ban action: {e}")
 
-
     async def _timeout_action(self, message: discord.Message, domain: str):
         """Deletes the message and times out the user."""
         reason = f"Sent a known malicious link: {domain}"
 
-        # Attempt delete first
-        await self._delete_action(message, domain, is_fallback=True) # Delete is part of timeout
+        await self._delete_action(message, domain, is_fallback=True)
 
         if not await self._can_timeout(message):
             log.warning(f"Missing MODERATE_MEMBERS permission for timeout action in guild {message.guild.name}.")
             return
 
         if not isinstance(message.author, discord.Member):
-             log.warning(f"Cannot timeout {message.author} ({message.author.id}), not a member object.")
-             return
+            log.warning(f"Cannot timeout {message.author} ({message.author.id}), not a member object.")
+            return
 
         try:
             timeout_duration_minutes = await self.config.guild(message.guild).timeout_duration()
             timeout_delta = datetime.timedelta(minutes=timeout_duration_minutes)
 
-            # Use timeout method directly (available in recent d.py versions)
             await message.author.timeout(timeout_delta, reason=reason)
 
             log.info(f"Timed out {message.author} ({message.author.id}) for {timeout_duration_minutes} minutes. Reason: {reason}")
@@ -758,11 +688,9 @@ class AntiPhishing(commands.Cog):
         except discord.Forbidden:
             log.warning(f"Missing permissions or hierarchy too low to timeout {message.author} ({message.author.id}).")
         except discord.HTTPException as e:
-            # Handle specific error for timeout duration if needed (e.g., too long)
             log.error(f"HTTP error timing out {message.author} ({message.author.id}): {e}")
         except Exception as e:
             log.exception(f"Unexpected error during timeout action: {e}")
-
 
     @commands.Cog.listener()
     async def on_message_edit(self, before: discord.Message, after: discord.Message):
@@ -772,14 +700,10 @@ class AntiPhishing(commands.Cog):
         """
         if not after.guild or after.author.bot:
             return
-        # Ignore if content hasn't changed or if message is too old
         if before.content == after.content or (discord.utils.utcnow() - after.created_at).total_seconds() > 300:
-             return
+            return
         if await self.bot.cog_disabled_in_guild(self, after.guild):
             return
-        # Check if user is immune based on permissions/roles (optional, add if needed)
-        # if await self.is_immune(after.author):
-        #     return
 
         links = self.get_links(after.content)
         if not links:
@@ -796,9 +720,6 @@ class AntiPhishing(commands.Cog):
             return
         if await self.bot.cog_disabled_in_guild(self, message.guild):
             return
-        # Check if user is immune based on permissions/roles (optional, add if needed)
-        # if await self.is_immune(message.author):
-        #     return
 
         links = self.get_links(message.content)
         if not links:
@@ -817,26 +738,20 @@ class AntiPhishing(commands.Cog):
                 log.warning(f"Could not parse URL for hostname: {url}")
                 continue
 
-            # 1. Check exact hostname match (e.g., malicious.example.com)
             if hostname in self.domains or hostname in self.domains_v2:
                 log.debug(f"Exact match found: {hostname}")
                 await self.handle_phishing(message, hostname)
-                continue # Continue processing other links in the message
+                continue
 
-            # 2. Check registered domain match (e.g., example.com from www.example.com)
             try:
-                # Use no_fetch=True as we don't need updated TLD list for every check
-                extracted = tldextract.extract(hostname, include_psl_private_domains=True)
-                # Construct registered domain only if both parts exist
-                if extracted.domain and extracted.suffix:
-                    registered_domain = f"{extracted.domain}.{extracted.suffix}".lower()
-                    # Avoid re-checking if hostname was already the registered domain
+                domain_match = re.search(r'([a-z0-9-]+\.[a-z]{2,})$', hostname)
+                if domain_match:
+                    registered_domain = domain_match.group(1).lower()
                     if registered_domain != hostname and (registered_domain in self.domains or registered_domain in self.domains_v2):
                         log.debug(f"Registered domain match found: {registered_domain} (from {hostname})")
                         await self.handle_phishing(message, registered_domain)
-                        continue # Continue processing other links in the message
+                        continue
             except Exception as e:
-                # Log error during extraction but continue checking other hostnames/links
                 log.error(f"Error extracting domain from hostname '{hostname}': {e}")
                 continue
 
