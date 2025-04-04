@@ -1260,21 +1260,21 @@ class Cloudflare(commands.Cog):
                 
             if "status" in whois_info:
                 status_explainers = {
-                    "clienttransferprohibited": ":lock: Transfer prohibited",
-                    "clientdeleteprohibited": ":no_entry: Deletion prohibited",
-                    "clientupdateprohibited": ":pencil2: Update prohibited",
-                    "clienthold": ":pause_button: On hold",
-                    "servertransferprohibited": ":lock: Server locked",
-                    "serverdeleteprohibited": ":no_entry: Server deletion prohibited",
-                    "serverupdateprohibited": ":pencil2: Server update prohibited",
-                    "serverhold": ":pause_button: Server on hold",
-                    "pendingtransfer": ":hourglass: Pending transfer",
-                    "pendingdelete": ":hourglass: Pending deletion",
-                    "pendingupdate": ":hourglass: Pending update",
-                    "ok": ":white_check_mark: Active"
+                    "clienttransferprohibited": ":lock: **Transfer prohibited**",
+                    "clientdeleteprohibited": ":no_entry: **Deletion prohibited**",
+                    "clientupdateprohibited": ":pencil2: **Update prohibited**",
+                    "clienthold": ":pause_button: **On hold**",
+                    "servertransferprohibited": ":lock: **Server locked**",
+                    "serverdeleteprohibited": ":no_entry: **Server deletion prohibited**",
+                    "serverupdateprohibited": ":pencil2: **Server update prohibited**",
+                    "serverhold": ":pause_button: **Server on hold**",
+                    "pendingtransfer": ":hourglass: **Pending transfer**",
+                    "pendingdelete": ":hourglass: **Pending deletion**",
+                    "pendingupdate": ":hourglass: **Pending update**",
+                    "ok": ":white_check_mark: **Active**"
                 }
                 status_list = "\n".join(
-                    f"- `{status}` \n> {status_explainers.get(status.lower(), ':grey_question: Unknown status')}" 
+                    f"- `{status}` \n> {status_explainers.get(status.lower(), ':grey_question: *Unknown status*')}" 
                     for status in whois_info["status"]
                 )
                 page = add_field_to_page(page, "Status", status_list)
