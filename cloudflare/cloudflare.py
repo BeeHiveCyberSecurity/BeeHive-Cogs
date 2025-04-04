@@ -1980,7 +1980,6 @@ class Cloudflare(commands.Cog):
     async def urlscanner(self, ctx):
         """
         With Cloudflare’s URL Scanner, you have the ability to investigate the details of a domain, IP, URL, or ASN. Cloudflare’s URL Scanner is available in the Security Center of the Cloudflare dashboard, Cloudflare Radar and the Cloudflare API.
-         
         Learn more at https://developers.cloudflare.com/radar/investigate/url-scanner/
         """
 
