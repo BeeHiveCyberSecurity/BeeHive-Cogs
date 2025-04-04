@@ -1862,7 +1862,7 @@ class Cloudflare(commands.Cog):
                 data = await response.json()
                 if data["success"]:
                     result = data["result"]
-                    embed = discord.Embed(title=f"ASN intelligence for {asn}", color=0xFF6633)
+                    embed = discord.Embed(title=f"ASN intelligence for #{asn}", color=0xFF6633)
                     
                     if "asn" in result:
                         embed.add_field(name="ASN Number", value=f"{result['asn']}", inline=True)
