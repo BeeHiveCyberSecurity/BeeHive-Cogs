@@ -1,4 +1,5 @@
 import contextlib
+import asyncio
 import datetime
 import re
 from typing import List, Optional, Dict, Any
@@ -304,6 +305,31 @@ class AntiPhishing(commands.Cog):
         await self._send_embed(ctx, 'Settings changed',
                                f"The timeout duration is now set to **{minutes}** minutes.",
                                0xffd966, "https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/clock.png")
+
+    @commands.admin_or_permissions()
+    @antiphishing.command()
+    async def lookup(self, ctx: Context, domain: str):
+        """
+        Lookup a domain in the blocklistv2 and show its details if it exists.
+        """
+        domain = domain.lower()
+        if domain in self.domains_v2:
+            additional_info = self.domains_v2[domain]
+            formatted_info = "\n".join(f"**{key.replace('_', ' ').title()}**: {value}" for key, value in additional_info.items())
+            embed = discord.Embed(
+                title=f"Domain Lookup: {domain}",
+                description=formatted_info,
+                color=0x2bbd8e  # Green
+            )
+            await ctx.send(embed=embed)
+        else:
+            await self._send_embed(
+                ctx,
+                'Domain Not Found',
+                f"The domain `{domain}` is not in the blocklistv2.",
+                0xffd966,  # Yellow
+                "https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/close.png"
+            )
 
     @tasks.loop(minutes=15)
     async def get_phishing_domains(self) -> None:
