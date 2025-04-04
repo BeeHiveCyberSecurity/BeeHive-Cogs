@@ -1223,7 +1223,7 @@ class Cloudflare(commands.Cog):
             if "updated_date" in whois_info:
                 try:
                     updated_date = int(datetime.strptime(whois_info["updated_date"], "%Y-%m-%dT%H:%M:%S.%fZ").timestamp())
-                    page = add_field_to_page(page, "Updated on", f"<t:{updated_date}:d>")
+                    page.add_field(name="Updated on", value=f"<t:{updated_date}:d>", inline=True)
                 except ValueError:
                     pass
                 except AttributeError:
