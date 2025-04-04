@@ -25,10 +25,10 @@ class AntiPhishing(commands.Cog):
     def __init__(self, bot: Red):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=73836)
-        self._initialize_config()
         self.session = aiohttp.ClientSession()
         self.domains = set()  # Stores lowercase registered domains
         self.domains_v2 = {}  # Stores lowercase registered domains -> additional info
+        self._initialize_config()
         self.bot.loop.create_task(self.get_phishing_domains())
 
     def _initialize_config(self):
