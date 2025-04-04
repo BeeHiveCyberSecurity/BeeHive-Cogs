@@ -1264,16 +1264,16 @@ class Cloudflare(commands.Cog):
 
             contact_methods = []
 
+            if "registrar_name" in whois_info:
+                contact_methods.append(f":office: **`{whois_info['registrar_name']}`**")
             if "registrar_email" in whois_info:
-                contact_methods.append(f"Email: **`{whois_info['registrar_email']}`**")
+                contact_methods.append(f":incoming_envelope: **`{whois_info['registrar_email']}`**")
             if "registrar_fax" in whois_info:
                 contact_methods.append(f"Fax: **`{whois_info['registrar_fax']}`**")
             if "registrar_fax_ext" in whois_info:
                 contact_methods.append(f"Fax Ext: **`{whois_info['registrar_fax_ext']}`**")
             if "registrar_id" in whois_info:
                 contact_methods.append(f"ID: **`{whois_info['registrar_id']}`**")
-            if "registrar_name" in whois_info:
-                contact_methods.append(f"Name: **`{whois_info['registrar_name']}`**")
             if "registrar_org" in whois_info:
                 contact_methods.append(f"Org: **`{whois_info['registrar_org']}`**")
             if "registrar_phone" in whois_info:
