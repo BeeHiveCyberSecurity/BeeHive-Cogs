@@ -1263,6 +1263,7 @@ class Cloudflare(commands.Cog):
                     "clienttransferprohibited": ":lock: **Transfer prohibited**",
                     "clientdeleteprohibited": ":no_entry: **Deletion prohibited**",
                     "clientupdateprohibited": ":pencil2: **Update prohibited**",
+                    "clientrenewprohibited": ":no_entry_sign: **Renewal prohibited**",
                     "clienthold": ":pause_button: **Held by registrar**",
                     "servertransferprohibited": ":lock: **Server locked**",
                     "serverdeleteprohibited": ":no_entry: **Server deletion prohibited**",
