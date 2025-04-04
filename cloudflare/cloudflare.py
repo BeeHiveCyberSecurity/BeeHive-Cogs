@@ -1415,13 +1415,13 @@ class Cloudflare(commands.Cog):
                                 </div>
                                 <hr>
                                 <div class="section">
-                                    <h2>Domain Information</h2>
+                                    <h2>Report information</h2>
                                     <div class="card">
-                                        <p><span class="key">Domain:</span> <span class="value">{domain}</span></p>
+                                        <p><span class="key">Domain queried</span> <span class="value">{domain}</span></p>
                                     </div>
                                 </div>
                                 <div class="section">
-                                    <h2>Registrar Information</h2>
+                                    <h2>WHOIS</h2>
                     """
                     for key, value in whois_info.items():
                         html_content += f"""
