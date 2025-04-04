@@ -1277,7 +1277,7 @@ class Cloudflare(commands.Cog):
             if "registrar_org" in whois_info:
                 contact_methods.append(f"Org: **`{whois_info['registrar_org']}`**")
             if "registrar_phone" in whois_info:
-                contact_methods.append(f"Phone: **`{whois_info['registrar_phone']}`**")
+                contact_methods.append(f":calling: **`{whois_info['registrar_phone']}`**")
             if "registrar_phone_ext" in whois_info:
                 contact_methods.append(f"Phone Ext: **`{whois_info['registrar_phone_ext']}`**")
             if "registrar_postal_code" in whois_info:
