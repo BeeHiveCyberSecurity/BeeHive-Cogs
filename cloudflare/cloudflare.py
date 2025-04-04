@@ -1867,7 +1867,9 @@ class Cloudflare(commands.Cog):
                     if "asn" in result:
                         embed.add_field(name="ASN Number", value=f"{result['asn']}", inline=True)
                     if "description" in result:
-                        embed.add_field(name="Owner", value=f"{result['description']}", inline=True)
+                        owner_query = result['description'].replace(' ', '+')
+                        google_search_url = f"https://www.google.com/search?q={owner_query}"
+                        embed.add_field(name="Owner", value=f"[{result['description']}]({google_search_url})", inline=True)
                     if "country" in result:
                         embed.add_field(name="Region", value=f":flag_{result['country'].lower()}: {result['country']}", inline=True)
                     if "type" in result:
