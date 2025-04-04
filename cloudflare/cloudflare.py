@@ -1191,6 +1191,7 @@ class Cloudflare(commands.Cog):
 
             pages = []
             page = discord.Embed(title=f"WHOIS query for {domain}", color=0xFF6633)
+            page.set_footer(text="WHOIS information provided by Cloudflare")
             field_count = 0
 
             def add_field_to_page(page, name, value):
@@ -1246,7 +1247,7 @@ class Cloudflare(commands.Cog):
                 
 
             if "id" in whois_info:
-                id_value = f"**`{whois_info['id']}`**"
+                id_value = f"`{whois_info['id']}`"
                 page = add_field_to_page(page, "ID", id_value)
 
             if "registrar_city" in whois_info:
