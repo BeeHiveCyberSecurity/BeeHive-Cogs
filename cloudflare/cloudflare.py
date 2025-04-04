@@ -1682,12 +1682,12 @@ class Cloudflare(commands.Cog):
                 
                 ip_value = result.get('ip')
                 if ip_value:
-                    embed.add_field(name="IP", value=f"**`{ip_value}`**", inline=False)
+                    embed.add_field(name="IP", value=f"{ip_value}", inline=True)
                 
                 belongs_to = result.get("belongs_to_ref", {})
                 description = belongs_to.get('description')
                 if description:
-                    embed.add_field(name="Belongs To", value=f"**`{description}`**", inline=False)
+                    embed.add_field(name="Belongs to", value=f"{description}", inline=True)
                 
                 country = belongs_to.get('country')
                 if country:
@@ -1701,12 +1701,12 @@ class Cloudflare(commands.Cog):
                 if risk_types:
                     risk_types_str = ", ".join([f"**`{risk.get('name', 'N/A')}`**" for risk in risk_types if risk.get('name')])
                     if risk_types_str:
-                        embed.add_field(name="Risk Types", value=risk_types_str, inline=False)
+                        embed.add_field(name="Risk types", value=risk_types_str, inline=False)
                 
                 result_info = data.get("result_info", {})
                 total_count = result_info.get('total_count')
                 if total_count:
-                    embed.add_field(name="Total Count", value=f"**`{total_count}`**", inline=False)
+                    embed.add_field(name="Total count", value=f"**`{total_count}`**", inline=False)
                 
                 page = result_info.get('page')
                 if page:
@@ -1714,7 +1714,7 @@ class Cloudflare(commands.Cog):
                 
                 per_page = result_info.get('per_page')
                 if per_page:
-                    embed.add_field(name="Per Page", value=f"**`{per_page}`**", inline=False)
+                    embed.add_field(name="Per page", value=f"**`{per_page}`**", inline=False)
                 
                 embed.set_footer(text="IP intelligence provided by Cloudflare")
                 await ctx.send(embed=embed)
