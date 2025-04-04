@@ -1282,29 +1282,30 @@ class Cloudflare(commands.Cog):
 
             contact_methods = []
 
+            # Order: Name, Organization, ID, Email, Phone, Fax, Address
             if "registrar_name" in whois_info:
-                contact_methods.append(f":office: {whois_info['registrar_name']}")
-            if "registrar_email" in whois_info:
-                contact_methods.append(f":incoming_envelope: {whois_info['registrar_email']}")
-            if "registrar_fax" in whois_info:
-                contact_methods.append(f":fax: {whois_info['registrar_fax']}")
-            if "registrar_fax_ext" in whois_info:
-                contact_methods.append(f":fax: :1234: {whois_info['registrar_fax_ext']}")
-            if "registrar_id" in whois_info:
-                contact_methods.append(f"ID: {whois_info['registrar_id']}")
+                contact_methods.append(f":office: **Name:** {whois_info['registrar_name']}")
             if "registrar_org" in whois_info:
-                contact_methods.append(f"Org: {whois_info['registrar_org']}")
+                contact_methods.append(f":busts_in_silhouette: **Organization:** {whois_info['registrar_org']}")
+            if "registrar_id" in whois_info:
+                contact_methods.append(f":id: **ID:** {whois_info['registrar_id']}")
+            if "registrar_email" in whois_info:
+                contact_methods.append(f":incoming_envelope: **Email:** {whois_info['registrar_email']}")
             if "registrar_phone" in whois_info:
                 phone_number = whois_info['registrar_phone']
-                contact_methods.append(f":calling: {phone_number}")
+                contact_methods.append(f":telephone_receiver: **Phone:** {phone_number}")
             if "registrar_phone_ext" in whois_info:
-                contact_methods.append(f":calling: :1234: {whois_info['registrar_phone_ext']}")
-            if "registrar_postal_code" in whois_info:
-                contact_methods.append(f"Postal Code: {whois_info['registrar_postal_code']}")
-            if "registrar_province" in whois_info:
-                contact_methods.append(f"Province: {whois_info['registrar_province']}")
+                contact_methods.append(f":1234: **Phone Ext:** {whois_info['registrar_phone_ext']}")
+            if "registrar_fax" in whois_info:
+                contact_methods.append(f":fax: **Fax:** {whois_info['registrar_fax']}")
+            if "registrar_fax_ext" in whois_info:
+                contact_methods.append(f":1234: **Fax Ext:** {whois_info['registrar_fax_ext']}")
             if "registrar_street" in whois_info:
-                contact_methods.append(f"Street: {whois_info['registrar_street']}")
+                contact_methods.append(f":house: **Street:** {whois_info['registrar_street']}")
+            if "registrar_province" in whois_info:
+                contact_methods.append(f":map: **Province:** {whois_info['registrar_province']}")
+            if "registrar_postal_code" in whois_info:
+                contact_methods.append(f":mailbox: **Postal Code:** {whois_info['registrar_postal_code']}")
 
             if contact_methods:
                 contact_info = "\n".join(contact_methods)
