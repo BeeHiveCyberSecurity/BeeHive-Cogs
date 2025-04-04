@@ -1347,11 +1347,11 @@ class Cloudflare(commands.Cog):
                         <style>
                             body {{ font-family: 'Inter', sans-serif; margin: 10px; background-color: #f4f4f9; color: #333; }}
                             h1 {{ color: #2c3e50; text-align: center; font-size: 1.5em; }}
-                            p {{ line-height: 1.6; margin: 10px 0; font-size: 1em; }}
-                            .key {{ font-weight: 600; color: #34495e; }}
-                            .value {{ color: #7f8c8d; }}
                             .header {{ text-align: center; margin-bottom: 20px; }}
                             .content {{ max-width: 100%; margin: 0 auto; padding: 10px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }}
+                            .card {{ background-color: var(--background-color, #ffffff); border-radius: 15px; padding: 15px; margin-bottom: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }}
+                            .key {{ font-weight: bold; color: #34495e; font-size: 16px; }}
+                            .value {{ color: #7f8c8d; font-size: 24px; font-weight: bold; }}
                             hr {{ border: 0; height: 1px; background: #ddd; margin: 20px 0; }}
                         </style>
                     </head>
@@ -1365,7 +1365,11 @@ class Cloudflare(commands.Cog):
                             <hr>
                     """
                     for key, value in whois_info.items():
-                        html_content += f"<p><span class='key'>{key}:</span> <span class='value'>{value}</span></p>"
+                        html_content += f"""
+                        <div class='card'>
+                            <p><span class='key'>{key}:</span> <span class='value'>{value}</span></p>
+                        </div>
+                        """
 
                     html_content += """
                         </div>
