@@ -1703,10 +1703,9 @@ class Cloudflare(commands.Cog):
                     if risk_types_str:
                         embed.add_field(name="Risk types", value=risk_types_str, inline=False)
                 
-                ptr_domains = result.get("ptr_domains", [])
-                if ptr_domains:
-                    ptr_domains_str = ", ".join([f"{ptr}" for ptr in ptr_domains])
-                    embed.add_field(name="PTR Domains", value=ptr_domains_str, inline=False)
+                if "ptr_lookup" in result and result["ptr_lookup"] and "ptr_domains" in result["ptr_lookup"] and result["ptr_lookup"]["ptr_domains"]:
+                ptr_domains = ", ".join([f"{domain}" for domain in result["ptr_lookup"]["ptr_domains"]])
+                embed.add_field(name="PTR Domains", value=ptr_domains, inline=False)
                 
                 result_info = data.get("result_info", {})
                 total_count = result_info.get('total_count')
