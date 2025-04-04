@@ -1469,8 +1469,6 @@ class Cloudflare(commands.Cog):
                     # Add blocklist status
                     blocklist_status = ":white_check_mark: Yes" if is_blocked else ":x: No"
                     embed.add_field(name="On BeeHive Blocklist", value=f"**{blocklist_status}**", inline=False)
-
-                    embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/globe.png")
                     await ctx.send(embed=embed)
                 else:
                     error_embed = discord.Embed(title="Error", description=f"Error: {data['errors']}", color=0xff4545)
