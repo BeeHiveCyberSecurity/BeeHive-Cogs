@@ -1874,8 +1874,7 @@ class Cloudflare(commands.Cog):
                         embed.add_field(name="Type", value=f"{result['type']}", inline=True)
                     if "risk_score" in result:
                         embed.add_field(name="Risk Score", value=f"**`{result['risk_score']}`**", inline=False)
-                    
-                    embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/globe.png")
+                    embed.set_footer(text="ASN intelligence provided by Cloudflare")
                     await ctx.send(embed=embed)
                 else:
                     embed = discord.Embed(title="Error", description=f"Error: {data['errors']}", color=0xff4545)
