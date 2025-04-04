@@ -1524,6 +1524,7 @@ class Cloudflare(commands.Cog):
                 download_button.callback = download_report
                 view.add_item(download_button)
 
+                embed.set_footer(text="Data provided by BeeHive and Cloudflare")
                 await ctx.send(embed=embed, view=view)
             else:
                 error_message = data.get("errors", [{"message": "Unknown error"}])[0].get("message", "Unknown error")
