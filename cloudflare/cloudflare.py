@@ -1191,7 +1191,7 @@ class Cloudflare(commands.Cog):
 
             pages = []
             page = discord.Embed(title=f"WHOIS query for {domain}", color=0xFF6633)
-            page.set_footer(text="WHOIS information provided by Cloudflare")
+            page.set_footer(text="WHOIS information provided by Cloudflare", icon_url="https://cdn.brandfetch.io/idJ3Cg8ymG/w/400/h/400/theme/dark/icon.jpeg?c=1dxbfHSJFAPEGdCLU4o5B")
             field_count = 0
 
             def add_field_to_page(page, name, value):
