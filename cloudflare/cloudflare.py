@@ -1437,32 +1437,51 @@ class Cloudflare(commands.Cog):
                 result = data.get("result", {})
                 embed = discord.Embed(title=f"Domain intelligence for {result.get('domain', 'N/A')}", color=0xFF6633)
                 
-                embed.add_field(name="Domain", value=f"`{result.get('domain', 'N/A')}`", inline=False)
-                embed.add_field(name="Risk Score", value=f"`{result.get('risk_score', 'N/A')}`", inline=False)
-                embed.add_field(name="Popularity Rank", value=f"`{result.get('popularity_rank', 'N/A')}`", inline=False)
+                domain = result.get('domain')
+                if domain:
+                    embed.add_field(name="Domain", value=f"`{domain}`", inline=False)
+                
+                risk_score = result.get('risk_score')
+                if risk_score is not None:
+                    embed.add_field(name="Risk Score", value=f"`{risk_score}`", inline=False)
+                
+                popularity_rank = result.get('popularity_rank')
+                if popularity_rank is not None:
+                    embed.add_field(name="Popularity Rank", value=f"`{popularity_rank}`", inline=False)
                 
                 application = result.get("application", {})
-                embed.add_field(name="Application", value=f"`{application.get('name', 'N/A')}`", inline=False)
+                application_name = application.get('name')
+                if application_name:
+                    embed.add_field(name="Application", value=f"`{application_name}`", inline=False)
                 
                 additional_info = result.get("additional_information", {})
-                embed.add_field(name="Suspected Malware Family", value=f"`{additional_info.get('suspected_malware_family', 'N/A')}`", inline=False)
+                suspected_malware_family = additional_info.get('suspected_malware_family')
+                if suspected_malware_family:
+                    embed.add_field(name="Suspected Malware Family", value=f"`{suspected_malware_family}`", inline=False)
                 
                 content_categories = result.get("content_categories", [])
-                embed.add_field(name="Content Categories", value=", ".join([f"`{cat.get('name', 'N/A')}`" for cat in content_categories]), inline=False)
+                if content_categories:
+                    embed.add_field(name="Content Categories", value=", ".join([f"`{cat.get('name', 'N/A')}`" for cat in content_categories]), inline=False)
                 
                 resolves_to_refs = result.get("resolves_to_refs", [])
-                embed.add_field(name="Resolves To", value=", ".join([f"`{ref.get('value', 'N/A')}`" for ref in resolves_to_refs]), inline=False)
+                if resolves_to_refs:
+                    embed.add_field(name="Resolves To", value=", ".join([f"`{ref.get('value', 'N/A')}`" for ref in resolves_to_refs]), inline=False)
                 
                 inherited_content_categories = result.get("inherited_content_categories", [])
-                embed.add_field(name="Inherited Content Categories", value=", ".join([f"`{cat.get('name', 'N/A')}`" for cat in inherited_content_categories]), inline=False)
+                if inherited_content_categories:
+                    embed.add_field(name="Inherited Content Categories", value=", ".join([f"`{cat.get('name', 'N/A')}`" for cat in inherited_content_categories]), inline=False)
                 
-                embed.add_field(name="Inherited From", value=f"`{result.get('inherited_from', 'N/A')}`", inline=False)
+                inherited_from = result.get('inherited_from')
+                if inherited_from:
+                    embed.add_field(name="Inherited From", value=f"`{inherited_from}`", inline=False)
                 
                 inherited_risk_types = result.get("inherited_risk_types", [])
-                embed.add_field(name="Inherited Risk Types", value=", ".join([f"`{risk.get('name', 'N/A')}`" for risk in inherited_risk_types]), inline=False)
+                if inherited_risk_types:
+                    embed.add_field(name="Inherited Risk Types", value=", ".join([f"`{risk.get('name', 'N/A')}`" for risk in inherited_risk_types]), inline=False)
                 
                 risk_types = result.get("risk_types", [])
-                embed.add_field(name="Risk Types", value=", ".join([f"`{risk.get('name', 'N/A')}`" for risk in risk_types]), inline=False)
+                if risk_types:
+                    embed.add_field(name="Risk Types", value=", ".join([f"`{risk.get('name', 'N/A')}`" for risk in risk_types]), inline=False)
 
                 # Add blocklist status
                 blocklist_status = ":white_check_mark: Yes" if is_blocked else ":x: No"
