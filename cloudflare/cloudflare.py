@@ -1572,7 +1572,8 @@ class Cloudflare(commands.Cog):
                 
                 content_categories = result.get("content_categories", [])
                 if content_categories:
-                    embed.add_field(name="Content categories", value=", ".join([f"{cat.get('name', 'N/A')}" for cat in content_categories]), inline=False)
+                    categories_list = "\n".join([f"- {cat.get('name', 'N/A')}" for cat in content_categories])
+                    embed.add_field(name="Content categories", value=categories_list, inline=False)
                 
                 resolves_to_refs = result.get("resolves_to_refs", [])
                 if resolves_to_refs:
