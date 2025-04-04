@@ -1228,7 +1228,7 @@ class Cloudflare(commands.Cog):
                         expiration_date = datetime.strptime(expiration_date, "%Y-%m-%dT%H:%M:%S")
                 unix_timestamp = int(expiration_date.timestamp())
                 discord_timestamp = f"<t:{unix_timestamp}:d>"
-                page = add_field_to_page(page, "Expires on", discord_timestamp)
+                page.add_field(name="Expires on", value=discord_timestamp, inline=True)
 
             if "dnssec" in whois_info:
                 dnssec_value = whois_info["dnssec"]
