@@ -1387,6 +1387,10 @@ class Cloudflare(commands.Cog):
                                     padding: 15px;
                                     margin-bottom: 10px;
                                     box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+                                    display: inline-block;
+                                    width: calc(50% - 20px);
+                                    vertical-align: top;
+                                    margin-right: 10px;
                                 }}
                                 .key {{
                                     font-weight: bold;
@@ -1422,13 +1426,22 @@ class Cloudflare(commands.Cog):
                                 <div class="section">
                                     <h2>WHOIS</h2>
                     """
+                    card_count = 0
                     for key, value in whois_info.items():
+                        if card_count % 2 == 0:
+                            html_content += "<div style='display: flex; flex-wrap: wrap;'>"
                         html_content += f"""
                                     <div class='card'>
                                         <p><span class='key'>{key.replace('_', ' ').title()}:</span></p>
                                         <p><span class='value'>{value}</span></p>
                                     </div>
                         """
+                        card_count += 1
+                        if card_count % 2 == 0:
+                            html_content += "</div>"
+
+                    if card_count % 2 != 0:
+                        html_content += "</div>"
 
                     html_content += """
                                 </div>
