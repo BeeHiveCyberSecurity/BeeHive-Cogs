@@ -107,12 +107,12 @@ class URLScan(commands.Cog):
                                 if 'verdicts' in res2 and 'overall' in res2['verdicts'] and 'score' in res2['verdicts']['overall']:
                                     threat_level = res2['verdicts']['overall']['score']
                                     if threat_level != 0:
-                                        embed.title = "URL is suspicious"
+                                        embed.title = "URLscan.io is suspicious"
                                         embed.description = f"URLScan says {url} is suspicious!\n\nFor your own safety, please don't click it."
                                         embed.color = 0xe25946
                                         view.add_item(discord.ui.Button(label="View results", url=report_url, style=discord.ButtonStyle.link))
                                     else:
-                                        embed.title = "URL is safe"
+                                        embed.title = "URLscan.io detected no threats"
                                         embed.color = 0x18bb9c
                                         embed.description = f"URLScan did not detect any threats associated with {url}"
                                         embed.add_field(name="Overall verdict", value="Scanned and found safe", inline=False)
