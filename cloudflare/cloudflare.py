@@ -1691,7 +1691,7 @@ class Cloudflare(commands.Cog):
                 
                 country = belongs_to.get('country')
                 if country:
-                    embed.add_field(name="Country", value=f"**`{country}`**", inline=False)
+                    embed.add_field(name="Country", value=f"{country}", inline=True)
                 
                 type_value = belongs_to.get('type')
                 if type_value:
