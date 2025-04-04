@@ -1348,11 +1348,17 @@ class Cloudflare(commands.Cog):
                             body {{ font-family: 'Inter', sans-serif; margin: 10px; background-color: #f4f4f9; color: #333; }}
                             h1 {{ color: #2c3e50; text-align: center; font-size: 1.5em; }}
                             .header {{ text-align: center; margin-bottom: 20px; }}
-                            .content {{ max-width: 100%; margin: 0 auto; padding: 10px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }}
-                            .card {{ background-color: var(--background-color, #ffffff); border-radius: 15px; padding: 15px; margin-bottom: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }}
+                            .content {{ max-width: 100%; margin: 0 auto; padding: 10px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); display: flex; flex-wrap: wrap; gap: 10px; }}
+                            .card {{ background-color: var(--background-color, #ffffff); border-radius: 15px; padding: 15px; margin-bottom: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); flex: 1 1 calc(33.333% - 20px); box-sizing: border-box; }}
                             .key {{ font-weight: bold; color: #34495e; font-size: 16px; }}
                             .value {{ color: #7f8c8d; font-size: 24px; font-weight: bold; }}
                             hr {{ border: 0; height: 1px; background: #ddd; margin: 20px 0; }}
+                            @media (max-width: 768px) {{
+                                .card {{ flex: 1 1 calc(50% - 20px); }}
+                            }}
+                            @media (max-width: 480px) {{
+                                .card {{ flex: 1 1 100%; }}
+                            }}
                         </style>
                     </head>
                     <body>
