@@ -1389,7 +1389,10 @@ class Cloudflare(commands.Cog):
                         temp_file_path = temp_file.name
 
                     # Send the HTML file
-                    await interaction.response.send_message(file=discord.File(temp_file_path))
+                    await interaction.response.send_message(
+                        content="Please open the attached file in a web browser to view the report.",
+                        file=discord.File(temp_file_path)
+                    )
                 except Exception as e:
                     await interaction.response.send_message(
                         content="Failed to generate or send the HTML report.",
