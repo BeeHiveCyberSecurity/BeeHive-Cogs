@@ -1193,12 +1193,12 @@ class Cloudflare(commands.Cog):
                 field_count += 1
                 if field_count == 10:
                     pages.append(page)
-                    page = discord.Embed(title=f"WHOIS Information for {domain}", color=0xFF6633)
+                    page = discord.Embed(title=f"WHOIS query for {domain}", color=0xFF6633)
                     field_count = 0
                 return page
 
             if "registrar" in whois_info:
-                registrar_value = f"`{whois_info['registrar']}`"
+                registrar_value = f"**{whois_info['registrar']}**"
                 page = add_field_to_page(page, "Registrar", registrar_value)
 
                 # Determine abuse report status
