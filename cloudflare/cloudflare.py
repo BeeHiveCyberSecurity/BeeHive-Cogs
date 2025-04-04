@@ -1224,7 +1224,7 @@ class Cloudflare(commands.Cog):
                 elif dnssec_value is False:
                     dnssec_value = ":x: **Disabled**"
                 else:
-                    dnssec_value = f"{dnssec_value}"
+                    dnssec_value = f":question: Unknown"
                 page.add_field(name="DNSSEC", value=dnssec_value, inline=True)
                 
                 if "domain" in whois_info:
