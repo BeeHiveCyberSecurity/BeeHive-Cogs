@@ -1772,9 +1772,9 @@ class Cloudflare(commands.Cog):
                     current_page = 0
 
                     def create_embed(page):
-                        embed = discord.Embed(title=f"Domain history for {domain}", color=0x2BBD8E)
+                        embed = discord.Embed(title=f"Domain history for {domain}", color=0xFF6633)
                         if "domain" in result:
-                            embed.add_field(name="Domain", value=f"**`{result['domain']}`**", inline=False)
+                            embed.add_field(name="Domain", value=f"{result['domain']}", inline=True)
                         for categorization in page:
                             categories = ", ".join([f"**`{category['name']}`**" for category in categorization["categories"]])
                             embed.add_field(name="Categories", value=categories, inline=True)
