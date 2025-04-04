@@ -1262,43 +1262,38 @@ class Cloudflare(commands.Cog):
                 status_list = "\n".join(f"- {status}" for status in whois_info["status"])
                 page = add_field_to_page(page, "Status", status_list)
 
-            if "id" in whois_info:
-                id_value = f"`{whois_info['id']}`"
-                page = add_field_to_page(page, "ID", id_value)
+            contact_methods = []
 
             if "registrar_email" in whois_info:
-                registrar_email = f"**`{whois_info['registrar_email']}`**"
-                page = add_field_to_page(page, "Registrar Email", registrar_email)
+                contact_methods.append(f"Email: **`{whois_info['registrar_email']}`**")
             if "registrar_fax" in whois_info:
-                registrar_fax = f"**`{whois_info['registrar_fax']}`**"
-                page = add_field_to_page(page, "Registrar Fax", registrar_fax)
+                contact_methods.append(f"Fax: **`{whois_info['registrar_fax']}`**")
             if "registrar_fax_ext" in whois_info:
-                registrar_fax_ext = f"**`{whois_info['registrar_fax_ext']}`**"
-                page = add_field_to_page(page, "Registrar Fax Ext", registrar_fax_ext)
+                contact_methods.append(f"Fax Ext: **`{whois_info['registrar_fax_ext']}`**")
             if "registrar_id" in whois_info:
-                registrar_id = f"**`{whois_info['registrar_id']}`**"
-                page = add_field_to_page(page, "Registrar ID", registrar_id)
+                contact_methods.append(f"ID: **`{whois_info['registrar_id']}`**")
             if "registrar_name" in whois_info:
-                registrar_name = f"**`{whois_info['registrar_name']}`**"
-                page = add_field_to_page(page, "Registrar Name", registrar_name)
+                contact_methods.append(f"Name: **`{whois_info['registrar_name']}`**")
             if "registrar_org" in whois_info:
-                registrar_org = f"**`{whois_info['registrar_org']}`**"
-                page = add_field_to_page(page, "Registrar Org", registrar_org)
+                contact_methods.append(f"Org: **`{whois_info['registrar_org']}`**")
             if "registrar_phone" in whois_info:
-                registrar_phone = f"**`{whois_info['registrar_phone']}`**"
-                page = add_field_to_page(page, "Registrar Phone", registrar_phone)
+                contact_methods.append(f"Phone: **`{whois_info['registrar_phone']}`**")
             if "registrar_phone_ext" in whois_info:
-                registrar_phone_ext = f"**`{whois_info['registrar_phone_ext']}`**"
-                page = add_field_to_page(page, "Registrar Phone Ext", registrar_phone_ext)
+                contact_methods.append(f"Phone Ext: **`{whois_info['registrar_phone_ext']}`**")
             if "registrar_postal_code" in whois_info:
-                registrar_postal_code = f"**`{whois_info['registrar_postal_code']}`**"
-                page = add_field_to_page(page, "Registrar Postal Code", registrar_postal_code)
+                contact_methods.append(f"Postal Code: **`{whois_info['registrar_postal_code']}`**")
             if "registrar_province" in whois_info:
-                registrar_province = f"**`{whois_info['registrar_province']}`**"
-                page = add_field_to_page(page, "Registrar Province", registrar_province)
+                contact_methods.append(f"Province: **`{whois_info['registrar_province']}`**")
             if "registrar_street" in whois_info:
-                registrar_street = f"**`{whois_info['registrar_street']}`**"
-                page = add_field_to_page(page, "Registrar Street", registrar_street)
+                contact_methods.append(f"Street: **`{whois_info['registrar_street']}`**")
+
+            if contact_methods:
+                contact_info = "\n".join(contact_methods)
+                page = add_field_to_page(page, "To report abuse", contact_info)
+
+            if "id" in whois_info:
+                id_value = f"```{whois_info['id']}```"
+                page = add_field_to_page(page, "ID", id_value)
 
             if page.fields:
                 pages.append(page)
