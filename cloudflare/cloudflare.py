@@ -1353,7 +1353,7 @@ class Cloudflare(commands.Cog):
                         ephemeral=True
                     )
 
-            download_button = discord.ui.Button(label="Download full report", style=discord.ButtonStyle.primary)
+            download_button = discord.ui.Button(label="Download full report", style=discord.ButtonStyle.grey)
             download_button.callback = download_report
             view.add_item(download_button)
 
@@ -1520,7 +1520,7 @@ class Cloudflare(commands.Cog):
                             ephemeral=True
                         )
 
-                download_button = discord.ui.Button(label="Download full report", style=discord.ButtonStyle.primary)
+                download_button = discord.ui.Button(label="Download full report", style=discord.ButtonStyle.grey)
                 download_button.callback = download_report
                 view.add_item(download_button)
 
