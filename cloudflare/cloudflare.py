@@ -1260,7 +1260,7 @@ class Cloudflare(commands.Cog):
                 
             if "status" in whois_info:
                 status_explainers = {
-                    "clientTransferProhibited": ":lock: Locked",
+                    "clientTransferProhibited": ":lock: Transfer prohibited",
                     "clientDeleteProhibited": ":no_entry: Deletion prohibited",
                     "clientUpdateProhibited": ":pencil2: Update prohibited",
                     "clientHold": ":pause_button: On hold",
