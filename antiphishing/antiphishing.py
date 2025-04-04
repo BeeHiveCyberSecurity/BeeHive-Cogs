@@ -431,7 +431,11 @@ class AntiPhishing(commands.Cog):
                         for entry in data["blocklist"]:
                             domain = entry.get("domain", "").lower()
                             if domain:
-                                domains_v2[domain] = entry
+                                domains_v2[domain] = {
+                                    "category": entry.get("category", ""),
+                                    "severity": entry.get("severity", ""),
+                                    "description": entry.get("description", "")
+                                }
                         log.debug(f"Successfully fetched and parsed V2 blocklist from {url}. {len(data['blocklist'])} entries raw.")
                         return True
                     else:
