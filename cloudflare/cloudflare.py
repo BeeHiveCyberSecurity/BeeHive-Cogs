@@ -1681,21 +1681,41 @@ class Cloudflare(commands.Cog):
                     result = data.get("result", [{}])[0]
                     embed = discord.Embed(title=f"IP intelligence for {result.get('ip', 'N/A')}", color=0xFF6633)
                     
-                    embed.add_field(name="IP", value=f"**`{result.get('ip', 'N/A')}`**", inline=False)
+                    ip_value = result.get('ip')
+                    if ip_value:
+                        embed.add_field(name="IP", value=f"**`{ip_value}`**", inline=False)
                     
                     belongs_to = result.get("belongs_to_ref", {})
-                    embed.add_field(name="Belongs To", value=f"**`{belongs_to.get('description', 'N/A')}`**", inline=False)
-                    embed.add_field(name="Country", value=f"**`{belongs_to.get('country', 'N/A')}`**", inline=False)
-                    embed.add_field(name="Type", value=f"**`{belongs_to.get('type', 'N/A').upper()}`**", inline=True)
+                    description = belongs_to.get('description')
+                    if description:
+                        embed.add_field(name="Belongs To", value=f"**`{description}`**", inline=False)
+                    
+                    country = belongs_to.get('country')
+                    if country:
+                        embed.add_field(name="Country", value=f"**`{country}`**", inline=False)
+                    
+                    type_value = belongs_to.get('type')
+                    if type_value:
+                        embed.add_field(name="Type", value=f"**`{type_value.upper()}`**", inline=True)
                     
                     risk_types = result.get("risk_types", [])
-                    risk_types_str = ", ".join([f"**`{risk.get('name', 'N/A')}`**" for risk in risk_types])
-                    embed.add_field(name="Risk Types", value=risk_types_str, inline=False)
+                    if risk_types:
+                        risk_types_str = ", ".join([f"**`{risk.get('name', 'N/A')}`**" for risk in risk_types if risk.get('name')])
+                        if risk_types_str:
+                            embed.add_field(name="Risk Types", value=risk_types_str, inline=False)
                     
                     result_info = data.get("result_info", {})
-                    embed.add_field(name="Total Count", value=f"**`{result_info.get('total_count', 'N/A')}`**", inline=False)
-                    embed.add_field(name="Page", value=f"**`{result_info.get('page', 'N/A')}`**", inline=False)
-                    embed.add_field(name="Per Page", value=f"**`{result_info.get('per_page', 'N/A')}`**", inline=False)
+                    total_count = result_info.get('total_count')
+                    if total_count:
+                        embed.add_field(name="Total Count", value=f"**`{total_count}`**", inline=False)
+                    
+                    page = result_info.get('page')
+                    if page:
+                        embed.add_field(name="Page", value=f"**`{page}`**", inline=False)
+                    
+                    per_page = result_info.get('per_page')
+                    if per_page:
+                        embed.add_field(name="Per Page", value=f"**`{per_page}`**", inline=False)
                     
                     await ctx.send(embed=embed)
                 else:
