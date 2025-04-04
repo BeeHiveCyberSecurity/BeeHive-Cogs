@@ -1282,9 +1282,9 @@ class Cloudflare(commands.Cog):
             contact_methods = []
 
             if "registrar_name" in whois_info:
-                contact_methods.append(f":office: `{whois_info['registrar_name']}`")
+                contact_methods.append(f":office: {whois_info['registrar_name']}")
             if "registrar_email" in whois_info:
-                contact_methods.append(f":incoming_envelope: `{whois_info['registrar_email']}`")
+                contact_methods.append(f":incoming_envelope: {whois_info['registrar_email']}")
             if "registrar_fax" in whois_info:
                 contact_methods.append(f":fax: `{whois_info['registrar_fax']}`")
             if "registrar_fax_ext" in whois_info:
