@@ -1269,9 +1269,9 @@ class Cloudflare(commands.Cog):
             if "registrar_email" in whois_info:
                 contact_methods.append(f":incoming_envelope: **`{whois_info['registrar_email']}`**")
             if "registrar_fax" in whois_info:
-                contact_methods.append(f"Fax: **`{whois_info['registrar_fax']}`**")
+                contact_methods.append(f":fax: **`{whois_info['registrar_fax']}`**")
             if "registrar_fax_ext" in whois_info:
-                contact_methods.append(f"Fax Ext: **`{whois_info['registrar_fax_ext']}`**")
+                contact_methods.append(f":fax: :1234: **`{whois_info['registrar_fax_ext']}`**")
             if "registrar_id" in whois_info:
                 contact_methods.append(f"ID: **`{whois_info['registrar_id']}`**")
             if "registrar_org" in whois_info:
@@ -1279,7 +1279,7 @@ class Cloudflare(commands.Cog):
             if "registrar_phone" in whois_info:
                 contact_methods.append(f":calling: **`{whois_info['registrar_phone']}`**")
             if "registrar_phone_ext" in whois_info:
-                contact_methods.append(f"Phone Ext: **`{whois_info['registrar_phone_ext']}`**")
+                contact_methods.append(f":calling: :1234: **`{whois_info['registrar_phone_ext']}`**")
             if "registrar_postal_code" in whois_info:
                 contact_methods.append(f"Postal Code: **`{whois_info['registrar_postal_code']}`**")
             if "registrar_province" in whois_info:
