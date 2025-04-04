@@ -1261,16 +1261,16 @@ class Cloudflare(commands.Cog):
             if "status" in whois_info:
                 status_explainers = {
                     "clientTransferProhibited": ":lock: Locked",
-                    "clientDeleteProhibited": ":no_entry: Deletion Prohibited",
-                    "clientUpdateProhibited": ":pencil2: Update Prohibited",
-                    "clientHold": ":pause_button: On Hold",
-                    "serverTransferProhibited": ":lock: Server Locked",
-                    "serverDeleteProhibited": ":no_entry: Server Deletion Prohibited",
-                    "serverUpdateProhibited": ":pencil2: Server Update Prohibited",
-                    "serverHold": ":pause_button: Server On Hold",
-                    "pendingTransfer": ":hourglass: Pending Transfer",
-                    "pendingDelete": ":hourglass: Pending Deletion",
-                    "pendingUpdate": ":hourglass: Pending Update",
+                    "clientDeleteProhibited": ":no_entry: Deletion prohibited",
+                    "clientUpdateProhibited": ":pencil2: Update prohibited",
+                    "clientHold": ":pause_button: On hold",
+                    "serverTransferProhibited": ":lock: Server locked",
+                    "serverDeleteProhibited": ":no_entry: Server deletion prohibited",
+                    "serverUpdateProhibited": ":pencil2: Server update prohibited",
+                    "serverHold": ":pause_button: Server on hold",
+                    "pendingTransfer": ":hourglass: Pending transfer",
+                    "pendingDelete": ":hourglass: Pending deletion",
+                    "pendingUpdate": ":hourglass: Pending update",
                     "ok": ":white_check_mark: Active"
                 }
                 status_list = "\n".join(f"- {status} {status_explainers.get(status, '')}" for status in whois_info["status"])
