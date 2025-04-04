@@ -1340,17 +1340,18 @@ class Cloudflare(commands.Cog):
                     <html>
                     <head>
                         <title>WHOIS Report for {domain}</title>
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
                         <link rel="preconnect" href="https://fonts.googleapis.com">
                         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
                         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
                         <style>
-                            body {{ font-family: 'Inter', sans-serif; margin: 20px; background-color: #f4f4f9; color: #333; }}
-                            h1 {{ color: #2c3e50; text-align: center; }}
-                            p {{ line-height: 1.6; margin: 10px 0; }}
+                            body {{ font-family: 'Inter', sans-serif; margin: 10px; background-color: #f4f4f9; color: #333; }}
+                            h1 {{ color: #2c3e50; text-align: center; font-size: 1.5em; }}
+                            p {{ line-height: 1.6; margin: 10px 0; font-size: 1em; }}
                             .key {{ font-weight: 600; color: #34495e; }}
                             .value {{ color: #7f8c8d; }}
                             .header {{ text-align: center; margin-bottom: 20px; }}
-                            .content {{ max-width: 800px; margin: 0 auto; padding: 20px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }}
+                            .content {{ max-width: 100%; margin: 0 auto; padding: 10px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }}
                             hr {{ border: 0; height: 1px; background: #ddd; margin: 20px 0; }}
                         </style>
                     </head>
