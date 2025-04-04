@@ -27,7 +27,7 @@ class URLScan(commands.Cog):
 
     @commands.guild_only()
     @commands.has_permissions(manage_guild=True)
-    @urlscan.command(name="autoscan", description="Toggle automatic URL scanning in messages")
+    @urlscan.command(name="autoscan", description="Toggle automatic URL scanning")
     async def autoscan(self, ctx, state: bool = None):
         """Toggle automatic URL scanning in messages"""
         if state is None:
@@ -49,7 +49,7 @@ class URLScan(commands.Cog):
 
     @commands.guild_only()
     @commands.has_permissions(manage_guild=True)
-    @urlscan.command(name="setlogchannel", description="Set the logging channel for URL scan results")
+    @urlscan.command(name="logs", description="Set the logging channel")
     async def set_log_channel(self, ctx, channel: discord.TextChannel):
         """Set the logging channel for URL scan results"""
         await self.config.guild(ctx.guild).log_channel.set(channel.id)
