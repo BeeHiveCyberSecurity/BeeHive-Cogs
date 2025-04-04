@@ -1,6 +1,7 @@
 import discord #type: ignore
 import asyncio
 import time
+import tempfile
 from datetime import datetime
 from PIL import Image #type: ignore
 from redbot.core import commands, Config #type: ignore
@@ -1330,9 +1331,8 @@ class Cloudflare(commands.Cog):
                 view.add_item(button)
             if "technical_referral_url" in whois_info:
                 button = discord.ui.Button(label="Technical", url=whois_info["technical_referral_url"])
-                view.add_item(button)
+                view.add_item(button)            
 
-            # Add a button to download the full report as a PDF
             async def download_report(interaction: discord.Interaction):
                 try:
                     # Generate TXT content
@@ -1340,13 +1340,13 @@ class Cloudflare(commands.Cog):
                     for key, value in whois_info.items():
                         txt_content += f"{key}: {value}\n"
 
-                    # Create a TXT file
-                    txt_file_path = f"{domain}_whois_report.txt"
-                    with open(txt_file_path, 'w') as txt_file:
-                        txt_file.write(txt_content)
+                    # Use a temporary file
+                    with tempfile.NamedTemporaryFile(delete=False, suffix=".txt") as temp_file:
+                        temp_file.write(txt_content.encode('utf-8'))
+                        temp_file_path = temp_file.name
 
                     # Send the TXT file
-                    await interaction.response.send_message(file=discord.File(txt_file_path))
+                    await interaction.response.send_message(file=discord.File(temp_file_path))
                 except Exception as e:
                     await interaction.response.send_message(
                         content="Failed to generate or send the TXT report.",
