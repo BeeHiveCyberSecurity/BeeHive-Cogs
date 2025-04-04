@@ -115,7 +115,6 @@ class URLScan(commands.Cog):
                                         embed.title = "URLscan.io detected no threats"
                                         embed.color = 0x18bb9c
                                         embed.description = f"URLScan did not detect any threats associated with {url}"
-                                        embed.add_field(name="Overall verdict", value="Scanned and found safe", inline=False)
                                         view.add_item(discord.ui.Button(label="View results", url=report_url, style=discord.ButtonStyle.link))
                                 elif 'message' in res2 and res2['message'] == "Scan prevented":
                                     embed.title = "Domain is known safe"
