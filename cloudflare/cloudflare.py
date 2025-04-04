@@ -1243,15 +1243,15 @@ class Cloudflare(commands.Cog):
             if "dnssec" in whois_info:
                 dnssec_value = whois_info["dnssec"]
                 if dnssec_value is True:
-                    dnssec_value = ":white_check_mark: **Enabled**"
+                    dnssec_value = ":white_check_mark: Enabled"
                 elif dnssec_value is False:
-                    dnssec_value = ":x: **Disabled**"
+                    dnssec_value = ":x: Disabled"
                 else:
                     dnssec_value = f":question: Unknown"
                 page.add_field(name="DNSSEC", value=dnssec_value, inline=True)
 
             if "whois_server" in whois_info:
-                whois_server = f"**`{whois_info['whois_server']}`**"
+                whois_server = f"{whois_info['whois_server']}"
                 page.add_field(name="Lookup via", value=whois_server, inline=True)
 
             if "nameservers" in whois_info:
