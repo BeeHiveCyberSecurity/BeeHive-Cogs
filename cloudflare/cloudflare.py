@@ -1711,15 +1711,15 @@ class Cloudflare(commands.Cog):
                 result_info = data.get("result_info", {})
                 total_count = result_info.get('total_count')
                 if total_count:
-                    embed.add_field(name="Total count", value=f"**`{total_count}`**", inline=False)
+                    embed.add_field(name="Total count", value=f"{total_count}", inline=False)
                 
                 page = result_info.get('page')
                 if page:
-                    embed.add_field(name="Page", value=f"**`{page}`**", inline=False)
+                    embed.add_field(name="Page", value=f"{page}", inline=False)
                 
                 per_page = result_info.get('per_page')
                 if per_page:
-                    embed.add_field(name="Per page", value=f"**`{per_page}`**", inline=False)
+                    embed.add_field(name="Per page", value=f"{per_page}", inline=False)
                 
                 embed.set_footer(text="IP intelligence provided by Cloudflare")
                 await ctx.send(embed=embed)
