@@ -1289,47 +1289,8 @@ class Cloudflare(commands.Cog):
                 registrar_street = f"**`{whois_info['registrar_street']}`**"
                 page = add_field_to_page(page, "Registrar Street", registrar_street)
             if "status" in whois_info:
-                status_value = f"**`{', '.join(whois_info['status'])}`**"
-                page = add_field_to_page(page, "Status", status_value)
-            if "technical_city" in whois_info:
-                technical_city = f"**`{whois_info['technical_city']}`**"
-                page = add_field_to_page(page, "Technical City", technical_city)
-            if "technical_country" in whois_info:
-                technical_country = f"**`{whois_info['technical_country']}`**"
-                page = add_field_to_page(page, "Technical Country", technical_country)
-            if "technical_email" in whois_info:
-                technical_email = f"**`{whois_info['technical_email']}`**"
-                page = add_field_to_page(page, "Technical Email", technical_email)
-            if "technical_fax" in whois_info:
-                technical_fax = f"**`{whois_info['technical_fax']}`**"
-                page = add_field_to_page(page, "Technical Fax", technical_fax)
-            if "technical_fax_ext" in whois_info:
-                technical_fax_ext = f"**`{whois_info['technical_fax_ext']}`**"
-                page = add_field_to_page(page, "Technical Fax Ext", technical_fax_ext)
-            if "technical_id" in whois_info:
-                technical_id = f"**`{whois_info['technical_id']}`**"
-                page = add_field_to_page(page, "Technical ID", technical_id)
-            if "technical_name" in whois_info:
-                technical_name = f"**`{whois_info['technical_name']}`**"
-                page = add_field_to_page(page, "Technical Name", technical_name)
-            if "technical_org" in whois_info:
-                technical_org = f"**`{whois_info['technical_org']}`**"
-                page = add_field_to_page(page, "Technical Org", technical_org)
-            if "technical_phone" in whois_info:
-                technical_phone = f"**`{whois_info['technical_phone']}`**"
-                page = add_field_to_page(page, "Technical Phone", technical_phone)
-            if "technical_phone_ext" in whois_info:
-                technical_phone_ext = f"**`{whois_info['technical_phone_ext']}`**"
-                page = add_field_to_page(page, "Technical Phone Ext", technical_phone_ext)
-            if "technical_postal_code" in whois_info:
-                technical_postal_code = f"**`{whois_info['technical_postal_code']}`**"
-                page = add_field_to_page(page, "Technical Postal Code", technical_postal_code)
-            if "technical_province" in whois_info:
-                technical_province = f"**`{whois_info['technical_province']}`**"
-                page = add_field_to_page(page, "Technical Province", technical_province)
-            if "technical_street" in whois_info:
-                technical_street = f"**`{whois_info['technical_street']}`**"
-                page = add_field_to_page(page, "Technical Street", technical_street)
+                status_list = "\n".join(f"- {status}" for status in whois_info["status"])
+                page = add_field_to_page(page, "Status", status_list)
             if "updated_date" in whois_info:
                 try:
                     updated_date = int(datetime.strptime(whois_info["updated_date"], "%Y-%m-%dT%H:%M:%S").timestamp())
