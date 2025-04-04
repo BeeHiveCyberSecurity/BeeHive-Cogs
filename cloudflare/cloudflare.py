@@ -1434,7 +1434,7 @@ class Cloudflare(commands.Cog):
                     for key, value in whois_info.items():
                         html_content += f"""
                                         <div class='card'>
-                                            <p><span class='key'>{key.replace('_', ' ').title()}:</span></p>
+                                            <p><span class='key'>{key.replace('_', ' ').title()}</span></p>
                                             <p><span class='value'>{value}</span></p>
                                         </div>
                         """
