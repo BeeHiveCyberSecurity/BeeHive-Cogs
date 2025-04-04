@@ -1259,7 +1259,21 @@ class Cloudflare(commands.Cog):
                 page = add_field_to_page(page, "Nameservers", nameservers_list)
                 
             if "status" in whois_info:
-                status_list = "\n".join(f"- {status}" for status in whois_info["status"])
+                status_explainers = {
+                    "clientTransferProhibited": ":lock: Locked",
+                    "clientDeleteProhibited": ":no_entry: Deletion Prohibited",
+                    "clientUpdateProhibited": ":pencil2: Update Prohibited",
+                    "clientHold": ":pause_button: On Hold",
+                    "serverTransferProhibited": ":lock: Server Locked",
+                    "serverDeleteProhibited": ":no_entry: Server Deletion Prohibited",
+                    "serverUpdateProhibited": ":pencil2: Server Update Prohibited",
+                    "serverHold": ":pause_button: Server On Hold",
+                    "pendingTransfer": ":hourglass: Pending Transfer",
+                    "pendingDelete": ":hourglass: Pending Deletion",
+                    "pendingUpdate": ":hourglass: Pending Update",
+                    "ok": ":white_check_mark: Active"
+                }
+                status_list = "\n".join(f"- {status} {status_explainers.get(status, '')}" for status in whois_info["status"])
                 page = add_field_to_page(page, "Status", status_list)
 
             contact_methods = []
