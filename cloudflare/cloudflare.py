@@ -1242,7 +1242,7 @@ class Cloudflare(commands.Cog):
                 page.add_field(name="DNSSEC", value=dnssec_value, inline=True)
 
             if "nameservers" in whois_info:
-                nameservers_list = "\n".join(f"- **{ns}**" for ns in whois_info["nameservers"])
+                nameservers_list = "\n".join(f"- {ns}" for ns in whois_info["nameservers"])
                 page = add_field_to_page(page, "Nameservers", nameservers_list)
                 
 
