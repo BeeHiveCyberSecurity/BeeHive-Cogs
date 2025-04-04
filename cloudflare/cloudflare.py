@@ -1352,8 +1352,8 @@ class Cloudflare(commands.Cog):
                                     color: #333;
                                 }}
                                 h1, h2, h3 {{
-                                    color: #2c3e50;
-                                    text-align: center;
+                                    color: #000000;
+                                    text-align: left;
                                 }}
                                 h1 {{
                                     font-size: 2em;
