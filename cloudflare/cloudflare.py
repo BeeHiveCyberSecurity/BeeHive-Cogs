@@ -1677,36 +1677,30 @@ class Cloudflare(commands.Cog):
         async with self.session.get(url, headers=headers, params=params) as response:
             if response.status == 200:
                 data = await response.json()
-                if data["success"]:
-                    result = data["result"][0]
-                    embed = discord.Embed(title=f"IP intelligence for {result['ip']}", color=0x2BBD8E)
+                if data.get("success", False):
+                    result = data.get("result", [{}])[0]
+                    embed = discord.Embed(title=f"IP intelligence for {result.get('ip', 'N/A')}", color=0xFF6633)
                     
-                    if "ip" in result:
-                        embed.add_field(name="IP", value=f"**`{result['ip']}`**", inline=False)
-                    if "belongs_to_ref" in result:
-                        belongs_to = result["belongs_to_ref"]
-                        if "description" in belongs_to:
-                            embed.add_field(name="Belongs To", value=f"**`{belongs_to['description']}`**", inline=False)
-                        if "country" in belongs_to:
-                            embed.add_field(name="Country", value=f"**`{belongs_to['country']}`**", inline=False)
-                        if "type" in belongs_to:
-                            embed.add_field(name="Type", value=f"**`{belongs_to['type'].upper()}`**", inline=True)
-                    if "ptr_lookup" in result and result["ptr_lookup"] and "ptr_domains" in result["ptr_lookup"] and result["ptr_lookup"]["ptr_domains"]:
-                        ptr_domains = ", ".join([f"**`{domain}`**" for domain in result["ptr_lookup"]["ptr_domains"]])
-                        embed.add_field(name="PTR Domains", value=ptr_domains, inline=False)
-                    if "risk_types" in result:
-                        risk_types = ", ".join([f"**`{risk['name']}`**" for risk in result["risk_types"]])
-                        embed.add_field(name="Risk Types", value=risk_types, inline=False)
-                    if "result_info" in data:
-                        result_info = data["result_info"]
-                        embed.add_field(name="Total Count", value=f"**`{result_info['total_count']}`**", inline=False)
-                        embed.add_field(name="Page", value=f"**`{result_info['page']}`**", inline=False)
-                        embed.add_field(name="Per Page", value=f"**`{result_info['per_page']}`**", inline=False)
-                        
-                    embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/globe.png")
+                    embed.add_field(name="IP", value=f"**`{result.get('ip', 'N/A')}`**", inline=False)
+                    
+                    belongs_to = result.get("belongs_to_ref", {})
+                    embed.add_field(name="Belongs To", value=f"**`{belongs_to.get('description', 'N/A')}`**", inline=False)
+                    embed.add_field(name="Country", value=f"**`{belongs_to.get('country', 'N/A')}`**", inline=False)
+                    embed.add_field(name="Type", value=f"**`{belongs_to.get('type', 'N/A').upper()}`**", inline=True)
+                    
+                    risk_types = result.get("risk_types", [])
+                    risk_types_str = ", ".join([f"**`{risk.get('name', 'N/A')}`**" for risk in risk_types])
+                    embed.add_field(name="Risk Types", value=risk_types_str, inline=False)
+                    
+                    result_info = data.get("result_info", {})
+                    embed.add_field(name="Total Count", value=f"**`{result_info.get('total_count', 'N/A')}`**", inline=False)
+                    embed.add_field(name="Page", value=f"**`{result_info.get('page', 'N/A')}`**", inline=False)
+                    embed.add_field(name="Per Page", value=f"**`{result_info.get('per_page', 'N/A')}`**", inline=False)
+                    
                     await ctx.send(embed=embed)
                 else:
-                    embed = discord.Embed(title="Error", description=f"Error: {data['errors']}", color=0xff4545)
+                    error_message = data.get("errors", [{"message": "Unknown error"}])[0].get("message", "Unknown error")
+                    embed = discord.Embed(title="Error", description=f"Error: {error_message}", color=0xff4545)
                     await ctx.send(embed=embed)
             else:
                 embed = discord.Embed(title="Failed to query Cloudflare API", description=f"Status code: {response.status}", color=0xff4545)
@@ -1769,7 +1763,6 @@ class Cloudflare(commands.Cog):
                             if "end" in categorization:
                                 end_timestamp = discord.utils.format_dt(discord.utils.parse_time(categorization['end']), style='R')
                                 embed.add_field(name="Ending", value=f"**{end_timestamp}**", inline=True)
-                        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/globe.png")
                         return embed
 
                     message = await ctx.send(embed=create_embed(pages[current_page]))
