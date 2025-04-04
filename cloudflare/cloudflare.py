@@ -2036,7 +2036,7 @@ class Cloudflare(commands.Cog):
                 current_page = discord.Embed(
                     title="URL Scan Results",
                     description=f"Search results for query: **`{query}`**",
-                    color=0x2BBD8E
+                    color=0xFF6633
                 )
                 total_size = len(current_page.description)
                 for result in results:
@@ -2149,7 +2149,7 @@ class Cloudflare(commands.Cog):
                 embed = discord.Embed(
                     title="URL Scan Started",
                     description=f"Scan started successfully.",
-                    color=0x2BBD8E
+                    color=0xFF6633
                 )
                 embed.add_field(name="UUID", value=f"**`{result.get('uuid', 'Unknown')}`**", inline=True)
                 embed.add_field(name="Visibility", value=f"**`{result.get('visibility', 'Unknown')}`**", inline=True)
@@ -2209,7 +2209,7 @@ class Cloudflare(commands.Cog):
                     await ctx.send(embed=discord.Embed(
                         title="No Data",
                         description="No relevant data found in the scan result.",
-                        color=0xff4545
+                        color=0xFF6633
                     ))
                     return
 
@@ -2409,8 +2409,8 @@ class Cloudflare(commands.Cog):
                     return
 
                 scan_id = data["result"]["uuid"]
-                embed = discord.Embed(title="Scanning URL", description=f"### Your scan ID is\n```{scan_id}```\nThe scan may take a few moments to complete, please wait...", color=0x2BBD8E)
-                embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/link.png")
+                embed = discord.Embed(title="Cloudflare is scanning your URL", description=f"This scan may take a few moments to complete, please wait patiently.", color=0xFF6633)
+                embed.set_footer(text=f"{scan_id}")
                 await ctx.send(embed=embed)
                 await ctx.typing()
 
