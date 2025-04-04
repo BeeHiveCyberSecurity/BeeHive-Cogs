@@ -1980,7 +1980,7 @@ class Cloudflare(commands.Cog):
     async def urlscanner(self, ctx):
         """
         Use the Cloudflare API to scan websites for threats via Discord.
-        
+
         Learn more at https://developers.cloudflare.com/radar/investigate/url-scanner/
         """
 
@@ -2452,24 +2452,22 @@ class Cloudflare(commands.Cog):
                         if malicious:
                             embed = discord.Embed(
                                 title="Cloudflare detected a threat",
-                                description=f"A URL safety scan finished for Scan ID\n```{scan_id}```",
+                                description=f"A URL scan has completed and Cloudflare has detected one or more threats",
                                 color=0xff4545
                             )
-                            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/bug.png")
+                            embed.set_footer(text=f"{scan_id}")
                         else:
                             embed = discord.Embed(
                                 title="Cloudflare detected no threats",
-                                description=f"A URL safety scan finished for Scan ID\n```{scan_id}```",
+                                description=f"A URL scan has finished with no detections to report.",
                                 color=0x2BBD8E
                             )
-                            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Green/shield-checkmark.png")
+                            embed.set_footer(text=f"{scan_id}")
 
-                        verdict = "Malicious" if malicious else "Safe"
-                        embed.add_field(name="Verdict", value=f"**`{verdict}`**", inline=False)
                         if categories:
-                            embed.add_field(name="Categories", value=f"**`{categories}`**", inline=False)
+                            embed.add_field(name="Categories", value=f"{categories}", inline=False)
                         if phishing:
-                            embed.add_field(name="Phishing", value=f"**`{phishing}`**", inline=False)
+                            embed.add_field(name="Phishing", value=f"{phishing}", inline=False)
                         await ctx.send(embed=embed)
                         return
 
