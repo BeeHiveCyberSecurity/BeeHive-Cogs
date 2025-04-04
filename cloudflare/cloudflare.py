@@ -1,4 +1,5 @@
 import discord #type: ignore
+from fpdf import FPDF
 import asyncio
 import time
 from datetime import datetime
@@ -1314,7 +1315,7 @@ class Cloudflare(commands.Cog):
             if page.fields:
                 pages.append(page)
 
-            # Create a view with a button
+            # Create a view with buttons
             view = discord.ui.View()
             if "administrative_referral_url" in whois_info:
                 button = discord.ui.Button(label="Admin", url=whois_info["administrative_referral_url"])
@@ -1331,6 +1332,31 @@ class Cloudflare(commands.Cog):
             if "technical_referral_url" in whois_info:
                 button = discord.ui.Button(label="Technical", url=whois_info["technical_referral_url"])
                 view.add_item(button)
+
+            # Add a button to download the full report as a PDF
+            async def download_report(interaction: discord.Interaction):
+                # Generate PDF content
+                pdf_content = f"WHOIS Report for {domain}\n\n"
+                for key, value in whois_info.items():
+                    pdf_content += f"{key}: {value}\n"
+
+                # Create a PDF file
+                pdf = FPDF()
+                pdf.add_page()
+                pdf.set_font("Arial", size=12)
+                for line in pdf_content.split('\n'):
+                    pdf.cell(200, 10, txt=line, ln=True)
+
+                # Save the PDF to a file
+                pdf_file_path = f"{domain}_whois_report.pdf"
+                pdf.output(pdf_file_path)
+
+                # Send the PDF file
+                await interaction.response.send_message(file=discord.File(pdf_file_path))
+
+            download_button = discord.ui.Button(label="Download full report", style=discord.ButtonStyle.primary)
+            download_button.callback = download_report
+            view.add_item(download_button)
 
             message = await ctx.send(embed=pages[0], view=view)
 
