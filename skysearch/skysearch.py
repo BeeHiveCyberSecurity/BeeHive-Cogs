@@ -130,7 +130,7 @@ class Skysearch(commands.Cog):
                 lon_dir = "E" if lon >= 0 else "W"
                 lon = f"{abs(lon)}{lon_dir}"
             if lat != 'N/A' and lon != 'N/A':
-                embed.add_field(name="Position", value=f"- `{lat}`\n- `{lon}`", inline=True)
+                embed.add_field(name="Position", value=f"- {lat}\n- {lon}", inline=True)
             embed.add_field(name="Squawk", value=f"{aircraft_data.get('squawk', 'BLOCKED')}", inline=True)
             
             aircraft_model = aircraft_data.get('t', None)
@@ -141,30 +141,30 @@ class Skysearch(commands.Cog):
                 ground_speed_mph = round(float(ground_speed_knots) * 1.15078)  # Convert knots to mph
                 embed.add_field(name="Speed", value=f"{ground_speed_mph} mph", inline=True)
             category_code_to_label = {
-                "A0": "`No info available`",
-                "A1": "`Light (< 15500 lbs)`",
-                "A2": "`Small (15500 to 75000 lbs)`",
-                "A3": "`Large (75000 to 300000 lbs)`",
-                "A4": "`High vortex large`",
-                "A5": "`Heavy (> 300000 lbs)`",
-                "A6": "`High performance (> 5g acceleration and 400 kts)`",
-                "A7": "`Rotorcraft`",
-                "B0": "`No info available`",
-                "B1": "`Glider / sailplane`",
-                "B2": "`Lighter-than-air`",
-                "B3": "`Parachutist / skydiver`",
-                "B4": "`Ultralight / hang-glider / paraglider`",
-                "B5": "`Reserved`",
-                "B6": "`UAV`",
-                "B7": "`Space / trans-atmospheric vehicle`",
-                "C0": "`No info available`",
-                "C1": "`Emergency vehicle`",
-                "C2": "`Service vehicle`",
-                "C3": "`Point obstacle`",
-                "C4": "`Cluster obstacle`",
-                "C5": "`Line obstacle`",
-                "C6": "`Reserved`",
-                "C7": "`Reserved`"
+                "A0": "No info available",
+                "A1": "Light (< 15500 lbs)",
+                "A2": "Small (15500 to 75000 lbs)",
+                "A3": "Large (75000 to 300000 lbs)",
+                "A4": "High vortex large",
+                "A5": "Heavy (> 300000 lbs)",
+                "A6": "High performance (> 5g acceleration and 400 kts)",
+                "A7": "Rotorcraft",
+                "B0": "No info available",
+                "B1": "Glider / sailplane",
+                "B2": "Lighter-than-air",
+                "B3": "Parachutist / skydiver",
+                "B4": "Ultralight / hang-glider / paraglider",
+                "B5": "Reserved",
+                "B6": "UAV",
+                "B7": "Space / trans-atmospheric vehicle",
+                "C0": "No info available",
+                "C1": "Emergency vehicle",
+                "C2": "Service vehicle",
+                "C3": "Point obstacle",
+                "C4": "Cluster obstacle",
+                "C5": "Line obstacle",
+                "C6": "Reserved",
+                "C7": "Reserved"
             }
             category = aircraft_data.get('category', None)
             if category is not None:
