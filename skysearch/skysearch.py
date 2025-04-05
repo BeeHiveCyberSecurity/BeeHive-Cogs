@@ -188,15 +188,15 @@ class Skysearch(commands.Cog):
             
             baro_rate = aircraft_data.get('baro_rate', 'N/A')
             if baro_rate == 'N/A':
-                embed.add_field(name="Altitude trend", value=":grey_question: Altitude trends unavailable, **not enough data**", inline=False)
+                embed.add_field(name="Altitude trend", value="Altitude trends unavailable, **not enough data**", inline=False)
             else:
                 baro_rate_fps = round(int(baro_rate) / 60, 2)  # Convert feet per minute to feet per second
                 if abs(baro_rate_fps) < 50/60:
-                    embed.add_field(name="Altitude data", value=":cloud: Maintaining **consistent** altitude", inline=False)
+                    embed.add_field(name="Altitude data", value="Maintaining consistent altitude", inline=False)
                 elif baro_rate_fps > 0:
-                    embed.add_field(name="Altitude data", value=":airplane_departure: Climbing @  " + f"**{baro_rate_fps} feet/sec**", inline=False)
+                    embed.add_field(name="Altitude data", value=" Climbing " + f"{baro_rate_fps} feet/sec", inline=False)
                 else:
-                    embed.add_field(name="Altitude data", value=":airplane_arriving: Descending @  " + f"**{abs(baro_rate_fps)} feet/sec**", inline=False)
+                    embed.add_field(name="Altitude data", value=" Descending " + f"**{abs(baro_rate_fps)} feet/sec", inline=False)
             embed.add_field(name="Flight status", value=emergency_status, inline=True)
 
 
