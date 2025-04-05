@@ -17,6 +17,7 @@ class InviteFilter(commands.Cog):
             delete_invites=True,
             whitelisted_channels=[],
             whitelisted_roles=[],
+            whitelisted_categories=[],  # New: Whitelisted categories
             logging_channel=None,
             timeout_duration=1,  # Default to 1 minute timeout
             invites_deleted=0,
@@ -42,6 +43,10 @@ class InviteFilter(commands.Cog):
 
         # Check channel whitelist
         if message.channel.id in await self.config.guild(guild).whitelisted_channels():
+            return
+
+        # Check category whitelist
+        if message.channel.category_id in await self.config.guild(guild).whitelisted_categories():
             return
 
         # Check role whitelist (ensure member object is used)
@@ -187,7 +192,7 @@ class InviteFilter(commands.Cog):
 
     @invitefilter.group(invoke_without_command=True)
     async def whitelist(self, ctx):
-        """Manage the invite filter whitelist (channels and roles)."""
+        """Manage the invite filter whitelist (channels, categories, and roles)."""
         await ctx.send_help(ctx.command)
 
     @whitelist.command(name="channel")
@@ -215,6 +220,31 @@ class InviteFilter(commands.Cog):
             await ctx.send(embed=embed)
         else:
              await ctx.send("No changes made to the channel whitelist.") # Should not happen based on logic, but good practice
+
+    @whitelist.command(name="category")
+    async def whitelist_category(self, ctx, category: discord.CategoryChannel):
+        """Add or remove a category from the invite filter whitelist."""
+        guild = ctx.guild
+        # Use context manager for safe list modification
+        async with self.config.guild(guild).whitelisted_categories() as whitelisted_categories:
+            changelog = []
+            if category.id in whitelisted_categories:
+                try:
+                    whitelisted_categories.remove(category.id)
+                    changelog.append(f"➖ Removed category: {category.name}")
+                except ValueError:
+                    await ctx.send("Error removing category, it might have already been removed.")
+                    return
+            else:
+                whitelisted_categories.append(category.id)
+                changelog.append(f"➕ Added category: {category.name}")
+
+        if changelog:
+            changelog_message = "\n".join(changelog)
+            embed = discord.Embed(title="Whitelist Category Updated", description=changelog_message, color=discord.Color.blue())
+            await ctx.send(embed=embed)
+        else:
+            await ctx.send("No changes made to the category whitelist.")
 
     @whitelist.command(name="role")
     async def whitelist_role(self, ctx, role: discord.Role):
@@ -313,12 +343,14 @@ class InviteFilter(commands.Cog):
         delete_invites = config_data['delete_invites']
         whitelisted_channels_ids = config_data['whitelisted_channels']
         whitelisted_roles_ids = config_data['whitelisted_roles']
+        whitelisted_categories_ids = config_data['whitelisted_categories']  # New: Whitelisted categories
         logging_channel_id = config_data['logging_channel']
         timeout_duration = config_data['timeout_duration']
 
         # Fetch mentions/names safely
         whitelisted_channels_mentions = [c.mention for i in whitelisted_channels_ids if (c := guild.get_channel(i))]
         whitelisted_roles_mentions = [r.mention for i in whitelisted_roles_ids if (r := guild.get_role(i))] # Use mention for roles
+        whitelisted_categories_names = [cat.name for i in whitelisted_categories_ids if (cat := guild.get_channel(i))]  # New: Fetch category names
         logging_channel_mention = (c.mention if (c := guild.get_channel(logging_channel_id)) else "None") if logging_channel_id else "None"
 
         embed = discord.Embed(title="⚙️ Invite Filter Settings", color=discord.Color.orange()) # Use a different color
@@ -326,6 +358,7 @@ class InviteFilter(commands.Cog):
         embed.add_field(name="Filter Status", value="✅ Enabled" if delete_invites else "❌ Disabled", inline=False)
         embed.add_field(name="Whitelisted Channels", value=", ".join(whitelisted_channels_mentions) or "None", inline=False)
         embed.add_field(name="Whitelisted Roles", value=", ".join(whitelisted_roles_mentions) or "None", inline=False)
+        embed.add_field(name="Whitelisted Categories", value=", ".join(whitelisted_categories_names) or "None", inline=False)  # New: Display whitelisted categories
         embed.add_field(name="Logging Channel", value=logging_channel_mention, inline=False)
         embed.add_field(name="Timeout Duration", value=f"{timeout_duration} minutes" + (" (disabled)" if timeout_duration == 0 else ""), inline=False)
 
