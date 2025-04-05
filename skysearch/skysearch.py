@@ -130,7 +130,7 @@ class Skysearch(commands.Cog):
                 lon_dir = "E" if lon >= 0 else "W"
                 lon = f"{abs(lon)}{lon_dir}"
             if lat != 'N/A' and lon != 'N/A':
-                embed.add_field(name="Position", value=f"`{lat}, {lon}`", inline=True)
+                embed.add_field(name="Position", value=f"- `{lat}`\n- `{lon}`", inline=True)
             embed.add_field(name="Squawk", value=f"{aircraft_data.get('squawk', 'BLOCKED')}", inline=True)
             
             aircraft_model = aircraft_data.get('t', None)
@@ -139,7 +139,7 @@ class Skysearch(commands.Cog):
             ground_speed_knots = aircraft_data.get('gs', 'N/A')
             if ground_speed_knots != 'N/A':
                 ground_speed_mph = round(float(ground_speed_knots) * 1.15078)  # Convert knots to mph
-                embed.add_field(name="Speed", value=f"`{ground_speed_mph} mph`", inline=True)
+                embed.add_field(name="Speed", value=f"{ground_speed_mph} mph", inline=True)
             category_code_to_label = {
                 "A0": "`No info available`",
                 "A1": "`Light (< 15500 lbs)`",
