@@ -63,23 +63,23 @@ class Skysearch(commands.Cog):
             image_url, photographer = await self._get_photo_by_hex(hex_id)
             link = f"https://globe.airplanes.live/?icao={hex_id}"
             squawk_code = aircraft_data.get('squawk', 'N/A')
-            description = f"# {aircraft_data.get('desc', 'N/A')}"
+            description = f"{aircraft_data.get('desc', 'N/A')}"
             if aircraft_data.get('year', None) is not None:
-                description += f" **({aircraft_data.get('year')})**"
+                description += f" ({aircraft_data.get('year')})"
             if squawk_code == '7500':
-                embed = discord.Embed(title='Aircraft alert', description=description, color=discord.Colour(0xff4545))
+                embed = discord.Embed(title=description, color=0xff4545)
                 emergency_status = ":rotating_light: Aircraft has been **hijacked**"
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/alert-circle.png")
             elif squawk_code == '7600':
-                embed = discord.Embed(title='Aircraft alert', description=description, color=discord.Colour(0xff4545))
+                embed = discord.Embed(title=description, color=0xff4545)
                 emergency_status = ":signal_strength: Aircraft has **lost radio contact**"
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/alert-circle.png")
             elif squawk_code == '7700':
-                embed = discord.Embed(title='Aircraft alert', description=description, color=discord.Colour(0xff4545))
+                embed = discord.Embed(title=description, color=0xff4545)
                 emergency_status = ":warning: Aircraft has **declared a general emergency**"
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/alert-circle.png")
             else:
-                embed = discord.Embed(title='Aircraft information', description=description, color=discord.Colour(0xfffffe))
+                embed = discord.Embed(title=description, color=0xff4545)
                 emergency_status = ":white_check_mark: Aircraft reports **normal** conditions"
                 embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/airplane.png")
             callsign = aircraft_data.get('flight', 'N/A').strip()
@@ -239,17 +239,6 @@ class Skysearch(commands.Cog):
             whatsapp_url = f"https://api.whatsapp.com/send?text={urllib.parse.quote_plus(whatsapp_text)}"
             view.add_item(discord.ui.Button(label="Send on WhatsApp", emoji="📱", url=whatsapp_url, style=discord.ButtonStyle.link))
             await ctx.send(embed=embed, view=view)
-
-#           squawk_code = aircraft_data.get('squawk', 'N/A')
-#            if squawk_code in emergency_squawk_codes:
-#               emergency_embed = discord.Embed(title='Aircraft emergency', color=discord.Colour(0xFF9145))
-#                if squawk_code == '7500':
-#                   emergency_embed.add_field(name="Squawk 7500 - Hijacking", value="The pilots of this aircraft have indicated that the plane is being hijacked. Check local news if this is a domestic flight, or the news channels of the airport the flight is scheduled to arrive at.", inline=False)
-#                elif squawk_code == '7600':
-#                    emergency_embed.add_field(name="Squawk 7600 - Radio failure", value="This code is used to indicate a radio failure. While this code is squawked, assume an aircraft is in a location where reception and/or communication, and thus tracking, may be poor, restricted, or non-existant.", inline=False)
-#                elif squawk_code == '7700':
-#                    emergency_embed.add_field(name="Squawk 7700 - General emergency", value="This code is used to indicate a general emergency. The pilot currently has ATC priority and is working to resolve the situation. Check local news outlets for more information, or if this is a military flight, look into what squadron the plane belonged to, and if they posted any updates later in the day.", inline=False)
-#                await ctx.send(embed=emergency_embed)
 
         else:
             embed = discord.Embed(title='No results found for your query', color=discord.Colour(0xff4545))
