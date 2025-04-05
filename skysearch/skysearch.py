@@ -169,17 +169,17 @@ class Skysearch(commands.Cog):
             category = aircraft_data.get('category', None)
             if category is not None:
                 category_label = category_code_to_label.get(category, "Unknown category")
-                embed.add_field(name="Category", value=f"{category_label}", inline=False)
+                embed.add_field(name="Category", value=f"{category_label}", inline=True)
 
             operator = aircraft_data.get('ownOp', None)
             if operator is not None:
                 operator_encoded = quote_plus(operator)
-                embed.add_field(name="Operated by", value=f"[{operator}](https://www.google.com/search?q={operator_encoded})", inline=False)
+                embed.add_field(name="Operated by", value=f"[{operator}](https://www.google.com/search?q={operator_encoded})", inline=True)
             
             last_seen = aircraft_data.get('seen', 'N/A')
             if last_seen != 'N/A':
-                last_seen_text = ":green_circle: Just **now**" if float(last_seen) < 1 else f":hourglass: **{int(float(last_seen))}** seconds ago"
-                embed.add_field(name="Last signal", value=last_seen_text, inline=False)
+                last_seen_text = "Just **now**" if float(last_seen) < 1 else f"{int(float(last_seen))} seconds ago"
+                embed.add_field(name="Last signal", value=last_seen_text, inline=True)
             
             last_seen_pos = aircraft_data.get('seen_pos', 'N/A')
             if last_seen_pos != 'N/A':
