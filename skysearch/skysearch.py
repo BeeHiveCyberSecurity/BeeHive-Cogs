@@ -190,9 +190,9 @@ class Skysearch(commands.Cog):
                 if abs(baro_rate_fps) < 50/60:
                     embed.add_field(name="Altitude data", value="Maintaining consistent altitude", inline=False)
                 elif baro_rate_fps > 0:
-                    embed.add_field(name="Altitude data", value=" Climbing " + f"{baro_rate_fps} feet/sec", inline=False)
+                    embed.add_field(name="Altitude data", value=" **Climbing** " + f"{baro_rate_fps} feet/sec", inline=False)
                 else:
-                    embed.add_field(name="Altitude data", value=" Descending " + f"**{abs(baro_rate_fps)} feet/sec", inline=False)
+                    embed.add_field(name="Altitude data", value=" **Descending** " + f"{abs(baro_rate_fps)} feet/sec", inline=False)
             embed.add_field(name="Flight status", value=emergency_status, inline=True)
 
 
