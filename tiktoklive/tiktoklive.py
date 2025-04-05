@@ -221,23 +221,22 @@ class TikTokLiveCog(commands.Cog):
                     description=clean_title,
                     color=0xfffffe
                 )
-                embed.add_field(name="Duration", value=f"{video_duration} seconds", inline=True)
                 if hashtags:
                     embed.add_field(name="Hashtags", value=' '.join(hashtags), inline=False)
 
                 view = discord.ui.View()
-                view.add_item(discord.ui.Button(label="Visit the creator", url=f"https://www.tiktok.com/@{video_uploader}"))
+                view.add_item(discord.ui.Button(label="Visit creator", url=f"https://www.tiktok.com/@{video_uploader}"))
 
                 await ctx.send(embed=embed, file=discord.File(video_path), view=view)
-                os.remove(video_path)  # Clean up the downloaded file after sending
+                os.remove(video_path)
         except ValueError as ve:
             await ctx.send(f"Failed to download video: {ve}")
         except Exception as e:
             if "No video formats found" in str(e):
                 embed = discord.Embed(
-                    title="Warning",
+                    title="This TikTok is restricted",
                     description="This video may contain potentially sensitive or graphic content, and TikTok has restricted access to it behind a login. Unfortunately, the bot cannot log in to access such content.",
-                    color=discord.Color.orange()
+                    color=0xff4545
                 )
                 await ctx.send(embed=embed)
             else:
