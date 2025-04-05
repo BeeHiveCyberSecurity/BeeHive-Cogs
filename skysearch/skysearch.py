@@ -193,7 +193,7 @@ class Skysearch(commands.Cog):
                     embed.add_field(name="Altitude data", value=" **Climbing** " + f"{baro_rate_fps} feet/sec", inline=True)
                 else:
                     embed.add_field(name="Altitude data", value=" **Descending** " + f"{abs(baro_rate_fps)} feet/sec", inline=True)
-                    
+
             embed.add_field(name="Flight status", value=emergency_status, inline=True)
 
 
@@ -219,8 +219,8 @@ class Skysearch(commands.Cog):
 
             image_url, photographer = await self._get_photo_by_hex(icao)
             if image_url and photographer:
-                embed.set_image(url=image_url)
-                embed.set_footer(text=f"📸 {photographer}")
+                embed.set_thumbnail(url=image_url)
+                embed.set_footer(text=f"Photo by {photographer}")
 
             view = discord.ui.View()
             view.add_item(discord.ui.Button(label="View on airplanes.live", emoji="🗺️", url=f"{link}", style=discord.ButtonStyle.link))
