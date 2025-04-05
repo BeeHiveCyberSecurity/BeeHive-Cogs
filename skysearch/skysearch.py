@@ -63,10 +63,6 @@ class Skysearch(commands.Cog):
             image_url, photographer = await self._get_photo_by_hex(hex_id)
             link = f"https://globe.airplanes.live/?icao={hex_id}"
             squawk_code = aircraft_data.get('squawk', 'N/A')
-#            if squawk_code == '7400':
-#                embed = discord.Embed(title='Aircraft information', color=discord.Colour(0xff9145))
-#                emergency_status = ":warning: **UAV has lost radio contact**"
-#                embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Orange/alert-circle-outline.png")
             description = f"# {aircraft_data.get('desc', 'N/A')}"
             if aircraft_data.get('year', None) is not None:
                 description += f" **({aircraft_data.get('year')})**"
@@ -89,21 +85,21 @@ class Skysearch(commands.Cog):
             callsign = aircraft_data.get('flight', 'N/A').strip()
             if not callsign or callsign == 'N/A':
                 callsign = 'BLOCKED'
-            embed.add_field(name="Callsign", value=f"`{callsign}`", inline=True)
+            embed.add_field(name="Callsign", value=f"{callsign}", inline=True)
             registration = aircraft_data.get('reg', None)
             if registration is not None:
                 registration = registration.upper()
-                embed.add_field(name="Registration", value=f"`{registration}`", inline=True)
+                embed.add_field(name="Registration", value=f"{registration}", inline=True)
             icao = aircraft_data.get('hex', 'N/A').upper()
-            embed.add_field(name="ICAO", value=f"`{icao}`", inline=True)
+            embed.add_field(name="ICAO", value=f"{icao}", inline=True)
             altitude = aircraft_data.get('alt_baro', 'N/A')
             if altitude == 'ground':
-                embed.add_field(name="Status", value="**On ground**", inline=True)
+                embed.add_field(name="Status", value="On ground", inline=True)
             elif altitude != 'N/A':
                 if isinstance(altitude, int):
                     altitude = "{:,}".format(altitude)
                 altitude_feet = f"{altitude} ft"
-                embed.add_field(name="Altitude", value=f"`{altitude_feet}`", inline=True)
+                embed.add_field(name="Altitude", value=f"{altitude_feet}", inline=True)
             heading = aircraft_data.get('true_heading', None)
             if heading is not None:
                 if 0 <= heading < 45:
@@ -122,7 +118,7 @@ class Skysearch(commands.Cog):
                     emoji = ":arrow_upper_left:"
                 else:
                     emoji = ":arrow_up:"
-                embed.add_field(name="Heading", value=f"{emoji} **{heading}°**", inline=True)
+                embed.add_field(name="Heading", value=f"{emoji} {heading}°", inline=True)
             lat = aircraft_data.get('lat', 'N/A')
             lon = aircraft_data.get('lon', 'N/A')
             if lat != 'N/A':
@@ -135,7 +131,7 @@ class Skysearch(commands.Cog):
                 lon = f"{abs(lon)}{lon_dir}"
             if lat != 'N/A' and lon != 'N/A':
                 embed.add_field(name="Position", value=f"`{lat}, {lon}`", inline=True)
-            embed.add_field(name="Squawk", value=f"**{aircraft_data.get('squawk', 'BLOCKED')}**", inline=True)
+            embed.add_field(name="Squawk", value=f"{aircraft_data.get('squawk', 'BLOCKED')}", inline=True)
             
             aircraft_model = aircraft_data.get('t', None)
             if aircraft_model is not None:
