@@ -68,20 +68,16 @@ class Skysearch(commands.Cog):
                 description += f" ({aircraft_data.get('year')})"
             if squawk_code == '7500':
                 embed = discord.Embed(title=description, color=0xff4545)
-                emergency_status = ":rotating_light: Aircraft has been **hijacked**"
-                embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/alert-circle.png")
+                emergency_status = "Aircraft reports it's been hijacked"
             elif squawk_code == '7600':
                 embed = discord.Embed(title=description, color=0xff4545)
-                emergency_status = ":signal_strength: Aircraft has **lost radio contact**"
-                embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/alert-circle.png")
+                emergency_status = "Aircraft has lost radio contact"
             elif squawk_code == '7700':
                 embed = discord.Embed(title=description, color=0xff4545)
-                emergency_status = ":warning: Aircraft has **declared a general emergency**"
-                embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/Red/alert-circle.png")
+                emergency_status = "Aircraft has declared a general emergency"
             else:
-                embed = discord.Embed(title=description, color=0xff4545)
-                emergency_status = ":white_check_mark: Aircraft reports **normal** conditions"
-                embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/airplane.png")
+                embed = discord.Embed(title=description, color=0xfffffe)
+                emergency_status = "Aircraft reports normal conditions"
             callsign = aircraft_data.get('flight', 'N/A').strip()
             if not callsign or callsign == 'N/A':
                 callsign = 'BLOCKED'
