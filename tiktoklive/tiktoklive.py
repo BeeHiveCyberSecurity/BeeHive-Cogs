@@ -243,6 +243,7 @@ class TikTokLiveCog(commands.Cog):
                 await ctx.send(f"Failed to download video: {e}")
 
     @tiktokliveset.command()
+    @commands.admin_or_permissions(manage_guild=True)
     async def auto(self, ctx):
         """Toggle automatic downloading of TikTok videos."""
         try:
