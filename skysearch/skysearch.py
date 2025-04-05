@@ -138,12 +138,12 @@ class Skysearch(commands.Cog):
                 embed.add_field(name="Speed", value=f"{ground_speed_mph} mph", inline=True)
             category_code_to_label = {
                 "A0": "No info available",
-                "A1": "Light",
-                "A2": "Small",
-                "A3": "Large",
-                "A4": "High vortex large",
-                "A5": "Heavy",
-                "A6": "High performance",
+                "A1": "Light aircraft",
+                "A2": "Small aircraft",
+                "A3": "Large aircraft",
+                "A4": "High vortex large aircraft",
+                "A5": "Heavy aircraft",
+                "A6": "High performance aircraft",
                 "A7": "Rotorcraft",
                 "B0": "No info available",
                 "B1": "Glider / sailplane",
