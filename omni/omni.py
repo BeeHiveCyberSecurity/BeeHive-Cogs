@@ -901,3 +901,33 @@ class Omni(commands.Cog):
                 self.bot.loop.create_task(self.session.close())
         except Exception as e:
             raise RuntimeError(f"Failed to unload cog: {e}")
+
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        """Handle incoming messages for monitoring reminders."""
+        if message.author.bot:
+            return
+
+        guild = message.guild
+        channel = message.channel
+
+        # Increment the message count for the channel
+        self.memory_user_message_counts[guild.id][channel.id] += 1
+
+        # Check if the message count has reached 150
+        if self.memory_user_message_counts[guild.id][channel.id] >= 150:
+            await self.send_monitoring_reminder(channel)
+            # Reset the message count for the channel
+            self.memory_user_message_counts[guild.id][channel.id] = 0
+
+    async def send_monitoring_reminder(self, channel):
+        """Send a monitoring reminder to the specified channel."""
+        embed = discord.Embed(
+            title="Omni is monitoring the conversation",
+            description=(
+                "AI is being used for agentic moderation, and conversations are being screened by an AI agent. Your messages may be subject to automatic moderation at any time.\n\n"
+                "You can use the `{}omni vote` command to let server staff know how the agent is doing.".format(self.bot.command_prefix)
+            ),
+            color=0xfffffe
+        )
+        await channel.send(embed=embed)
