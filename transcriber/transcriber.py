@@ -52,11 +52,15 @@ class Transcriber(commands.Cog):
             },
             "gpt-4o-mini-transcribe": {
                 "token_cost": "0.03 per 1K tokens",
-                "context_cap": "4K tokens"
+                "context_cap": "4K tokens",
+                "performance": ":white_circle: :white_circle: :white_circle:",
+                "speed": ":zap: :zap: :zap: :zap:",
             },
             "whisper-1": {
                 "token_cost": "0.02 per 1K tokens",
-                "context_cap": "2K tokens"
+                "context_cap": "2K tokens",
+                "performance": ":white_circle: :white_circle:",
+                "speed": ":zap: :zap: :zap:",
             }
         }
         
