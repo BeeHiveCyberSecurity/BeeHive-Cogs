@@ -304,7 +304,10 @@ class Transcriber(commands.Cog):
         if logging_channel_id:
             logging_channel = self.bot.get_channel(logging_channel_id)
             if logging_channel:
-                await logging_channel.send(
-                    f"Moderated voice note from {message.author.mention} in {message.channel.mention}.",
-                    file=discord.File(voice_note, filename="moderated_voice_note.mp3")
+                embed = discord.Embed(
+                    title="Voice note moderated",
+                    description=f"A voice note from {message.author.mention} in {message.channel.mention} has been moderated.",
+                    color=0xff4545
                 )
+                embed.set_author(name=message.author.display_name, icon_url=message.author.avatar.url)
+                await logging_channel.send(embed=embed, file=discord.File(voice_note, filename="moderated_voice_note.mp3"))
