@@ -276,7 +276,11 @@ class Transcriber(commands.Cog):
                     highest_role_color = message.author.top_role.color if message.author.top_role.color else discord.Color.default()
                     embed = discord.Embed(title="", description=transcription, color=highest_role_color)
                     embed.set_author(name=f"{message.author.display_name} said...", icon_url=message.author.avatar.url)
-                    embed.set_footer(text=f"Transcription took {transcription_time_display}, moderation {moderation_time_display}. AI can make mistakes, double-check for accuracy")
+                    footer_text = f"{transcription_time_display} to transcribe"
+                    if moderation_time_display != "is disabled":
+                        footer_text += f", {moderation_time_display} to moderate"
+                    footer_text += ". AI can make mistakes, double-check for accuracy"
+                    embed.set_footer(text=footer_text)
 
                     # Reply to the message with the transcription
                     await message.reply(embed=embed)
