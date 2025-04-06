@@ -1,5 +1,5 @@
 import discord
-from redbot.core import commands
+from redbot.core import commands, Config
 from redbot.core.bot import Red
 import aiohttp
 from typing import Optional
@@ -9,6 +9,9 @@ class Transcriber(commands.Cog):
 
     def __init__(self, bot: Red):
         self.bot = bot
+        self.config = Config.get_conf(self, identifier=1234567890, force_registration=True)
+        default_guild = {"default_model": "gpt-4o-mini-transcribe"}
+        self.config.register_guild(**default_guild)
         self.openai_api_key: Optional[str] = None
 
     async def cog_load(self):
@@ -31,13 +34,12 @@ class Transcriber(commands.Cog):
         if model not in ["gpt-4o-transcribe", "gpt-4o-mini-transcribe", "whisper-1"]:
             await ctx.send("Invalid model. Choose from: gpt-4o-transcribe, gpt-4o-mini-transcribe, whisper-1.")
             return
-        await self.bot.set_guild_data(ctx.guild.id, "transcriber", {"default_model": model})
+        await self.config.guild(ctx.guild).default_model.set(model)
         await ctx.send(f"Default transcription model set to: {model} for this server.")
 
     async def get_default_model(self, guild_id: int) -> str:
         """Retrieve the default model for a specific server."""
-        data = await self.bot.get_guild_data(guild_id, "transcriber")
-        return data.get("default_model", "gpt-4o-mini-transcribe")
+        return await self.config.guild_from_id(guild_id).default_model()
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
