@@ -99,7 +99,7 @@ class Transcriber(commands.Cog):
         knowledge_cutoff = details.get("knowledge_cutoff") or "Not applicable"
         
         # Create an embed for the settings
-        highest_role_color = ctx.author.top_role.color if ctx.author.top_role.color else discord.Color.default()
+        highest_role_color = ctx.author.top_role.color if ctx.author.top_role.color else 0xfffffe
         embed = discord.Embed(title="Transcriber settings", color=highest_role_color)
         embed.add_field(name="Model in use", value=f"**{default_model.replace('-', ' ')}**", inline=False)
         embed.add_field(name="Description", value=description, inline=False)
