@@ -188,7 +188,7 @@ class Transcriber(commands.Cog):
         model_usage = await self.config.guild(ctx.guild).model_usage()
         embed = discord.Embed(title="Transcriber model usage", color=0xfffffe)
         for model, count in model_usage.items():
-            embed.add_field(name=model.replace('-', ' ').title(), value=f"{count} voice notes", inline=False)
+            embed.add_field(name=model, value=f"{count} voice notes", inline=False)
         await ctx.send(embed=embed)
 
     @transcriber_group.command(name="setlogchannel")
