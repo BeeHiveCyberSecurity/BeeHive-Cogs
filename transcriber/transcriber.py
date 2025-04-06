@@ -28,20 +28,47 @@ class Transcriber(commands.Cog):
         """Group command for transcriber related commands."""
         await ctx.send_help(ctx.command)
 
-    @transcriber_group.command(name="setmodel")
+    @transcriber_group.command(name="model")
     async def set_model(self, ctx: commands.Context, model: str):
-        """Set the default model for transcription for this server."""
+        """Choose an AI model to use for transcription requests"""
         if model not in ["gpt-4o-transcribe", "gpt-4o-mini-transcribe", "whisper-1"]:
             await ctx.send("Invalid model. Choose from: gpt-4o-transcribe, gpt-4o-mini-transcribe, whisper-1.")
             return
         await self.config.guild(ctx.guild).default_model.set(model)
         await ctx.send(f"Default transcription model set to: {model} for this server.")
 
-    @transcriber_group.command(name="showsettings")
+    @transcriber_group.command(name="settings")
     async def show_settings(self, ctx: commands.Context):
         """Show the current transcription settings for this server."""
         default_model = await self.get_default_model(ctx.guild.id)
-        await ctx.send(f"Current default transcription model for this server is: {default_model}")
+        
+        # Define model details
+        model_details = {
+            "gpt-4o-transcribe": {
+                "token_cost": "$2.50 per 1M tokens",
+                "context_cap": "8K tokens"
+            },
+            "gpt-4o-mini-transcribe": {
+                "token_cost": "0.03 per 1K tokens",
+                "context_cap": "4K tokens"
+            },
+            "whisper-1": {
+                "token_cost": "0.02 per 1K tokens",
+                "context_cap": "2K tokens"
+            }
+        }
+        
+        details = model_details.get(default_model, {})
+        token_cost = details.get("token_cost", "N/A")
+        context_cap = details.get("context_cap", "N/A")
+        
+        # Create an embed for the settings
+        embed = discord.Embed(title="Transcriber settings", color=0xfffffe)
+        embed.add_field(name="Default Model", value=default_model, inline=True)
+        embed.add_field(name="Token Cost", value=token_cost, inline=True)
+        embed.add_field(name="Context Cap", value=context_cap, inline=True)
+        
+        await ctx.send(embed=embed)
 
     async def get_default_model(self, guild_id: int) -> str:
         """Retrieve the default model for a specific server."""
