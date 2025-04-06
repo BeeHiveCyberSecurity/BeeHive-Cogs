@@ -1,5 +1,5 @@
 {
-    "name": "openai-transcribe",
+    "name": "transcriber",
     "author": ["movelaterally"],
     "description": "A Discord bot cog that transcribes voice notes using AI models.",
     "install_msg": "Thank you for installing OpenAI Transcribe. Please ensure you have set your OpenAI API key using the bot's configuration.",
