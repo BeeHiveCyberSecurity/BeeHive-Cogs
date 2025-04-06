@@ -31,11 +31,18 @@ class Transcriber(commands.Cog):
                     voice_note = await attachment.read()
 
                     try:
+                        # Indicate that transcription is in progress
+                        typing_task = message.channel.typing()
+                        await typing_task.__aenter__()
+
                         # Send the voice note to OpenAI for transcription
                         transcription = await self.transcribe_voice_note(voice_note, attachment.content_type)
                     except ValueError as e:
                         await message.reply(f"Error during transcription: {str(e)}")
                         return
+                    finally:
+                        # Ensure typing indicator is stopped
+                        await typing_task.__aexit__(None, None, None)
 
                     # Create an embed with the transcription
                     embed = discord.Embed(title="", description=transcription, color=0xfffffe)
