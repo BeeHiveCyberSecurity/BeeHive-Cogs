@@ -90,8 +90,7 @@ class Transcriber(commands.Cog):
         embed.add_field(name="Model in use", value=f"**{default_model}**", inline=False)
         embed.add_field(name="Model performance", value=f"{performance}", inline=False)
         embed.add_field(name="Model speed", value=f"{speed}", inline=False)
-        embed.add_field(name="Input cost", value=input_cost, inline=True)
-        embed.add_field(name="Output cost", value=output_cost, inline=True)
+        embed.add_field(name="Model cost", value=f"Input: {input_cost}\nOutput: {output_cost}", inline=True)
         embed.add_field(name="Context cap", value=context_cap, inline=True)
         
         await ctx.send(embed=embed)
