@@ -72,7 +72,9 @@ class Transcriber(commands.Cog):
         
         # Create an embed for the settings
         embed = discord.Embed(title="Transcriber settings", color=0xfffffe)
-        embed.add_field(name="Model in use", value=f"`{default_model}`\n{performance}\n{speed}", inline=False)
+        embed.add_field(name="Model in use", value=f"**{default_model}**", inline=False)
+        embed.add_field(name="Model performance", value=f"{performance}", inline=False)
+        embed.add_field(name="Model speed", value=f"{speed}", inline=False)
         embed.add_field(name="Token cost", value=token_cost, inline=True)
         embed.add_field(name="Context cap", value=context_cap, inline=True)
         
