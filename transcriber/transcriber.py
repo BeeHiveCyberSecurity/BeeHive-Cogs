@@ -191,7 +191,7 @@ class Transcriber(commands.Cog):
             embed.add_field(name=model, value=f"{count} voice notes", inline=False)
         await ctx.send(embed=embed)
 
-    @transcriber_group.command(name="setlogchannel")
+    @transcriber_group.command(name="logs")
     async def set_log_channel(self, ctx: commands.Context, channel: discord.TextChannel):
         """Set the channel where moderated voice notes and alerts are sent."""
         await self.config.guild(ctx.guild).logging_channel.set(channel.id)
