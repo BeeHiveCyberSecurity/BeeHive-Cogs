@@ -256,7 +256,7 @@ class Transcriber(commands.Cog):
                                 moderation_time = moderation_end_time - moderation_start_time
                                 moderation_time_display = f"{moderation_time * 1000:.2f} ms" if moderation_time < 1 else f"{moderation_time:.2f} seconds"
                             else:
-                                moderation_time_display = "Moderation disabled"
+                                moderation_time_display = "moderation not applicable"
 
                             # Convert transcription time to human-readable format
                             transcription_time_display = f"{transcription_time * 1000:.2f} ms" if transcription_time < 1 else f"{transcription_time:.2f} seconds"
