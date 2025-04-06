@@ -47,7 +47,7 @@ class Transcriber(commands.Cog):
         # Define model details
         model_details = {
             "gpt-4o-transcribe": {
-                "description": "`gpt 4o transcribe` is a speech-to-text model that uses GPT-4o to transcribe audio. It offers improvements to word error rate and better language recognition and accuracy compared to original Whisper models. Use `gpt 4o transcribe` to get the longest context window at the highest comparable prices for input and output.",
+                "description": "[gpt-4o-transcribe](<https://platform.openai.com/docs/models/gpt-4o-transcribe>) is a speech-to-text model that uses [GPT-4o](<https://platform.openai.com/docs/models/gpt-4o>) to transcribe audio. It offers improvements to word error rate and better language recognition and accuracy compared to original Whisper models. Use `gpt 4o transcribe` to get the longest context window at the highest comparable prices for input and output.",
                 "pricing": {
                     "input": "**$6.00** / **1,000,000 tokens**",
                     "cached_input": "",
@@ -60,7 +60,7 @@ class Transcriber(commands.Cog):
                 "knowledge_cutoff": "May 31, 2024"
             },
             "gpt-4o-mini-transcribe": {
-                "description": "`gpt 4o mini transcribe` is a speech-to-text model that uses GPT-4o mini to transcribe audio. It offers improvements to word error rate and better language recognition and accuracy compared to original Whisper models. `mini` models provide a balance of accuracy and cost-saving with the usage of frontier models, in comparison to their full-size and full-feature master model.",
+                "description": "`gpt-4o-mini-transcribe` is a speech-to-text model that uses GPT-4o mini to transcribe audio. It offers improvements to word error rate and better language recognition and accuracy compared to original Whisper models. `mini` models provide a balance of accuracy and cost-saving with the usage of frontier models, in comparison to their full-size and full-feature master model.",
                 "pricing": {
                     "input": "**$3.00** / **1,000,000 tokens**",
                     "cached_input": "",
