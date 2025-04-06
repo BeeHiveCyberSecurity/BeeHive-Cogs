@@ -14,7 +14,8 @@ class Transcriber(commands.Cog):
         default_guild = {
             "default_model": "whisper-1",
             "model_usage": {"gpt-4o-transcribe": 0, "gpt-4o-mini-transcribe": 0, "whisper-1": 0},
-            "logging_channel": None
+            "logging_channel": None,
+            "moderation_enabled": True  # Add a toggle for moderation
         }
         self.config.register_guild(**default_guild)
         self.openai_api_key: Optional[str] = None
@@ -108,6 +109,7 @@ class Transcriber(commands.Cog):
     async def show_settings(self, ctx: commands.Context):
         """Show the current transcription settings for this server."""
         default_model = await self.get_default_model(ctx.guild.id)
+        moderation_enabled = await self.config.guild(ctx.guild).moderation_enabled()
         
         # Define model details
         model_details = {
@@ -174,6 +176,7 @@ class Transcriber(commands.Cog):
         embed.add_field(name="Model performance", value=f"{performance}", inline=True)
         embed.add_field(name="Model speed", value=f"{speed}", inline=True)
         embed.add_field(name="Knowledge cutoff", value=f"{knowledge_cutoff}", inline=True)
+        embed.add_field(name="Moderation Enabled", value=f"{moderation_enabled}", inline=True)
         
         await ctx.send(embed=embed)
 
@@ -191,6 +194,15 @@ class Transcriber(commands.Cog):
         """Set the channel where moderated voice notes and alerts are sent."""
         await self.config.guild(ctx.guild).logging_channel.set(channel.id)
         await ctx.send(f"Logging channel set to {channel.mention}")
+
+    @transcriber_group.command(name="moderation")
+    async def toggle_moderation(self, ctx: commands.Context):
+        """Toggle the moderation feature on or off."""
+        current_state = await self.config.guild(ctx.guild).moderation_enabled()
+        new_state = not current_state
+        await self.config.guild(ctx.guild).moderation_enabled.set(new_state)
+        state_str = "enabled" if new_state else "disabled"
+        await ctx.send(f"Moderation has been {state_str}.")
 
     async def get_default_model(self, guild_id: int) -> str:
         """Retrieve the default model for a specific server."""
@@ -224,24 +236,30 @@ class Transcriber(commands.Cog):
                             transcription_end_time = time.monotonic()
                             transcription_time = transcription_end_time - transcription_start_time
 
-                            # Start timing the moderation process
-                            moderation_start_time = time.monotonic()
+                            # Check if moderation is enabled
+                            moderation_enabled = await self.config.guild(message.guild).moderation_enabled()
 
-                            # Send the transcription to the moderation endpoint
-                            if await self.moderate_transcription(transcription):
-                                # Delete the message if flagged
-                                await message.delete()
-                                # Log the moderated voice note
-                                await self.log_moderation(message, voice_note)
-                                return
+                            if moderation_enabled:
+                                # Start timing the moderation process
+                                moderation_start_time = time.monotonic()
 
-                            # Calculate the time taken for moderation
-                            moderation_end_time = time.monotonic()
-                            moderation_time = moderation_end_time - moderation_start_time
+                                # Send the transcription to the moderation endpoint
+                                if await self.moderate_transcription(transcription):
+                                    # Delete the message if flagged
+                                    await message.delete()
+                                    # Log the moderated voice note
+                                    await self.log_moderation(message, voice_note)
+                                    return
 
-                            # Convert transcription and moderation times to human-readable format
+                                # Calculate the time taken for moderation
+                                moderation_end_time = time.monotonic()
+                                moderation_time = moderation_end_time - moderation_start_time
+                                moderation_time_display = f"{moderation_time * 1000:.2f} ms" if moderation_time < 1 else f"{moderation_time:.2f} seconds"
+                            else:
+                                moderation_time_display = "Moderation disabled"
+
+                            # Convert transcription time to human-readable format
                             transcription_time_display = f"{transcription_time * 1000:.2f} ms" if transcription_time < 1 else f"{transcription_time:.2f} seconds"
-                            moderation_time_display = f"{moderation_time * 1000:.2f} ms" if moderation_time < 1 else f"{moderation_time:.2f} seconds"
 
                             # Update model usage stats
                             async with self.config.guild(message.guild).model_usage() as model_usage:
