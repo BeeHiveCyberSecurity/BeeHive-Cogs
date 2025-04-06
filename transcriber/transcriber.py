@@ -83,7 +83,7 @@ class Transcriber(commands.Cog):
             }
         }
         
-        details = model_details.get(default_model, {})
+        details = model_details.get(default_model.replace("-", " "), {})
         pricing = details.get("pricing", {})
         input_cost = pricing.get("input", "Free")
         output_cost = pricing.get("output", "Free")
