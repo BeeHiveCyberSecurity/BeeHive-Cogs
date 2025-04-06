@@ -58,9 +58,9 @@ class Transcriber(commands.Cog):
             },
             "gpt-4o-mini-transcribe": {
                 "pricing": {
-                    "input": "$0.03 per 1K tokens",
+                    "input": "$1.25 / 1M tokens",
                     "cached_input": "-",
-                    "output": "-"
+                    "output": "$5.00 / 1M tokens"
                 },
                 "context_window": "4K tokens",
                 "performance": ":white_circle: :white_circle: :white_circle:",
