@@ -47,11 +47,11 @@ class Transcriber(commands.Cog):
         model_details = {
             "gpt-4o-transcribe": {
                 "pricing": {
-                    "input": "$2.50 per 1M tokens",
+                    "input": "$2.50 / 1M tokens",
                     "cached_input": "-",
-                    "output": "$10.00 per 1M tokens"
+                    "output": "$10.00 / 1M tokens"
                 },
-                "context_cap": "8K tokens",
+                "context_window": "8K tokens",
                 "performance": ":white_circle: :white_circle: :white_circle: :white_circle:",
                 "speed": ":zap: :zap: :zap:",
             },
@@ -61,7 +61,7 @@ class Transcriber(commands.Cog):
                     "cached_input": "-",
                     "output": "-"
                 },
-                "context_cap": "4K tokens",
+                "context_window": "4K tokens",
                 "performance": ":white_circle: :white_circle: :white_circle:",
                 "speed": ":zap: :zap: :zap: :zap:",
             },
@@ -71,7 +71,7 @@ class Transcriber(commands.Cog):
                     "cached_input": "-",
                     "output": "-"
                 },
-                "context_cap": "2K tokens",
+                "context_window": "2K tokens",
                 "performance": ":white_circle: :white_circle:",
                 "speed": ":zap: :zap: :zap:",
             }
@@ -81,7 +81,7 @@ class Transcriber(commands.Cog):
         pricing = details.get("pricing", {})
         input_cost = pricing.get("input", "N/A")
         output_cost = pricing.get("output", "N/A")
-        context_cap = details.get("context_cap", "N/A")
+        context_window = details.get("context_window", "N/A")
         performance = details.get("performance", "N/A")
         speed = details.get("speed", "N/A")
         
@@ -91,7 +91,7 @@ class Transcriber(commands.Cog):
         embed.add_field(name="Model performance", value=f"{performance}", inline=False)
         embed.add_field(name="Model speed", value=f"{speed}", inline=False)
         embed.add_field(name="Model cost", value=f"Input: {input_cost}\nOutput: {output_cost}", inline=True)
-        embed.add_field(name="Context cap", value=context_cap, inline=True)
+        embed.add_field(name="Context window", value=context_window, inline=True)
         
         await ctx.send(embed=embed)
 
