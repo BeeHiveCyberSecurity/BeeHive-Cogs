@@ -9,7 +9,7 @@ class Transcriber(commands.Cog):
 
     def __init__(self, bot: Red):
         self.bot = bot
-        self.config = Config.get_conf(self, identifier=1234567890, force_registration=True)
+        self.config = Config.get_conf(self, identifier=11111111, force_registration=True)
         default_guild = {"default_model": "whisper-1"}
         self.config.register_guild(**default_guild)
         self.openai_api_key: Optional[str] = None
