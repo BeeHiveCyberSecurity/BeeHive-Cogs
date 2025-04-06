@@ -95,16 +95,11 @@ class Transcriber(commands.Cog):
 
         # Create an embed to show the change
         embed = discord.Embed(title="Model updated", description="The model used for voice note transcription has been changed. See important details below.", color=0xfffffe)
-        embed.add_field(name="Previous Model", value=f"**{current_model.replace('-', ' ')}**", inline=False)
-        embed.add_field(name="New Model", value=f"**{model.replace('-', ' ')}**", inline=False)
-        embed.add_field(name="Previous Description", value=current_details.get("description", "No description available"), inline=False)
-        embed.add_field(name="New Description", value=new_details.get("description", "No description available"), inline=False)
-        embed.add_field(name="Previous Pricing", value=f"**`Input`** {current_details.get('pricing', {}).get('input', 'Not priced')}\n**`Output`** {current_details.get('pricing', {}).get('output', 'Not priced')}", inline=False)
-        embed.add_field(name="New Pricing", value=f"**`Input`** {new_details.get('pricing', {}).get('input', 'Not priced')}\n**`Output`** {new_details.get('pricing', {}).get('output', 'Not priced')}", inline=False)
-        embed.add_field(name="Previous Performance", value=current_details.get("performance", "Not rated"), inline=True)
-        embed.add_field(name="New Performance", value=new_details.get("performance", "Not rated"), inline=True)
-        embed.add_field(name="Previous Speed", value=current_details.get("speed", "Not rated"), inline=True)
-        embed.add_field(name="New Speed", value=new_details.get("speed", "Not rated"), inline=True)
+        embed.add_field(name="Model", value=f"**Before:** {current_model.replace('-', ' ')}\n**After:** {model.replace('-', ' ')}", inline=False)
+        embed.add_field(name="Description", value=f"**Before:** {current_details.get('description', 'No description available')}\n\n**After:** {new_details.get('description', 'No description available')}", inline=False)
+        embed.add_field(name="Pricing", value=f"**Before:**\n**`Input`** {current_details.get('pricing', {}).get('input', 'Not priced')}\n**`Output`** {current_details.get('pricing', {}).get('output', 'Not priced')}\n\n**After:**\n**`Input`** {new_details.get('pricing', {}).get('input', 'Not priced')}\n**`Output`** {new_details.get('pricing', {}).get('output', 'Not priced')}", inline=False)
+        embed.add_field(name="Performance", value=f"**Before:** {current_details.get('performance', 'Not rated')}\n**After:** {new_details.get('performance', 'Not rated')}", inline=True)
+        embed.add_field(name="Speed", value=f"**Before:** {current_details.get('speed', 'Not rated')}\n**After:** {new_details.get('speed', 'Not rated')}", inline=True)
 
         await ctx.send(embed=embed)
 
