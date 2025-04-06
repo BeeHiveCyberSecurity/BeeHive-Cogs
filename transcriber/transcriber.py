@@ -13,7 +13,8 @@ class Transcriber(commands.Cog):
         self.config = Config.get_conf(self, identifier=11111111, force_registration=True)
         default_guild = {
             "default_model": "whisper-1",
-            "model_usage": {"gpt-4o-transcribe": 0, "gpt-4o-mini-transcribe": 0, "whisper-1": 0}
+            "model_usage": {"gpt-4o-transcribe": 0, "gpt-4o-mini-transcribe": 0, "whisper-1": 0},
+            "logging_channel": None
         }
         self.config.register_guild(**default_guild)
         self.openai_api_key: Optional[str] = None
@@ -185,6 +186,12 @@ class Transcriber(commands.Cog):
             embed.add_field(name=model.replace('-', ' ').title(), value=f"{count} voice notes", inline=False)
         await ctx.send(embed=embed)
 
+    @transcriber_group.command(name="setlogchannel")
+    async def set_log_channel(self, ctx: commands.Context, channel: discord.TextChannel):
+        """Set the channel where moderated voice notes and alerts are sent."""
+        await self.config.guild(ctx.guild).logging_channel.set(channel.id)
+        await ctx.send(f"Logging channel set to {channel.mention}")
+
     async def get_default_model(self, guild_id: int) -> str:
         """Retrieve the default model for a specific server."""
         return await self.config.guild_from_id(guild_id).default_model()
@@ -208,23 +215,33 @@ class Transcriber(commands.Cog):
                             default_model = await self.get_default_model(message.guild.id)
 
                             # Start timing the transcription process
-                            start_time = time.monotonic()
+                            transcription_start_time = time.monotonic()
 
                             # Send the voice note to OpenAI for transcription
                             transcription = await self.transcribe_voice_note(voice_note, attachment.content_type, default_model)
 
                             # Calculate the time taken for transcription
-                            end_time = time.monotonic()
-                            transcription_time = end_time - start_time
+                            transcription_end_time = time.monotonic()
+                            transcription_time = transcription_end_time - transcription_start_time
 
-                            # Convert transcription time to human-readable format
-                            if transcription_time < 1:
-                                time_display = f"{transcription_time * 1000:.2f} ms"
-                            elif transcription_time < 60:
-                                time_display = f"{transcription_time:.2f} seconds"
-                            else:
-                                minutes, seconds = divmod(transcription_time, 60)
-                                time_display = f"{int(minutes)} minutes and {seconds:.2f} seconds"
+                            # Start timing the moderation process
+                            moderation_start_time = time.monotonic()
+
+                            # Send the transcription to the moderation endpoint
+                            if await self.moderate_transcription(transcription):
+                                # Delete the message if flagged
+                                await message.delete()
+                                # Log the moderated voice note
+                                await self.log_moderation(message, voice_note)
+                                return
+
+                            # Calculate the time taken for moderation
+                            moderation_end_time = time.monotonic()
+                            moderation_time = moderation_end_time - moderation_start_time
+
+                            # Convert transcription and moderation times to human-readable format
+                            transcription_time_display = f"{transcription_time * 1000:.2f} ms" if transcription_time < 1 else f"{transcription_time:.2f} seconds"
+                            moderation_time_display = f"{moderation_time * 1000:.2f} ms" if moderation_time < 1 else f"{moderation_time:.2f} seconds"
 
                             # Update model usage stats
                             async with self.config.guild(message.guild).model_usage() as model_usage:
@@ -238,7 +255,7 @@ class Transcriber(commands.Cog):
                     highest_role_color = message.author.top_role.color if message.author.top_role.color else discord.Color.default()
                     embed = discord.Embed(title="", description=transcription, color=highest_role_color)
                     embed.set_author(name=f"{message.author.display_name} said...", icon_url=message.author.avatar.url)
-                    embed.set_footer(text=f"Transcribed using AI in {time_display}, check results for accuracy")
+                    embed.set_footer(text=f"Transcription: {transcription_time_display}, Moderation: {moderation_time_display}, check results for accuracy")
 
                     # Reply to the message with the transcription
                     await message.reply(embed=embed)
@@ -261,3 +278,33 @@ class Transcriber(commands.Cog):
                     raise ValueError(f"Failed to transcribe audio: {response.status} - {error_message}")
                 result = await response.json()
                 return result.get('text', 'Transcription failed: No text returned')
+
+    async def moderate_transcription(self, transcription: str) -> bool:
+        """Send the transcription to the moderation endpoint and return if it is flagged."""
+        url = "https://api.openai.com/v1/moderations"
+        headers = {
+            "Authorization": f"Bearer {self.openai_api_key}"
+        }
+        data = {
+            "input": transcription
+        }
+
+        async with aiohttp.ClientSession() as session:
+            async with session.post(url, headers=headers, json=data) as response:
+                if response.status != 200:
+                    error_message = await response.text()
+                    raise ValueError(f"Failed to moderate transcription: {response.status} - {error_message}")
+                result = await response.json()
+                return result.get('results', [{}])[0].get('flagged', False)
+
+    async def log_moderation(self, message: discord.Message, voice_note: bytes):
+        """Log the moderated voice note to the configured logging channel."""
+        guild_config = await self.config.guild(message.guild).all()
+        logging_channel_id = guild_config.get("logging_channel")
+        if logging_channel_id:
+            logging_channel = self.bot.get_channel(logging_channel_id)
+            if logging_channel:
+                await logging_channel.send(
+                    f"Moderated voice note from {message.author.mention} in {message.channel.mention}.",
+                    file=discord.File(voice_note, filename="moderated_voice_note.mp3")
+                )
