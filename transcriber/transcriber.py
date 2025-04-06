@@ -61,7 +61,7 @@ class Transcriber(commands.Cog):
             "gpt-4o-mini-transcribe": {
                 "description": "GPT-4o mini Transcribe is a speech-to-text model that uses GPT-4o mini to transcribe audio. It offers improvements to word error rate and better language recognition and accuracy compared to original Whisper models. Use it for more accurate transcripts.",
                 "pricing": {
-                    "input": "**$1.25** / **1,000,000 tokens**",
+                    "input": "**$3.00** / **1,000,000 tokens**",
                     "cached_input": "",
                     "output": "**$5.00** / **1,000,000 tokens**"
                 },
