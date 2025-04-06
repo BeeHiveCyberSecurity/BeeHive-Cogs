@@ -46,7 +46,9 @@ class Transcriber(commands.Cog):
         model_details = {
             "gpt-4o-transcribe": {
                 "token_cost": "$2.50 per 1M tokens",
-                "context_cap": "8K tokens"
+                "context_cap": "8K tokens",
+                "performance": ":white_circle: :white_circle: :white_circle: :white_circle:",
+                "speed": ":zap: :zap: :zap:",
             },
             "gpt-4o-mini-transcribe": {
                 "token_cost": "0.03 per 1K tokens",
@@ -61,10 +63,12 @@ class Transcriber(commands.Cog):
         details = model_details.get(default_model, {})
         token_cost = details.get("token_cost", "N/A")
         context_cap = details.get("context_cap", "N/A")
+        performance = details.get("performance", "N/A")
+        speed = details.get("speed", "N/A")
         
         # Create an embed for the settings
         embed = discord.Embed(title="Transcriber settings", color=0xfffffe)
-        embed.add_field(name="Model in use", value=default_model, inline=True)
+        embed.add_field(name="Model in use", value=f"`{default_model}`\n{performance}\n{speed}", inline=False)
         embed.add_field(name="Token cost", value=token_cost, inline=True)
         embed.add_field(name="Context cap", value=context_cap, inline=True)
         
