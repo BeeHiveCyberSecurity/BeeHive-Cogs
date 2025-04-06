@@ -3,7 +3,6 @@ from redbot.core import commands
 from redbot.core.bot import Red
 import aiohttp
 from typing import Optional
-import time  # Import time module to measure duration
 
 class Transcriber(commands.Cog):
     """Cog to transcribe voice notes using OpenAI."""
@@ -54,31 +53,20 @@ class Transcriber(commands.Cog):
 
                     try:
                         # Indicate that transcription is in progress
-                        typing_task = message.channel.typing()
-                        await typing_task.__aenter__()
+                        async with message.channel.typing():
+                            # Get the default model for the server
+                            default_model = await self.get_default_model(message.guild.id)
 
-                        # Start timing the transcription process
-                        start_time = time.time()
-
-                        # Get the default model for the server
-                        default_model = await self.get_default_model(message.guild.id)
-
-                        # Send the voice note to OpenAI for transcription
-                        transcription = await self.transcribe_voice_note(voice_note, attachment.content_type, default_model)
-
-                        # Calculate the duration of the transcription process
-                        duration = time.time() - start_time
+                            # Send the voice note to OpenAI for transcription
+                            transcription = await self.transcribe_voice_note(voice_note, attachment.content_type, default_model)
                     except ValueError as e:
                         await message.reply(f"Error during transcription: {str(e)}")
                         return
-                    finally:
-                        # Ensure typing indicator is stopped
-                        await typing_task.__aexit__(None, None, None)
 
                     # Create an embed with the transcription
                     embed = discord.Embed(title="", description=transcription, color=0xfffffe)
                     embed.set_author(name=f"{message.author.display_name} said...", icon_url=message.author.avatar.url)
-                    embed.set_footer(text=f"Transcribed using AI in {duration:.2f} seconds, check results for accuracy")
+                    embed.set_footer(text="Transcribed using AI, check results for accuracy")
 
                     # Reply to the message with the transcription
                     await message.reply(embed=embed)
