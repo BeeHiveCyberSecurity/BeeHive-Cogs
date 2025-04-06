@@ -3,6 +3,7 @@ from redbot.core import commands
 from redbot.core.bot import Red
 import aiohttp
 from typing import Optional
+import tempfile
 
 class Transcriber(commands.Cog):
     """Cog to transcribe voice notes using OpenAI."""
@@ -46,8 +47,13 @@ class Transcriber(commands.Cog):
         headers = {
             "Authorization": f"Bearer {self.openai_api_key}"
         }
+        
+        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+            temp_file.write(voice_note)
+            temp_file_name = temp_file.name
+
         data = aiohttp.FormData()
-        data.add_field('file', voice_note, filename='audio.mp3', content_type=content_type or "audio/mpeg")
+        data.add_field('file', open(temp_file_name, 'rb'), filename='audio.mp3', content_type=content_type or "audio/mpeg")
         data.add_field('model', 'gpt-4o-transcribe')
 
         async with aiohttp.ClientSession() as session:
