@@ -47,9 +47,9 @@ class Transcriber(commands.Cog):
         model_details = {
             "gpt-4o-transcribe": {
                 "pricing": {
-                    "input": "**$2.50** / **1M tokens**",
-                    "cached_input": "-",
-                    "output": "**$10.00** / **1M tokens**"
+                    "input": "**$2.50** / **1,000,000 tokens**",
+                    "cached_input": "",
+                    "output": "**$10.00** / **1,000,000 tokens**"
                 },
                 "context_window": "16,000 tokens",
                 "performance": ":white_circle: :white_circle: :white_circle: :white_circle:",
@@ -58,9 +58,9 @@ class Transcriber(commands.Cog):
             },
             "gpt-4o-mini-transcribe": {
                 "pricing": {
-                    "input": "**$1.25** / **1M** tokens",
-                    "cached_input": "-",
-                    "output": "**$5.00** / **1M** tokens"
+                    "input": "**$1.25** / **1,000,000** tokens",
+                    "cached_input": "",
+                    "output": "**$5.00** / **1,000,000** tokens"
                 },
                 "context_window": "16,000 tokens",
                 "performance": ":white_circle: :white_circle: :white_circle:",
@@ -69,9 +69,9 @@ class Transcriber(commands.Cog):
             },
             "whisper-1": {
                 "pricing": {
-                    "input": "$0.006 / 1M tokens",
-                    "cached_input": "-",
-                    "output": "-"
+                    "input": "**$0.006** / **1,000,000** tokens",
+                    "cached_input": "",
+                    "output": ""
                 },
                 "context_window": "",
                 "performance": ":white_circle: :white_circle:",
