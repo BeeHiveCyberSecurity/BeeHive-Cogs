@@ -51,8 +51,62 @@ class Transcriber(commands.Cog):
         if model not in valid_models:
             await ctx.send(f"Invalid model. Choose from: {', '.join(valid_models)}.")
             return
+
+        # Get the current model before changing
+        current_model = await self.get_default_model(ctx.guild.id)
+        
+        # Update the model
         await self.config.guild(ctx.guild).default_model.set(model)
-        await ctx.send(f"Default transcription model set to: {model} for this server.")
+
+        # Get model details
+        model_details = {
+            "gpt-4o-transcribe": {
+                "description": "[gpt-4o-transcribe](<https://platform.openai.com/docs/models/gpt-4o-transcribe>) is a speech-to-text model that uses [GPT-4o](<https://platform.openai.com/docs/models/gpt-4o>) to transcribe audio. It offers improvements to word error rate and better language recognition and accuracy compared to original Whisper models. Use `gpt 4o transcribe` to get the longest context window at the highest comparable prices for input and output.",
+                "pricing": {
+                    "input": "**$6.00** / **1,000,000 tokens**",
+                    "output": "**$10.00** / **1,000,000 tokens**"
+                },
+                "performance": ":white_circle: :white_circle: :white_circle: :white_circle:",
+                "speed": ":zap: :zap: :zap:"
+            },
+            "gpt-4o-mini-transcribe": {
+                "description": "[gpt-4o-mini-transcribe](<https://platform.openai.com/docs/models/gpt-4o-mini-transcribe>) is a speech-to-text model that uses [GPT-4o mini](<https://platform.openai.com/docs/models/gpt-4o-mini>) to transcribe audio. It offers improvements to word error rate and better language recognition and accuracy compared to original Whisper models. `mini` models provide a balance of accuracy and cost-saving with the usage of frontier models, in comparison to their full-size and full-feature master model.",
+                "pricing": {
+                    "input": "**$3.00** / **1,000,000 tokens**",
+                    "output": "**$5.00** / **1,000,000 tokens**"
+                },
+                "performance": ":white_circle: :white_circle: :white_circle:",
+                "speed": ":zap: :zap: :zap: :zap:"
+            },
+            "whisper-1": {
+                "description": "[whisper-1](<https://platform.openai.com/docs/models/whisper-1>) is a general-purpose speech recognition model, trained on a large dataset of diverse audio. You can also use it as a multitask model to perform multilingual speech recognition as well as speech translation and language identification. Use `whisper-1` for affordable, reliable transcription.",
+                "pricing": {
+                    "input": "**$0.006** / **1,000,000 tokens**",
+                    "output": "Not priced"
+                },
+                "performance": ":white_circle: :white_circle:",
+                "speed": ":zap: :zap: :zap:"
+            }
+        }
+
+        # Get details for the current and new model
+        current_details = model_details.get(current_model, {})
+        new_details = model_details.get(model, {})
+
+        # Create an embed to show the change
+        embed = discord.Embed(title="Model updated", description="The model used for voice note transcription has been changed. See important details below." color=0xfffffe)
+        embed.add_field(name="Previous Model", value=f"**{current_model.replace('-', ' ')}**", inline=False)
+        embed.add_field(name="New Model", value=f"**{model.replace('-', ' ')}**", inline=False)
+        embed.add_field(name="Previous Description", value=current_details.get("description", "No description available"), inline=False)
+        embed.add_field(name="New Description", value=new_details.get("description", "No description available"), inline=False)
+        embed.add_field(name="Previous Pricing", value=f"**`Input`** {current_details.get('pricing', {}).get('input', 'Not priced')}\n**`Output`** {current_details.get('pricing', {}).get('output', 'Not priced')}", inline=False)
+        embed.add_field(name="New Pricing", value=f"**`Input`** {new_details.get('pricing', {}).get('input', 'Not priced')}\n**`Output`** {new_details.get('pricing', {}).get('output', 'Not priced')}", inline=False)
+        embed.add_field(name="Previous Performance", value=current_details.get("performance", "Not rated"), inline=True)
+        embed.add_field(name="New Performance", value=new_details.get("performance", "Not rated"), inline=True)
+        embed.add_field(name="Previous Speed", value=current_details.get("speed", "Not rated"), inline=True)
+        embed.add_field(name="New Speed", value=new_details.get("speed", "Not rated"), inline=True)
+
+        await ctx.send(embed=embed)
 
     @transcriber_group.command(name="settings")
     async def show_settings(self, ctx: commands.Context):
