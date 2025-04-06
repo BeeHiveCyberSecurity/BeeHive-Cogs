@@ -47,9 +47,9 @@ class Transcriber(commands.Cog):
         model_details = {
             "gpt-4o-transcribe": {
                 "pricing": {
-                    "input": "$2.50 / 1M tokens",
+                    "input": "**$2.50** / **1M tokens**",
                     "cached_input": "-",
-                    "output": "$10.00 / 1M tokens"
+                    "output": "**$10.00** / **1M tokens**"
                 },
                 "context_window": "16,000 tokens",
                 "performance": ":white_circle: :white_circle: :white_circle: :white_circle:",
@@ -58,9 +58,9 @@ class Transcriber(commands.Cog):
             },
             "gpt-4o-mini-transcribe": {
                 "pricing": {
-                    "input": "$1.25 / 1M tokens",
+                    "input": "**$1.25** / **1M** tokens",
                     "cached_input": "-",
-                    "output": "$5.00 / 1M tokens"
+                    "output": "**$5.00** / **1M** tokens"
                 },
                 "context_window": "4K tokens",
                 "performance": ":white_circle: :white_circle: :white_circle:",
