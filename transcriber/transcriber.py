@@ -47,7 +47,7 @@ class Transcriber(commands.Cog):
         # Define model details
         model_details = {
             "gpt-4o-transcribe": {
-                "description": "GPT-4o Transcribe is a speech-to-text model that uses GPT-4o to transcribe audio. It offers improvements to word error rate and better language recognition and accuracy compared to original Whisper models. Use it for more accurate transcripts.",
+                "description": "`gpt 4o transcribe` is a speech-to-text model that uses GPT-4o to transcribe audio. It offers improvements to word error rate and better language recognition and accuracy compared to original Whisper models. Use `gpt 4o transcribe` to get the longest context window at the highest comparable prices for input and output.",
                 "pricing": {
                     "input": "**$6.00** / **1,000,000 tokens**",
                     "cached_input": "",
@@ -60,7 +60,7 @@ class Transcriber(commands.Cog):
                 "knowledge_cutoff": "May 31, 2024"
             },
             "gpt-4o-mini-transcribe": {
-                "description": "GPT-4o mini Transcribe is a speech-to-text model that uses GPT-4o mini to transcribe audio. It offers improvements to word error rate and better language recognition and accuracy compared to original Whisper models. Use it for more accurate transcripts.",
+                "description": "`gpt 4o mini transcribe` is a speech-to-text model that uses GPT-4o mini to transcribe audio. It offers improvements to word error rate and better language recognition and accuracy compared to original Whisper models. `mini` models provide a balance of accuracy and cost-saving with the usage of frontier models, in comparison to their full-size and full-feature master model.",
                 "pricing": {
                     "input": "**$3.00** / **1,000,000 tokens**",
                     "cached_input": "",
@@ -73,7 +73,7 @@ class Transcriber(commands.Cog):
                 "knowledge_cutoff": "May 31, 2024"
             },
             "whisper-1": {
-                "description": "Whisper is a general-purpose speech recognition model, trained on a large dataset of diverse audio. You can also use it as a multitask model to perform multilingual speech recognition as well as speech translation and language identification.",
+                "description": "`whisper` is a general-purpose speech recognition model, trained on a large dataset of diverse audio. You can also use it as a multitask model to perform multilingual speech recognition as well as speech translation and language identification. Use `whisper` for affordable, reliable transcription.",
                 "pricing": {
                     "input": "**$0.006** / **1,000,000 tokens**",
                     "cached_input": "",
