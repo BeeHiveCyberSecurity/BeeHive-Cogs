@@ -11,7 +11,10 @@ class Transcriber(commands.Cog):
     def __init__(self, bot: Red):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=11111111, force_registration=True)
-        default_guild = {"default_model": "whisper-1"}
+        default_guild = {
+            "default_model": "whisper-1",
+            "model_usage": {"gpt-4o-transcribe": 0, "gpt-4o-mini-transcribe": 0, "whisper-1": 0}
+        }
         self.config.register_guild(**default_guild)
         self.openai_api_key: Optional[str] = None
 
@@ -124,6 +127,15 @@ class Transcriber(commands.Cog):
         
         await ctx.send(embed=embed)
 
+    @transcriber_group.command(name="stats")
+    async def show_stats(self, ctx: commands.Context):
+        """Show the number of voice notes processed by each model in this server."""
+        model_usage = await self.config.guild(ctx.guild).model_usage()
+        embed = discord.Embed(title="Transcriber model usage", color=0xfffffe)
+        for model, count in model_usage.items():
+            embed.add_field(name=model.replace('-', ' ').title(), value=f"{count} voice notes", inline=False)
+        await ctx.send(embed=embed)
+
     async def get_default_model(self, guild_id: int) -> str:
         """Retrieve the default model for a specific server."""
         return await self.config.guild_from_id(guild_id).default_model()
@@ -164,6 +176,11 @@ class Transcriber(commands.Cog):
                             else:
                                 minutes, seconds = divmod(transcription_time, 60)
                                 time_display = f"{int(minutes)} minutes and {seconds:.2f} seconds"
+
+                            # Update model usage stats
+                            async with self.config.guild(message.guild).model_usage() as model_usage:
+                                model_usage[default_model] += 1
+
                     except ValueError as e:
                         await message.reply(f"Error during transcription: {str(e)}")
                         return
