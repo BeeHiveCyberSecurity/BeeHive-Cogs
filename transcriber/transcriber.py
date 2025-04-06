@@ -99,7 +99,7 @@ class Transcriber(commands.Cog):
         
         # Create an embed for the settings
         embed = discord.Embed(title="Transcriber settings", color=0xfffffe)
-        embed.add_field(name="Model in use", value=f"**{default_model}**", inline=False)
+        embed.add_field(name="Model in use", value=f"**{default_model.replace('-', ' ')}**", inline=False)
         embed.add_field(name="Description", value=description, inline=False)
         embed.add_field(name="Context window", value=context_window, inline=True)
         embed.add_field(name="Maximum output", value=f"{max_output}", inline=True)
