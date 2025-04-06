@@ -64,9 +64,9 @@ class Transcriber(commands.Cog):
         
         # Create an embed for the settings
         embed = discord.Embed(title="Transcriber settings", color=0xfffffe)
-        embed.add_field(name="Default Model", value=default_model, inline=True)
-        embed.add_field(name="Token Cost", value=token_cost, inline=True)
-        embed.add_field(name="Context Cap", value=context_cap, inline=True)
+        embed.add_field(name="Model in use", value=default_model, inline=True)
+        embed.add_field(name="Token cost", value=token_cost, inline=True)
+        embed.add_field(name="Context cap", value=context_cap, inline=True)
         
         await ctx.send(embed=embed)
 
