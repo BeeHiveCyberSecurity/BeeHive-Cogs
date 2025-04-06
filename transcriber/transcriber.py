@@ -178,7 +178,7 @@ class Transcriber(commands.Cog):
         embed.add_field(name="Model performance", value=f"{performance}", inline=True)
         embed.add_field(name="Model speed", value=f"{speed}", inline=True)
         embed.add_field(name="Knowledge cutoff", value=f"{knowledge_cutoff}", inline=True)
-        embed.add_field(name="Real-time moderation enabled", value=f"{moderation_enabled}", inline=True)
+        embed.add_field(name="Real-time moderation", value="Enabled" if moderation_enabled else "Disabled", inline=True)
         
         await ctx.send(embed=embed)
 
