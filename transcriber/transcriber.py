@@ -31,8 +31,9 @@ class Transcriber(commands.Cog):
     @transcriber_group.command(name="model")
     async def set_model(self, ctx: commands.Context, model: str):
         """Choose an AI model to use for transcription requests"""
-        if model not in ["gpt-4o-transcribe", "gpt-4o-mini-transcribe", "whisper-1"]:
-            await ctx.send("Invalid model. Choose from: gpt-4o-transcribe, gpt-4o-mini-transcribe, whisper-1.")
+        valid_models = ["gpt-4o-transcribe", "gpt-4o-mini-transcribe", "whisper-1"]
+        if model not in valid_models:
+            await ctx.send(f"Invalid model. Choose from: {', '.join(valid_models)}.")
             return
         await self.config.guild(ctx.guild).default_model.set(model)
         await ctx.send(f"Default transcription model set to: {model} for this server.")
@@ -107,7 +108,7 @@ class Transcriber(commands.Cog):
         # Check if the message contains an attachment and if it's a voice note
         if message.attachments:
             for attachment in message.attachments:
-                if attachment.filename.endswith(('.mp3', '.wav', '.ogg', '.flac', '.mp4', '.mpeg', '.mpga', '.m4a', '.webm')):
+                if attachment.filename.lower().endswith(('.mp3', '.wav', '.ogg', '.flac', '.mp4', '.mpeg', '.mpga', '.m4a', '.webm')):
                     # Download the voice note
                     voice_note = await attachment.read()
 
@@ -148,4 +149,4 @@ class Transcriber(commands.Cog):
                     error_message = await response.text()
                     raise ValueError(f"Failed to transcribe audio: {response.status} - {error_message}")
                 result = await response.json()
-                return result['text']
+                return result.get('text', 'Transcription failed: No text returned')
