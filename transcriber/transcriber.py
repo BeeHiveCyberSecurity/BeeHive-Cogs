@@ -37,6 +37,12 @@ class Transcriber(commands.Cog):
         await self.config.guild(ctx.guild).default_model.set(model)
         await ctx.send(f"Default transcription model set to: {model} for this server.")
 
+    @transcriber_group.command(name="showsettings")
+    async def show_settings(self, ctx: commands.Context):
+        """Show the current transcription settings for this server."""
+        default_model = await self.get_default_model(ctx.guild.id)
+        await ctx.send(f"Current default transcription model for this server is: {default_model}")
+
     async def get_default_model(self, guild_id: int) -> str:
         """Retrieve the default model for a specific server."""
         return await self.config.guild_from_id(guild_id).default_model()
