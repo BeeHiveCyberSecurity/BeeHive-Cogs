@@ -45,19 +45,31 @@ class Transcriber(commands.Cog):
         # Define model details
         model_details = {
             "gpt-4o-transcribe": {
-                "token_cost": "$2.50 per 1M tokens",
+                "pricing": {
+                    "input": "$2.50 per 1M tokens",
+                    "cached_input": "-",
+                    "output": "$10.00 per 1M tokens"
+                },
                 "context_cap": "8K tokens",
                 "performance": ":white_circle: :white_circle: :white_circle: :white_circle:",
                 "speed": ":zap: :zap: :zap:",
             },
             "gpt-4o-mini-transcribe": {
-                "token_cost": "0.03 per 1K tokens",
+                "pricing": {
+                    "input": "$0.03 per 1K tokens",
+                    "cached_input": "-",
+                    "output": "-"
+                },
                 "context_cap": "4K tokens",
                 "performance": ":white_circle: :white_circle: :white_circle:",
                 "speed": ":zap: :zap: :zap: :zap:",
             },
             "whisper-1": {
-                "token_cost": "0.02 per 1K tokens",
+                "pricing": {
+                    "input": "$0.02 per 1K tokens",
+                    "cached_input": "-",
+                    "output": "-"
+                },
                 "context_cap": "2K tokens",
                 "performance": ":white_circle: :white_circle:",
                 "speed": ":zap: :zap: :zap:",
@@ -65,7 +77,9 @@ class Transcriber(commands.Cog):
         }
         
         details = model_details.get(default_model, {})
-        token_cost = details.get("token_cost", "N/A")
+        pricing = details.get("pricing", {})
+        input_cost = pricing.get("input", "N/A")
+        output_cost = pricing.get("output", "N/A")
         context_cap = details.get("context_cap", "N/A")
         performance = details.get("performance", "N/A")
         speed = details.get("speed", "N/A")
@@ -75,7 +89,8 @@ class Transcriber(commands.Cog):
         embed.add_field(name="Model in use", value=f"**{default_model}**", inline=False)
         embed.add_field(name="Model performance", value=f"{performance}", inline=False)
         embed.add_field(name="Model speed", value=f"{speed}", inline=False)
-        embed.add_field(name="Token cost", value=token_cost, inline=True)
+        embed.add_field(name="Input cost", value=input_cost, inline=True)
+        embed.add_field(name="Output cost", value=output_cost, inline=True)
         embed.add_field(name="Context cap", value=context_cap, inline=True)
         
         await ctx.send(embed=embed)
