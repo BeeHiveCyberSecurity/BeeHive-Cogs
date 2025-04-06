@@ -62,7 +62,7 @@ class Transcriber(commands.Cog):
                     "cached_input": "-",
                     "output": "**$5.00** / **1M** tokens"
                 },
-                "context_window": "4K tokens",
+                "context_window": "16,000 tokens",
                 "performance": ":white_circle: :white_circle: :white_circle:",
                 "speed": ":zap: :zap: :zap: :zap:",
                 "max_output": "2,000 tokens"
@@ -73,7 +73,7 @@ class Transcriber(commands.Cog):
                     "cached_input": "-",
                     "output": "-"
                 },
-                "context_window": "2K tokens",
+                "context_window": "",
                 "performance": ":white_circle: :white_circle:",
                 "speed": ":zap: :zap: :zap:",
                 "max_output": ""
@@ -82,12 +82,12 @@ class Transcriber(commands.Cog):
         
         details = model_details.get(default_model, {})
         pricing = details.get("pricing", {})
-        input_cost = pricing.get("input", "N/A")
-        output_cost = pricing.get("output", "N/A")
-        context_window = details.get("context_window", "N/A")
+        input_cost = pricing.get("input", "Free")
+        output_cost = pricing.get("output", "Free")
+        context_window = details.get("context_window", "Not supported")
         max_output = details.get("max_output", "Not supported")
-        performance = details.get("performance", "N/A")
-        speed = details.get("speed", "N/A")
+        performance = details.get("performance", "Not rated")
+        speed = details.get("speed", "Not rated")
         
         # Create an embed for the settings
         embed = discord.Embed(title="Transcriber settings", color=0xfffffe)
