@@ -48,7 +48,7 @@ class Transcriber(commands.Cog):
             "gpt-4o-transcribe": {
                 "description": "GPT-4o Transcribe is a speech-to-text model that uses GPT-4o to transcribe audio. It offers improvements to word error rate and better language recognition and accuracy compared to original Whisper models. Use it for more accurate transcripts.",
                 "pricing": {
-                    "input": "**$2.50** / **1,000,000 tokens**",
+                    "input": "**$6.00** / **1,000,000 tokens**",
                     "cached_input": "",
                     "output": "**$10.00** / **1,000,000 tokens**"
                 },
