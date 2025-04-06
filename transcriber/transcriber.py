@@ -4,7 +4,7 @@ from redbot.core.bot import Red
 import openai
 from typing import Optional
 
-class OpenAITranscribe(commands.Cog):
+class Transcriber(commands.Cog):
     """Cog to transcribe voice notes using OpenAI."""
 
     def __init__(self, bot: Red):
@@ -49,6 +49,3 @@ class OpenAITranscribe(commands.Cog):
             file_type=content_type or "audio/mpeg"  # Use content_type if available, otherwise default
         )
         return response['text']
-
-def setup(bot: Red):
-    bot.add_cog(OpenAITranscribe(bot))
