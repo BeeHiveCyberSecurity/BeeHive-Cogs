@@ -4,7 +4,8 @@ from redbot.core.bot import Red
 import aiohttp
 from typing import Optional
 import time
-import io
+import tempfile
+import os  # Import os for file operations
 
 class Transcriber(commands.Cog):
     """Cog to transcribe voice notes using OpenAI."""
@@ -329,7 +330,14 @@ class Transcriber(commands.Cog):
                     color=0xff4545
                 )
                 embed.set_author(name=message.author.display_name, icon_url=message.author.avatar.url)
+                temp_file_path = None  # Initialize temp_file_path
                 try:
-                    await logging_channel.send(embed=embed, file=discord.File(io.BytesIO(voice_note), filename="moderated_voice_note.mp3"))
-                except ValueError as e:
+                    with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as temp_file:
+                        temp_file.write(voice_note)
+                        temp_file_path = temp_file.name
+                    await logging_channel.send(embed=embed, file=discord.File(temp_file_path, filename="moderated_voice_note.mp3"))
+                except Exception as e:  # Catch all exceptions
                     await logging_channel.send(f"Failed to send moderated voice note: {str(e)}")
+                finally:
+                    if temp_file_path and os.path.exists(temp_file_path):
+                        os.remove(temp_file_path)
