@@ -3,7 +3,6 @@ from redbot.core import commands
 from redbot.core.bot import Red
 import aiohttp
 from typing import Optional
-import tempfile
 
 class Transcriber(commands.Cog):
     """Cog to transcribe voice notes using OpenAI."""
@@ -27,7 +26,7 @@ class Transcriber(commands.Cog):
         # Check if the message contains an attachment and if it's a voice note
         if message.attachments:
             for attachment in message.attachments:
-                if attachment.filename.endswith(('.mp3', '.wav', '.ogg')):
+                if attachment.filename.endswith(('.mp3', '.wav', '.ogg', '.flac', '.mp4', '.mpeg', '.mpga', '.m4a', '.webm')):
                     # Download the voice note
                     voice_note = await attachment.read()
 
@@ -51,13 +50,9 @@ class Transcriber(commands.Cog):
         headers = {
             "Authorization": f"Bearer {self.openai_api_key}"
         }
-        
-        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-            temp_file.write(voice_note)
-            temp_file_name = temp_file.name
 
         data = aiohttp.FormData()
-        data.add_field('file', open(temp_file_name, 'rb'), filename='audio.mp3', content_type=content_type or "audio/mpeg")
+        data.add_field('file', voice_note, filename='audio', content_type=content_type or "audio/mpeg")
         data.add_field('model', 'gpt-4o-transcribe')
 
         async with aiohttp.ClientSession() as session:
