@@ -19,8 +19,14 @@ class Transcriber(commands.Cog):
         if not self.openai_api_key:
             raise ValueError("OpenAI API key is not set. Please set it using the bot's configuration.")
 
-    @commands.command()
+    @commands.group(name="transcriber", invoke_without_command=True)
     @commands.guild_only()
+    @commands.admin_or_permissions()
+    async def transcriber_group(self, ctx: commands.Context):
+        """Group command for transcriber related commands."""
+        await ctx.send_help(ctx.command)
+
+    @transcriber_group.command(name="setmodel")
     async def set_model(self, ctx: commands.Context, model: str):
         """Set the default model for transcription for this server."""
         if model not in ["gpt-4o-transcribe", "gpt-4o-mini-transcribe", "whisper-1"]:
