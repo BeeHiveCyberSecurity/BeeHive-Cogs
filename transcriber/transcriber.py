@@ -246,11 +246,12 @@ class Transcriber(commands.Cog):
                                 moderation_start_time = time.monotonic()
 
                                 # Send the transcription to the moderation endpoint
-                                if await self.moderate_transcription(transcription):
+                                flagged, flags = await self.moderate_transcription(transcription)
+                                if flagged:
                                     # Delete the message if flagged
                                     await message.delete()
                                     # Log the moderated voice note
-                                    await self.log_moderation(message, voice_note)
+                                    await self.log_moderation(message, voice_note, flags)
                                     return
 
                                 # Calculate the time taken for moderation
@@ -299,8 +300,8 @@ class Transcriber(commands.Cog):
                 result = await response.json()
                 return result.get('text', 'Transcription failed: No text returned')
 
-    async def moderate_transcription(self, transcription: str) -> bool:
-        """Send the transcription to the moderation endpoint and return if it is flagged."""
+    async def moderate_transcription(self, transcription: str) -> (bool, list):
+        """Send the transcription to the moderation endpoint and return if it is flagged along with the flags."""
         url = "https://api.openai.com/v1/moderations"
         headers = {
             "Authorization": f"Bearer {self.openai_api_key}"
@@ -315,9 +316,13 @@ class Transcriber(commands.Cog):
                     error_message = await response.text()
                     raise ValueError(f"Failed to moderate transcription: {response.status} - {error_message}")
                 result = await response.json()
-                return result.get('results', [{}])[0].get('flagged', False)
+                flagged = result.get('results', [{}])[0].get('flagged', False)
+                flags = result.get('results', [{}])[0].get('categories', {})
+                # Sort flags by score and get the top 5
+                sorted_flags = sorted(flags.items(), key=lambda item: item[1], reverse=True)[:5]
+                return flagged, sorted_flags
 
-    async def log_moderation(self, message: discord.Message, voice_note: bytes):
+    async def log_moderation(self, message: discord.Message, voice_note: bytes, flags: list):
         """Log the moderated voice note to the configured logging channel."""
         guild_config = await self.config.guild(message.guild).all()
         logging_channel_id = guild_config.get("logging_channel")
@@ -329,7 +334,10 @@ class Transcriber(commands.Cog):
                     description=f"A voice note from {message.author.mention} in {message.channel.mention} has been moderated.",
                     color=0xff4545
                 )
-                embed.set_author(name=message.author.display_name, icon_url=message.author.avatar.url)
+                # Add the top 5 flags to the embed
+                if flags:
+                    flag_details = "\n".join([f"{flag}: {score:.2f}" for flag, score in flags])
+                    embed.add_field(name="Top Flags", value=flag_details, inline=False)
                 temp_file_path = None  # Initialize temp_file_path
                 try:
                     with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as temp_file:
