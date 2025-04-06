@@ -11,26 +11,28 @@ class Transcriber(commands.Cog):
     def __init__(self, bot: Red):
         self.bot = bot
         self.openai_api_key: Optional[str] = None
-        self.default_model: str = "gpt-4o-mini-transcribe"  # Default model
 
     async def cog_load(self):
-        # Load the OpenAI API key and default model from the bot's configuration
+        # Load the OpenAI API key from the bot's configuration
         tokens = await self.bot.get_shared_api_tokens("openai")
         self.openai_api_key = tokens.get("api_key")
-        self.default_model = tokens.get("default_model", "gpt-4o-mini-transcribe")
         if not self.openai_api_key:
             raise ValueError("OpenAI API key is not set. Please set it using the bot's configuration.")
 
     @commands.command()
-    @commands.is_owner()
+    @commands.guild_only()
     async def set_model(self, ctx: commands.Context, model: str):
-        """Set the default model for transcription."""
+        """Set the default model for transcription for this server."""
         if model not in ["gpt-4o-transcribe", "gpt-4o-mini-transcribe", "whisper-1"]:
             await ctx.send("Invalid model. Choose from: gpt-4o-transcribe, gpt-4o-mini-transcribe, whisper-1.")
             return
-        self.default_model = model
-        await self.bot.set_shared_api_tokens("openai", default_model=model)
-        await ctx.send(f"Default transcription model set to: {model}")
+        await self.bot.set_guild_data(ctx.guild.id, "transcriber", {"default_model": model})
+        await ctx.send(f"Default transcription model set to: {model} for this server.")
+
+    async def get_default_model(self, guild_id: int) -> str:
+        """Retrieve the default model for a specific server."""
+        data = await self.bot.get_guild_data(guild_id, "transcriber")
+        return data.get("default_model", "gpt-4o-mini-transcribe")
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
@@ -52,8 +54,11 @@ class Transcriber(commands.Cog):
                         # Start timing the transcription process
                         start_time = time.time()
 
+                        # Get the default model for the server
+                        default_model = await self.get_default_model(message.guild.id)
+
                         # Send the voice note to OpenAI for transcription
-                        transcription = await self.transcribe_voice_note(voice_note, attachment.content_type)
+                        transcription = await self.transcribe_voice_note(voice_note, attachment.content_type, default_model)
 
                         # Calculate the duration of the transcription process
                         duration = time.time() - start_time
@@ -72,7 +77,7 @@ class Transcriber(commands.Cog):
                     # Reply to the message with the transcription
                     await message.reply(embed=embed)
 
-    async def transcribe_voice_note(self, voice_note: bytes, content_type: Optional[str]) -> str:
+    async def transcribe_voice_note(self, voice_note: bytes, content_type: Optional[str], model: str) -> str:
         # This function should handle sending the voice note to OpenAI and returning the transcription
         url = "https://api.openai.com/v1/audio/transcriptions"
         headers = {
@@ -81,7 +86,7 @@ class Transcriber(commands.Cog):
 
         data = aiohttp.FormData()
         data.add_field('file', voice_note, filename='audio', content_type=content_type or "audio/mpeg")
-        data.add_field('model', self.default_model)
+        data.add_field('model', model)
 
         async with aiohttp.ClientSession() as session:
             async with session.post(url, headers=headers, data=data) as response:
