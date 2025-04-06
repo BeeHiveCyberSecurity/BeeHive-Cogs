@@ -198,8 +198,19 @@ Utilize OpenAI's frontier moderation models to keep chat clean in your server fo
 [p]set api openai api_key YOURAPIKEYHERE
 ```
 
+### [transcriber](https://github.com/BeeHiveSafety/BeeHive-Cogs/tree/main/transcriber)
 
+Automatically transcribe and moderate voice notes and other audio sent in your server using frontier AI models. `[p]transcriber`
 
+```
+[p]cog install BeeHiveSafety transcriber
+```
+```
+[p]load transcriber
+```
+```
+[p]set api openai api_key YOURAPIKEYHERE
+```
 
 
 
