@@ -44,18 +44,14 @@ class Transcriber(commands.Cog):
         # This function should handle sending the voice note to OpenAI and returning the transcription
         url = "https://api.openai.com/v1/audio/transcriptions"
         headers = {
-            "Authorization": f"Bearer {self.openai_api_key}",
-            "Content-Type": content_type or "audio/mpeg"
+            "Authorization": f"Bearer {self.openai_api_key}"
         }
-        data = {
-            "model": "whisper-1"
-        }
-        files = {
-            "file": voice_note
-        }
+        data = aiohttp.FormData()
+        data.add_field('file', voice_note, filename='audio.mp3', content_type=content_type or "audio/mpeg")
+        data.add_field('model', 'gpt-4o-transcribe')
 
         async with aiohttp.ClientSession() as session:
-            async with session.post(url, headers=headers, data=data, files=files) as response:
+            async with session.post(url, headers=headers, data=data) as response:
                 if response.status != 200:
                     raise ValueError(f"Failed to transcribe audio: {response.status}")
                 result = await response.json()
