@@ -31,7 +31,15 @@ class Transcriber(commands.Cog):
 
     @transcriber_group.command(name="model")
     async def set_model(self, ctx: commands.Context, model: str):
-        """Choose an AI model to use for transcription requests"""
+        """
+        Specify an AI model to use for transcription
+
+        You can choose between the following models:
+        `whisper-1` - For cost efficiency
+        `gpt-4o-mini-transcribe` - A balance of speed and cost
+        `gpt-4o-transcribe` - For maximum performance and intelligence
+               
+        """
         valid_models = ["gpt-4o-transcribe", "gpt-4o-mini-transcribe", "whisper-1"]
         if model not in valid_models:
             await ctx.send(f"Invalid model. Choose from: {', '.join(valid_models)}.")
