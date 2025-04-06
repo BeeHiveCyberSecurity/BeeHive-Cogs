@@ -60,7 +60,7 @@ class Transcriber(commands.Cog):
                 "knowledge_cutoff": "May 31, 2024"
             },
             "gpt-4o-mini-transcribe": {
-                "description": "`gpt-4o-mini-transcribe` is a speech-to-text model that uses GPT-4o mini to transcribe audio. It offers improvements to word error rate and better language recognition and accuracy compared to original Whisper models. `mini` models provide a balance of accuracy and cost-saving with the usage of frontier models, in comparison to their full-size and full-feature master model.",
+                "description": "[gpt-4o-mini-transcribe](<https://platform.openai.com/docs/models/gpt-4o-mini-transcribe>) is a speech-to-text model that uses [GPT-4o mini](<https://platform.openai.com/docs/models/gpt-4o-mini>) to transcribe audio. It offers improvements to word error rate and better language recognition and accuracy compared to original Whisper models. `mini` models provide a balance of accuracy and cost-saving with the usage of frontier models, in comparison to their full-size and full-feature master model.",
                 "pricing": {
                     "input": "**$3.00** / **1,000,000 tokens**",
                     "cached_input": "",
@@ -73,7 +73,7 @@ class Transcriber(commands.Cog):
                 "knowledge_cutoff": "May 31, 2024"
             },
             "whisper-1": {
-                "description": "`whisper` is a general-purpose speech recognition model, trained on a large dataset of diverse audio. You can also use it as a multitask model to perform multilingual speech recognition as well as speech translation and language identification. Use `whisper` for affordable, reliable transcription.",
+                "description": "[whisper-1](<https://platform.openai.com/docs/models/whisper-1>) is a general-purpose speech recognition model, trained on a large dataset of diverse audio. You can also use it as a multitask model to perform multilingual speech recognition as well as speech translation and language identification. Use `whisper-1` for affordable, reliable transcription.",
                 "pricing": {
                     "input": "**$0.006** / **1,000,000 tokens**",
                     "cached_input": "",
