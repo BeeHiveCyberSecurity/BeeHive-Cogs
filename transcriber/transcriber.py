@@ -92,9 +92,9 @@ class Transcriber(commands.Cog):
         # Create an embed for the settings
         embed = discord.Embed(title="Transcriber settings", color=0xfffffe)
         embed.add_field(name="Model in use", value=f"**{default_model}**", inline=True)
-        embed.add_field(name="Model cost", value=f"Input: {input_cost}\nOutput: {output_cost}", inline=True)
         embed.add_field(name="Context window", value=context_window, inline=True)
         embed.add_field(name="Maximum output", value=f"{max_output}", inline=True)
+        embed.add_field(name="Model cost", value=f"**`I`** {input_cost}\n**`O`** {output_cost}", inline=False)
         embed.add_field(name="Model performance", value=f"{performance}", inline=False)
         embed.add_field(name="Model speed", value=f"{speed}", inline=False)
         
