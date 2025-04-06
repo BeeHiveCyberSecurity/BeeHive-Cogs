@@ -51,7 +51,7 @@ class Transcriber(commands.Cog):
                     "cached_input": "-",
                     "output": "$10.00 / 1M tokens"
                 },
-                "context_window": "8K tokens",
+                "context_window": "16,000 tokens",
                 "performance": ":white_circle: :white_circle: :white_circle: :white_circle:",
                 "speed": ":zap: :zap: :zap:",
             },
