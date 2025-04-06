@@ -94,7 +94,7 @@ class Transcriber(commands.Cog):
         new_details = model_details.get(model, {})
 
         # Create an embed to show the change
-        embed = discord.Embed(title="Model updated", description="The model used for voice note transcription has been changed. See important details below." color=0xfffffe)
+        embed = discord.Embed(title="Model updated", description="The model used for voice note transcription has been changed. See important details below.", color=0xfffffe)
         embed.add_field(name="Previous Model", value=f"**{current_model.replace('-', ' ')}**", inline=False)
         embed.add_field(name="New Model", value=f"**{model.replace('-', ' ')}**", inline=False)
         embed.add_field(name="Previous Description", value=current_details.get("description", "No description available"), inline=False)
