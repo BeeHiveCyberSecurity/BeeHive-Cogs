@@ -4,6 +4,7 @@ from redbot.core.bot import Red
 import aiohttp
 from typing import Optional
 import time
+import io
 
 class Transcriber(commands.Cog):
     """Cog to transcribe voice notes using OpenAI."""
@@ -328,4 +329,7 @@ class Transcriber(commands.Cog):
                     color=0xff4545
                 )
                 embed.set_author(name=message.author.display_name, icon_url=message.author.avatar.url)
-                await logging_channel.send(embed=embed, file=discord.File(voice_note, filename="moderated_voice_note.mp3"))
+                try:
+                    await logging_channel.send(embed=embed, file=discord.File(io.BytesIO(voice_note), filename="moderated_voice_note.mp3"))
+                except ValueError as e:
+                    await logging_channel.send(f"Failed to send moderated voice note: {str(e)}")
