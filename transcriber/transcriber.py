@@ -38,8 +38,9 @@ class Transcriber(commands.Cog):
                         return
 
                     # Create an embed with the transcription
-                    embed = discord.Embed(title="AI transcript", description=transcription, color=discord.Color.blue())
-                    embed.set_author(name=message.author.display_name, icon_url=message.author.avatar.url)
+                    embed = discord.Embed(title="", description=transcription, color=0xfffffe)
+                    embed.set_author(name=f"{message.author.display_name} said...", icon_url=message.author.avatar.url)
+                    embed.set_footer(text="Transcribed using AI, check results for accuracy")
 
                     # Reply to the message with the transcription
                     await message.reply(embed=embed)
