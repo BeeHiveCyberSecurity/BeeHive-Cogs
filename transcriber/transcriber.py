@@ -33,14 +33,15 @@ class Transcriber(commands.Cog):
     async def set_model(self, ctx: commands.Context, model: str):
         """
         Specify an AI model to use for transcription
+
         You can choose between the following models
-        
+
         - **whisper-1**
-        > For cost efficiency
+        > Cost efficient for use in large servers
         - **gpt-4o-mini-transcribe**
-        > A balance of speed and cost
+        > Faster, more intelligent, more expensive
         - **gpt-4o-transcribe**
-        > For maximum performance and intelligence
+        > High performance, high cost, high accuracy
 
         """
         valid_models = ["gpt-4o-transcribe", "gpt-4o-mini-transcribe", "whisper-1"]
