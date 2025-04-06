@@ -3,6 +3,7 @@ from redbot.core import commands, Config
 from redbot.core.bot import Red
 import aiohttp
 from typing import Optional
+import time
 
 class Transcriber(commands.Cog):
     """Cog to transcribe voice notes using OpenAI."""
@@ -132,8 +133,15 @@ class Transcriber(commands.Cog):
                             # Get the default model for the server
                             default_model = await self.get_default_model(message.guild.id)
 
+                            # Start timing the transcription process
+                            start_time = time.monotonic()
+
                             # Send the voice note to OpenAI for transcription
                             transcription = await self.transcribe_voice_note(voice_note, attachment.content_type, default_model)
+
+                            # Calculate the time taken for transcription
+                            end_time = time.monotonic()
+                            transcription_time = end_time - start_time
                     except ValueError as e:
                         await message.reply(f"Error during transcription: {str(e)}")
                         return
@@ -141,7 +149,7 @@ class Transcriber(commands.Cog):
                     # Create an embed with the transcription
                     embed = discord.Embed(title="", description=transcription, color=0xfffffe)
                     embed.set_author(name=f"{message.author.display_name} said...", icon_url=message.author.avatar.url)
-                    embed.set_footer(text="Transcribed using AI, check results for accuracy")
+                    embed.set_footer(text=f"Transcribed using AI in {transcription_time:.2f} seconds, check results for accuracy")
 
                     # Reply to the message with the transcription
                     await message.reply(embed=embed)
