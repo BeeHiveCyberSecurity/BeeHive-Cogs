@@ -142,6 +142,15 @@ class Transcriber(commands.Cog):
                             # Calculate the time taken for transcription
                             end_time = time.monotonic()
                             transcription_time = end_time - start_time
+
+                            # Convert transcription time to human-readable format
+                            if transcription_time < 1:
+                                time_display = f"{transcription_time * 1000:.2f} ms"
+                            elif transcription_time < 60:
+                                time_display = f"{transcription_time:.2f} seconds"
+                            else:
+                                minutes, seconds = divmod(transcription_time, 60)
+                                time_display = f"{int(minutes)} minutes and {seconds:.2f} seconds"
                     except ValueError as e:
                         await message.reply(f"Error during transcription: {str(e)}")
                         return
@@ -149,7 +158,7 @@ class Transcriber(commands.Cog):
                     # Create an embed with the transcription
                     embed = discord.Embed(title="", description=transcription, color=0xfffffe)
                     embed.set_author(name=f"{message.author.display_name} said...", icon_url=message.author.avatar.url)
-                    embed.set_footer(text=f"Transcribed using AI in {transcription_time:.2f} seconds, check results for accuracy")
+                    embed.set_footer(text=f"Transcribed using AI in {time_display}, check results for accuracy")
 
                     # Reply to the message with the transcription
                     await message.reply(embed=embed)
