@@ -39,7 +39,7 @@ class Transcriber(commands.Cog):
                         return
 
                     # Create an embed with the transcription
-                    embed = discord.Embed(title="Transcription", description=transcription, color=discord.Color.blue())
+                    embed = discord.Embed(title="AI transcript", description=transcription, color=discord.Color.blue())
                     embed.set_author(name=message.author.display_name, icon_url=message.author.avatar.url)
 
                     # Reply to the message with the transcription
