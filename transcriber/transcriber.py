@@ -69,14 +69,14 @@ class Transcriber(commands.Cog):
             },
             "whisper-1": {
                 "pricing": {
-                    "input": "$0.02 per 1K tokens",
+                    "input": "$0.006 / 1M tokens",
                     "cached_input": "-",
                     "output": "-"
                 },
                 "context_window": "2K tokens",
                 "performance": ":white_circle: :white_circle:",
                 "speed": ":zap: :zap: :zap:",
-                "max_output": "1,000 tokens"
+                "max_output": ""
             }
         }
         
