@@ -95,7 +95,7 @@ class Transcriber(commands.Cog):
 
         # Create an embed to show the change
         embed = discord.Embed(title="Model updated", description="The model used for voice note transcription has been changed. See important details below.", color=0xfffffe)
-        embed.add_field(name="Model", value=f"**Before:** {current_model.replace('-', ' ')}\n**After:** {model.replace('-', ' ')}", inline=False)
+        embed.add_field(name="Model", value=f" {current_model.replace('-', ' ')} -> {model.replace('-', ' ')}", inline=False)
         embed.add_field(name="Description", value=f"**Before:** {current_details.get('description', 'No description available')}\n\n**After:** {new_details.get('description', 'No description available')}", inline=False)
         embed.add_field(name="Pricing", value=f"**Before:**\n**`Input`** {current_details.get('pricing', {}).get('input', 'Not priced')}\n**`Output`** {current_details.get('pricing', {}).get('output', 'Not priced')}\n\n**After:**\n**`Input`** {new_details.get('pricing', {}).get('input', 'Not priced')}\n**`Output`** {new_details.get('pricing', {}).get('output', 'Not priced')}", inline=False)
         embed.add_field(name="Performance", value=f"{current_details.get('performance', 'Not rated')} -> {new_details.get('performance', 'Not rated')}", inline=True)
