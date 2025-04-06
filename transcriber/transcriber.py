@@ -178,7 +178,7 @@ class Transcriber(commands.Cog):
         embed.add_field(name="Model performance", value=f"{performance}", inline=True)
         embed.add_field(name="Model speed", value=f"{speed}", inline=True)
         embed.add_field(name="Knowledge cutoff", value=f"{knowledge_cutoff}", inline=True)
-        embed.add_field(name="Moderation Enabled", value=f"{moderation_enabled}", inline=True)
+        embed.add_field(name="Real-time moderation enabled", value=f"{moderation_enabled}", inline=True)
         
         await ctx.send(embed=embed)
 
@@ -337,7 +337,7 @@ class Transcriber(commands.Cog):
                 # Add the top 5 flags to the embed
                 if flags:
                     flag_details = "\n".join([f"{flag}: {score:.2f}" for flag, score in flags])
-                    embed.add_field(name="Top Flags", value=flag_details, inline=False)
+                    embed.add_field(name="Scored categories", value=flag_details, inline=False)
                 temp_file_path = None  # Initialize temp_file_path
                 try:
                     with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as temp_file:
