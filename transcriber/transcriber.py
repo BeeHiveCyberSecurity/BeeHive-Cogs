@@ -11,13 +11,26 @@ class Transcriber(commands.Cog):
     def __init__(self, bot: Red):
         self.bot = bot
         self.openai_api_key: Optional[str] = None
+        self.default_model: str = "gpt-4o-mini-transcribe"  # Default model
 
     async def cog_load(self):
-        # Load the OpenAI API key from the bot's configuration
+        # Load the OpenAI API key and default model from the bot's configuration
         tokens = await self.bot.get_shared_api_tokens("openai")
         self.openai_api_key = tokens.get("api_key")
+        self.default_model = tokens.get("default_model", "gpt-4o-mini-transcribe")
         if not self.openai_api_key:
             raise ValueError("OpenAI API key is not set. Please set it using the bot's configuration.")
+
+    @commands.command()
+    @commands.is_owner()
+    async def set_model(self, ctx: commands.Context, model: str):
+        """Set the default model for transcription."""
+        if model not in ["gpt-4o-transcribe", "gpt-4o-mini-transcribe", "whisper-1"]:
+            await ctx.send("Invalid model. Choose from: gpt-4o-transcribe, gpt-4o-mini-transcribe, whisper-1.")
+            return
+        self.default_model = model
+        await self.bot.set_shared_api_tokens("openai", default_model=model)
+        await ctx.send(f"Default transcription model set to: {model}")
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
@@ -68,7 +81,7 @@ class Transcriber(commands.Cog):
 
         data = aiohttp.FormData()
         data.add_field('file', voice_note, filename='audio', content_type=content_type or "audio/mpeg")
-        data.add_field('model', 'gpt-4o-transcribe')
+        data.add_field('model', self.default_model)
 
         async with aiohttp.ClientSession() as session:
             async with session.post(url, headers=headers, data=data) as response:
