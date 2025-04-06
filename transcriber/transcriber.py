@@ -46,6 +46,7 @@ class Transcriber(commands.Cog):
         # Define model details
         model_details = {
             "gpt-4o-transcribe": {
+                "description": "GPT-4o Transcribe is a speech-to-text model that uses GPT-4o to transcribe audio. It offers improvements to word error rate and better language recognition and accuracy compared to original Whisper models. Use it for more accurate transcripts.",
                 "pricing": {
                     "input": "**$2.50** / **1,000,000 tokens**",
                     "cached_input": "",
@@ -58,6 +59,7 @@ class Transcriber(commands.Cog):
                 "knowledge_cutoff": "May 31, 2024"
             },
             "gpt-4o-mini-transcribe": {
+                "description": "GPT-4o mini Transcribe is a speech-to-text model that uses GPT-4o mini to transcribe audio. It offers improvements to word error rate and better language recognition and accuracy compared to original Whisper models. Use it for more accurate transcripts.",
                 "pricing": {
                     "input": "**$1.25** / **1,000,000** tokens",
                     "cached_input": "",
@@ -70,6 +72,7 @@ class Transcriber(commands.Cog):
                 "knowledge_cutoff": "May 31, 2024"
             },
             "whisper-1": {
+                "description": "Whisper is a general-purpose speech recognition model, trained on a large dataset of diverse audio. You can also use it as a multitask model to perform multilingual speech recognition as well as speech translation and language identification.",
                 "pricing": {
                     "input": "**$0.006** / **1,000,000** tokens",
                     "cached_input": "",
@@ -84,6 +87,7 @@ class Transcriber(commands.Cog):
         }
         
         details = model_details.get(default_model.replace("-", " "), {})
+        description = details.get("description", "No description available")
         pricing = details.get("pricing", {})
         input_cost = pricing.get("input", "Free")
         output_cost = pricing.get("output", "Free")
@@ -95,7 +99,8 @@ class Transcriber(commands.Cog):
         
         # Create an embed for the settings
         embed = discord.Embed(title="Transcriber settings", color=0xfffffe)
-        embed.add_field(name="Model in use", value=f"**{default_model}**", inline=True)
+        embed.add_field(name="Model in use", value=f"**{default_model}**", inline=False)
+        embed.add_field(name="Description", value=description, inline=False)
         embed.add_field(name="Context window", value=context_window, inline=True)
         embed.add_field(name="Maximum output", value=f"{max_output}", inline=True)
         embed.add_field(name="Model cost", value=f"**`Input`** {input_cost}\n**`Output`** {output_cost}", inline=False)
