@@ -54,6 +54,7 @@ class Transcriber(commands.Cog):
                 "context_window": "16,000 tokens",
                 "performance": ":white_circle: :white_circle: :white_circle: :white_circle:",
                 "speed": ":zap: :zap: :zap:",
+                "max_output": "2,000 tokens"
             },
             "gpt-4o-mini-transcribe": {
                 "pricing": {
@@ -64,6 +65,7 @@ class Transcriber(commands.Cog):
                 "context_window": "4K tokens",
                 "performance": ":white_circle: :white_circle: :white_circle:",
                 "speed": ":zap: :zap: :zap: :zap:",
+                "max_output": "2,000 tokens"
             },
             "whisper-1": {
                 "pricing": {
@@ -74,6 +76,7 @@ class Transcriber(commands.Cog):
                 "context_window": "2K tokens",
                 "performance": ":white_circle: :white_circle:",
                 "speed": ":zap: :zap: :zap:",
+                "max_output": "1,000 tokens"
             }
         }
         
@@ -82,16 +85,18 @@ class Transcriber(commands.Cog):
         input_cost = pricing.get("input", "N/A")
         output_cost = pricing.get("output", "N/A")
         context_window = details.get("context_window", "N/A")
+        max_output = details.get("max_output", "Not supported")
         performance = details.get("performance", "N/A")
         speed = details.get("speed", "N/A")
         
         # Create an embed for the settings
         embed = discord.Embed(title="Transcriber settings", color=0xfffffe)
-        embed.add_field(name="Model in use", value=f"**{default_model}**", inline=False)
-        embed.add_field(name="Model performance", value=f"{performance}", inline=False)
-        embed.add_field(name="Model speed", value=f"{speed}", inline=False)
+        embed.add_field(name="Model in use", value=f"**{default_model}**", inline=True)
         embed.add_field(name="Model cost", value=f"Input: {input_cost}\nOutput: {output_cost}", inline=True)
         embed.add_field(name="Context window", value=context_window, inline=True)
+        embed.add_field(name="Maximum output", value=f"{max_output}", inline=True)
+        embed.add_field(name="Model performance", value=f"{performance}", inline=False)
+        embed.add_field(name="Model speed", value=f"{speed}", inline=False)
         
         await ctx.send(embed=embed)
 
