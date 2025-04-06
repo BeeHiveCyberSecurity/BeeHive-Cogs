@@ -256,7 +256,7 @@ class Transcriber(commands.Cog):
                                 moderation_time = moderation_end_time - moderation_start_time
                                 moderation_time_display = f"{moderation_time * 1000:.2f} ms" if moderation_time < 1 else f"{moderation_time:.2f} seconds"
                             else:
-                                moderation_time_display = "moderation not applicable"
+                                moderation_time_display = "is disabled"
 
                             # Convert transcription time to human-readable format
                             transcription_time_display = f"{transcription_time * 1000:.2f} ms" if transcription_time < 1 else f"{transcription_time:.2f} seconds"
@@ -273,7 +273,7 @@ class Transcriber(commands.Cog):
                     highest_role_color = message.author.top_role.color if message.author.top_role.color else discord.Color.default()
                     embed = discord.Embed(title="", description=transcription, color=highest_role_color)
                     embed.set_author(name=f"{message.author.display_name} said...", icon_url=message.author.avatar.url)
-                    embed.set_footer(text=f"Transcription took {transcription_time_display}, trust and safety screening took {moderation_time_display}. AI can make mistakes, double-check for accuracy")
+                    embed.set_footer(text=f"Transcription took {transcription_time_display}, moderation {moderation_time_display}. AI can make mistakes, double-check for accuracy")
 
                     # Reply to the message with the transcription
                     await message.reply(embed=embed)
