@@ -61,9 +61,9 @@ class Transcriber(commands.Cog):
             "gpt-4o-mini-transcribe": {
                 "description": "GPT-4o mini Transcribe is a speech-to-text model that uses GPT-4o mini to transcribe audio. It offers improvements to word error rate and better language recognition and accuracy compared to original Whisper models. Use it for more accurate transcripts.",
                 "pricing": {
-                    "input": "**$1.25** / **1,000,000** tokens",
+                    "input": "**$1.25** / **1,000,000 tokens**",
                     "cached_input": "",
-                    "output": "**$5.00** / **1,000,000** tokens"
+                    "output": "**$5.00** / **1,000,000 tokens**"
                 },
                 "context_window": "16,000 tokens",
                 "performance": ":white_circle: :white_circle: :white_circle:",
@@ -74,7 +74,7 @@ class Transcriber(commands.Cog):
             "whisper-1": {
                 "description": "Whisper is a general-purpose speech recognition model, trained on a large dataset of diverse audio. You can also use it as a multitask model to perform multilingual speech recognition as well as speech translation and language identification.",
                 "pricing": {
-                    "input": "**$0.006** / **1,000,000** tokens",
+                    "input": "**$0.006** / **1,000,000 tokens**",
                     "cached_input": "",
                     "output": ""
                 },
@@ -86,7 +86,7 @@ class Transcriber(commands.Cog):
             }
         }
         
-        details = model_details.get(default_model.replace("-", " "), {})
+        details = model_details.get(default_model, {})
         description = details.get("description", "No description available")
         pricing = details.get("pricing", {})
         input_cost = pricing.get("input", "Free")
