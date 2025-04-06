@@ -17,7 +17,7 @@ class Transcriber(commands.Cog):
             "default_model": "whisper-1",
             "model_usage": {"gpt-4o-transcribe": 0, "gpt-4o-mini-transcribe": 0, "whisper-1": 0},
             "logging_channel": None,
-            "moderation_enabled": True  # Add a toggle for moderation
+            "moderation_enabled": True
         }
         self.config.register_guild(**default_guild)
         self.openai_api_key: Optional[str] = None
