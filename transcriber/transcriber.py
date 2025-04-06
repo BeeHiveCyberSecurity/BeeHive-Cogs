@@ -272,18 +272,23 @@ class Transcriber(commands.Cog):
                         await message.reply(f"Error during transcription: {str(e)}")
                         return
 
-                    # Create an embed with the transcription
+                    # Create embeds with the transcription
                     highest_role_color = message.author.top_role.color if message.author.top_role.color else discord.Color.default()
-                    embed = discord.Embed(title="", description=transcription, color=highest_role_color)
-                    embed.set_author(name=f"{message.author.display_name} said...", icon_url=message.author.avatar.url)
-                    footer_text = f"{transcription_time_display} to transcribe"
-                    if moderation_time_display != "is disabled":
-                        footer_text += f", {moderation_time_display} to moderate"
-                    footer_text += ". AI can make mistakes, double-check for accuracy"
-                    embed.set_footer(text=footer_text)
+                    embeds = []
+                    max_length = 4096
+                    for i in range(0, len(transcription), max_length):
+                        embed = discord.Embed(title="", description=transcription[i:i+max_length], color=highest_role_color)
+                        embed.set_author(name=f"{message.author.display_name} said...", icon_url=message.author.avatar.url)
+                        footer_text = f"{transcription_time_display} to transcribe"
+                        if moderation_time_display != "is disabled":
+                            footer_text += f", {moderation_time_display} to moderate"
+                        footer_text += ". AI can make mistakes, double-check for accuracy"
+                        embed.set_footer(text=footer_text)
+                        embeds.append(embed)
 
                     # Reply to the message with the transcription
-                    await message.reply(embed=embed)
+                    for embed in embeds:
+                        await message.reply(embed=embed)
 
     async def transcribe_voice_note(self, voice_note: bytes, content_type: Optional[str], model: str) -> str:
         # This function should handle sending the voice note to OpenAI and returning the transcription
