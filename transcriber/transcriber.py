@@ -99,7 +99,8 @@ class Transcriber(commands.Cog):
         knowledge_cutoff = details.get("knowledge_cutoff") or "Not applicable"
         
         # Create an embed for the settings
-        embed = discord.Embed(title="Transcriber settings", color=0xfffffe)
+        highest_role_color = ctx.author.top_role.color if ctx.author.top_role.color else discord.Color.default()
+        embed = discord.Embed(title="Transcriber settings", color=highest_role_color)
         embed.add_field(name="Model in use", value=f"**{default_model.replace('-', ' ')}**", inline=False)
         embed.add_field(name="Description", value=description, inline=False)
         embed.add_field(name="Context window", value=context_window, inline=True)
@@ -156,7 +157,8 @@ class Transcriber(commands.Cog):
                         return
 
                     # Create an embed with the transcription
-                    embed = discord.Embed(title="", description=transcription, color=0xfffffe)
+                    highest_role_color = message.author.top_role.color if message.author.top_role.color else discord.Color.default()
+                    embed = discord.Embed(title="", description=transcription, color=highest_role_color)
                     embed.set_author(name=f"{message.author.display_name} said...", icon_url=message.author.avatar.url)
                     embed.set_footer(text=f"Transcribed using AI in {time_display}, check results for accuracy")
 
