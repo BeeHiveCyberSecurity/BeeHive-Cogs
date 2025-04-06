@@ -31,8 +31,12 @@ class Transcriber(commands.Cog):
                     # Download the voice note
                     voice_note = await attachment.read()
 
-                    # Send the voice note to OpenAI for transcription
-                    transcription = await self.transcribe_voice_note(voice_note, attachment.content_type)
+                    try:
+                        # Send the voice note to OpenAI for transcription
+                        transcription = await self.transcribe_voice_note(voice_note, attachment.content_type)
+                    except ValueError as e:
+                        await message.reply(f"Error during transcription: {str(e)}")
+                        return
 
                     # Create an embed with the transcription
                     embed = discord.Embed(title="Transcription", description=transcription, color=discord.Color.blue())
@@ -59,6 +63,7 @@ class Transcriber(commands.Cog):
         async with aiohttp.ClientSession() as session:
             async with session.post(url, headers=headers, data=data) as response:
                 if response.status != 200:
-                    raise ValueError(f"Failed to transcribe audio: {response.status}")
+                    error_message = await response.text()
+                    raise ValueError(f"Failed to transcribe audio: {response.status} - {error_message}")
                 result = await response.json()
                 return result['text']
