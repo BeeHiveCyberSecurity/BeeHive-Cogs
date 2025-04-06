@@ -54,7 +54,8 @@ class Transcriber(commands.Cog):
                 "context_window": "16,000 tokens",
                 "performance": ":white_circle: :white_circle: :white_circle: :white_circle:",
                 "speed": ":zap: :zap: :zap:",
-                "max_output": "2,000 tokens"
+                "max_output": "2,000 tokens",
+                "knowledge_cutoff": "May 31, 2024"
             },
             "gpt-4o-mini-transcribe": {
                 "pricing": {
@@ -65,7 +66,8 @@ class Transcriber(commands.Cog):
                 "context_window": "16,000 tokens",
                 "performance": ":white_circle: :white_circle: :white_circle:",
                 "speed": ":zap: :zap: :zap: :zap:",
-                "max_output": "2,000 tokens"
+                "max_output": "2,000 tokens",
+                "knowledge_cutoff": "May 31, 2024"
             },
             "whisper-1": {
                 "pricing": {
@@ -76,7 +78,8 @@ class Transcriber(commands.Cog):
                 "context_window": "",
                 "performance": ":white_circle: :white_circle:",
                 "speed": ":zap: :zap: :zap:",
-                "max_output": ""
+                "max_output": "",
+                "knowledge_cutoff": ""
             }
         }
         
@@ -88,6 +91,7 @@ class Transcriber(commands.Cog):
         max_output = details.get("max_output", "Not supported")
         performance = details.get("performance", "Not rated")
         speed = details.get("speed", "Not rated")
+        knowledge_cutoff = details.get("knowledge_cutoff", "Not applicable")
         
         # Create an embed for the settings
         embed = discord.Embed(title="Transcriber settings", color=0xfffffe)
@@ -97,6 +101,7 @@ class Transcriber(commands.Cog):
         embed.add_field(name="Model cost", value=f"**`Input`** {input_cost}\n**`Output`** {output_cost}", inline=False)
         embed.add_field(name="Model performance", value=f"{performance}", inline=True)
         embed.add_field(name="Model speed", value=f"{speed}", inline=True)
+        embed.add_field(name="Knowledge cutoff", value=f"{knowledge_cutoff}", inline=True)
         
         await ctx.send(embed=embed)
 
