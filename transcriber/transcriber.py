@@ -89,13 +89,13 @@ class Transcriber(commands.Cog):
         details = model_details.get(default_model, {})
         description = details.get("description", "No description available")
         pricing = details.get("pricing", {})
-        input_cost = pricing.get("input") or "Not available"
-        output_cost = pricing.get("output") or "Not available"
+        input_cost = pricing.get("input") or "Not priced"
+        output_cost = pricing.get("output") or "Not priced"
         context_window = details.get("context_window") or "Not available"
-        max_output = details.get("max_output") or "Not available"
-        performance = details.get("performance") or "Not available"
-        speed = details.get("speed") or "Not available"
-        knowledge_cutoff = details.get("knowledge_cutoff") or "Not available"
+        max_output = details.get("max_output") or "Not provided"
+        performance = details.get("performance") or "Not rated"
+        speed = details.get("speed") or "Not rated"
+        knowledge_cutoff = details.get("knowledge_cutoff") or "Not applicable"
         
         # Create an embed for the settings
         embed = discord.Embed(title="Transcriber settings", color=0xfffffe)
