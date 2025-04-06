@@ -1,7 +1,7 @@
 import discord
 from redbot.core import commands
 from redbot.core.bot import Red
-import openai
+import aiohttp
 from typing import Optional
 
 class Transcriber(commands.Cog):
@@ -42,10 +42,21 @@ class Transcriber(commands.Cog):
 
     async def transcribe_voice_note(self, voice_note: bytes, content_type: Optional[str]) -> str:
         # This function should handle sending the voice note to OpenAI and returning the transcription
-        openai.api_key = self.openai_api_key
-        response = openai.Audio.transcribe(
-            model="whisper-1",
-            file=voice_note,
-            file_type=content_type or "audio/mpeg"  # Use content_type if available, otherwise default
-        )
-        return response['text']
+        url = "https://api.openai.com/v1/audio/transcriptions"
+        headers = {
+            "Authorization": f"Bearer {self.openai_api_key}",
+            "Content-Type": content_type or "audio/mpeg"
+        }
+        data = {
+            "model": "whisper-1"
+        }
+        files = {
+            "file": voice_note
+        }
+
+        async with aiohttp.ClientSession() as session:
+            async with session.post(url, headers=headers, data=data, files=files) as response:
+                if response.status != 200:
+                    raise ValueError(f"Failed to transcribe audio: {response.status}")
+                result = await response.json()
+                return result['text']
