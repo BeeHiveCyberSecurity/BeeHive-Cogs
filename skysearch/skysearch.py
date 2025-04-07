@@ -844,6 +844,11 @@ class Skysearch(commands.Cog):
                     async with session.get(url1) as response1:
                         data1 = await response1.json()
                 
+                if 'error' in data1 or not data1 or 'name' not in data1:
+                    embed = discord.Embed(title="Error", description="No airport found with the provided code.", color=0xff4545)
+                    await ctx.send(embed=embed)
+                    return
+
                 embed = discord.Embed(title=f"{data1.get('name', 'Unknown Airport')}", color=0xfffffe)
 
                 # Check for OpenAI API key and use it to generate a summary if available
@@ -903,34 +908,29 @@ class Skysearch(commands.Cog):
                                 pass
 
                 view = discord.ui.View(timeout=180)  # Initialize view outside of the else block
-                if 'error' in data1:
-                    embed.add_field(name="Error", value=data1['error'], inline=False)
-                elif not data1 or 'name' not in data1:
-                    embed.add_field(name="Error", value="No airport found with the provided code.", inline=False)
-                else:
-                    if 'icao' in data1:
-                        embed.add_field(name='ICAO', value=f"{data1['icao']}", inline=True)
-                    if 'iata' in data1:
-                        embed.add_field(name='IATA', value=f"{data1['iata']}", inline=True)
-                    if 'country_code' in data1:
-                        embed.add_field(name='Country code', value=f":flag_{data1['country_code'].lower()}: {data1['country_code']}", inline=True)
-                    if 'location' in data1:
-                        embed.add_field(name='Location', value=f"{data1['location']}", inline=True)
-                    if 'country' in data1:
-                        embed.add_field(name='Country', value=f"{data1['country']}", inline=True)
-                    if 'longitude' in data1:
-                        embed.add_field(name='Longitude', value=f"{data1['longitude']}", inline=True)
-                    if 'latitude' in data1:
-                        embed.add_field(name='Latitude', value=f"{data1['latitude']}", inline=True)
-                    
-                    # Check if 'link' is in data1 and add it to the view
-                    if 'link' in data1:
-                        link = data1['link']
-                        if not (link.startswith('http://') or link.startswith('https://')):
-                            link = 'https://airport-data.com' + link
-                        # URL button
-                        view_airport = discord.ui.Button(label=f"More info about {data1['icao']}", url=link, style=discord.ButtonStyle.link)
-                        view.add_item(view_airport)
+                if 'icao' in data1:
+                    embed.add_field(name='ICAO', value=f"{data1['icao']}", inline=True)
+                if 'iata' in data1:
+                    embed.add_field(name='IATA', value=f"{data1['iata']}", inline=True)
+                if 'country_code' in data1:
+                    embed.add_field(name='Country code', value=f":flag_{data1['country_code'].lower()}: {data1['country_code']}", inline=True)
+                if 'location' in data1:
+                    embed.add_field(name='Location', value=f"{data1['location']}", inline=True)
+                if 'country' in data1:
+                    embed.add_field(name='Country', value=f"{data1['country']}", inline=True)
+                if 'longitude' in data1:
+                    embed.add_field(name='Longitude', value=f"{data1['longitude']}", inline=True)
+                if 'latitude' in data1:
+                    embed.add_field(name='Latitude', value=f"{data1['latitude']}", inline=True)
+                
+                # Check if 'link' is in data1 and add it to the view
+                if 'link' in data1:
+                    link = data1['link']
+                    if not (link.startswith('http://') or link.startswith('https://')):
+                        link = 'https://airport-data.com' + link
+                    # URL button
+                    view_airport = discord.ui.Button(label=f"More info about {data1['icao']}", url=link, style=discord.ButtonStyle.link)
+                    view.add_item(view_airport)
 
             # Send the message with the embed, view, and file (if available)
             await ctx.send(embed=embed, view=view, file=file)
