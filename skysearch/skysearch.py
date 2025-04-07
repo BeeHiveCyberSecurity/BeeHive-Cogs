@@ -861,11 +861,11 @@ class Skysearch(commands.Cog):
                         "messages": [
                             {
                                 "role": "system",
-                                "content": "You are an AI summarizer inside a Discord bot feature. Produce text without titles or headings, and use markdown for styling like - bulletpoints where appropriate. Don't mention terrorist attacks or other world terrorism events. Don't mention the airport's name, ICAO or IATA. At the end of your response, list 3 links using markdown where the user can read more about the airport - don't use example links."
+                                "content": "You are an AI summarizer inside a Discord bot feature. Produce text without titles or headings, and use markdown for styling like - bulletpoints where appropriate. Don't mention terrorist attacks or other world terrorism events. Don't mention the airport's name, ICAO or IATA."
                             },
                             {
                                 "role": "user",
-                                "content": f"Generate a summary of the airport named {airport_name}."
+                                "content": f"Generate a summary of the airport named {airport_name}. Include 3 links as bulletpoints using markdown where the user can read more about the airport - don't use example links."
                             }
                         ]
                     }
