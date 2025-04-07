@@ -883,7 +883,7 @@ class Skysearch(commands.Cog):
                 if 'iata' in data1:
                     embed.add_field(name='IATA', value=f"{data1['iata']}", inline=True)
                 if 'country_code' in data1:
-                    embed.add_field(name='Country Code', value=f"{data1['country_code']}", inline=True)
+                    embed.add_field(name='Country code', value=f":flag_{data1['country_code'].lower()}: {data1['country_code']}", inline=True)
                 if 'location' in data1:
                     embed.add_field(name='Location', value=f"{data1['location']}", inline=True)
                 if 'country' in data1:
