@@ -857,7 +857,7 @@ class Skysearch(commands.Cog):
                     "zoom": "13",
                     "scale": "2", 
                     "center": f"{data1['latitude']},{data1['longitude']}",  # Latitude and Longitude as comma-separated string
-                    "maptype": "satellite",
+                    "maptype": "hybrid",
                     "key": google_street_view_api_key
                 }
                 async with aiohttp.ClientSession() as session:
