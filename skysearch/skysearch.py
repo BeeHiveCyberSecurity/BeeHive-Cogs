@@ -1152,7 +1152,7 @@ class Skysearch(commands.Cog):
             await ctx.send(embed=embed)
 
     @commands.guild_only()
-    @airport_group.command(name='forecast', help='Get the future weather format for an airport by ICAO or IATA code.')
+    @airport_group.command(name='forecast', help='Get the weather for an airport by ICAO or IATA code.')
     async def get_forecast(self, ctx, code: str):
         """Fetch the latitude and longitude of an airport via IATA or ICAO code, then show the forecast"""
         code_type = 'icao' if len(code) == 4 else 'iata' if len(code) == 3 else None
