@@ -844,7 +844,6 @@ class Skysearch(commands.Cog):
                     data1 = await response1.json()
             
             embed = discord.Embed(title=f"{data1.get('name', 'Unknown Airport')}", description=f"", color=0xfffffe)
-            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/location.png")
 
             googlemaps_tokens = await self.bot.get_shared_api_tokens("googlemaps")
             google_street_view_api_key = googlemaps_tokens.get("api_key", "YOUR_API_KEY")
