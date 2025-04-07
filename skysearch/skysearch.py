@@ -865,7 +865,7 @@ class Skysearch(commands.Cog):
                             },
                             {
                                 "role": "user",
-                                "content": f"Generate a summary of the airport named {airport_name}. Include 3 links as bulletpoints using markdown where the user can read more about the airport - don't use example links."
+                                "content": f"Generate a summary of the airport named {airport_name}. Include 3 links as bulletpoints where I can read more about the airport"
                             }
                         ]
                     }
