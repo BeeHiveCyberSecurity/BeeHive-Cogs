@@ -855,6 +855,10 @@ class Skysearch(commands.Cog):
                     "input": [
                         {
                             "role": "developer",
+                            "content": f"Use Discord-compatible formatting/markdown where needed."
+                        },
+                        {
+                            "role": "user",
                             "content": f"Generate a summary for the airport named {airport_name}."
                         }
                     ]
