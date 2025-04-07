@@ -851,15 +851,15 @@ class Skysearch(commands.Cog):
                 openai_api_key = openai_api_key['api_key']
                 airport_name = data1.get('name', 'Unknown Airport')
                 openai_payload = {
-                    "model": "gpt-4o",
+                    "model": "gpt-4o-mini",
                     "messages": [
                         {
                             "role": "system",
-                            "content": "Use Discord-compatible formatting/markdown where needed."
+                            "content": "You are an AI summarizer inside a Discord bot feature. Produce only formatted text without titles or headings, and use markdown for styling like *italics*, **bold**, - bulletpoints, and `code`."
                         },
                         {
                             "role": "user",
-                            "content": f"Generate a summary for the airport named {airport_name}."
+                            "content": f"Generate a summary of the airport named {airport_name}."
                         }
                     ]
                 }
