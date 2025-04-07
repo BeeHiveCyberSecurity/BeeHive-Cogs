@@ -838,97 +838,99 @@ class Skysearch(commands.Cog):
             return
 
         try:
-            url1 = f"https://airport-data.com/api/ap_info.json?{code_type}={code}"
-            async with aiohttp.ClientSession() as session:
-                async with session.get(url1) as response1:
-                    data1 = await response1.json()
-            
-            embed = discord.Embed(title=f"{data1.get('name', 'Unknown Airport')}", color=0xfffffe)
-
-            # Check for OpenAI API key and use it to generate a summary if available
-            openai_api_key = await self.bot.get_shared_api_tokens("openai")
-            if openai_api_key and 'api_key' in openai_api_key:
-                openai_api_key = openai_api_key['api_key']
-                airport_name = data1.get('name', 'Unknown Airport')
-                openai_payload = {
-                    "model": "gpt-4o-mini",
-                    "messages": [
-                        {
-                            "role": "system",
-                            "content": "You are an AI summarizer inside a Discord bot feature. Produce only formatted text without titles or headings, and use markdown for styling like *italics*, **bold**, - bulletpoints, and `code`."
-                        },
-                        {
-                            "role": "user",
-                            "content": f"Generate a summary of the airport named {airport_name}."
-                        }
-                    ]
-                }
-                headers = {
-                    "Content-Type": "application/json",
-                    "Authorization": f"Bearer {openai_api_key}"
-                }
+            async with ctx.typing():
+                url1 = f"https://airport-data.com/api/ap_info.json?{code_type}={code}"
                 async with aiohttp.ClientSession() as session:
-                    async with session.post("https://api.openai.com/v1/chat/completions", headers=headers, json=openai_payload) as openai_response:
-                        if openai_response.status == 200:
-                            openai_data = await openai_response.json()
-                            summary = openai_data.get('choices', [{}])[0].get('message', {}).get('content', '')
-                            embed.description = summary
-
-            googlemaps_tokens = await self.bot.get_shared_api_tokens("googlemaps")
-            google_street_view_api_key = googlemaps_tokens.get("api_key", "YOUR_API_KEY")
-            
-            file = None  # Initialize file to None to handle cases where no image is available
-            if google_street_view_api_key != "YOUR_API_KEY":
-                street_view_base_url = "https://maps.googleapis.com/maps/api/staticmap"
-                street_view_params = {
-                    "size": "700x500", # Width x Height
-                    "zoom": "13",
-                    "scale": "2", 
-                    "center": f"{data1['latitude']},{data1['longitude']}",  # Latitude and Longitude as comma-separated string
-                    "maptype": "hybrid",
-                    "key": google_street_view_api_key
-                }
-                async with aiohttp.ClientSession() as session:
-                    async with session.get(street_view_base_url, params=street_view_params) as street_view_response:
-                        if street_view_response.status == 200:
-                            # Save the raw binary that the API returns as an image to set in embed.set_image
-                            street_view_image_url = "attachment://street_view_image.png"
-                            embed.set_image(url=street_view_image_url)
-                            street_view_image_stream = io.BytesIO(await street_view_response.read())
-                            file = discord.File(fp=street_view_image_stream, filename="street_view_image.png")
-                        else:
-                            # Handle the error accordingly, e.g., log it or send a message to the user
-                            pass
-
-            view = discord.ui.View(timeout=180)  # Initialize view outside of the else block
-            if 'error' in data1:
-                embed.add_field(name="Error", value=data1['error'], inline=False)
-            elif not data1 or 'name' not in data1:
-                embed.add_field(name="Error", value="No airport found with the provided code.", inline=False)
-            else:
-                if 'icao' in data1:
-                    embed.add_field(name='ICAO', value=f"{data1['icao']}", inline=True)
-                if 'iata' in data1:
-                    embed.add_field(name='IATA', value=f"{data1['iata']}", inline=True)
-                if 'country_code' in data1:
-                    embed.add_field(name='Country code', value=f":flag_{data1['country_code'].lower()}: {data1['country_code']}", inline=True)
-                if 'location' in data1:
-                    embed.add_field(name='Location', value=f"{data1['location']}", inline=True)
-                if 'country' in data1:
-                    embed.add_field(name='Country', value=f"{data1['country']}", inline=True)
-                if 'longitude' in data1:
-                    embed.add_field(name='Longitude', value=f"{data1['longitude']}", inline=True)
-                if 'latitude' in data1:
-                    embed.add_field(name='Latitude', value=f"{data1['latitude']}", inline=True)
+                    async with session.get(url1) as response1:
+                        data1 = await response1.json()
                 
-                # Check if 'link' is in data1 and add it to the view
-                if 'link' in data1:
-                    link = data1['link']
-                    if not (link.startswith('http://') or link.startswith('https://')):
-                        link = 'https://airport-data.com' + link
-                    # URL button
-                    view_airport = discord.ui.Button(label=f"More info about {data1['icao']}", url=link, style=discord.ButtonStyle.link)
-                    view.add_item(view_airport)
+                embed = discord.Embed(title=f"{data1.get('name', 'Unknown Airport')}", color=0xfffffe)
+
+                # Check for OpenAI API key and use it to generate a summary if available
+                openai_api_key = await self.bot.get_shared_api_tokens("openai")
+                if openai_api_key and 'api_key' in openai_api_key:
+                    openai_api_key = openai_api_key['api_key']
+                    airport_name = data1.get('name', 'Unknown Airport')
+                    openai_payload = {
+                        "model": "gpt-4o-mini",
+                        "messages": [
+                            {
+                                "role": "system",
+                                "content": "You are an AI summarizer inside a Discord bot feature. Produce only formatted text without titles or headings, and use markdown for styling like *italics*, **bold**, - bulletpoints, and `code`."
+                            },
+                            {
+                                "role": "user",
+                                "content": f"Generate a summary of the airport named {airport_name}."
+                            }
+                        ]
+                    }
+                    headers = {
+                        "Content-Type": "application/json",
+                        "Authorization": f"Bearer {openai_api_key}"
+                    }
+                    async with aiohttp.ClientSession() as session:
+                        async with session.post("https://api.openai.com/v1/chat/completions", headers=headers, json=openai_payload) as openai_response:
+                            if openai_response.status == 200:
+                                openai_data = await openai_response.json()
+                                summary = openai_data.get('choices', [{}])[0].get('message', {}).get('content', '')
+                                embed.description = summary
+                                embed.set_footer(text="Summary generated using AI, check factual accuracy")
+
+                googlemaps_tokens = await self.bot.get_shared_api_tokens("googlemaps")
+                google_street_view_api_key = googlemaps_tokens.get("api_key", "YOUR_API_KEY")
+                
+                file = None  # Initialize file to None to handle cases where no image is available
+                if google_street_view_api_key != "YOUR_API_KEY":
+                    street_view_base_url = "https://maps.googleapis.com/maps/api/staticmap"
+                    street_view_params = {
+                        "size": "700x500", # Width x Height
+                        "zoom": "13",
+                        "scale": "2", 
+                        "center": f"{data1['latitude']},{data1['longitude']}",  # Latitude and Longitude as comma-separated string
+                        "maptype": "hybrid",
+                        "key": google_street_view_api_key
+                    }
+                    async with aiohttp.ClientSession() as session:
+                        async with session.get(street_view_base_url, params=street_view_params) as street_view_response:
+                            if street_view_response.status == 200:
+                                # Save the raw binary that the API returns as an image to set in embed.set_image
+                                street_view_image_url = "attachment://street_view_image.png"
+                                embed.set_image(url=street_view_image_url)
+                                street_view_image_stream = io.BytesIO(await street_view_response.read())
+                                file = discord.File(fp=street_view_image_stream, filename="street_view_image.png")
+                            else:
+                                # Handle the error accordingly, e.g., log it or send a message to the user
+                                pass
+
+                view = discord.ui.View(timeout=180)  # Initialize view outside of the else block
+                if 'error' in data1:
+                    embed.add_field(name="Error", value=data1['error'], inline=False)
+                elif not data1 or 'name' not in data1:
+                    embed.add_field(name="Error", value="No airport found with the provided code.", inline=False)
+                else:
+                    if 'icao' in data1:
+                        embed.add_field(name='ICAO', value=f"{data1['icao']}", inline=True)
+                    if 'iata' in data1:
+                        embed.add_field(name='IATA', value=f"{data1['iata']}", inline=True)
+                    if 'country_code' in data1:
+                        embed.add_field(name='Country code', value=f":flag_{data1['country_code'].lower()}: {data1['country_code']}", inline=True)
+                    if 'location' in data1:
+                        embed.add_field(name='Location', value=f"{data1['location']}", inline=True)
+                    if 'country' in data1:
+                        embed.add_field(name='Country', value=f"{data1['country']}", inline=True)
+                    if 'longitude' in data1:
+                        embed.add_field(name='Longitude', value=f"{data1['longitude']}", inline=True)
+                    if 'latitude' in data1:
+                        embed.add_field(name='Latitude', value=f"{data1['latitude']}", inline=True)
+                    
+                    # Check if 'link' is in data1 and add it to the view
+                    if 'link' in data1:
+                        link = data1['link']
+                        if not (link.startswith('http://') or link.startswith('https://')):
+                            link = 'https://airport-data.com' + link
+                        # URL button
+                        view_airport = discord.ui.Button(label=f"More info about {data1['icao']}", url=link, style=discord.ButtonStyle.link)
+                        view.add_item(view_airport)
 
             # Send the message with the embed, view, and file (if available)
             await ctx.send(embed=embed, view=view, file=file)
