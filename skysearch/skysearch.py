@@ -856,7 +856,7 @@ class Skysearch(commands.Cog):
                         "messages": [
                             {
                                 "role": "system",
-                                "content": "You are an AI summarizer inside a Discord bot feature. Produce only formatted text without titles or headings, and use markdown for styling like *italics*, **bold**, - bulletpoints, and `code`. Don't mention terrorist attacks or other world terrorism events."
+                                "content": "You are an AI summarizer inside a Discord bot feature. Produce only formatted text without titles or headings, and use markdown for styling like *italics*, **bold**, - bulletpoints, and `code`. Don't mention terrorist attacks or other world terrorism events. Don't mention the airport's ICAO or IATA."
                             },
                             {
                                 "role": "user",
