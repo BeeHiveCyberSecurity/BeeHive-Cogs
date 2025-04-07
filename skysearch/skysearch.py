@@ -879,19 +879,19 @@ class Skysearch(commands.Cog):
                 embed.add_field(name="Error", value="No airport found with the provided code.", inline=False)
             else:
                 if 'icao' in data1:
-                    embed.add_field(name='ICAO', value=f"`{data1['icao']}`", inline=True)
+                    embed.add_field(name='ICAO', value=f"{data1['icao']}", inline=True)
                 if 'iata' in data1:
-                    embed.add_field(name='IATA', value=f"`{data1['iata']}`", inline=True)
+                    embed.add_field(name='IATA', value=f"{data1['iata']}", inline=True)
                 if 'country_code' in data1:
-                    embed.add_field(name='Country Code', value=f"`{data1['country_code']}`", inline=True)
+                    embed.add_field(name='Country Code', value=f"{data1['country_code']}", inline=True)
                 if 'location' in data1:
-                    embed.add_field(name='Location', value=f"`{data1['location']}`", inline=True)
+                    embed.add_field(name='Location', value=f"{data1['location']}", inline=True)
                 if 'country' in data1:
-                    embed.add_field(name='Country', value=f"`{data1['country']}`", inline=True)
+                    embed.add_field(name='Country', value=f"{data1['country']}", inline=True)
                 if 'longitude' in data1:
-                    embed.add_field(name='Longitude', value=f"`{data1['longitude']}`", inline=True)
+                    embed.add_field(name='Longitude', value=f"{data1['longitude']}", inline=True)
                 if 'latitude' in data1:
-                    embed.add_field(name='Latitude', value=f"`{data1['latitude']}`", inline=True)
+                    embed.add_field(name='Latitude', value=f"{data1['latitude']}", inline=True)
                 
                 # Check if 'link' is in data1 and add it to the view
                 if 'link' in data1:
