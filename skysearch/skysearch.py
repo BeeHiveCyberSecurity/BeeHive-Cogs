@@ -843,7 +843,32 @@ class Skysearch(commands.Cog):
                 async with session.get(url1) as response1:
                     data1 = await response1.json()
             
-            embed = discord.Embed(title=f"{data1.get('name', 'Unknown Airport')}", description=f"", color=0xfffffe)
+            embed = discord.Embed(title=f"{data1.get('name', 'Unknown Airport')}", color=0xfffffe)
+
+            # Check for OpenAI API key and use it to generate a summary if available
+            openai_api_key = await self.bot.get_shared_api_tokens("openai")
+            if openai_api_key and 'api_key' in openai_api_key:
+                openai_api_key = openai_api_key['api_key']
+                airport_name = data1.get('name', 'Unknown Airport')
+                openai_payload = {
+                    "model": "gpt-4o",
+                    "input": [
+                        {
+                            "role": "developer",
+                            "content": f"Generate a summary for the airport named {airport_name}."
+                        }
+                    ]
+                }
+                headers = {
+                    "Content-Type": "application/json",
+                    "Authorization": f"Bearer {openai_api_key}"
+                }
+                async with aiohttp.ClientSession() as session:
+                    async with session.post("https://api.openai.com/v1/responses", headers=headers, json=openai_payload) as openai_response:
+                        if openai_response.status == 200:
+                            openai_data = await openai_response.json()
+                            summary = openai_data.get('choices', [{}])[0].get('message', {}).get('content', '')
+                            embed.description = summary
 
             googlemaps_tokens = await self.bot.get_shared_api_tokens("googlemaps")
             google_street_view_api_key = googlemaps_tokens.get("api_key", "YOUR_API_KEY")
