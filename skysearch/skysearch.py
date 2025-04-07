@@ -852,10 +852,10 @@ class Skysearch(commands.Cog):
                 airport_name = data1.get('name', 'Unknown Airport')
                 openai_payload = {
                     "model": "gpt-4o",
-                    "input": [
+                    "messages": [
                         {
-                            "role": "developer",
-                            "content": f"Use Discord-compatible formatting/markdown where needed."
+                            "role": "system",
+                            "content": "Use Discord-compatible formatting/markdown where needed."
                         },
                         {
                             "role": "user",
@@ -868,7 +868,7 @@ class Skysearch(commands.Cog):
                     "Authorization": f"Bearer {openai_api_key}"
                 }
                 async with aiohttp.ClientSession() as session:
-                    async with session.post("https://api.openai.com/v1/responses", headers=headers, json=openai_payload) as openai_response:
+                    async with session.post("https://api.openai.com/v1/chat/completions", headers=headers, json=openai_payload) as openai_response:
                         if openai_response.status == 200:
                             openai_data = await openai_response.json()
                             summary = openai_data.get('choices', [{}])[0].get('message', {}).get('content', '')
