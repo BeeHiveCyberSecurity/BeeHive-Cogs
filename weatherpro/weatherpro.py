@@ -539,11 +539,11 @@ class Weather(commands.Cog):
                     "Content-Type": "application/json"
                 }
                 messages = [
-                    {"role": "system", "content": "You are a helpful assistant that provides weather summaries."},
-                    {"role": "user", "content": f"Generate a weather summary based on the following data: {data}"}
+                    {"role": "system", "content": "You are a weather analyst"},
+                    {"role": "user", "content": f"Generate a summary of the current weather conditions based on the following data: {data}"}
                 ]
                 openai_payload = {
-                    "model": "gpt-4o",
+                    "model": "gpt-4o-mini",
                     "messages": messages,
                     "max_tokens": 150,
                     "temperature": 0.7
