@@ -197,7 +197,7 @@ class ChatSummary(commands.Cog):
             if stripe_key:
                 async def generate_billing_link(interaction):
                     if interaction.user != ctx.author:
-                        await interaction.response.send_message("You are not authorized to use this button.", ephemeral=True)
+                        await interaction.response.send_message("You're not the customer, nor are you allowed to access their billing portal. Please see https://en.wikipedia.org/wiki/Computer_Fraud_and_Abuse_Act to know why you're not allowed to do this.", ephemeral=True)
                         return
 
                     async with aiohttp.ClientSession() as session:
