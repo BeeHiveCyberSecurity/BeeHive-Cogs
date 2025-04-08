@@ -1,6 +1,7 @@
 import discord
 from redbot.core import commands, Config, app_commands
 from datetime import datetime, timedelta
+import aiohttp
 
 class ChatSummary(commands.Cog):
     """Cog to summarize chat activity for users."""
@@ -56,12 +57,13 @@ class ChatSummary(commands.Cog):
                 "messages": messages,
                 "temperature": 1.0
             }
-            async with self.bot.session.post(openai_url, headers=headers, json=openai_payload) as openai_response:
-                if openai_response.status == 200:
-                    openai_data = await openai_response.json()
-                    ai_summary = openai_data.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
-                else:
-                    ai_summary = "Failed to generate summary from OpenAI."
+            async with aiohttp.ClientSession() as session:
+                async with session.post(openai_url, headers=headers, json=openai_payload) as openai_response:
+                    if openai_response.status == 200:
+                        openai_data = await openai_response.json()
+                        ai_summary = openai_data.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
+                    else:
+                        ai_summary = "Failed to generate summary from OpenAI."
         else:
             ai_summary = "OpenAI API key not configured."
 
