@@ -38,6 +38,7 @@ class ChatSummary(commands.Cog):
 
             cutoff = datetime.now() - timedelta(hours=hours)
             recent_messages = []
+            mentions = []
 
             channel = ctx.channel
             if not channel:
@@ -52,6 +53,12 @@ class ChatSummary(commands.Cog):
                             "content": message.content,
                             "timestamp": message.created_at.isoformat()
                         })
+                        if ctx.author in message.mentions:
+                            time_ago = datetime.now() - message.created_at
+                            mentions.append({
+                                "author": message.author.display_name,
+                                "time_ago": time_ago
+                            })
 
                 messages_content = "\n".join(f"{msg['author']}: {msg['content']}" for msg in recent_messages)
                 openai_url = "https://api.openai.com/v1/chat/completions"
@@ -59,7 +66,9 @@ class ChatSummary(commands.Cog):
                 openai_key = tokens.get("api_key") if tokens else None
 
                 ai_summary = await self._generate_ai_summary(openai_key, messages_content, customer_id)
-                await self._send_summary_embed(ctx, ai_summary, customer_id)
+                mention_summary = self._generate_mention_summary(mentions)
+                full_summary = f"{ai_summary}\n\nWho mentioned you:\n{mention_summary}"
+                await self._send_summary_embed(ctx, full_summary, customer_id)
 
                 if openai_key and customer_id:
                     await self._track_stripe_event(customer_id)
@@ -97,10 +106,15 @@ class ChatSummary(commands.Cog):
         else:
             return "OpenAI API key not configured."
 
-    async def _send_summary_embed(self, ctx, ai_summary, customer_id):
+    def _generate_mention_summary(self, mentions):
+        if not mentions:
+            return "No mentions in the recent messages."
+        return "\n".join(f"{mention['author']} mentioned you {mention['time_ago']} ago" for mention in mentions)
+
+    async def _send_summary_embed(self, ctx, full_summary, customer_id):
         embed = discord.Embed(
             title="AI chat summary",
-            description=ai_summary or "No recent messages.",
+            description=full_summary or "No recent messages.",
             color=0xfffffe
         )
         if not customer_id:
