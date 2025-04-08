@@ -157,10 +157,38 @@ class ChatSummary(commands.Cog):
             embed.add_field(name="Customer ID", value="Hidden (viewable in DMs only)", inline=False)
 
         if customer_id != "Not set":
-            view = discord.ui.View()
-            button = discord.ui.Button(label="Manage your billing", style=discord.ButtonStyle.link, url="https://billing.stripe.com/p/login/aEU2aCdNsgRwgTecMM")
-            view.add_item(button)
-            await ctx.send(embed=embed, view=view)
+            stripe_tokens = await self.bot.get_shared_api_tokens("stripe")
+            stripe_key = stripe_tokens.get("api_key") if stripe_tokens else None
+
+            if stripe_key:
+                async def generate_billing_link(interaction):
+                    async with aiohttp.ClientSession() as session:
+                        try:
+                            stripe_url = "https://api.stripe.com/v1/billing_portal/sessions"
+                            stripe_headers = {
+                                "Authorization": f"Bearer {stripe_key}",
+                                "Content-Type": "application/x-www-form-urlencoded"
+                            }
+                            stripe_payload = {
+                                "customer": customer_id,
+                                "return_url": ctx.channel.jump_url
+                            }
+                            async with session.post(stripe_url, headers=stripe_headers, data=stripe_payload) as stripe_response:
+                                if stripe_response.status == 200:
+                                    response_data = await stripe_response.json()
+                                    login_url = response_data.get("url")
+                                    if login_url:
+                                        await interaction.response.send_message(f"Click [here]({login_url}) to manage your billing.", ephemeral=True)
+                                else:
+                                    await interaction.response.send_message(f"Failed to generate billing portal link. Status code: {stripe_response.status}", ephemeral=True)
+                        except aiohttp.ClientError as e:
+                            await interaction.response.send_message(f"Failed to connect to Stripe API: {str(e)}", ephemeral=True)
+
+                view = discord.ui.View()
+                button = discord.ui.Button(label="Login and manage billing", style=discord.ButtonStyle.primary)
+                button.callback = generate_billing_link
+                view.add_item(button)
+                await ctx.send(embed=embed, view=view)
         else:
             await ctx.send(embed=embed)
 
