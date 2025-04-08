@@ -931,4 +931,5 @@ class Omni(commands.Cog):
             ),
             color=0xfffffe
         )
+        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/sparkles.png")
         await channel.send(embed=embed)
