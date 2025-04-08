@@ -87,7 +87,7 @@ class ChatSummary(commands.Cog):
                 color=0xfffffe
             )
             if not customer_id:
-                embed.set_footer(text="You're using the free version of the AI summarizer. Upgrade for improved speed, intelligence, and functionality.")
+                embed.set_footer(text="You're using the free version of BeeHive's AI summarizer. Upgrade for improved speed, intelligence, and functionality.")
             else
                 embed.set_footer(text="You're powered up with premium AI models and extended discussion context.")
             await ctx.send(embed=embed)
