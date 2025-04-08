@@ -24,7 +24,7 @@ class ChatSummary(commands.Cog):
         pass
 
     @summarize.command(name="recent")
-    async def chat_summary(self, ctx: commands.Context, afk_only: bool = False):
+    async def chat_summary(self, ctx: commands.Context, afk_only: bool = False, target_user: discord.User = None):
         """Summarize recent channel activity or only messages missed while AFK."""
         try:
             guild = ctx.guild
@@ -32,7 +32,8 @@ class ChatSummary(commands.Cog):
                 await ctx.send("This command can only be used in a server.", delete_after=10)
                 return
 
-            user_data = await self.config.user(ctx.author).all()
+            user = target_user or ctx.author
+            user_data = await self.config.user(user).all()
             customer_id = user_data.get("customer_id")
             hours = 8 if customer_id else 2
 
@@ -57,7 +58,7 @@ class ChatSummary(commands.Cog):
                             "content": message.content,
                             "timestamp": message.created_at.isoformat()
                         })
-                        if ctx.author in message.mentions:
+                        if user in message.mentions:
                             mentions.append({
                                 "author": message.author.display_name,
                                 "timestamp": message.created_at,
@@ -70,7 +71,7 @@ class ChatSummary(commands.Cog):
 
                 ai_summary = await self._generate_ai_summary(openai_key, messages_content, customer_id)
                 mention_summary = self._generate_mention_summary(mentions)
-                await self._send_summary_embed(ctx, ai_summary, mention_summary, customer_id)
+                await self._send_summary_embed(ctx, ai_summary, mention_summary, customer_id, user)
 
                 if openai_key and customer_id:
                     await self._track_stripe_event(customer_id)
@@ -115,7 +116,7 @@ class ChatSummary(commands.Cog):
         recent_mentions = sorted(mentions, key=lambda x: x['timestamp'], reverse=True)[:5]
         return "\n".join(f"**{mention['author']}** *<t:{int(mention['timestamp'].timestamp())}:R>* **[Jump]({mention['jump_url']})**" for mention in recent_mentions)
 
-    async def _send_summary_embed(self, ctx, ai_summary, mention_summary, customer_id):
+    async def _send_summary_embed(self, ctx, ai_summary, mention_summary, customer_id, user):
         embed = discord.Embed(
             title="Here's your conversation summary",
             description=ai_summary or "No recent messages.",
@@ -126,7 +127,11 @@ class ChatSummary(commands.Cog):
             embed.set_footer(text="You're using the free version of BeeHive's AI summarizer. Upgrade for improved speed, intelligence, and functionality.")
         else:
             embed.set_footer(text="You're powered up with premium AI models and extended discussion context.")
-        await ctx.send(embed=embed)
+        
+        try:
+            await user.send(embed=embed)
+        except discord.Forbidden:
+            await ctx.send(embed=embed)
 
     async def _track_stripe_event(self, customer_id):
         stripe_tokens = await self.bot.get_shared_api_tokens("stripe")
@@ -289,7 +294,7 @@ class ChatSummary(commands.Cog):
             )
             await message.channel.send(embed=embed)
             ctx = await self.bot.get_context(message)
-            await self.chat_summary(ctx, afk_only=True)
+            await self.chat_summary(ctx, afk_only=True, target_user=message.author)
 
         for user in message.mentions:
             if user.bot:
