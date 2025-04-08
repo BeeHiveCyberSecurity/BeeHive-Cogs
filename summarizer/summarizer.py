@@ -31,6 +31,10 @@ class ChatSummary(commands.Cog):
 
         # Gather messages from the channel where the command is run
         channel = interaction.channel
+        if not channel:
+            await interaction.response.send_message("This command can only be used in a text channel.", ephemeral=True)
+            return
+
         async for message in channel.history(limit=1000, after=cutoff):
             if not message.author.bot:
                 recent_messages.append({
@@ -60,12 +64,15 @@ class ChatSummary(commands.Cog):
                 "temperature": 1.0
             }
             async with aiohttp.ClientSession() as session:
-                async with session.post(openai_url, headers=headers, json=openai_payload) as openai_response:
-                    if openai_response.status == 200:
-                        openai_data = await openai_response.json()
-                        ai_summary = openai_data.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
-                    else:
-                        ai_summary = "Failed to generate summary from OpenAI."
+                try:
+                    async with session.post(openai_url, headers=headers, json=openai_payload) as openai_response:
+                        if openai_response.status == 200:
+                            openai_data = await openai_response.json()
+                            ai_summary = openai_data.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
+                        else:
+                            ai_summary = f"Failed to generate summary from OpenAI. Status code: {openai_response.status}"
+                except aiohttp.ClientError as e:
+                    ai_summary = f"Failed to connect to OpenAI API: {str(e)}"
         else:
             ai_summary = "OpenAI API key not configured."
 
