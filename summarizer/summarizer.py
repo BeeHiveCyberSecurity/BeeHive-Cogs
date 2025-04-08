@@ -60,7 +60,7 @@ class ChatSummary(commands.Cog):
                     "Content-Type": "application/json"
                 }
                 messages = [
-                    {"role": "system", "content": "You are a chat summary generator."},
+                    {"role": "system", "content": "You are a chat summary generator. Use bulletpoints where appropriate."},
                     {"role": "user", "content": f"Summarize the following chat messages: {messages_content}"}
                 ]
                 openai_payload = {
