@@ -266,7 +266,8 @@ class ChatSummary(commands.Cog):
             color=0xfffffe
         )
         embed.set_footer(text="TIP: You'll automatically have your away status cleared if you type in a channel while marked away.")
-        await ctx.send(embed=embed)
+        async with ctx.typing():
+            await ctx.send(embed=embed)
 
     @commands.Cog.listener()
     async def on_message_without_command(self, message: discord.Message):
