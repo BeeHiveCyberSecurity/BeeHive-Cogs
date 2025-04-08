@@ -37,7 +37,7 @@ class ChatSummary(commands.Cog):
             hours = 8 if customer_id else 2
 
             if afk_only and user_data.get("afk_since"):
-                cutoff = user_data["afk_since"]
+                cutoff = datetime.fromisoformat(user_data["afk_since"])
             else:
                 cutoff = datetime.now(timezone.utc) - timedelta(hours=hours)
 
@@ -264,7 +264,7 @@ class ChatSummary(commands.Cog):
     async def set_away(self, ctx: commands.Context):
         """Set your status to away."""
         await self.config.user(ctx.author).is_afk.set(True)
-        await self.config.user(ctx.author).afk_since.set(datetime.now(timezone.utc))
+        await self.config.user(ctx.author).afk_since.set(datetime.now(timezone.utc).isoformat())
         embed = discord.Embed(
             title="See you later!",
             description=f"You're now **away**.\nYou'll get an AI-powered summary of what you've missed when you come back.",
