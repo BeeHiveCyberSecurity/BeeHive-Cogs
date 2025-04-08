@@ -86,6 +86,8 @@ class ChatSummary(commands.Cog):
                 description=ai_summary or "No recent messages.",
                 color=0xfffffe
             )
+            if not customer_id:
+                embed.set_footer(text="You're using the free version of the AI summarizer. Upgrade for improved speed, intelligence, and functionality.")
             await ctx.send(embed=embed)
 
             # Stripe meter tracking
