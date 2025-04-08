@@ -265,7 +265,7 @@ class ChatSummary(commands.Cog):
             description=f"You're now **away**.\nYou'll get an AI-powered summary of what you've missed when you come back.",
             color=0xfffffe
         )
-        embed.set_footer(text="TIP: You'll automatically have your away status cleared if you type in a channel while marked away.")
+        embed.set_footer(text="You'll automatically have your away status cleared if you type in a channel while marked away.")
         async with ctx.typing():
             await ctx.send(embed=embed)
 
