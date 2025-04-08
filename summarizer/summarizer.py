@@ -68,6 +68,7 @@ class ChatSummary(commands.Cog):
             await ctx.send(f"An error occurred: {str(e)}", delete_after=10)
 
     async def _generate_ai_summary(self, openai_key, messages_content, customer_id):
+        openai_url = "https://api.openai.com/v1/chat/completions"
         if openai_key:
             headers = {
                 "Authorization": f"Bearer {openai_key}",
