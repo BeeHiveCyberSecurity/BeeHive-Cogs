@@ -277,9 +277,9 @@ class ChatSummary(commands.Cog):
         if user_data.get("is_afk"):
             await self.config.user(message.author).is_afk.set(False)
             embed = discord.Embed(
-                title="Welcome Back!",
-                description=f"{message.author.display_name}, you are no longer marked as AFK.",
-                color=discord.Color.green()
+                title="Welcome back!",
+                description=f"{message.author.display_name}, you are no longer marked as AFK.\n\nGenerating your AI summary, one moment please...",
+                color=0x2bbd8e
             )
             await message.channel.send(embed=embed)
             ctx = await self.bot.get_context(message)
