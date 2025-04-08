@@ -14,10 +14,9 @@ class ChatSummary(commands.Cog):
         }
         self.config.register_user(**default_user)
 
-    @commands.group(name="summarizer", invoke_without_command=True)
+    @commands.group(name="summarizer")
     async def summarizer(self, ctx: commands.Context):
         """Group for summarizer related commands."""
-        await ctx.send("Use a subcommand for specific actions.")
 
     @summarizer.command(name="chatsummary")
     async def chat_summary(self, ctx: commands.Context):
