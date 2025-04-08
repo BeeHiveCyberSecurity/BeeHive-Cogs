@@ -905,7 +905,7 @@ class Omni(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message):
         """Handle incoming messages for monitoring reminders."""
-        if message.author.bot:
+        if message.author.bot or not message.guild:
             return
 
         guild = message.guild
