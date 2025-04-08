@@ -15,7 +15,12 @@ class OnTheRecord(commands.Cog):
         self.voice_clients = {}
         self.recording_tasks = {}
 
-    @commands.command(name="on_the_record")
+    @commands.group(name="ontherecord", invoke_without_command=True)
+    async def ontherecord_group(self, ctx):
+        """Group command for OnTheRecord operations."""
+        await ctx.send_help(ctx.command)
+
+    @ontherecord_group.command(name="start")
     async def start_recording(self, ctx):
         """Join the voice channel and start recording."""
         if ctx.author.voice is None:
@@ -52,6 +57,8 @@ class OnTheRecord(commands.Cog):
                 frames.append(audio_data)
                 await asyncio.sleep(0.1)  # Sleep to allow other tasks to run
 
+        except Exception as e:
+            print(f"Error during audio recording: {str(e)}")
         finally:
             # Save the recording
             file_path = f"data/ontherecord/{guild_id}_recording.wav"
@@ -62,7 +69,7 @@ class OnTheRecord(commands.Cog):
             async with self.config.guild_from_id(guild_id).recordings() as recordings:
                 recordings[file_path] = {"name": f"{guild_id}_recording.wav"}
 
-    @commands.command(name="end_recording")
+    @ontherecord_group.command(name="end")
     async def end_recording(self, ctx):
         """End the recording and save it."""
         if ctx.guild.id not in self.voice_clients:
@@ -79,7 +86,7 @@ class OnTheRecord(commands.Cog):
 
         await ctx.send("Recording ended and saved.")
 
-    @commands.command(name="list_recordings")
+    @ontherecord_group.command(name="list")
     async def list_recordings(self, ctx):
         """List all recordings for the server."""
         recordings = await self.config.guild(ctx.guild).recordings()
@@ -90,7 +97,7 @@ class OnTheRecord(commands.Cog):
         recording_list = "\n".join([f"- {info['name']}" for info in recordings.values()])
         await ctx.send(f"Recordings for this server:\n{recording_list}")
 
-    @commands.command(name="transcribe")
+    @ontherecord_group.command(name="transcribe")
     async def transcribe_recording(self, ctx, recording_name: str):
         """Choose a recording to process by sending it to OpenAI to transcribe."""
         file_path = f"data/ontherecord/{recording_name}.wav"
@@ -123,7 +130,8 @@ class OnTheRecord(commands.Cog):
                             transcription_text = transcription_data.get('text', 'No transcription available.')
                             await ctx.send(f"Transcription of {recording_name} completed: {transcription_text}")
                         else:
-                            await ctx.send(f"Failed to transcribe {recording_name}. Error: {response.status}")
+                            error_message = await response.text()
+                            await ctx.send(f"Failed to transcribe {recording_name}. Error: {response.status} - {error_message}")
         except Exception as e:
             await ctx.send(f"An error occurred during transcription: {str(e)}")
 
