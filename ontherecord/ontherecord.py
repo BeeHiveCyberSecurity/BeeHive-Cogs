@@ -2,8 +2,7 @@ import discord
 from redbot.core import commands, Config
 import os
 import asyncio
-import wave
-import pyaudio  # Use PyAudio instead of sounddevice
+import soundfile as sf  # Use soundfile for making the recordings
 import aiohttp  # Ensure aiohttp is imported
 
 class OnTheRecord(commands.Cog):
@@ -47,37 +46,17 @@ class OnTheRecord(commands.Cog):
         channels = 2
         frames = []
 
-        # Initialize PyAudio
-        p = pyaudio.PyAudio()
-
-        def callback(in_data, frame_count, time_info, status):
-            frames.append(in_data)
-            return (in_data, pyaudio.paContinue)
-
         try:
-            stream = p.open(format=pyaudio.paInt16,
-                            channels=channels,
-                            rate=samplerate,
-                            input=True,
-                            stream_callback=callback)
-
-            stream.start_stream()
-
             while guild_id in self.voice_clients:
+                audio_data = await voice_client.recv_audio()
+                frames.append(audio_data)
                 await asyncio.sleep(0.1)  # Sleep to allow other tasks to run
 
-            stream.stop_stream()
-            stream.close()
         finally:
-            p.terminate()
             # Save the recording
             file_path = f"data/ontherecord/{guild_id}_recording.wav"
             os.makedirs(os.path.dirname(file_path), exist_ok=True)
-            with wave.open(file_path, 'wb') as wf:
-                wf.setnchannels(channels)
-                wf.setsampwidth(p.get_sample_size(pyaudio.paInt16))
-                wf.setframerate(samplerate)
-                wf.writeframes(b''.join(frames))
+            sf.write(file_path, b''.join(frames), samplerate, 'PCM_16')
 
             # Update the recordings list in the config
             async with self.config.guild_from_id(guild_id).recordings() as recordings:
