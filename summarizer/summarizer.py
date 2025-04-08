@@ -293,7 +293,7 @@ class ChatSummary(commands.Cog):
             if user_data.get("is_afk"):
                 embed = discord.Embed(
                     title="This user's away right now",
-                    description=f"{user.display_name} is currently AFK and may not respond immediately.",
+                    description=f"{user.display_name} is currently AFK and may not respond immediately. They'll get a summary of what they missed when they return.",
                     color=discord.Color.orange()
                 )
                 await message.channel.send(embed=embed)
