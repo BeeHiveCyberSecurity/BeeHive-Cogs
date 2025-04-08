@@ -34,7 +34,7 @@ class ChatSummary(commands.Cog):
 
             user_data = await self.config.user(ctx.author).all()
             customer_id = user_data.get("customer_id")
-            hours = 4 if customer_id else 2
+            hours = 8 if customer_id else 2
 
             cutoff = datetime.now() - timedelta(hours=hours)
             recent_messages = []
@@ -225,7 +225,7 @@ class ChatSummary(commands.Cog):
         )
         embed.add_field(
             name="Extended discussion context",
-            value="Benefit from extended discussion context, allowing for more comprehensive summaries.",
+            value="Benefit from extended discussion context, allowing for more comprehensive summaries. (Summarizes up to 8 hours of chat history instead of 2)",
             inline=False
         )
         embed.add_field(
