@@ -16,7 +16,7 @@ class FileInfo(commands.Cog):
         # Check if the message contains attachments
         if message.attachments:
             for attachment in message.attachments:
-                embed = discord.Embed(title="File Information", color=discord.Color.blue())
+                embed = discord.Embed(title="File information", color=discord.Color.blue())
                 embed.add_field(name="File Name", value=attachment.filename, inline=False)
                 embed.add_field(name="File Size", value=f"{attachment.size / 1024:.2f} KB", inline=False)
                 embed.add_field(name="File Type", value=attachment.content_type, inline=False)

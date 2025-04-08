@@ -89,7 +89,7 @@ class ChatSummary(commands.Cog):
                 {"role": "system", "content": "You are a chat summary generator. Use title-less bulletpoints where appropriate."},
                 {"role": "user", "content": f"Summarize the following chat messages: {messages_content}"}
             ]
-            model = "o3-mini" if customer_id else "gpt-4o-mini"
+            model = "gpt-4o" if customer_id else "gpt-4o-mini"
             openai_payload = {
                 "model": model,
                 "messages": messages,
