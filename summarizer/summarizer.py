@@ -1,5 +1,4 @@
 import discord
-from discord.ext import tasks
 from redbot.core import commands, Config, app_commands
 from datetime import datetime, timedelta
 
@@ -9,36 +8,10 @@ class ChatSummary(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=9876543210)
-        default_guild = {
-            "messages": []
-        }
         default_user = {
             "customer_id": None
         }
-        self.config.register_guild(**default_guild)
         self.config.register_user(**default_user)
-        self.cleanup_old_messages.start()
-
-    @commands.Cog.listener()
-    async def on_message(self, message):
-        if message.author.bot:
-            return
-
-        guild = message.guild
-        if guild:
-            async with self.config.guild(guild).messages() as messages:
-                messages.append({
-                    "author": message.author.name,
-                    "content": message.content,
-                    "timestamp": message.created_at.isoformat()
-                })
-
-    @tasks.loop(hours=1)
-    async def cleanup_old_messages(self):
-        for guild in self.bot.guilds:
-            async with self.config.guild(guild).messages() as messages:
-                cutoff = datetime.now() - timedelta(hours=4)
-                messages[:] = [msg for msg in messages if datetime.fromisoformat(msg["timestamp"]) > cutoff]
 
     @app_commands.command(name="chatsummary")
     async def chat_summary(self, ctx: commands.Context):
@@ -52,13 +25,17 @@ class ChatSummary(commands.Cog):
         customer_id = user_data.get("customer_id")
         hours = 4 if customer_id else 2
 
-        messages = await self.config.guild(guild).messages()
-        if not messages:
-            await ctx.send(f"No messages to summarize from the last {hours} hours.")
-            return
-
         cutoff = datetime.now() - timedelta(hours=hours)
-        recent_messages = [msg for msg in messages if datetime.fromisoformat(msg["timestamp"]) > cutoff]
+        recent_messages = []
+
+        async for message in guild.text_channels[0].history(limit=1000, after=cutoff):
+            if not message.author.bot:
+                recent_messages.append({
+                    "author": message.author.name,
+                    "content": message.content,
+                    "timestamp": message.created_at.isoformat()
+                })
+
         summary = "\n".join(f"{msg['author']}: {msg['content']}" for msg in recent_messages[-10:])
         embed = discord.Embed(
             title="AI chat summary",
@@ -78,6 +55,3 @@ class ChatSummary(commands.Cog):
         """Set a customer's ID for a user globally."""
         await self.config.user(user).customer_id.set(customer_id)
         await ctx.send(f"Customer ID for {user.name} has been set to {customer_id}.")
-
-    def cog_unload(self):
-        self.cleanup_old_messages.cancel()
