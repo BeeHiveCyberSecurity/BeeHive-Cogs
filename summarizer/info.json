@@ -1,0 +1,12 @@
+{
+    "author": ["adminelevation"],
+    "install_msg": "Thank you for installing the Chat Summary cog. Use `/chatsummary` to get a summary of recent chat activity.",
+    "name": "summarizer",
+    "short": "Summarize chat activity for users.",
+    "description": "This cog provides a summary of chat activity in a server, allowing users to see recent messages and activity.",
+    "tags": ["chat", "summary", "activity", "discord"],
+    "requirements": [],
+    "min_bot_version": "3.5.0",
+    "hidden": false,
+    "disabled": false
+}
