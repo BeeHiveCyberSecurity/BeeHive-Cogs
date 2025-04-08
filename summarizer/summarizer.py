@@ -36,10 +36,39 @@ class ChatSummary(commands.Cog):
                     "timestamp": message.created_at.isoformat()
                 })
 
-        summary = "\n".join(f"{msg['author']}: {msg['content']}" for msg in recent_messages[-10:])
+        # Prepare the data for OpenAI request
+        messages_content = "\n".join(f"{msg['author']}: {msg['content']}" for msg in recent_messages)
+        openai_url = "https://api.openai.com/v1/chat/completions"
+        tokens = await self.bot.get_shared_api_tokens("openai")
+        openai_key = tokens.get("api_key") if tokens else None
+
+        if openai_key:
+            headers = {
+                "Authorization": f"Bearer {openai_key}",
+                "Content-Type": "application/json"
+            }
+            messages = [
+                {"role": "system", "content": "You are a helpful assistant that summarizes chat activity."},
+                {"role": "user", "content": f"Summarize the following chat messages: {messages_content}"}
+            ]
+            openai_payload = {
+                "model": "gpt-4o-mini",
+                "messages": messages,
+                "max_tokens": 150,
+                "temperature": 0.7
+            }
+            async with self.bot.session.post(openai_url, headers=headers, json=openai_payload) as openai_response:
+                if openai_response.status == 200:
+                    openai_data = await openai_response.json()
+                    ai_summary = openai_data.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
+                else:
+                    ai_summary = "Failed to generate summary from OpenAI."
+        else:
+            ai_summary = "OpenAI API key not configured."
+
         embed = discord.Embed(
             title="AI chat summary",
-            description=summary or "No recent messages.",
+            description=ai_summary or "No recent messages.",
             color=0xfffffe
         )
         await ctx.send(embed=embed)
