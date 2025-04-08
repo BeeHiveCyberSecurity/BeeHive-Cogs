@@ -289,7 +289,7 @@ class ChatSummary(commands.Cog):
             await self.config.user(message.author).is_afk.set(False)
             embed = discord.Embed(
                 title="Welcome back",
-                description=f":sparkles: Generating your AI summary, please wait...",
+                description=f":sparkles: Generating your AI summary, check your Direct Messages...",
                 color=0xfffffe
             )
             await message.channel.send(embed=embed)
