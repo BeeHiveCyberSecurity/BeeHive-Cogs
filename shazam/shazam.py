@@ -22,7 +22,7 @@ class ShazamCog(commands.Cog):
                 response.raise_for_status()
                 return await response.read()
         except aiohttp.ClientError as error:
-            log.exception("Error fetching media from URL: %s", url, exc_info=error)
+            logging.exception("Error fetching media from URL: %s", url, exc_info=error)
             raise commands.UserFeedbackCheckFailure("Failed to fetch media from the URL.")
 
     @commands.command(name="identify")
@@ -39,12 +39,12 @@ class ShazamCog(commands.Cog):
                     url = attachment.url
 
                 media: bytes = await self.__aio_get(url)
-                track_info: Dict[str, Any] = await self.alchemist.recognize(media)
+                track_info = await self.alchemist.recognize(media)
 
                 if track_info:
                     serialized_info = Shazamalize.full_track(track_info)
-                    track_title = serialized_info['track']['title']
-                    track_artist = serialized_info['track']['subtitle']
+                    track_title = serialized_info.track.title
+                    track_artist = serialized_info.track.subtitle
                     embed = discord.Embed(
                         title="Song Identified",
                         description=f"**Title:** {track_title}\n**Artist:** {track_artist}",
