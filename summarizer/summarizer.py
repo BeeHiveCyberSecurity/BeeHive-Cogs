@@ -134,11 +134,25 @@ class ChatSummary(commands.Cog):
 
     @summarizer.command(name="id")
     @commands.is_owner()
-    async def set_customer_id(self, ctx: commands.Context, user: discord.User, customer_id: str):
-        """Set a customer's ID for a user globally."""
-        await self.config.user(user).customer_id.set(customer_id)
-        await ctx.message.delete()
-        await ctx.send(f"Customer ID for {user.name} has been set.")
+    async def set_customer_id(self, ctx: commands.Context, user: discord.User):
+        """Set a customer's ID for a user globally using a button and modal."""
+        
+        class CustomerIDModal(discord.ui.Modal, title="Enter Customer ID"):
+            customer_id = discord.ui.TextInput(label="Customer ID", placeholder="Enter the customer ID here")
+
+            async def on_submit(self, interaction: discord.Interaction):
+                await self.config.user(user).customer_id.set(self.customer_id.value)
+                await interaction.response.send_message(f"Customer ID for {user.name} has been set.", ephemeral=True)
+
+        class CustomerIDButton(discord.ui.View):
+            @discord.ui.button(label="Set Customer ID", style=discord.ButtonStyle.primary)
+            async def set_id_button(self, button: discord.ui.Button, interaction: discord.Interaction):
+                if interaction.user != ctx.author:
+                    await interaction.response.send_message("You are not authorized to use this button.", ephemeral=True)
+                    return
+                await interaction.response.send_modal(CustomerIDModal())
+
+        await ctx.send("Click the button below to set the customer ID.", view=CustomerIDButton())
 
     @summarizer.command(name="profile")
     async def view_profile(self, ctx: commands.Context, user: discord.User = None):
