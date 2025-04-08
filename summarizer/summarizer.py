@@ -113,7 +113,7 @@ class ChatSummary(commands.Cog):
 
     async def _send_summary_embed(self, ctx, ai_summary, mention_summary, customer_id):
         embed = discord.Embed(
-            title="AI chat summary",
+            title="Here's your conversation summary",
             description=ai_summary or "No recent messages.",
             color=0xfffffe
         )
@@ -278,9 +278,9 @@ class ChatSummary(commands.Cog):
         if user_data.get("is_afk"):
             await self.config.user(message.author).is_afk.set(False)
             embed = discord.Embed(
-                title="Welcome back!",
+                title="Welcome back",
                 description=f":sparkles: **Generating your AI summary, please wait...**",
-                color=0x2bbd8e
+                color=0xfffffe
             )
             await message.channel.send(embed=embed)
             ctx = await self.bot.get_context(message)
