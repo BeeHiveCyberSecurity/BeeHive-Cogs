@@ -63,8 +63,9 @@ class ChatSummary(commands.Cog):
                     {"role": "system", "content": "You are a chat summary generator. Use title-less bulletpoints where appropriate."},
                     {"role": "user", "content": f"Summarize the following chat messages: {messages_content}"}
                 ]
+                model = "o3-mini" if customer_id else "gpt-4o-mini"
                 openai_payload = {
-                    "model": "gpt-4o-mini",
+                    "model": model,
                     "messages": messages,
                     "temperature": 1.0
                 }
@@ -118,7 +119,7 @@ class ChatSummary(commands.Cog):
         except Exception as e:
             await ctx.send(f"An error occurred: {str(e)}", delete_after=10)
 
-    @summarizer.command(name="setcustomerid")
+    @summarizer.command(name="id")
     @commands.is_owner()
     async def set_customer_id(self, ctx: commands.Context, user: discord.User, customer_id: str):
         """Set a customer's ID for a user globally."""
