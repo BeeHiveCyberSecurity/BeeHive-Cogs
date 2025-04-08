@@ -1,6 +1,6 @@
 import discord
 from discord.ext import tasks
-from redbot.core import commands, Config
+from redbot.core import commands, Config, app_commands
 from datetime import datetime, timedelta
 
 class ChatSummary(commands.Cog):
@@ -40,7 +40,7 @@ class ChatSummary(commands.Cog):
                 cutoff = datetime.now() - timedelta(hours=4)
                 messages[:] = [msg for msg in messages if datetime.fromisoformat(msg["timestamp"]) > cutoff]
 
-    @commands.slash_command(name="chatsummary")
+    @app_commands.command(name="chatsummary")
     async def chat_summary(self, ctx: commands.Context):
         """Get a summary of the chat activity from the last 2 or 4 hours."""
         guild = ctx.guild
@@ -68,7 +68,7 @@ class ChatSummary(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.has_permissions(manage_guild=True)
-    @commands.slash_command(name="setcustomerid")
+    @app_commands.command(name="setcustomerid")
     async def set_customer_id(self, ctx: commands.Context, user: discord.User, customer_id: str):
         """Set a customer's ID for a user globally."""
         await self.config.user(user).customer_id.set(customer_id)
