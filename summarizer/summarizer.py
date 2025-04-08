@@ -43,7 +43,7 @@ class ChatSummary(commands.Cog):
             async for message in channel.history(limit=1000, after=cutoff):
                 if not message.author.bot:
                     recent_messages.append({
-                        "author": message.author.name,
+                        "author": message.author.display_name,
                         "content": message.content,
                         "timestamp": message.created_at.isoformat()
                     })
