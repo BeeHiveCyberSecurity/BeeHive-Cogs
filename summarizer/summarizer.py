@@ -25,7 +25,7 @@ class ChatSummary(commands.Cog):
 
     @summarize.command(name="recent")
     async def chat_summary(self, ctx: commands.Context):
-        """Get a summary of the chat activity from the last 2 or 4 hours."""
+        """Summarize recent channel activity"""
         try:
             guild = ctx.guild
             if not guild:
