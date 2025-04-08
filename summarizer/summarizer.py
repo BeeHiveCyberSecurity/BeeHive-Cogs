@@ -41,81 +41,82 @@ class ChatSummary(commands.Cog):
                 await ctx.send("This command can only be used in a text channel.", delete_after=10)
                 return
 
-            async for message in channel.history(limit=1000, after=cutoff):
-                if not message.author.bot:
-                    recent_messages.append({
-                        "author": message.author.display_name,
-                        "content": message.content,
-                        "timestamp": message.created_at.isoformat()
-                    })
+            async with ctx.typing():
+                async for message in channel.history(limit=1000, after=cutoff):
+                    if not message.author.bot:
+                        recent_messages.append({
+                            "author": message.author.display_name,
+                            "content": message.content,
+                            "timestamp": message.created_at.isoformat()
+                        })
 
-            # Prepare the data for OpenAI request
-            messages_content = "\n".join(f"{msg['author']}: {msg['content']}" for msg in recent_messages)
-            openai_url = "https://api.openai.com/v1/chat/completions"
-            tokens = await self.bot.get_shared_api_tokens("openai")
-            openai_key = tokens.get("api_key") if tokens else None
+                # Prepare the data for OpenAI request
+                messages_content = "\n".join(f"{msg['author']}: {msg['content']}" for msg in recent_messages)
+                openai_url = "https://api.openai.com/v1/chat/completions"
+                tokens = await self.bot.get_shared_api_tokens("openai")
+                openai_key = tokens.get("api_key") if tokens else None
 
-            if openai_key:
-                headers = {
-                    "Authorization": f"Bearer {openai_key}",
-                    "Content-Type": "application/json"
-                }
-                messages = [
-                    {"role": "system", "content": "You are a chat summary generator. Use title-less bulletpoints where appropriate."},
-                    {"role": "user", "content": f"Summarize the following chat messages: {messages_content}"}
-                ]
-                model = "o3-mini" if customer_id else "gpt-4o-mini"
-                openai_payload = {
-                    "model": model,
-                    "messages": messages,
-                    "temperature": 1.0
-                }
-                async with aiohttp.ClientSession() as session:
-                    try:
-                        async with session.post(openai_url, headers=headers, json=openai_payload) as openai_response:
-                            if openai_response.status == 200:
-                                openai_data = await openai_response.json()
-                                ai_summary = openai_data.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
-                            else:
-                                ai_summary = f"Failed to generate summary from OpenAI. Status code: {openai_response.status}"
-                    except aiohttp.ClientError as e:
-                        ai_summary = f"Failed to connect to OpenAI API: {str(e)}"
-            else:
-                ai_summary = "OpenAI API key not configured."
+                if openai_key:
+                    headers = {
+                        "Authorization": f"Bearer {openai_key}",
+                        "Content-Type": "application/json"
+                    }
+                    messages = [
+                        {"role": "system", "content": "You are a chat summary generator. Use title-less bulletpoints where appropriate."},
+                        {"role": "user", "content": f"Summarize the following chat messages: {messages_content}"}
+                    ]
+                    model = "o3-mini" if customer_id else "gpt-4o-mini"
+                    openai_payload = {
+                        "model": model,
+                        "messages": messages,
+                        "temperature": 1.0
+                    }
+                    async with aiohttp.ClientSession() as session:
+                        try:
+                            async with session.post(openai_url, headers=headers, json=openai_payload) as openai_response:
+                                if openai_response.status == 200:
+                                    openai_data = await openai_response.json()
+                                    ai_summary = openai_data.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
+                                else:
+                                    ai_summary = f"Failed to generate summary from OpenAI. Status code: {openai_response.status}"
+                        except aiohttp.ClientError as e:
+                            ai_summary = f"Failed to connect to OpenAI API: {str(e)}"
+                else:
+                    ai_summary = "OpenAI API key not configured."
 
-            embed = discord.Embed(
-                title="AI chat summary",
-                description=ai_summary or "No recent messages.",
-                color=0xfffffe
-            )
-            if not customer_id:
-                embed.set_footer(text="You're using the free version of BeeHive's AI summarizer. Upgrade for improved speed, intelligence, and functionality.")
-            else:
-                embed.set_footer(text="You're powered up with premium AI models and extended discussion context.")
-            await ctx.send(embed=embed)
+                embed = discord.Embed(
+                    title="AI chat summary",
+                    description=ai_summary or "No recent messages.",
+                    color=0xfffffe
+                )
+                if not customer_id:
+                    embed.set_footer(text="You're using the free version of BeeHive's AI summarizer. Upgrade for improved speed, intelligence, and functionality.")
+                else:
+                    embed.set_footer(text="You're powered up with premium AI models and extended discussion context.")
+                await ctx.send(embed=embed)
 
-            # Stripe meter tracking
-            stripe_tokens = await self.bot.get_shared_api_tokens("stripe")
-            stripe_key = stripe_tokens.get("api_key") if stripe_tokens else None
+                # Stripe meter tracking
+                stripe_tokens = await self.bot.get_shared_api_tokens("stripe")
+                stripe_key = stripe_tokens.get("api_key") if stripe_tokens else None
 
-            if stripe_key and customer_id:
-                stripe_url = "https://api.stripe.com/v1/billing/meter_events"
-                stripe_headers = {
-                    "Authorization": f"Bearer {stripe_key}",
-                    "Content-Type": "application/x-www-form-urlencoded"
-                }
-                stripe_payload = {
-                    "event_name": "summary_generated",
-                    "timestamp": int(datetime.now().timestamp()),
-                    "payload[stripe_customer_id]": customer_id
-                }
-                async with aiohttp.ClientSession() as session:
-                    try:
-                        async with session.post(stripe_url, headers=stripe_headers, data=stripe_payload) as stripe_response:
-                            if stripe_response.status != 200:
-                                await ctx.send(f"Failed to track event with Stripe. Status code: {stripe_response.status}", delete_after=10)
-                    except aiohttp.ClientError as e:
-                        await ctx.send(f"Failed to connect to Stripe API: {str(e)}", delete_after=10)
+                if stripe_key and customer_id:
+                    stripe_url = "https://api.stripe.com/v1/billing/meter_events"
+                    stripe_headers = {
+                        "Authorization": f"Bearer {stripe_key}",
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    }
+                    stripe_payload = {
+                        "event_name": "summary_generated",
+                        "timestamp": int(datetime.now().timestamp()),
+                        "payload[stripe_customer_id]": customer_id
+                    }
+                    async with aiohttp.ClientSession() as session:
+                        try:
+                            async with session.post(stripe_url, headers=stripe_headers, data=stripe_payload) as stripe_response:
+                                if stripe_response.status != 200:
+                                    await ctx.send(f"Failed to track event with Stripe. Status code: {stripe_response.status}", delete_after=10)
+                        except aiohttp.ClientError as e:
+                            await ctx.send(f"Failed to connect to Stripe API: {str(e)}", delete_after=10)
 
         except Exception as e:
             await ctx.send(f"An error occurred: {str(e)}", delete_after=10)
