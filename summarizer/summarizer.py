@@ -204,7 +204,7 @@ class ChatSummary(commands.Cog):
                             await interaction.response.send_message(f"Failed to connect to Stripe API: {str(e)}", ephemeral=True)
 
                 view = discord.ui.View(timeout=30)
-                button = discord.ui.Button(label="Login and manage billing", style=discord.ButtonStyle.primary)
+                button = discord.ui.Button(label="Login and manage billing", style=discord.ButtonStyle.green)
                 button.callback = generate_billing_link
                 view.add_item(button)
                 await ctx.send(embed=embed, view=view)
