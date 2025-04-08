@@ -10,10 +10,18 @@ class ShazamCog(commands.Cog):
         self.shazam = Shazam()
 
     @commands.command(name="identify")
-    async def identify_song(self, ctx: commands.Context, url: str):
-        """Identify a song from an audio URL."""
+    async def identify_song(self, ctx: commands.Context, url: str = None):
+        """Identify a song from an audio URL or uploaded file."""
+        if not url and not ctx.message.attachments:
+            await ctx.send("Please provide a URL or upload an audio file.", delete_after=10)
+            return
+
         async with ctx.typing():
             try:
+                if ctx.message.attachments:
+                    attachment = ctx.message.attachments[0]
+                    url = attachment.url
+
                 track_info = await self.shazam.recognize_song(url)
                 if track_info:
                     track_title = track_info['track']['title']
@@ -26,7 +34,7 @@ class ShazamCog(commands.Cog):
                 else:
                     embed = discord.Embed(
                         title="Song Not Identified",
-                        description="Could not identify the song from the provided URL.",
+                        description="Could not identify the song from the provided URL or file.",
                         color=discord.Color.red()
                     )
             except Exception as e:
