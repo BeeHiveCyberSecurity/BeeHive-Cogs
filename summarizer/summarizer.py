@@ -158,36 +158,11 @@ class ChatSummary(commands.Cog):
 
         if customer_id != "Not set":
             view = discord.ui.View()
-            button = discord.ui.Button(label="Log into customer portal", style=discord.ButtonStyle.link)
-            button.callback = self._create_billing_portal_callback(ctx, customer_id)
+            button = discord.ui.Button(label="Manage your billing", style=discord.ButtonStyle.link, url="https://billing.stripe.com/p/login/aEU2aCdNsgRwgTecMM")
             view.add_item(button)
             await ctx.send(embed=embed, view=view)
         else:
             await ctx.send(embed=embed)
-
-    def _create_billing_portal_callback(self, ctx, customer_id):
-        async def button_callback(interaction: discord.Interaction):
-            if interaction.user != ctx.author:
-                await interaction.response.send_message("You cannot use this button.", ephemeral=True)
-                return
-
-            stripe_tokens = await self.bot.get_shared_api_tokens("stripe")
-            stripe_key = stripe_tokens.get("api_key") if stripe_tokens else None
-
-            if stripe_key:
-                try:
-                    stripe.api_key = stripe_key
-                    session = stripe.billing_portal.Session.create(
-                        customer=customer_id,
-                        return_url=ctx.channel.jump_url
-                    )
-                    await interaction.response.send_message(f"Access your billing portal here: {session.url}", ephemeral=True)
-                except Exception as e:
-                    await interaction.response.send_message(f"Failed to create billing portal session: {str(e)}", ephemeral=True)
-            else:
-                await interaction.response.send_message("Stripe integration not yet configured, this action is not yet possible.", ephemeral=True)
-
-        return button_callback
 
     @summarizer.command(name="upgrade")
     async def upgrade_info(self, ctx: commands.Context):
