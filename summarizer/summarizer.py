@@ -50,7 +50,7 @@ class ChatSummary(commands.Cog):
         await ctx.send("Use a subcommand for specific actions.")
 
     @summarizer.command(name="setcustomerid")
-    @commands.is_bot_owner()
+    @commands.is_owner()
     async def set_customer_id(self, ctx: commands.Context, user: discord.User, customer_id: str):
         """Set a customer's ID for a user globally."""
         await self.config.user(user).customer_id.set(customer_id)
