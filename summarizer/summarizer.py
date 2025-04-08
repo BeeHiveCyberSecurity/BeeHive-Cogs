@@ -87,6 +87,30 @@ class ChatSummary(commands.Cog):
                 color=0xfffffe
             )
             await ctx.send(embed=embed)
+
+            # Stripe meter tracking
+            stripe_tokens = await self.bot.get_shared_api_tokens("stripe")
+            stripe_key = stripe_tokens.get("api_key") if stripe_tokens else None
+
+            if stripe_key and customer_id:
+                stripe_url = "https://api.stripe.com/v1/billing/meter_events"
+                stripe_headers = {
+                    "Authorization": f"Bearer {stripe_key}",
+                    "Content-Type": "application/x-www-form-urlencoded"
+                }
+                stripe_payload = {
+                    "event_name": "summary_generated",
+                    "timestamp": int(datetime.now().timestamp()),
+                    "payload[stripe_customer_id]": customer_id
+                }
+                async with aiohttp.ClientSession() as session:
+                    try:
+                        async with session.post(stripe_url, headers=stripe_headers, data=stripe_payload) as stripe_response:
+                            if stripe_response.status != 200:
+                                await ctx.send(f"Failed to track event with Stripe. Status code: {stripe_response.status}", delete_after=10)
+                    except aiohttp.ClientError as e:
+                        await ctx.send(f"Failed to connect to Stripe API: {str(e)}", delete_after=10)
+
         except Exception as e:
             await ctx.send(f"An error occurred: {str(e)}", delete_after=10)
 
