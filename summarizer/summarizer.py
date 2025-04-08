@@ -264,7 +264,7 @@ class ChatSummary(commands.Cog):
         await ctx.send(f"{ctx.author.display_name} is now set to AFK: {reason}")
 
     @commands.Cog.listener()
-    async def on_message(self, message: discord.Message):
+    async def on_message_without_command(self, message: discord.Message):
         if message.author.bot:
             return
 
