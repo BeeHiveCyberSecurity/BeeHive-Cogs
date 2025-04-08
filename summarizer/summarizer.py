@@ -215,7 +215,7 @@ class ChatSummary(commands.Cog):
     async def upgrade_info(self, ctx: commands.Context):
         """Explain the perks of upgrading by adding a customer ID."""
         embed = discord.Embed(
-            title="Upgrade to Premium",
+            title="Go premium, get more",
             color=0xfffffe
         )
         embed.add_field(
@@ -229,12 +229,12 @@ class ChatSummary(commands.Cog):
             inline=False
         )
         embed.add_field(
-            name="Priority Access to New Features",
+            name="Priority new feature access",
             value="Enjoy priority access to new features and updates as they become available.",
             inline=False
         )
         embed.add_field(
-            name="Support for Longer Chat Histories",
+            name="Longer chat history support",
             value="Receive support for summarizing longer chat histories, enhancing your experience.",
             inline=False
         )
