@@ -17,71 +17,74 @@ class ChatSummary(commands.Cog):
     @app_commands.command(name="chatsummary")
     async def chat_summary(self, interaction: discord.Interaction):
         """Get a summary of the chat activity from the last 2 or 4 hours."""
-        guild = interaction.guild
-        if not guild:
-            await interaction.response.send_message("This command can only be used in a server.", ephemeral=True)
-            return
+        try:
+            guild = interaction.guild
+            if not guild:
+                await interaction.response.send_message("This command can only be used in a server.", ephemeral=True)
+                return
 
-        user_data = await self.config.user(interaction.user).all()
-        customer_id = user_data.get("customer_id")
-        hours = 4 if customer_id else 2
+            user_data = await self.config.user(interaction.user).all()
+            customer_id = user_data.get("customer_id")
+            hours = 4 if customer_id else 2
 
-        cutoff = datetime.now() - timedelta(hours=hours)
-        recent_messages = []
+            cutoff = datetime.now() - timedelta(hours=hours)
+            recent_messages = []
 
-        # Gather messages from the channel where the command is run
-        channel = interaction.channel
-        if not channel:
-            await interaction.response.send_message("This command can only be used in a text channel.", ephemeral=True)
-            return
+            # Gather messages from the channel where the command is run
+            channel = interaction.channel
+            if not channel:
+                await interaction.response.send_message("This command can only be used in a text channel.", ephemeral=True)
+                return
 
-        async for message in channel.history(limit=1000, after=cutoff):
-            if not message.author.bot:
-                recent_messages.append({
-                    "author": message.author.name,
-                    "content": message.content,
-                    "timestamp": message.created_at.isoformat()
-                })
+            async for message in channel.history(limit=1000, after=cutoff):
+                if not message.author.bot:
+                    recent_messages.append({
+                        "author": message.author.name,
+                        "content": message.content,
+                        "timestamp": message.created_at.isoformat()
+                    })
 
-        # Prepare the data for OpenAI request
-        messages_content = "\n".join(f"{msg['author']}: {msg['content']}" for msg in recent_messages)
-        openai_url = "https://api.openai.com/v1/chat/completions"
-        tokens = await self.bot.get_shared_api_tokens("openai")
-        openai_key = tokens.get("api_key") if tokens else None
+            # Prepare the data for OpenAI request
+            messages_content = "\n".join(f"{msg['author']}: {msg['content']}" for msg in recent_messages)
+            openai_url = "https://api.openai.com/v1/chat/completions"
+            tokens = await self.bot.get_shared_api_tokens("openai")
+            openai_key = tokens.get("api_key") if tokens else None
 
-        if openai_key:
-            headers = {
-                "Authorization": f"Bearer {openai_key}",
-                "Content-Type": "application/json"
-            }
-            messages = [
-                {"role": "system", "content": "You are a chat summary generator."},
-                {"role": "user", "content": f"Summarize the following chat messages: {messages_content}"}
-            ]
-            openai_payload = {
-                "model": "gpt-4o-mini",
-                "messages": messages,
-                "temperature": 1.0
-            }
-            async with aiohttp.ClientSession() as session:
-                try:
-                    async with session.post(openai_url, headers=headers, json=openai_payload) as openai_response:
-                        if openai_response.status == 200:
-                            openai_data = await openai_response.json()
-                            ai_summary = openai_data.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
-                        else:
-                            ai_summary = f"Failed to generate summary from OpenAI. Status code: {openai_response.status}"
-                except aiohttp.ClientError as e:
-                    ai_summary = f"Failed to connect to OpenAI API: {str(e)}"
-        else:
-            ai_summary = "OpenAI API key not configured."
+            if openai_key:
+                headers = {
+                    "Authorization": f"Bearer {openai_key}",
+                    "Content-Type": "application/json"
+                }
+                messages = [
+                    {"role": "system", "content": "You are a chat summary generator."},
+                    {"role": "user", "content": f"Summarize the following chat messages: {messages_content}"}
+                ]
+                openai_payload = {
+                    "model": "gpt-4o-mini",
+                    "messages": messages,
+                    "temperature": 1.0
+                }
+                async with aiohttp.ClientSession() as session:
+                    try:
+                        async with session.post(openai_url, headers=headers, json=openai_payload) as openai_response:
+                            if openai_response.status == 200:
+                                openai_data = await openai_response.json()
+                                ai_summary = openai_data.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
+                            else:
+                                ai_summary = f"Failed to generate summary from OpenAI. Status code: {openai_response.status}"
+                    except aiohttp.ClientError as e:
+                        ai_summary = f"Failed to connect to OpenAI API: {str(e)}"
+            else:
+                ai_summary = "OpenAI API key not configured."
 
-        embed = discord.Embed(
-            title="AI chat summary",
-            description=ai_summary or "No recent messages.",
-            color=0xfffffe
-        )
-        await interaction.response.send_message(embed=embed)
+            embed = discord.Embed(
+                title="AI chat summary",
+                description=ai_summary or "No recent messages.",
+                color=0xfffffe
+            )
+            await interaction.response.send_message(embed=embed)
+        except Exception as e:
+            await interaction.response.send_message(f"An error occurred: {str(e)}", ephemeral=True)
 
     @commands.group(name="summarizer", invoke_without_command=True)
     async def summarizer(self, ctx: commands.Context):
