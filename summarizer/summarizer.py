@@ -262,7 +262,7 @@ class ChatSummary(commands.Cog):
         await self.config.user(ctx.author).is_afk.set(True)
         embed = discord.Embed(
             title="See you later!",
-            description=f"{ctx.author.display_name}, you're now marked as away. I'll have an AI-powered summary of what you've missed waiting for you when you return.",
+            description=f"You're now **away**.\nYou'll get an AI-powered summary of what you've missed when you come back.",
             color=0xfffffe
         )
         embed.set_footer(text="TIP: You'll automatically have your away status cleared if you type in a channel while marked away.")
