@@ -61,7 +61,6 @@ class ChatSummary(commands.Cog):
                             })
 
                 messages_content = "\n".join(f"{msg['author']}: {msg['content']}" for msg in recent_messages)
-                openai_url = "https://api.openai.com/v1/chat/completions"
                 tokens = await self.bot.get_shared_api_tokens("openai")
                 openai_key = tokens.get("api_key") if tokens else None
 
@@ -271,7 +270,12 @@ class ChatSummary(commands.Cog):
         user_data = await self.config.user(message.author).all()
         if user_data.get("is_afk"):
             await self.config.user(message.author).is_afk.set(False)
-            await message.channel.send(f"Welcome back, {message.author.display_name}! You are no longer marked as AFK.")
+            embed = discord.Embed(
+                title="Welcome Back!",
+                description=f"{message.author.display_name}, you are no longer marked as AFK.",
+                color=discord.Color.green()
+            )
+            await message.channel.send(embed=embed)
             ctx = await self.bot.get_context(message)
             await self.chat_summary(ctx)
 
@@ -280,4 +284,9 @@ class ChatSummary(commands.Cog):
                 continue
             user_data = await self.config.user(user).all()
             if user_data.get("is_afk"):
-                await message.channel.send(f"{user.display_name} is currently AFK and may not respond immediately.")
+                embed = discord.Embed(
+                    title="This user's away right now",
+                    description=f"{user.display_name} is currently AFK and may not respond immediately.",
+                    color=discord.Color.orange()
+                )
+                await message.channel.send(embed=embed)
