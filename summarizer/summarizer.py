@@ -1,6 +1,6 @@
 import discord
 from redbot.core import commands, Config, app_commands
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import aiohttp
 import stripe
 
@@ -36,7 +36,7 @@ class ChatSummary(commands.Cog):
             customer_id = user_data.get("customer_id")
             hours = 8 if customer_id else 2
 
-            cutoff = datetime.now() - timedelta(hours=hours)
+            cutoff = datetime.now(timezone.utc) - timedelta(hours=hours)
             recent_messages = []
             mentions = []
 
@@ -54,7 +54,7 @@ class ChatSummary(commands.Cog):
                             "timestamp": message.created_at.isoformat()
                         })
                         if ctx.author in message.mentions:
-                            time_ago = datetime.now() - message.created_at
+                            time_ago = datetime.now(timezone.utc) - message.created_at
                             mentions.append({
                                 "author": message.author.display_name,
                                 "time_ago": time_ago
