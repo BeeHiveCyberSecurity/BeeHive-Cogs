@@ -150,7 +150,11 @@ class ChatSummary(commands.Cog):
             title=f"{user.name}'s summarizer profile",
             color=0xfffffe
         )
-        embed.add_field(name="Customer ID", value=customer_id, inline=False)
+
+        if isinstance(ctx.channel, discord.DMChannel):
+            embed.add_field(name="Customer ID", value=customer_id, inline=False)
+        else:
+            embed.add_field(name="Customer ID", value="Hidden (viewable in DMs only)", inline=False)
 
         if customer_id != "Not set":
             view = discord.ui.View()
