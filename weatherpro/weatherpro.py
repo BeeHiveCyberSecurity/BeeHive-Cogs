@@ -292,324 +292,325 @@ class Weather(commands.Cog):
     @weather.command(name="now")
     async def now(self, ctx, zip_code: str = None):
         """Check current conditions and alerts, specify a zip for conditions at that location"""
-        if not zip_code:
-            zip_code = await self.config.user(ctx.author).zip_code()
+        async with ctx.typing():
             if not zip_code:
+                zip_code = await self.config.user(ctx.author).zip_code()
+                if not zip_code:
+                    embed = discord.Embed(
+                        title="Weather profile not configured",
+                        description="You haven't set a zip code yet. Use the `weatherset zip` command to set one.",
+                        color=0xff4545
+                    )
+                    await ctx.send(embed=embed)
+                    return
+            
+            # Fetch latitude and longitude using the zip code
+            if zip_code not in self.zip_codes:
                 embed = discord.Embed(
-                    title="Weather profile not configured",
-                    description="You haven't set a zip code yet. Use the `weatherset zip` command to set one.",
+                    title="Invalid zip code",
+                    description="Invalid zip code. Please set a valid 5 digit, US zip code.\nIf this is a valid zip code and we don't know about it yet, please open an issue using the button below and we'll add it.",
                     color=0xff4545
                 )
-                await ctx.send(embed=embed)
-                return
-        
-        # Fetch latitude and longitude using the zip code
-        if zip_code not in self.zip_codes:
-            embed = discord.Embed(
-                title="Invalid zip code",
-                description="Invalid zip code. Please set a valid 5 digit, US zip code.\nIf this is a valid zip code and we don't know about it yet, please open an issue using the button below and we'll add it.",
-                color=0xff4545
-            )
-            issue_button = discord.ui.Button(
-                label="Open an issue",
-                url="https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/issues/new?assignees=&labels=enhancement%2C+good+first+issue&projects=&template=location-review.md&title=%28Location+review%29",
-                style=discord.ButtonStyle.link
-            )
-            view = discord.ui.View()
-            view.add_item(issue_button)
-            await ctx.send(embed=embed, view=view)
-            return
-        
-        latitude, longitude = self.zip_codes[zip_code]
-        
-        # Fetch current weather data using the latitude and longitude
-        url = "https://api.open-meteo.com/v1/forecast"
-        params = {
-            "latitude": str(latitude).strip(),
-            "longitude": str(longitude).strip(),
-            "current": "temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,showers,snowfall,cloud_cover,pressure_msl,surface_pressure,wind_speed_10m,wind_direction_10m,wind_gusts_10m",
-            "hourly": "uv_index,cape,direct_radiation_instant,soil_temperature_0cm",
-            "minutely_15": "lightning_potential,visibility,soil_moisture_0_to_1cm",
-            "temperature_unit": "fahrenheit",
-            "wind_speed_unit": "mph",
-            "precipitation_unit": "inch",
-            "forecast_hours": 1,
-            "forecast_minutely_15": 1
-        }
-        
-        queryString = "&".join(f"{key}={value}" for key, value in params.items())
-        weather_url = f"{url}?{queryString}"
-        
-        async with self.session.get(weather_url) as response:
-            if response.status != 200:
-                await ctx.send(f"Failed to fetch the weather data. URL: {weather_url}, Status Code: {response.status}")
-                return
-
-            data = await response.json()
-            if not data:
-                await ctx.send(f"Failed to retrieve current weather data. URL: {weather_url}, Data: {data}")
+                issue_button = discord.ui.Button(
+                    label="Open an issue",
+                    url="https://github.com/BeeHiveCyberSecurity/BeeHive-Cogs/issues/new?assignees=&labels=enhancement%2C+good+first+issue&projects=&template=location-review.md&title=%28Location+review%29",
+                    style=discord.ButtonStyle.link
+                )
+                view = discord.ui.View()
+                view.add_item(issue_button)
+                await ctx.send(embed=embed, view=view)
                 return
             
-            current = data.get('current', {})
-            hourly = data.get('hourly', {})
-            minutely_15 = data.get('minutely_15', {})
+            latitude, longitude = self.zip_codes[zip_code]
             
-            embed = discord.Embed(
-                title=f"Current conditions",
-                color=0xfffffe
-            )
-            temperature = current.get('temperature_2m', 'N/A')
-            embed.add_field(name="Temperature", value=f"**{temperature}°F** • {self.fahrenheit_to_celsius(temperature)}°C")
-            embed.add_field(name="Feels like", value=f"**{current.get('apparent_temperature', 'N/A')}°F** • {self.fahrenheit_to_celsius(current.get('apparent_temperature', 'N/A'))}°C")
+            # Fetch current weather data using the latitude and longitude
+            url = "https://api.open-meteo.com/v1/forecast"
+            params = {
+                "latitude": str(latitude).strip(),
+                "longitude": str(longitude).strip(),
+                "current": "temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,showers,snowfall,cloud_cover,pressure_msl,surface_pressure,wind_speed_10m,wind_direction_10m,wind_gusts_10m",
+                "hourly": "uv_index,cape,direct_radiation_instant,soil_temperature_0cm",
+                "minutely_15": "lightning_potential,visibility,soil_moisture_0_to_1cm",
+                "temperature_unit": "fahrenheit",
+                "wind_speed_unit": "mph",
+                "precipitation_unit": "inch",
+                "forecast_hours": 1,
+                "forecast_minutely_15": 1
+            }
+            
+            queryString = "&".join(f"{key}={value}" for key, value in params.items())
+            weather_url = f"{url}?{queryString}"
+            
+            async with self.session.get(weather_url) as response:
+                if response.status != 200:
+                    await ctx.send(f"Failed to fetch the weather data. URL: {weather_url}, Status Code: {response.status}")
+                    return
 
-            ground_temp = hourly.get('soil_temperature_0cm', 'N/A')
-            if isinstance(ground_temp, list) and ground_temp:
-                ground_temp = ground_temp[0]
-            embed.add_field(name="Ground temperature", value=f"**{ground_temp}°F** • {self.fahrenheit_to_celsius(ground_temp)}°C")
+                data = await response.json()
+                if not data:
+                    await ctx.send(f"Failed to retrieve current weather data. URL: {weather_url}, Data: {data}")
+                    return
+                
+                current = data.get('current', {})
+                hourly = data.get('hourly', {})
+                minutely_15 = data.get('minutely_15', {})
+                
+                embed = discord.Embed(
+                    title=f"Current conditions",
+                    color=0xfffffe
+                )
+                temperature = current.get('temperature_2m', 'N/A')
+                embed.add_field(name="Temperature", value=f"**{temperature}°F** • {self.fahrenheit_to_celsius(temperature)}°C")
+                embed.add_field(name="Feels like", value=f"**{current.get('apparent_temperature', 'N/A')}°F** • {self.fahrenheit_to_celsius(current.get('apparent_temperature', 'N/A'))}°C")
 
-            wind_direction = current.get('wind_direction_10m', 'N/A')
-            if wind_direction != 'N/A':
-                if (wind_direction >= 0 and wind_direction <= 22.5) or (wind_direction > 337.5 and wind_direction <= 360):
-                    wind_direction_str = 'North'
-                elif wind_direction > 22.5 and wind_direction <= 67.5:
-                    wind_direction_str = 'Northeast'
-                elif wind_direction > 67.5 and wind_direction <= 112.5:
-                    wind_direction_str = 'East'
-                elif wind_direction > 112.5 and wind_direction <= 157.5:
-                    wind_direction_str = 'Southeast'
-                elif wind_direction > 157.5 and wind_direction <= 202.5:
-                    wind_direction_str = 'South'
-                elif wind_direction > 202.5 and wind_direction <= 247.5:
-                    wind_direction_str = 'Southwest'
-                elif wind_direction > 247.5 and wind_direction <= 292.5:
-                    wind_direction_str = 'West'
+                ground_temp = hourly.get('soil_temperature_0cm', 'N/A')
+                if isinstance(ground_temp, list) and ground_temp:
+                    ground_temp = ground_temp[0]
+                embed.add_field(name="Ground temperature", value=f"**{ground_temp}°F** • {self.fahrenheit_to_celsius(ground_temp)}°C")
+
+                wind_direction = current.get('wind_direction_10m', 'N/A')
+                if wind_direction != 'N/A':
+                    if (wind_direction >= 0 and wind_direction <= 22.5) or (wind_direction > 337.5 and wind_direction <= 360):
+                        wind_direction_str = 'North'
+                    elif wind_direction > 22.5 and wind_direction <= 67.5:
+                        wind_direction_str = 'Northeast'
+                    elif wind_direction > 67.5 and wind_direction <= 112.5:
+                        wind_direction_str = 'East'
+                    elif wind_direction > 112.5 and wind_direction <= 157.5:
+                        wind_direction_str = 'Southeast'
+                    elif wind_direction > 157.5 and wind_direction <= 202.5:
+                        wind_direction_str = 'South'
+                    elif wind_direction > 202.5 and wind_direction <= 247.5:
+                        wind_direction_str = 'Southwest'
+                    elif wind_direction > 247.5 and wind_direction <= 292.5:
+                        wind_direction_str = 'West'
+                    else:
+                        wind_direction_str = 'Northwest'
                 else:
-                    wind_direction_str = 'Northwest'
-            else:
-                wind_direction_str = 'N/A'
-            embed.add_field(name="Wind direction", value=wind_direction_str)
+                    wind_direction_str = 'N/A'
+                embed.add_field(name="Wind direction", value=wind_direction_str)
 
-            wind_speed = current.get('wind_speed_10m', 'N/A')
-            if wind_speed != 'N/A':
-                wind_speed_knots = self.mph_to_knots(wind_speed)
-                embed.add_field(name="Wind speed", value=f"**{wind_speed} mph** • {wind_speed_knots} kts")
+                wind_speed = current.get('wind_speed_10m', 'N/A')
+                if wind_speed != 'N/A':
+                    wind_speed_knots = self.mph_to_knots(wind_speed)
+                    embed.add_field(name="Wind speed", value=f"**{wind_speed} mph** • {wind_speed_knots} kts")
 
-            wind_gusts = current.get('wind_gusts_10m', 'N/A')
-            if wind_gusts != 'N/A':
-                wind_gusts_knots = self.mph_to_knots(wind_gusts)
-                embed.add_field(name="Wind gusts", value=f"**{wind_gusts} mph** • {wind_gusts_knots} kts")
-            
-            embed.add_field(name="Humidity", value=f"{current.get('relative_humidity_2m', 'N/A')}%")
-            
-            precipitation = current.get('precipitation', 'N/A')
-            if precipitation != 'N/A' and precipitation != 0.0:
-                embed.add_field(name="Precipitation", value=f"{precipitation} inches")
-            
-            rain = current.get('rain', 'N/A')
-            if rain != 'N/A' and rain != 0.0:
-                embed.add_field(name="Rain", value=f"{rain} inches")
-            
-            showers = current.get('showers', 'N/A')
-            if showers != 'N/A' and showers != 0.0:
-                embed.add_field(name="Showers", value=f"{showers} inches")
-            
-            snowfall = current.get('snowfall', 'N/A')
-            if snowfall != 'N/A' and snowfall != 0.0:
-                embed.add_field(name="Snowfall", value=f"{snowfall} inches")
-            
-            embed.add_field(name="Cloud cover", value=f"{current.get('cloud_cover', 'N/A')}%")
+                wind_gusts = current.get('wind_gusts_10m', 'N/A')
+                if wind_gusts != 'N/A':
+                    wind_gusts_knots = self.mph_to_knots(wind_gusts)
+                    embed.add_field(name="Wind gusts", value=f"**{wind_gusts} mph** • {wind_gusts_knots} kts")
+                
+                embed.add_field(name="Humidity", value=f"{current.get('relative_humidity_2m', 'N/A')}%")
+                
+                precipitation = current.get('precipitation', 'N/A')
+                if precipitation != 'N/A' and precipitation != 0.0:
+                    embed.add_field(name="Precipitation", value=f"{precipitation} inches")
+                
+                rain = current.get('rain', 'N/A')
+                if rain != 'N/A' and rain != 0.0:
+                    embed.add_field(name="Rain", value=f"{rain} inches")
+                
+                showers = current.get('showers', 'N/A')
+                if showers != 'N/A' and showers != 0.0:
+                    embed.add_field(name="Showers", value=f"{showers} inches")
+                
+                snowfall = current.get('snowfall', 'N/A')
+                if snowfall != 'N/A' and snowfall != 0.0:
+                    embed.add_field(name="Snowfall", value=f"{snowfall} inches")
+                
+                embed.add_field(name="Cloud cover", value=f"{current.get('cloud_cover', 'N/A')}%")
 
-            visibility = minutely_15.get('visibility', [0])
-            if isinstance(visibility, list) and visibility:
-                visibility_value_miles = visibility[0] / 5280
-                visibility_value_meters = float(self.miles_to_meters(visibility_value_miles))
-                if visibility_value_meters < 1000:
-                    visibility_str = f"{visibility_value_meters:.1f} m"
+                visibility = minutely_15.get('visibility', [0])
+                if isinstance(visibility, list) and visibility:
+                    visibility_value_miles = visibility[0] / 5280
+                    visibility_value_meters = float(self.miles_to_meters(visibility_value_miles))
+                    if visibility_value_meters < 1000:
+                        visibility_str = f"{visibility_value_meters:.1f} m"
+                    else:
+                        visibility_value_km = visibility_value_meters / 1000
+                        visibility_str = f"{visibility_value_km:.1f} km"
                 else:
-                    visibility_value_km = visibility_value_meters / 1000
-                    visibility_str = f"{visibility_value_km:.1f} km"
-            else:
-                visibility_value_miles = 0
-                visibility_str = "0.0 miles"
-            embed.add_field(name="Visibility", value=f"{visibility_value_miles:.2f} mi • {visibility_str}")
+                    visibility_value_miles = 0
+                    visibility_str = "0.0 miles"
+                embed.add_field(name="Visibility", value=f"{visibility_value_miles:.2f} mi • {visibility_str}")
 
-            embed.add_field(name="Pressure (MSL)", value=f"{current.get('pressure_msl', 'N/A')} hPa")
-            embed.add_field(name="Surface pressure", value=f"{current.get('surface_pressure', 'N/A')} hPa")
-            
-            lightning_potential = minutely_15.get('lightning_potential', [None])
-            if isinstance(lightning_potential, list) and lightning_potential:
-                lightning_potential = lightning_potential[0]
-            if lightning_potential is None or lightning_potential == 0:
-                lightning_potential_str = 'None'
-            elif lightning_potential < 500:
-                lightning_potential_str = 'Low'
-            elif lightning_potential < 1000:
-                lightning_potential_str = 'Medium'
-            elif lightning_potential < 2000:
-                lightning_potential_str = 'High'
-            else:
-                lightning_potential_str = 'Extreme'
-            embed.add_field(name="Lightning potential", value=f"{lightning_potential_str}")
-            
-            # Fetch severe and extreme weather alerts
-            alerts_url = f"https://api.weather.gov/alerts/active?point={latitude.strip()},{longitude.strip()}"
-            async with self.session.get(alerts_url) as alerts_response:
-                try:
-                    alerts_response.raise_for_status()
-                    alerts_data = await alerts_response.json()
-                    alerts = alerts_data.get('features', [])
-                    if alerts:
-                        embed.set_footer(text="When thunder roars, go indoors. If you can hear thunder, you can be struck by lightning.")
-                        alert_titles = []
-                        event_emojis = {
-                            "Tornado Warning": ":cloud_tornado:",
-                            "Severe Thunderstorm Warning": ":thunder_cloud_rain:",
-                            "Flood Warning": ":ocean:",
-                            "Flood Watch": ":ocean:",
-                            "Heat Advisory": ":desert:",
-                            "Special Weather Statement": ":information_source:",
-                            "Winter Storm Warning": ":cloud_snow:",
-                            "High Wind Warning": ":wind_blowing_face:",
-                            "Excessive Heat Warning": ":thermometer:",
-                            "Fire Weather Watch": ":fire:",
-                            "Flood Advisory": ":ocean:",
-                            "Hurricane Warning": ":cyclone:",
-                            "Tsunami Warning": ":ocean:",
-                            "Earthquake Warning": ":earth_americas:",
-                            "Blizzard Warning": ":snowflake:",
-                            "Freeze Warning": ":snowflake:",
-                            "Dust Storm Warning": ":dash:",
-                            "Extreme Cold Warning": ":cold_face:",
-                            "Extreme Heat Warning": ":hot_face:",
-                            "Gale Warning": ":wind_face:",
-                            "Ice Storm Warning": ":ice_cube:",
-                            "Red Flag Warning": ":triangular_flag_on_post:",
-                            "Severe Weather Statement": ":cloud_with_lightning_and_rain:",
-                            "Special Marine Warning": ":anchor:",
-                            "Storm Surge Warning": ":ocean:",
-                            "Tropical Storm Warning": ":thunder_cloud_rain:",
-                            "Tropical Cyclone Statement": ":cyclone:",
-                            "Volcano Warning": ":volcano:",
-                            "Flash Flood Warning": ":ocean:",
-                            "Frost Advisory": ":snowflake:",
-                            "Hydrologic Outlook": ":notepad_spiral:",
-                            "Rip Current Statement": ":ocean:",
-                            "Mandatory evacuation order": ":person_running:",
-                            "Air Quality Alert": ":face_in_clouds:",
-                            "Coastal Flood Warning": ":beach_umbrella:",
-                            # Add more event types and corresponding emojis as needed
-                        }
-                        event_transformations = {
-                            "Evacuation - Immediate": "Mandatory evacuation order",
-                            # Add more event transformations as needed
-                        }
-                        for alert in alerts:
-                            event = alert['properties']['event']
-                            event = event_transformations.get(event, event)  # Transform event name if applicable
-                            emoji = event_emojis.get(event, ":warning:")  # Default to warning emoji if event not found
-                            expires = alert['properties'].get('expires')
-                            if expires:
-                                try:
-                                    expires_timestamp = f"<t:{int(datetime.fromisoformat(expires[:-1]).timestamp())}:R>"
-                                except ValueError:
-                                    # Attempt to correct the timestamp format
+                embed.add_field(name="Pressure (MSL)", value=f"{current.get('pressure_msl', 'N/A')} hPa")
+                embed.add_field(name="Surface pressure", value=f"{current.get('surface_pressure', 'N/A')} hPa")
+                
+                lightning_potential = minutely_15.get('lightning_potential', [None])
+                if isinstance(lightning_potential, list) and lightning_potential:
+                    lightning_potential = lightning_potential[0]
+                if lightning_potential is None or lightning_potential == 0:
+                    lightning_potential_str = 'None'
+                elif lightning_potential < 500:
+                    lightning_potential_str = 'Low'
+                elif lightning_potential < 1000:
+                    lightning_potential_str = 'Medium'
+                elif lightning_potential < 2000:
+                    lightning_potential_str = 'High'
+                else:
+                    lightning_potential_str = 'Extreme'
+                embed.add_field(name="Lightning potential", value=f"{lightning_potential_str}")
+                
+                # Fetch severe and extreme weather alerts
+                alerts_url = f"https://api.weather.gov/alerts/active?point={latitude.strip()},{longitude.strip()}"
+                async with self.session.get(alerts_url) as alerts_response:
+                    try:
+                        alerts_response.raise_for_status()
+                        alerts_data = await alerts_response.json()
+                        alerts = alerts_data.get('features', [])
+                        if alerts:
+                            embed.set_footer(text="When thunder roars, go indoors. If you can hear thunder, you can be struck by lightning.")
+                            alert_titles = []
+                            event_emojis = {
+                                "Tornado Warning": ":cloud_tornado:",
+                                "Severe Thunderstorm Warning": ":thunder_cloud_rain:",
+                                "Flood Warning": ":ocean:",
+                                "Flood Watch": ":ocean:",
+                                "Heat Advisory": ":desert:",
+                                "Special Weather Statement": ":information_source:",
+                                "Winter Storm Warning": ":cloud_snow:",
+                                "High Wind Warning": ":wind_blowing_face:",
+                                "Excessive Heat Warning": ":thermometer:",
+                                "Fire Weather Watch": ":fire:",
+                                "Flood Advisory": ":ocean:",
+                                "Hurricane Warning": ":cyclone:",
+                                "Tsunami Warning": ":ocean:",
+                                "Earthquake Warning": ":earth_americas:",
+                                "Blizzard Warning": ":snowflake:",
+                                "Freeze Warning": ":snowflake:",
+                                "Dust Storm Warning": ":dash:",
+                                "Extreme Cold Warning": ":cold_face:",
+                                "Extreme Heat Warning": ":hot_face:",
+                                "Gale Warning": ":wind_face:",
+                                "Ice Storm Warning": ":ice_cube:",
+                                "Red Flag Warning": ":triangular_flag_on_post:",
+                                "Severe Weather Statement": ":cloud_with_lightning_and_rain:",
+                                "Special Marine Warning": ":anchor:",
+                                "Storm Surge Warning": ":ocean:",
+                                "Tropical Storm Warning": ":thunder_cloud_rain:",
+                                "Tropical Cyclone Statement": ":cyclone:",
+                                "Volcano Warning": ":volcano:",
+                                "Flash Flood Warning": ":ocean:",
+                                "Frost Advisory": ":snowflake:",
+                                "Hydrologic Outlook": ":notepad_spiral:",
+                                "Rip Current Statement": ":ocean:",
+                                "Mandatory evacuation order": ":person_running:",
+                                "Air Quality Alert": ":face_in_clouds:",
+                                "Coastal Flood Warning": ":beach_umbrella:",
+                                # Add more event types and corresponding emojis as needed
+                            }
+                            event_transformations = {
+                                "Evacuation - Immediate": "Mandatory evacuation order",
+                                # Add more event transformations as needed
+                            }
+                            for alert in alerts:
+                                event = alert['properties']['event']
+                                event = event_transformations.get(event, event)  # Transform event name if applicable
+                                emoji = event_emojis.get(event, ":warning:")  # Default to warning emoji if event not found
+                                expires = alert['properties'].get('expires')
+                                if expires:
                                     try:
-                                        corrected_expires = expires + '0'  # Adding missing zero
-                                        expires_timestamp = f"<t:{int(datetime.fromisoformat(corrected_expires[:-1]).timestamp())}:R>"
-                                    except ValueError as ve:
-                                        expires_timestamp = f"Invalid expiry time format: {expires}"
-                                alert_titles.append(f"{emoji} **{event}** expiring **{expires_timestamp}**")
-                            else:
-                                alert_titles.append(f"{emoji} **{event}**")
-                        alert_status = "\n".join(alert_titles)
-                    else:
-                        alert_status = "None right now - **#It'sAmazingOutThere**"
-                except Exception as e:
-                    alert_status = f"Failed to fetch alerts: {str(e)}, url={alerts_url}"
-            
-            embed.add_field(name="Active alerts", value=alert_status, inline=False)
+                                        expires_timestamp = f"<t:{int(datetime.fromisoformat(expires[:-1]).timestamp())}:R>"
+                                    except ValueError:
+                                        # Attempt to correct the timestamp format
+                                        try:
+                                            corrected_expires = expires + '0'  # Adding missing zero
+                                            expires_timestamp = f"<t:{int(datetime.fromisoformat(corrected_expires[:-1]).timestamp())}:R>"
+                                        except ValueError as ve:
+                                            expires_timestamp = f"Invalid expiry time format: {expires}"
+                                    alert_titles.append(f"{emoji} **{event}** expiring **{expires_timestamp}**")
+                                else:
+                                    alert_titles.append(f"{emoji} **{event}**")
+                            alert_status = "\n".join(alert_titles)
+                        else:
+                            alert_status = "None right now - **#It'sAmazingOutThere**"
+                    except Exception as e:
+                        alert_status = f"Failed to fetch alerts: {str(e)}, url={alerts_url}"
+                
+                embed.add_field(name="Active alerts", value=alert_status, inline=False)
 
-            # Check if OpenAI key is set and generate AI weather summary
-            tokens = await self.bot.get_shared_api_tokens("openai")
-            openai_key = tokens.get("api_key") if tokens else None
-            if openai_key:
-                openai_url = "https://api.openai.com/v1/chat/completions"
-                headers = {
-                    "Authorization": f"Bearer {openai_key}",
-                    "Content-Type": "application/json"
-                }
-                messages = [
-                    {"role": "system", "content": "You are a weather analyst built into an app. Never talk about the location the data comes from or the time."},
-                    {"role": "user", "content": f"Generate a summary of the current weather conditions based on the following data: {data}"}
-                ]
-                openai_payload = {
-                    "model": "gpt-4o-mini",
-                    "messages": messages,
-                    "max_tokens": 150,
-                    "temperature": 0.7
-                }
-                async with self.session.post(openai_url, headers=headers, json=openai_payload) as openai_response:
-                    if openai_response.status == 200:
-                        openai_data = await openai_response.json()
-                        ai_summary = openai_data.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
-                        embed.add_field(name="AI weather summary", value=ai_summary, inline=False)
-                    else:
-                        pass
+                # Check if OpenAI key is set and generate AI weather summary
+                tokens = await self.bot.get_shared_api_tokens("openai")
+                openai_key = tokens.get("api_key") if tokens else None
+                if openai_key:
+                    openai_url = "https://api.openai.com/v1/chat/completions"
+                    headers = {
+                        "Authorization": f"Bearer {openai_key}",
+                        "Content-Type": "application/json"
+                    }
+                    messages = [
+                        {"role": "system", "content": "You are a weather analyst built into an app. Never talk about the location the data comes from or the time."},
+                        {"role": "user", "content": f"Generate a summary of the current weather conditions based on the following data: {data}"}
+                    ]
+                    openai_payload = {
+                        "model": "gpt-4o-mini",
+                        "messages": messages,
+                        "max_tokens": 150,
+                        "temperature": 0.7
+                    }
+                    async with self.session.post(openai_url, headers=headers, json=openai_payload) as openai_response:
+                        if openai_response.status == 200:
+                            openai_data = await openai_response.json()
+                            ai_summary = openai_data.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
+                            embed.add_field(name="AI weather summary", value=ai_summary, inline=False)
+                        else:
+                            pass
 
-            await ctx.send(embed=embed)
-            nowcasts_fetched = await self.config.nowcasts_fetched()
-            await self.config.nowcasts_fetched.set(nowcasts_fetched + 1)
+                await ctx.send(embed=embed)
+                nowcasts_fetched = await self.config.nowcasts_fetched()
+                await self.config.nowcasts_fetched.set(nowcasts_fetched + 1)
 
-            # Update highest and lowest values
-            highest_temperature = await self.config.highest_temperature()
-            highest_temperature_date = await self.config.highest_temperature_date()
-            lowest_temperature = await self.config.lowest_temperature()
-            lowest_temperature_date = await self.config.lowest_temperature_date()
-            highest_wind_speed = await self.config.highest_wind_speed()
-            highest_wind_speed_date = await self.config.highest_wind_speed_date()
-            highest_precipitation = await self.config.highest_precipitation()
-            highest_precipitation_date = await self.config.highest_precipitation_date()
-            highest_wind_gusts = await self.config.highest_wind_gusts()
-            highest_wind_gusts_date = await self.config.highest_wind_gusts_date()
-            highest_snowfall = await self.config.highest_snowfall()
-            highest_snowfall_date = await self.config.highest_snowfall_date()
-            highest_rainfall = await self.config.highest_rainfall()
-            highest_rainfall_date = await self.config.highest_rainfall_date()
+                # Update highest and lowest values
+                highest_temperature = await self.config.highest_temperature()
+                highest_temperature_date = await self.config.highest_temperature_date()
+                lowest_temperature = await self.config.lowest_temperature()
+                lowest_temperature_date = await self.config.lowest_temperature_date()
+                highest_wind_speed = await self.config.highest_wind_speed()
+                highest_wind_speed_date = await self.config.highest_wind_speed_date()
+                highest_precipitation = await self.config.highest_precipitation()
+                highest_precipitation_date = await self.config.highest_precipitation_date()
+                highest_wind_gusts = await self.config.highest_wind_gusts()
+                highest_wind_gusts_date = await self.config.highest_wind_gusts_date()
+                highest_snowfall = await self.config.highest_snowfall()
+                highest_snowfall_date = await self.config.highest_snowfall_date()
+                highest_rainfall = await self.config.highest_rainfall()
+                highest_rainfall_date = await self.config.highest_rainfall_date()
 
-            current_date = datetime.now().isoformat()
+                current_date = datetime.now().isoformat()
 
-            if temperature != 'N/A':
-                if highest_temperature is None or temperature > highest_temperature:
-                    await self.config.highest_temperature.set(temperature)
-                    await self.config.highest_temperature_date.set(current_date)
-                if lowest_temperature is None or temperature < lowest_temperature:
-                    await self.config.lowest_temperature.set(temperature)
-                    await self.config.lowest_temperature_date.set(current_date)
+                if temperature != 'N/A':
+                    if highest_temperature is None or temperature > highest_temperature:
+                        await self.config.highest_temperature.set(temperature)
+                        await self.config.highest_temperature_date.set(current_date)
+                    if lowest_temperature is None or temperature < lowest_temperature:
+                        await self.config.lowest_temperature.set(temperature)
+                        await self.config.lowest_temperature_date.set(current_date)
 
-            if wind_speed != 'N/A':
-                if highest_wind_speed is None or wind_speed > highest_wind_speed:
-                    await self.config.highest_wind_speed.set(wind_speed)
-                    await self.config.highest_wind_speed_date.set(current_date)
+                if wind_speed != 'N/A':
+                    if highest_wind_speed is None or wind_speed > highest_wind_speed:
+                        await self.config.highest_wind_speed.set(wind_speed)
+                        await self.config.highest_wind_speed_date.set(current_date)
 
-            if wind_gusts != 'N/A':
-                if highest_wind_gusts is None or wind_gusts > highest_wind_gusts:
-                    await self.config.highest_wind_gusts.set(wind_gusts)
-                    await self.config.highest_wind_gusts_date.set(current_date)
+                if wind_gusts != 'N/A':
+                    if highest_wind_gusts is None or wind_gusts > highest_wind_gusts:
+                        await self.config.highest_wind_gusts.set(wind_gusts)
+                        await self.config.highest_wind_gusts_date.set(current_date)
 
-            if precipitation != 'N/A' and precipitation != 0.0:
-                if highest_precipitation is None or precipitation > highest_precipitation:
-                    await self.config.highest_precipitation.set(precipitation)
-                    await self.config.highest_precipitation_date.set(current_date)
+                if precipitation != 'N/A' and precipitation != 0.0:
+                    if highest_precipitation is None or precipitation > highest_precipitation:
+                        await self.config.highest_precipitation.set(precipitation)
+                        await self.config.highest_precipitation_date.set(current_date)
 
-            if snowfall != 'N/A' and snowfall != 0.0:
-                if highest_snowfall is None or snowfall > highest_snowfall:
-                    await self.config.highest_snowfall.set(snowfall)
-                    await self.config.highest_snowfall_date.set(current_date)
+                if snowfall != 'N/A' and snowfall != 0.0:
+                    if highest_snowfall is None or snowfall > highest_snowfall:
+                        await self.config.highest_snowfall.set(snowfall)
+                        await self.config.highest_snowfall_date.set(current_date)
 
-            if showers != 'N/A' and showers != 0.0:
-                if highest_rainfall is None or showers > highest_rainfall:
-                    await self.config.highest_rainfall.set(showers)
-                    await self.config.highest_rainfall_date.set(current_date)
+                if showers != 'N/A' and showers != 0.0:
+                    if highest_rainfall is None or showers > highest_rainfall:
+                        await self.config.highest_rainfall.set(showers)
+                        await self.config.highest_rainfall_date.set(current_date)
 
     @commands.guild_only()
     @weather.command(name="glossary")
