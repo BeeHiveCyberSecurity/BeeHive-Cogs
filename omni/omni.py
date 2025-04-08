@@ -926,7 +926,7 @@ class Omni(commands.Cog):
         embed = discord.Embed(
             title="Omni is monitoring the conversation",
             description=(
-                "AI is being used for agentic moderation, and conversations are being screened by an AI agent in real-time. Your messages are subject to logging, analysis, and automatic moderation at any time.\n\n"
+                "An agentic moderator is analyzing this conversation in real-time, watching for harmful content and behaviors. Your messages are subject to logging, analysis, and automatic moderation at any time.\n\n"
                 f"You can use the `{command_prefix}omni vote` command to let server staff know how the agent is doing."
             ),
             color=0xfffffe
