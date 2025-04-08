@@ -2,6 +2,7 @@ import discord
 from redbot.core import commands, Config, app_commands
 from datetime import datetime, timedelta
 import aiohttp
+import stripe
 
 class ChatSummary(commands.Cog):
     """Cog to summarize chat activity for users."""
@@ -138,4 +139,64 @@ class ChatSummary(commands.Cog):
             color=0xfffffe
         )
         embed.add_field(name="Customer ID", value=customer_id, inline=False)
+
+        if customer_id != "Not set":
+            view = discord.ui.View()
+            button = discord.ui.Button(label="Log into customer portal", style=discord.ButtonStyle.link)
+            
+            async def button_callback(interaction: discord.Interaction):
+                if interaction.user != ctx.author:
+                    await interaction.response.send_message("You cannot use this button.", ephemeral=True)
+                    return
+                
+                stripe_tokens = await self.bot.get_shared_api_tokens("stripe")
+                stripe_key = stripe_tokens.get("api_key") if stripe_tokens else None
+
+                if stripe_key:
+                    try:
+                        stripe.api_key = stripe_key
+                        session = stripe.billing_portal.Session.create(
+                            customer=customer_id,
+                            return_url=ctx.channel.jump_url
+                        )
+                        await interaction.response.send_message(f"Access your billing portal here: {session.url}", ephemeral=True)
+                    except Exception as e:
+                        await interaction.response.send_message(f"Failed to create billing portal session: {str(e)}", ephemeral=True)
+                else:
+                    await interaction.response.send_message("Stripe integration not yet configured, this action is not yet possible.", ephemeral=True)
+
+            button.callback = button_callback
+            view.add_item(button)
+            await ctx.send(embed=embed, view=view)
+        else:
+            await ctx.send(embed=embed)
+
+    @summarizer.command(name="upgrade")
+    async def upgrade_info(self, ctx: commands.Context):
+        """Explain the perks of upgrading by adding a customer ID."""
+        embed = discord.Embed(
+            title="Upgrade to Premium",
+            color=0xfffffe
+        )
+        embed.add_field(
+            name="Access to frontier AI models",
+            value="Gain access to advanced AI models that provide more accurate and faster summaries.",
+            inline=False
+        )
+        embed.add_field(
+            name="Extended discussion context",
+            value="Benefit from extended discussion context, allowing for more comprehensive summaries.",
+            inline=False
+        )
+        embed.add_field(
+            name="Priority Access to New Features",
+            value="Enjoy priority access to new features and updates as they become available.",
+            inline=False
+        )
+        embed.add_field(
+            name="Support for Longer Chat Histories",
+            value="Receive support for summarizing longer chat histories, enhancing your experience.",
+            inline=False
+        )
+        embed.set_footer(text="Upgrade today to enhance your summarization experience!")
         await ctx.send(embed=embed)
