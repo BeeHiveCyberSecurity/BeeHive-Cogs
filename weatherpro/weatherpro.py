@@ -552,7 +552,7 @@ class Weather(commands.Cog):
                     if openai_response.status == 200:
                         openai_data = await openai_response.json()
                         ai_summary = openai_data.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
-                        embed.add_field(name="AI Weather Summary", value=ai_summary, inline=False)
+                        embed.add_field(name="AI weather summary", value=ai_summary, inline=False)
                     else:
                         pass
 
