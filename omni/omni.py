@@ -89,6 +89,7 @@ class Omni(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message):
         await self.process_message(message)
+        await self.check_monitoring_reminder(message)
 
     @commands.Cog.listener()
     async def on_message_edit(self, before, after):
@@ -902,9 +903,8 @@ class Omni(commands.Cog):
         except Exception as e:
             raise RuntimeError(f"Failed to unload cog: {e}")
 
-    @commands.Cog.listener()
-    async def on_message(self, message):
-        """Handle incoming messages for monitoring reminders."""
+    async def check_monitoring_reminder(self, message):
+        """Check and send a monitoring reminder if needed."""
         if message.author.bot or not message.guild:
             return
 
