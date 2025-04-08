@@ -257,7 +257,7 @@ class ChatSummary(commands.Cog):
         embed.set_footer(text="Upgrade today to enhance your summarization experience!")
         await ctx.send(embed=embed)
 
-    @summarizer.command(name="away")
+    @commands.command(name="away")
     async def set_away(self, ctx: commands.Context, *, reason: str = "AFK"):
         """Set your status to away with an optional reason."""
         await self.config.user(ctx.author).is_afk.set(True)
