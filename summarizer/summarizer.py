@@ -162,6 +162,10 @@ class ChatSummary(commands.Cog):
 
             if stripe_key:
                 async def generate_billing_link(interaction):
+                    if interaction.user != ctx.author:
+                        await interaction.response.send_message("You are not authorized to use this button.", ephemeral=True)
+                        return
+
                     async with aiohttp.ClientSession() as session:
                         try:
                             stripe_url = "https://api.stripe.com/v1/billing_portal/sessions"
@@ -184,7 +188,7 @@ class ChatSummary(commands.Cog):
                         except aiohttp.ClientError as e:
                             await interaction.response.send_message(f"Failed to connect to Stripe API: {str(e)}", ephemeral=True)
 
-                view = discord.ui.View()
+                view = discord.ui.View(timeout=30)
                 button = discord.ui.Button(label="Login and manage billing", style=discord.ButtonStyle.primary)
                 button.callback = generate_billing_link
                 view.add_item(button)
