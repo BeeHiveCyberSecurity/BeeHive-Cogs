@@ -1,16 +1,29 @@
-import discord
-from redbot.core import commands
-from shazamio import Shazam, Serialize
+import asyncio
+import logging
+from typing import Union, Dict, Any
+
 import aiohttp
-import os
-import tempfile
+from aiohttp_retry import ExponentialRetry as Pulse
+from redbot.core import commands
+from shazamio.api import Shazam as AudioAlchemist
+from shazamio.serializers import Serialize as Shazamalize
 
 class ShazamCog(commands.Cog):
     """Cog to interact with the Shazam API using shazamio."""
 
     def __init__(self, bot):
         self.bot = bot
-        self.shazam = Shazam()
+        self.alchemist: AudioAlchemist = AudioAlchemist()
+
+    async def __aio_get(self, url: str) -> bytes:
+        try:
+            async with aiohttp.ClientSession() as session:
+                response: aiohttp.ClientResponse = await session.get(url, timeout=120.0)
+                response.raise_for_status()
+                return await response.read()
+        except aiohttp.ClientError as error:
+            log.exception("Error fetching media from URL: %s", url, exc_info=error)
+            raise commands.UserFeedbackCheckFailure("Failed to fetch media from the URL.")
 
     @commands.command(name="identify")
     async def identify_song(self, ctx: commands.Context, url: str = None):
@@ -24,21 +37,12 @@ class ShazamCog(commands.Cog):
                 if ctx.message.attachments:
                     attachment = ctx.message.attachments[0]
                     url = attachment.url
-                    async with aiohttp.ClientSession() as session:
-                        async with session.get(url) as response:
-                            if response.status == 200:
-                                with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-                                    temp_file.write(await response.read())
-                                    temp_file_path = temp_file.name
-                                track_info = await self.shazam.recognize_song(temp_file_path)
-                                os.remove(temp_file_path)
-                            else:
-                                raise Exception("Failed to download the file.")
-                else:
-                    track_info = await self.shazam.recognize_song(url)
+
+                media: bytes = await self.__aio_get(url)
+                track_info: Dict[str, Any] = await self.alchemist.recognize(media)
 
                 if track_info:
-                    serialized_info = Serialize.full_track(track_info)
+                    serialized_info = Shazamalize.full_track(track_info)
                     track_title = serialized_info['track']['title']
                     track_artist = serialized_info['track']['subtitle']
                     embed = discord.Embed(
