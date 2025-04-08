@@ -110,7 +110,7 @@ class ChatSummary(commands.Cog):
             return "No mentions in the recent messages."
         # Sort mentions by timestamp in descending order and take the last 5
         recent_mentions = sorted(mentions, key=lambda x: x['timestamp'], reverse=True)[:5]
-        return "\n".join(f"**{mention['author']}** [<t:{int(mention['timestamp'].timestamp())}:R>] [Jump]({mention['jump_url']})" for mention in recent_mentions)
+        return "\n".join(f"**{mention['author']}** *<t:{int(mention['timestamp'].timestamp())}:R>* **[Jump]({mention['jump_url']})**" for mention in recent_mentions)
 
     async def _send_summary_embed(self, ctx, ai_summary, mention_summary, customer_id):
         embed = discord.Embed(
