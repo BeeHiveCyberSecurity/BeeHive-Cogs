@@ -14,6 +14,11 @@ class ChatSummary(commands.Cog):
         }
         self.config.register_user(**default_user)
 
+    @commands.group(name="summarizer", invoke_without_command=True)
+    async def summarizer(self, ctx: commands.Context):
+        """Group for summarizer related commands."""
+        await ctx.send("Use a subcommand for specific actions.")
+
     @summarizer.command(name="chatsummary")
     async def chat_summary(self, ctx: commands.Context):
         """Get a summary of the chat activity from the last 2 or 4 hours."""
@@ -85,11 +90,6 @@ class ChatSummary(commands.Cog):
             await ctx.send(embed=embed)
         except Exception as e:
             await ctx.send(f"An error occurred: {str(e)}", delete_after=10)
-
-    @commands.group(name="summarizer", invoke_without_command=True)
-    async def summarizer(self, ctx: commands.Context):
-        """Group for summarizer related commands."""
-        await ctx.send("Use a subcommand for specific actions.")
 
     @summarizer.command(name="setcustomerid")
     @commands.is_owner()
