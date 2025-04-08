@@ -54,8 +54,7 @@ class ChatSummary(commands.Cog):
             openai_payload = {
                 "model": "gpt-4o-mini",
                 "messages": messages,
-                "max_tokens": 150,
-                "temperature": 0.7
+                "temperature": 1.0
             }
             async with self.bot.session.post(openai_url, headers=headers, json=openai_payload) as openai_response:
                 if openai_response.status == 200:
