@@ -29,7 +29,9 @@ class ChatSummary(commands.Cog):
         cutoff = datetime.now() - timedelta(hours=hours)
         recent_messages = []
 
-        async for message in guild.text_channels[0].history(limit=1000, after=cutoff):
+        # Gather messages from the channel where the command is run
+        channel = interaction.channel
+        async for message in channel.history(limit=1000, after=cutoff):
             if not message.author.bot:
                 recent_messages.append({
                     "author": message.author.name,
@@ -49,7 +51,7 @@ class ChatSummary(commands.Cog):
                 "Content-Type": "application/json"
             }
             messages = [
-                {"role": "system", "content": "You are a helpful assistant that summarizes chat activity."},
+                {"role": "system", "content": "You are a chat summary generator."},
                 {"role": "user", "content": f"Summarize the following chat messages: {messages_content}"}
             ]
             openai_payload = {
