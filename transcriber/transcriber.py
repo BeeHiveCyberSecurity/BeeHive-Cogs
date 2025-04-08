@@ -218,7 +218,7 @@ class Transcriber(commands.Cog):
         # Check if the message contains an attachment and if it's a voice note
         if message.attachments:
             for attachment in message.attachments:
-                if attachment.filename.lower().endswith(('.mp3', '.wav', '.ogg', '.flac' '.mpeg', '.m4a')):
+                if attachment.filename.lower() == "voice-message.ogg":
                     # Download the voice note
                     voice_note = await attachment.read()
 
