@@ -55,3 +55,17 @@ class ChatSummary(commands.Cog):
         """Set a customer's ID for a user globally."""
         await self.config.user(user).customer_id.set(customer_id)
         await ctx.send(f"Customer ID for {user.name} has been set to {customer_id}.")
+
+    @summarizer.command(name="profile")
+    async def view_profile(self, ctx: commands.Context, user: discord.User = None):
+        """View a user's summarizer profile."""
+        user = user or ctx.author
+        user_data = await self.config.user(user).all()
+        customer_id = user_data.get("customer_id", "Not set")
+
+        embed = discord.Embed(
+            title=f"{user.name}'s Summarizer Profile",
+            description=f"**Customer ID:** {customer_id}",
+            color=0x00ff00
+        )
+        await ctx.send(embed=embed)
