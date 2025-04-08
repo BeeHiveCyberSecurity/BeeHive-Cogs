@@ -107,7 +107,7 @@ class ChatSummary(commands.Cog):
     def _generate_mention_summary(self, mentions):
         if not mentions:
             return "No mentions in the recent messages."
-        return "\n".join(f"{mention['author']} mentioned you <t:{int(mention['timestamp'].timestamp())}:R>" for mention in mentions)
+        return "\n".join(f"**{mention['author']}** <t:{int(mention['timestamp'].timestamp())}:R>" for mention in mentions)
 
     async def _send_summary_embed(self, ctx, ai_summary, mention_summary, customer_id):
         embed = discord.Embed(
