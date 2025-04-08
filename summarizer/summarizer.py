@@ -10,7 +10,7 @@ class ChatSummary(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=9876543210)
-        default_user = {"customer_id": None}
+        default_user = {"customer_id": None, "is_afk": False}
         self.config.register_user(**default_user)
 
     @commands.group(name="summarizer")
@@ -256,3 +256,28 @@ class ChatSummary(commands.Cog):
         )
         embed.set_footer(text="Upgrade today to enhance your summarization experience!")
         await ctx.send(embed=embed)
+
+    @summarizer.command(name="away")
+    async def set_away(self, ctx: commands.Context, *, reason: str = "AFK"):
+        """Set your status to away with an optional reason."""
+        await self.config.user(ctx.author).is_afk.set(True)
+        await ctx.send(f"{ctx.author.display_name} is now set to AFK: {reason}")
+
+    @commands.Cog.listener()
+    async def on_message(self, message: discord.Message):
+        if message.author.bot:
+            return
+
+        user_data = await self.config.user(message.author).all()
+        if user_data.get("is_afk"):
+            await self.config.user(message.author).is_afk.set(False)
+            await message.channel.send(f"Welcome back, {message.author.display_name}! You are no longer marked as AFK.")
+            ctx = await self.bot.get_context(message)
+            await self.chat_summary(ctx)
+
+        for user in message.mentions:
+            if user.bot:
+                continue
+            user_data = await self.config.user(user).all()
+            if user_data.get("is_afk"):
+                await message.channel.send(f"{user.display_name} is currently AFK and may not respond immediately.")
