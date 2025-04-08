@@ -257,10 +257,16 @@ class ChatSummary(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command(name="away")
-    async def set_away(self, ctx: commands.Context, *, reason: str = "AFK"):
-        """Set your status to away with an optional reason."""
+    async def set_away(self, ctx: commands.Context):
+        """Set your status to away."""
         await self.config.user(ctx.author).is_afk.set(True)
-        await ctx.send(f"{ctx.author.display_name} is now set to AFK: {reason}")
+        embed = discord.Embed(
+            title="See you later!",
+            description=f"{ctx.author.display_name}, you're now marked as away. I'll have an AI-powered summary of what you've missed waiting for you when you return.",
+            color=0xfffffe
+        )
+        embed.set_footer(text="TIP: You'll automatically have your away status cleared if you type in a channel while marked away.")
+        await ctx.send(embed=embed)
 
     @commands.Cog.listener()
     async def on_message_without_command(self, message: discord.Message):
