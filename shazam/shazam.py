@@ -1,6 +1,9 @@
 import discord
 from redbot.core import commands
 from shazamio import Shazam
+import aiohttp
+import os
+import tempfile
 
 class ShazamCog(commands.Cog):
     """Cog to interact with the Shazam API using shazamio."""
@@ -21,8 +24,19 @@ class ShazamCog(commands.Cog):
                 if ctx.message.attachments:
                     attachment = ctx.message.attachments[0]
                     url = attachment.url
+                    async with aiohttp.ClientSession() as session:
+                        async with session.get(url) as response:
+                            if response.status == 200:
+                                with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+                                    temp_file.write(await response.read())
+                                    temp_file_path = temp_file.name
+                                track_info = await self.shazam.recognize_song(temp_file_path)
+                                os.remove(temp_file_path)
+                            else:
+                                raise Exception("Failed to download the file.")
+                else:
+                    track_info = await self.shazam.recognize_song(url)
 
-                track_info = await self.shazam.recognize_song(url)
                 if track_info:
                     track_title = track_info['track']['title']
                     track_artist = track_info['track']['subtitle']
