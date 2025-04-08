@@ -14,16 +14,16 @@ class ChatSummary(commands.Cog):
         }
         self.config.register_user(**default_user)
 
-    @app_commands.command(name="chatsummary")
-    async def chat_summary(self, interaction: discord.Interaction):
+    @summarizer.command(name="chatsummary")
+    async def chat_summary(self, ctx: commands.Context):
         """Get a summary of the chat activity from the last 2 or 4 hours."""
         try:
-            guild = interaction.guild
+            guild = ctx.guild
             if not guild:
-                await interaction.response.send_message("This command can only be used in a server.", ephemeral=True)
+                await ctx.send("This command can only be used in a server.", delete_after=10)
                 return
 
-            user_data = await self.config.user(interaction.user).all()
+            user_data = await self.config.user(ctx.author).all()
             customer_id = user_data.get("customer_id")
             hours = 4 if customer_id else 2
 
@@ -31,9 +31,9 @@ class ChatSummary(commands.Cog):
             recent_messages = []
 
             # Gather messages from the channel where the command is run
-            channel = interaction.channel
+            channel = ctx.channel
             if not channel:
-                await interaction.response.send_message("This command can only be used in a text channel.", ephemeral=True)
+                await ctx.send("This command can only be used in a text channel.", delete_after=10)
                 return
 
             async for message in channel.history(limit=1000, after=cutoff):
@@ -82,9 +82,9 @@ class ChatSummary(commands.Cog):
                 description=ai_summary or "No recent messages.",
                 color=0xfffffe
             )
-            await interaction.response.send_message(embed=embed)
+            await ctx.send(embed=embed)
         except Exception as e:
-            await interaction.response.send_message(f"An error occurred: {str(e)}", ephemeral=True)
+            await ctx.send(f"An error occurred: {str(e)}", delete_after=10)
 
     @commands.group(name="summarizer", invoke_without_command=True)
     async def summarizer(self, ctx: commands.Context):
