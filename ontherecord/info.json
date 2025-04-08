@@ -1,8 +1,0 @@
-{
-    "author": ["adminelevation"],
-    "description": "A cog to record and transcribe voice channels.",
-    "install_msg": "Thank you for installing OnTheRecord! Use `[p]help OnTheRecord` to get started.",
-    "short": "Record and transcribe voice channels.",
-    "requirements": ["soundfile", "aiohttp"],
-    "tags": ["audio", "recording", "transcription", "voice"]
-}
