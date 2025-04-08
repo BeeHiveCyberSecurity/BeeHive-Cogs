@@ -530,7 +530,8 @@ class Weather(commands.Cog):
             embed.add_field(name="Active alerts", value=alert_status, inline=False)
 
             # Check if OpenAI key is set and generate AI weather summary
-            openai_key = await self.bot.get_shared_api_tokens("openai").get("api_key")
+            tokens = await self.bot.get_shared_api_tokens("openai")
+            openai_key = tokens.get("api_key") if tokens else None
             if openai_key:
                 openai_url = "https://api.openai.com/v1/chat/completions"
                 headers = {
