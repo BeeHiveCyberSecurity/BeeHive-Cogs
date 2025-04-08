@@ -137,6 +137,7 @@ class ChatSummary(commands.Cog):
     async def set_customer_id(self, ctx: commands.Context, user: discord.User, customer_id: str):
         """Set a customer's ID for a user globally."""
         await self.config.user(user).customer_id.set(customer_id)
+        await ctx.message.delete()
         await ctx.send(f"Customer ID for {user.name} has been set.")
 
     @summarizer.command(name="profile")
