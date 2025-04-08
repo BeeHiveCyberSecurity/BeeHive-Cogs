@@ -54,10 +54,9 @@ class ChatSummary(commands.Cog):
                             "timestamp": message.created_at.isoformat()
                         })
                         if ctx.author in message.mentions:
-                            time_ago = datetime.now(timezone.utc) - message.created_at
                             mentions.append({
                                 "author": message.author.display_name,
-                                "time_ago": time_ago
+                                "timestamp": message.created_at
                             })
 
                 messages_content = "\n".join(f"{msg['author']}: {msg['content']}" for msg in recent_messages)
@@ -67,8 +66,7 @@ class ChatSummary(commands.Cog):
 
                 ai_summary = await self._generate_ai_summary(openai_key, messages_content, customer_id)
                 mention_summary = self._generate_mention_summary(mentions)
-                full_summary = f"{ai_summary}\n\nWho mentioned you:\n{mention_summary}"
-                await self._send_summary_embed(ctx, full_summary, customer_id)
+                await self._send_summary_embed(ctx, ai_summary, mention_summary, customer_id)
 
                 if openai_key and customer_id:
                     await self._track_stripe_event(customer_id)
@@ -109,14 +107,15 @@ class ChatSummary(commands.Cog):
     def _generate_mention_summary(self, mentions):
         if not mentions:
             return "No mentions in the recent messages."
-        return "\n".join(f"{mention['author']} mentioned you {mention['time_ago']} ago" for mention in mentions)
+        return "\n".join(f"{mention['author']} mentioned you <t:{int(mention['timestamp'].timestamp())}:R>" for mention in mentions)
 
-    async def _send_summary_embed(self, ctx, full_summary, customer_id):
+    async def _send_summary_embed(self, ctx, ai_summary, mention_summary, customer_id):
         embed = discord.Embed(
             title="AI chat summary",
-            description=full_summary or "No recent messages.",
+            description=ai_summary or "No recent messages.",
             color=0xfffffe
         )
+        embed.add_field(name="Who mentioned you", value=mention_summary, inline=False)
         if not customer_id:
             embed.set_footer(text="You're using the free version of BeeHive's AI summarizer. Upgrade for improved speed, intelligence, and functionality.")
         else:
