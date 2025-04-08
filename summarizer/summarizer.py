@@ -14,14 +14,14 @@ class ChatSummary(commands.Cog):
         self.config.register_user(**default_user)
 
     @app_commands.command(name="chatsummary")
-    async def chat_summary(self, ctx: commands.Context):
+    async def chat_summary(self, interaction: discord.Interaction):
         """Get a summary of the chat activity from the last 2 or 4 hours."""
-        guild = ctx.guild
+        guild = interaction.guild
         if not guild:
-            await ctx.send("This command can only be used in a server.")
+            await interaction.response.send_message("This command can only be used in a server.", ephemeral=True)
             return
 
-        user_data = await self.config.user(ctx.author).all()
+        user_data = await self.config.user(interaction.user).all()
         customer_id = user_data.get("customer_id")
         hours = 4 if customer_id else 2
 
@@ -70,7 +70,7 @@ class ChatSummary(commands.Cog):
             description=ai_summary or "No recent messages.",
             color=0xfffffe
         )
-        await ctx.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
 
     @commands.group(name="summarizer", invoke_without_command=True)
     async def summarizer(self, ctx: commands.Context):
