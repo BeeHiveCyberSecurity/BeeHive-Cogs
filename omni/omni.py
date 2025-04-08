@@ -922,11 +922,12 @@ class Omni(commands.Cog):
 
     async def send_monitoring_reminder(self, channel):
         """Send a monitoring reminder to the specified channel."""
+        command_prefix = (await self.bot.get_valid_prefixes())[0]  # Get the first valid prefix
         embed = discord.Embed(
             title="Omni is monitoring the conversation",
             description=(
                 "AI is being used for agentic moderation, and conversations are being screened by an AI agent. Your messages may be subject to automatic moderation at any time.\n\n"
-                "You can use the `{}omni vote` command to let server staff know how the agent is doing.".format(self.bot.command_prefix)
+                f"You can use the `{command_prefix}omni vote` command to let server staff know how the agent is doing."
             ),
             color=0xfffffe
         )
