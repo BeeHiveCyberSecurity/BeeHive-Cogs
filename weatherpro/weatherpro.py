@@ -528,7 +528,33 @@ class Weather(commands.Cog):
                     alert_status = f"Failed to fetch alerts: {str(e)}, url={alerts_url}"
             
             embed.add_field(name="Active alerts", value=alert_status, inline=False)
-            
+
+            # Check if OpenAI key is set and generate AI weather summary
+            openai_key = await self.bot.get_shared_api_tokens("openai").get("api_key")
+            if openai_key:
+                openai_url = "https://api.openai.com/v1/chat/completions"
+                headers = {
+                    "Authorization": f"Bearer {openai_key}",
+                    "Content-Type": "application/json"
+                }
+                messages = [
+                    {"role": "system", "content": "You are a helpful assistant that provides weather summaries."},
+                    {"role": "user", "content": f"Generate a weather summary based on the following data: {data}"}
+                ]
+                openai_payload = {
+                    "model": "gpt-4o",
+                    "messages": messages,
+                    "max_tokens": 150,
+                    "temperature": 0.7
+                }
+                async with self.session.post(openai_url, headers=headers, json=openai_payload) as openai_response:
+                    if openai_response.status == 200:
+                        openai_data = await openai_response.json()
+                        ai_summary = openai_data.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
+                        embed.add_field(name="AI Weather Summary", value=ai_summary, inline=False)
+                    else:
+                        pass
+
             await ctx.send(embed=embed)
             nowcasts_fetched = await self.config.nowcasts_fetched()
             await self.config.nowcasts_fetched.set(nowcasts_fetched + 1)
