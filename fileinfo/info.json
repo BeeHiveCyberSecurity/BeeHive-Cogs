@@ -1,0 +1,8 @@
+{
+    "author": ["adminelevation"],
+    "description": "A cog to display debug information about files shared in a channel.",
+    "install_msg": "Thank you for installing FileInfo cog. Use it to get detailed information about files shared in your Discord server.",
+    "short": "File information display cog.",
+    "requirements": [],
+    "tags": ["file", "information", "discord", "cog"]
+}
