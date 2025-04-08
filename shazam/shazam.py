@@ -1,6 +1,6 @@
 import discord
 from redbot.core import commands
-from shazamio import Shazam
+from shazamio import Shazam, Serialize
 import aiohttp
 import os
 import tempfile
@@ -38,8 +38,9 @@ class ShazamCog(commands.Cog):
                     track_info = await self.shazam.recognize_song(url)
 
                 if track_info:
-                    track_title = track_info['track']['title']
-                    track_artist = track_info['track']['subtitle']
+                    serialized_info = Serialize.full_track(track_info)
+                    track_title = serialized_info['track']['title']
+                    track_artist = serialized_info['track']['subtitle']
                     embed = discord.Embed(
                         title="Song Identified",
                         description=f"**Title:** {track_title}\n**Artist:** {track_artist}",
