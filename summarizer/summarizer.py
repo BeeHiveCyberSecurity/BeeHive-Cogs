@@ -19,7 +19,11 @@ class ChatSummary(commands.Cog):
     async def summarizer(self, ctx: commands.Context):
         """Group for summarizer related commands."""
 
-    @summarizer.command(name="chatsummary")
+    @commands.group(name="summarize")
+    async def summarizer(self, ctx: commands.Context):
+        """Group for summarize related commands."""
+
+    @summarize.command(name="recent")
     async def chat_summary(self, ctx: commands.Context):
         """Get a summary of the chat activity from the last 2 or 4 hours."""
         try:
