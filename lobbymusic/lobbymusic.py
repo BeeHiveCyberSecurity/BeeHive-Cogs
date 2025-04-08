@@ -8,7 +8,7 @@ class LobbyMusic(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.music_folder = "./music/"  # Set the path to your music folder
+        self.music_folder = os.path.join(os.path.dirname(__file__), "music")  # Set the path to your music folder
 
     @commands.group()
     async def lobbymusic(self, ctx):
