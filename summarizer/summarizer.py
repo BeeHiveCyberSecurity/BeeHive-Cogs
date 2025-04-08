@@ -67,8 +67,13 @@ class ChatSummary(commands.Cog):
         )
         await ctx.send(embed=embed)
 
+    @commands.group(name="summarizer", invoke_without_command=True)
+    async def summarizer(self, ctx: commands.Context):
+        """Group for summarizer related commands."""
+        await ctx.send("Use a subcommand for specific actions.")
+
+    @summarizer.command(name="setcustomerid")
     @commands.has_permissions(manage_guild=True)
-    @app_commands.command(name="setcustomerid")
     async def set_customer_id(self, ctx: commands.Context, user: discord.User, customer_id: str):
         """Set a customer's ID for a user globally."""
         await self.config.user(user).customer_id.set(customer_id)
