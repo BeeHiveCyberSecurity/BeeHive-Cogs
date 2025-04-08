@@ -155,9 +155,9 @@ class ChatSummary(commands.Cog):
         await ctx.send("Click the button below to set the customer ID.", view=CustomerIDButton())
 
     @summarizer.command(name="profile")
-    async def view_profile(self, ctx: commands.Context, user: discord.User = None):
-        """View a user's summarizer profile."""
-        user = user or ctx.author
+    async def view_profile(self, ctx: commands.Context):
+        """View your own summarizer profile."""
+        user = ctx.author
         user_data = await self.config.user(user).all()
         customer_id = user_data.get("customer_id", "Not set")
 
