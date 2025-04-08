@@ -182,7 +182,7 @@ class ChatSummary(commands.Cog):
                                     response_data = await stripe_response.json()
                                     login_url = response_data.get("url")
                                     if login_url:
-                                        await interaction.response.send_message(f"Click [here]({login_url}) to manage your billing.", ephemeral=True)
+                                        await interaction.response.send_message(f"Click [here]({login_url}) to manage your billing.\n\n:octagonal_sign: This link will automatically sign you in - **don't share it with others no matter what**.", ephemeral=True)
                                 else:
                                     await interaction.response.send_message(f"Failed to generate billing portal link. Status code: {stripe_response.status}", ephemeral=True)
                         except aiohttp.ClientError as e:
