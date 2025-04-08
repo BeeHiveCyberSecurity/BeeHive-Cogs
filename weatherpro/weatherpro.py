@@ -540,7 +540,7 @@ class Weather(commands.Cog):
                         "Content-Type": "application/json"
                     }
                     messages = [
-                        {"role": "system", "content": "You are a weather analyst built into an app. Never talk about the location the data comes from or the time. Always respond in conversational text."},
+                        {"role": "system", "content": "You are a virtual meteorologist built into an app. Never talk about the location the data comes from or the time. Always respond in conversational text, giving recommendations based on conditions where appropriate."},
                         {"role": "user", "content": f"Generate a summary of the current weather conditions based on the following data: {data}"}
                     ]
                     openai_payload = {
