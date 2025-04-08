@@ -10,7 +10,7 @@ class ChatSummary(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=9876543210)
-        default_user = {"customer_id": None, "is_afk": False}
+        default_user = {"customer_id": None, "is_afk": False, "afk_since": None}
         self.config.register_user(**default_user)
 
     @commands.group(name="summarizer")
@@ -24,8 +24,8 @@ class ChatSummary(commands.Cog):
         pass
 
     @summarize.command(name="recent")
-    async def chat_summary(self, ctx: commands.Context):
-        """Summarize recent channel activity"""
+    async def chat_summary(self, ctx: commands.Context, afk_only: bool = False):
+        """Summarize recent channel activity or only messages missed while AFK."""
         try:
             guild = ctx.guild
             if not guild:
@@ -36,7 +36,11 @@ class ChatSummary(commands.Cog):
             customer_id = user_data.get("customer_id")
             hours = 8 if customer_id else 2
 
-            cutoff = datetime.now(timezone.utc) - timedelta(hours=hours)
+            if afk_only and user_data.get("afk_since"):
+                cutoff = user_data["afk_since"]
+            else:
+                cutoff = datetime.now(timezone.utc) - timedelta(hours=hours)
+
             recent_messages = []
             mentions = []
 
@@ -260,6 +264,7 @@ class ChatSummary(commands.Cog):
     async def set_away(self, ctx: commands.Context):
         """Set your status to away."""
         await self.config.user(ctx.author).is_afk.set(True)
+        await self.config.user(ctx.author).afk_since.set(datetime.now(timezone.utc))
         embed = discord.Embed(
             title="See you later!",
             description=f"You're now **away**.\nYou'll get an AI-powered summary of what you've missed when you come back.",
@@ -279,12 +284,12 @@ class ChatSummary(commands.Cog):
             await self.config.user(message.author).is_afk.set(False)
             embed = discord.Embed(
                 title="Welcome back",
-                description=f":sparkles: **Generating your AI summary, please wait...**",
+                description=f":sparkles: Generating your AI summary, please wait...",
                 color=0xfffffe
             )
             await message.channel.send(embed=embed)
             ctx = await self.bot.get_context(message)
-            await self.chat_summary(ctx)
+            await self.chat_summary(ctx, afk_only=True)
 
         for user in message.mentions:
             if user.bot:
