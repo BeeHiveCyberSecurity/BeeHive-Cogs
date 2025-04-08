@@ -1,5 +1,5 @@
 import discord
-import pynacl
+import PyNaCl
 from redbot.core import commands, Config
 import os
 import asyncio
