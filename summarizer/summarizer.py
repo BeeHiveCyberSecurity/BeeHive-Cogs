@@ -56,7 +56,8 @@ class ChatSummary(commands.Cog):
                         if ctx.author in message.mentions:
                             mentions.append({
                                 "author": message.author.display_name,
-                                "timestamp": message.created_at
+                                "timestamp": message.created_at,
+                                "jump_url": message.jump_url
                             })
 
                 messages_content = "\n".join(f"{msg['author']}: {msg['content']}" for msg in recent_messages)
@@ -107,7 +108,7 @@ class ChatSummary(commands.Cog):
     def _generate_mention_summary(self, mentions):
         if not mentions:
             return "No mentions in the recent messages."
-        return "\n".join(f"**{mention['author']}** (<t:{int(mention['timestamp'].timestamp())}:R>)" for mention in mentions)
+        return "\n".join(f"**{mention['author']}** [<t:{int(mention['timestamp'].timestamp())}:R>]([Jump]({mention['jump_url']}))" for mention in mentions)
 
     async def _send_summary_embed(self, ctx, ai_summary, mention_summary, customer_id):
         embed = discord.Embed(
