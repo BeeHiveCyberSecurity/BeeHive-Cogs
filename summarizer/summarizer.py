@@ -65,7 +65,7 @@ class ChatSummary(commands.Cog):
 
         embed = discord.Embed(
             title=f"{user.name}'s Summarizer Profile",
-            description=f"**Customer ID:** {customer_id}",
             color=0x00ff00
         )
+        embed.add_field(name="Customer ID", value=customer_id, inline=False)
         await ctx.send(embed=embed)
