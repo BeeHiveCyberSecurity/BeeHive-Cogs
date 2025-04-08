@@ -3,7 +3,8 @@ from redbot.core import commands, Config
 import os
 import asyncio
 import wave
-import pyaudio
+import sounddevice as sd
+import numpy as np
 import aiohttp  # Ensure aiohttp is imported
 
 class OnTheRecord(commands.Cog):
@@ -43,28 +44,28 @@ class OnTheRecord(commands.Cog):
     async def record_audio(self, guild_id):
         """Record audio from the voice channel."""
         voice_client = self.voice_clients[guild_id]
-        audio = pyaudio.PyAudio()
-        stream = audio.open(format=pyaudio.paInt16, channels=2, rate=44100, input=True, frames_per_buffer=1024)
-
+        samplerate = 44100
+        channels = 2
         frames = []
 
-        try:
-            while guild_id in self.voice_clients:
-                data = stream.read(1024, exception_on_overflow=False)  # Handle overflow
-                frames.append(data)
-        finally:
-            stream.stop_stream()
-            stream.close()
-            audio.terminate()
+        def callback(indata, frames, time, status):
+            if status:
+                print(status)
+            frames.append(indata.copy())
 
+        try:
+            with sd.InputStream(samplerate=samplerate, channels=channels, callback=callback):
+                while guild_id in self.voice_clients:
+                    await asyncio.sleep(0.1)  # Sleep to allow other tasks to run
+        finally:
             # Save the recording
             file_path = f"data/ontherecord/{guild_id}_recording.wav"
             os.makedirs(os.path.dirname(file_path), exist_ok=True)
             with wave.open(file_path, 'wb') as wf:
-                wf.setnchannels(2)
-                wf.setsampwidth(audio.get_sample_size(pyaudio.paInt16))
-                wf.setframerate(44100)
-                wf.writeframes(b''.join(frames))
+                wf.setnchannels(channels)
+                wf.setsampwidth(2)  # 2 bytes for int16
+                wf.setframerate(samplerate)
+                wf.writeframes(b''.join(np.concatenate(frames).astype(np.int16).tobytes()))
 
             # Update the recordings list in the config
             async with self.config.guild_from_id(guild_id).recordings() as recordings:
