@@ -1,0 +1,8 @@
+{
+    "author": ["adminelevation"],
+    "description": "A Discord bot cog to identify songs using the Shazam API.",
+    "install_msg": "Thank you for installing the Shazam Cog. Use `[p]identify <url>` to identify songs.",
+    "short": "Identify songs using Shazam.",
+    "requirements": ["shazamio"],
+    "tags": ["music", "shazam", "audio", "identification"]
+}
