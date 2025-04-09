@@ -76,9 +76,9 @@ class ShazamCog(commands.Cog):
                     metadata = sections[0].get('metadata', []) if sections else []
 
                     # Check for explicit content
-                    if track.get('explicit', True):
+                    hub_info = track.get('hub', {})
+                    if hub_info.get('explicit', False):
                         embed.set_footer(text="Song contains explicit content, audience discretion advised")
-
 
                     # Create URL buttons for Shazam and Apple Music
                     view = discord.ui.View()
