@@ -45,8 +45,9 @@ class ShazamCog(commands.Cog):
 
                 if track_info and 'track' in track_info:
                     track = track_info['track']
+                    share_text = track.get('share', {}).get('text', 'Unknown Title')
                     embed = discord.Embed(
-                        title=track.get('title', 'Unknown Title'),
+                        title=share_text,
                         description=f"Artist: {track.get('subtitle', 'Unknown Artist')}",
                         color=discord.Color.blue()
                     )
