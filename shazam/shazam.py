@@ -64,7 +64,12 @@ class ShazamCog(commands.Cog):
                     embed.add_field(name="Label", value=label, inline=True)
                     embed.add_field(name="Released", value=released, inline=True)
                     embed.add_field(name="Genre", value=track.get('genres', {}).get('primary', 'N/A'), inline=True)
-                    embed.set_footer(text="Powered by Shazam")
+
+                    # Check for explicit content
+                    if track.get('explicit', False):
+                        embed.set_footer(text="Song contains explicit content, audience discretion advised")
+                    else:
+                        pass
 
                     # Add additional fields from the track_info
                     embed.add_field(name="Track ID", value=track_info.get('track', {}).get('key', 'N/A'), inline=True)
