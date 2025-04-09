@@ -113,7 +113,8 @@ class ShazamCog(commands.Cog):
                         shazam_button = discord.ui.Button(label="Listen on Shazam", url=shazam_url)
                         view.add_item(shazam_button)
 
-                    if apple_music_url:
+                    # Ensure the Apple Music URL is valid
+                    if apple_music_url.startswith(('http://', 'https://')):
                         apple_music_button = discord.ui.Button(label="Open in Apple Music", url=apple_music_url)
                         view.add_item(apple_music_button)
 
