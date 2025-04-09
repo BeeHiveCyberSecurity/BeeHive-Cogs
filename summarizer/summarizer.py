@@ -139,7 +139,12 @@ class ChatSummary(commands.Cog):
         
         try:
             await user.send(embed=embed)
-            await ctx.send("Generating AI summary, check your messages")
+            embed = discord.Embed(
+                title="AI summary sent",
+                description=":mailbox_with_mail: Check your **Direct Messages** for more details",
+                color=0xfffffe
+            )
+            await ctx.send(embed=embed)
         except discord.Forbidden:
             await ctx.send(embed=embed)
 
@@ -299,7 +304,7 @@ class ChatSummary(commands.Cog):
             await self.config.user(message.author).is_afk.set(False)
             embed = discord.Embed(
                 title="Welcome back",
-                description=f":sparkles: Generating AI summary, check your messages",
+                description=f":sparkles: Generating AI summary",
                 color=0xfffffe
             )
             await message.channel.send(embed=embed)
