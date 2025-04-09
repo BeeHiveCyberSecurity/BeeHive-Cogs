@@ -42,19 +42,19 @@ class ShazamCog(commands.Cog):
                 media: bytes = await self.__aio_get(url)
                 track_info = await self.alchemist.recognize(media)
 
-                if track_info:
+                if track_info and 'track' in track_info:
                     track = track_info['track']
                     embed = discord.Embed(
-                        title=track['title'],
-                        description=f"Artist: {track['subtitle']}",
+                        title=track.get('title', 'Unknown Title'),
+                        description=f"Artist: {track.get('subtitle', 'Unknown Artist')}",
                         color=discord.Color.blue()
                     )
-                    embed.set_thumbnail(url=track['images']['coverart'])
+                    embed.set_thumbnail(url=track.get('images', {}).get('coverart', ''))
                     embed.add_field(name="Album", value=track_info.get('sections', [{}])[0].get('metadata', [{}])[0].get('text', 'N/A'), inline=True)
                     embed.add_field(name="Label", value=track_info.get('sections', [{}])[0].get('metadata', [{}])[1].get('text', 'N/A'), inline=True)
                     embed.add_field(name="Released", value=track_info.get('sections', [{}])[0].get('metadata', [{}])[2].get('text', 'N/A'), inline=True)
                     embed.add_field(name="Genre", value=track.get('genres', {}).get('primary', 'N/A'), inline=True)
-                    embed.add_field(name="Listen on Shazam", value=f"[Link]({track['url']})", inline=False)
+                    embed.add_field(name="Listen on Shazam", value=f"[Link]({track.get('url', '')})", inline=False)
                     embed.set_footer(text="Powered by Shazam")
                 else:
                     embed = discord.Embed(
