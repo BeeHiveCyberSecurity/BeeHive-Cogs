@@ -3,7 +3,7 @@ from redbot.core import commands
 import aiohttp
 import tempfile
 import os
-import ffmpeg
+from ffmpeg import video
 
 class VideoToAudio(commands.Cog):
     """Cog to convert video messages to audio and reply with the audio file."""
@@ -29,12 +29,8 @@ class VideoToAudio(commands.Cog):
                     if audio_file_path:
                         await message.reply(file=discord.File(audio_file_path))
                         os.remove(audio_file_path)  # Clean up the audio file after sending
-                except ffmpeg.Error as e:
-                    await message.channel.send(f"Failed to convert video to audio: {str(e)}")
-                except aiohttp.ClientError as e:
-                    await message.channel.send(f"Failed to download video: {str(e)}")
                 except Exception as e:
-                    await message.channel.send(f"An unexpected error occurred: {str(e)}")
+                    await message.channel.send(f"An error occurred: {str(e)}")
 
     async def download_and_convert_to_audio(self, video_url: str) -> str:
         """Download the video and convert it to an audio file."""
@@ -52,10 +48,10 @@ class VideoToAudio(commands.Cog):
                 with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as audio_file:
                     audio_file_path = audio_file.name
 
-                # Use ffmpeg-python to extract audio
+                # Use ffmpeg to extract audio
                 try:
-                    ffmpeg.input(video_file_path).output(audio_file_path, qscale_a=0, map='a').run(capture_stdout=True, capture_stderr=True)
-                except ffmpeg.Error as e:
+                    video.ins_img(video_file_path, [], audio_file_path)
+                except Exception as e:
                     os.remove(video_file_path)  # Ensure video file is removed even if conversion fails
                     raise e
 
