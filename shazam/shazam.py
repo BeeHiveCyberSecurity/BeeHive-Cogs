@@ -66,7 +66,7 @@ class ShazamCog(commands.Cog):
 
                     embed = discord.Embed(
                         title=share_text,
-                        description=f"`{genre}`",
+                        description=f"{genre}",
                         color=embed_color
                     )
                     embed.set_thumbnail(url=coverart_url)
@@ -76,12 +76,9 @@ class ShazamCog(commands.Cog):
                     metadata = sections[0].get('metadata', []) if sections else []
 
                     # Check for explicit content
-                    if track.get('explicit', False):
+                    if track.get('explicit', True):
                         embed.set_footer(text="Song contains explicit content, audience discretion advised")
 
-                    # Add additional fields from the track_info
-                    embed.add_field(name="Track ID", value=track.get('key', 'N/A'), inline=True)
-                    embed.add_field(name="ISRC", value=track.get('isrc', 'N/A'), inline=True)
 
                     # Create URL buttons for Shazam and Apple Music
                     view = discord.ui.View()
