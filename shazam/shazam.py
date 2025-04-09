@@ -44,8 +44,6 @@ class ShazamCog(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
         """Automatically identify a song from an audio URL or uploaded file."""
-        if message.author.bot:
-            return
 
         urls = []
         for attachment in message.attachments:
