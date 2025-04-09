@@ -88,7 +88,7 @@ class ShazamCog(commands.Cog):
                             release_date_timestamp = release_date_str
 
                     description = f"{genre}"
-                    if release_date_timestamp:
+                    if release_date_str:  # Ensure release date is shown when available
                         description += f", released {release_date_timestamp}"
 
                     embed = discord.Embed(
