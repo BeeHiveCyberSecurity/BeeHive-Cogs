@@ -47,86 +47,85 @@ class ShazamCog(commands.Cog):
         if message.author.bot:
             return
 
-        url = None
-        if message.attachments:
-            attachment = message.attachments[0]
-            if attachment.filename == "voice-message.ogg":
-                return
-            url = attachment.url
+        urls = []
+        for attachment in message.attachments:
+            if attachment.filename != "voice-message.ogg":
+                urls.append(attachment.url)
 
-        if not url:
+        if not urls:
             return
 
         async with message.channel.typing():
-            try:
-                media: bytes = await self.__aio_get(url)
-                track_info = await self.alchemist.recognize(media)
+            for url in urls:
+                try:
+                    media: bytes = await self.__aio_get(url)
+                    track_info = await self.alchemist.recognize(media)
 
-                if track_info and 'track' in track_info:
-                    track = track_info['track']
-                    share_text = track.get('share', {}).get('text', 'Unknown Title')
-                    coverart_url = track.get('images', {}).get('coverart', '')
-                    embed_color = self.get_dominant_color(coverart_url) if coverart_url else discord.Color.blue()
+                    if track_info and 'track' in track_info:
+                        track = track_info['track']
+                        share_text = track.get('share', {}).get('text', 'Unknown Title')
+                        coverart_url = track.get('images', {}).get('coverart', '')
+                        embed_color = self.get_dominant_color(coverart_url) if coverart_url else discord.Color.blue()
 
-                    genre = track.get('genres', {}).get('primary', 'N/A')
-                    release_date_str = track.get('releasedate', '')
+                        genre = track.get('genres', {}).get('primary', 'N/A')
+                        release_date_str = track.get('releasedate', '')
 
-                    # Check if release date is available, otherwise use metadata
-                    if not release_date_str or release_date_str == 'Unknown Release Date':
-                        sections = track_info.get('sections', [{}])
-                        metadata = sections[0].get('metadata', []) if sections else []
-                        release_date_str = metadata[2].get('text', '') if len(metadata) > 2 else ''
+                        # Check if release date is available, otherwise use metadata
+                        if not release_date_str or release_date_str == 'Unknown Release Date':
+                            sections = track_info.get('sections', [{}])
+                            metadata = sections[0].get('metadata', []) if sections else []
+                            release_date_str = metadata[2].get('text', '') if len(metadata) > 2 else ''
 
-                    # Convert release date to discord dynamic timestamp
-                    release_date_timestamp = ''
-                    if release_date_str:
-                        try:
-                            if len(release_date_str) == 4:  # Year only
-                                release_date = datetime.strptime(release_date_str, '%Y')
-                            else:
-                                release_date = datetime.strptime(release_date_str, '%d-%m-%Y')
-                            release_date_timestamp = f"<t:{int(release_date.timestamp())}:D>"
-                        except ValueError:
-                            release_date_timestamp = release_date_str
+                        # Convert release date to discord dynamic timestamp
+                        release_date_timestamp = ''
+                        if release_date_str:
+                            try:
+                                if len(release_date_str) == 4:  # Year only
+                                    release_date = datetime.strptime(release_date_str, '%Y')
+                                else:
+                                    release_date = datetime.strptime(release_date_str, '%d-%m-%Y')
+                                release_date_timestamp = f"<t:{int(release_date.timestamp())}:D>"
+                            except ValueError:
+                                release_date_timestamp = release_date_str
 
-                    description = f"{genre}"
-                    if release_date_str:  # Ensure release date is shown when available
-                        description += f", released {release_date_timestamp}"
+                        description = f"{genre}"
+                        if release_date_str:  # Ensure release date is shown when available
+                            description += f", released {release_date_timestamp}"
 
+                        embed = discord.Embed(
+                            title=share_text,
+                            description=description,
+                            color=embed_color
+                        )
+                        embed.set_thumbnail(url=coverart_url)
+
+                        # Check for explicit content
+                        hub_info = track.get('hub', {})
+                        if hub_info.get('explicit', False):
+                            embed.set_footer(text="Song contains explicit content, audience discretion advised")
+
+                        # Create URL buttons for Shazam and Apple Music
+                        view = discord.ui.View()
+                        shazam_url = track.get('url', '')
+                        apple_music_option = track.get('hub', {}).get('options', [{}])[0]
+                        apple_music_url = apple_music_option.get('actions', [{}])[0].get('uri', '')
+
+                        if shazam_url:
+                            shazam_button = discord.ui.Button(label="Listen on Shazam", url=shazam_url)
+                            view.add_item(shazam_button)
+
+                        # Ensure the Apple Music URL is valid
+                        if apple_music_url.startswith(('http://', 'https://')):
+                            apple_music_button = discord.ui.Button(label="Open in Apple Music", url=apple_music_url)
+                            view.add_item(apple_music_button)
+
+                        # Send the embed without the JSON file
+                        await message.reply(embed=embed, view=view)
+                except Exception as e:
+                    logging.exception("Error processing message: %s", message.content, exc_info=e)
                     embed = discord.Embed(
-                        title=share_text,
-                        description=description,
-                        color=embed_color
+                        title="Error",
+                        description=f"An error occurred: {str(e)}",
+                        color=discord.Color.red()
                     )
-                    embed.set_thumbnail(url=coverart_url)
-
-                    # Check for explicit content
-                    hub_info = track.get('hub', {})
-                    if hub_info.get('explicit', False):
-                        embed.set_footer(text="Song contains explicit content, audience discretion advised")
-
-                    # Create URL buttons for Shazam and Apple Music
-                    view = discord.ui.View()
-                    shazam_url = track.get('url', '')
-                    apple_music_option = track.get('hub', {}).get('options', [{}])[0]
-                    apple_music_url = apple_music_option.get('actions', [{}])[0].get('uri', '')
-
-                    if shazam_url:
-                        shazam_button = discord.ui.Button(label="Listen on Shazam", url=shazam_url)
-                        view.add_item(shazam_button)
-
-                    # Ensure the Apple Music URL is valid
-                    if apple_music_url.startswith(('http://', 'https://')):
-                        apple_music_button = discord.ui.Button(label="Open in Apple Music", url=apple_music_url)
-                        view.add_item(apple_music_button)
-
-                    # Send the embed without the JSON file
-                    await message.reply(embed=embed, view=view)
-            except Exception as e:
-                logging.exception("Error processing message: %s", message.content, exc_info=e)
-                embed = discord.Embed(
-                    title="Error",
-                    description=f"An error occurred: {str(e)}",
-                    color=discord.Color.red()
-                )
-                await message.reply(embed=embed)
+                    await message.reply(embed=embed)
