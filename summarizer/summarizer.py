@@ -62,7 +62,8 @@ class ChatSummary(commands.Cog):
                             mentions.append({
                                 "author": message.author.display_name,
                                 "timestamp": message.created_at,
-                                "jump_url": message.jump_url
+                                "jump_url": message.jump_url,
+                                "is_reply": message.reference is not None and message.reference.resolved and message.reference.resolved.author == user
                             })
 
                 messages_content = "\n".join(f"{msg['author']}: {msg['content']}" for msg in recent_messages)
@@ -114,7 +115,10 @@ class ChatSummary(commands.Cog):
             return "No mentions in the recent messages."
         # Sort mentions by timestamp in descending order and take the last 5
         recent_mentions = sorted(mentions, key=lambda x: x['timestamp'], reverse=True)[:5]
-        return "\n".join(f"**{mention['author']}** *<t:{int(mention['timestamp'].timestamp())}:R>* **[Jump]({mention['jump_url']})**" for mention in recent_mentions)
+        return "\n".join(
+            f"**{mention['author']}** {'replied to you' if mention['is_reply'] else 'mentioned you'} *<t:{int(mention['timestamp'].timestamp())}:R>* **[Jump]({mention['jump_url']})**"
+            for mention in recent_mentions
+        )
 
     async def _send_summary_embed(self, ctx, ai_summary, mention_summary, customer_id, user):
         embed = discord.Embed(
@@ -271,7 +275,7 @@ class ChatSummary(commands.Cog):
         await self.config.user(ctx.author).is_afk.set(True)
         await self.config.user(ctx.author).afk_since.set(datetime.now(timezone.utc).isoformat())
         embed = discord.Embed(
-            title="See you later!",
+            title=f"See you later, {ctx.author.display_name}!",
             description=f"You're now **away**.\nYou'll get an AI-powered summary of what you've missed when you come back.",
             color=0xfffffe
         )
