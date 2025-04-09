@@ -12,6 +12,7 @@ from shazamio.serializers import Serialize as Shazamalize
 from colorthief import ColorThief
 import requests
 from datetime import datetime
+import ffmpeg
 
 class ShazamCog(commands.Cog):
     """Cog to interact with the Shazam API using shazamio."""
@@ -41,15 +42,27 @@ class ShazamCog(commands.Cog):
             logging.exception("Error fetching dominant color from image: %s", image_url, exc_info=e)
             return discord.Color(0xfffffe)
 
+    async def extract_audio_from_video(self, video_bytes: bytes) -> bytes:
+        """Extract audio from video bytes using ffmpeg."""
+        try:
+            input_stream = ffmpeg.input('pipe:0')
+            output_stream = ffmpeg.output(input_stream, 'pipe:1', format='mp3', acodec='libmp3lame')
+            process = ffmpeg.run_async(output_stream, pipe_stdin=True, pipe_stdout=True, pipe_stderr=True)
+            audio_bytes, _ = process.communicate(input=video_bytes)
+            return audio_bytes
+        except Exception as e:
+            logging.exception("Error extracting audio from video", exc_info=e)
+            raise commands.UserFeedbackCheckFailure("Failed to extract audio from the video.")
+
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
-        """Automatically identify a song from an audio URL or uploaded file."""
+        """Automatically identify a song from an audio or video URL or uploaded file."""
         if message.author.bot:
             return
 
         urls = []
         for attachment in message.attachments:
-            if attachment.content_type and attachment.content_type.startswith('audio/'):
+            if attachment.content_type and (attachment.content_type.startswith('audio/') or attachment.content_type.startswith('video/')):
                 urls.append(attachment.url)
 
         if not urls:
@@ -59,6 +72,11 @@ class ShazamCog(commands.Cog):
             for url in urls:
                 try:
                     media: bytes = await self.__aio_get(url)
+                    
+                    # Check if the file is a video and extract audio if necessary
+                    if 'video/' in url:
+                        media = await self.extract_audio_from_video(media)
+
                     track_info = await self.alchemist.recognize(media)
 
                     if track_info and 'track' in track_info:
