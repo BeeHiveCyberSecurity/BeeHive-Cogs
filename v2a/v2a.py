@@ -3,6 +3,7 @@ from redbot.core import commands
 import aiohttp
 import tempfile
 import os
+import asyncio
 from moviepy import VideoFileClip
 
 class VideoToAudio(commands.Cog):
@@ -28,7 +29,8 @@ class VideoToAudio(commands.Cog):
                     audio_file_path = await self.download_and_convert_to_audio(video_url)
                     if audio_file_path:
                         await message.reply(file=discord.File(audio_file_path))
-                        os.remove(audio_file_path)  # Clean up the audio file after sending
+                        # Schedule the audio file to be deleted after 15 seconds
+                        asyncio.create_task(self.delete_file_after_delay(audio_file_path, 15))
                 except Exception as e:
                     await message.channel.send(f"An error occurred: {str(e)}")
 
@@ -60,3 +62,9 @@ class VideoToAudio(commands.Cog):
                 os.remove(video_file_path)  # Clean up the video file after conversion
 
                 return audio_file_path
+
+    async def delete_file_after_delay(self, file_path: str, delay: int):
+        """Delete a file after a specified delay."""
+        await asyncio.sleep(delay)
+        if os.path.exists(file_path):
+            os.remove(file_path)
