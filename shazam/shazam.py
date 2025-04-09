@@ -13,6 +13,7 @@ from colorthief import ColorThief
 import requests
 from datetime import datetime
 import ffmpeg
+import tempfile
 
 class ShazamCog(commands.Cog):
     """Cog to interact with the Shazam API using shazamio."""
@@ -24,9 +25,9 @@ class ShazamCog(commands.Cog):
     async def __aio_get(self, url: str) -> bytes:
         try:
             async with aiohttp.ClientSession() as session:
-                response: aiohttp.ClientResponse = await session.get(url, timeout=120.0)
-                response.raise_for_status()
-                return await response.read()
+                async with session.get(url, timeout=120.0) as response:
+                    response.raise_for_status()
+                    return await response.read()
         except aiohttp.ClientError as error:
             logging.exception("Error fetching media from URL: %s", url, exc_info=error)
             raise commands.UserFeedbackCheckFailure("Failed to fetch media from the URL.")
@@ -45,10 +46,17 @@ class ShazamCog(commands.Cog):
     async def extract_audio_from_video(self, video_bytes: bytes) -> bytes:
         """Extract audio from video bytes using ffmpeg."""
         try:
-            input_stream = ffmpeg.input('pipe:0')
-            output_stream = ffmpeg.output(input_stream, 'pipe:1', format='mp3', acodec='libmp3lame')
-            process = ffmpeg.run_async(output_stream, pipe_stdin=True, pipe_stdout=True, pipe_stderr=True)
-            audio_bytes, _ = process.communicate(input=video_bytes)
+            with tempfile.NamedTemporaryFile(delete=False) as temp_video, tempfile.NamedTemporaryFile(delete=False) as temp_audio:
+                temp_video.write(video_bytes)
+                temp_video.flush()
+
+                input_stream = ffmpeg.input(temp_video.name)
+                output_stream = ffmpeg.output(input_stream, temp_audio.name, format='mp3', acodec='libmp3lame')
+                ffmpeg.run(output_stream)
+
+                with open(temp_audio.name, 'rb') as audio_file:
+                    audio_bytes = audio_file.read()
+
             return audio_bytes
         except Exception as e:
             logging.exception("Error extracting audio from video", exc_info=e)
