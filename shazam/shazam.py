@@ -50,16 +50,21 @@ class ShazamCog(commands.Cog):
                         description=f"**Title:** {track_title}\n**Artist:** {track_artist}",
                         color=0xfffffe
                     )
+                    # Send the entire data as a JSON string
+                    full_data = f"Full Track Info: {track_info}"
                 else:
                     embed = discord.Embed(
                         title="Couldn't match this audio",
                         description="Could not identify the song from the provided URL or file.",
                         color=discord.Color.red()
                     )
+                    full_data = "No track information available."
             except Exception as e:
                 embed = discord.Embed(
                     title="Error",
                     description=f"An error occurred: {str(e)}",
                     color=discord.Color.red()
                 )
+                full_data = f"Error details: {str(e)}"
             await ctx.send(embed=embed)
+            await ctx.send(full_data)
