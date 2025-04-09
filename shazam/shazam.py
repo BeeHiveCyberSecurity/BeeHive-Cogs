@@ -50,9 +50,18 @@ class ShazamCog(commands.Cog):
                         color=discord.Color.blue()
                     )
                     embed.set_thumbnail(url=track.get('images', {}).get('coverart', ''))
-                    embed.add_field(name="Album", value=track_info.get('sections', [{}])[0].get('metadata', [{}])[0].get('text', 'N/A'), inline=True)
-                    embed.add_field(name="Label", value=track_info.get('sections', [{}])[0].get('metadata', [{}])[1].get('text', 'N/A'), inline=True)
-                    embed.add_field(name="Released", value=track_info.get('sections', [{}])[0].get('metadata', [{}])[2].get('text', 'N/A'), inline=True)
+                    
+                    # Safely access metadata fields
+                    sections = track_info.get('sections', [{}])
+                    metadata = sections[0].get('metadata', []) if sections else []
+                    
+                    album = metadata[0].get('text', 'N/A') if len(metadata) > 0 else 'N/A'
+                    label = metadata[1].get('text', 'N/A') if len(metadata) > 1 else 'N/A'
+                    released = metadata[2].get('text', 'N/A') if len(metadata) > 2 else 'N/A'
+                    
+                    embed.add_field(name="Album", value=album, inline=True)
+                    embed.add_field(name="Label", value=label, inline=True)
+                    embed.add_field(name="Released", value=released, inline=True)
                     embed.add_field(name="Genre", value=track.get('genres', {}).get('primary', 'N/A'), inline=True)
                     embed.add_field(name="Listen on Shazam", value=f"[Link]({track.get('url', '')})", inline=False)
                     embed.set_footer(text="Powered by Shazam")
