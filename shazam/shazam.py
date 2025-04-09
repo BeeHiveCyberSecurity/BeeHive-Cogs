@@ -106,14 +106,15 @@ class ShazamCog(commands.Cog):
                     # Create URL buttons for Shazam and Apple Music
                     view = discord.ui.View()
                     shazam_url = track.get('url', '')
-                    apple_music_url = track.get('hub', {}).get('actions', [{}])[0].get('uri', '')
+                    apple_music_option = track.get('hub', {}).get('options', [{}])[0]
+                    apple_music_url = apple_music_option.get('actions', [{}])[0].get('uri', '')
 
                     if shazam_url:
                         shazam_button = discord.ui.Button(label="Listen on Shazam", url=shazam_url)
                         view.add_item(shazam_button)
 
                     if apple_music_url:
-                        apple_music_button = discord.ui.Button(label="Listen on Apple Music", url=apple_music_url)
+                        apple_music_button = discord.ui.Button(label="Open in Apple Music", url=apple_music_url)
                         view.add_item(apple_music_button)
 
                     # Convert track_info to JSON and send as a file
