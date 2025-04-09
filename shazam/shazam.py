@@ -4,6 +4,7 @@ import json
 from typing import Union, Dict, Any
 import discord
 import aiohttp
+import io
 from aiohttp_retry import ExponentialRetry as Pulse
 from redbot.core import commands
 from shazamio.api import Shazam as AudioAlchemist
