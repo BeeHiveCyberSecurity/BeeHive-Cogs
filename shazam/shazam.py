@@ -51,26 +51,42 @@ class ShazamCog(commands.Cog):
                         color=discord.Color.blue()
                     )
                     embed.set_thumbnail(url=track.get('images', {}).get('coverart', ''))
-                    
+
                     # Safely access metadata fields
                     sections = track_info.get('sections', [{}])
                     metadata = sections[0].get('metadata', []) if sections else []
-                    
+
                     album = metadata[0].get('text', 'N/A') if len(metadata) > 0 else 'N/A'
                     label = metadata[1].get('text', 'N/A') if len(metadata) > 1 else 'N/A'
                     released = metadata[2].get('text', 'N/A') if len(metadata) > 2 else 'N/A'
-                    
+
                     embed.add_field(name="Album", value=album, inline=True)
                     embed.add_field(name="Label", value=label, inline=True)
                     embed.add_field(name="Released", value=released, inline=True)
                     embed.add_field(name="Genre", value=track.get('genres', {}).get('primary', 'N/A'), inline=True)
-                    embed.add_field(name="Listen on Shazam", value=f"[Link]({track.get('url', '')})", inline=False)
                     embed.set_footer(text="Powered by Shazam")
-                    
+
+                    # Add additional fields from the track_info
+                    embed.add_field(name="Track ID", value=track_info.get('track', {}).get('key', 'N/A'), inline=True)
+                    embed.add_field(name="ISRC", value=track_info.get('track', {}).get('isrc', 'N/A'), inline=True)
+
+                    # Create URL buttons for Shazam and Apple Music
+                    view = discord.ui.View()
+                    shazam_url = track.get('url', '')
+                    apple_music_url = track_info.get('track', {}).get('hub', {}).get('actions', [{}])[0].get('uri', '')
+
+                    if shazam_url:
+                        shazam_button = discord.ui.Button(label="Listen on Shazam", url=shazam_url)
+                        view.add_item(shazam_button)
+
+                    if apple_music_url:
+                        apple_music_button = discord.ui.Button(label="Listen on Apple Music", url=apple_music_url)
+                        view.add_item(apple_music_button)
+
                     # Convert track_info to JSON and send as a file
                     json_data = json.dumps(track_info, indent=4)
                     json_file = discord.File(fp=io.StringIO(json_data), filename="track_info.json")
-                    await ctx.send(embed=embed, file=json_file)
+                    await ctx.send(embed=embed, file=json_file, view=view)
                 else:
                     embed = discord.Embed(
                         title="Identification Failed",
