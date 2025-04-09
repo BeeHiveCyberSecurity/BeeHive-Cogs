@@ -75,14 +75,6 @@ class ShazamCog(commands.Cog):
                     sections = track_info.get('sections', [{}])
                     metadata = sections[0].get('metadata', []) if sections else []
 
-                    album = metadata[0].get('text', 'N/A') if len(metadata) > 0 else 'N/A'
-                    label = metadata[1].get('text', 'N/A') if len(metadata) > 1 else 'N/A'
-                    released = metadata[2].get('text', 'N/A') if len(metadata) > 2 else 'N/A'
-
-                    embed.add_field(name="Album", value=album, inline=True)
-                    embed.add_field(name="Label", value=label, inline=True)
-                    embed.add_field(name="Released", value=released, inline=True)
-
                     # Check for explicit content
                     if track.get('explicit', False):
                         embed.set_footer(text="Song contains explicit content, audience discretion advised")
