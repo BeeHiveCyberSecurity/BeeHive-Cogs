@@ -114,13 +114,6 @@ class ShazamCog(commands.Cog):
                     json_data = json.dumps(track_info, indent=4)
                     json_file = discord.File(fp=io.StringIO(json_data), filename="track_info.json")
                     await message.channel.send(embed=embed, file=json_file, view=view)
-                else:
-                    embed = discord.Embed(
-                        title="Identification Failed",
-                        description="Could not identify the song from the provided URL or file.",
-                        color=discord.Color.red()
-                    )
-                    await message.channel.send(embed=embed)
             except Exception as e:
                 embed = discord.Embed(
                     title="Error",
