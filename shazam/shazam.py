@@ -39,7 +39,7 @@ class ShazamCog(commands.Cog):
             return discord.Color.from_rgb(*dominant_color)
         except Exception as e:
             logging.exception("Error fetching dominant color from image: %s", image_url, exc_info=e)
-            return discord.Color.blue()
+            return 0xfffffe
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
@@ -73,21 +73,27 @@ class ShazamCog(commands.Cog):
                     if not release_date_str or release_date_str == 'Unknown Release Date':
                         sections = track_info.get('sections', [{}])
                         metadata = sections[0].get('metadata', []) if sections else []
-                        release_date_str = next((item['text'] for item in metadata if item['title'] == 'Released'), 'Unknown Release Date')
+                        release_date_str = next((item['text'] for item in metadata if item['title'] == 'Released'), '')
 
                     # Convert release date to discord dynamic timestamp
-                    try:
-                        if len(release_date_str) == 4:  # Year only
-                            release_date = datetime.strptime(release_date_str, '%Y')
-                        else:
-                            release_date = datetime.strptime(release_date_str, '%d-%m-%Y')
-                        release_date_timestamp = f"<t:{int(release_date.timestamp())}:D>"
-                    except ValueError:
-                        release_date_timestamp = release_date_str
+                    release_date_timestamp = ''
+                    if release_date_str:
+                        try:
+                            if len(release_date_str) == 4:  # Year only
+                                release_date = datetime.strptime(release_date_str, '%Y')
+                            else:
+                                release_date = datetime.strptime(release_date_str, '%d-%m-%Y')
+                            release_date_timestamp = f"<t:{int(release_date.timestamp())}:D>"
+                        except ValueError:
+                            release_date_timestamp = release_date_str
+
+                    description = f"Genre: {genre}"
+                    if release_date_timestamp:
+                        description += f"\nRelease Date: {release_date_timestamp}"
 
                     embed = discord.Embed(
                         title=share_text,
-                        description=f"Genre: {genre}\nRelease Date: {release_date_timestamp}",
+                        description=description,
                         color=embed_color
                     )
                     embed.set_thumbnail(url=coverart_url)
