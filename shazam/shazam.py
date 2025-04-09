@@ -43,21 +43,27 @@ class ShazamCog(commands.Cog):
             logging.exception("Error fetching dominant color from image: %s", image_url, exc_info=e)
             raise RuntimeError("Failed to fetch dominant color from the image.") from e
 
-    async def extract_audio_from_video(self, video_bytes: bytes) -> bytes:
-        """Extract audio from video bytes using ffmpeg."""
+    async def extract_audio_from_video(self, ctx, video_bytes: bytes) -> str:
+        """Extract audio from video bytes using ffmpeg, send it to the channel, and return the URL."""
         try:
-            with tempfile.NamedTemporaryFile(delete=False) as temp_video, tempfile.NamedTemporaryFile(delete=False) as temp_audio:
-                temp_video.write(video_bytes)
-                temp_video.flush()
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as temp_audio:
+                with tempfile.NamedTemporaryFile(delete=False) as temp_video:
+                    temp_video.write(video_bytes)
+                    temp_video.flush()
 
-                input_stream = ffmpeg.input(temp_video.name)
-                output_stream = ffmpeg.output(input_stream, temp_audio.name, format='mp3', acodec='libmp3lame')
-                ffmpeg.run(output_stream)
+                    input_stream = ffmpeg.input(temp_video.name)
+                    output_stream = ffmpeg.output(input_stream, temp_audio.name, format='mp3', acodec='libmp3lame')
+                    ffmpeg.run(output_stream)
 
                 with open(temp_audio.name, 'rb') as audio_file:
                     audio_bytes = audio_file.read()
 
-            return audio_bytes
+                # Send the audio file to the channel
+                audio_file = discord.File(io.BytesIO(audio_bytes), filename="extracted_audio.mp3")
+                message = await ctx.send(file=audio_file)
+
+                # Return the URL of the uploaded audio file
+                return message.attachments[0].url
         except Exception as e:
             logging.exception("Error extracting audio from video", exc_info=e)
             raise commands.UserFeedbackCheckFailure("Failed to extract audio from the video.") from e
