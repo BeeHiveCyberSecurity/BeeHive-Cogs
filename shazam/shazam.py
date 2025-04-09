@@ -89,7 +89,7 @@ class ShazamCog(commands.Cog):
                     
                     # Check if the file is a video and extract audio if necessary
                     if 'video/' in url:
-                        media = await self.extract_audio_from_video(media)
+                        media = await self.extract_audio_from_video(ctx, media)
 
                     track_info = await self.alchemist.recognize(media)
 
