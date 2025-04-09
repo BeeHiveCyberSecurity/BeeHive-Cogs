@@ -63,10 +63,11 @@ class ShazamCog(commands.Cog):
                     embed_color = self.get_dominant_color(coverart_url) if coverart_url else discord.Color.blue()
 
                     genre = track.get('genres', {}).get('primary', 'N/A')
+                    release_date = track.get('releasedate', 'Unknown Release Date')
 
                     embed = discord.Embed(
                         title=share_text,
-                        description=f"{genre}",
+                        description=f"Genre: {genre}\nRelease Date: {release_date}",
                         color=embed_color
                     )
                     embed.set_thumbnail(url=coverart_url)
