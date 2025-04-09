@@ -293,7 +293,7 @@ class ChatSummary(commands.Cog):
             await self.config.user(message.author).is_afk.set(False)
             embed = discord.Embed(
                 title="Welcome back",
-                description=f":sparkles: Generating your AI summary, check your Direct Messages...",
+                description=f":sparkles: Generating your AI summary, check your direct messages...",
                 color=0xfffffe
             )
             await message.channel.send(embed=embed)
@@ -307,7 +307,7 @@ class ChatSummary(commands.Cog):
             if user_data.get("is_afk"):
                 embed = discord.Embed(
                     title="This user's away right now",
-                    description=f"{user.display_name} is currently AFK and may not respond immediately. They'll get a summary of what they missed when they return.",
+                    description=f"**{user.display_name} is currently AFK and may not respond immediately.**\nThey'll get a summary of what they missed when they return.",
                     color=discord.Color.orange()
                 )
                 await message.channel.send(embed=embed)
