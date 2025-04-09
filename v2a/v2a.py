@@ -3,7 +3,7 @@ from redbot.core import commands
 import aiohttp
 import tempfile
 import os
-from moviepy.editor import VideoFileClip
+from moviepy import VideoFileClip
 
 class VideoToAudio(commands.Cog):
     """Cog to convert video messages to audio and reply with the audio file."""
