@@ -68,8 +68,6 @@ class ShazamCog(commands.Cog):
                     # Check for explicit content
                     if track.get('explicit', False):
                         embed.set_footer(text="Song contains explicit content, audience discretion advised")
-                    else:
-                        pass
 
                     # Add additional fields from the track_info
                     embed.add_field(name="Track ID", value=track_info.get('track', {}).get('key', 'N/A'), inline=True)
