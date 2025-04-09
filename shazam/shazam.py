@@ -74,7 +74,10 @@ class ShazamCog(commands.Cog):
 
                     # Convert release date to discord dynamic timestamp
                     try:
-                        release_date = datetime.strptime(release_date_str, '%d-%m-%Y')
+                        if len(release_date_str) == 4:  # Year only
+                            release_date = datetime.strptime(release_date_str, '%Y')
+                        else:
+                            release_date = datetime.strptime(release_date_str, '%d-%m-%Y')
                         release_date_timestamp = f"<t:{int(release_date.timestamp())}:D>"
                     except ValueError:
                         release_date_timestamp = release_date_str
