@@ -1,9 +1,9 @@
 import discord
 from redbot.core import commands
 import aiohttp
-import subprocess
 import tempfile
 import os
+import ffmpeg
 
 class VideoToAudio(commands.Cog):
     """Cog to convert video messages to audio and reply with the audio file."""
@@ -29,7 +29,7 @@ class VideoToAudio(commands.Cog):
                     if audio_file_path:
                         await message.reply(file=discord.File(audio_file_path))
                         os.remove(audio_file_path)  # Clean up the audio file after sending
-                except subprocess.CalledProcessError as e:
+                except ffmpeg.Error as e:
                     await message.channel.send(f"Failed to convert video to audio: {str(e)}")
                 except aiohttp.ClientError as e:
                     await message.channel.send(f"Failed to download video: {str(e)}")
@@ -52,10 +52,10 @@ class VideoToAudio(commands.Cog):
                 with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as audio_file:
                     audio_file_path = audio_file.name
 
-                # Use subprocess to call ffmpeg for extracting audio
+                # Use ffmpeg-python to extract audio
                 try:
-                    subprocess.run(['ffmpeg', '-i', video_file_path, '-q:a', '0', '-map', 'a', audio_file_path], check=True)
-                except subprocess.CalledProcessError as e:
+                    ffmpeg.input(video_file_path).output(audio_file_path, qscale_a=0, map='a').run(capture_stdout=True, capture_stderr=True)
+                except ffmpeg.Error as e:
                     os.remove(video_file_path)  # Ensure video file is removed even if conversion fails
                     raise e
 
