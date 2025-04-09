@@ -43,23 +43,29 @@ class ShazamCog(commands.Cog):
                 track_info = await self.alchemist.recognize(media)
 
                 if track_info:
-                    serialized_info = Shazamalize.full_track(track_info)
-                    track_title = serialized_info.track.title
-                    track_artist = serialized_info.track.subtitle
-                    response_data = {
-                        "status": "success",
-                        "title": track_title,
-                        "artist": track_artist,
-                        "full_track_info": track_info
-                    }
+                    track = track_info['track']
+                    embed = discord.Embed(
+                        title=track['title'],
+                        description=f"Artist: {track['subtitle']}",
+                        color=discord.Color.blue()
+                    )
+                    embed.set_thumbnail(url=track['images']['coverart'])
+                    embed.add_field(name="Album", value=track_info.get('sections', [{}])[0].get('metadata', [{}])[0].get('text', 'N/A'), inline=True)
+                    embed.add_field(name="Label", value=track_info.get('sections', [{}])[0].get('metadata', [{}])[1].get('text', 'N/A'), inline=True)
+                    embed.add_field(name="Released", value=track_info.get('sections', [{}])[0].get('metadata', [{}])[2].get('text', 'N/A'), inline=True)
+                    embed.add_field(name="Genre", value=track.get('genres', {}).get('primary', 'N/A'), inline=True)
+                    embed.add_field(name="Listen on Shazam", value=f"[Link]({track['url']})", inline=False)
+                    embed.set_footer(text="Powered by Shazam")
                 else:
-                    response_data = {
-                        "status": "failure",
-                        "message": "Could not identify the song from the provided URL or file."
-                    }
+                    embed = discord.Embed(
+                        title="Identification Failed",
+                        description="Could not identify the song from the provided URL or file.",
+                        color=discord.Color.red()
+                    )
             except Exception as e:
-                response_data = {
-                    "status": "error",
-                    "message": f"An error occurred: {str(e)}"
-                }
-            await ctx.send(file=discord.File(fp=json.dumps(response_data, indent=4), filename="response.json"))
+                embed = discord.Embed(
+                    title="Error",
+                    description=f"An error occurred: {str(e)}",
+                    color=discord.Color.red()
+                )
+            await ctx.send(embed=embed)
