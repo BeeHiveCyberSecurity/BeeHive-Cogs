@@ -1,7 +1,7 @@
 import discord
 from redbot.core import commands
 import aiohttp
-import ffmpeg
+import subprocess
 import tempfile
 import os
 
@@ -48,8 +48,8 @@ class VideoToAudio(commands.Cog):
                 with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as audio_file:
                     audio_file_path = audio_file.name
 
-                # Use ffmpeg to extract audio
-                ffmpeg.input(video_file_path).output(audio_file_path, format='mp3').run(overwrite_output=True)
+                # Use subprocess to call ffmpeg for extracting audio
+                subprocess.run(['ffmpeg', '-i', video_file_path, '-q:a', '0', '-map', 'a', audio_file_path], check=True)
 
                 os.remove(video_file_path)  # Clean up the video file after conversion
 
