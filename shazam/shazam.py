@@ -9,6 +9,8 @@ from aiohttp_retry import ExponentialRetry as Pulse
 from redbot.core import commands
 from shazamio.api import Shazam as AudioAlchemist
 from shazamio.serializers import Serialize as Shazamalize
+from colorthief import ColorThief
+import requests
 
 class ShazamCog(commands.Cog):
     """Cog to interact with the Shazam API using shazamio."""
@@ -26,6 +28,17 @@ class ShazamCog(commands.Cog):
         except aiohttp.ClientError as error:
             logging.exception("Error fetching media from URL: %s", url, exc_info=error)
             raise commands.UserFeedbackCheckFailure("Failed to fetch media from the URL.")
+
+    def get_dominant_color(self, image_url: str) -> discord.Color:
+        try:
+            response = requests.get(image_url)
+            response.raise_for_status()
+            color_thief = ColorThief(io.BytesIO(response.content))
+            dominant_color = color_thief.get_color(quality=1)
+            return discord.Color.from_rgb(*dominant_color)
+        except Exception as e:
+            logging.exception("Error fetching dominant color from image: %s", image_url, exc_info=e)
+            return discord.Color.blue()
 
     @commands.command(name="identify")
     async def identify_song(self, ctx: commands.Context, url: str = None):
@@ -46,12 +59,15 @@ class ShazamCog(commands.Cog):
                 if track_info and 'track' in track_info:
                     track = track_info['track']
                     share_text = track.get('share', {}).get('text', 'Unknown Title')
+                    coverart_url = track.get('images', {}).get('coverart', '')
+                    embed_color = self.get_dominant_color(coverart_url) if coverart_url else discord.Color.blue()
+
                     embed = discord.Embed(
                         title=share_text,
                         description=f"Artist: {track.get('subtitle', 'Unknown Artist')}",
-                        color=discord.Color.blue()
+                        color=embed_color
                     )
-                    embed.set_thumbnail(url=track.get('images', {}).get('coverart', ''))
+                    embed.set_thumbnail(url=coverart_url)
 
                     # Safely access metadata fields
                     sections = track_info.get('sections', [{}])
