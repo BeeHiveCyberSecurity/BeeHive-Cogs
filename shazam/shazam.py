@@ -30,7 +30,7 @@ class ShazamCog(commands.Cog):
                     return await response.read()
         except aiohttp.ClientError as error:
             logging.exception("Error fetching media from URL: %s", url, exc_info=error)
-            raise commands.UserFeedbackCheckFailure("Failed to fetch media from the URL.")
+            raise commands.UserFeedbackCheckFailure("Failed to fetch media from the URL.") from error
 
     def get_dominant_color(self, image_url: str) -> discord.Color:
         try:
@@ -41,7 +41,7 @@ class ShazamCog(commands.Cog):
             return discord.Color.from_rgb(*dominant_color)
         except Exception as e:
             logging.exception("Error fetching dominant color from image: %s", image_url, exc_info=e)
-            return discord.Color(0xfffffe)
+            raise RuntimeError("Failed to fetch dominant color from the image.") from e
 
     async def extract_audio_from_video(self, video_bytes: bytes) -> bytes:
         """Extract audio from video bytes using ffmpeg."""
@@ -60,7 +60,7 @@ class ShazamCog(commands.Cog):
             return audio_bytes
         except Exception as e:
             logging.exception("Error extracting audio from video", exc_info=e)
-            raise commands.UserFeedbackCheckFailure("Failed to extract audio from the video.")
+            raise commands.UserFeedbackCheckFailure("Failed to extract audio from the video.") from e
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
@@ -111,8 +111,9 @@ class ShazamCog(commands.Cog):
                                 else:
                                     release_date = datetime.strptime(release_date_str, '%d-%m-%Y')
                                 release_date_timestamp = f"<t:{int(release_date.timestamp())}:D>"
-                            except ValueError:
-                                release_date_timestamp = release_date_str
+                            except ValueError as ve:
+                                logging.exception("Error parsing release date: %s", release_date_str, exc_info=ve)
+                                raise RuntimeError("Failed to parse release date.") from ve
 
                         description = f"{genre}"
                         if release_date_str:  # Ensure release date is shown when available
@@ -149,9 +150,4 @@ class ShazamCog(commands.Cog):
                         await message.reply(embed=embed, view=view)
                 except Exception as e:
                     logging.exception("Error processing message: %s", message.content, exc_info=e)
-                    embed = discord.Embed(
-                        title="Error",
-                        description=f"An error occurred: {str(e)}",
-                        color=discord.Color.red()
-                    )
-                    await message.reply(embed=embed)
+                    raise RuntimeError("An error occurred while processing the message.") from e
