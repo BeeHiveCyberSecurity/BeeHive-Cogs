@@ -41,19 +41,22 @@ class ShazamCog(commands.Cog):
             logging.exception("Error fetching dominant color from image: %s", image_url, exc_info=e)
             return discord.Color.blue()
 
-    @commands.command(name="identify")
-    async def identify_song(self, ctx: commands.Context, url: str = None):
-        """Identify a song from an audio URL or uploaded file."""
-        if not url and not ctx.message.attachments:
-            await ctx.send("Please provide a URL or upload an audio file.", delete_after=10)
+    @commands.Cog.listener()
+    async def on_message(self, message: discord.Message):
+        """Automatically identify a song from an audio URL or uploaded file."""
+        if message.author.bot:
             return
 
-        async with ctx.typing():
-            try:
-                if ctx.message.attachments:
-                    attachment = ctx.message.attachments[0]
-                    url = attachment.url
+        url = None
+        if message.attachments:
+            attachment = message.attachments[0]
+            url = attachment.url
 
+        if not url:
+            return
+
+        async with message.channel.typing():
+            try:
                 media: bytes = await self.__aio_get(url)
                 track_info = await self.alchemist.recognize(media)
 
@@ -110,18 +113,18 @@ class ShazamCog(commands.Cog):
                     # Convert track_info to JSON and send as a file
                     json_data = json.dumps(track_info, indent=4)
                     json_file = discord.File(fp=io.StringIO(json_data), filename="track_info.json")
-                    await ctx.send(embed=embed, file=json_file, view=view)
+                    await message.channel.send(embed=embed, file=json_file, view=view)
                 else:
                     embed = discord.Embed(
                         title="Identification Failed",
                         description="Could not identify the song from the provided URL or file.",
                         color=discord.Color.red()
                     )
-                    await ctx.send(embed=embed)
+                    await message.channel.send(embed=embed)
             except Exception as e:
                 embed = discord.Embed(
                     title="Error",
                     description=f"An error occurred: {str(e)}",
                     color=discord.Color.red()
                 )
-                await ctx.send(embed=embed)
+                await message.channel.send(embed=embed)
