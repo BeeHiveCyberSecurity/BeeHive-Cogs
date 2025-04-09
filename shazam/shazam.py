@@ -39,7 +39,7 @@ class ShazamCog(commands.Cog):
             return discord.Color.from_rgb(*dominant_color)
         except Exception as e:
             logging.exception("Error fetching dominant color from image: %s", image_url, exc_info=e)
-            return 0xfffffe
+            return discord.Color(0xfffffe)
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
@@ -73,7 +73,7 @@ class ShazamCog(commands.Cog):
                     if not release_date_str or release_date_str == 'Unknown Release Date':
                         sections = track_info.get('sections', [{}])
                         metadata = sections[0].get('metadata', []) if sections else []
-                        release_date_str = next((item['text'] for item in metadata if item['title'] == 'Released'), '')
+                        release_date_str = metadata[2].get('text', '') if len(metadata) > 2 else ''
 
                     # Convert release date to discord dynamic timestamp
                     release_date_timestamp = ''
@@ -121,6 +121,7 @@ class ShazamCog(commands.Cog):
                     json_file = discord.File(fp=io.StringIO(json_data), filename="track_info.json")
                     await message.channel.send(embed=embed, file=json_file, view=view)
             except Exception as e:
+                logging.exception("Error processing message: %s", message.content, exc_info=e)
                 embed = discord.Embed(
                     title="Error",
                     description=f"An error occurred: {str(e)}",
