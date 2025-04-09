@@ -50,6 +50,8 @@ class ShazamCog(commands.Cog):
         url = None
         if message.attachments:
             attachment = message.attachments[0]
+            if attachment.filename == "voice-message.ogg":
+                return
             url = attachment.url
 
         if not url:
@@ -118,10 +120,8 @@ class ShazamCog(commands.Cog):
                         apple_music_button = discord.ui.Button(label="Open in Apple Music", url=apple_music_url)
                         view.add_item(apple_music_button)
 
-                    # Convert track_info to JSON and send as a file
-                    json_data = json.dumps(track_info, indent=4)
-                    json_file = discord.File(fp=io.StringIO(json_data), filename="track_info.json")
-                    await message.reply(embed=embed, file=json_file, view=view)
+                    # Send the embed without the JSON file
+                    await message.reply(embed=embed, view=view)
             except Exception as e:
                 logging.exception("Error processing message: %s", message.content, exc_info=e)
                 embed = discord.Embed(
