@@ -49,7 +49,7 @@ class ShazamCog(commands.Cog):
 
         urls = []
         for attachment in message.attachments:
-            if attachment.filename != "voice-message.ogg":
+            if attachment.content_type and attachment.content_type.startswith('audio/'):
                 urls.append(attachment.url)
 
         if not urls:
