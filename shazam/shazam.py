@@ -87,9 +87,9 @@ class ShazamCog(commands.Cog):
                         except ValueError:
                             release_date_timestamp = release_date_str
 
-                    description = f"Genre: {genre}"
+                    description = f"{genre}"
                     if release_date_timestamp:
-                        description += f"\nRelease Date: {release_date_timestamp}"
+                        description += f", released {release_date_timestamp}"
 
                     embed = discord.Embed(
                         title=share_text,
