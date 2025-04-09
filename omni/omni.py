@@ -914,7 +914,7 @@ class Omni(commands.Cog):
         # Increment the message count for the channel
         self.memory_user_message_counts[guild.id][channel.id] += 1
 
-        # Check if the message count has reached 150
+        # Check if the message count has reached 50
         if self.memory_user_message_counts[guild.id][channel.id] >= 50:
             await self.send_monitoring_reminder(channel)
             # Reset the message count for the channel
