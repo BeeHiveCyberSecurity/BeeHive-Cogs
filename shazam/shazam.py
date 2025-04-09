@@ -62,9 +62,11 @@ class ShazamCog(commands.Cog):
                     coverart_url = track.get('images', {}).get('coverart', '')
                     embed_color = self.get_dominant_color(coverart_url) if coverart_url else discord.Color.blue()
 
+                    genre = track.get('genres', {}).get('primary', 'N/A')
+
                     embed = discord.Embed(
                         title=share_text,
-                        description=f"Artist: {track.get('subtitle', 'Unknown Artist')}",
+                        description=f"`{genre}`",
                         color=embed_color
                     )
                     embed.set_thumbnail(url=coverart_url)
@@ -80,7 +82,6 @@ class ShazamCog(commands.Cog):
                     embed.add_field(name="Album", value=album, inline=True)
                     embed.add_field(name="Label", value=label, inline=True)
                     embed.add_field(name="Released", value=released, inline=True)
-                    embed.add_field(name="Genre", value=track.get('genres', {}).get('primary', 'N/A'), inline=True)
 
                     # Check for explicit content
                     if track.get('explicit', False):
