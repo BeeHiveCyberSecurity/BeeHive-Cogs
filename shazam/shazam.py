@@ -120,7 +120,7 @@ class ShazamCog(commands.Cog):
                     # Convert track_info to JSON and send as a file
                     json_data = json.dumps(track_info, indent=4)
                     json_file = discord.File(fp=io.StringIO(json_data), filename="track_info.json")
-                    await message.channel.send(embed=embed, file=json_file, view=view)
+                    await message.reply(embed=embed, file=json_file, view=view)
             except Exception as e:
                 logging.exception("Error processing message: %s", message.content, exc_info=e)
                 embed = discord.Embed(
@@ -128,4 +128,4 @@ class ShazamCog(commands.Cog):
                     description=f"An error occurred: {str(e)}",
                     color=discord.Color.red()
                 )
-                await message.channel.send(embed=embed)
+                await message.reply(embed=embed)
