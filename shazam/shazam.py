@@ -46,13 +46,13 @@ class ShazamCog(commands.Cog):
                     track_title = serialized_info.track.title
                     track_artist = serialized_info.track.subtitle
                     embed = discord.Embed(
-                        title="Song Identified",
+                        title="Song identified",
                         description=f"**Title:** {track_title}\n**Artist:** {track_artist}",
-                        color=discord.Color.blue()
+                        color=0xfffffe
                     )
                 else:
                     embed = discord.Embed(
-                        title="Song Not Identified",
+                        title="Couldn't match this audio",
                         description="Could not identify the song from the provided URL or file.",
                         color=discord.Color.red()
                     )
