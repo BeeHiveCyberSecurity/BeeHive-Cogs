@@ -10,7 +10,6 @@ from redbot.core import commands
 from shazamio.api import Shazam as AudioAlchemist
 from shazamio.serializers import Serialize as Shazamalize
 from colorthief import ColorThief
-import requests
 from datetime import datetime
 from moviepy import VideoFileClip
 import tempfile
@@ -33,19 +32,21 @@ class ShazamCog(commands.Cog):
             logging.exception("Error fetching media from URL: %s", url, exc_info=error)
             raise commands.UserFeedbackCheckFailure("Failed to fetch media from the URL.") from error
 
-    def get_dominant_color(self, image_url: str) -> discord.Color:
+    async def get_dominant_color(self, image_url: str) -> discord.Color:
         try:
-            response = requests.get(image_url)
-            response.raise_for_status()
-            color_thief = ColorThief(io.BytesIO(response.content))
-            dominant_color = color_thief.get_color(quality=1)
-            return discord.Color.from_rgb(*dominant_color)
+            async with aiohttp.ClientSession() as session:
+                async with session.get(image_url) as response:
+                    response.raise_for_status()
+                    image_data = await response.read()
+                    color_thief = ColorThief(io.BytesIO(image_data))
+                    dominant_color = color_thief.get_color(quality=1)
+                    return discord.Color.from_rgb(*dominant_color)
         except Exception as e:
             logging.exception("Error fetching dominant color from image: %s", image_url, exc_info=e)
             raise RuntimeError("Failed to fetch dominant color from the image.") from e
 
-    async def download_and_convert_to_audio(self, video_url: str) -> bytes:
-        """Download the video and convert it to an audio file."""
+    async def download_and_convert_to_audio(self, video_url: str) -> str:
+        """Download the video and convert it to an audio file, returning the URL of the uploaded audio."""
         async with aiohttp.ClientSession() as session:
             async with session.get(video_url) as response:
                 if response.status != 200:
@@ -71,12 +72,16 @@ class ShazamCog(commands.Cog):
 
                 os.remove(video_file_path)  # Clean up the video file after conversion
 
-                with open(audio_file_path, 'rb') as audio_file:
-                    audio_data = audio_file.read()
+                # Upload the audio file using aiohttp
+                try:
+                    async with session.post('https://temp.sh/upload', data={'file': open(audio_file_path, 'rb')}) as upload_response:
+                        upload_response.raise_for_status()
+                        audio_url = await upload_response.text()
+                        audio_url = audio_url.strip()
+                finally:
+                    os.remove(audio_file_path)  # Clean up the audio file after uploading
 
-                os.remove(audio_file_path)  # Clean up the audio file after reading
-
-                return audio_data
+                return audio_url
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
@@ -94,7 +99,8 @@ class ShazamCog(commands.Cog):
             for url in urls:
                 try:
                     if url.endswith(('.mp4', '.mov', '.avi', '.mkv')):
-                        media = await self.download_and_convert_to_audio(url)
+                        media_url = await self.download_and_convert_to_audio(url)
+                        media = await self.__aio_get(media_url)
                     else:
                         media = await self.__aio_get(url)
 
@@ -104,7 +110,7 @@ class ShazamCog(commands.Cog):
                         track = track_info['track']
                         share_text = track.get('share', {}).get('text', 'Unknown Title')
                         coverart_url = track.get('images', {}).get('coverart', '')
-                        embed_color = self.get_dominant_color(coverart_url) if coverart_url else discord.Color.blue()
+                        embed_color = await self.get_dominant_color(coverart_url) if coverart_url else discord.Color.blue()
 
                         genre = track.get('genres', {}).get('primary', 'N/A')
                         release_date_str = track.get('releasedate', '')
