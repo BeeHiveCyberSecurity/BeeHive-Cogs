@@ -11,6 +11,7 @@ from shazamio.api import Shazam as AudioAlchemist
 from shazamio.serializers import Serialize as Shazamalize
 from colorthief import ColorThief
 import requests
+from datetime import datetime
 
 class ShazamCog(commands.Cog):
     """Cog to interact with the Shazam API using shazamio."""
@@ -63,18 +64,27 @@ class ShazamCog(commands.Cog):
                     embed_color = self.get_dominant_color(coverart_url) if coverart_url else discord.Color.blue()
 
                     genre = track.get('genres', {}).get('primary', 'N/A')
-                    release_date = track.get('releasedate', 'Unknown Release Date')
+                    release_date_str = track.get('releasedate', '')
+
+                    # Check if release date is available, otherwise use metadata
+                    if not release_date_str or release_date_str == 'Unknown Release Date':
+                        sections = track_info.get('sections', [{}])
+                        metadata = sections[0].get('metadata', []) if sections else []
+                        release_date_str = next((item['text'] for item in metadata if item['title'] == 'Released'), 'Unknown Release Date')
+
+                    # Convert release date to discord dynamic timestamp
+                    try:
+                        release_date = datetime.strptime(release_date_str, '%d-%m-%Y')
+                        release_date_timestamp = f"<t:{int(release_date.timestamp())}:D>"
+                    except ValueError:
+                        release_date_timestamp = release_date_str
 
                     embed = discord.Embed(
                         title=share_text,
-                        description=f"Genre: {genre}\nRelease Date: {release_date}",
+                        description=f"Genre: {genre}\nRelease Date: {release_date_timestamp}",
                         color=embed_color
                     )
                     embed.set_thumbnail(url=coverart_url)
-
-                    # Safely access metadata fields
-                    sections = track_info.get('sections', [{}])
-                    metadata = sections[0].get('metadata', []) if sections else []
 
                     # Check for explicit content
                     hub_info = track.get('hub', {})
