@@ -12,8 +12,6 @@ from shazamio.serializers import Serialize as Shazamalize
 from colorthief import ColorThief
 import requests
 from datetime import datetime
-import ffmpeg
-import tempfile
 
 class ShazamCog(commands.Cog):
     """Cog to interact with the Shazam API using shazamio."""
@@ -43,40 +41,15 @@ class ShazamCog(commands.Cog):
             logging.exception("Error fetching dominant color from image: %s", image_url, exc_info=e)
             raise RuntimeError("Failed to fetch dominant color from the image.") from e
 
-    async def extract_audio_from_video(self, ctx, video_bytes: bytes) -> bytes:
-        """Extract audio from video bytes using ffmpeg and return the audio bytes."""
-        try:
-            with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as temp_audio:
-                with tempfile.NamedTemporaryFile(delete=False) as temp_video:
-                    temp_video.write(video_bytes)
-                    temp_video.flush()
-
-                    input_stream = ffmpeg.input(temp_video.name)
-                    output_stream = ffmpeg.output(input_stream, temp_audio.name, format='mp3', acodec='libmp3lame')
-                    ffmpeg.run(output_stream)
-
-                with open(temp_audio.name, 'rb') as audio_file:
-                    audio_bytes = audio_file.read()
-
-                # Send the audio file to the channel
-                audio_file = discord.File(io.BytesIO(audio_bytes), filename="extracted_audio.mp3")
-                await ctx.send(file=audio_file)
-
-                # Return the audio bytes
-                return audio_bytes
-        except Exception as e:
-            logging.exception("Error extracting audio from video", exc_info=e)
-            raise commands.UserFeedbackCheckFailure("Failed to extract audio from the video.") from e
-
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
-        """Automatically identify a song from an audio or video URL or uploaded file."""
+        """Automatically identify a song from an audio URL or uploaded file."""
         if message.author.bot:
             return
 
         urls = []
         for attachment in message.attachments:
-            if attachment.content_type and (attachment.content_type.startswith('audio/') or attachment.content_type.startswith('video/')):
+            if attachment.content_type and attachment.content_type.startswith('audio/'):
                 urls.append(attachment.url)
 
         if not urls:
@@ -86,10 +59,6 @@ class ShazamCog(commands.Cog):
             for url in urls:
                 try:
                     media: bytes = await self.__aio_get(url)
-                    
-                    # Check if the file is a video and extract audio if necessary
-                    if 'video/' in url:
-                        media = await self.extract_audio_from_video(message.channel, media)
 
                     track_info = await self.alchemist.recognize(media)
 
