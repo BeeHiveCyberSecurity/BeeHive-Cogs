@@ -65,16 +65,22 @@ class ShazamCog(commands.Cog):
                     embed.add_field(name="Genre", value=track.get('genres', {}).get('primary', 'N/A'), inline=True)
                     embed.add_field(name="Listen on Shazam", value=f"[Link]({track.get('url', '')})", inline=False)
                     embed.set_footer(text="Powered by Shazam")
+                    
+                    # Convert track_info to JSON and send as a file
+                    json_data = json.dumps(track_info, indent=4)
+                    json_file = discord.File(fp=io.StringIO(json_data), filename="track_info.json")
+                    await ctx.send(embed=embed, file=json_file)
                 else:
                     embed = discord.Embed(
                         title="Identification Failed",
                         description="Could not identify the song from the provided URL or file.",
                         color=discord.Color.red()
                     )
+                    await ctx.send(embed=embed)
             except Exception as e:
                 embed = discord.Embed(
                     title="Error",
                     description=f"An error occurred: {str(e)}",
                     color=discord.Color.red()
                 )
-            await ctx.send(embed=embed)
+                await ctx.send(embed=embed)
