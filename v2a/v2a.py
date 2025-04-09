@@ -3,7 +3,7 @@ from redbot.core import commands
 import aiohttp
 import tempfile
 import os
-from ffmpeg import video
+from moviepy.editor import VideoFileClip
 
 class VideoToAudio(commands.Cog):
     """Cog to convert video messages to audio and reply with the audio file."""
@@ -48,9 +48,11 @@ class VideoToAudio(commands.Cog):
                 with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as audio_file:
                     audio_file_path = audio_file.name
 
-                # Use ffmpeg to extract audio
+                # Use moviepy to extract audio
                 try:
-                    video.ins_img(video_file_path, [], audio_file_path)
+                    with VideoFileClip(video_file_path) as video_clip:
+                        audio_clip = video_clip.audio
+                        audio_clip.write_audiofile(audio_file_path)
                 except Exception as e:
                     os.remove(video_file_path)  # Ensure video file is removed even if conversion fails
                     raise e
