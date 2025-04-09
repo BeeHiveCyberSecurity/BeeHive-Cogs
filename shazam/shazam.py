@@ -80,13 +80,13 @@ class ShazamCog(commands.Cog):
                         embed.set_footer(text="Song contains explicit content, audience discretion advised")
 
                     # Add additional fields from the track_info
-                    embed.add_field(name="Track ID", value=track_info.get('track', {}).get('key', 'N/A'), inline=True)
-                    embed.add_field(name="ISRC", value=track_info.get('track', {}).get('isrc', 'N/A'), inline=True)
+                    embed.add_field(name="Track ID", value=track.get('key', 'N/A'), inline=True)
+                    embed.add_field(name="ISRC", value=track.get('isrc', 'N/A'), inline=True)
 
                     # Create URL buttons for Shazam and Apple Music
                     view = discord.ui.View()
                     shazam_url = track.get('url', '')
-                    apple_music_url = track_info.get('track', {}).get('hub', {}).get('actions', [{}])[0].get('uri', '')
+                    apple_music_url = track.get('hub', {}).get('actions', [{}])[0].get('uri', '')
 
                     if shazam_url:
                         shazam_button = discord.ui.Button(label="Listen on Shazam", url=shazam_url)
