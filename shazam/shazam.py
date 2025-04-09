@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import json
 from typing import Union, Dict, Any
 import discord
 import aiohttp
@@ -45,26 +46,20 @@ class ShazamCog(commands.Cog):
                     serialized_info = Shazamalize.full_track(track_info)
                     track_title = serialized_info.track.title
                     track_artist = serialized_info.track.subtitle
-                    embed = discord.Embed(
-                        title="Song identified",
-                        description=f"**Title:** {track_title}\n**Artist:** {track_artist}",
-                        color=0xfffffe
-                    )
-                    # Send the entire data as a JSON string
-                    full_data = f"Full Track Info: {track_info}"
+                    response_data = {
+                        "status": "success",
+                        "title": track_title,
+                        "artist": track_artist,
+                        "full_track_info": track_info
+                    }
                 else:
-                    embed = discord.Embed(
-                        title="Couldn't match this audio",
-                        description="Could not identify the song from the provided URL or file.",
-                        color=discord.Color.red()
-                    )
-                    full_data = "No track information available."
+                    response_data = {
+                        "status": "failure",
+                        "message": "Could not identify the song from the provided URL or file."
+                    }
             except Exception as e:
-                embed = discord.Embed(
-                    title="Error",
-                    description=f"An error occurred: {str(e)}",
-                    color=discord.Color.red()
-                )
-                full_data = f"Error details: {str(e)}"
-            await ctx.send(embed=embed)
-            await ctx.send(full_data)
+                response_data = {
+                    "status": "error",
+                    "message": f"An error occurred: {str(e)}"
+                }
+            await ctx.send(file=discord.File(fp=json.dumps(response_data, indent=4), filename="response.json"))
