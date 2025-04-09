@@ -12,6 +12,9 @@ from shazamio.serializers import Serialize as Shazamalize
 from colorthief import ColorThief
 import requests
 from datetime import datetime
+from moviepy import VideoFileClip
+import tempfile
+import os
 
 class ShazamCog(commands.Cog):
     """Cog to interact with the Shazam API using shazamio."""
@@ -41,13 +44,47 @@ class ShazamCog(commands.Cog):
             logging.exception("Error fetching dominant color from image: %s", image_url, exc_info=e)
             raise RuntimeError("Failed to fetch dominant color from the image.") from e
 
+    async def download_and_convert_to_audio(self, video_url: str) -> bytes:
+        """Download the video and convert it to an audio file."""
+        async with aiohttp.ClientSession() as session:
+            async with session.get(video_url) as response:
+                if response.status != 200:
+                    raise aiohttp.ClientError(f"Failed to download video, status code: {response.status}")
+
+                video_data = await response.read()
+
+                with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as video_file:
+                    video_file.write(video_data)
+                    video_file_path = video_file.name
+
+                with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as audio_file:
+                    audio_file_path = audio_file.name
+
+                # Use moviepy to extract audio
+                try:
+                    with VideoFileClip(video_file_path) as video_clip:
+                        audio_clip = video_clip.audio
+                        audio_clip.write_audiofile(audio_file_path)
+                except Exception as e:
+                    os.remove(video_file_path)  # Ensure video file is removed even if conversion fails
+                    raise e
+
+                os.remove(video_file_path)  # Clean up the video file after conversion
+
+                with open(audio_file_path, 'rb') as audio_file:
+                    audio_data = audio_file.read()
+
+                os.remove(audio_file_path)  # Clean up the audio file after reading
+
+                return audio_data
+
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
-        """Automatically identify a song from an audio URL or uploaded file."""
+        """Automatically identify a song from an audio or video URL or uploaded file."""
 
         urls = []
         for attachment in message.attachments:
-            if attachment.content_type and attachment.content_type.startswith('audio/'):
+            if attachment.content_type and (attachment.content_type.startswith('audio/') or attachment.content_type.startswith('video/')):
                 urls.append(attachment.url)
 
         if not urls:
@@ -56,7 +93,10 @@ class ShazamCog(commands.Cog):
         async with message.channel.typing():
             for url in urls:
                 try:
-                    media: bytes = await self.__aio_get(url)
+                    if url.endswith(('.mp4', '.mov', '.avi', '.mkv')):
+                        media = await self.download_and_convert_to_audio(url)
+                    else:
+                        media = await self.__aio_get(url)
 
                     track_info = await self.alchemist.recognize(media)
 
