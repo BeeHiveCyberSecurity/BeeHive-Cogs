@@ -59,11 +59,16 @@ class ChatSummary(commands.Cog):
                             "timestamp": message.created_at.isoformat()
                         })
                         if user in message.mentions:
+                            is_reply = False
+                            if message.reference and message.reference.resolved:
+                                resolved_message = message.reference.resolved
+                                if isinstance(resolved_message, discord.Message) and resolved_message.author == user:
+                                    is_reply = True
                             mentions.append({
                                 "author": message.author.display_name,
                                 "timestamp": message.created_at,
                                 "jump_url": message.jump_url,
-                                "is_reply": message.reference is not None and message.reference.resolved and message.reference.resolved.author == user
+                                "is_reply": is_reply
                             })
 
                 messages_content = "\n".join(f"{msg['author']}: {msg['content']}" for msg in recent_messages)
