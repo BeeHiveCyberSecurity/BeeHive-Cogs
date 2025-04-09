@@ -29,15 +29,19 @@ class VideoToAudio(commands.Cog):
                     if audio_file_path:
                         await message.reply(file=discord.File(audio_file_path))
                         os.remove(audio_file_path)  # Clean up the audio file after sending
+                except subprocess.CalledProcessError as e:
+                    await message.channel.send(f"Failed to convert video to audio: {str(e)}")
+                except aiohttp.ClientError as e:
+                    await message.channel.send(f"Failed to download video: {str(e)}")
                 except Exception as e:
-                    await message.channel.send(f"Failed to process video: {str(e)}")
+                    await message.channel.send(f"An unexpected error occurred: {str(e)}")
 
     async def download_and_convert_to_audio(self, video_url: str) -> str:
         """Download the video and convert it to an audio file."""
         async with aiohttp.ClientSession() as session:
             async with session.get(video_url) as response:
                 if response.status != 200:
-                    raise Exception("Failed to download video.")
+                    raise aiohttp.ClientError(f"Failed to download video, status code: {response.status}")
 
                 video_data = await response.read()
 
@@ -49,7 +53,11 @@ class VideoToAudio(commands.Cog):
                     audio_file_path = audio_file.name
 
                 # Use subprocess to call ffmpeg for extracting audio
-                subprocess.run(['ffmpeg', '-i', video_file_path, '-q:a', '0', '-map', 'a', audio_file_path], check=True)
+                try:
+                    subprocess.run(['ffmpeg', '-i', video_file_path, '-q:a', '0', '-map', 'a', audio_file_path], check=True)
+                except subprocess.CalledProcessError as e:
+                    os.remove(video_file_path)  # Ensure video file is removed even if conversion fails
+                    raise e
 
                 os.remove(video_file_path)  # Clean up the video file after conversion
 
