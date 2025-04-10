@@ -2,13 +2,14 @@ import asyncio
 import datetime
 import re
 from typing import List, Optional, Dict, Any
-from urllib.parse import urlsplit, urlunsplit
+from urllib.parse import urlsplit
 import aiohttp  # type: ignore
 import discord  # type: ignore
 from discord.ext import tasks  # type: ignore
 from redbot.core import Config, commands  # type: ignore
 from redbot.core.bot import Red  # type: ignore
 from redbot.core.commands import Context  # type: ignore
+from redbot.core.utils.common_filters import filter_urls  # Import the filter_urls function
 import logging
 
 log = logging.getLogger("red.beehive-cogs.antiphishing")
@@ -60,22 +61,17 @@ class AntiPhishing(commands.Cog):
 
     def extract_urls(self, message: str) -> List[str]:
         """
-        Extract URLs from a message using regex.
-        Handles potential surrounding characters like < >
+        Extract URLs from a message using the filter_urls utility.
         """
-        url_pattern = re.compile(r'(?:<)?(https?://[^\s<>]+)(?:>)?')
-        zero_width_chars = ["\u200b", "\u200c", "\u200d", "\u2060", "\uFEFF"]
-        for char in zero_width_chars:
-            message = message.replace(char, "")
-
-        matches = url_pattern.findall(message)
+        sanitized_message = filter_urls(message)
+        url_pattern = re.compile(r'(https?://[^\s<>]+)')
+        matches = url_pattern.findall(sanitized_message)
         urls = []
         for url in matches:
             try:
                 result = urlsplit(url)
                 if result.scheme in {"http", "https"} and result.netloc:
-                    reconstructed_url = urlunsplit(result)
-                    urls.append(reconstructed_url)
+                    urls.append(url)
                 else:
                     log.debug(f"Skipping invalid URL structure: {url}")
             except ValueError as e:
