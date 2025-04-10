@@ -414,19 +414,26 @@ class ChatSummary(commands.Cog):
                                     response_data = await stripe_response.json()
                                     login_url = response_data.get("url")
                                     if login_url:
-                                        await interaction.response.send_message(f"Click **[here](<{login_url}>)** to manage your billing.\n\n:octagonal_sign: This link will automatically sign you in - **don't share it with others no matter what**.", ephemeral=True)
+                                        await interaction.response.send_message(f"[Click here to manage your billing](<{login_url}>)\n\n# :octagonal_sign: This link will automatically sign you in - **don't share it with others no matter what**.", ephemeral=True)
                                 else:
                                     await interaction.response.send_message(f"Failed to generate billing portal link. Status code: {stripe_response.status}", ephemeral=True)
                         except aiohttp.ClientError as e:
                             await interaction.response.send_message(f"Failed to connect to Stripe API: {str(e)}", ephemeral=True)
 
                 view = discord.ui.View(timeout=30)
-                button = discord.ui.Button(label="Login and manage billing", style=discord.ButtonStyle.green)
+                button = discord.ui.Button(label="🔒 Quick login", style=discord.ButtonStyle.gray)
                 button.callback = generate_billing_link
                 view.add_item(button)
                 await ctx.send(embed=embed, view=view)
         else:
             await ctx.send(embed=embed)
+
+
+
+
+
+
+
 
 
     @commands.command(name="away")
