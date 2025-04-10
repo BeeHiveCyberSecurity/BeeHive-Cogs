@@ -55,12 +55,11 @@ class ChatSummary(commands.Cog):
                         })
                     elif entry.action == discord.AuditLogAction.member_update:
                         moderation_actions.append({
-                            "action": "timeout",
+                            "action": "member_update",
                             "user": entry.user.display_name,
                             "target": entry.target.display_name if isinstance(entry.target, discord.Member) else str(entry.target),
                             "reason": entry.reason or "No reason found",
                             "timestamp": entry.created_at.isoformat(),
-                            "timeout_duration": f"{timeout_duration / 60:.0f} minutes" if timeout_duration else "Timeout removed"
                         })
                     elif entry.action == discord.AuditLogAction.unban:
                         moderation_actions.append({
