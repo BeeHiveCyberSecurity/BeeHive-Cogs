@@ -336,7 +336,10 @@ class ChatSummary(commands.Cog):
             async with aiohttp.ClientSession() as session:
                 try:
                     async with session.post(stripe_url, headers=stripe_headers, data=stripe_payload) as stripe_response:
-                        if stripe_response.status != 200:
+                        if stripe_response.status == 400:
+                            error_message = await stripe_response.text()
+                            raise Exception(f"Failed to track event with Stripe. Status code: 400, Error: {error_message}")
+                        elif stripe_response.status != 200:
                             await ctx.send(f"Failed to track event with Stripe. Status code: {stripe_response.status}", delete_after=10)
                 except aiohttp.ClientError as e:
                     await ctx.send(f"Failed to connect to Stripe API: {str(e)}", delete_after=10)
