@@ -291,17 +291,15 @@ class ChatSummary(commands.Cog):
 
     @summarizer.command(name="id")
     @commands.is_owner()
-    async def manage_customer_id(self, ctx: commands.Context, user: discord.User, action: str, customer_id: Optional[str] = None):
-        """Set or delete a customer's ID for a user globally."""
+    async def manage_customer_id(self, ctx: commands.Context, user: discord.User, customer_id: Optional[str] = None):
+        """Set or clear a customer's ID for a user globally."""
         
-        if action.lower() == "set" and customer_id:
+        if customer_id:
             await self.config.user(user).customer_id.set(customer_id)
             await ctx.send(f"Customer ID for {user.name} has been set to {customer_id}.")
-        elif action.lower() == "delete":
-            await self.config.user(user).customer_id.clear()
-            await ctx.send(f"Customer ID for {user.name} has been deleted.")
         else:
-            await ctx.send("Invalid action or missing customer ID. Use 'set <customer_id>' to set or 'delete' to remove the ID.")
+            await self.config.user(user).customer_id.clear()
+            await ctx.send(f"Customer ID for {user.name} has been cleared.")
 
     @summarizer.command(name="profile")
     async def view_profile(self, ctx: commands.Context):
