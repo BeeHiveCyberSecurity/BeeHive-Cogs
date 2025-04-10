@@ -53,17 +53,13 @@ class ChatSummary(commands.Cog):
                             "reason": entry.reason or "No reason provided",
                             "timestamp": entry.created_at.isoformat()
                         })
-                    elif entry.action == discord.AuditLogAction.member_update:
-                        # Check if the timeout change is present
-                        timeout_change = 'timed_out_until' in entry.before
-                        if timeout_change:
-                            moderation_actions.append({
-                                "action": "timeout",
-                                "user": entry.user.display_name,
-                                "target": entry.target.display_name if isinstance(entry.target, discord.Member) else str(entry.target),
-                                "reason": entry.reason or "No reason provided",
-                                "timestamp": entry.created_at.isoformat()
-                            })
+                    moderation_actions.append({
+                        "action": "timeout",
+                        "user": entry.user.display_name,
+                        "target": entry.target.display_name if isinstance(entry.target, discord.Member) else str(entry.target),
+                        "reason": entry.reason or "No reason provided",
+                        "timestamp": entry.created_at.isoformat()
+                    })
                     elif entry.action == discord.AuditLogAction.unban:
                         moderation_actions.append({
                             "action": "unban",
