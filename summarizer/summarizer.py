@@ -42,8 +42,11 @@ class ChatSummary(commands.Cog):
                         discord.AuditLogAction.kick,
                         discord.AuditLogAction.member_update  # Assuming timeouts are logged as member updates
                     ]:
-                        if entry.action == discord.AuditLogAction.member_update and 'timeout' not in entry.changes.keys():
-                            continue
+                        if entry.action == discord.AuditLogAction.member_update:
+                            # Check if the timeout change is present
+                            timeout_change = any(change.key == 'timeout' for change in entry.changes)
+                            if not timeout_change:
+                                continue
                         moderation_actions.append({
                             "action": entry.action.name,
                             "user": entry.user.display_name,
