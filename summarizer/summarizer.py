@@ -113,7 +113,16 @@ class ChatSummary(commands.Cog):
                     }
                     payload = {
                         "model": "gpt-4o-mini",
-                        "messages": f"Summarize the following moderation actions:\n{actions_content}"
+                        "messages": [
+                            {
+                                "role": "system",
+                                "content": "You are a moderation summary generator. Use title-less bulletpoints where appropriate."
+                            },
+                            {
+                                "role": "user",
+                                "content": f"Summarize the following moderation history: {moderation_actions}"
+                            }
+                        ]
                     }
                     async with session.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload) as response:
                         if response.status == 200:
