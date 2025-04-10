@@ -451,7 +451,9 @@ class ChatSummary(commands.Cog):
 
         # Create a dropdown menu for model selection
         class ModelDropdown(discord.ui.Select):
-            def __init__(self):
+            def __init__(self, config, user):
+                self.config = config
+                self.user = user
                 options = [
                     discord.SelectOption(label=model, description=f"Select {model} as your preferred model")
                     for model in valid_models
@@ -460,21 +462,20 @@ class ChatSummary(commands.Cog):
 
             async def callback(self, interaction: discord.Interaction):
                 selected_model = self.values[0]
-                await self.view.set_model(interaction, selected_model)
-
-        class ModelDropdownView(discord.ui.View):
-            def __init__(self, user):
-                super().__init__(timeout=30)
-                self.user = user
-                self.add_item(ModelDropdown())
+                await self.set_model(interaction, selected_model)
 
             async def set_model(self, interaction: discord.Interaction, model: str):
                 await self.config.user(self.user).preferred_model.set(model)
                 await interaction.response.defer(ephemeral=True)
                 await interaction.followup.send(f"Your preferred model has been set to {model}.", ephemeral=True)
 
+        class ModelDropdownView(discord.ui.View):
+            def __init__(self, config, user):
+                super().__init__(timeout=30)
+                self.add_item(ModelDropdown(config, user))
+
         # Send the dropdown view to the user
-        view = ModelDropdownView(user)
+        view = ModelDropdownView(self.config, user)
         await ctx.send("Please select your preferred AI model for summarization:", view=view)
 
 
