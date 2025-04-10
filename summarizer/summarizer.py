@@ -55,7 +55,7 @@ class ChatSummary(commands.Cog):
                         })
                     elif entry.action == discord.AuditLogAction.member_update:
                         # Check if the timeout change is present
-                        timeout_change = any(change[0] == 'timed_out_until' for change in entry.before)
+                        timeout_change = any(change[0] == 'timed_out_until' for change in entry.before.items())
                         if timeout_change:
                             moderation_actions.append({
                                 "action": "timeout",
@@ -120,14 +120,14 @@ class ChatSummary(commands.Cog):
                             },
                             {
                                 "role": "user",
-                                "content": f"Summarize the following moderation history: {moderation_actions}"
+                                "content": f"Summarize the following moderation history: {actions_content}"
                             }
                         ]
                     }
                     async with session.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload) as response:
                         if response.status == 200:
                             data = await response.json()
-                            summary = data['choices'][0]['text'].strip()
+                            summary = data['choices'][0]['message']['content'].strip()
                             embed = discord.Embed(
                                 title="Moderation Summary",
                                 description=summary,
