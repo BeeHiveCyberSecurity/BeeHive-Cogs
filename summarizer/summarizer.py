@@ -113,7 +113,7 @@ class ChatSummary(commands.Cog):
                         "messages": [
                             {
                                 "role": "system",
-                                "content": "You are a moderation summary generator. Use title-less bulletpoints where appropriate."
+                                "content": "You are a moderation summary generator. Use bulletpoints. Don't use titles."
                             },
                             {
                                 "role": "user",
