@@ -393,7 +393,7 @@ class ChatSummary(commands.Cog):
             embed.add_field(name="Preferred Model", value=preferred_model, inline=False)
         else:
             embed.add_field(name="Customer ID", value="Hidden", inline=False)
-            embed.add_field(name="Preferred Model", value="Hidden", inline=False)
+            embed.add_field(name="Preferred Model", value=preferred_model, inline=False)
 
         if customer_id != "Not set":
             stripe_tokens = await self.bot.get_shared_api_tokens("stripe")
