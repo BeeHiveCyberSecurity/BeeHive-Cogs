@@ -129,9 +129,9 @@ class ChatSummary(commands.Cog):
                             data = await response.json()
                             summary = data['choices'][0]['message']['content'].strip()
                             embed = discord.Embed(
-                                title="Moderation Summary",
+                                title="AI moderation summary",
                                 description=summary,
-                                color=discord.Color.blue()
+                                color=0xfffffe
                             )
                             await ctx.send(embed=embed)
                         else:
