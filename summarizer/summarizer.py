@@ -39,9 +39,7 @@ class ChatSummary(commands.Cog):
                 async for entry in guild.audit_logs(limit=100, after=cutoff):
                     if entry.action in [
                         discord.AuditLogAction.ban, 
-                        discord.AuditLogAction.kick, 
-                        discord.AuditLogAction.mute, 
-                        discord.AuditLogAction.unmute, 
+                        discord.AuditLogAction.kick,
                         discord.AuditLogAction.member_update  # Assuming timeouts are logged as member updates
                     ]:
                         if entry.action == discord.AuditLogAction.member_update and 'timeout' not in entry.changes.keys():
