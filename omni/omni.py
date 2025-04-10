@@ -264,8 +264,10 @@ class Omni(commands.Cog):
             timeout_issued = False
             if timeout_duration > 0:
                 try:
-                    reason = "AI moderator action. Violation scores: " + ", ".join(
-                        f"{category}: {score:.2f}" for category, score in category_scores.items() if score > 0.2
+                    reason = (
+                        f"Agentic moderator issued a timeout. Violation scores: " +
+                        ", ".join(f"{category}: {score:.2f}" for category, score in category_scores.items() if score > 0.2) +
+                        f". Flagged message: {message.content}"
                     )
                     await message.author.timeout(timedelta(minutes=timeout_duration), reason=reason)
                     self.increment_statistic(guild.id, 'timeout_count')
