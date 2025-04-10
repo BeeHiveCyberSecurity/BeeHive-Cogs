@@ -446,8 +446,13 @@ class ChatSummary(commands.Cog):
             await ctx.send("You must have a customer ID set to use this command.", delete_after=10)
             return
 
-        # Define valid models
-        valid_models = ["gpt-4o", "gpt-4o-mini", "gpt-3.5", "o1"]
+        # Define valid models with descriptions
+        model_details = {
+            "gpt-4o": "GPT-4o: Optimized for high-quality summarization with advanced language understanding.",
+            "gpt-4o-mini": "GPT-4o-mini: A lighter version of GPT-4o, balancing performance and efficiency.",
+            "gpt-3.5": "GPT-3.5: A robust model for general summarization tasks.",
+            "o1": "O1: A custom model designed for specific summarization needs."
+        }
 
         # Create a dropdown menu for model selection
         class ModelDropdown(discord.ui.Select):
@@ -455,8 +460,8 @@ class ChatSummary(commands.Cog):
                 self.config = config
                 self.user = user
                 options = [
-                    discord.SelectOption(label=model, description=f"Select {model} as your preferred model")
-                    for model in valid_models
+                    discord.SelectOption(label=model, description=description)
+                    for model, description in model_details.items()
                 ]
                 super().__init__(placeholder="Choose your preferred model...", min_values=1, max_values=1, options=options)
 
