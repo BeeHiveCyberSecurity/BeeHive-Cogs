@@ -119,7 +119,7 @@ class Omni(commands.Cog):
                 ),
                 color=0xfffffe
             )
-            embed.set_footer(text=f"Use `{command_prefix}omni vote` to give feedback on this server's moderation")
+            embed.set_footer(text=f"Use {command_prefix}omni vote to give feedback on this server's moderation")
             embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/sparkles.png")
             await channel.send(embed=embed)
         except discord.HTTPException as e:
