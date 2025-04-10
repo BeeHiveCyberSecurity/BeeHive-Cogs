@@ -14,7 +14,7 @@ class ChatSummary(commands.Cog):
         default_user = {"customer_id": None, "is_afk": False, "afk_since": None}
         self.config.register_user(**default_user)
 
-    async def _track_stripe_event(self, ctx, customer_id, model_name, event_type, total_tokens):
+    async def _track_stripe_event(self, ctx, customer_id, model_name, event_type, tokens):
         stripe_tokens = await self.bot.get_shared_api_tokens("stripe")
         stripe_key = stripe_tokens.get("api_key") if stripe_tokens else None
 
@@ -28,7 +28,7 @@ class ChatSummary(commands.Cog):
                 "event_name": f"{model_name}_{event_type}",
                 "timestamp": int(datetime.now().timestamp()),
                 "payload[stripe_customer_id]": customer_id,
-                "payload[tokens]": total_tokens
+                "payload[tokens]": tokens
             }
             async with aiohttp.ClientSession() as session:
                 try:
@@ -209,7 +209,6 @@ class ChatSummary(commands.Cog):
                             data = await response.json()
                             summary = data['choices'][0]['message']['content'].strip()
                             output_tokens = len(encoding.encode(summary))
-                            total_tokens = input_tokens + output_tokens
                             embed = discord.Embed(
                                 title="AI moderation summary",
                                 description=summary,
@@ -281,14 +280,14 @@ class ChatSummary(commands.Cog):
                 tokens = await self.bot.get_shared_api_tokens("openai")
                 openai_key = tokens.get("api_key") if tokens else None
 
-                ai_summary, total_tokens = await self._generate_ai_summary(openai_key, messages_content, customer_id)
+                ai_summary, input_tokens, output_tokens = await self._generate_ai_summary(openai_key, messages_content, customer_id)
                 mention_summary = self._generate_mention_summary(mentions)
                 await self._send_summary_embed(ctx, ai_summary, mention_summary, customer_id, user)
 
                 if openai_key and customer_id:
                     model_name = "gpt-4o" if customer_id else "gpt-4o-mini"
-                    await self._track_stripe_event(ctx, customer_id, model_name, "input", total_tokens // 2)
-                    await self._track_stripe_event(ctx, customer_id, model_name, "output", total_tokens // 2)
+                    await self._track_stripe_event(ctx, customer_id, model_name, "input", input_tokens)
+                    await self._track_stripe_event(ctx, customer_id, model_name, "output", output_tokens)
 
         except Exception as e:
             await ctx.send(f"An error occurred: {str(e)}", delete_after=10)
@@ -319,14 +318,13 @@ class ChatSummary(commands.Cog):
                             openai_data = await openai_response.json()
                             summary = openai_data.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
                             output_tokens = len(encoding.encode(summary))
-                            total_tokens = input_tokens + output_tokens
-                            return summary, total_tokens
+                            return summary, input_tokens, output_tokens
                         else:
-                            return f"Failed to generate summary from OpenAI. Status code: {openai_response.status}", 0
+                            return f"Failed to generate summary from OpenAI. Status code: {openai_response.status}", 0, 0
                 except aiohttp.ClientError as e:
-                    return f"Failed to connect to OpenAI API: {str(e)}", 0
+                    return f"Failed to connect to OpenAI API: {str(e)}", 0, 0
         else:
-            return "OpenAI API key not configured.", 0
+            return "OpenAI API key not configured.", 0, 0
 
     def _generate_mention_summary(self, mentions):
         if not mentions:
