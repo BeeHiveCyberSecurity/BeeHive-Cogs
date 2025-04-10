@@ -25,7 +25,7 @@ class ChatSummary(commands.Cog):
     
     @summarize.command(name="moderation")
     async def summarize_moderation(self, ctx: commands.Context, hours: int = 1):
-        """Summarize recent moderation actions from the audit log."""
+        """Summarize recent moderation actions from the audit log, including timeouts."""
         try:
             guild = ctx.guild
             if not guild:
@@ -37,7 +37,15 @@ class ChatSummary(commands.Cog):
 
             async with ctx.typing():
                 async for entry in guild.audit_logs(limit=100, after=cutoff):
-                    if entry.action in [discord.AuditLogAction.ban, discord.AuditLogAction.kick, discord.AuditLogAction.mute, discord.AuditLogAction.unmute]:
+                    if entry.action in [
+                        discord.AuditLogAction.ban, 
+                        discord.AuditLogAction.kick, 
+                        discord.AuditLogAction.mute, 
+                        discord.AuditLogAction.unmute, 
+                        discord.AuditLogAction.member_update  # Assuming timeouts are logged as member updates
+                    ]:
+                        if entry.action == discord.AuditLogAction.member_update and 'timeout' not in entry.changes.keys():
+                            continue
                         moderation_actions.append({
                             "action": entry.action.name,
                             "user": entry.user.display_name,
