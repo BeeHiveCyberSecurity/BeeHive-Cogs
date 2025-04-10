@@ -11,7 +11,7 @@ from shazamio.api import Shazam as AudioAlchemist
 from shazamio.serializers import Serialize as Shazamalize
 from colorthief import ColorThief
 from datetime import datetime
-from moviepy import VideoFileClip  # Corrected import
+from moviepy import VideoFileClip
 import tempfile
 import os
 
