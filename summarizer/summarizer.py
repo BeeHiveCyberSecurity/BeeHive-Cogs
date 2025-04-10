@@ -100,20 +100,20 @@ class ChatSummary(commands.Cog):
                 )
 
                 # Use OpenAI to summarize the actions
-                api_key = (await self.bot.get_shared_api_tokens("openai")).get("api_key")
-                if not api_key:
+                tokens = await self.bot.get_shared_api_tokens("openai")
+                openai_key = tokens.get("api_key") if tokens else None
+                if not openai_key:
                     await ctx.send("OpenAI API key is not set.", delete_after=10)
                     return
 
                 async with aiohttp.ClientSession() as session:
                     headers = {
-                        "Authorization": f"Bearer {api_key}",
+                        "Authorization": f"Bearer {openai_key}",
                         "Content-Type": "application/json"
                     }
                     payload = {
                         "model": "gpt-4o-mini",
-                        "messages": f"Summarize the following moderation actions:\n{actions_content}",
-                        "max_tokens": 150
+                        "messages": f"Summarize the following moderation actions:\n{actions_content}"
                     }
                     async with session.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload) as response:
                         if response.status == 200:
