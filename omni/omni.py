@@ -594,7 +594,7 @@ class Omni(commands.Cog):
             whitelisted_users_names = ", ".join([f"<@{user_id}>" for user_id in whitelisted_users]) or "None"
             last_reminder_display = last_reminder_time if last_reminder_time else "Never"
 
-            embed = discord.Embed(title="Omni configuration", color=0xfffffe)
+            embed = discord.Embed(title="Omni settings", color=0xfffffe)
             embed.add_field(name="Moderative threshold", value=str(moderation_threshold), inline=True)
             embed.add_field(name="Timeout duration", value=f"{timeout_duration} minutes", inline=True)
             embed.add_field(name="Log channel", value=log_channel_name, inline=True)
