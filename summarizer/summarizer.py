@@ -14,6 +14,34 @@ class ChatSummary(commands.Cog):
         default_user = {"customer_id": None, "is_afk": False, "afk_since": None}
         self.config.register_user(**default_user)
 
+    async def _track_stripe_event(self, ctx, customer_id, model_name, event_type, total_tokens):
+        stripe_tokens = await self.bot.get_shared_api_tokens("stripe")
+        stripe_key = stripe_tokens.get("api_key") if stripe_tokens else None
+
+        if stripe_key:
+            stripe_url = "https://api.stripe.com/v1/billing/meter_events"
+            stripe_headers = {
+                "Authorization": f"Bearer {stripe_key}",
+                "Content-Type": "application/x-www-form-urlencoded"
+            }
+            stripe_payload = {
+                "event_name": f"{model_name}_{event_type}",
+                "timestamp": int(datetime.now().timestamp()),
+                "payload[stripe_customer_id]": customer_id,
+                "payload[tokens]": total_tokens
+            }
+            async with aiohttp.ClientSession() as session:
+                try:
+                    async with session.post(stripe_url, headers=stripe_headers, data=stripe_payload) as stripe_response:
+                        if stripe_response.status == 400:
+                            error_message = await stripe_response.text()
+                            raise Exception(f"Failed to track event with Stripe. Status code: 400, Error: {error_message}")
+                        elif stripe_response.status != 200:
+                            await ctx.send(f"Failed to track event with Stripe. Status code: {stripe_response.status}", delete_after=10)
+                except aiohttp.ClientError as e:
+                    await ctx.send(f"Failed to connect to Stripe API: {str(e)}", delete_after=10)
+
+                        
     @commands.group(name="summarizer")
     async def summarizer(self, ctx: commands.Context):
         """Group for summarizer related commands."""
@@ -168,7 +196,7 @@ class ChatSummary(commands.Cog):
                         "messages": [
                             {
                                 "role": "system",
-                                "content": "You are a moderation summary generator. Use bulletpoints. Don't use titles. Only connect events if they happen within an ongoing time span of eachother."
+                                "content": "You are a moderation summary generator. Use bulletpoints. Don't use titles. Only connect events if they happen within an ongoing time span of each other."
                             },
                             {
                                 "role": "user",
@@ -192,8 +220,8 @@ class ChatSummary(commands.Cog):
                             user_data = await self.config.user(user).all()
                             customer_id = user_data.get("customer_id")
                             if customer_id:
-                                await self._track_stripe_event(ctx, customer_id, "gpt-4o_input", input_tokens)
-                                await self._track_stripe_event(ctx, customer_id, "gpt-4o_output", output_tokens)
+                                await self._track_stripe_event(ctx, customer_id, "gpt-4o", "input", input_tokens)
+                                await self._track_stripe_event(ctx, customer_id, "gpt-4o", "output", output_tokens)
                         else:
                             await ctx.send(f"Failed to summarize moderation actions. Status code: {response.status}", delete_after=10)
 
@@ -258,8 +286,9 @@ class ChatSummary(commands.Cog):
                 await self._send_summary_embed(ctx, ai_summary, mention_summary, customer_id, user)
 
                 if openai_key and customer_id:
-                    await self._track_stripe_event(ctx, customer_id, "gpt-4o_input" if customer_id else "gpt-4o-mini_input", total_tokens // 2)
-                    await self._track_stripe_event(ctx, customer_id, "gpt-4o_output" if customer_id else "gpt-4o-mini_output", total_tokens // 2)
+                    model_name = "gpt-4o" if customer_id else "gpt-4o-mini"
+                    await self._track_stripe_event(ctx, customer_id, model_name, "input", total_tokens // 2)
+                    await self._track_stripe_event(ctx, customer_id, model_name, "output", total_tokens // 2)
 
         except Exception as e:
             await ctx.send(f"An error occurred: {str(e)}", delete_after=10)
@@ -331,33 +360,6 @@ class ChatSummary(commands.Cog):
             await ctx.send(embed=embed)
         except discord.Forbidden:
             await ctx.send(embed=embed)
-
-    async def _track_stripe_event(self, ctx, customer_id, event_name, total_tokens):
-        stripe_tokens = await self.bot.get_shared_api_tokens("stripe")
-        stripe_key = stripe_tokens.get("api_key") if stripe_tokens else None
-
-        if stripe_key:
-            stripe_url = "https://api.stripe.com/v1/billing/meter_events"
-            stripe_headers = {
-                "Authorization": f"Bearer {stripe_key}",
-                "Content-Type": "application/x-www-form-urlencoded"
-            }
-            stripe_payload = {
-                "event_name": event_name,
-                "timestamp": int(datetime.now().timestamp()),
-                "payload[stripe_customer_id]": customer_id,
-                "payload[tokens]": total_tokens
-            }
-            async with aiohttp.ClientSession() as session:
-                try:
-                    async with session.post(stripe_url, headers=stripe_headers, data=stripe_payload) as stripe_response:
-                        if stripe_response.status == 400:
-                            error_message = await stripe_response.text()
-                            raise Exception(f"Failed to track event with Stripe. Status code: 400, Error: {error_message}")
-                        elif stripe_response.status != 200:
-                            await ctx.send(f"Failed to track event with Stripe. Status code: {stripe_response.status}", delete_after=10)
-                except aiohttp.ClientError as e:
-                    await ctx.send(f"Failed to connect to Stripe API: {str(e)}", delete_after=10)
 
     @summarizer.command(name="id")
     @commands.is_owner()
