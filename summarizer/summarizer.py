@@ -55,7 +55,7 @@ class ChatSummary(commands.Cog):
                         })
                     elif entry.action == discord.AuditLogAction.member_update:
                             moderation_actions.append({
-                                "action": "member_update",
+                                "action": "timeout",
                                 "user": entry.user.display_name,
                                 "target": entry.target.display_name if isinstance(entry.target, discord.Member) else str(entry.target),
                                 "reason": entry.reason or "No reason found",
