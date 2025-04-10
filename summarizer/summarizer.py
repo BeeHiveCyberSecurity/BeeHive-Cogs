@@ -54,17 +54,8 @@ class ChatSummary(commands.Cog):
                             "timestamp": entry.created_at.isoformat()
                         })
                     elif entry.action == discord.AuditLogAction.member_update:
-                        if entry.before.timed_out_until != entry.after.timed_out_until:
                             moderation_actions.append({
-                                "action": "timeout",
-                                "user": entry.user.display_name,
-                                "target": entry.target.display_name if isinstance(entry.target, discord.Member) else str(entry.target),
-                                "reason": entry.reason or "No reason found",
-                                "timestamp": entry.created_at.isoformat()
-                            })
-                        elif entry.before.roles != entry.after.roles:
-                            moderation_actions.append({
-                                "action": "update_member_roles",
+                                "action": "member_update",
                                 "user": entry.user.display_name,
                                 "target": entry.target.display_name if isinstance(entry.target, discord.Member) else str(entry.target),
                                 "reason": entry.reason or "No reason found",
@@ -86,6 +77,14 @@ class ChatSummary(commands.Cog):
                             "reason": entry.reason or "No reason found",
                             "timestamp": entry.created_at.isoformat()
                         })
+                    elif entry.action == discord.AuditLogAction.message_bulk_delete:
+                        moderation_actions.append({
+                            "action": "bulk_message_delete",
+                            "user": entry.user.display_name,
+                            "target": "Multiple messages",
+                            "reason": entry.reason or "No reason found",
+                            "timestamp": entry.created_at.isoformat()
+                        })
                     elif entry.action == discord.AuditLogAction.role_update:
                         moderation_actions.append({
                             "action": "role_update",
@@ -97,6 +96,38 @@ class ChatSummary(commands.Cog):
                     elif entry.action == discord.AuditLogAction.member_disconnect:
                         moderation_actions.append({
                             "action": "disconnect_member",
+                            "user": entry.user.display_name,
+                            "target": entry.target.display_name if isinstance(entry.target, discord.Member) else str(entry.target),
+                            "reason": entry.reason or "No reason found",
+                            "timestamp": entry.created_at.isoformat()
+                        })
+                    elif entry.action == discord.AuditLogAction.automod_rule_create:
+                        moderation_actions.append({
+                            "action": "automod_rule_create",
+                            "user": entry.user.display_name,
+                            "target": entry.target.name if isinstance(entry.target, discord.AutoModRule) else str(entry.target),
+                            "reason": entry.reason or "No reason found",
+                            "timestamp": entry.created_at.isoformat()
+                        })
+                    elif entry.action == discord.AuditLogAction.automod_rule_update:
+                        moderation_actions.append({
+                            "action": "automod_rule_update",
+                            "user": entry.user.display_name,
+                            "target": entry.target.name if isinstance(entry.target, discord.AutoModRule) else str(entry.target),
+                            "reason": entry.reason or "No reason found",
+                            "timestamp": entry.created_at.isoformat()
+                        })
+                    elif entry.action == discord.AuditLogAction.automod_rule_delete:
+                        moderation_actions.append({
+                            "action": "automod_rule_delete",
+                            "user": entry.user.display_name,
+                            "target": entry.target.name if isinstance(entry.target, discord.AutoModRule) else str(entry.target),
+                            "reason": entry.reason or "No reason found",
+                            "timestamp": entry.created_at.isoformat()
+                        })
+                    elif entry.action == discord.AuditLogAction.automod_block_message:
+                        moderation_actions.append({
+                            "action": "automod_block_message",
                             "user": entry.user.display_name,
                             "target": entry.target.display_name if isinstance(entry.target, discord.Member) else str(entry.target),
                             "reason": entry.reason or "No reason found",
