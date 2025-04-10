@@ -115,11 +115,11 @@ class Omni(commands.Cog):
             embed = discord.Embed(
                 title="Omni is monitoring the conversation",
                 description=(
-                    "An agentic moderator is analyzing this conversation in real-time, watching for harmful content and behaviors. Your messages are subject to logging, analysis, and automatic moderation at any time.\n\n"
-                    f"You can use the `{command_prefix}omni vote` command to let server staff know how the agent is doing."
+                    "- An agentic moderator is analyzing this conversation in real-time, watching for harmful content and behaviors.\n- Your messages are subject to logging, analysis, and automatic moderation at any time.\n- Omni will hand out punishments without waiting for human intervention.\n- All violations are automatically documented"
                 ),
                 color=0xfffffe
             )
+            embed.set_footer(text=f"Use `{command_prefix}omni vote` to give feedback on this server's moderation")
             embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/sparkles.png")
             await channel.send(embed=embed)
         except discord.HTTPException as e:
