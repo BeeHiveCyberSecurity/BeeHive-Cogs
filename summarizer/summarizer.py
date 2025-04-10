@@ -181,7 +181,7 @@ class ChatSummary(commands.Cog):
                             )
                             await ctx.send(embed=embed)
                             # Track stripe event if customer_id is present
-                            user = target_user or ctx.author
+                            user = ctx.author
                             user_data = await self.config.user(user).all()
                             customer_id = user_data.get("customer_id")
                             if customer_id:
