@@ -680,7 +680,7 @@ class Omni(commands.Cog):
             embed = discord.Embed(
                 title="How's our agentic moderation?",
                 description=f"Your feedback matters and will be used to help us tune the assistive AI used in {ctx.guild.name}.",
-                color=0xfffffe
+                color=0x45ABF5
             )
 
             view = discord.ui.View()
