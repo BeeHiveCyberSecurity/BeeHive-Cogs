@@ -121,7 +121,7 @@ class ChatSummary(commands.Cog):
         # Sort mentions by timestamp in descending order and take the last 5
         recent_mentions = sorted(mentions, key=lambda x: x['timestamp'], reverse=True)[:5]
         return "\n".join(
-            f"**{mention['author']}** {'replied to you' if mention['is_reply'] else 'mentioned you'} *<t:{int(mention['timestamp'].timestamp())}:R>* **[Jump]({mention['jump_url']})**"
+            f"- **{mention['author']}** {'replied to you' if mention['is_reply'] else 'mentioned you'} *<t:{int(mention['timestamp'].timestamp())}:R>* **[Jump]({mention['jump_url']})**"
             for mention in recent_mentions
         )
 
@@ -131,7 +131,7 @@ class ChatSummary(commands.Cog):
             description=ai_summary or "No recent messages.",
             color=0xfffffe
         )
-        embed.add_field(name="Who mentioned you", value=mention_summary, inline=False)
+        embed.add_field(name="Activity you may have missed", value=mention_summary, inline=False)
         if not customer_id:
             embed.set_footer(text="You're using the free version of BeeHive's AI summarizer. Upgrade for improved speed, intelligence, and functionality.")
         else:
