@@ -585,12 +585,14 @@ class Omni(commands.Cog):
             whitelisted_users = await self.config.guild(guild).whitelisted_users()
             moderation_enabled = await self.config.guild(guild).moderation_enabled()
             delete_violatory_messages = await self.config.guild(guild).delete_violatory_messages()
+            last_reminder_time = await self.config.guild(guild).last_reminder_time()
 
             log_channel = guild.get_channel(log_channel_id) if log_channel_id else None
             log_channel_name = log_channel.mention if log_channel else "Not set"
             whitelisted_channels_names = ", ".join([guild.get_channel(ch_id).mention for ch_id in whitelisted_channels if guild.get_channel(ch_id)]) or "None"
             whitelisted_roles_names = ", ".join([guild.get_role(role_id).mention for role_id in whitelisted_roles if guild.get_role(role_id)]) or "None"
             whitelisted_users_names = ", ".join([f"<@{user_id}>" for user_id in whitelisted_users]) or "None"
+            last_reminder_display = last_reminder_time if last_reminder_time else "Never"
 
             embed = discord.Embed(title="Omni configuration", color=0xfffffe)
             embed.add_field(name="Moderative threshold", value=str(moderation_threshold), inline=True)
@@ -602,6 +604,7 @@ class Omni(commands.Cog):
             embed.add_field(name="Whitelisted channels", value=whitelisted_channels_names, inline=False)
             embed.add_field(name="Whitelisted roles", value=whitelisted_roles_names, inline=False)
             embed.add_field(name="Whitelisted users", value=whitelisted_users_names, inline=False)
+            embed.add_field(name="Last reminder sent", value=last_reminder_display, inline=False)
 
             await ctx.send(embed=embed)
         except Exception as e:
