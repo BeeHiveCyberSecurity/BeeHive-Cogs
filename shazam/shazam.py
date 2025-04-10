@@ -11,7 +11,7 @@ from shazamio.api import Shazam as AudioAlchemist
 from shazamio.serializers import Serialize as Shazamalize
 from colorthief import ColorThief
 from datetime import datetime
-from moviepy import VideoFileClip
+from moviepy import VideoFileClip  # Corrected import
 import tempfile
 import os
 
@@ -65,10 +65,11 @@ class ShazamCog(commands.Cog):
                 try:
                     with VideoFileClip(video_file_path) as video_clip:
                         audio_clip = video_clip.audio
-                        audio_clip.write_audiofile(audio_file_path)
+                        audio_clip.write_audiofile(audio_file_path, codec='mp3')  # Ensure codec is specified
                 except Exception as e:
                     os.remove(video_file_path)  # Ensure video file is removed even if conversion fails
-                    raise e
+                    logging.exception("Error converting video to audio: %s", video_url, exc_info=e)
+                    raise RuntimeError("Failed to convert video to audio.") from e
 
                 os.remove(video_file_path)  # Clean up the video file after conversion
 
