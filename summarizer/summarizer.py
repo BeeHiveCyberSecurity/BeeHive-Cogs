@@ -404,37 +404,6 @@ class ChatSummary(commands.Cog):
         else:
             await ctx.send(embed=embed)
 
-    
-
-    @summarizer.command(name="upgrade")
-    async def upgrade_info(self, ctx: commands.Context):
-        """Explain the perks of upgrading by adding a customer ID."""
-        embed = discord.Embed(
-            title="Go premium, get more",
-            color=0xfffffe
-        )
-        embed.add_field(
-            name="Access to frontier AI models",
-            value="Gain access to advanced AI models that provide more accurate and faster summaries.",
-            inline=False
-        )
-        embed.add_field(
-            name="Extended discussion context",
-            value="Benefit from extended discussion context, allowing for more comprehensive summaries. (Summarizes up to 8 hours of chat history instead of 2)",
-            inline=False
-        )
-        embed.add_field(
-            name="Priority new feature access",
-            value="Enjoy priority access to new features and updates as they become available.",
-            inline=False
-        )
-        embed.add_field(
-            name="Longer chat history support",
-            value="Receive support for summarizing longer chat histories, enhancing your experience.",
-            inline=False
-        )
-        embed.set_footer(text="Upgrade today to enhance your summarization experience!")
-        await ctx.send(embed=embed)
 
     @commands.command(name="away")
     async def set_away(self, ctx: commands.Context):
