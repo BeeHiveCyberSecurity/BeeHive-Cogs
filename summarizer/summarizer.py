@@ -291,10 +291,10 @@ class ChatSummary(commands.Cog):
 
     @summarizer.command(name="id")
     @commands.is_owner()
-    async def manage_customer_id(self, ctx: commands.Context, user: discord.User, customer_id: Optional[str] = None):
+    async def manage_customer_id(self, ctx: commands.Context, user: discord.User, customer_id: str = None):
         """Set or clear a customer's ID for a user globally."""
         
-        if customer_id:
+        if customer_id is not None:
             await self.config.user(user).customer_id.set(customer_id)
             await ctx.send(f"Customer ID for {user.name} has been set to {customer_id}.")
         else:
