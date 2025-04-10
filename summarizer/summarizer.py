@@ -55,13 +55,23 @@ class ChatSummary(commands.Cog):
                             "timestamp": entry.created_at.isoformat()
                         })
                     elif entry.action == discord.AuditLogAction.member_update:
-                        moderation_actions.append({
-                            "action": "member_update",
-                            "user": entry.user.display_name,
-                            "target": entry.target.display_name if isinstance(entry.target, discord.Member) else str(entry.target),
-                            "reason": entry.reason or "No reason found",
-                            "timestamp": entry.created_at.isoformat(),
-                        })
+                        if entry.before and entry.after and entry.before.timed_out_until != entry.after.timed_out_until:
+                            moderation_actions.append({
+                                "action": "timeout",
+                                "user": entry.user.display_name,
+                                "target": entry.target.display_name if isinstance(entry.target, discord.Member) else str(entry.target),
+                                "reason": entry.reason or "No reason found",
+                                "timestamp": entry.created_at.isoformat(),
+                                "timed_out_until": entry.after.timed_out_until.isoformat() if entry.after.timed_out_until else "No timeout set"
+                            })
+                        else:
+                            moderation_actions.append({
+                                "action": "member_update",
+                                "user": entry.user.display_name,
+                                "target": entry.target.display_name if isinstance(entry.target, discord.Member) else str(entry.target),
+                                "reason": entry.reason or "No reason found",
+                                "timestamp": entry.created_at.isoformat(),
+                            })
                     elif entry.action == discord.AuditLogAction.unban:
                         moderation_actions.append({
                             "action": "unban",
