@@ -111,7 +111,7 @@ class ChatSummary(commands.Cog):
                         "Content-Type": "application/json"
                     }
                     payload = {
-                        "model": "text-davinci-003",
+                        "model": "gpt-4o-mini",
                         "prompt": f"Summarize the following moderation actions:\n{actions_content}",
                         "max_tokens": 150
                     }
