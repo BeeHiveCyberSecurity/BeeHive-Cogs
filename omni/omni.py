@@ -303,11 +303,12 @@ class Omni(commands.Cog):
         )
         embed.add_field(name="Sent by", value=f"<@{message.author.id}> - `{message.author.id}`", inline=True)
         embed.add_field(name="Sent in", value=f"<#{message.channel.id}> - `{message.channel.id}`", inline=True)
-        embed.add_field(name="Scoring", value="", inline=False)
+        embed.add_field(name="AI moderator ratings", value="", inline=False)
         moderation_threshold = await self.config.guild(message.guild).moderation_threshold()
         sorted_scores = sorted(category_scores.items(), key=lambda item: item[1], reverse=True)[:3]
         for category, score in sorted_scores:
-            score_display = f"**{score:.2f}**" if score > moderation_threshold else f"{score:.2f}"
+            score_percentage = score * 100
+            score_display = f"**{score_percentage:.0f}%**" if score > moderation_threshold else f"{score_percentage:.0f}%"
             embed.add_field(name=category.capitalize(), value=score_display, inline=True)
 
         if message.attachments:
