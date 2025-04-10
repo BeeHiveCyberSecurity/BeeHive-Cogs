@@ -55,7 +55,7 @@ class ChatSummary(commands.Cog):
                         })
                     elif entry.action == discord.AuditLogAction.member_update:
                         # Check if the timeout change is present
-                        timeout_change = any(change[0] == 'communication_disabled_until' for change in entry.before)
+                        timeout_change = any(change[0] == 'timed_out_until' for change in entry.before)
                         if timeout_change:
                             moderation_actions.append({
                                 "action": "timeout",
@@ -64,6 +64,30 @@ class ChatSummary(commands.Cog):
                                 "reason": entry.reason or "No reason provided",
                                 "timestamp": entry.created_at.isoformat()
                             })
+                    elif entry.action == discord.AuditLogAction.unban:
+                        moderation_actions.append({
+                            "action": "unban",
+                            "user": entry.user.display_name,
+                            "target": entry.target.display_name if isinstance(entry.target, discord.User) else str(entry.target),
+                            "reason": entry.reason or "No reason provided",
+                            "timestamp": entry.created_at.isoformat()
+                        })
+                    elif entry.action == discord.AuditLogAction.message_delete:
+                        moderation_actions.append({
+                            "action": "message_delete",
+                            "user": entry.user.display_name,
+                            "target": entry.target.display_name if isinstance(entry.target, discord.Member) else str(entry.target),
+                            "reason": entry.reason or "No reason provided",
+                            "timestamp": entry.created_at.isoformat()
+                        })
+                    elif entry.action == discord.AuditLogAction.role_update:
+                        moderation_actions.append({
+                            "action": "role_update",
+                            "user": entry.user.display_name,
+                            "target": entry.target.name if isinstance(entry.target, discord.Role) else str(entry.target),
+                            "reason": entry.reason or "No reason provided",
+                            "timestamp": entry.created_at.isoformat()
+                        })
 
                 if not moderation_actions:
                     await ctx.send("No moderation actions found in the specified time frame.", delete_after=10)
