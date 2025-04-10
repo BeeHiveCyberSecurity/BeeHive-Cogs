@@ -265,7 +265,7 @@ class Omni(commands.Cog):
             if timeout_duration > 0:
                 try:
                     reason = (
-                        f"Agentic moderator issued a timeout. Violation scores: " +
+                        f"The AI moderator issued a timeout. Violation scores: " +
                         ", ".join(f"{category}: {score:.2f}" for category, score in category_scores.items() if score > 0.2) +
                         f". Flagged message: {message.content}"
                     )
