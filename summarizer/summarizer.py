@@ -54,15 +54,19 @@ class ChatSummary(commands.Cog):
                             "timestamp": entry.created_at.isoformat()
                         })
                     elif entry.action == discord.AuditLogAction.member_update:
-                        if entry.before and entry.after and entry.before.communication_disabled_until != entry.after.communication_disabled_until:
-                            timeout_duration = (entry.after.communication_disabled_until - entry.created_at).total_seconds() if entry.after.communication_disabled_until else 0
-                            moderation_actions.append({
-                                "action": "timeout",
-                                "user": entry.user.display_name,
-                                "target": entry.target.display_name if isinstance(entry.target, discord.Member) else str(entry.target),
-                                "reason": entry.reason or "No reason found",
-                                "timestamp": entry.created_at.isoformat(),
-                                "timeout_duration": f"{timeout_duration / 60:.0f} minutes" if timeout_duration else "Timeout removed"
+                        if entry.changes and 'communication_disabled_until' in entry.changes:
+                            before_timeout = entry.changes['communication_disabled_until'].before
+                            after_timeout = entry.changes['communication_disabled_until'].after
+                            if before_timeout != after_timeout:
+                                timeout_duration = (after_timeout - entry.created_at).total_seconds() if after_timeout else 0
+                                moderation_actions.append({
+                                    "action": "timeout",
+                                    "user": entry.user.display_name,
+                                    "target": entry.target.display_name if isinstance(entry.target, discord.Member) else str(entry.target),
+                                    "reason": entry.reason or "No reason found",
+                                    "timestamp": entry.created_at.isoformat(),
+                                    "timeout_duration": f"{timeout_duration / 60:.0f} minutes" if timeout_duration else "Timeout removed"
+                                })
                             })
                     elif entry.action == discord.AuditLogAction.unban:
                         moderation_actions.append({
