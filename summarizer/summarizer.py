@@ -22,6 +22,71 @@ class ChatSummary(commands.Cog):
     async def summarize(self, ctx: commands.Context):
         """Group for summarize related commands."""
         pass
+    @summarize.command(name="moderation")
+    async def summarize_moderation(self, ctx: commands.Context, hours: int = 1):
+        """Summarize recent moderation actions from the audit log."""
+        try:
+            guild = ctx.guild
+            if not guild:
+                await ctx.send("This command can only be used in a server.", delete_after=10)
+                return
+
+            cutoff = datetime.now(timezone.utc) - timedelta(hours=hours)
+            moderation_actions = []
+
+            async with ctx.typing():
+                async for entry in guild.audit_logs(limit=100, after=cutoff):
+                    if entry.action in [discord.AuditLogAction.ban, discord.AuditLogAction.kick, discord.AuditLogAction.mute, discord.AuditLogAction.unmute]:
+                        moderation_actions.append({
+                            "action": entry.action.name,
+                            "user": entry.user.display_name,
+                            "target": entry.target.display_name if isinstance(entry.target, discord.Member) else str(entry.target),
+                            "reason": entry.reason or "No reason provided",
+                            "timestamp": entry.created_at.isoformat()
+                        })
+
+                if not moderation_actions:
+                    await ctx.send("No moderation actions found in the specified time frame.", delete_after=10)
+                    return
+
+                # Prepare the content for summarization
+                actions_content = "\n".join(
+                    f"{action['timestamp']}: {action['user']} performed {action['action']} on {action['target']} for '{action['reason']}'"
+                    for action in moderation_actions
+                )
+
+                # Use OpenAI to summarize the actions
+                api_key = (await self.bot.get_shared_api_tokens("openai")).get("api_key")
+                if not api_key:
+                    await ctx.send("OpenAI API key is not set.", delete_after=10)
+                    return
+
+                async with aiohttp.ClientSession() as session:
+                    headers = {
+                        "Authorization": f"Bearer {api_key}",
+                        "Content-Type": "application/json"
+                    }
+                    payload = {
+                        "model": "text-davinci-003",
+                        "prompt": f"Summarize the following moderation actions:\n{actions_content}",
+                        "max_tokens": 150
+                    }
+                    async with session.post("https://api.openai.com/v1/completions", headers=headers, json=payload) as response:
+                        if response.status == 200:
+                            data = await response.json()
+                            summary = data['choices'][0]['text'].strip()
+                            embed = discord.Embed(
+                                title="Moderation Summary",
+                                description=summary,
+                                color=discord.Color.blue()
+                            )
+                            await ctx.send(embed=embed)
+                        else:
+                            await ctx.send(f"Failed to summarize moderation actions. Status code: {response.status}", delete_after=10)
+
+        except Exception as e:
+            await ctx.send(f"An error occurred: {str(e)}", delete_after=10)
+
 
     @summarize.command(name="recent")
     async def chat_summary(self, ctx: commands.Context, afk_only: bool = False, target_user: discord.User = None):
@@ -249,6 +314,8 @@ class ChatSummary(commands.Cog):
                 await ctx.send(embed=embed, view=view)
         else:
             await ctx.send(embed=embed)
+
+    
 
     @summarizer.command(name="upgrade")
     async def upgrade_info(self, ctx: commands.Context):
