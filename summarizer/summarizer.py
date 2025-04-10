@@ -36,7 +36,7 @@ class ChatSummary(commands.Cog):
             moderation_actions = []
 
             async with ctx.typing():
-                async for entry in guild.audit_logs(limit=100, after=cutoff):
+                async for entry in guild.audit_logs(limit=1200, after=cutoff):
                     if entry.action in [
                         discord.AuditLogAction.ban, 
                         discord.AuditLogAction.kick,
