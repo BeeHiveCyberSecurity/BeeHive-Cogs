@@ -33,6 +33,7 @@ class ChatSummary(commands.Cog):
                 await ctx.send("This command can only be used in a server.", delete_after=10)
                 return
 
+            user = ctx.author  # Ensure ctx.author is defined here
             cutoff = datetime.now(timezone.utc) - timedelta(hours=hours)
             moderation_actions = []
 
@@ -181,7 +182,6 @@ class ChatSummary(commands.Cog):
                             )
                             await ctx.send(embed=embed)
                             # Track stripe event if customer_id is present
-                            user = ctx.author
                             user_data = await self.config.user(user).all()
                             customer_id = user_data.get("customer_id")
                             if customer_id:
