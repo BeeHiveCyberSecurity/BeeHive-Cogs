@@ -736,7 +736,7 @@ class Omni(commands.Cog):
                 if threshold_adjusted:
                     updated_embed.description += " Based on your feedback, the moderation agent has been adjusted. Please continue to provide feedback as needed."
                 await interaction.message.edit(embed=updated_embed, view=None)
-                await interaction.response.send_message("You can submit additional feedback tomorrow. Thank you for taking the time to help make this server a better place. If you have additional feedback about this server's AI-assisted moderation, please contact a member of the staff or administration team.", ephemeral=True)
+                await interaction.response.send_message("Thank you for taking the time to help make this server a better place. If you have additional feedback about this server's AI-assisted moderation, please contact a member of the staff or administration team.", ephemeral=True)
 
             too_weak_button = discord.ui.Button(label="Moderation is too forgiving", style=discord.ButtonStyle.red)
             too_weak_button.callback = lambda interaction: vote_callback(interaction, "too weak")
