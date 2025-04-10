@@ -318,7 +318,7 @@ class ChatSummary(commands.Cog):
         except discord.Forbidden:
             await ctx.send(embed=embed)
 
-    async def _track_stripe_event(self, customer_id, event_name):
+    async def _track_stripe_event(self, ctx, customer_id, event_name):
         stripe_tokens = await self.bot.get_shared_api_tokens("stripe")
         stripe_key = stripe_tokens.get("api_key") if stripe_tokens else None
 
