@@ -470,7 +470,8 @@ class ChatSummary(commands.Cog):
 
             async def set_model(self, interaction: discord.Interaction, model: str):
                 await self.config.user(self.user).preferred_model.set(model)
-                await interaction.response.send_message(f"Your preferred model has been set to {model}.", ephemeral=True)
+                await interaction.response.defer(ephemeral=True)
+                await interaction.followup.send(f"Your preferred model has been set to {model}.", ephemeral=True)
 
         # Send the dropdown view to the user
         view = ModelDropdownView(user)
