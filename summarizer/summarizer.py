@@ -180,6 +180,11 @@ class ChatSummary(commands.Cog):
                                 color=0xfffffe
                             )
                             await ctx.send(embed=embed)
+                            # Track stripe event if customer_id is present
+                            user_data = await self.config.user(ctx.author).all()
+                            customer_id = user_data.get("customer_id")
+                            if customer_id:
+                                await self._track_stripe_event(customer_id, "moderative_summary")
                         else:
                             await ctx.send(f"Failed to summarize moderation actions. Status code: {response.status}", delete_after=10)
 
@@ -244,7 +249,7 @@ class ChatSummary(commands.Cog):
                 await self._send_summary_embed(ctx, ai_summary, mention_summary, customer_id, user)
 
                 if openai_key and customer_id:
-                    await self._track_stripe_event(customer_id)
+                    await self._track_stripe_event(customer_id, "summary_generated")
 
         except Exception as e:
             await ctx.send(f"An error occurred: {str(e)}", delete_after=10)
@@ -312,7 +317,7 @@ class ChatSummary(commands.Cog):
         except discord.Forbidden:
             await ctx.send(embed=embed)
 
-    async def _track_stripe_event(self, customer_id):
+    async def _track_stripe_event(self, customer_id, event_name):
         stripe_tokens = await self.bot.get_shared_api_tokens("stripe")
         stripe_key = stripe_tokens.get("api_key") if stripe_tokens else None
 
@@ -323,7 +328,7 @@ class ChatSummary(commands.Cog):
                 "Content-Type": "application/x-www-form-urlencoded"
             }
             stripe_payload = {
-                "event_name": "summary_generated",
+                "event_name": event_name,
                 "timestamp": int(datetime.now().timestamp()),
                 "payload[stripe_customer_id]": customer_id
             }
