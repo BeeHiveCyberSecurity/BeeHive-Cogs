@@ -53,9 +53,9 @@ class ChatSummary(commands.Cog):
                             "timestamp": entry.created_at.isoformat()
                         })
                     elif entry.action == discord.AuditLogAction.member_update:
-                        if entry.changes and 'communication_disabled_until' in entry.changes:
-                            before_timeout = entry.changes['communication_disabled_until'].before
-                            after_timeout = entry.changes['communication_disabled_until'].after
+                        if entry.changes and entry.changes.before and entry.changes.after:
+                            before_timeout = entry.changes.before.get('communication_disabled_until')
+                            after_timeout = entry.changes.after.get('communication_disabled_until')
                             if before_timeout != after_timeout:
                                 timeout_duration = (after_timeout - entry.created_at).total_seconds() if after_timeout else 0
                                 moderation_actions.append({
