@@ -162,7 +162,7 @@ class ChatSummary(commands.Cog):
                         "messages": [
                             {
                                 "role": "system",
-                                "content": "You are a moderation summary generator. Use bulletpoints. Don't use titles."
+                                "content": "You are a moderation summary generator. Use bulletpoints. Don't use titles. Only connect events if they happen within an ongoing time span of eachother."
                             },
                             {
                                 "role": "user",
