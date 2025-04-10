@@ -604,7 +604,7 @@ class Omni(commands.Cog):
             embed.add_field(name="Whitelisted channels", value=whitelisted_channels_names, inline=False)
             embed.add_field(name="Whitelisted roles", value=whitelisted_roles_names, inline=False)
             embed.add_field(name="Whitelisted users", value=whitelisted_users_names, inline=False)
-            embed.add_field(name="Last reminder sent", value=last_reminder_display, inline=False)
+            embed.add_field(name="Last disclosure notice", value=last_reminder_display, inline=False)
 
             await ctx.send(embed=embed)
         except Exception as e:
