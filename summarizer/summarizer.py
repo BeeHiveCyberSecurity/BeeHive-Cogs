@@ -11,7 +11,7 @@ class ChatSummary(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=9876543210)
-        default_user = {"customer_id": None, "is_afk": False, "afk_since": None}
+        default_user = {"customer_id": None, "is_afk": False, "afk_since": None, "preferred_model": "gpt-4o"}
         self.config.register_user(**default_user)
 
     async def _track_stripe_event(self, ctx, customer_id, model_name, event_type, tokens):
@@ -182,8 +182,14 @@ class ChatSummary(commands.Cog):
                     await ctx.send("OpenAI API key is not set.", delete_after=10)
                     return
 
+                # Determine model based on user preference
+                user_data = await self.config.user(user).all()
+                customer_id = user_data.get("customer_id")
+                preferred_model = user_data.get("preferred_model", "gpt-4o")
+                model = preferred_model if customer_id else "gpt-4o-mini"
+
                 # Calculate token usage
-                encoding = tiktoken.encoding_for_model("gpt-4o")
+                encoding = tiktoken.encoding_for_model(model)
                 input_tokens = len(encoding.encode(actions_content))
 
                 async with aiohttp.ClientSession() as session:
@@ -192,7 +198,7 @@ class ChatSummary(commands.Cog):
                         "Content-Type": "application/json"
                     }
                     payload = {
-                        "model": "gpt-4o",
+                        "model": model,
                         "messages": [
                             {
                                 "role": "system",
@@ -216,11 +222,9 @@ class ChatSummary(commands.Cog):
                             )
                             await ctx.send(embed=embed)
                             # Track stripe event if customer_id is present
-                            user_data = await self.config.user(user).all()
-                            customer_id = user_data.get("customer_id")
                             if customer_id:
-                                await self._track_stripe_event(ctx, customer_id, "gpt-4o", "input", input_tokens)
-                                await self._track_stripe_event(ctx, customer_id, "gpt-4o", "output", output_tokens)
+                                await self._track_stripe_event(ctx, customer_id, model, "input", input_tokens)
+                                await self._track_stripe_event(ctx, customer_id, model, "output", output_tokens)
                         else:
                             await ctx.send(f"Failed to summarize moderation actions. Status code: {response.status}", delete_after=10)
 
@@ -240,6 +244,8 @@ class ChatSummary(commands.Cog):
             user = target_user or ctx.author
             user_data = await self.config.user(user).all()
             customer_id = user_data.get("customer_id")
+            preferred_model = user_data.get("preferred_model", "gpt-4o")
+            model = preferred_model if customer_id else "gpt-4o-mini"
             hours = 8 if customer_id else 2
 
             if afk_only and user_data.get("afk_since"):
@@ -280,19 +286,18 @@ class ChatSummary(commands.Cog):
                 tokens = await self.bot.get_shared_api_tokens("openai")
                 openai_key = tokens.get("api_key") if tokens else None
 
-                ai_summary, input_tokens, output_tokens = await self._generate_ai_summary(openai_key, messages_content, customer_id)
+                ai_summary, input_tokens, output_tokens = await self._generate_ai_summary(openai_key, messages_content, customer_id, model)
                 mention_summary = self._generate_mention_summary(mentions)
                 await self._send_summary_embed(ctx, ai_summary, mention_summary, customer_id, user)
 
                 if openai_key and customer_id:
-                    model_name = "gpt-4o" if customer_id else "gpt-4o-mini"
-                    await self._track_stripe_event(ctx, customer_id, model_name, "input", input_tokens)
-                    await self._track_stripe_event(ctx, customer_id, model_name, "output", output_tokens)
+                    await self._track_stripe_event(ctx, customer_id, model, "input", input_tokens)
+                    await self._track_stripe_event(ctx, customer_id, model, "output", output_tokens)
 
         except Exception as e:
             await ctx.send(f"An error occurred: {str(e)}", delete_after=10)
 
-    async def _generate_ai_summary(self, openai_key, messages_content, customer_id):
+    async def _generate_ai_summary(self, openai_key, messages_content, customer_id, model):
         openai_url = "https://api.openai.com/v1/chat/completions"
         if openai_key:
             headers = {
@@ -303,7 +308,6 @@ class ChatSummary(commands.Cog):
                 {"role": "system", "content": "You are a chat summary generator. Use title-less bulletpoints where appropriate."},
                 {"role": "user", "content": f"Summarize the following chat messages: {messages_content}"}
             ]
-            model = "gpt-4o" if customer_id else "gpt-4o-mini"
             encoding = tiktoken.encoding_for_model(model)
             input_tokens = len(encoding.encode(messages_content))
             openai_payload = {
@@ -377,6 +381,7 @@ class ChatSummary(commands.Cog):
         user = ctx.author
         user_data = await self.config.user(user).all()
         customer_id = user_data.get("customer_id", "Not set")
+        preferred_model = user_data.get("preferred_model", "gpt-4o")
 
         embed = discord.Embed(
             title=f"{user.display_name}'s summarizer profile",
@@ -385,8 +390,10 @@ class ChatSummary(commands.Cog):
 
         if isinstance(ctx.channel, discord.DMChannel):
             embed.add_field(name="Customer ID", value=customer_id, inline=False)
+            embed.add_field(name="Preferred Model", value=preferred_model, inline=False)
         else:
             embed.add_field(name="Customer ID", value="Hidden", inline=False)
+            embed.add_field(name="Preferred Model", value="Hidden", inline=False)
 
         if customer_id != "Not set":
             stripe_tokens = await self.bot.get_shared_api_tokens("stripe")
@@ -428,11 +435,46 @@ class ChatSummary(commands.Cog):
         else:
             await ctx.send(embed=embed)
 
+    @summarizer.command(name="setmodel")
+    async def set_preferred_model(self, ctx: commands.Context):
+        """Set your preferred AI model for summarization."""
+        user = ctx.author
+        user_data = await self.config.user(user).all()
+        customer_id = user_data.get("customer_id")
 
+        if not customer_id:
+            await ctx.send("You must have a customer ID set to use this command.", delete_after=10)
+            return
 
+        # Define valid models
+        valid_models = ["gpt-4o", "gpt-4o-mini", "gpt-3.5", "o1"]
 
+        # Create a dropdown menu for model selection
+        class ModelDropdown(discord.ui.Select):
+            def __init__(self):
+                options = [
+                    discord.SelectOption(label=model, description=f"Select {model} as your preferred model")
+                    for model in valid_models
+                ]
+                super().__init__(placeholder="Choose your preferred model...", min_values=1, max_values=1, options=options)
 
+            async def callback(self, interaction: discord.Interaction):
+                selected_model = self.values[0]
+                await self.view.set_model(interaction, selected_model)
 
+        class ModelDropdownView(discord.ui.View):
+            def __init__(self, user):
+                super().__init__(timeout=30)
+                self.user = user
+                self.add_item(ModelDropdown())
+
+            async def set_model(self, interaction: discord.Interaction, model: str):
+                await self.config.user(self.user).preferred_model.set(model)
+                await interaction.response.send_message(f"Your preferred model has been set to {model}.", ephemeral=True)
+
+        # Send the dropdown view to the user
+        view = ModelDropdownView(user)
+        await ctx.send("Please select your preferred AI model for summarization:", view=view)
 
 
 
