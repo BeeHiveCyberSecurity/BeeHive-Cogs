@@ -23,6 +23,7 @@ class ChatSummary(commands.Cog):
         """Group for summarize related commands."""
         pass
     
+    @commands.mod_or_permissions()
     @summarize.command(name="moderation")
     async def summarize_moderation(self, ctx: commands.Context, hours: int = 24):
         """Summarize recent moderation actions from the audit log, including timeouts."""
