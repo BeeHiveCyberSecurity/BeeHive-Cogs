@@ -91,6 +91,40 @@ class Omni(commands.Cog):
         await self.process_message(message)
         await self.check_monitoring_reminder(message)
 
+    async def check_monitoring_reminder(self, message):
+        """Check and send a monitoring reminder if needed."""
+        if message.author.bot or not message.guild:
+            return
+
+        guild = message.guild
+        channel = message.channel
+
+        # Increment the message count for the channel
+        self.memory_user_message_counts[guild.id][channel.id] += 1
+
+        # Check if the message count has reached 50
+        if self.memory_user_message_counts[guild.id][channel.id] >= 50:
+            await self.send_monitoring_reminder(channel)
+            # Reset the message count for the channel
+            self.memory_user_message_counts[guild.id][channel.id] = 0
+
+    async def send_monitoring_reminder(self, channel):
+        """Send a monitoring reminder to the specified channel."""
+        try:
+            command_prefix = (await self.bot.get_valid_prefixes())[0]  # Get the first valid prefix
+            embed = discord.Embed(
+                title="Omni is monitoring the conversation",
+                description=(
+                    "An agentic moderator is analyzing this conversation in real-time, watching for harmful content and behaviors. Your messages are subject to logging, analysis, and automatic moderation at any time.\n\n"
+                    f"You can use the `{command_prefix}omni vote` command to let server staff know how the agent is doing."
+                ),
+                color=0xfffffe
+            )
+            embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/sparkles.png")
+            await channel.send(embed=embed)
+        except discord.HTTPException as e:
+            raise RuntimeError(f"Failed to send monitoring reminder: {e}")
+
     @commands.Cog.listener()
     async def on_message_edit(self, before, after):
         await self.process_message(after)
@@ -902,34 +936,3 @@ class Omni(commands.Cog):
                 self.bot.loop.create_task(self.session.close())
         except Exception as e:
             raise RuntimeError(f"Failed to unload cog: {e}")
-
-    async def check_monitoring_reminder(self, message):
-        """Check and send a monitoring reminder if needed."""
-        if message.author.bot or not message.guild:
-            return
-
-        guild = message.guild
-        channel = message.channel
-
-        # Increment the message count for the channel
-        self.memory_user_message_counts[guild.id][channel.id] += 1
-
-        # Check if the message count has reached 50
-        if self.memory_user_message_counts[guild.id][channel.id] >= 50:
-            await self.send_monitoring_reminder(channel)
-            # Reset the message count for the channel
-            self.memory_user_message_counts[guild.id][channel.id] = 0
-
-    async def send_monitoring_reminder(self, channel):
-        """Send a monitoring reminder to the specified channel."""
-        command_prefix = (await self.bot.get_valid_prefixes())[0]  # Get the first valid prefix
-        embed = discord.Embed(
-            title="Omni is monitoring the conversation",
-            description=(
-                "An agentic moderator is analyzing this conversation in real-time, watching for harmful content and behaviors. Your messages are subject to logging, analysis, and automatic moderation at any time.\n\n"
-                f"You can use the `{command_prefix}omni vote` command to let server staff know how the agent is doing."
-            ),
-            color=0xfffffe
-        )
-        embed.set_thumbnail(url="https://www.beehive.systems/hubfs/Icon%20Packs/White/sparkles.png")
-        await channel.send(embed=embed)
