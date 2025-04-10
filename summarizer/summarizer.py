@@ -379,7 +379,7 @@ class ChatSummary(commands.Cog):
         customer_id = user_data.get("customer_id", "Not set")
 
         embed = discord.Embed(
-            title=f"{user.name}'s summarizer profile",
+            title=f"{user.display_name}'s summarizer profile",
             color=0xfffffe
         )
 
