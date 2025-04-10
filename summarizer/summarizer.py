@@ -435,7 +435,7 @@ class ChatSummary(commands.Cog):
         else:
             await ctx.send(embed=embed)
 
-    @summarizer.command(name="setmodel")
+    @summarizer.command(name="model")
     async def set_preferred_model(self, ctx: commands.Context):
         """Set your preferred AI model for summarization."""
         user = ctx.author
