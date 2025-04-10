@@ -36,24 +36,34 @@ class ChatSummary(commands.Cog):
             moderation_actions = []
 
             async with ctx.typing():
-                async for entry in guild.audit_logs(limit=1200, after=cutoff):
-                    if entry.action in [
-                        discord.AuditLogAction.ban, 
-                        discord.AuditLogAction.kick,
-                        discord.AuditLogAction.member_update  # Assuming timeouts are logged as member updates
-                    ]:
-                        if entry.action == discord.AuditLogAction.member_update:
-                            # Check if the timeout change is present
-                            timeout_change = any(change[0] == 'communication_disabled_until' for change in entry.before)
-                            if not timeout_change:
-                                continue
+                async for entry in guild.audit_logs(after=cutoff):
+                    if entry.action == discord.AuditLogAction.ban:
                         moderation_actions.append({
-                            "action": entry.action.name,
+                            "action": "ban",
                             "user": entry.user.display_name,
                             "target": entry.target.display_name if isinstance(entry.target, discord.Member) else str(entry.target),
                             "reason": entry.reason or "No reason provided",
                             "timestamp": entry.created_at.isoformat()
                         })
+                    elif entry.action == discord.AuditLogAction.kick:
+                        moderation_actions.append({
+                            "action": "kick",
+                            "user": entry.user.display_name,
+                            "target": entry.target.display_name if isinstance(entry.target, discord.Member) else str(entry.target),
+                            "reason": entry.reason or "No reason provided",
+                            "timestamp": entry.created_at.isoformat()
+                        })
+                    elif entry.action == discord.AuditLogAction.member_update:
+                        # Check if the timeout change is present
+                        timeout_change = any(change[0] == 'communication_disabled_until' for change in entry.before)
+                        if timeout_change:
+                            moderation_actions.append({
+                                "action": "timeout",
+                                "user": entry.user.display_name,
+                                "target": entry.target.display_name if isinstance(entry.target, discord.Member) else str(entry.target),
+                                "reason": entry.reason or "No reason provided",
+                                "timestamp": entry.created_at.isoformat()
+                            })
 
                 if not moderation_actions:
                     await ctx.send("No moderation actions found in the specified time frame.", delete_after=10)
