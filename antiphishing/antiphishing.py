@@ -184,20 +184,11 @@ class AntiPhishing(commands.Cog):
             "timeout": 0xffd966  # Yellow
         }
 
-        thumbnail_urls = {
-            "ignore": "https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/close.png",
-            "notify": "https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/notifications.png",
-            "delete": "https://www.beehive.systems/hubfs/Icon%20Packs/Red/trash.png",
-            "kick": "https://www.beehive.systems/hubfs/Icon%20Packs/Red/footsteps.png",
-            "ban": "https://www.beehive.systems/hubfs/Icon%20Packs/Red/ban.png",
-            "timeout": "https://www.beehive.systems/hubfs/Icon%20Packs/Yellow/clock.png"
-        }
-
         description = descriptions.get(action, "Unknown action configured.")
         colour = colours.get(action, 0xfffffe)
         thumbnail_url = thumbnail_urls.get(action, "")
 
-        await self._send_embed(ctx, 'Settings changed', description, colour, thumbnail_url)
+        await self._send_embed(ctx, 'Settings changed', description, colour)
 
     @antiphishing.command()
     async def stats(self, ctx: Context):
