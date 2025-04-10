@@ -255,12 +255,7 @@ class Omni(commands.Cog):
             message_deleted = False
             if delete_violatory_messages:
                 try:
-                    reason = (
-                        f"The AI moderator deleted the message. Violation scores: " +
-                        ", ".join(f"{category}: {score:.2f}" for category, score in category_scores.items() if score > 0.2) +
-                        f". Flagged message: {message.content}"
-                    )
-                    await message.delete(reason=reason)
+                    await message.delete()
                     self.memory_moderated_users[guild.id][message.author.id] += 1
                     message_deleted = True
                 except discord.NotFound:
