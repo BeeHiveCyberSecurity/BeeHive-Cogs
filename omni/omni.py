@@ -169,9 +169,24 @@ class Omni(commands.Cog):
                         self.increment_statistic(guild.id, 'image_count')
                         self.increment_statistic('global', 'global_image_count')
 
+            # Analyze text content first
             text_category_scores = await self.analyze_content(input_data, api_key, message)
             moderation_threshold = await self.config.guild(guild).moderation_threshold()
             text_flagged = any(score > moderation_threshold for score in text_category_scores.values())
+
+            # Analyze each image separately
+            for attachment in message.attachments:
+                if attachment.content_type and attachment.content_type.startswith("image/") and not attachment.content_type.endswith("gif"):
+                    image_data = [{"type": "image_url", "image_url": {"url": attachment.url}}]
+                    image_category_scores = await self.analyze_content(image_data, api_key, message)
+                    image_flagged = any(score > moderation_threshold for score in image_category_scores.values())
+
+                    if image_flagged:
+                        self.update_moderation_stats(guild.id, message, image_category_scores)
+                        await self.handle_moderation(message, image_category_scores)
+
+                    # Space out requests
+                    await asyncio.sleep(1)
 
             if text_flagged:
                 self.update_moderation_stats(guild.id, message, text_category_scores)
