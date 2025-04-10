@@ -54,13 +54,22 @@ class ChatSummary(commands.Cog):
                             "timestamp": entry.created_at.isoformat()
                         })
                     elif entry.action == discord.AuditLogAction.member_update:
-                        moderation_actions.append({
-                            "action": "timeout",
-                            "user": entry.user.display_name,
-                            "target": entry.target.display_name if isinstance(entry.target, discord.Member) else str(entry.target),
-                            "reason": entry.reason or "No reason found",
-                            "timestamp": entry.created_at.isoformat()
-                        })
+                        if entry.before.timed_out_until != entry.after.timed_out_until:
+                            moderation_actions.append({
+                                "action": "timeout",
+                                "user": entry.user.display_name,
+                                "target": entry.target.display_name if isinstance(entry.target, discord.Member) else str(entry.target),
+                                "reason": entry.reason or "No reason found",
+                                "timestamp": entry.created_at.isoformat()
+                            })
+                        elif entry.before.roles != entry.after.roles:
+                            moderation_actions.append({
+                                "action": "update_member_roles",
+                                "user": entry.user.display_name,
+                                "target": entry.target.display_name if isinstance(entry.target, discord.Member) else str(entry.target),
+                                "reason": entry.reason or "No reason found",
+                                "timestamp": entry.created_at.isoformat()
+                            })
                     elif entry.action == discord.AuditLogAction.unban:
                         moderation_actions.append({
                             "action": "unban",
@@ -82,6 +91,14 @@ class ChatSummary(commands.Cog):
                             "action": "role_update",
                             "user": entry.user.display_name,
                             "target": entry.target.name if isinstance(entry.target, discord.Role) else str(entry.target),
+                            "reason": entry.reason or "No reason found",
+                            "timestamp": entry.created_at.isoformat()
+                        })
+                    elif entry.action == discord.AuditLogAction.member_disconnect:
+                        moderation_actions.append({
+                            "action": "disconnect_member",
+                            "user": entry.user.display_name,
+                            "target": entry.target.display_name if isinstance(entry.target, discord.Member) else str(entry.target),
                             "reason": entry.reason or "No reason found",
                             "timestamp": entry.created_at.isoformat()
                         })
