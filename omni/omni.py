@@ -587,12 +587,12 @@ class Omni(commands.Cog):
             embed.add_field(name="Moderative threshold", value=str(moderation_threshold), inline=True)
             embed.add_field(name="Timeout duration", value=f"{timeout_duration} minutes", inline=True)
             embed.add_field(name="Log channel", value=log_channel_name, inline=True)
+            embed.add_field(name="Moderation enabled", value="Yes" if moderation_enabled else "No", inline=True)
+            embed.add_field(name="Deletion enabled", value="Yes" if delete_violatory_messages else "No", inline=True)
             embed.add_field(name="Debug mode", value="Enabled" if debug_mode else "Disabled", inline=True)
             embed.add_field(name="Whitelisted channels", value=whitelisted_channels_names, inline=False)
             embed.add_field(name="Whitelisted roles", value=whitelisted_roles_names, inline=False)
-            embed.add_field(name="Whitelisted rsers", value=whitelisted_users_names, inline=False)
-            embed.add_field(name="Moderation enabled", value="Yes" if moderation_enabled else "No", inline=True)
-            embed.add_field(name="Deletion enabled", value="Yes" if delete_violatory_messages else "No", inline=True)
+            embed.add_field(name="Whitelisted users", value=whitelisted_users_names, inline=False)
 
             await ctx.send(embed=embed)
         except Exception as e:
