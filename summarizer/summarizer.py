@@ -386,7 +386,7 @@ class ChatSummary(commands.Cog):
         if isinstance(ctx.channel, discord.DMChannel):
             embed.add_field(name="Customer ID", value=customer_id, inline=False)
         else:
-            embed.add_field(name="Customer ID", value="Hidden (viewable in DMs only)", inline=False)
+            embed.add_field(name="Customer ID", value="Hidden", inline=False)
 
         if customer_id != "Not set":
             stripe_tokens = await self.bot.get_shared_api_tokens("stripe")
