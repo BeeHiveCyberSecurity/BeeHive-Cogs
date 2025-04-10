@@ -112,10 +112,10 @@ class ChatSummary(commands.Cog):
                     }
                     payload = {
                         "model": "gpt-4o-mini",
-                        "prompt": f"Summarize the following moderation actions:\n{actions_content}",
+                        "messages": f"Summarize the following moderation actions:\n{actions_content}",
                         "max_tokens": 150
                     }
-                    async with session.post("https://api.openai.com/v1/completions", headers=headers, json=payload) as response:
+                    async with session.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload) as response:
                         if response.status == 200:
                             data = await response.json()
                             summary = data['choices'][0]['text'].strip()
