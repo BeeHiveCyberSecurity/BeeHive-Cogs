@@ -44,7 +44,7 @@ class ChatSummary(commands.Cog):
                     ]:
                         if entry.action == discord.AuditLogAction.member_update:
                             # Check if the timeout change is present
-                            timeout_change = any(change.key == 'timeout' for change in entry.changes)
+                            timeout_change = any(change.key == 'communication_disabled_until' for change in entry.before)
                             if not timeout_change:
                                 continue
                         moderation_actions.append({
