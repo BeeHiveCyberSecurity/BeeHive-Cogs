@@ -192,7 +192,8 @@ class ChatSummary(commands.Cog):
                             user_data = await self.config.user(user).all()
                             customer_id = user_data.get("customer_id")
                             if customer_id:
-                                await self._track_stripe_event(ctx, customer_id, "gpt-4o", total_tokens)
+                                await self._track_stripe_event(ctx, customer_id, "gpt-4o_input", input_tokens)
+                                await self._track_stripe_event(ctx, customer_id, "gpt-4o_output", output_tokens)
                         else:
                             await ctx.send(f"Failed to summarize moderation actions. Status code: {response.status}", delete_after=10)
 
@@ -257,7 +258,8 @@ class ChatSummary(commands.Cog):
                 await self._send_summary_embed(ctx, ai_summary, mention_summary, customer_id, user)
 
                 if openai_key and customer_id:
-                    await self._track_stripe_event(ctx, customer_id, "gpt-4o" if customer_id else "gpt-4o-mini", total_tokens)
+                    await self._track_stripe_event(ctx, customer_id, "gpt-4o_input" if customer_id else "gpt-4o-mini_input", total_tokens // 2)
+                    await self._track_stripe_event(ctx, customer_id, "gpt-4o_output" if customer_id else "gpt-4o-mini_output", total_tokens // 2)
 
         except Exception as e:
             await ctx.send(f"An error occurred: {str(e)}", delete_after=10)
