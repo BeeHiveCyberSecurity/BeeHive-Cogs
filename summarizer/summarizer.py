@@ -3,6 +3,7 @@ from redbot.core import commands, Config, app_commands
 from datetime import datetime, timedelta, timezone
 import aiohttp
 import stripe
+import tiktoken
 
 class ChatSummary(commands.Cog):
     """Cog to summarize chat activity for users."""
@@ -153,6 +154,10 @@ class ChatSummary(commands.Cog):
                     await ctx.send("OpenAI API key is not set.", delete_after=10)
                     return
 
+                # Calculate token usage
+                encoding = tiktoken.encoding_for_model("gpt-4o")
+                input_tokens = len(encoding.encode(actions_content))
+
                 async with aiohttp.ClientSession() as session:
                     headers = {
                         "Authorization": f"Bearer {openai_key}",
@@ -175,6 +180,8 @@ class ChatSummary(commands.Cog):
                         if response.status == 200:
                             data = await response.json()
                             summary = data['choices'][0]['message']['content'].strip()
+                            output_tokens = len(encoding.encode(summary))
+                            total_tokens = input_tokens + output_tokens
                             embed = discord.Embed(
                                 title="AI moderation summary",
                                 description=summary,
@@ -185,7 +192,7 @@ class ChatSummary(commands.Cog):
                             user_data = await self.config.user(user).all()
                             customer_id = user_data.get("customer_id")
                             if customer_id:
-                                await self._track_stripe_event(ctx, customer_id, "moderation_summary")
+                                await self._track_stripe_event(ctx, customer_id, "gpt-4o", total_tokens)
                         else:
                             await ctx.send(f"Failed to summarize moderation actions. Status code: {response.status}", delete_after=10)
 
@@ -245,12 +252,12 @@ class ChatSummary(commands.Cog):
                 tokens = await self.bot.get_shared_api_tokens("openai")
                 openai_key = tokens.get("api_key") if tokens else None
 
-                ai_summary = await self._generate_ai_summary(openai_key, messages_content, customer_id)
+                ai_summary, total_tokens = await self._generate_ai_summary(openai_key, messages_content, customer_id)
                 mention_summary = self._generate_mention_summary(mentions)
                 await self._send_summary_embed(ctx, ai_summary, mention_summary, customer_id, user)
 
                 if openai_key and customer_id:
-                    await self._track_stripe_event(ctx, customer_id, "summary_generated")
+                    await self._track_stripe_event(ctx, customer_id, "gpt-4o" if customer_id else "gpt-4o-mini", total_tokens)
 
         except Exception as e:
             await ctx.send(f"An error occurred: {str(e)}", delete_after=10)
@@ -267,6 +274,8 @@ class ChatSummary(commands.Cog):
                 {"role": "user", "content": f"Summarize the following chat messages: {messages_content}"}
             ]
             model = "gpt-4o" if customer_id else "gpt-4o-mini"
+            encoding = tiktoken.encoding_for_model(model)
+            input_tokens = len(encoding.encode(messages_content))
             openai_payload = {
                 "model": model,
                 "messages": messages,
@@ -277,13 +286,16 @@ class ChatSummary(commands.Cog):
                     async with session.post(openai_url, headers=headers, json=openai_payload) as openai_response:
                         if openai_response.status == 200:
                             openai_data = await openai_response.json()
-                            return openai_data.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
+                            summary = openai_data.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
+                            output_tokens = len(encoding.encode(summary))
+                            total_tokens = input_tokens + output_tokens
+                            return summary, total_tokens
                         else:
-                            return f"Failed to generate summary from OpenAI. Status code: {openai_response.status}"
+                            return f"Failed to generate summary from OpenAI. Status code: {openai_response.status}", 0
                 except aiohttp.ClientError as e:
-                    return f"Failed to connect to OpenAI API: {str(e)}"
+                    return f"Failed to connect to OpenAI API: {str(e)}", 0
         else:
-            return "OpenAI API key not configured."
+            return "OpenAI API key not configured.", 0
 
     def _generate_mention_summary(self, mentions):
         if not mentions:
@@ -318,7 +330,7 @@ class ChatSummary(commands.Cog):
         except discord.Forbidden:
             await ctx.send(embed=embed)
 
-    async def _track_stripe_event(self, ctx, customer_id, event_name):
+    async def _track_stripe_event(self, ctx, customer_id, event_name, total_tokens):
         stripe_tokens = await self.bot.get_shared_api_tokens("stripe")
         stripe_key = stripe_tokens.get("api_key") if stripe_tokens else None
 
@@ -331,7 +343,8 @@ class ChatSummary(commands.Cog):
             stripe_payload = {
                 "event_name": event_name,
                 "timestamp": int(datetime.now().timestamp()),
-                "payload[stripe_customer_id]": customer_id
+                "payload[stripe_customer_id]": customer_id,
+                "payload[tokens]": total_tokens
             }
             async with aiohttp.ClientSession() as session:
                 try:
