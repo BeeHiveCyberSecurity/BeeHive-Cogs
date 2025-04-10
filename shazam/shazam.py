@@ -74,10 +74,11 @@ class ShazamCog(commands.Cog):
 
                 # Upload the audio file using aiohttp
                 try:
-                    async with session.post('https://temp.sh/upload', data={'file': open(audio_file_path, 'rb')}) as upload_response:
-                        upload_response.raise_for_status()
-                        audio_url = await upload_response.text()
-                        audio_url = audio_url.strip()
+                    with open(audio_file_path, 'rb') as f:
+                        async with session.post('https://temp.sh/upload', data={'file': f}) as upload_response:
+                            upload_response.raise_for_status()
+                            audio_url = await upload_response.text()
+                            audio_url = audio_url.strip()
                 finally:
                     os.remove(audio_file_path)  # Clean up the audio file after uploading
 
