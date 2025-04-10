@@ -159,7 +159,7 @@ class ChatSummary(commands.Cog):
                         "Content-Type": "application/json"
                     }
                     payload = {
-                        "model": "gpt-4o-mini",
+                        "model": "gpt-4o",
                         "messages": [
                             {
                                 "role": "system",
