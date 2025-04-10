@@ -55,7 +55,7 @@ class ChatSummary(commands.Cog):
                         })
                     elif entry.action == discord.AuditLogAction.member_update:
                         # Check if the timeout change is present
-                        timeout_change = any(change[0] == 'timed_out_until' for change in entry.before.items())
+                        timeout_change = 'timed_out_until' in entry.before
                         if timeout_change:
                             moderation_actions.append({
                                 "action": "timeout",
