@@ -52,7 +52,8 @@ class Omni(commands.Cog):
             too_tough_votes=0,
             just_right_votes=0,
             last_vote_time=None,
-            delete_violatory_messages=True
+            delete_violatory_messages=True,
+            last_reminder_time=None  # Added to track last reminder time
         )
         self.config.register_global(
             global_message_count=0,
@@ -102,11 +103,16 @@ class Omni(commands.Cog):
         # Increment the message count for the channel
         self.memory_user_message_counts[guild.id][channel.id] += 1
 
-        # Check if the message count has reached 35
-        if self.memory_user_message_counts[guild.id][channel.id] >= 35:
+        # Check if the message count has reached 35 or if it's been more than 10 minutes since the last reminder
+        last_reminder_time = await self.config.guild(guild).last_reminder_time()
+        current_time = datetime.utcnow()
+        if (self.memory_user_message_counts[guild.id][channel.id] >= 35 or 
+            (last_reminder_time and (current_time - datetime.fromisoformat(last_reminder_time)).total_seconds() >= 600)):
             await self.send_monitoring_reminder(channel)
             # Reset the message count for the channel
             self.memory_user_message_counts[guild.id][channel.id] = 0
+            # Update the last reminder time
+            await self.config.guild(guild).last_reminder_time.set(current_time.isoformat())
 
     async def send_monitoring_reminder(self, channel):
         """Send a monitoring reminder to the specified channel."""
