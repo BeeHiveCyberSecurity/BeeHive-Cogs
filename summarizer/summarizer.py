@@ -185,7 +185,7 @@ class ChatSummary(commands.Cog):
                             user_data = await self.config.user(user).all()
                             customer_id = user_data.get("customer_id")
                             if customer_id:
-                                await self._track_stripe_event(ctx, customer_id, "moderative_summary")
+                                await self._track_stripe_event(ctx, customer_id, "moderation_summary")
                         else:
                             await ctx.send(f"Failed to summarize moderation actions. Status code: {response.status}", delete_after=10)
 
