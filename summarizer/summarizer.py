@@ -1,7 +1,8 @@
 import discord
-from redbot.core import commands, Config
+from redbot.core import commands, Config, app_commands
 from datetime import datetime, timedelta, timezone
 import aiohttp
+import stripe
 
 class ChatSummary(commands.Cog):
     """Cog to summarize chat activity for users."""
@@ -40,7 +41,7 @@ class ChatSummary(commands.Cog):
                         moderation_actions.append({
                             "action": "ban",
                             "user": entry.user.display_name,
-                            "target": entry.target.display_name if isinstance(entry.target, discord.User) else str(entry.target),
+                            "target": entry.target.display_name if isinstance(entry.target, discord.Member) else str(entry.target),
                             "reason": entry.reason or "No reason found",
                             "timestamp": entry.created_at.isoformat()
                         })
@@ -48,24 +49,19 @@ class ChatSummary(commands.Cog):
                         moderation_actions.append({
                             "action": "kick",
                             "user": entry.user.display_name,
-                            "target": entry.target.display_name if isinstance(entry.target, discord.User) else str(entry.target),
+                            "target": entry.target.display_name if isinstance(entry.target, discord.Member) else str(entry.target),
                             "reason": entry.reason or "No reason found",
                             "timestamp": entry.created_at.isoformat()
                         })
                     elif entry.action == discord.AuditLogAction.member_update:
-                        if entry.changes and entry.changes.before and entry.changes.after:
-                            before_timeout = entry.changes.before.get('communication_disabled_until')
-                            after_timeout = entry.changes.after.get('communication_disabled_until')
-                            if before_timeout != after_timeout:
-                                timeout_duration = (after_timeout - entry.created_at).total_seconds() if after_timeout else 0
-                                moderation_actions.append({
-                                    "action": "timeout",
-                                    "user": entry.user.display_name,
-                                    "target": entry.target.display_name if isinstance(entry.target, discord.User) else str(entry.target),
-                                    "reason": entry.reason or "No reason found",
-                                    "timestamp": entry.created_at.isoformat(),
-                                    "timeout_duration": f"{timeout_duration / 60:.0f} minutes" if timeout_duration else "Timeout removed"
-                                })
+                        moderation_actions.append({
+                            "action": "timeout",
+                            "user": entry.user.display_name,
+                            "target": entry.target.display_name if isinstance(entry.target, discord.Member) else str(entry.target),
+                            "reason": entry.reason or "No reason found",
+                            "timestamp": entry.created_at.isoformat(),
+                            "timeout_duration": f"{timeout_duration / 60:.0f} minutes" if timeout_duration else "Timeout removed"
+                        })
                     elif entry.action == discord.AuditLogAction.unban:
                         moderation_actions.append({
                             "action": "unban",
@@ -78,7 +74,7 @@ class ChatSummary(commands.Cog):
                         moderation_actions.append({
                             "action": "message_delete",
                             "user": entry.user.display_name,
-                            "target": entry.target.display_name if isinstance(entry.target, discord.User) else str(entry.target),
+                            "target": entry.target.display_name if isinstance(entry.target, discord.Member) else str(entry.target),
                             "reason": entry.reason or "No reason found",
                             "timestamp": entry.created_at.isoformat()
                         })
@@ -102,7 +98,7 @@ class ChatSummary(commands.Cog):
                         moderation_actions.append({
                             "action": "disconnect_member",
                             "user": entry.user.display_name,
-                            "target": entry.target.display_name if isinstance(entry.target, discord.User) else str(entry.target),
+                            "target": entry.target.display_name if isinstance(entry.target, discord.Member) else str(entry.target),
                             "reason": entry.reason or "No reason found",
                             "timestamp": entry.created_at.isoformat()
                         })
@@ -134,7 +130,7 @@ class ChatSummary(commands.Cog):
                         moderation_actions.append({
                             "action": "automod_block_message",
                             "user": entry.user.display_name,
-                            "target": entry.target.display_name if isinstance(entry.target, discord.User) else str(entry.target),
+                            "target": entry.target.display_name if isinstance(entry.target, discord.Member) else str(entry.target),
                             "reason": entry.reason or "No reason found",
                             "timestamp": entry.created_at.isoformat()
                         })
