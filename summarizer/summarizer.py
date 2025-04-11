@@ -145,7 +145,7 @@ class ChatSummary(commands.Cog):
                         # Create buttons for start and cancel
                         class StartCancelButtons(discord.ui.View):
                             def __init__(self, parent_cog, ctx, customer_id, preferred_model, openai_api_key, selected_category, selected_context_size):
-                                super().__init__()
+                                super().__init__(timeout=None)  # Disable timeout to prevent expiration
                                 self.parent_cog = parent_cog
                                 self.ctx = ctx
                                 self.customer_id = customer_id
@@ -293,7 +293,7 @@ class ChatSummary(commands.Cog):
                             await self.ctx.send("The interaction has expired. Please try again.", delete_after=10)
 
                 # Send the search context size dropdown to the user
-                view = discord.ui.View()
+                view = discord.ui.View(timeout=None)  # Disable timeout to prevent expiration
                 view.add_item(SearchContextDropdown(self.parent_cog, self.ctx, self.customer_id, self.preferred_model, self.openai_api_key, selected_category))
                 embed = discord.Embed(
                     title="Select your search intensity",
@@ -307,7 +307,7 @@ class ChatSummary(commands.Cog):
                     await self.ctx.send("The interaction has expired. Please try again.", delete_after=10)
 
         # Send the category dropdown to the user
-        view = discord.ui.View()
+        view = discord.ui.View(timeout=None)  # Disable timeout to prevent expiration
         view.add_item(NewsCategoryDropdown(self, ctx, customer_id, preferred_model, openai_api_key))
         embed = discord.Embed(
             title="Choose a news category",
