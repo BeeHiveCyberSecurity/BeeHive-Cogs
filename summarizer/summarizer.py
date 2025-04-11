@@ -294,7 +294,8 @@ class ChatSummary(commands.Cog):
                             "role": "user",
                             "content": f"Summarize the following server information: {server_content}"
                         }
-                    ]
+                    ],
+                    "temperature": 1.0
                 }
                 async with session.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload) as response:
                     if response.status == 200:
@@ -552,7 +553,6 @@ class ChatSummary(commands.Cog):
             "gpt-4o-mini": "Fast, affordable model for focused tasks.",
             "gpt-4-turbo": "Enhanced version of GPT-4 with faster processing and improved efficiency.",
             "o1": "Uses reinforcement learning for complex reasoning with high intelligence",
-            "o1-mini": "Small reasoning model with high intelligence",
             "o3-mini": "Newest small reasoning model with high intelligence",
         }
 
