@@ -545,7 +545,7 @@ class ChatSummary(commands.Cog):
 
         # Define valid models with descriptions
         model_details = {
-            "gpt-3.5-turbo": "The original imprint of LLM technology"
+            "gpt-3.5-turbo": "The original imprint of LLM technology",
             "gpt-4": "Standard version of GPT-4 with balanced performance.",
             "chatgpt-4o-latest": "GPT model used on chatgpt.com",
             "gpt-4o": "Versatile, high-intelligence model.",
