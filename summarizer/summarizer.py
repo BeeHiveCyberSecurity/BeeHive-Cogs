@@ -168,7 +168,7 @@ class ChatSummary(commands.Cog):
                                     color=0x2bbd8e
                                 )
                                 embed.add_field(name="Category", value=self.selected_category, inline=False)
-                                await interaction.followup.send(embed=embed)
+                                await interaction.followup.send(embed=embed, ephemeral=True)
 
                                 input_text = f"What are 5 recent {self.selected_category} news stories?"
                                 payload = {
@@ -257,7 +257,7 @@ class ChatSummary(commands.Cog):
                                                                 description=summary,
                                                                 color=0xfffffe
                                                             )
-                                                            await interaction.followup.send(embed=embed)
+                                                            await interaction.followup.send(embed=embed, ephemeral=True)
                                                         else:
                                                             error_message = await summarize_response.text()
                                                             await interaction.followup.send(f"Failed to summarize news stories. Status code: {summarize_response.status}, Error: {error_message}", delete_after=10)
@@ -280,7 +280,7 @@ class ChatSummary(commands.Cog):
                             description=f"Category: {self.selected_category}\nSearch Context Size: {selected_context_size.capitalize()}",
                             color=0x2bbd8e
                         )
-                        await interaction.response.send_message(embed=embed, view=view)
+                        await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
 
                 # Send the search context size dropdown to the user
                 view = discord.ui.View()
@@ -290,7 +290,7 @@ class ChatSummary(commands.Cog):
                     description="Please select the search context size for your news summary",
                     color=0x45ab45
                 )
-                await interaction.response.send_message(embed=embed, view=view)
+                await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
 
         # Send the category dropdown to the user
         view = discord.ui.View()
