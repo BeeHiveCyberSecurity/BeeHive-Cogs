@@ -286,7 +286,7 @@ class ChatSummary(commands.Cog):
                     "messages": [
                         {
                             "role": "system",
-                            "content": "You are a Discord server information summary generator. Use bulletpoints. Don't use titles."
+                            "content": "You are a Discord server information summary generator. Reply in a single conversational paragraph."
                         },
                         {
                             "role": "user",
