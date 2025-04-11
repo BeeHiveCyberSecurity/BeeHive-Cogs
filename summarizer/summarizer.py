@@ -151,7 +151,7 @@ class ChatSummary(commands.Cog):
                                 self.selected_context_size = selected_context_size
 
                             @discord.ui.button(label="Start", style=discord.ButtonStyle.green)
-                            async def start(self, button: discord.ui.Button, interaction: discord.Interaction):
+                            async def start(self, interaction: discord.Interaction, button: discord.ui.Button):
                                 if interaction.user != self.ctx.author:
                                     await interaction.response.send_message("You are not authorized to use this button.", ephemeral=True)
                                     return
@@ -168,7 +168,7 @@ class ChatSummary(commands.Cog):
                                     color=0x2bbd8e
                                 )
                                 embed.add_field(name="Category", value=self.selected_category, inline=False)
-                                await interaction.followup.send(embed=embed, ephemeral=True)
+                                await interaction.followup.send(embed=embed)
 
                                 input_text = f"What are 5 recent {self.selected_category} news stories?"
                                 payload = {
@@ -257,7 +257,7 @@ class ChatSummary(commands.Cog):
                                                                 description=summary,
                                                                 color=0xfffffe
                                                             )
-                                                            await interaction.followup.send(embed=embed, ephemeral=True)
+                                                            await interaction.followup.send(embed=embed)
                                                         else:
                                                             error_message = await summarize_response.text()
                                                             await interaction.followup.send(f"Failed to summarize news stories. Status code: {summarize_response.status}, Error: {error_message}", delete_after=10)
@@ -266,7 +266,7 @@ class ChatSummary(commands.Cog):
                                                 await interaction.followup.send(f"Failed to fetch news stories. Status code: {response.status}, Error: {error_message}", delete_after=10)
 
                             @discord.ui.button(label="Cancel", style=discord.ButtonStyle.red)
-                            async def cancel(self, button: discord.ui.Button, interaction: discord.Interaction):
+                            async def cancel(self, interaction: discord.Interaction, button: discord.ui.Button):
                                 if interaction.user != self.ctx.author:
                                     await interaction.response.send_message("You are not authorized to use this button.", ephemeral=True)
                                     return
@@ -290,7 +290,7 @@ class ChatSummary(commands.Cog):
                     description="Please select the search context size for your news summary",
                     color=0x45ab45
                 )
-                await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
+                await interaction.response.send_message(embed=embed, ephemeral=True)
 
         # Send the category dropdown to the user
         view = discord.ui.View()
