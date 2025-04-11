@@ -322,7 +322,7 @@ class ChatSummary(commands.Cog):
         embed = discord.Embed(
             title="Choose a news category",
             description="To get started, select what type of news coverage you're interested in.\n- This helps align the AI to your interests before it starts research on your behalf.",
-            color=0xfffffe
+            color=0xff9144
         )
         await ctx.send(embed=embed, view=view)
     
