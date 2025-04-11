@@ -135,7 +135,7 @@ class ChatSummary(commands.Cog):
 
                                     # Create and send embed
                                     embed = discord.Embed(
-                                        title="Summarized News Stories",
+                                        title="📰 Your AI news summary",
                                         description=summary,
                                         color=0xfffffe
                                     )
