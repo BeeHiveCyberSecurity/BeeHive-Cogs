@@ -86,16 +86,33 @@ class ChatSummary(commands.Cog):
                 async with session.post(url, headers=headers, json=payload) as response:
                     if response.status == 200:
                         data = await response.json()
-                        news_stories = data.get("choices", [{}])[0].get("text", "No news stories found.")
-                        
-                        # Tokenize input and output using tiktoken's encoding
-                        encoding = tiktoken.get_encoding("o200k_base")
-                        input_tokens = len(encoding.encode(input_text))
-                        output_tokens = len(encoding.encode(news_stories))
-                        
-                        # Track stripe event
-                        await self._track_stripe_event(ctx, customer_id, "gpt-4o-search-preview", "input", input_tokens)
-                        await self._track_stripe_event(ctx, customer_id, "gpt-4o-search-preview", "output", output_tokens)
+                        web_search_call = next((item for item in data if item["type"] == "web_search_call"), None)
+                        message = next((item for item in data if item["type"] == "message"), None)
+
+                        if message:
+                            output_text = message["content"][0]["text"]
+                            annotations = message["content"][0].get("annotations", [])
+                            news_stories = output_text
+
+                            # Create clickable citations
+                            for annotation in annotations:
+                                if annotation["type"] == "url_citation":
+                                    url = annotation["url"]
+                                    title = annotation["title"]
+                                    start_index = annotation["start_index"]
+                                    end_index = annotation["end_index"]
+                                    news_stories = (news_stories[:start_index] +
+                                                    f"[{news_stories[start_index:end_index]}]({url} '{title}')" +
+                                                    news_stories[end_index:])
+
+                            # Tokenize input and output using tiktoken's encoding
+                            encoding = tiktoken.get_encoding("o200k_base")
+                            input_tokens = len(encoding.encode(input_text))
+                            output_tokens = len(encoding.encode(news_stories))
+                            
+                            # Track stripe event
+                            await self._track_stripe_event(ctx, customer_id, "gpt-4o-search-preview", "input", input_tokens)
+                            await self._track_stripe_event(ctx, customer_id, "gpt-4o-search-preview", "output", output_tokens)
 
                         
                         stripe_tokens = await self.bot.get_shared_api_tokens("stripe")
