@@ -341,8 +341,8 @@ class ChatSummary(commands.Cog):
                         view = discord.ui.View(timeout=None)  # Disable timeout to prevent expiration
                         view.add_item(DocumentGenerationDropdown(self.parent_cog, self.ctx, self.customer_id, self.preferred_model, self.openai_api_key, selected_category, selected_context_size))
                         embed = discord.Embed(
-                            title="Would you like a document generated?",
-                            description="Select whether you want a document generated of your news report.",
+                            title="Do you need an extra text copy of your report?",
+                            description="This might be useful if you're going without internet, or need to save the news to use it in a project or other activities.",
                             color=0xff9144
                         )
                         try:
