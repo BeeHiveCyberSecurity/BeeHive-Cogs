@@ -294,7 +294,7 @@ class ChatSummary(commands.Cog):
                         embed = discord.Embed(
                             title="Review your choices",
                             description="Make sure everything here looks good, then click **Start**",
-                            color=0x45ABF5
+                            color=0xff9144
                         )
                         embed.add_field(name="News category", value=self.selected_category, inline=True)
                         embed.add_field(name="Search intensity", value=selected_context_size.capitalize(), inline=True)
@@ -309,7 +309,7 @@ class ChatSummary(commands.Cog):
                 embed = discord.Embed(
                     title="Select your search intensity",
                     description="- Less intense searches are cheaper and faster, but may miss information you're interested in\n- More intense searches take longer and cost more, but can be more comprehensive.",
-                    color=0x45ABF5
+                    color=0xff9144
                 )
                 embed.set_footer(text="If you're not sure, choose Medium")
                 try:
@@ -323,7 +323,7 @@ class ChatSummary(commands.Cog):
         embed = discord.Embed(
             title="Choose a news category",
             description="Please select a category of news you're interested in. This is the category of news and reports the AI will exclusively look for and contextualize",
-            color=0x45ABF5
+            color=0xfffffe
         )
         await ctx.send(embed=embed, view=view)
     
