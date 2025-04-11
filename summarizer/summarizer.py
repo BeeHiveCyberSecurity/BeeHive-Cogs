@@ -450,7 +450,7 @@ class ChatSummary(commands.Cog):
         model_details = {
             "gpt-4o": "Versatile, high-intelligence flagship model. Accepts both text and image inputs",
             "gpt-4o-mini": "Fast, affordable small model for focused tasks. Accepts both text and image inputs",
-            "gpt-4.5-preview": "Excels at tasks that benefit from creative, open-ended thinking and conversation, such as writing, learning, or exploring new ideas",
+            "gpt-4.5-preview": "Excels at tasks that benefit from creative, open-ended thinking such as writing",
             "o1": "Trained with reinforcement learning to perform complex reasoning with high intelligence.",
             "o3-mini": "The newest small reasoning model, providing high intelligence at the same cost and latency targets of o1-mini",
         }
