@@ -544,16 +544,16 @@ class ChatSummary(commands.Cog):
             await ctx.send("You must have a customer ID set to use this command.", delete_after=10)
             return
 
-        # Define valid models with descriptions
+        # Define valid models with descriptions and emojis
         model_details = {
-            "gpt-3.5-turbo": "Original imprint of LLM technology with balanced performance.",
-            "gpt-4": "Standard version of GPT-4 with balanced performance.",
-            "chatgpt-4o-latest": "Model used on chatgpt.com with versatile capabilities.",
-            "gpt-4o": "Versatile model with high intelligence.",
-            "gpt-4o-mini": "Fast and affordable model for focused tasks.",
-            "gpt-4-turbo": "Enhanced version of GPT-4 with faster processing and improved efficiency.",
-            "o1": "Model using reinforcement learning for complex reasoning with high intelligence.",
-            "o3-mini": "Newest small reasoning model with high intelligence.",
+            "gpt-3.5-turbo": "🌀 Original imprint of LLM technology with balanced performance.",
+            "gpt-4": "🔍 Standard version of GPT-4 with balanced performance.",
+            "chatgpt-4o-latest": "🌐 Model used on chatgpt.com with versatile capabilities.",
+            "gpt-4o": "🧠 Versatile model with high intelligence.",
+            "gpt-4o-mini": "⚡ Fast and affordable model for focused tasks.",
+            "gpt-4-turbo": "🚀 Enhanced version of GPT-4 with faster processing and improved efficiency.",
+            "o1": "🤖 Model using reinforcement learning for complex reasoning with high intelligence.",
+            "o3-mini": "🔬 Newest small reasoning model with high intelligence.",
         }
 
         # Create a dropdown menu for model selection
