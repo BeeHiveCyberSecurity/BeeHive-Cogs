@@ -171,7 +171,8 @@ class ChatSummary(commands.Cog):
                                     description="This might take a minute, please be patient...",
                                     color=0x2bbd8e
                                 )
-                                embed.add_field(name="Category", value=self.selected_category, inline=False)
+                                embed.add_field(name="News category", value=self.selected_category, inline=True)
+                                embed.add_field(name="Search intensity", value=self.selected_context_size, inline=True)
                                 await interaction.followup.send(embed=embed)
 
                                 input_text = f"What are 5 recent {self.selected_category} news stories?"
