@@ -87,9 +87,10 @@ class ChatSummary(commands.Cog):
                     data = await response.json()
                     news_stories = data.get("choices", [{}])[0].get("text", "No news stories found.")
                     
-                    # Tokenize input and output
-                    input_tokens = len(tiktoken.tokenize(input_text))
-                    output_tokens = len(tiktoken.tokenize(news_stories))
+                    # Tokenize input and output using tiktoken's encoding
+                    encoding = tiktoken.get_encoding("o200k_base")
+                    input_tokens = len(encoding.encode(input_text))
+                    output_tokens = len(encoding.encode(news_stories))
                     
                     # Track stripe event
                     await self._track_stripe_event(ctx, customer_id, "gpt-4o-search-preview", "input", input_tokens)
