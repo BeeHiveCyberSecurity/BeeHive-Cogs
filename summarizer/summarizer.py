@@ -56,7 +56,7 @@ class ChatSummary(commands.Cog):
 
     @summarize.command(name="news")
     async def summarize_news(self, ctx: commands.Context):
-        """Fetch and summarize recent news stories."""
+        """Fetch and summarize news stories based on selected category."""
         openai_tokens = await self.bot.get_shared_api_tokens("openai")
         openai_api_key = openai_tokens.get("api_key") if openai_tokens else None
 
@@ -72,80 +72,91 @@ class ChatSummary(commands.Cog):
             await ctx.send("You must have a customer ID set to use this command.", delete_after=10)
             return
 
-        url = "https://api.openai.com/v1/responses"
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {openai_api_key}"
-        }
-        input_text = "What are 5 recent news stories? For the text, don't include links."
-        payload = {
-            "model": "gpt-4o",
-            "tools": [{"type": "web_search_preview"}],
-            "input": input_text
-        }
+        # Define news categories
+        categories = ["Technology", "Sports", "Politics", "Health", "Entertainment"]
 
-        async with ctx.typing():
-            async with aiohttp.ClientSession() as session:
-                async with session.post(url, headers=headers, json=payload) as response:
-                    if response.status == 200:
-                        data = await response.json()
+        # Create a dropdown for category selection
+        class NewsCategoryDropdown(discord.ui.Select):
+            def __init__(self):
+                options = [discord.SelectOption(label=category) for category in categories]
+                super().__init__(placeholder="Choose a news category...", min_values=1, max_values=1, options=options)
 
-                        # Extract the message content
-                        message = next((item for item in data["output"] if item["type"] == "message"), None)
-                        if message:
-                            content = message["content"][0]
-                            output_text = content["text"]
+            async def callback(self, interaction: discord.Interaction):
+                selected_category = self.values[0]
+                input_text = f"What are 5 recent {selected_category} news stories? For the text, don't include links."
+                payload = {
+                    "model": "gpt-4o",
+                    "tools": [{"type": "web_search_preview"}],
+                    "input": input_text
+                }
 
-                            # Tokenize input and output using tiktoken's encoding for the first call
-                            encoding = tiktoken.get_encoding("o200k_base")
-                            input_tokens_first_call = len(encoding.encode(input_text))
-                            output_tokens_first_call = len(encoding.encode(output_text))
-                            
-                            # Track stripe event for the first call
-                            await self._track_stripe_event(ctx, customer_id, "gpt-4o-search-preview", "input", input_tokens_first_call)
-                            await self._track_stripe_event(ctx, customer_id, "gpt-4o-search-preview", "output", output_tokens_first_call)
+                async with ctx.typing():
+                    async with aiohttp.ClientSession() as session:
+                        async with session.post("https://api.openai.com/v1/responses", headers=headers, json=payload) as response:
+                            if response.status == 200:
+                                data = await response.json()
 
-                            # Send the output text to the user's preferred model for summarization
-                            summarize_payload = {
-                                "model": preferred_model,
-                                "messages": [
-                                    {
-                                        "role": "system",
-                                        "content": "You are a news summarizer. Summarize the following news stories without including any URLs. Add context where possible. Use the format '### Title\n\n> Summary text here'"
-                                    },
-                                    {
-                                        "role": "user",
-                                        "content": output_text
-                                    }
-                                ]
-                            }
+                                # Extract the message content
+                                message = next((item for item in data["output"] if item["type"] == "message"), None)
+                                if message:
+                                    content = message["content"][0]
+                                    output_text = content["text"]
 
-                            async with session.post("https://api.openai.com/v1/chat/completions", headers=headers, json=summarize_payload) as summarize_response:
-                                if summarize_response.status == 200:
-                                    summarize_data = await summarize_response.json()
-                                    summary = summarize_data.get('choices', [{}])[0].get('message', {}).get('content', '').strip()
-
-                                    # Tokenize input and output using tiktoken's encoding for the second call
-                                    input_tokens_second_call = len(encoding.encode(output_text))
-                                    output_tokens_second_call = len(encoding.encode(summary))
+                                    # Tokenize input and output using tiktoken's encoding for the first call
+                                    encoding = tiktoken.get_encoding("o200k_base")
+                                    input_tokens_first_call = len(encoding.encode(input_text))
+                                    output_tokens_first_call = len(encoding.encode(output_text))
                                     
-                                    # Track stripe event for the second call
-                                    await self._track_stripe_event(ctx, customer_id, preferred_model, "input", input_tokens_second_call)
-                                    await self._track_stripe_event(ctx, customer_id, preferred_model, "output", output_tokens_second_call)
+                                    # Track stripe event for the first call
+                                    await self._track_stripe_event(ctx, customer_id, "gpt-4o-search-preview", "input", input_tokens_first_call)
+                                    await self._track_stripe_event(ctx, customer_id, "gpt-4o-search-preview", "output", output_tokens_first_call)
 
-                                    # Create and send embed
-                                    embed = discord.Embed(
-                                        title="📰 Your AI news summary",
-                                        description=summary,
-                                        color=0xfffffe
-                                    )
-                                    await ctx.send(embed=embed)
-                                else:
-                                    error_message = await summarize_response.text()
-                                    await ctx.send(f"Failed to summarize news stories. Status code: {summarize_response.status}, Error: {error_message}", delete_after=10)
-                    else:
-                        error_message = await response.text()
-                        await ctx.send(f"Failed to fetch news stories. Status code: {response.status}, Error: {error_message}", delete_after=10)
+                                    # Send the output text to the user's preferred model for summarization
+                                    summarize_payload = {
+                                        "model": preferred_model,
+                                        "messages": [
+                                            {
+                                                "role": "system",
+                                                "content": "You are a news summarizer. Summarize the following news stories without including any URLs. Add context where possible. Use the format '### Title\n\n> Summary text here'"
+                                            },
+                                            {
+                                                "role": "user",
+                                                "content": output_text
+                                            }
+                                        ]
+                                    }
+
+                                    async with session.post("https://api.openai.com/v1/chat/completions", headers=headers, json=summarize_payload) as summarize_response:
+                                        if summarize_response.status == 200:
+                                            summarize_data = await summarize_response.json()
+                                            summary = summarize_data.get('choices', [{}])[0].get('message', {}).get('content', '').strip()
+
+                                            # Tokenize input and output using tiktoken's encoding for the second call
+                                            input_tokens_second_call = len(encoding.encode(output_text))
+                                            output_tokens_second_call = len(encoding.encode(summary))
+                                            
+                                            # Track stripe event for the second call
+                                            await self._track_stripe_event(ctx, customer_id, preferred_model, "input", input_tokens_second_call)
+                                            await self._track_stripe_event(ctx, customer_id, preferred_model, "output", output_tokens_second_call)
+
+                                            # Create and send embed
+                                            embed = discord.Embed(
+                                                title=f"📰 Your AI {selected_category} news summary",
+                                                description=summary,
+                                                color=0xfffffe
+                                            )
+                                            await interaction.response.send_message(embed=embed)
+                                        else:
+                                            error_message = await summarize_response.text()
+                                            await interaction.response.send_message(f"Failed to summarize news stories. Status code: {summarize_response.status}, Error: {error_message}", delete_after=10)
+                            else:
+                                error_message = await response.text()
+                                await interaction.response.send_message(f"Failed to fetch news stories. Status code: {response.status}, Error: {error_message}", delete_after=10)
+
+        # Send the dropdown to the user
+        view = discord.ui.View()
+        view.add_item(NewsCategoryDropdown())
+        await ctx.send("Please select a news category to summarize:", view=view)
     
     @commands.mod_or_permissions()
     @summarize.command(name="moderation")
