@@ -103,6 +103,10 @@ class ChatSummary(commands.Cog):
                 super().__init__(placeholder="Choose a news category...", min_values=1, max_values=1, options=options)
 
             async def callback(self, interaction: discord.Interaction):
+                if interaction.user != self.ctx.author:
+                    await interaction.response.send_message("You are not authorized to use this dropdown.", ephemeral=True)
+                    return
+
                 await interaction.response.defer()  # Defer the interaction
 
                 # Delete the original message with the dropdown
