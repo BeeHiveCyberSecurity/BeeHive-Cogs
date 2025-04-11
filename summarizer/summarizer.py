@@ -272,7 +272,7 @@ class ChatSummary(commands.Cog):
                                                                 description=summary,
                                                                 color=0xfffffe
                                                             )
-                                                            embed.set_footer(text=f"{time_taken_first_call:.2f}s to search, {time_taken_second_call:.2f}s to summarize. AI makes mistakes, check for errors")
+                                                            embed.set_footer(text=f"{time_taken_first_call:.2f}s to search, {time_taken_second_call:.2f}s to summarize. AI can make mistakes, check for errors")
                                                             await interaction.message.edit(embed=embed, view=None)
                                                         else:
                                                             error_message = await summarize_response.text()
