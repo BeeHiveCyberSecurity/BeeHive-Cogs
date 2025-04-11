@@ -167,8 +167,8 @@ class ChatSummary(commands.Cog):
 
                                 # Change the message to an embed indicating the search is in progress
                                 embed = discord.Embed(
-                                    title="Starting AI task",
-                                    description="This might take a minute, please be patient...",
+                                    title="Task confirmed",
+                                    description="AI is curating your requested news now. Please wait, this shouldn't take long...",
                                     color=0x2bbd8e
                                 )
                                 embed.add_field(name="News category", value=self.selected_category, inline=True)
