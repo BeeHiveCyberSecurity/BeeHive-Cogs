@@ -96,7 +96,7 @@ class ChatSummary(commands.Cog):
                         # Track stripe event
                         await self._track_stripe_event(ctx, customer_id, "gpt-4o-search-preview", "input", input_tokens)
                         await self._track_stripe_event(ctx, customer_id, "gpt-4o-search-preview", "output", output_tokens)
-                        await self._track_stripe_event(ctx, customer_id, "gpt-4o-search-preview_medium", "uses, "1")
+                        await self._track_stripe_event(ctx, customer_id, "gpt-4o-search-preview_medium", "uses", 1)
 
                         embed = discord.Embed(
                             title="Recent News Stories",
