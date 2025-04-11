@@ -72,12 +72,24 @@ class ChatSummary(commands.Cog):
             await ctx.send("You must have a customer ID set to use this command.", delete_after=10)
             return
 
-        # Define news categories
-        categories = [
-            "Technology", "Sports", "Politics", "Health", "Entertainment", 
-            "Music", "Stocks", "Government", "Law Enforcement", "Science", 
-            "Travel", "Education", "Environment", "Business", "World"
-        ]
+        # Define news categories with descriptions
+        categories = {
+            "Technology": "Latest advancements and updates in technology.",
+            "Sports": "Recent sports events and news.",
+            "Politics": "Current political news and updates.",
+            "Health": "Health-related news and discoveries.",
+            "Entertainment": "News from the entertainment industry.",
+            "Music": "Updates and news from the music world.",
+            "Stocks": "Latest stock market news and trends.",
+            "Government": "News related to government actions and policies.",
+            "Law Enforcement": "Updates on law enforcement activities.",
+            "Science": "Recent scientific discoveries and research.",
+            "Travel": "News and updates from the travel industry.",
+            "Education": "News related to education and learning.",
+            "Environment": "Updates on environmental issues and news.",
+            "Business": "Business news and market trends.",
+            "World": "Global news and international updates."
+        }
 
         # Create a dropdown for category selection
         class NewsCategoryDropdown(discord.ui.Select):
@@ -87,7 +99,7 @@ class ChatSummary(commands.Cog):
                 self.customer_id = customer_id
                 self.preferred_model = preferred_model
                 self.openai_api_key = openai_api_key
-                options = [discord.SelectOption(label=category) for category in categories]
+                options = [discord.SelectOption(label=category, description=description) for category, description in categories.items()]
                 super().__init__(placeholder="Choose a news category...", min_values=1, max_values=1, options=options)
 
             async def callback(self, interaction: discord.Interaction):
