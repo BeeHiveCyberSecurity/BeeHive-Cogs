@@ -76,11 +76,13 @@ class ChatSummary(commands.Cog):
             "Content-Type": "application/json",
             "Authorization": f"Bearer {openai_api_key}"
         }
-        input_text = "What are 5 recent news stories? For the text, don't include links."
+        input_text = "What are 5 recent news stories?"
+        system_guidance = "Provide a summary of recent news stories without including any links."
         payload = {
             "model": "gpt-4o",
             "tools": [{"type": "web_search_preview"}],
-            "input": input_text
+            "input": input_text,
+            "system": system_guidance
         }
 
         async with ctx.typing():
