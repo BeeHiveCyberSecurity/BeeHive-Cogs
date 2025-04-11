@@ -587,7 +587,7 @@ class ChatSummary(commands.Cog):
 
         # Send the dropdown view to the user
         view = ModelDropdownView(self.config, user)
-        await ctx.send("Please select your preferred AI model for summarization:", view=view)
+        await ctx.send("Please select your preferred AI model for summarization", view=view)
 
 
 
