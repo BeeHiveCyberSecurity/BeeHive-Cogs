@@ -552,6 +552,7 @@ class ChatSummary(commands.Cog):
             "gpt-4o-mini": "Fast, affordable model for focused tasks.",
             "gpt-4-turbo": "Enhanced version of GPT-4 with faster processing and improved efficiency.",
             "o1": "Uses reinforcement learning for complex reasoning with high intelligence",
+            "o1-mini": "Small reasoning model with high intelligence",
             "o3-mini": "Newest small reasoning model with high intelligence",
         }
 
