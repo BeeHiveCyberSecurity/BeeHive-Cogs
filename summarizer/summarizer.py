@@ -76,7 +76,7 @@ class ChatSummary(commands.Cog):
             "Content-Type": "application/json",
             "Authorization": f"Bearer {openai_api_key}"
         }
-        input_text = "What are 5 recent news stories"
+        input_text = "What are 5 recent news stories? For the text, don't include links."
         payload = {
             "model": "gpt-4o",
             "tools": [{"type": "web_search_preview"}],
