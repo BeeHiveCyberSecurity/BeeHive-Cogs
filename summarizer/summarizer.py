@@ -213,7 +213,7 @@ class ChatSummary(commands.Cog):
                     async with session.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload) as response:
                         if response.status == 200:
                             data = await response.json()
-                            summary = data['choices'][0]['message']['content'].strip()
+                            summary = data.get('choices', [{}])[0].get('message', {}).get('content', '').strip()
                             output_tokens = len(encoding.encode(summary))
                             embed = discord.Embed(
                                 title="AI moderation summary",
