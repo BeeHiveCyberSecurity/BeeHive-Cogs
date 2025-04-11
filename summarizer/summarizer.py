@@ -99,7 +99,7 @@ class ChatSummary(commands.Cog):
                     embed = discord.Embed(
                         title="Recent News Stories",
                         description=news_stories,
-                        color=discord.Color.blue()
+                        color=0xfffffe
                     )
                     await ctx.send(embed=embed)
                 else:
