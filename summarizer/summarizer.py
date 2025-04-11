@@ -369,7 +369,7 @@ class ChatSummary(commands.Cog):
         view.add_item(NewsCategoryDropdown(self, ctx, customer_id, preferred_model, openai_api_key))
         embed = discord.Embed(
             title="Choose a news category",
-            description="To get started, select what type of news coverage you're interested in.\n- This helps align the AI to your interests before it starts research on your behalf.",
+            description="To get started, select what type of news coverage you're interested in.\n- This helps align the AI to your interests before it starts research on your behalf.\n- If you choose the wrong category, you can cancel before submitting your task.",
             color=0xff9144
         )
         await ctx.send(embed=embed, view=view)
