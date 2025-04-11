@@ -86,8 +86,12 @@ class ChatSummary(commands.Cog):
                 async with session.post(url, headers=headers, json=payload) as response:
                     if response.status == 200:
                         data = await response.json()
-                        web_search_call = next((item for item in data if item["type"] == "web_search_call"), None)
-                        message = next((item for item in data if item["type"] == "message"), None)
+                        if isinstance(data, list):
+                            web_search_call = next((item for item in data if item.get("type") == "web_search_call"), None)
+                            message = next((item for item in data if item.get("type") == "message"), None)
+                        else:
+                            web_search_call = None
+                            message = None
 
                         if message:
                             output_text = message["content"][0]["text"]
