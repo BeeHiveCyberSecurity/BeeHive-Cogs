@@ -451,8 +451,8 @@ class ChatSummary(commands.Cog):
             "gpt-4o": "GPT-4o: Optimized for high-quality summarization with advanced language understanding.",
             "gpt-4o-mini": "GPT-4o-mini: A lighter version of GPT-4o, balancing performance and efficiency.",
             "gpt-3.5-turbo": "GPT-3.5: A robust model for general summarization tasks.",
-            "o1": "O1: A custom model designed for specific summarization needs.",
-            "o1-mini": "O1-mini: A compact version of O1, tailored for efficient summarization with specific needs."
+            "o1": "A custom model designed for specific summarization needs.",
+            "o1-pro": "A compact version of O1, tailored for efficient summarization with specific needs."
         }
 
         # Create a dropdown menu for model selection
