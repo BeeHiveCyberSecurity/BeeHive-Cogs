@@ -81,31 +81,32 @@ class ChatSummary(commands.Cog):
             "input": input_text
         }
 
-        async with aiohttp.ClientSession() as session:
-            async with session.post(url, headers=headers, json=payload) as response:
-                if response.status == 200:
-                    data = await response.json()
-                    news_stories = data.get("choices", [{}])[0].get("text", "No news stories found.")
-                    
-                    # Tokenize input and output using tiktoken's encoding
-                    encoding = tiktoken.get_encoding("o200k_base")
-                    input_tokens = len(encoding.encode(input_text))
-                    output_tokens = len(encoding.encode(news_stories))
-                    
-                    # Track stripe event
-                    await self._track_stripe_event(ctx, customer_id, "gpt-4o-search-preview", "input", input_tokens)
-                    await self._track_stripe_event(ctx, customer_id, "gpt-4o-search-preview", "output", output_tokens)
-                    await self._track_stripe_event(ctx, customer_id, "gpt-4o-search-preview_medium")
+        async with ctx.typing():
+            async with aiohttp.ClientSession() as session:
+                async with session.post(url, headers=headers, json=payload) as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        news_stories = data.get("choices", [{}])[0].get("text", "No news stories found.")
+                        
+                        # Tokenize input and output using tiktoken's encoding
+                        encoding = tiktoken.get_encoding("o200k_base")
+                        input_tokens = len(encoding.encode(input_text))
+                        output_tokens = len(encoding.encode(news_stories))
+                        
+                        # Track stripe event
+                        await self._track_stripe_event(ctx, customer_id, "gpt-4o-search-preview", "input", input_tokens)
+                        await self._track_stripe_event(ctx, customer_id, "gpt-4o-search-preview", "output", output_tokens)
+                        await self._track_stripe_event(ctx, customer_id, "gpt-4o-search-preview_medium")
 
-                    embed = discord.Embed(
-                        title="Recent News Stories",
-                        description=news_stories,
-                        color=0xfffffe
-                    )
-                    await ctx.send(embed=embed)
-                else:
-                    error_message = await response.text()
-                    await ctx.send(f"Failed to fetch news stories. Status code: {response.status}, Error: {error_message}", delete_after=10)
+                        embed = discord.Embed(
+                            title="Recent News Stories",
+                            description=news_stories,
+                            color=0xfffffe
+                        )
+                        await ctx.send(embed=embed)
+                    else:
+                        error_message = await response.text()
+                        await ctx.send(f"Failed to fetch news stories. Status code: {response.status}, Error: {error_message}", delete_after=10)
     
     @commands.mod_or_permissions()
     @summarize.command(name="moderation")
