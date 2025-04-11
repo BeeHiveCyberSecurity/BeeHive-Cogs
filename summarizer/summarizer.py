@@ -94,7 +94,11 @@ class ChatSummary(commands.Cog):
             "Automotive": "News and updates from the automotive industry.",
             "Real Estate": "Current trends and news in the real estate market.",
             "Aviation": "Latest news and updates from the aviation industry.",
-            "Military": "News and updates related to military actions and defense."
+            "Military": "News and updates related to military actions and defense.",
+            "Cryptocurrency": "News and trends in the cryptocurrency market.",
+            "Weather": "Updates on weather conditions and forecasts.",
+            "Art": "News and updates from the art world.",
+            "History": "Insights and discoveries related to historical events."
         }
 
         # Create a dropdown for category selection
