@@ -276,10 +276,12 @@ class ChatSummary(commands.Cog):
                         # Send the start and cancel buttons to the user
                         view = StartCancelButtons(self.parent_cog, self.ctx, self.customer_id, self.preferred_model, self.openai_api_key, self.selected_category, selected_context_size)
                         embed = discord.Embed(
-                            title="Confirm your selection",
-                            description=f"Category: {self.selected_category}\nSearch Context Size: {selected_context_size.capitalize()}",
-                            color=0x2bbd8e
+                            title="Confirm Your selections",
+                            description="Make sure everything here looks good, then click **Start**",
+                            color=discord.Color.teal()
                         )
+                        embed.add_field(name="Category", value=self.selected_category, inline=False)
+                        embed.add_field(name="Search Context Size", value=selected_context_size.capitalize(), inline=False)
                         await interaction.response.send_message(embed=embed, view=view)
 
                 # Send the search context size dropdown to the user
