@@ -6,6 +6,7 @@ import stripe
 import tiktoken
 import json
 import io
+import time  # Import time module to measure processing time
 
 class ChatSummary(commands.Cog):
     """Cog to summarize chat activity for users."""
@@ -189,6 +190,7 @@ class ChatSummary(commands.Cog):
                                 }
 
                                 async with self.ctx.typing():
+                                    start_time_first_call = time.time()  # Start timing the first call
                                     async with aiohttp.ClientSession() as session:
                                         async with session.post("https://api.openai.com/v1/responses", headers=headers, json=payload) as response:
                                             if response.status == 200:
@@ -209,6 +211,9 @@ class ChatSummary(commands.Cog):
                                                     await self.parent_cog._track_stripe_event(self.ctx, self.customer_id, f"gpt-4o-search-preview", "input", input_tokens_first_call)
                                                     await self.parent_cog._track_stripe_event(self.ctx, self.customer_id, f"gpt-4o-search-preview", "output", output_tokens_first_call)
 
+                                                    # Measure time taken for the first call
+                                                    time_taken_first_call = time.time() - start_time_first_call
+
                                                     # Send the output text to the user's preferred model for summarization
                                                     summarize_payload = {
                                                         "model": self.preferred_model,
@@ -224,6 +229,7 @@ class ChatSummary(commands.Cog):
                                                         ]
                                                     }
 
+                                                    start_time_second_call = time.time()  # Start timing the second call
                                                     async with session.post("https://api.openai.com/v1/chat/completions", headers=headers, json=summarize_payload) as summarize_response:
                                                         if summarize_response.status == 200:
                                                             summarize_data = await summarize_response.json()
@@ -236,6 +242,9 @@ class ChatSummary(commands.Cog):
                                                             # Track stripe event for the second call
                                                             await self.parent_cog._track_stripe_event(self.ctx, self.customer_id, self.preferred_model, "input", input_tokens_second_call)
                                                             await self.parent_cog._track_stripe_event(self.ctx, self.customer_id, self.preferred_model, "output", output_tokens_second_call)
+
+                                                            # Measure time taken for the second call
+                                                            time_taken_second_call = time.time() - start_time_second_call
 
                                                             # Corrected the payload format and removed incorrect string interpolation
                                                             stripe_payload = {
@@ -263,6 +272,7 @@ class ChatSummary(commands.Cog):
                                                                 description=summary,
                                                                 color=0xfffffe
                                                             )
+                                                            embed.set_footer(text=f"{time_taken_first_call:.2f}s to search, {time_taken_second_call:.2f}s to summarize. AI makes mistakes, check for errors")
                                                             await interaction.message.edit(embed=embed, view=None)
                                                         else:
                                                             error_message = await summarize_response.text()
