@@ -147,10 +147,9 @@ class ChatSummary(commands.Cog):
 
                         selected_context_size = self.values[0].lower()
 
-                        # Create buttons for start and cancel
-                        class StartCancelButtons(discord.ui.View):
+                        # Create a dropdown for document generation selection
+                        class DocumentGenerationDropdown(discord.ui.Select):
                             def __init__(self, parent_cog, ctx, customer_id, preferred_model, openai_api_key, selected_category, selected_context_size):
-                                super().__init__(timeout=None)
                                 self.parent_cog = parent_cog
                                 self.ctx = ctx
                                 self.customer_id = customer_id
@@ -158,145 +157,187 @@ class ChatSummary(commands.Cog):
                                 self.openai_api_key = openai_api_key
                                 self.selected_category = selected_category
                                 self.selected_context_size = selected_context_size
+                                options = [
+                                    discord.SelectOption(label="Yes", description="Generate a document of the news report"),
+                                    discord.SelectOption(label="No", description="Do not generate a document")
+                                ]
+                                super().__init__(placeholder="Generate a document?", min_values=1, max_values=1, options=options)
 
-                            @discord.ui.button(label="Start", style=discord.ButtonStyle.green)
-                            async def start(self, interaction: discord.Interaction, button: discord.ui.Button):
+                            async def callback(self, interaction: discord.Interaction):
                                 if interaction.user != self.ctx.author:
-                                    await interaction.response.send_message("You are not authorized to use this button.", ephemeral=True)
+                                    await interaction.response.send_message("You are not authorized to use this dropdown.", ephemeral=True)
                                     return
 
-                                await interaction.response.defer()
+                                await interaction.response.defer()  # Defer the interaction
 
+                                generate_document = self.values[0].lower() == "yes"
+
+                                # Create buttons for start and cancel
+                                class StartCancelButtons(discord.ui.View):
+                                    def __init__(self, parent_cog, ctx, customer_id, preferred_model, openai_api_key, selected_category, selected_context_size, generate_document):
+                                        super().__init__(timeout=None)
+                                        self.parent_cog = parent_cog
+                                        self.ctx = ctx
+                                        self.customer_id = customer_id
+                                        self.preferred_model = preferred_model
+                                        self.openai_api_key = openai_api_key
+                                        self.selected_category = selected_category
+                                        self.selected_context_size = selected_context_size
+                                        self.generate_document = generate_document
+
+                                    @discord.ui.button(label="Start", style=discord.ButtonStyle.green)
+                                    async def start(self, interaction: discord.Interaction, button: discord.ui.Button):
+                                        if interaction.user != self.ctx.author:
+                                            await interaction.response.send_message("You are not authorized to use this button.", ephemeral=True)
+                                            return
+
+                                        await interaction.response.defer()
+
+                                        embed = discord.Embed(
+                                            title="Task confirmed",
+                                            description="Your task has been dispatched to an AI model.\n- This task can take up to 30 seconds to complete, please wait.",
+                                            color=0x2bbd8e
+                                        )
+                                        embed.add_field(name="News category", value=self.selected_category, inline=True)
+                                        embed.add_field(name="Search intensity", value=self.selected_context_size.capitalize() if self.selected_context_size else "Unknown", inline=True)
+                                        embed.add_field(name="Generate Document", value="Yes" if self.generate_document else "No", inline=True)
+                                        await interaction.message.edit(embed=embed, view=None)
+
+                                        input_text = f"What are 5 recent {self.selected_category} news stories?"
+                                        payload = {
+                                            "model": "gpt-4o",
+                                            "tools": [{"type": "web_search_preview", "search_context_size": selected_context_size}],
+                                            "input": input_text
+                                        }
+
+                                        headers = {
+                                            "Authorization": f"Bearer {self.openai_api_key}",
+                                            "Content-Type": "application/json"
+                                        }
+
+                                        async with self.ctx.typing():
+                                            start_time_first_call = time.time()  # Start timing the first call
+                                            async with aiohttp.ClientSession() as session:
+                                                async with session.post("https://api.openai.com/v1/responses", headers=headers, json=payload) as response:
+                                                    if response.status == 200:
+                                                        data = await response.json()
+
+                                                        # Extract the message content
+                                                        message = next((item for item in data["output"] if item["type"] == "message"), None)
+                                                        if message:
+                                                            content = message["content"][0]
+                                                            output_text = content["text"]
+
+                                                            # Tokenize input and output using tiktoken's encoding for the first call
+                                                            encoding = tiktoken.get_encoding("o200k_base")
+                                                            input_tokens_first_call = len(encoding.encode(input_text))
+                                                            output_tokens_first_call = len(encoding.encode(output_text))
+                                                            
+                                                            # Track stripe event for the first call
+                                                            await self.parent_cog._track_stripe_event(self.ctx, self.customer_id, f"gpt-4o-search-preview", "input", input_tokens_first_call)
+                                                            await self.parent_cog._track_stripe_event(self.ctx, self.customer_id, f"gpt-4o-search-preview", "output", output_tokens_first_call)
+
+                                                            # Measure time taken for the first call
+                                                            time_taken_first_call = time.time() - start_time_first_call
+
+                                                            # Send the output text to the user's preferred model for summarization
+                                                            summarize_payload = {
+                                                                "model": self.preferred_model,
+                                                                "messages": [
+                                                                    {
+                                                                        "role": "system",
+                                                                        "content": "You are a news summarizer. Summarize the following news stories without including any URLs. Add context where possible. Use the format '### Title\n\n> Summary text here'"
+                                                                    },
+                                                                    {
+                                                                        "role": "user",
+                                                                        "content": output_text
+                                                                    }
+                                                                ]
+                                                            }
+
+                                                            start_time_second_call = time.time()  # Start timing the second call
+                                                            async with session.post("https://api.openai.com/v1/chat/completions", headers=headers, json=summarize_payload) as summarize_response:
+                                                                if summarize_response.status == 200:
+                                                                    summarize_data = await summarize_response.json()
+                                                                    summary = summarize_data.get('choices', [{}])[0].get('message', {}).get('content', '').strip()
+
+                                                                    # Tokenize input and output using tiktoken's encoding for the second call
+                                                                    input_tokens_second_call = len(encoding.encode(output_text))
+                                                                    output_tokens_second_call = len(encoding.encode(summary))
+                                                                    
+                                                                    # Track stripe event for the second call
+                                                                    await self.parent_cog._track_stripe_event(self.ctx, self.customer_id, self.preferred_model, "input", input_tokens_second_call)
+                                                                    await self.parent_cog._track_stripe_event(self.ctx, self.customer_id, self.preferred_model, "output", output_tokens_second_call)
+
+                                                                    # Measure time taken for the second call
+                                                                    time_taken_second_call = time.time() - start_time_second_call
+
+                                                                    # Corrected the payload format and removed incorrect string interpolation
+                                                                    stripe_payload = {
+                                                                        "event_name": f"gpt-4o-search-preview_{selected_context_size}",
+                                                                        "timestamp": int(datetime.now().timestamp()),
+                                                                        "payload[stripe_customer_id]": self.customer_id,
+                                                                        "payload[uses]": 1
+                                                                    }
+                                                                    stripe_tokens = await self.parent_cog.bot.get_shared_api_tokens("stripe")
+                                                                    stripe_api_key = stripe_tokens.get("api_key") if stripe_tokens else None
+                                                                    stripe_headers = {
+                                                                        "Authorization": f"Bearer {stripe_api_key}",
+                                                                        "Content-Type": "application/x-www-form-urlencoded"
+                                                                    }
+                                                                    async with session.post("https://api.stripe.com/v1/billing/meter_events", 
+                                                                                            headers=stripe_headers, 
+                                                                                            data=stripe_payload) as stripe_response:
+                                                                        if stripe_response.status != 200:
+                                                                            stripe_error_message = await stripe_response.text()
+                                                                            await interaction.message.edit(content=f"Failed to log Stripe event. Status code: {stripe_response.status}, Error: {stripe_error_message}", embed=None, view=None)
+
+                                                                    # Create and send embed
+                                                                    embed = discord.Embed(
+                                                                        title=f"Here's your {self.selected_category.lower()} news summary, curated by AI",
+                                                                        description=summary,
+                                                                        color=0xfffffe
+                                                                    )
+                                                                    embed.set_footer(text=f"{time_taken_first_call:.2f}s to search, {time_taken_second_call:.2f}s to summarize. AI can make mistakes, check for errors")
+                                                                    await interaction.message.edit(embed=embed, view=None)
+                                                                else:
+                                                                    error_message = await summarize_response.text()
+                                                                    await interaction.message.edit(content=f"Failed to summarize news stories. Status code: {summarize_response.status}, Error: {error_message}", embed=None, view=None)
+                                                    else:
+                                                        error_message = await response.text()
+                                                        await interaction.message.edit(content=f"Failed to fetch news stories. Status code: {response.status}, Error: {error_message}", embed=None, view=None)
+
+                                    @discord.ui.button(label="Cancel", style=discord.ButtonStyle.red)
+                                    async def cancel(self, interaction: discord.Interaction, button: discord.ui.Button):
+                                        if interaction.user.id != self.ctx.author.id:
+                                            await interaction.response.send_message("You are not authorized to use this button.", ephemeral=True)
+                                            return
+                                        await interaction.response.defer()  # Defer the interaction
+                                        await interaction.message.delete()
+
+                                # Send the start and cancel buttons to the user
+                                view = StartCancelButtons(self.parent_cog, self.ctx, self.customer_id, self.preferred_model, self.openai_api_key, self.selected_category, selected_context_size, generate_document)
                                 embed = discord.Embed(
-                                    title="Task confirmed",
-                                    description="Your task has been dispatched to an AI model.\m- This task can take up to 30 seconds to complete, please wait.",
-                                    color=0x2bbd8e
+                                    title="Review your choices",
+                                    description="Make sure everything here looks good, then click **Start**",
+                                    color=0xff9144
                                 )
                                 embed.add_field(name="News category", value=self.selected_category, inline=True)
-                                embed.add_field(name="Search intensity", value=self.selected_context_size.capitalize() if self.selected_context_size else "Unknown", inline=True)
-                                await interaction.message.edit(embed=embed, view=None)
+                                embed.add_field(name="Search intensity", value=selected_context_size.capitalize(), inline=True)
+                                embed.add_field(name="Generate Document", value="Yes" if generate_document else "No", inline=True)
+                                try:
+                                    await interaction.message.edit(embed=embed, view=view)
+                                except discord.errors.NotFound:
+                                    await self.ctx.send("The interaction has expired. Please try again.", delete_after=10)
 
-                                input_text = f"What are 5 recent {self.selected_category} news stories?"
-                                payload = {
-                                    "model": "gpt-4o",
-                                    "tools": [{"type": "web_search_preview", "search_context_size": selected_context_size}],
-                                    "input": input_text
-                                }
-
-                                headers = {
-                                    "Authorization": f"Bearer {self.openai_api_key}",
-                                    "Content-Type": "application/json"
-                                }
-
-                                async with self.ctx.typing():
-                                    start_time_first_call = time.time()  # Start timing the first call
-                                    async with aiohttp.ClientSession() as session:
-                                        async with session.post("https://api.openai.com/v1/responses", headers=headers, json=payload) as response:
-                                            if response.status == 200:
-                                                data = await response.json()
-
-                                                # Extract the message content
-                                                message = next((item for item in data["output"] if item["type"] == "message"), None)
-                                                if message:
-                                                    content = message["content"][0]
-                                                    output_text = content["text"]
-
-                                                    # Tokenize input and output using tiktoken's encoding for the first call
-                                                    encoding = tiktoken.get_encoding("o200k_base")
-                                                    input_tokens_first_call = len(encoding.encode(input_text))
-                                                    output_tokens_first_call = len(encoding.encode(output_text))
-                                                    
-                                                    # Track stripe event for the first call
-                                                    await self.parent_cog._track_stripe_event(self.ctx, self.customer_id, f"gpt-4o-search-preview", "input", input_tokens_first_call)
-                                                    await self.parent_cog._track_stripe_event(self.ctx, self.customer_id, f"gpt-4o-search-preview", "output", output_tokens_first_call)
-
-                                                    # Measure time taken for the first call
-                                                    time_taken_first_call = time.time() - start_time_first_call
-
-                                                    # Send the output text to the user's preferred model for summarization
-                                                    summarize_payload = {
-                                                        "model": self.preferred_model,
-                                                        "messages": [
-                                                            {
-                                                                "role": "system",
-                                                                "content": "You are a news summarizer. Summarize the following news stories without including any URLs. Add context where possible. Use the format '### Title\n\n> Summary text here'"
-                                                            },
-                                                            {
-                                                                "role": "user",
-                                                                "content": output_text
-                                                            }
-                                                        ]
-                                                    }
-
-                                                    start_time_second_call = time.time()  # Start timing the second call
-                                                    async with session.post("https://api.openai.com/v1/chat/completions", headers=headers, json=summarize_payload) as summarize_response:
-                                                        if summarize_response.status == 200:
-                                                            summarize_data = await summarize_response.json()
-                                                            summary = summarize_data.get('choices', [{}])[0].get('message', {}).get('content', '').strip()
-
-                                                            # Tokenize input and output using tiktoken's encoding for the second call
-                                                            input_tokens_second_call = len(encoding.encode(output_text))
-                                                            output_tokens_second_call = len(encoding.encode(summary))
-                                                            
-                                                            # Track stripe event for the second call
-                                                            await self.parent_cog._track_stripe_event(self.ctx, self.customer_id, self.preferred_model, "input", input_tokens_second_call)
-                                                            await self.parent_cog._track_stripe_event(self.ctx, self.customer_id, self.preferred_model, "output", output_tokens_second_call)
-
-                                                            # Measure time taken for the second call
-                                                            time_taken_second_call = time.time() - start_time_second_call
-
-                                                            # Corrected the payload format and removed incorrect string interpolation
-                                                            stripe_payload = {
-                                                                "event_name": f"gpt-4o-search-preview_{selected_context_size}",
-                                                                "timestamp": int(datetime.now().timestamp()),
-                                                                "payload[stripe_customer_id]": self.customer_id,
-                                                                "payload[uses]": 1
-                                                            }
-                                                            stripe_tokens = await self.parent_cog.bot.get_shared_api_tokens("stripe")
-                                                            stripe_api_key = stripe_tokens.get("api_key") if stripe_tokens else None
-                                                            stripe_headers = {
-                                                                "Authorization": f"Bearer {stripe_api_key}",
-                                                                "Content-Type": "application/x-www-form-urlencoded"
-                                                            }
-                                                            async with session.post("https://api.stripe.com/v1/billing/meter_events", 
-                                                                                    headers=stripe_headers, 
-                                                                                    data=stripe_payload) as stripe_response:
-                                                                if stripe_response.status != 200:
-                                                                    stripe_error_message = await stripe_response.text()
-                                                                    await interaction.message.edit(content=f"Failed to log Stripe event. Status code: {stripe_response.status}, Error: {stripe_error_message}", embed=None, view=None)
-
-                                                            # Create and send embed
-                                                            embed = discord.Embed(
-                                                                title=f"Here's your {self.selected_category.lower()} news summary, curated by AI",
-                                                                description=summary,
-                                                                color=0xfffffe
-                                                            )
-                                                            embed.set_footer(text=f"{time_taken_first_call:.2f}s to search, {time_taken_second_call:.2f}s to summarize. AI can make mistakes, check for errors")
-                                                            await interaction.message.edit(embed=embed, view=None)
-                                                        else:
-                                                            error_message = await summarize_response.text()
-                                                            await interaction.message.edit(content=f"Failed to summarize news stories. Status code: {summarize_response.status}, Error: {error_message}", embed=None, view=None)
-                                            else:
-                                                error_message = await response.text()
-                                                await interaction.message.edit(content=f"Failed to fetch news stories. Status code: {response.status}, Error: {error_message}", embed=None, view=None)
-
-                            @discord.ui.button(label="Cancel", style=discord.ButtonStyle.red)
-                            async def cancel(self, interaction: discord.Interaction, button: discord.ui.Button):
-                                if interaction.user.id != self.ctx.author.id:
-                                    await interaction.response.send_message("You are not authorized to use this button.", ephemeral=True)
-                                    return
-                                await interaction.response.defer()  # Defer the interaction
-                                await interaction.message.delete()
-
-                        # Send the start and cancel buttons to the user
-                        view = StartCancelButtons(self.parent_cog, self.ctx, self.customer_id, self.preferred_model, self.openai_api_key, self.selected_category, selected_context_size)
+                        # Send the document generation dropdown to the user
+                        view = discord.ui.View(timeout=None)  # Disable timeout to prevent expiration
+                        view.add_item(DocumentGenerationDropdown(self.parent_cog, self.ctx, self.customer_id, self.preferred_model, self.openai_api_key, selected_category, selected_context_size))
                         embed = discord.Embed(
-                            title="Review your choices",
-                            description="Make sure everything here looks good, then click **Start**",
+                            title="Would you like a document generated?",
+                            description="Select whether you want a document generated of your news report.",
                             color=0xff9144
                         )
-                        embed.add_field(name="News category", value=self.selected_category, inline=True)
-                        embed.add_field(name="Search intensity", value=selected_context_size.capitalize(), inline=True)
                         try:
                             await interaction.message.edit(embed=embed, view=view)
                         except discord.errors.NotFound:
