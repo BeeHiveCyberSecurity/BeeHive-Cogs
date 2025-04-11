@@ -66,6 +66,7 @@ class ChatSummary(commands.Cog):
 
         user_data = await self.config.user(ctx.author).all()
         customer_id = user_data.get("customer_id")
+        preferred_model = user_data.get("preferred_model", "gpt-4o")
 
         if not customer_id:
             await ctx.send("You must have a customer ID set to use this command.", delete_after=10)
@@ -76,13 +77,11 @@ class ChatSummary(commands.Cog):
             "Content-Type": "application/json",
             "Authorization": f"Bearer {openai_api_key}"
         }
-        input_text = "What are 5 recent news stories?"
-        system_guidance = "Provide a summary of recent news stories without including any links."
+        input_text = "What are 5 recent news stories? For the text, don't include links."
         payload = {
             "model": "gpt-4o",
             "tools": [{"type": "web_search_preview"}],
-            "input": input_text,
-            "system": system_guidance
+            "input": input_text
         }
 
         async with ctx.typing():
@@ -96,36 +95,54 @@ class ChatSummary(commands.Cog):
                         if message:
                             content = message["content"][0]
                             output_text = content["text"]
-                            annotations = content.get("annotations", [])
-                            news_stories = output_text
 
-                            # Create clickable citations
-                            for annotation in annotations:
-                                if annotation["type"] == "url_citation":
-                                    url = annotation["url"]
-                                    title = annotation["title"]
-                                    start_index = annotation["start_index"]
-                                    end_index = annotation["end_index"]
-                                    news_stories = (news_stories[:start_index] +
-                                                    f"[{news_stories[start_index:end_index]}]({url} '{title}')" +
-                                                    news_stories[end_index:])
-
-                            # Tokenize input and output using tiktoken's encoding
+                            # Tokenize input and output using tiktoken's encoding for the first call
                             encoding = tiktoken.get_encoding("o200k_base")
-                            input_tokens = len(encoding.encode(input_text))
-                            output_tokens = len(encoding.encode(news_stories))
+                            input_tokens_first_call = len(encoding.encode(input_text))
+                            output_tokens_first_call = len(encoding.encode(output_text))
                             
-                            # Track stripe event
-                            await self._track_stripe_event(ctx, customer_id, "gpt-4o-search-preview", "input", input_tokens)
-                            await self._track_stripe_event(ctx, customer_id, "gpt-4o-search-preview", "output", output_tokens)
+                            # Track stripe event for the first call
+                            await self._track_stripe_event(ctx, customer_id, "gpt-4o-search-preview", "input", input_tokens_first_call)
+                            await self._track_stripe_event(ctx, customer_id, "gpt-4o-search-preview", "output", output_tokens_first_call)
 
-                            # Create and send embed
-                            embed = discord.Embed(
-                                title="Recent News Stories",
-                                description=news_stories,
-                                color=0xfffffe
-                            )
-                            await ctx.send(embed=embed)
+                            # Send the output text to the user's preferred model for summarization
+                            summarize_payload = {
+                                "model": preferred_model,
+                                "messages": [
+                                    {
+                                        "role": "system",
+                                        "content": "You are a news summarizer. Summarize the following news stories without including any URLs. Use the format '### Title\n\n> Summary text here'"
+                                    },
+                                    {
+                                        "role": "user",
+                                        "content": output_text
+                                    }
+                                ]
+                            }
+
+                            async with session.post("https://api.openai.com/v1/chat/completions", headers=headers, json=summarize_payload) as summarize_response:
+                                if summarize_response.status == 200:
+                                    summarize_data = await summarize_response.json()
+                                    summary = summarize_data.get('choices', [{}])[0].get('message', {}).get('content', '').strip()
+
+                                    # Tokenize input and output using tiktoken's encoding for the second call
+                                    input_tokens_second_call = len(encoding.encode(output_text))
+                                    output_tokens_second_call = len(encoding.encode(summary))
+                                    
+                                    # Track stripe event for the second call
+                                    await self._track_stripe_event(ctx, customer_id, preferred_model, "input", input_tokens_second_call)
+                                    await self._track_stripe_event(ctx, customer_id, preferred_model, "output", output_tokens_second_call)
+
+                                    # Create and send embed
+                                    embed = discord.Embed(
+                                        title="Summarized News Stories",
+                                        description=summary,
+                                        color=0xfffffe
+                                    )
+                                    await ctx.send(embed=embed)
+                                else:
+                                    error_message = await summarize_response.text()
+                                    await ctx.send(f"Failed to summarize news stories. Status code: {summarize_response.status}, Error: {error_message}", delete_after=10)
                     else:
                         error_message = await response.text()
                         await ctx.send(f"Failed to fetch news stories. Status code: {response.status}, Error: {error_message}", delete_after=10)
