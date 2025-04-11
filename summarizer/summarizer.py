@@ -288,7 +288,7 @@ class ChatSummary(commands.Cog):
                     "messages": [
                         {
                             "role": "system",
-                            "content": "You are a Discord server information summary generator. Reply in a single conversational paragraph. Use Discord native timestamps when referring to times."
+                            "content": "You are a Discord server information summary generator. Reply in a single conversational paragraph. Use Discord native timestamps when referring to times which are formatted as <t:UNIXTIME:d>."
                         },
                         {
                             "role": "user",
