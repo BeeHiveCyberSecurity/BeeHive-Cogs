@@ -88,7 +88,11 @@ class ChatSummary(commands.Cog):
             "Education": "News related to education and learning.",
             "Environment": "Updates on environmental issues and news.",
             "Business": "Business news and market trends.",
-            "World": "Global news and international updates."
+            "World": "Global news and international updates.",
+            "Fashion": "Latest trends and news in the fashion industry.",
+            "Food": "Updates and news about food and culinary arts.",
+            "Automotive": "News and updates from the automotive industry.",
+            "Real Estate": "Current trends and news in the real estate market."
         }
 
         # Create a dropdown for category selection
