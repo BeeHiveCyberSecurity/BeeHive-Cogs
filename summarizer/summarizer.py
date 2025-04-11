@@ -92,7 +92,8 @@ class ChatSummary(commands.Cog):
             "Fashion": "Latest trends and news in the fashion industry.",
             "Food": "Updates and news about food and culinary arts.",
             "Automotive": "News and updates from the automotive industry.",
-            "Real Estate": "Current trends and news in the real estate market."
+            "Real Estate": "Current trends and news in the real estate market.",
+            "Aviation": "Latest news and updates from the aviation industry."
         }
 
         # Create a dropdown for category selection
