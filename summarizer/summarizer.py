@@ -183,7 +183,12 @@ class ChatSummary(commands.Cog):
         # Send the dropdown to the user
         view = discord.ui.View()
         view.add_item(NewsCategoryDropdown(self, ctx, customer_id, preferred_model, openai_api_key))
-        await ctx.send("Please select a news category to summarize:", view=view)
+        embed = discord.Embed(
+            title="Choose a news category",
+            description="Please select a category of news you're interested in",
+            color=0x45ab45
+        )
+        await ctx.send(embed=embed, view=view)
     
     @commands.mod_or_permissions()
     @summarize.command(name="moderation")
