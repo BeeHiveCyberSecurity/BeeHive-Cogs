@@ -136,7 +136,7 @@ class ChatSummary(commands.Cog):
                             discord.SelectOption(label="Medium", emoji="⚖️", description="Recommended & most popular, costs $0.035 / search"),
                             discord.SelectOption(label="High", emoji="🧠", description="Smartest, slowest, costs $0.05 / search")
                         ]
-                        super().__init__(placeholder="3 levels available", min_values=1, max_values=1, options=options)
+                        super().__init__(placeholder="3 intensities available", min_values=1, max_values=1, options=options)
 
                     async def callback(self, interaction: discord.Interaction):
                         if interaction.user != self.ctx.author:
@@ -150,7 +150,7 @@ class ChatSummary(commands.Cog):
                         # Create buttons for start and cancel
                         class StartCancelButtons(discord.ui.View):
                             def __init__(self, parent_cog, ctx, customer_id, preferred_model, openai_api_key, selected_category, selected_context_size):
-                                super().__init__(timeout=None)  # Disable timeout to prevent expiration
+                                super().__init__(timeout=None)
                                 self.parent_cog = parent_cog
                                 self.ctx = ctx
                                 self.customer_id = customer_id
@@ -165,9 +165,8 @@ class ChatSummary(commands.Cog):
                                     await interaction.response.send_message("You are not authorized to use this button.", ephemeral=True)
                                     return
 
-                                await interaction.response.defer()  # Defer the interaction
+                                await interaction.response.defer()
 
-                                # Edit the original message to indicate the search is in progress
                                 embed = discord.Embed(
                                     title="Task confirmed",
                                     description="Your task has been dispatched to an AI model.\m- This task can take up to 30 seconds to complete, please wait.",
@@ -322,7 +321,7 @@ class ChatSummary(commands.Cog):
         view.add_item(NewsCategoryDropdown(self, ctx, customer_id, preferred_model, openai_api_key))
         embed = discord.Embed(
             title="Choose a news category",
-            description="Please select a category of news you're interested in.\n- This is the category of news and content the AI will look for and contextualize",
+            description="To get started, select what type of news coverage you're interested in.\n- This helps align the AI to your interests before it starts research on your behalf.",
             color=0xfffffe
         )
         await ctx.send(embed=embed, view=view)
