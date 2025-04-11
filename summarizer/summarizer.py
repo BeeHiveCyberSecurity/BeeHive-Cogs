@@ -282,7 +282,10 @@ class ChatSummary(commands.Cog):
                         )
                         embed.add_field(name="Category", value=self.selected_category, inline=False)
                         embed.add_field(name="Search Context Size", value=selected_context_size.capitalize(), inline=False)
-                        await interaction.response.send_message(embed=embed, view=view)
+                        try:
+                            await interaction.response.send_message(embed=embed, view=view)
+                        except discord.errors.NotFound:
+                            await self.ctx.send("The interaction has expired. Please try again.", delete_after=10)
 
                 # Send the search context size dropdown to the user
                 view = discord.ui.View()
@@ -292,7 +295,10 @@ class ChatSummary(commands.Cog):
                     description="Please select the search context size for your news summary",
                     color=0x45ab45
                 )
-                await interaction.response.send_message(embed=embed, view=view)
+                try:
+                    await interaction.response.send_message(embed=embed, view=view)
+                except discord.errors.NotFound:
+                    await self.ctx.send("The interaction has expired. Please try again.", delete_after=10)
 
         # Send the category dropdown to the user
         view = discord.ui.View()
