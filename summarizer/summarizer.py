@@ -88,23 +88,13 @@ class ChatSummary(commands.Cog):
                 async with session.post(url, headers=headers, json=payload) as response:
                     if response.status == 200:
                         data = await response.json()
-                        
-                        # Send the entire response body as a .json file
-                        json_data = json.dumps(data, indent=4)
-                        json_file = io.BytesIO(json_data.encode('utf-8'))
-                        json_file.name = "openai_response.json"
-                        await ctx.send(file=discord.File(json_file))
 
-                        if isinstance(data, list):
-                            web_search_call = next((item for item in data if item.get("type") == "web_search_call"), None)
-                            message = next((item for item in data if item.get("type") == "message"), None)
-                        else:
-                            web_search_call = None
-                            message = None
-
+                        # Extract the message content
+                        message = next((item for item in data["output"] if item["type"] == "message"), None)
                         if message:
-                            output_text = message["content"][0]["text"]
-                            annotations = message["content"][0].get("annotations", [])
+                            content = message["content"][0]
+                            output_text = content["text"]
+                            annotations = content.get("annotations", [])
                             news_stories = output_text
 
                             # Create clickable citations
@@ -127,31 +117,13 @@ class ChatSummary(commands.Cog):
                             await self._track_stripe_event(ctx, customer_id, "gpt-4o-search-preview", "input", input_tokens)
                             await self._track_stripe_event(ctx, customer_id, "gpt-4o-search-preview", "output", output_tokens)
 
-                        
-                        stripe_tokens = await self.bot.get_shared_api_tokens("stripe")
-                        stripe_key = stripe_tokens.get("api_key") if stripe_tokens else None
-
-                        if stripe_key:
-                            async with aiohttp.ClientSession() as session:
-                                stripe_url = "https://api.stripe.com/v1/billing/meter_events"
-                                stripe_auth = aiohttp.BasicAuth(stripe_key, '')
-                                stripe_payload = {
-                                    "event_name": "gpt-4o-search-preview_medium",
-                                    "timestamp": int(datetime.now().timestamp()),
-                                    "payload[stripe_customer_id]": customer_id,
-                                    "payload[uses]": 1
-                                }
-                                async with session.post(stripe_url, auth=stripe_auth, data=stripe_payload) as stripe_response:
-                                    if stripe_response.status != 200:
-                                        error_message = await stripe_response.text()
-                                        await ctx.send(f"Failed to track stripe event. Status code: {stripe_response.status}, Error: {error_message}", delete_after=10)
-
-                        embed = discord.Embed(
-                            title="Recent News Stories",
-                            description=news_stories,
-                            color=0xfffffe
-                        )
-                        await ctx.send(embed=embed)
+                            # Create and send embed
+                            embed = discord.Embed(
+                                title="Recent News Stories",
+                                description=news_stories,
+                                color=0xfffffe
+                            )
+                            await ctx.send(embed=embed)
                     else:
                         error_message = await response.text()
                         await ctx.send(f"Failed to fetch news stories. Status code: {response.status}, Error: {error_message}", delete_after=10)
