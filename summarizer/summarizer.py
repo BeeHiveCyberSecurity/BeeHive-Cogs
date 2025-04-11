@@ -99,6 +99,11 @@ class ChatSummary(commands.Cog):
                     "input": input_text
                 }
 
+                headers = {
+                    "Authorization": f"Bearer {openai_api_key}",
+                    "Content-Type": "application/json"
+                }
+
                 async with ctx.typing():
                     async with aiohttp.ClientSession() as session:
                         async with session.post("https://api.openai.com/v1/responses", headers=headers, json=payload) as response:
