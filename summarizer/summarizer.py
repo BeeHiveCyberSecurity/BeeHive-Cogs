@@ -173,7 +173,7 @@ class ChatSummary(commands.Cog):
                                 input_text = f"What are 5 recent {self.selected_category} news stories?"
                                 payload = {
                                     "model": "gpt-4o",
-                                    "tools": [{"type": "web_search_preview", "search_context_size": self.selected_context_size}],
+                                    "tools": [{"type": "web_search_preview", "search_context_size": selected_context_size}],
                                     "input": input_text
                                 }
 
@@ -200,8 +200,8 @@ class ChatSummary(commands.Cog):
                                                     output_tokens_first_call = len(encoding.encode(output_text))
                                                     
                                                     # Track stripe event for the first call
-                                                    await self.parent_cog._track_stripe_event(self.ctx, self.customer_id, f"gpt-4o-search-preview_{self.selected_context_size}", "input", input_tokens_first_call)
-                                                    await self.parent_cog._track_stripe_event(self.ctx, self.customer_id, f"gpt-4o-search-preview_{self.selected_context_size}", "output", output_tokens_first_call)
+                                                    await self.parent_cog._track_stripe_event(self.ctx, self.customer_id, f"gpt-4o-search-preview", "input", input_tokens_first_call)
+                                                    await self.parent_cog._track_stripe_event(self.ctx, self.customer_id, f"gpt-4o-search-preview", "output", output_tokens_first_call)
 
                                                     # Send the output text to the user's preferred model for summarization
                                                     summarize_payload = {
@@ -233,7 +233,7 @@ class ChatSummary(commands.Cog):
 
                                                             # Corrected the payload format and removed incorrect string interpolation
                                                             stripe_payload = {
-                                                                "event_name": f"gpt-4o-search-preview_{self.selected_context_size}",
+                                                                "event_name": f"gpt-4o-search-preview_{selected_context_size}",
                                                                 "timestamp": int(datetime.now().timestamp()),
                                                                 "payload[stripe_customer_id]": self.customer_id,
                                                                 "payload[uses]": 1
