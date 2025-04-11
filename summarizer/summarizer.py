@@ -73,7 +73,7 @@ class ChatSummary(commands.Cog):
             return
 
         # Define news categories
-        categories = ["Technology", "Sports", "Politics", "Health", "Entertainment"]
+        categories = ["Technology", "Sports", "Politics", "Health", "Entertainment", "Music", "Stocks", "Government", "Law Enforcement"]
 
         # Create a dropdown for category selection
         class NewsCategoryDropdown(discord.ui.Select):
