@@ -110,7 +110,7 @@ class ChatSummary(commands.Cog):
                 self.preferred_model = preferred_model
                 self.openai_api_key = openai_api_key
                 options = [discord.SelectOption(label=category, description=description) for category, description in categories.items()]
-                super().__init__(placeholder="Choose a news category...", min_values=1, max_values=1, options=options)
+                super().__init__(placeholder="Click here to select", min_values=1, max_values=1, options=options)
 
             async def callback(self, interaction: discord.Interaction):
                 if interaction.user != self.ctx.author:
@@ -129,9 +129,9 @@ class ChatSummary(commands.Cog):
                         self.openai_api_key = openai_api_key
                         self.selected_category = selected_category
                         options = [
-                            discord.SelectOption(label="Low", description="Low context size"),
-                            discord.SelectOption(label="Medium", description="Medium context size"),
-                            discord.SelectOption(label="High", description="High context size")
+                            discord.SelectOption(label="Low", description="Smallest, costs $0.03 / search"),
+                            discord.SelectOption(label="Medium", description="Default, costs $0.035 / search"),
+                            discord.SelectOption(label="High", description="Largest, costs $0.05 / search")
                         ]
                         super().__init__(placeholder="Choose a search context size...", min_values=1, max_values=1, options=options)
 
