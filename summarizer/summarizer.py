@@ -158,8 +158,8 @@ class ChatSummary(commands.Cog):
                                 self.selected_category = selected_category
                                 self.selected_context_size = selected_context_size
                                 options = [
-                                    discord.SelectOption(label="Yes", description="Generate a document of the news report"),
-                                    discord.SelectOption(label="No", description="Do not generate a document")
+                                    discord.SelectOption(label="Yes", emoji="✅", description="Include a .txt of my news summary"),
+                                    discord.SelectOption(label="No", emoji="🚫", description="Just send the news in an embed")
                                 ]
                                 super().__init__(placeholder="Generate a document?", min_values=1, max_values=1, options=options)
 
