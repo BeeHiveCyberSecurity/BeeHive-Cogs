@@ -273,7 +273,6 @@ class ChatSummary(commands.Cog):
                                     await interaction.response.send_message("You are not authorized to use this button.", ephemeral=True)
                                     return
                                 await interaction.message.delete()
-                                await interaction.followup.send("News summarization task has been canceled.", delete_after=10)
 
                         # Send the start and cancel buttons to the user
                         view = StartCancelButtons(self.parent_cog, self.ctx, self.customer_id, self.preferred_model, self.openai_api_key, self.selected_category, selected_context_size)
@@ -285,7 +284,7 @@ class ChatSummary(commands.Cog):
                         embed.add_field(name="News category", value=self.selected_category, inline=True)
                         embed.add_field(name="Search intensity", value=selected_context_size.capitalize(), inline=True)
                         try:
-                            await interaction.response.send_message(embed=embed, view=view)
+                            await interaction.message.edit(embed=embed, view=view)
                         except discord.errors.NotFound:
                             await self.ctx.send("The interaction has expired. Please try again.", delete_after=10)
 
@@ -299,7 +298,7 @@ class ChatSummary(commands.Cog):
                 )
                 embed.set_footer(text="If you're not sure, choose Medium")
                 try:
-                    await interaction.response.send_message(embed=embed, view=view)
+                    await interaction.message.edit(embed=embed, view=view)
                 except discord.errors.NotFound:
                     await self.ctx.send("The interaction has expired. Please try again.", delete_after=10)
 
