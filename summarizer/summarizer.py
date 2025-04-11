@@ -94,7 +94,8 @@ class ChatSummary(commands.Cog):
 
                 # Change the message to an embed indicating the search is in progress
                 embed = discord.Embed(
-                    title="Searching the internet to create your summary, please wait...",
+                    title="Starting AI task",
+                    description="This might take a minute, please be patient..."
                     color=0x2bbd8e
                 )
                 await interaction.followup.send(embed=embed)
