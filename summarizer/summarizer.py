@@ -170,7 +170,7 @@ class ChatSummary(commands.Cog):
                                 # Edit the original message to indicate the search is in progress
                                 embed = discord.Embed(
                                     title="Task confirmed",
-                                    description="AI is curating your requested news now. Please wait, this shouldn't take long...",
+                                    description="Your task has been dispatched to an AI model.\m- This task can take up to 30 seconds to complete, please wait.",
                                     color=0x2bbd8e
                                 )
                                 embed.add_field(name="News category", value=self.selected_category, inline=True)
