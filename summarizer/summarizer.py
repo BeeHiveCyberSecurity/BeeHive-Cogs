@@ -73,33 +73,33 @@ class ChatSummary(commands.Cog):
             await ctx.send("You must have a customer ID set to use this command.", delete_after=10)
             return
 
-        # Define news categories with descriptions
+        # Define news categories with descriptions and emojis
         categories = {
-            "Technology": "Latest advancements and updates in technology.",
-            "Sports": "Recent sports events and news.",
-            "Politics": "Current political news and updates.",
-            "Health": "Health-related news and discoveries.",
-            "Entertainment": "News from the entertainment industry.",
-            "Music": "Updates and news from the music world.",
-            "Stocks": "Latest stock market news and trends.",
-            "Government": "News related to government actions and policies.",
-            "Law Enforcement": "Updates on law enforcement activities.",
-            "Science": "Recent scientific discoveries and research.",
-            "Travel": "News and updates from the travel industry.",
-            "Education": "News related to education and learning.",
-            "Environment": "Updates on environmental issues and news.",
-            "Business": "Business news and market trends.",
-            "World": "Global news and international updates.",
-            "Fashion": "Latest trends and news in the fashion industry.",
-            "Food": "Updates and news about food and culinary arts.",
-            "Automotive": "News and updates from the automotive industry.",
-            "Real Estate": "Current trends and news in the real estate market.",
-            "Aviation": "Latest news and updates from the aviation industry.",
-            "Military": "News and updates related to military actions and defense.",
-            "Cryptocurrency": "News and trends in the cryptocurrency market.",
-            "Weather": "Updates on weather conditions and forecasts.",
-            "Art": "News and updates from the art world.",
-            "History": "Insights and discoveries related to historical events."
+            "Technology": {"description": "Latest advancements and updates in technology.", "emoji": "💻"},
+            "Sports": {"description": "Recent sports events and news.", "emoji": "🏅"},
+            "Politics": {"description": "Current political news and updates.", "emoji": "🏛️"},
+            "Health": {"description": "Health-related news and discoveries.", "emoji": "🩺"},
+            "Entertainment": {"description": "News from the entertainment industry.", "emoji": "🎬"},
+            "Music": {"description": "Updates and news from the music world.", "emoji": "🎵"},
+            "Stocks": {"description": "Latest stock market news and trends.", "emoji": "📈"},
+            "Government": {"description": "News related to government actions and policies.", "emoji": "🏢"},
+            "Law Enforcement": {"description": "Updates on law enforcement activities.", "emoji": "👮"},
+            "Science": {"description": "Recent scientific discoveries and research.", "emoji": "🔬"},
+            "Travel": {"description": "News and updates from the travel industry.", "emoji": "✈️"},
+            "Education": {"description": "News related to education and learning.", "emoji": "📚"},
+            "Environment": {"description": "Updates on environmental issues and news.", "emoji": "🌍"},
+            "Business": {"description": "Business news and market trends.", "emoji": "💼"},
+            "World": {"description": "Global news and international updates.", "emoji": "🌐"},
+            "Fashion": {"description": "Latest trends and news in the fashion industry.", "emoji": "👗"},
+            "Food": {"description": "Updates and news about food and culinary arts.", "emoji": "🍽️"},
+            "Automotive": {"description": "News and updates from the automotive industry.", "emoji": "🚗"},
+            "Real Estate": {"description": "Current trends and news in the real estate market.", "emoji": "🏠"},
+            "Aviation": {"description": "Latest news and updates from the aviation industry.", "emoji": "🛩️"},
+            "Military": {"description": "News and updates related to military actions and defense.", "emoji": "🪖"},
+            "Cryptocurrency": {"description": "News and trends in the cryptocurrency market.", "emoji": "💰"},
+            "Weather": {"description": "Updates on weather conditions and forecasts.", "emoji": "☀️"},
+            "Art": {"description": "News and updates from the art world.", "emoji": "🎨"},
+            "History": {"description": "Insights and discoveries related to historical events.", "emoji": "📜"}
         }
 
         # Create a dropdown for category selection
@@ -110,7 +110,7 @@ class ChatSummary(commands.Cog):
                 self.customer_id = customer_id
                 self.preferred_model = preferred_model
                 self.openai_api_key = openai_api_key
-                options = [discord.SelectOption(label=category, description=description) for category, description in categories.items()]
+                options = [discord.SelectOption(label=f"{category}", emoji=f"{info['emoji']}", description=info['description']) for category, info in categories.items()]
                 super().__init__(placeholder="25 categories available", min_values=1, max_values=1, options=options)
 
             async def callback(self, interaction: discord.Interaction):
