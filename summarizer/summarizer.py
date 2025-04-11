@@ -252,7 +252,9 @@ class ChatSummary(commands.Cog):
                     "idle": sum(1 for member in guild.members if member.status == discord.Status.idle),
                     "dnd": sum(1 for member in guild.members if member.status == discord.Status.dnd),
                     "offline": sum(1 for member in guild.members if member.status == discord.Status.offline)
-                }
+                },
+                "games_playing": [activity.name for member in guild.members for activity in member.activities if isinstance(activity, discord.Game)],
+                "songs_listening": [activity.title for member in guild.members for activity in member.activities if isinstance(activity, discord.Spotify)]
             }
 
             # Prepare the content for summarization
