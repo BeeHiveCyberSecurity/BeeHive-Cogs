@@ -83,7 +83,7 @@ class ChatSummary(commands.Cog):
 
             async def callback(self, interaction: discord.Interaction):
                 selected_category = self.values[0]
-                input_text = f"What are 5 recent {selected_category} news stories? For the text, don't include links."
+                input_text = f"What are 5 recent {selected_category} news stories?"
                 payload = {
                     "model": "gpt-4o",
                     "tools": [{"type": "web_search_preview"}],
