@@ -111,7 +111,7 @@ class ChatSummary(commands.Cog):
                                 "messages": [
                                     {
                                         "role": "system",
-                                        "content": "You are a news summarizer. Summarize the following news stories without including any URLs. Use the format '### Title\n\n> Summary text here'"
+                                        "content": "You are a news summarizer. Summarize the following news stories without including any URLs. Explain a little more about each headline where appropriate. Use the format '### Title\n\n> Summary text here'"
                                     },
                                     {
                                         "role": "user",
