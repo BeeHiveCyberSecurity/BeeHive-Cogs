@@ -77,7 +77,12 @@ class ChatSummary(commands.Cog):
 
         # Create a dropdown for category selection
         class NewsCategoryDropdown(discord.ui.Select):
-            def __init__(self):
+            def __init__(self, parent_cog, ctx, customer_id, preferred_model, openai_api_key):
+                self.parent_cog = parent_cog
+                self.ctx = ctx
+                self.customer_id = customer_id
+                self.preferred_model = preferred_model
+                self.openai_api_key = openai_api_key
                 options = [discord.SelectOption(label=category) for category in categories]
                 super().__init__(placeholder="Choose a news category...", min_values=1, max_values=1, options=options)
 
@@ -100,11 +105,11 @@ class ChatSummary(commands.Cog):
                 }
 
                 headers = {
-                    "Authorization": f"Bearer {openai_api_key}",
+                    "Authorization": f"Bearer {self.openai_api_key}",
                     "Content-Type": "application/json"
                 }
 
-                async with ctx.typing():
+                async with self.ctx.typing():
                     async with aiohttp.ClientSession() as session:
                         async with session.post("https://api.openai.com/v1/responses", headers=headers, json=payload) as response:
                             if response.status == 200:
@@ -122,12 +127,12 @@ class ChatSummary(commands.Cog):
                                     output_tokens_first_call = len(encoding.encode(output_text))
                                     
                                     # Track stripe event for the first call
-                                    await self._track_stripe_event(ctx, customer_id, "gpt-4o-search-preview", "input", input_tokens_first_call)
-                                    await self._track_stripe_event(ctx, customer_id, "gpt-4o-search-preview", "output", output_tokens_first_call)
+                                    await self.parent_cog._track_stripe_event(self.ctx, self.customer_id, "gpt-4o-search-preview", "input", input_tokens_first_call)
+                                    await self.parent_cog._track_stripe_event(self.ctx, self.customer_id, "gpt-4o-search-preview", "output", output_tokens_first_call)
 
                                     # Send the output text to the user's preferred model for summarization
                                     summarize_payload = {
-                                        "model": preferred_model,
+                                        "model": self.preferred_model,
                                         "messages": [
                                             {
                                                 "role": "system",
@@ -150,8 +155,8 @@ class ChatSummary(commands.Cog):
                                             output_tokens_second_call = len(encoding.encode(summary))
                                             
                                             # Track stripe event for the second call
-                                            await self._track_stripe_event(ctx, customer_id, preferred_model, "input", input_tokens_second_call)
-                                            await self._track_stripe_event(ctx, customer_id, preferred_model, "output", output_tokens_second_call)
+                                            await self.parent_cog._track_stripe_event(self.ctx, self.customer_id, self.preferred_model, "input", input_tokens_second_call)
+                                            await self.parent_cog._track_stripe_event(self.ctx, self.customer_id, self.preferred_model, "output", output_tokens_second_call)
 
                                             # Create and send embed
                                             embed = discord.Embed(
@@ -169,7 +174,7 @@ class ChatSummary(commands.Cog):
 
         # Send the dropdown to the user
         view = discord.ui.View()
-        view.add_item(NewsCategoryDropdown())
+        view.add_item(NewsCategoryDropdown(self, ctx, customer_id, preferred_model, openai_api_key))
         await ctx.send("Please select a news category to summarize:", view=view)
     
     @commands.mod_or_permissions()
