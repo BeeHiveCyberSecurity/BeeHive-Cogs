@@ -302,7 +302,7 @@ class ChatSummary(commands.Cog):
                         summary = data.get('choices', [{}])[0].get('message', {}).get('content', '').strip()
                         output_tokens = len(encoding.encode(summary))
                         embed = discord.Embed(
-                            title="AI Server Summary",
+                            title="AI summary of this server",
                             description=summary,
                             color=0xfffffe
                         )
