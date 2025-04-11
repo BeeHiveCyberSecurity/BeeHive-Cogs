@@ -173,7 +173,7 @@ class ChatSummary(commands.Cog):
                                     color=0x2bbd8e
                                 )
                                 embed.add_field(name="News category", value=self.selected_category, inline=True)
-                                embed.add_field(name="Search intensity", value=self.selected_context_size, inline=True)
+                                embed.add_field(name="Search intensity", value=self.selected_context_size.capitalize() if self.selected_context_size else "Unknown", inline=True)
                                 await interaction.message.edit(embed=embed, view=None)
 
                                 input_text = f"What are 5 recent {self.selected_category} news stories?"
