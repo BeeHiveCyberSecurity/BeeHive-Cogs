@@ -450,7 +450,6 @@ class ChatSummary(commands.Cog):
         model_details = {
             "gpt-4o": "Versatile, high-intelligence model.",
             "gpt-4o-mini": "Fast, affordable model for focused tasks.",
-            "gpt-4.5-preview": "Excels at creative, open-ended tasks like writing",
             "o1": "Uses reinforcement learning for complex reasoning with high intelligence",
             "o3-mini": "Newest small reasoning model with high intelligence",
         }
