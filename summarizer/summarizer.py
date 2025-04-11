@@ -132,9 +132,9 @@ class ChatSummary(commands.Cog):
                         self.openai_api_key = openai_api_key
                         self.selected_category = selected_category
                         options = [
-                            discord.SelectOption(label="Low", emoji="⚡", description="Smallest, costs $0.03 / search"),
+                            discord.SelectOption(label="Low", emoji="⚡", description="Fastest, costs $0.03 / search"),
                             discord.SelectOption(label="Medium", emoji="⚖️", description="Default, costs $0.035 / search"),
-                            discord.SelectOption(label="High", emoji="🧠", description="Largest, costs $0.05 / search")
+                            discord.SelectOption(label="High", emoji="🧠", description="Smartest, costs $0.05 / search")
                         ]
                         super().__init__(placeholder="3 levels available", min_values=1, max_values=1, options=options)
 
