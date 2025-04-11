@@ -182,6 +182,25 @@ class ChatSummary(commands.Cog):
                                             await self.parent_cog._track_stripe_event(self.ctx, self.customer_id, self.preferred_model, "input", input_tokens_second_call)
                                             await self.parent_cog._track_stripe_event(self.ctx, self.customer_id, self.preferred_model, "output", output_tokens_second_call)
 
+                                            # Corrected the payload format and removed incorrect string interpolation
+                                            stripe_payload = {
+                                                "event_name": "gpt-4o-search-preview_medium",
+                                                "timestamp": int(datetime.now().timestamp()),
+                                                "payload[stripe_customer_id]": self.customer_id,
+                                                "payload[uses]": 1
+                                            }
+                                            stripe_api_key = await self.parent_cog._get_api_key("stripe_api_key")
+                                            stripe_headers = {
+                                                "Authorization": f"Bearer {stripe_api_key}",
+                                                "Content-Type": "application/x-www-form-urlencoded"
+                                            }
+                                            async with session.post("https://api.stripe.com/v1/billing/meter_events", 
+                                                                    headers=stripe_headers, 
+                                                                    data=stripe_payload) as stripe_response:
+                                                if stripe_response.status != 200:
+                                                    stripe_error_message = await stripe_response.text()
+                                                    await interaction.followup.send(f"Failed to log Stripe event. Status code: {stripe_response.status}, Error: {stripe_error_message}", delete_after=10)
+
                                             # Create and send embed
                                             embed = discord.Embed(
                                                 title=f"📰 Your AI {selected_category} news summary",
