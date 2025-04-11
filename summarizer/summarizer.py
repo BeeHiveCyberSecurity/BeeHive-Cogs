@@ -82,6 +82,7 @@ class ChatSummary(commands.Cog):
                 super().__init__(placeholder="Choose a news category...", min_values=1, max_values=1, options=options)
 
             async def callback(self, interaction: discord.Interaction):
+                await interaction.response.defer()  # Defer the interaction
                 selected_category = self.values[0]
                 input_text = f"What are 5 recent {selected_category} news stories?"
                 payload = {
@@ -145,13 +146,13 @@ class ChatSummary(commands.Cog):
                                                 description=summary,
                                                 color=0xfffffe
                                             )
-                                            await interaction.response.send_message(embed=embed)
+                                            await interaction.followup.send(embed=embed)
                                         else:
                                             error_message = await summarize_response.text()
-                                            await interaction.response.send_message(f"Failed to summarize news stories. Status code: {summarize_response.status}, Error: {error_message}", delete_after=10)
+                                            await interaction.followup.send(f"Failed to summarize news stories. Status code: {summarize_response.status}, Error: {error_message}", delete_after=10)
                             else:
                                 error_message = await response.text()
-                                await interaction.response.send_message(f"Failed to fetch news stories. Status code: {response.status}, Error: {error_message}", delete_after=10)
+                                await interaction.followup.send(f"Failed to fetch news stories. Status code: {response.status}, Error: {error_message}", delete_after=10)
 
         # Send the dropdown to the user
         view = discord.ui.View()
