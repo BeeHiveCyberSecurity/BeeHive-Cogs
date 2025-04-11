@@ -200,7 +200,7 @@ class ChatSummary(commands.Cog):
                                         )
                                         embed.add_field(name="News category", value=self.selected_category, inline=True)
                                         embed.add_field(name="Search intensity", value=self.selected_context_size.capitalize() if self.selected_context_size else "Unknown", inline=True)
-                                        embed.add_field(name="Generate Document", value="Yes" if self.generate_document else "No", inline=True)
+                                        embed.add_field(name="Extra copy", value="Yes" if self.generate_document else "No", inline=True)
                                         await interaction.message.edit(embed=embed, view=None)
 
                                         input_text = f"What are 5 recent {self.selected_category} news stories?"
@@ -331,7 +331,7 @@ class ChatSummary(commands.Cog):
                                 )
                                 embed.add_field(name="News category", value=self.selected_category, inline=True)
                                 embed.add_field(name="Search intensity", value=selected_context_size.capitalize(), inline=True)
-                                embed.add_field(name="Generate Document", value="Yes" if generate_document else "No", inline=True)
+                                embed.add_field(name="Extra copy", value="Yes" if generate_document else "No", inline=True)
                                 try:
                                     await interaction.message.edit(embed=embed, view=view)
                                 except discord.errors.NotFound:
