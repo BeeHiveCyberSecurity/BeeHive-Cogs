@@ -81,7 +81,6 @@ class ChatSummary(commands.Cog):
             "Health": {"description": "Health-related news and discoveries.", "emoji": "🩺"},
             "Entertainment": {"description": "News from the entertainment industry.", "emoji": "🎬"},
             "Music": {"description": "Updates and news from the music world.", "emoji": "🎵"},
-            "Stocks": {"description": "Latest stock market news and trends.", "emoji": "📈"},
             "Government": {"description": "News related to government actions and policies.", "emoji": "🏢"},
             "Law Enforcement": {"description": "Updates on law enforcement activities.", "emoji": "👮"},
             "Science": {"description": "Recent scientific discoveries and research.", "emoji": "🔬"},
@@ -99,12 +98,9 @@ class ChatSummary(commands.Cog):
             "Cryptocurrency": {"description": "News and trends in the cryptocurrency market.", "emoji": "💰"},
             "Weather": {"description": "Updates on weather conditions and forecasts.", "emoji": "☀️"},
             "Art": {"description": "News and updates from the art world.", "emoji": "🎨"},
-            "History": {"description": "Insights and discoveries related to historical events.", "emoji": "📜"},
             "Gaming": {"description": "Latest news and updates in the gaming industry.", "emoji": "🎮"},
             "Space": {"description": "News about space exploration and astronomy.", "emoji": "🚀"},
-            "Finance": {"description": "Updates on financial markets and economic news.", "emoji": "💵"},
-            "Lifestyle": {"description": "News and trends in lifestyle and culture.", "emoji": "🏖️"},
-            "Social Media": {"description": "Updates and news from the world of social media.", "emoji": "📱"}
+            "Finance": {"description": "Updates on financial markets and economic news.", "emoji": "💵"}
         }
 
         # Create a dropdown for category selection
