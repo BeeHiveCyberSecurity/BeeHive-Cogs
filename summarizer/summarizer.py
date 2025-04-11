@@ -110,7 +110,7 @@ class ChatSummary(commands.Cog):
                 self.preferred_model = preferred_model
                 self.openai_api_key = openai_api_key
                 options = [discord.SelectOption(label=category, description=description) for category, description in categories.items()]
-                super().__init__(placeholder="Click here to select", min_values=1, max_values=1, options=options)
+                super().__init__(placeholder="25 categories available", min_values=1, max_values=1, options=options)
 
             async def callback(self, interaction: discord.Interaction):
                 if interaction.user != self.ctx.author:
@@ -133,7 +133,7 @@ class ChatSummary(commands.Cog):
                             discord.SelectOption(label="Medium", description="Default, costs $0.035 / search"),
                             discord.SelectOption(label="High", description="Largest, costs $0.05 / search")
                         ]
-                        super().__init__(placeholder="Choose a search context size...", min_values=1, max_values=1, options=options)
+                        super().__init__(placeholder="3 levels available", min_values=1, max_values=1, options=options)
 
                     async def callback(self, interaction: discord.Interaction):
                         if interaction.user != self.ctx.author:
@@ -280,12 +280,12 @@ class ChatSummary(commands.Cog):
                         # Send the start and cancel buttons to the user
                         view = StartCancelButtons(self.parent_cog, self.ctx, self.customer_id, self.preferred_model, self.openai_api_key, self.selected_category, selected_context_size)
                         embed = discord.Embed(
-                            title="Confirm Your selections",
+                            title="Review your choices",
                             description="Make sure everything here looks good, then click **Start**",
                             color=0x45ABF5
                         )
-                        embed.add_field(name="Category", value=self.selected_category, inline=False)
-                        embed.add_field(name="Search Context Size", value=selected_context_size.capitalize(), inline=False)
+                        embed.add_field(name="News category", value=self.selected_category, inline=True)
+                        embed.add_field(name="Search intensity", value=selected_context_size.capitalize(), inline=True)
                         try:
                             await interaction.response.send_message(embed=embed, view=view)
                         except discord.errors.NotFound:
@@ -295,8 +295,8 @@ class ChatSummary(commands.Cog):
                 view = discord.ui.View()
                 view.add_item(SearchContextDropdown(self.parent_cog, self.ctx, self.customer_id, self.preferred_model, self.openai_api_key, selected_category))
                 embed = discord.Embed(
-                    title="Choose a search context size",
-                    description="- Smaller context requests are cheaper and faster, but may not be as expansive as you'd like.\n- Larger context searches are more expansive, but also more computationally intensive and expensive.",
+                    title="Select your search intensity",
+                    description="- Less intense searches are cheaper and faster, but may miss information you're interested in\n- More intense searches take longer and cost more, but can be more comprehensive.",
                     color=0x45ABF5
                 )
                 embed.set_footer(text="If you're not sure, choose Medium")
