@@ -97,7 +97,6 @@ class ChatSummary(commands.Cog):
             "Military": {"description": "News and updates related to military actions and defense.", "emoji": "🪖"},
             "Cryptocurrency": {"description": "News and trends in the cryptocurrency market.", "emoji": "💰"},
             "Weather": {"description": "Updates on weather conditions and forecasts.", "emoji": "☀️"},
-            "Art": {"description": "News and updates from the art world.", "emoji": "🎨"},
             "Gaming": {"description": "Latest news and updates in the gaming industry.", "emoji": "🎮"},
             "Space": {"description": "News about space exploration and astronomy.", "emoji": "🚀"},
             "Finance": {"description": "Updates on financial markets and economic news.", "emoji": "💵"}
