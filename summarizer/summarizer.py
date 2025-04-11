@@ -14,7 +14,7 @@ class ChatSummary(commands.Cog):
         default_user = {"customer_id": None, "is_afk": False, "afk_since": None, "preferred_model": "gpt-4o"}
         self.config.register_user(**default_user)
 
-    async def _track_stripe_event(self, ctx, customer_id, model_name, event_type, tokens):
+    async def _track_stripe_event(self, ctx, customer_id, model_name, event_type, units):
         stripe_tokens = await self.bot.get_shared_api_tokens("stripe")
         stripe_key = stripe_tokens.get("api_key") if stripe_tokens else None
 
@@ -28,7 +28,7 @@ class ChatSummary(commands.Cog):
                 "event_name": f"{model_name}_{event_type}",
                 "timestamp": int(datetime.now().timestamp()),
                 "payload[stripe_customer_id]": customer_id,
-                "payload[tokens]": tokens
+                "payload[units]": units
             }
             async with aiohttp.ClientSession() as session:
                 try:
@@ -94,9 +94,9 @@ class ChatSummary(commands.Cog):
                         output_tokens = len(encoding.encode(news_stories))
                         
                         # Track stripe event
-                        await self._track_stripe_event(ctx, customer_id, "gpt-4o-search-preview", "input", input_tokens)
-                        await self._track_stripe_event(ctx, customer_id, "gpt-4o-search-preview", "output", output_tokens)
-                        await self._track_stripe_event(ctx, customer_id, "gpt-4o-search-preview", "uses", 1)
+                        await self._track_stripe_event(ctx, customer_id, "gpt-4o-search-preview_medium", "input", input_tokens)
+                        await self._track_stripe_event(ctx, customer_id, "gpt-4o-search-preview_medium", "output", output_tokens)
+                        await self._track_stripe_event(ctx, customer_id, "gpt-4o-search-preview_medium", "uses", 1)
 
                         embed = discord.Embed(
                             title="Recent News Stories",
