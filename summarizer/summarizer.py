@@ -247,8 +247,6 @@ class ChatSummary(commands.Cog):
                 "member_count": guild.member_count,
                 "owner": guild.owner.display_name if guild.owner else "Unknown",
                 "created_at": guild.created_at.isoformat(),
-                "roles": [role.name for role in guild.roles],
-                "channels": [channel.name for channel in guild.channels],
                 "activity_statuses": {
                     "online": sum(1 for member in guild.members if member.status == discord.Status.online),
                     "idle": sum(1 for member in guild.members if member.status == discord.Status.idle),
