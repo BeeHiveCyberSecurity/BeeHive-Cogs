@@ -292,9 +292,10 @@ class ChatSummary(commands.Cog):
                 view.add_item(SearchContextDropdown(self.parent_cog, self.ctx, self.customer_id, self.preferred_model, self.openai_api_key, selected_category))
                 embed = discord.Embed(
                     title="Choose a search context size",
-                    description="Please select the search context size for your news summary",
+                    description="- Smaller context requests are cheaper and faster, but may not be as expansive as you'd like.\n- Larger context searches are more expansive, but also more computationally intensive and expensive.",
                     color=0x45ABF5
                 )
+                embed.set_footer(text="If you're not sure, choose Medium")
                 try:
                     await interaction.response.send_message(embed=embed, view=view)
                 except discord.errors.NotFound:
