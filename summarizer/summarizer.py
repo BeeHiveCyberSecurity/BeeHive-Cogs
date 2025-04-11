@@ -299,7 +299,14 @@ class ChatSummary(commands.Cog):
                                                                         color=0xfffffe
                                                                     )
                                                                     embed.set_footer(text=f"{time_taken_first_call:.2f}s to search, {time_taken_second_call:.2f}s to summarize. AI can make mistakes, check for errors")
-                                                                    await interaction.message.edit(embed=embed, view=None)
+                                                                    
+                                                                    # If document generation is requested, create a file
+                                                                    if self.generate_document:
+                                                                        document_content = f"News Summary for {self.selected_category}\n\n{summary}"
+                                                                        document_file = discord.File(io.BytesIO(document_content.encode()), filename="news_summary.txt")
+                                                                        await interaction.message.edit(embed=embed, attachments=[document_file], view=None)
+                                                                    else:
+                                                                        await interaction.message.edit(embed=embed, view=None)
                                                                 else:
                                                                     error_message = await summarize_response.text()
                                                                     await interaction.message.edit(content=f"Failed to summarize news stories. Status code: {summarize_response.status}, Error: {error_message}", embed=None, view=None)
