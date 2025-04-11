@@ -267,7 +267,7 @@ class ChatSummary(commands.Cog):
 
                             @discord.ui.button(label="Cancel", style=discord.ButtonStyle.red)
                             async def cancel(self, interaction: discord.Interaction, button: discord.ui.Button):
-                                if interaction.user != self.ctx.author:
+                                if interaction.user.id != self.ctx.author.id:
                                     await interaction.response.send_message("You are not authorized to use this button.", ephemeral=True)
                                     return
                                 await interaction.message.delete()
@@ -280,7 +280,7 @@ class ChatSummary(commands.Cog):
                             description=f"Category: {self.selected_category}\nSearch Context Size: {selected_context_size.capitalize()}",
                             color=0x2bbd8e
                         )
-                        await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
+                        await interaction.response.send_message(embed=embed, view=view)
 
                 # Send the search context size dropdown to the user
                 view = discord.ui.View()
