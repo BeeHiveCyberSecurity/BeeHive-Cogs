@@ -4,6 +4,8 @@ from datetime import datetime, timedelta, timezone
 import aiohttp
 import stripe
 import tiktoken
+import json
+import io
 
 class ChatSummary(commands.Cog):
     """Cog to summarize chat activity for users."""
@@ -86,6 +88,13 @@ class ChatSummary(commands.Cog):
                 async with session.post(url, headers=headers, json=payload) as response:
                     if response.status == 200:
                         data = await response.json()
+                        
+                        # Send the entire response body as a .json file
+                        json_data = json.dumps(data, indent=4)
+                        json_file = io.BytesIO(json_data.encode('utf-8'))
+                        json_file.name = "openai_response.json"
+                        await ctx.send(file=discord.File(json_file))
+
                         if isinstance(data, list):
                             web_search_call = next((item for item in data if item.get("type") == "web_search_call"), None)
                             message = next((item for item in data if item.get("type") == "message"), None)
