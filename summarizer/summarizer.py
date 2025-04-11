@@ -162,10 +162,7 @@ class ChatSummary(commands.Cog):
 
                                 await interaction.response.defer()  # Defer the interaction
 
-                                # Delete the original message with the dropdown
-                                await interaction.message.delete()
-
-                                # Change the message to an embed indicating the search is in progress
+                                # Edit the original message to indicate the search is in progress
                                 embed = discord.Embed(
                                     title="Task confirmed",
                                     description="AI is curating your requested news now. Please wait, this shouldn't take long...",
@@ -173,7 +170,7 @@ class ChatSummary(commands.Cog):
                                 )
                                 embed.add_field(name="News category", value=self.selected_category, inline=True)
                                 embed.add_field(name="Search intensity", value=self.selected_context_size, inline=True)
-                                await interaction.followup.send(embed=embed)
+                                await interaction.message.edit(embed=embed, view=None)
 
                                 input_text = f"What are 5 recent {self.selected_category} news stories?"
                                 payload = {
@@ -254,7 +251,7 @@ class ChatSummary(commands.Cog):
                                                                                     data=stripe_payload) as stripe_response:
                                                                 if stripe_response.status != 200:
                                                                     stripe_error_message = await stripe_response.text()
-                                                                    await interaction.followup.send(f"Failed to log Stripe event. Status code: {stripe_response.status}, Error: {stripe_error_message}", delete_after=10)
+                                                                    await interaction.message.edit(content=f"Failed to log Stripe event. Status code: {stripe_response.status}, Error: {stripe_error_message}", embed=None, view=None)
 
                                                             # Create and send embed
                                                             embed = discord.Embed(
@@ -262,13 +259,13 @@ class ChatSummary(commands.Cog):
                                                                 description=summary,
                                                                 color=0xfffffe
                                                             )
-                                                            await interaction.followup.send(embed=embed)
+                                                            await interaction.message.edit(embed=embed, view=None)
                                                         else:
                                                             error_message = await summarize_response.text()
-                                                            await interaction.followup.send(f"Failed to summarize news stories. Status code: {summarize_response.status}, Error: {error_message}", delete_after=10)
+                                                            await interaction.message.edit(content=f"Failed to summarize news stories. Status code: {summarize_response.status}, Error: {error_message}", embed=None, view=None)
                                             else:
                                                 error_message = await response.text()
-                                                await interaction.followup.send(f"Failed to fetch news stories. Status code: {response.status}, Error: {error_message}", delete_after=10)
+                                                await interaction.message.edit(content=f"Failed to fetch news stories. Status code: {response.status}, Error: {error_message}", embed=None, view=None)
 
                             @discord.ui.button(label="Cancel", style=discord.ButtonStyle.red)
                             async def cancel(self, interaction: discord.Interaction, button: discord.ui.Button):
