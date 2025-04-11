@@ -472,7 +472,11 @@ class ChatSummary(commands.Cog):
 
             async def set_model(self, interaction: discord.Interaction, model: str):
                 await self.config.user(self.user).preferred_model.set(model)
-                await interaction.response.defer(ephemeral=True)
+                try:
+                    await interaction.response.defer(ephemeral=True)
+                except discord.errors.NotFound:
+                    await interaction.followup.send("Interaction not found. Please try again.", ephemeral=True)
+                    return
                 await interaction.followup.send(f"Your preferred model has been set to {model}.", ephemeral=True)
 
         class ModelDropdownView(discord.ui.View):
