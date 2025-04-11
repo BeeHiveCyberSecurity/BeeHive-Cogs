@@ -117,6 +117,8 @@ class ChatSummary(commands.Cog):
                     await interaction.response.send_message("You are not authorized to use this dropdown.", ephemeral=True)
                     return
 
+                await interaction.response.defer()  # Defer the interaction
+
                 selected_category = self.values[0]
 
                 # Create a dropdown for search context size selection
@@ -139,6 +141,8 @@ class ChatSummary(commands.Cog):
                         if interaction.user != self.ctx.author:
                             await interaction.response.send_message("You are not authorized to use this dropdown.", ephemeral=True)
                             return
+
+                        await interaction.response.defer()  # Defer the interaction
 
                         selected_context_size = self.values[0].lower()
 
@@ -272,6 +276,7 @@ class ChatSummary(commands.Cog):
                                 if interaction.user.id != self.ctx.author.id:
                                     await interaction.response.send_message("You are not authorized to use this button.", ephemeral=True)
                                     return
+                                await interaction.response.defer()  # Defer the interaction
                                 await interaction.message.delete()
 
                         # Send the start and cancel buttons to the user
