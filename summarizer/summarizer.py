@@ -231,6 +231,104 @@ class ChatSummary(commands.Cog):
         except Exception as e:
             await ctx.send(f"An error occurred: {str(e)}", delete_after=10)
 
+    @summarize.command(name="server")
+    async def summarize_server(self, ctx: commands.Context):
+        """Summarize information about the server using AI."""
+        try:
+            guild = ctx.guild
+            if not guild:
+                await ctx.send("This command can only be used in a server.", delete_after=10)
+                return
+
+            # Collect server information
+            server_info = {
+                "name": guild.name,
+                "id": guild.id,
+                "member_count": guild.member_count,
+                "owner": guild.owner.display_name if guild.owner else "Unknown",
+                "region": str(guild.region),
+                "created_at": guild.created_at.isoformat(),
+                "roles": [role.name for role in guild.roles],
+                "channels": [channel.name for channel in guild.channels],
+                "activity_statuses": {
+                    "online": sum(1 for member in guild.members if member.status == discord.Status.online),
+                    "idle": sum(1 for member in guild.members if member.status == discord.Status.idle),
+                    "dnd": sum(1 for member in guild.members if member.status == discord.Status.dnd),
+                    "offline": sum(1 for member in guild.members if member.status == discord.Status.offline)
+                }
+            }
+
+            # Prepare the content for summarization
+            server_content = "\n".join(f"{key}: {value}" for key, value in server_info.items())
+
+            # Use OpenAI to summarize the server information
+            tokens = await self.bot.get_shared_api_tokens("openai")
+            openai_key = tokens.get("api_key") if tokens else None
+            if not openai_key:
+                await ctx.send("OpenAI API key is not set.", delete_after=10)
+                return
+
+            # Determine model based on user preference
+            user = ctx.author
+            user_data = await self.config.user(user).all()
+            customer_id = user_data.get("customer_id")
+            preferred_model = user_data.get("preferred_model", "gpt-4o")
+            model = preferred_model if customer_id else "gpt-4o-mini"
+
+            # Calculate token usage
+            encoding = tiktoken.encoding_for_model(model)
+            input_tokens = len(encoding.encode(server_content))
+
+            async with aiohttp.ClientSession() as session:
+                headers = {
+                    "Authorization": f"Bearer {openai_key}",
+                    "Content-Type": "application/json"
+                }
+                payload = {
+                    "model": model,
+                    "messages": [
+                        {
+                            "role": "system",
+                            "content": "You are a Discord server information summary generator. Use bulletpoints. Don't use titles."
+                        },
+                        {
+                            "role": "user",
+                            "content": f"Summarize the following server information: {server_content}"
+                        }
+                    ]
+                }
+                async with session.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload) as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        summary = data.get('choices', [{}])[0].get('message', {}).get('content', '').strip()
+                        output_tokens = len(encoding.encode(summary))
+                        embed = discord.Embed(
+                            title="AI Server Summary",
+                            description=summary,
+                            color=0xfffffe
+                        )
+                        await ctx.send(embed=embed)
+                        # Track stripe event if customer_id is present
+                        if customer_id:
+                            await self._track_stripe_event(ctx, customer_id, model, "input", input_tokens)
+                            await self._track_stripe_event(ctx, customer_id, model, "output", output_tokens)
+                    else:
+                        await ctx.send(f"Failed to summarize server information. Status code: {response.status}", delete_after=10)
+
+        except Exception as e:
+            await ctx.send(f"An error occurred: {str(e)}", delete_after=10)
+
+
+
+
+
+
+
+
+
+
+
+
 
     @summarize.command(name="recent")
     async def chat_summary(self, ctx: commands.Context, afk_only: bool = False, target_user: discord.User = None):
