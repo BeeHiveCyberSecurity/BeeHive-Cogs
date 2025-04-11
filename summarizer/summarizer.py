@@ -83,6 +83,14 @@ class ChatSummary(commands.Cog):
 
             async def callback(self, interaction: discord.Interaction):
                 await interaction.response.defer()  # Defer the interaction
+
+                # Change the message to an embed indicating the search is in progress
+                embed = discord.Embed(
+                    title="Searching the internet to create your summary, please wait...",
+                    color=0x2bbd8e
+                )
+                await interaction.message.edit(embed=embed, view=None)
+
                 selected_category = self.values[0]
                 input_text = f"What are 5 recent {selected_category} news stories?"
                 payload = {
