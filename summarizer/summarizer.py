@@ -51,6 +51,60 @@ class ChatSummary(commands.Cog):
     async def summarize(self, ctx: commands.Context):
         """Group for summarize related commands."""
         pass
+
+    @summarize.command(name="news")
+    async def summarize_news(self, ctx: commands.Context):
+        """Fetch and summarize recent news stories."""
+        openai_tokens = await self.bot.get_shared_api_tokens("openai")
+        openai_api_key = openai_tokens.get("api_key") if openai_tokens else None
+
+        if not openai_api_key:
+            await ctx.send("OpenAI API key is not set.", delete_after=10)
+            return
+
+        user_data = await self.config.user(ctx.author).all()
+        customer_id = user_data.get("customer_id")
+
+        if not customer_id:
+            await ctx.send("You must have a customer ID set to use this command.", delete_after=10)
+            return
+
+        url = "https://api.openai.com/v1/responses"
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {openai_api_key}"
+        }
+        input_text = "What are 5 recent news stories"
+        payload = {
+            "model": "gpt-4o",
+            "tools": [{"type": "web_search_preview"}],
+            "input": input_text
+        }
+
+        async with aiohttp.ClientSession() as session:
+            async with session.post(url, headers=headers, json=payload) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    news_stories = data.get("choices", [{}])[0].get("text", "No news stories found.")
+                    
+                    # Tokenize input and output
+                    input_tokens = len(tiktoken.tokenize(input_text))
+                    output_tokens = len(tiktoken.tokenize(news_stories))
+                    
+                    # Track stripe event
+                    await self._track_stripe_event(ctx, customer_id, "gpt-4o-search-preview", "input", input_tokens)
+                    await self._track_stripe_event(ctx, customer_id, "gpt-4o-search-preview", "output", output_tokens)
+                    await self._track_stripe_event(ctx, customer_id, "gpt-4o-search-preview_medium")
+
+                    embed = discord.Embed(
+                        title="Recent News Stories",
+                        description=news_stories,
+                        color=discord.Color.blue()
+                    )
+                    await ctx.send(embed=embed)
+                else:
+                    error_message = await response.text()
+                    await ctx.send(f"Failed to fetch news stories. Status code: {response.status}, Error: {error_message}", delete_after=10)
     
     @commands.mod_or_permissions()
     @summarize.command(name="moderation")
