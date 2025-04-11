@@ -246,7 +246,6 @@ class ChatSummary(commands.Cog):
                 "id": guild.id,
                 "member_count": guild.member_count,
                 "owner": guild.owner.display_name if guild.owner else "Unknown",
-                "region": str(guild.region),
                 "created_at": guild.created_at.isoformat(),
                 "roles": [role.name for role in guild.roles],
                 "channels": [channel.name for channel in guild.channels],
