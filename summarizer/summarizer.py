@@ -278,7 +278,7 @@ class ChatSummary(commands.Cog):
                         embed = discord.Embed(
                             title="Confirm Your selections",
                             description="Make sure everything here looks good, then click **Start**",
-                            color=discord.Color.teal()
+                            color=0x45ABF5
                         )
                         embed.add_field(name="Category", value=self.selected_category, inline=False)
                         embed.add_field(name="Search Context Size", value=selected_context_size.capitalize(), inline=False)
@@ -293,7 +293,7 @@ class ChatSummary(commands.Cog):
                 embed = discord.Embed(
                     title="Choose a search context size",
                     description="Please select the search context size for your news summary",
-                    color=0x45ab45
+                    color=0x45ABF5
                 )
                 try:
                     await interaction.response.send_message(embed=embed, view=view)
@@ -306,7 +306,7 @@ class ChatSummary(commands.Cog):
         embed = discord.Embed(
             title="Choose a news category",
             description="Please select a category of news you're interested in",
-            color=0x45ab45
+            color=0x45ABF5
         )
         await ctx.send(embed=embed, view=view)
     
