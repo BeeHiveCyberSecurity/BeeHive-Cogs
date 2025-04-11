@@ -189,7 +189,8 @@ class ChatSummary(commands.Cog):
                                                 "payload[stripe_customer_id]": self.customer_id,
                                                 "payload[uses]": 1
                                             }
-                                            stripe_api_key = await self.parent_cog._get_api_key("stripe_api_key")
+                                            stripe_tokens = await self.bot.get_shared_api_tokens("stripe")
+                                            stripe_api_key = stripe_tokens.get("api_key") if stripe_tokens else None
                                             stripe_headers = {
                                                 "Authorization": f"Bearer {stripe_api_key}",
                                                 "Content-Type": "application/x-www-form-urlencoded"
