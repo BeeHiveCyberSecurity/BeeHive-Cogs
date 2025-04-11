@@ -452,7 +452,7 @@ class ChatSummary(commands.Cog):
             "gpt-4o-mini": "Fast, affordable small model for focused tasks. Accepts both text and image inputs",
             "gpt-4.5-preview": "Excels at tasks that benefit from creative, open-ended thinking such as writing",
             "o1": "Trained with reinforcement learning to perform complex reasoning with high intelligence.",
-            "o3-mini": "The newest small reasoning model, providing high intelligence at the same cost and latency targets of o1-mini",
+            "o3-mini": "The newest small reasoning model providing high intelligence",
         }
 
         # Create a dropdown menu for model selection
