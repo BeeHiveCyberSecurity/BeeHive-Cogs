@@ -448,11 +448,11 @@ class ChatSummary(commands.Cog):
 
         # Define valid models with descriptions
         model_details = {
-            "gpt-4o": "Versatile, high-intelligence flagship model. Accepts both text and image inputs",
-            "gpt-4o-mini": "Fast, affordable small model for focused tasks. Accepts both text and image inputs",
-            "gpt-4.5-preview": "Excels at tasks that benefit from creative, open-ended thinking such as writing",
-            "o1": "Trained with reinforcement learning to perform complex reasoning with high intelligence.",
-            "o3-mini": "The newest small reasoning model providing high intelligence",
+            "gpt-4o": "Versatile, high-intelligence model. Accepts text and image inputs",
+            "gpt-4o-mini": "Fast, affordable model for focused tasks. Accepts text and image inputs",
+            "gpt-4.5-preview": "Excels at creative, open-ended tasks like writing",
+            "o1": "Uses reinforcement learning for complex reasoning with high intelligence",
+            "o3-mini": "Newest small reasoning model with high intelligence",
         }
 
         # Create a dropdown menu for model selection
