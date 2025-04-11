@@ -195,7 +195,7 @@ class ChatSummary(commands.Cog):
 
                                         embed = discord.Embed(
                                             title="Task confirmed",
-                                            description="Your task has been dispatched to an AI model.\n- This task can take up to 30 seconds to complete, please wait.",
+                                            description="Your task has been dispatched to an AI model.\n - This task can take up to 30 seconds to complete, please wait.",
                                             color=0x2bbd8e
                                         )
                                         embed.add_field(name="News category", value=self.selected_category, inline=True)
