@@ -99,7 +99,12 @@ class ChatSummary(commands.Cog):
             "Cryptocurrency": {"description": "News and trends in the cryptocurrency market.", "emoji": "💰"},
             "Weather": {"description": "Updates on weather conditions and forecasts.", "emoji": "☀️"},
             "Art": {"description": "News and updates from the art world.", "emoji": "🎨"},
-            "History": {"description": "Insights and discoveries related to historical events.", "emoji": "📜"}
+            "History": {"description": "Insights and discoveries related to historical events.", "emoji": "📜"},
+            "Gaming": {"description": "Latest news and updates in the gaming industry.", "emoji": "🎮"},
+            "Space": {"description": "News about space exploration and astronomy.", "emoji": "🚀"},
+            "Finance": {"description": "Updates on financial markets and economic news.", "emoji": "💵"},
+            "Lifestyle": {"description": "News and trends in lifestyle and culture.", "emoji": "🏖️"},
+            "Social Media": {"description": "Updates and news from the world of social media.", "emoji": "📱"}
         }
 
         # Create a dropdown for category selection
